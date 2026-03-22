@@ -22,7 +22,7 @@ PM/customer review checkpoint: Run Playwright/agent tests simulating Bob mid-con
 Backlog triage: Log MCP tool schema gaps, CLI UX friction, and any agent integration issues discovered.
 Planning input for Sprint 4: Identify which UI components (capability tree, faceted search) are highest priority based on use-case coverage gaps.
 
-**Sprint 4: Web UI — Public Tier and Browse Experience**
+**Sprint 4: Web UI — Public Tier and Browse Experience (COMPLETED 2026-03-22)**
 Build goals: Build the static S3/CloudFront site. Implement the public tier: capability cluster browse (circle packing or treemap using React + D3.js), faceted search/filter panel with all defined facets (capability, tech stack, language, last active, maturity, has tests, has docs), and search results with result cards showing repo name, tags, description, and matching snippet. Implement mobile-responsive layout (vertical list on small screens, slide-out filter panel).
 PM/customer review checkpoint: Use Playwright to simulate a recruiter visiting the public site with no auth — browse capability clusters, apply facet filters, search 'real-time voice processing', verify no code snippets appear in results. Test mobile viewport behavior.
 Backlog triage: Capture visual design issues, facet count accuracy, dead-end facet values, and mobile layout bugs.
@@ -43,16 +43,16 @@ Planning input for Sprint 7+: Based on roadmap extension checkpoint from Sprint 
 
 ### Current Focus
 
-**Phase 1: Index + Search Core (Sprints 1-2)**
+**Sprint 5: Gated Tier, Approval Workflow, and Roadmap Extension (Sprints 1-4 COMPLETE)**
 
-Build the indexing pipeline that fetches all ~90 repos via GitHub API, generates embeddings with sentence-transformers, and stores them in SQLite-vec. Deliver a working CLI (`ghps search "query"`) that returns ranked results with code snippets in <2 seconds.
+Sprints 1-4 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, and deploy pipeline. Sprint 5 adds authentication, gated access tiers, and extends the roadmap with 5 more sprints.
 
 Key deliverables:
-- GitHub API client: fetch repos, READMEs, top-level source files
-- Embedding pipeline with sentence-transformers
-- SQLite-vec vector store for persistence
-- Basic CLI tool with semantic search
-- Test: "presigned URL" returns S3-presignedURL repo; "voice" returns ~20 repos
+- Google OAuth login flow
+- Access request + approval workflow with Telegram notifications
+- Gated tier unlocking code snippets and full search
+- Activity timeline/heatmap view
+- Roadmap extension checkpoint: plan Sprints 7-11
 
 ### Next Up
 

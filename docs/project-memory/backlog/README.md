@@ -46,3 +46,6 @@ What should happen?
 | F-001 | Add .env support for GITHUB_TOKEN (python-dotenv) | Open | Medium |
 | F-002 | Add progress bar to indexer (tqdm) | Open | Low |
 | F-003 | Add Makefile with install/test/serve/index targets | Open | Medium |
+| B-008 | API /search and /clusters return empty when no index exists (no error msg) | Open | Medium |
+| B-009 | davidbmar.com still shows placeholder — web UI not deployed | Open | High |
+| F-004 | Deploy script should auto-export data before uploading | Open | Medium |

@@ -60,10 +60,10 @@ docs/
 | Sprint | Focus | Status |
 |--------|-------|--------|
 | 1 | Indexing pipeline + search + CLI | Complete |
-| 2 | REST API + core search endpoint | Planned |
-| 3 | CLI improvements + MCP server | Planned |
-| 4 | Web UI — public tier + browse | Planned |
-| 5 | Gated access + approval workflow | Planned |
+| 2 | REST API + core search endpoint | Complete |
+| 3 | CLI improvements + MCP server | Complete |
+| 4 | Web UI — public tier + browse | Complete |
+| 5 | Gated access + approval workflow | **Next** |
 | 6 | Auto-refresh + production hardening | Planned |
 
 ## Deployment
