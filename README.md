@@ -66,6 +66,26 @@ docs/
 | 5 | Gated access + approval workflow | Planned |
 | 6 | Auto-refresh + production hardening | Planned |
 
+## Deployment
+
+Deploy the web UI to S3/CloudFront at davidbmar.com:
+
+```bash
+# Prerequisites: AWS CLI configured with appropriate credentials
+# The script is idempotent — safe to run multiple times.
+
+./deploy.sh
+```
+
+The deploy script will:
+1. Run `ghps export` to generate fresh data (if available)
+2. Copy web assets to a build directory
+3. Upload to S3 (`davidbmar-com` bucket) via `aws s3 sync`
+4. Invalidate the CloudFront cache (distribution `E3RCY6XA80ANRT`)
+5. Print the live URL: https://davidbmar.com
+
+Health check endpoint: `https://davidbmar.com/health.json`
+
 ## Tech Stack
 
 - **Python 3.9+**, sentence-transformers, SQLite-vec, Click

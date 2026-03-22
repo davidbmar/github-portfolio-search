@@ -9,6 +9,9 @@ terraform/*.tfstate
 terraform/*.tfstate.backup
 terraform/.terraform.lock.hcl
 
+# Deploy build artifacts
+_build/
+
 # Node
 node_modules/
 .venv/
