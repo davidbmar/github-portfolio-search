@@ -1,96 +1,90 @@
-# Sprint 2
+# Sprint 3
 
 Goal
-- Fix Sprint 1 packaging bugs so tests pass and CLI works
-- Build the REST API with search, clusters, and repo detail endpoints
-- Wire API to the SQLite-vec index from Sprint 1
+- Fix remaining packaging and test bugs from Sprint 1-2 (B-001, B-004)
+- Build MCP server for Claude Code and Bob integration
+- Improve CLI with better output formatting and error handling
 
 Constraints
 - No two agents may modify the same files
-- agentA owns packaging fixes and test fixes (pyproject.toml, tests/, .github/)
-- agentB owns REST API server (src/ghps/api.py, src/ghps/clusters.py)
-- agentC owns API tests and integration (tests/test_api.py, tests/test_integration.py)
+- agentA owns bug fixes and test reliability (pyproject.toml, tests/, Makefile)
+- agentB owns MCP server (src/ghps/mcp_server.py, src/ghps/mcp_tools.py)
+- agentC owns CLI improvements and end-to-end testing (src/ghps/cli.py, tests/test_cli.py, tests/test_e2e.py)
 - Use python3 for all commands
-- All API endpoints must return JSON
+- MCP server must follow the MCP protocol spec
 
 Merge Order
-1. agentA-packaging-fixes
-2. agentB-rest-api
-3. agentC-api-tests
+1. agentA-bug-fixes
+2. agentB-mcp-server
+3. agentC-cli-e2e
 
 Merge Verification
 - python3 -m pytest tests/ -v
 
-## agentA-packaging-fixes
+## agentA-bug-fixes
 
 Objective
-- Fix all Sprint 1 packaging and test bugs so the project installs and tests pass cleanly
+- Fix all test failures and packaging issues so the full test suite passes reliably
 
 Tasks
-- Fix pyproject.toml: add [project.scripts] ghps = "ghps.cli:main"
-- Fix editable install issue: ensure src layout works with pip install -e .
-- Fix tests/test_embeddings.py import errors — mock sentence_transformers if needed for unit tests
-- Fix tests/test_store.py import errors — mock sqlite_vec if needed for unit tests
-- Ensure all 4 test files pass: test_github_client.py, test_embeddings.py, test_store.py, test_search.py
-- Add .gitignore entries for .venv/, *.egg-info/, __pycache__/, .ghps/
-- Add a Makefile or scripts for common operations: make install, make test, make index
+- Fix B-001: editable install — ensure pip install -e ".[dev]" works and ghps is importable
+- Fix B-004: test_embeddings.py and test_store.py collection errors — mock heavy dependencies (sentence-transformers, sqlite-vec) in unit tests so tests run without GPU/native deps
+- Add conftest.py fixtures if not already present for mocking embeddings and store
+- Create a Makefile with targets: install, test, lint, index, serve
+- Add typing stubs or py.typed marker
+- Ensure python3 -m pytest tests/ -v passes all tests with 0 failures
 
 Acceptance Criteria
-- pip install -e ".[dev]" succeeds
-- python3 -m pytest tests/ -v passes all tests
-- ghps --help shows CLI usage
-- .gitignore properly excludes build artifacts
+- pip install -e ".[dev]" succeeds on a clean venv
+- python3 -m pytest tests/ -v passes with 0 errors, 0 failures
+- make test runs the full suite
+- make install sets up a working environment
 
-## agentB-rest-api
+## agentB-mcp-server
 
 Objective
-- Build a FastAPI REST API with search, clusters, and repo detail endpoints
+- Build an MCP server that exposes portfolio search tools for Claude Code and Bob
 
 Tasks
-- Add fastapi and uvicorn to pyproject.toml dependencies
-- Create src/ghps/api.py with FastAPI app:
-  - GET /api/search?q=<query>&top_k=10 — semantic search, returns ranked results with repo name, description, score, snippet, url
-  - GET /api/clusters — capability clusters grouped by embedding similarity
-  - GET /api/repos/<slug> — repo detail with metadata, README excerpt, matched chunks
-  - GET /api/health — health check endpoint
-  - CORS middleware for browser access
-- Create src/ghps/clusters.py with:
-  - ClusterEngine class that groups repos by embedding similarity
-  - cluster_repos(store, n_clusters=10) -> list of Cluster(name, repos, centroid)
-  - Use sklearn KMeans or simple cosine-similarity grouping
-- Add [project.scripts] entry: ghps-server = "ghps.api:main" (uvicorn launcher)
-- Server should accept --port, --db flags
-- All responses follow consistent JSON format: {"ok": true, "data": ...} or {"ok": false, "error": "..."}
+- Add mcp dependency to pyproject.toml (or use the lightweight JSON-RPC approach)
+- Create src/ghps/mcp_server.py with MCP server implementing these tools:
+  - portfolio_search(query: str, top_k: int = 10) -> list of results with repo_name, score, snippet, url
+  - portfolio_clusters() -> list of capability clusters with repo names
+  - portfolio_repo_detail(repo_name: str) -> full repo metadata, README excerpt, tech stack
+  - portfolio_reindex(username: str) -> trigger re-indexing, return count
+- Each tool should have clear JSON Schema input/output descriptions
+- Server should accept --db flag for index path (default: ~/.ghps/index.db)
+- Add [project.scripts] entry: ghps-mcp = "ghps.mcp_server:main"
+- Create tests/test_mcp.py with unit tests for each tool
 
 Acceptance Criteria
-- python3 -m uvicorn ghps.api:app starts without errors
-- GET /api/search?q=test returns valid JSON with results array
-- GET /api/clusters returns grouped repos
-- GET /api/repos/some-repo returns repo metadata
-- CORS headers present in responses
+- ghps-mcp starts without errors
+- MCP tool list returns 4 tools with correct schemas
+- portfolio_search returns ranked results
+- portfolio_reindex triggers indexing
 
-## agentC-api-tests
+## agentC-cli-e2e
 
 Objective
-- Write comprehensive API tests and an integration test that exercises the full pipeline
+- Improve CLI output formatting and add end-to-end tests
 
 Tasks
-- Create tests/test_api.py with:
-  - Test /api/search returns results for known queries
-  - Test /api/search with empty query returns error
-  - Test /api/clusters returns non-empty clusters
-  - Test /api/repos/<slug> returns 404 for unknown repos
-  - Test /api/health returns ok
-  - Use FastAPI TestClient (no server needed)
-- Create tests/test_integration.py with:
-  - End-to-end test: create temp store → add mock repos → search → verify results
-  - Test that indexer + search pipeline produces correct rankings
-  - Test deduplication (same repo, multiple chunks → one result per repo)
-- Create tests/conftest.py with shared fixtures:
-  - mock_store fixture — in-memory SQLite with test data
-  - mock_github_responses fixture — cached API responses for testing
+- Improve src/ghps/cli.py:
+  - Add rich/click formatting for search results (colored scores, truncated snippets)
+  - Add ghps serve command to start the FastAPI server
+  - Add ghps status command showing index stats (repo count, chunk count, last indexed)
+  - Add --format json flag for machine-readable output
+  - Better error messages when index doesn't exist
+- Create tests/test_cli.py with Click CliRunner tests:
+  - Test ghps search with mock store
+  - Test ghps index with mock GitHub API
+  - Test ghps status with mock store
+  - Test --format json output
+- Create tests/test_e2e.py with end-to-end test:
+  - Create temp index → index mock repos → search → verify results → clean up
 
 Acceptance Criteria
-- python3 -m pytest tests/test_api.py -v passes
-- python3 -m pytest tests/test_integration.py -v passes
-- Integration test demonstrates full index → search pipeline
+- ghps search "query" shows colored, formatted results
+- ghps serve starts the FastAPI server
+- ghps status shows index statistics
+- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes
