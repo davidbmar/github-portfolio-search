@@ -1,0 +1,22 @@
+---
+
+## Summary
+
+### Files changed
+- **`pyproject.toml`** — Merged duplicate `[project.scripts]` sections (B-001 fix); added `httpx`, `numpy` to dev deps
+- **`src/ghps/embeddings.py`** — Made `sentence_transformers` a lazy import inside the `model` property (B-004 fix)
+- **`src/ghps/store.py`** — Made `sqlite_vec` a lazy import inside `connect()` (B-004 fix)
+- **`Makefile`** — Added `lint` and `serve` targets
+- **`src/ghps/py.typed`** — New PEP 561 marker file
+- **`docs/project-memory/sessions/S-2026-03-22-0556-sprint3-bug-fixes.md`** — Session doc
+
+### Commands run
+- `git pull origin main`
+- `pip install -e ".[dev]"` — verified B-001 fix
+- `python3 -m pytest tests/ -v` — 62 passed, 0 failures
+- `make test` — confirmed Makefile works
+- `git push -u origin HEAD`
+
+### Notes / follow-on work
+- `make lint` uses `py_compile` as a basic check since no linter (ruff/flake8) is in dev deps. Could be upgraded later.
+- `make serve` assumes `ghps.api:app` exists — depends on agentB's API module.
