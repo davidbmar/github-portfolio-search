@@ -1,4 +1,4 @@
-agentC-data-pipeline — Sprint 14
+agentB-reindex-actions — Sprint 14
 
 Sprint-Level Context
 
@@ -18,26 +18,27 @@ Constraints
 
 
 Objective
-- Improve indexing reliability and add metadata for freshness tracking
+- Create GitHub Actions workflow for automated reindexing and deployment
 
 Tasks
-- Update src/ghps/store.py:
-  - Add `indexed_at` timestamp column to repos table (datetime of when each repo was indexed)
-  - Ensure `indexed_at` is populated during insert/update
-  - Add method: `get_index_stats()` → returns { total_repos, last_indexed, oldest_repo }
-- Update src/ghps/indexer.py:
-  - Pass `indexed_at` timestamp when storing repos
-  - Add `--dry-run` flag: show what would be indexed without making changes
-  - Improve error handling: skip repos that fail to fetch (log warning, continue)
-  - Print summary at end: N repos indexed, M failed, K skipped
-- Update src/ghps/search.py:
-  - Include `indexed_at` in search results metadata
-  - Add `freshness` field to results: "today", "this_week", "this_month", "stale"
-- Add tests for indexed_at storage, freshness calculation, and dry-run mode
+- Create `.github/workflows/reindex.yml`:
+  - Trigger: manual dispatch (workflow_dispatch) + scheduled (weekly cron)
+  - Steps: checkout, setup Python, install deps, run ghps index, run ghps export, deploy to S3
+  - Use secrets: GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+  - Include CloudFront invalidation after S3 sync
+  - Add concurrency group to prevent overlapping runs
+- Create `scripts/reindex.sh`:
+  - Standalone script that runs: index → export → deploy
+  - Reads GITHUB_TOKEN from env
+  - Idempotent — safe to run multiple times
+  - Prints summary: repos indexed, files exported, deploy status
+- Update src/ghps/api.py:
+  - Fix B-008/B-016: when no SQLite index exists, return `{"results": [], "error": "No index found. Run ghps index first."}` with 200 status instead of 500
+  - Apply to /api/search, /api/clusters, /api/repos/<slug> endpoints
+- Add tests for graceful error handling (no index → 200 with empty results)
 
 Acceptance Criteria
-- `indexed_at` timestamp stored for every repo during indexing
-- `--dry-run` flag works (shows plan, no changes)
-- Failed repos don't crash the indexer
-- Freshness field appears in search results
+- `scripts/reindex.sh` runs end-to-end locally (with GITHUB_TOKEN set)
+- API returns empty results with helpful error when no index exists (not 500)
+- GitHub Actions workflow is valid YAML (test with `act` or manual review)
 - python3 -m pytest tests/ -v passes

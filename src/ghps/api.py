@@ -38,6 +38,14 @@ def _err(message: str, status: int = 400) -> JSONResponse:
     return JSONResponse({"ok": False, "error": message}, status_code=status)
 
 
+_NO_INDEX_MSG = "No index found. Run ghps index first."
+
+
+def _is_no_table_error(exc: Exception) -> bool:
+    """Check if an exception is a 'no such table' OperationalError from any sqlite3 variant."""
+    return "OperationalError" in type(exc).__name__ and "no such table" in str(exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Open the vector store on startup, close on shutdown."""
@@ -74,8 +82,13 @@ async def search(q: str = Query(..., min_length=1), top_k: int = Query(10, ge=1,
     if _store is None or _embedder is None:
         return _err("Store not initialized", 503)
 
-    query_vec = _embedder.embed_text(q)
-    raw = _store.search(query_vec, limit=top_k * 3)
+    try:
+        query_vec = _embedder.embed_text(q)
+        raw = _store.search(query_vec, limit=top_k * 3)
+    except Exception as exc:
+        if _is_no_table_error(exc):
+            return JSONResponse({"results": [], "error": _NO_INDEX_MSG})
+        raise
 
     db = _store.connect()
 
@@ -110,8 +123,13 @@ async def clusters():
     if _store is None:
         return _err("Store not initialized", 503)
 
-    engine = ClusterEngine(_store)
-    cluster_list = engine.cluster_repos(n_clusters=10)
+    try:
+        engine = ClusterEngine(_store)
+        cluster_list = engine.cluster_repos(n_clusters=10)
+    except Exception as exc:
+        if _is_no_table_error(exc):
+            return JSONResponse({"results": [], "error": _NO_INDEX_MSG})
+        raise
 
     data = [
         {"name": c.name, "repos": c.repos, "size": len(c.repos)}
@@ -125,11 +143,16 @@ async def repo_detail(slug: str):
     if _store is None:
         return _err("Store not initialized", 503)
 
-    db = _store.connect()
-    repo_row = db.execute(
-        "SELECT name, description, language, topics, stars, updated_at, url FROM repos WHERE name = ?",
-        (slug,),
-    ).fetchone()
+    try:
+        db = _store.connect()
+        repo_row = db.execute(
+            "SELECT name, description, language, topics, stars, updated_at, url FROM repos WHERE name = ?",
+            (slug,),
+        ).fetchone()
+    except Exception as exc:
+        if _is_no_table_error(exc):
+            return JSONResponse({"results": [], "error": _NO_INDEX_MSG})
+        raise
 
     if not repo_row:
         return _err(f"Repo '{slug}' not found", 404)
