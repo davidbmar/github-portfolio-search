@@ -140,11 +140,11 @@ class TestSearchCommand:
         sys.modules.pop("ghps.cli", None)
         from ghps.cli import main
 
-        runner = CliRunner(mix_stderr=False)
+        runner = CliRunner()
         result = runner.invoke(main, ["search", "query", "--db", "/nonexistent/path.db"])
 
         assert result.exit_code != 0
-        assert "Index not found" in result.stderr
+        assert "Index not found" in result.output
 
         sys.modules.pop("ghps.cli", None)
 
@@ -280,11 +280,11 @@ class TestStatusCommand:
         sys.modules.pop("ghps.cli", None)
         from ghps.cli import main
 
-        runner = CliRunner(mix_stderr=False)
+        runner = CliRunner()
         result = runner.invoke(main, ["status", "--db", "/nonexistent/path.db"])
 
         assert result.exit_code != 0
-        assert "Index not found" in result.stderr
+        assert "Index not found" in result.output
 
         sys.modules.pop("ghps.cli", None)
 
@@ -313,10 +313,10 @@ class TestServeCommand:
         sys.modules.pop("ghps.cli", None)
         from ghps.cli import main
 
-        runner = CliRunner(mix_stderr=False)
+        runner = CliRunner()
         result = runner.invoke(main, ["serve", "--db", "/nonexistent/path.db"])
 
         assert result.exit_code != 0
-        assert "Index not found" in result.stderr
+        assert "Index not found" in result.output
 
         sys.modules.pop("ghps.cli", None)

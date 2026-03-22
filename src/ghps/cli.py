@@ -32,6 +32,14 @@ def main() -> None:
 @click.option("--format", "fmt", type=click.Choice(["text", "json"]), default="text", help="Output format.")
 def search(query: str, top_k: int, db: str, fmt: str) -> None:
     """Search indexed repos by semantic similarity."""
+    # Suppress model-loading progress bars so they don't corrupt stdout
+    # (especially important for --format json).
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+    os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+    import logging
+    logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
+
     from ghps.embeddings import EmbeddingPipeline
     from ghps.search import SearchEngine
     from ghps.store import VectorStore
