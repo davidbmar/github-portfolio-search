@@ -1,47 +1,162 @@
 [
   {
-    "name": "ml-pipeline",
-    "description": "Machine learning data pipeline for training and inference",
+    "name": "audio-stream-transcription",
+    "description": "Real-time audio streaming and transcription pipeline using AWS services, SQS, and Whisper for scalable voice-to-text processing",
     "language": "Python",
-    "topics": ["machine-learning", "data-pipeline", "pytorch"],
-    "stars": 120,
-    "updated_at": "2025-06-01T00:00:00Z",
-    "url": "https://github.com/davidbmar/ml-pipeline"
+    "topics": [
+      "audio",
+      "transcription",
+      "aws",
+      "whisper",
+      "streaming",
+      "sqs"
+    ],
+    "stars": 42,
+    "html_url": "https://github.com/davidbmar/audio-stream-transcription",
+    "url": "https://github.com/davidbmar/audio-stream-transcription",
+    "updated_at": "2026-03-15T00:00:00Z"
   },
   {
-    "name": "web-dashboard",
-    "description": "React dashboard for real-time monitoring and analytics",
-    "language": "JavaScript",
-    "topics": ["react", "dashboard", "monitoring"],
-    "stars": 45,
-    "updated_at": "2025-05-15T00:00:00Z",
-    "url": "https://github.com/davidbmar/web-dashboard"
-  },
-  {
-    "name": "cli-toolkit",
-    "description": "Command-line utilities for DevOps automation",
-    "language": "Go",
-    "topics": ["cli", "devops", "automation"],
-    "stars": 80,
-    "updated_at": "2025-04-20T00:00:00Z",
-    "url": "https://github.com/davidbmar/cli-toolkit"
-  },
-  {
-    "name": "audio-transcriber",
-    "description": "Audio transcription service using AWS and Whisper",
+    "name": "presigned-url-s3",
+    "description": "Secure presigned URL generation for S3 uploads and downloads with Lambda-backed API Gateway",
     "language": "Python",
-    "topics": ["audio", "transcription", "aws", "whisper"],
-    "stars": 35,
-    "updated_at": "2025-03-10T00:00:00Z",
-    "url": "https://github.com/davidbmar/audio-transcriber"
+    "topics": [
+      "aws",
+      "s3",
+      "lambda",
+      "api-gateway",
+      "security"
+    ],
+    "stars": 28,
+    "html_url": "https://github.com/davidbmar/presigned-url-s3",
+    "url": "https://github.com/davidbmar/presigned-url-s3",
+    "updated_at": "2026-02-20T00:00:00Z"
+  },
+  {
+    "name": "grassyknoll",
+    "description": "Audio analysis and signal processing toolkit for forensic-style audio investigation",
+    "language": "Python",
+    "topics": [
+      "audio",
+      "signal-processing",
+      "analysis",
+      "forensics"
+    ],
+    "stars": 15,
+    "html_url": "https://github.com/davidbmar/grassyknoll",
+    "url": "https://github.com/davidbmar/grassyknoll",
+    "updated_at": "2025-11-10T00:00:00Z"
+  },
+  {
+    "name": "FSM-generic",
+    "description": "Generic finite state machine library for modeling workflows, protocols, and event-driven systems",
+    "language": "Python",
+    "topics": [
+      "state-machine",
+      "fsm",
+      "workflow",
+      "design-patterns"
+    ],
+    "stars": 19,
+    "html_url": "https://github.com/davidbmar/FSM-generic",
+    "url": "https://github.com/davidbmar/FSM-generic",
+    "updated_at": "2025-09-05T00:00:00Z"
+  },
+  {
+    "name": "tool-telegram-whatsapp",
+    "description": "Unified messaging bot framework supporting Telegram and WhatsApp with shared command handlers",
+    "language": "Python",
+    "topics": [
+      "telegram",
+      "whatsapp",
+      "chatbot",
+      "messaging",
+      "automation"
+    ],
+    "stars": 22,
+    "html_url": "https://github.com/davidbmar/tool-telegram-whatsapp",
+    "url": "https://github.com/davidbmar/tool-telegram-whatsapp",
+    "updated_at": "2026-01-18T00:00:00Z"
+  },
+  {
+    "name": "bot-customerobsessed",
+    "description": "AI-powered customer service chatbot using LLMs for contextual, empathetic responses",
+    "language": "Python",
+    "topics": [
+      "chatbot",
+      "ai",
+      "customer-service",
+      "llm",
+      "nlp"
+    ],
+    "stars": 31,
+    "html_url": "https://github.com/davidbmar/bot-customerobsessed",
+    "url": "https://github.com/davidbmar/bot-customerobsessed",
+    "updated_at": "2026-03-01T00:00:00Z"
+  },
+  {
+    "name": "traceable-searchable-adr-memory-index",
+    "description": "Project memory framework with ADR tracking, session logs, sprint orchestration, and searchable decision history",
+    "language": "Python",
+    "topics": [
+      "adr",
+      "project-management",
+      "documentation",
+      "sprint",
+      "memory"
+    ],
+    "stars": 8,
+    "html_url": "https://github.com/davidbmar/traceable-searchable-adr-memory-index",
+    "url": "https://github.com/davidbmar/traceable-searchable-adr-memory-index",
+    "updated_at": "2026-03-20T00:00:00Z"
   },
   {
     "name": "github-portfolio-search",
-    "description": "Semantic search engine for GitHub portfolio repositories",
+    "description": "Semantic search engine for GitHub portfolio repositories using embeddings and vector similarity",
     "language": "Python",
-    "topics": ["search", "embeddings", "portfolio"],
+    "topics": [
+      "search",
+      "embeddings",
+      "portfolio",
+      "vector-search",
+      "github"
+    ],
     "stars": 12,
-    "updated_at": "2026-03-22T00:00:00Z",
-    "url": "https://github.com/davidbmar/github-portfolio-search"
+    "html_url": "https://github.com/davidbmar/github-portfolio-search",
+    "url": "https://github.com/davidbmar/github-portfolio-search",
+    "updated_at": "2026-03-22T00:00:00Z"
+  },
+  {
+    "name": "tool-s3-cloudfront-push",
+    "description": "CLI tool for deploying static sites to S3 with CloudFront cache invalidation",
+    "language": "Bash",
+    "topics": [
+      "aws",
+      "s3",
+      "cloudfront",
+      "deployment",
+      "cli",
+      "devops"
+    ],
+    "stars": 11,
+    "html_url": "https://github.com/davidbmar/tool-s3-cloudfront-push",
+    "url": "https://github.com/davidbmar/tool-s3-cloudfront-push",
+    "updated_at": "2025-12-01T00:00:00Z"
+  },
+  {
+    "name": "everyone-ai",
+    "description": "Democratized AI platform making machine learning accessible to non-technical users with guided workflows",
+    "language": "JavaScript",
+    "topics": [
+      "ai",
+      "machine-learning",
+      "web-app",
+      "accessibility",
+      "education"
+    ],
+    "stars": 35,
+    "html_url": "https://github.com/davidbmar/everyone-ai",
+    "url": "https://github.com/davidbmar/everyone-ai",
+    "updated_at": "2026-02-10T00:00:00Z"
   }
 ]
