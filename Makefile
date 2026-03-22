@@ -22,8 +22,8 @@ export:
 
 deploy:
 	@test -d web/ || (echo "Error: web/ directory not found" && exit 1)
-	@test -f scripts/deploy.sh || (echo "Error: scripts/deploy.sh not found" && exit 1)
-	bash scripts/deploy.sh
+	@test -f deploy.sh || (echo "Error: deploy.sh not found" && exit 1)
+	bash deploy.sh
 
 reindex:
 	@echo "Usage: make reindex USER=<github-username>"
