@@ -387,7 +387,12 @@ const App = (() => {
 
     html += '<div class="section-header">';
     if (query) {
-      html += '<h3>Results for &ldquo;' + escapeHtml(query) + '&rdquo;</h3>';
+      const queryTerms = SearchEngine.tokenize(query);
+      if (queryTerms.length > 1) {
+        html += '<h3>' + escapeHtml(String(results.length)) + ' results for ' + escapeHtml(queryTerms.join(", ")) + '</h3>';
+      } else {
+        html += '<h3>Results for &ldquo;' + escapeHtml(query) + '&rdquo;</h3>';
+      }
     } else {
       html += "<h3>All Repositories</h3>";
     }
