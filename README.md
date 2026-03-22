@@ -91,8 +91,13 @@ docs/
 | 11 | Activity visualization + D3.js + 94 repos | Complete |
 | 12 | Auto-tagging + cluster quality + password gate | Complete |
 | 13 | Gated access — Google OAuth + approval | Complete |
-| 14 | Auto-refresh + GitHub webhooks | **Next** |
-| 15 | 5th-sprint checkpoint — performance + polish | Planned |
+| 14 | Auto-refresh + GitHub Actions + freshness badges | Complete |
+| 15 | 5th-sprint checkpoint — public tier UX + polish | **Next** |
+| 16 | MCP integration + agent search | Planned |
+| 17 | Semantic search upgrade | Planned |
+| 18 | Collaboration and sharing | Planned |
+| 19 | Analytics and insights | Planned |
+| 20 | Browser-native + offline + PWA | Planned |
 
 ## Deployment
 

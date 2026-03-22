@@ -46,7 +46,7 @@ What should happen?
 | F-001 | Add .env support for GITHUB_TOKEN (python-dotenv) | Fixed | Medium |
 | F-002 | Add progress bar to indexer (tqdm) | Open | Low |
 | F-003 | Add Makefile with install/test/serve/index targets | Fixed | Medium |
-| B-008 | API /search and /clusters return empty when no index exists (no error msg) | Open | Medium |
+| B-008 | API /search and /clusters return empty when no index exists (no error msg) | Fixed | Medium |
 | B-009 | davidbmar.com still shows placeholder — web UI not deployed | Fixed | High |
 | B-010 | davidbmar.com "Could not load data" — data/repos.json is empty (.gitkeep only) | Fixed | Critical |
 | B-011 | test_web_playwright.py errors — playwright not in dev dependencies | Fixed | High |
@@ -57,7 +57,10 @@ What should happen?
 | B-014 | Technology Distribution shows only 3 topics — most repos lack GitHub topic tags | Fixed | Medium |
 | B-015 | AI & Search cluster contains non-AI repos (exampleLoops, Palindrome-Index) | Fixed | Low |
 | F-006 | Auto-tag repos with topics inferred from README content during indexing | Fixed | Medium |
-| B-016 | API /search and /clusters return 500 when no SQLite index exists (no graceful error) | Open | Medium |
+| B-016 | API /search and /clusters return 500 when no SQLite index exists (no graceful error) | Fixed | Medium |
 | B-017 | google-auth not installed after sprint merge — pyproject.toml updated but venv not synced | Fixed | High |
-| F-007 | Google Sign-In button not visible — needs googleClientId configured in web/config.json | Open | Medium |
-| F-008 | Request Access form should show Google Sign-In when clientId is configured | Open | Medium |
+| F-007 | Google Sign-In button not visible — needs googleClientId configured in web/config.json | Fixed | Medium |
+| F-008 | Request Access form should show Google Sign-In when clientId is configured | Fixed | Medium |
+| B-018 | Mixed content warning — Google avatar loaded over http:// on HTTPS site | Fixed | High |
+| B-019 | Google OAuth gates entire site — public tier (browse/search) blocked for unauthenticated users | Open | High |
+| F-009 | Public tier should be accessible without sign-in, auth only for gated features | Open | High |

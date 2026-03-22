@@ -83,33 +83,58 @@ PM/customer review checkpoint: Request Access page renders with Name/Email/Reaso
 Backlog triage: B-017 fixed (google-auth not installed post-merge). Added F-007 (configure googleClientId), F-008 (Google Sign-In button activation). No critical bugs.
 Planning input for Sprint 14: Need to configure Google Cloud OAuth client ID to activate Sign-In. Auto-refresh and webhooks are next priority per roadmap.
 
-**Sprint 14: Auto-Refresh and GitHub Webhooks**
-Build goals: Implement GitHub webhook listener for push events. Auto-reindex repos on push. Add periodic re-index fallback (cron or GitHub Actions). Add "freshness" badge on repos (indexed today, this week, stale). Private repo support with token-scoped indexing.
-PM/customer review checkpoint: Push a commit to a test repo → verify index updates within 5 minutes. Freshness badges display correctly. Private repos indexed but excluded from public view.
-Backlog triage: Webhook reliability, rate limiting, stale index edge cases.
-Planning input for Sprint 14: Based on webhook reliability, decide on push vs. poll strategy.
+**Sprint 14: Auto-Refresh and Data Pipeline Improvements (COMPLETED 2026-03-22)**
+Build goals: Created GitHub Actions workflow for automated reindex + deploy (`.github/workflows/reindex.yml`). Added `scripts/reindex.sh` standalone reindex script. Added freshness badges to web UI (green/blue/gray/red by recency). Added `indexed_at` timestamp to store, `--dry-run` flag to indexer, error resilience for failed repos. Fixed B-008/B-016 (API returns graceful error when no index exists). Tests: 212 passed, 0 failed, 1 skipped.
+PM/customer review checkpoint: API returns `{"results":[],"error":"No index found..."}` with 200 instead of 500. Freshness badges render on repo cards. GitHub Actions YAML valid. Mixed content warning fixed (B-018). Google OAuth configured and live.
+Backlog triage: B-008 fixed, B-016 fixed, B-018 fixed, F-007 fixed, F-008 fixed. Added B-019 (public tier blocked by OAuth gate) and F-009 (public browse without auth).
+Planning input for Sprint 15: Public tier UX (B-019/F-009) is highest priority — the site should be browsable without sign-in.
 
-**Sprint 14: MCP Integration and Agent Search**
+**Sprint 15: 5th-Sprint Checkpoint — Public Tier UX and Polish**
+Build goals: Fix B-019/F-009 (public tier accessible without sign-in — browse clusters, search descriptions without auth; sign-in only for gated features). Performance audit (Lighthouse >90). SEO optimization (structured data, sitemap.xml). Clean up docs, README, CLAUDE.md. Full system review.
+PM/customer review checkpoint: Visit davidbmar.com without signing in — verify clusters, search, and repo detail pages work. Sign in → verify gated features (code snippets, file tree) unlock. Lighthouse score >90. Mobile audit at 375px.
+Backlog triage: Review all open items, close stale bugs, reprioritize.
+Roadmap extension checkpoint: Plan Sprints 16-20.
+Planning input for Sprint 16: Based on real usage, prioritize features users want.
+
+**Sprint 16: MCP Integration and Agent Search**
 Build goals: Expose portfolio search via MCP server for Claude Code and No Prob Bob. Add portfolio_search, portfolio_clusters, portfolio_repo_detail tools. Enable agents to search David's portfolio during conversations. Add search analytics (what people search for, popular repos).
 PM/customer review checkpoint: Call portfolio_search("presigned URL") from Claude Code — verify structured JSON response. Test MCP tool discovery. Verify analytics capture search queries.
 Backlog triage: MCP schema gaps, agent integration issues.
-Planning input for Sprint 15: 5th-sprint checkpoint — review full system, plan next phase.
+Planning input for Sprint 17: Based on agent usage patterns, tune search results.
 
-**Sprint 15: 5th-Sprint Checkpoint — Performance and Polish**
-Build goals: Performance audit (page load time, search latency, mobile performance). Accessibility audit (WCAG 2.1 AA). SEO optimization (structured data, sitemap). Browser-native offline mode exploration (transformers.js for local embeddings). Full system review and cleanup.
-PM/customer review checkpoint: Lighthouse score >90. All WCAG AA issues resolved. Search works offline with cached data. Full end-to-end test of every feature.
-Roadmap extension checkpoint: Plan Sprints 16-20 based on production usage and feedback.
-Planning input for Sprint 16: Based on analytics, prioritize features users actually want.
+**Sprint 17: Semantic Search Upgrade**
+Build goals: Replace keyword-only web search with real semantic search (embeddings served via API or pre-computed similarity matrix). Add "related repos" powered by embeddings (not just same-cluster). Add search suggestions/autocomplete. Improve search result snippets with relevant README excerpts.
+PM/customer review checkpoint: Search "how did I handle auth" → returns auth-related repos (semantic, not keyword). Related repos are genuinely similar. Autocomplete suggests popular queries.
+Backlog triage: Search quality issues, false positive/negative results.
+Planning input for Sprint 18: Based on search analytics, identify gaps.
+
+**Sprint 18: Collaboration and Sharing**
+Build goals: Shareable search result links (deep links with query + filters). Export search results as markdown/JSON. "Collections" — save groups of repos as named lists. Public portfolio embed widget (iframe-embeddable view for resume sites).
+PM/customer review checkpoint: Share a search URL → recipient sees same results. Export works. Collections persist across sessions. Embed widget renders on external site.
+Backlog triage: Sharing edge cases, embed security.
+Planning input for Sprint 19: Based on collaboration usage, prioritize.
+
+**Sprint 19: Analytics and Insights**
+Build goals: Search analytics dashboard (popular queries, trending repos, visitor count). Repo activity heatmap (contribution calendar view). Technology trend analysis (which tech stacks are growing). Portfolio health score (test coverage, documentation, staleness).
+PM/customer review checkpoint: Analytics dashboard shows real data. Heatmap renders accurately. Health scores match reality.
+Backlog triage: Data accuracy, privacy concerns.
+Planning input for Sprint 20: 5th-sprint checkpoint — plan Sprints 21-25.
+
+**Sprint 20: 5th-Sprint Checkpoint — Browser-Native and Offline**
+Build goals: Browser-native embeddings via transformers.js (search works offline). Service worker for offline access. PWA manifest for installability. Full end-to-end performance audit. Accessibility audit (WCAG 2.1 AA compliance). Plan Sprints 21-25.
+PM/customer review checkpoint: Disconnect network → search still returns results from cached embeddings. Install as PWA on mobile. Lighthouse score >95. All WCAG AA issues resolved.
+Roadmap extension checkpoint: Plan Sprints 21-25 based on production usage and feedback.
+Planning input for Sprint 21: Based on offline usage and PWA installs, prioritize next phase.
 
 ### Current Focus
 
-**Sprint 14: Auto-Refresh and GitHub Webhooks (Sprints 1-13 COMPLETE)**
+**Sprint 15: 5th-Sprint Checkpoint — Public Tier UX and Polish (Sprints 1-14 COMPLETE)**
 
-Sprints 1-13 delivered: full stack portfolio search with 104 repos (including private), D3.js visualization, faceted search with 15+ inferred topics, multi-word queries, search highlighting, relevance scoring, 6 capability clusters, Recent Activity, Request Access page, repo detail pages, Google OAuth frontend + auth API + Telegram notifications + CLI access management, and mobile support at davidbmar.com. 192 tests passing. Sprint 14 adds auto-refresh via GitHub webhooks.
+Sprints 1-14 delivered: full stack portfolio search with 104 repos, D3.js visualization, faceted search with 15+ inferred topics, multi-word queries, search highlighting, relevance scoring, 6 capability clusters, Google OAuth + auth API + Telegram notifications, GitHub Actions reindex workflow, freshness badges, graceful API error handling, and mobile support at davidbmar.com. 212 tests passing. Sprint 15 fixes the public tier (currently blocked by OAuth gate) and does 5th-sprint polish.
 
 ### Next Up
 
-**Sprint 15: 5th-Sprint Checkpoint — Performance and Polish** — Lighthouse audit, accessibility, SEO, browser-native offline mode. Full system review + roadmap extension to Sprint 20.
+**Sprint 16: MCP Integration and Agent Search** — Expose portfolio search as MCP tools for Claude Code and AI agents. Search analytics.
 
 ## Architecture
 
