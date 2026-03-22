@@ -1,4 +1,4 @@
-agentB-access-page — Sprint 9
+agentC-infra — Sprint 9
 
 Sprint-Level Context
 
@@ -18,24 +18,16 @@ Constraints
 
 
 Objective
-- Add a "Request Access" page and improve site metadata
+- Fix venv symlink issue and clean up infrastructure
 
 Tasks
-- Create the Request Access page in web/js/app.js (add route handler for #/access):
-  - Show a form with: Name, Email, Reason for access (textarea)
-  - Submit button (disabled for now — shows "Coming soon" message on submit)
-  - Explain what gated access provides: "Full code search, file tree browsing, and detailed repository analysis"
-  - Style with existing CSS variables
-- Update web/index.html:
-  - Ensure OG meta tags use real data: "42 repositories across 6 capability areas"
-  - Add og:image pointing to a screenshot or placeholder
-- Update web/css/style.css:
-  - Style the access request form (consistent with existing dark theme)
-  - Add form input styles: dark background, light text, blue accent border on focus
-  - Style the "Coming soon" message as a friendly info card
+- Fix B-012: In .sprint/scripts/ (the local project copy), find where .venv gets symlinked into worktrees and remove that behavior. If sprint-init.sh or sprint-tmux.sh symlinks .venv, change it to skip .venv. Add a comment: "# .venv is NOT symlinked — each worktree uses system python or creates its own venv"
+- Update Makefile: add "deploy" target that runs aws s3 sync + cloudfront invalidation
+- Add a simple smoke test in tests/test_smoke.py: verify ghps --help returns 0, verify ghps search --help returns 0
+- Clean up: remove any .gitkeep files from web/data/ (we have real data now)
 
 Acceptance Criteria
-- Playwright: navigate to https://davidbmar.com/#/access — form renders with 3 fields
-- Playwright: click Submit — shows "Coming soon" message, no errors
-- OG tags are present and accurate in page source
-- Mobile layout works at 375px
+- python3 -m pytest tests/ -v shows 0 failures, 0 errors
+- make deploy works (syncs to S3 + invalidates CloudFront)
+- .venv is NOT symlinked into worktrees after sprint-init.sh runs
+- No .gitkeep files in web/data/

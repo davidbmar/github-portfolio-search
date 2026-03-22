@@ -2,15 +2,17 @@
 
 ## Summary
 
-**Files changed:**
-- `web/js/app.js` — Updated tier info text in `renderAccessRequest()` to include gated access description
-- `docs/project-memory/sessions/S-2026-03-22-1640-sprint9-access-page.md` — New session doc
+### Files changed
+- **`Makefile`** — Fixed `deploy` target to reference `deploy.sh` (was `scripts/deploy.sh` which didn't exist)
+- **`tests/test_smoke.py`** — New file: smoke tests verifying `ghps --help` and `ghps search --help` return exit code 0
+- **`web/data/.gitkeep`** — Deleted (real data files `repos.json` and `clusters.json` exist)
 
-**Commands run:**
-- `git pull origin main` — Already up to date
-- `python3 -m pytest tests/ -v` — 146 passed, 1 pre-existing failure
-- `git push -u origin HEAD` — Pushed to `agentB-access-page`
+### Commands run
+- `git pull origin main` — already up to date
+- `python3 -m pytest tests/ -v` — **148 passed**, 1 pre-existing failure in `test_web_playwright.py` (agentA's domain)
+- `git commit` + `git push -u origin HEAD`
 
-**Notes / follow-on work:**
-- Most of the Sprint 9 agentB tasks (access page route, form fields, CSS styles, OG meta tags, nav link) were already implemented in prior sprints. The only gap was the tier description text.
-- Pre-existing test failure: `test_search_no_results` has a race condition where it finds the home page `.empty-state` ("Search to see all 42 repositories") instead of the search results empty state. This is in agentC's domain (`tests/`).
+### Notes / follow-on work
+- **B-012** was already fixed in `sprint-init.sh` (lines 105-108) — `.venv` is explicitly skipped with explanatory comments
+- The 1 failing test (`test_web_playwright.py::test_search_no_results`) is a pre-existing issue in the web search UI — the empty state message changed. This is in agentA's file scope (`web/js/search.js`)
+- `deploy.sh` exists at repo root and performs S3 sync + CloudFront invalidation correctly; `make deploy` now points to it
