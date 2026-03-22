@@ -1,27 +1,21 @@
-`★ Insight ─────────────────────────────────────`
-- The `renderAccessRequest()` function uses DOM API (`createElement`/`textContent`) instead of the `innerHTML` pattern used elsewhere in app.js. This avoids security hook warnings and is actually safer for form elements where no dynamic user data is interpolated.
-- The Playwright test uses Python's `http.server` as a module-scoped fixture — the server starts once and is shared across all 8 tests, keeping the test suite fast (~1.3s total).
-`─────────────────────────────────────────────────`
+All tasks complete. Here's the summary:
 
 ---
 
-## Summary
+## Files changed
+- **web/data/repos.json** — Replaced 5 generic repos with 10 realistic portfolio repos
+- **web/data/clusters.json** — Replaced 2 generic clusters with 4 capability clusters
+- **scripts/generate-sample-data.py** — New: reproducible sample data generator with validation
+- **deploy.sh** — Added `validate_json()` gate before S3 sync
+- **docs/project-memory/sessions/S-2026-03-22-0711-sprint6-data-pipeline.md** — Session doc
 
-### Files changed
-- **`web/data/repos.json`** — new, 8 sample repositories
-- **`web/data/clusters.json`** — new, 4 capability clusters
-- **`web/js/app.js`** — fixed data fetch paths, added `#/clusters` and `#/access` routes, added `renderClustersPage()` and `renderAccessRequest()`
-- **`web/index.html`** — added nav bar (Home | Search | Clusters | Request Access)
-- **`web/css/style.css`** — added nav, access form, cluster description, and 375px responsive styles
-- **`tests/test_web_playwright.py`** — new, 8 Playwright tests
-- **`docs/project-memory/sessions/S-2026-03-22-0641-web-ui-improvements.md`** — session doc
+## Commands run
+- `git fetch origin main && git merge origin/main` — sync with main
+- `python3 scripts/generate-sample-data.py` — verified generator works
+- `python3 -m pytest tests/ -v` — **137 passed**, 1 warning
+- `git push -u origin HEAD` — pushed to remote
 
-### Commands run
-- `git pull origin main`
-- `pip install playwright` + `playwright install chromium`
-- `python3 -m pytest tests/test_web_playwright.py -v` — **8/8 passed**
-- `git commit` + `git push -u origin HEAD`
-
-### Notes / follow-on work
-- Access request form shows "Coming soon" message — needs backend `/api/access/request` endpoint
-- Data files contain sample repos; agentB's export pipeline should replace these with real GitHub data
+## Notes / follow-on work
+- The brief requested `html_url` but the existing app.js and export.py use `url`. Both fields are included in sample data for compatibility. If `export.py` is updated to emit `html_url`, the web UI (`app.js:428`) would also need updating (agentC's domain).
+- The `validate_json()` function in deploy.sh uses `python3` for JSON parsing — this is already a project dependency so no new deps added.
+- The sample data generator can be re-run anytime with `python3 scripts/generate-sample-data.py` to reset data files to known-good state.
