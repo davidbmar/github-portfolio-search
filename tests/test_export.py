@@ -8,7 +8,7 @@ import os
 import pytest
 from click.testing import CliRunner
 
-from ghps.export import export_static_bundle, _build_repos, _build_clusters, _build_search_index
+from ghps.export import export_static_bundle, _build_repos, _build_clusters, _build_search_index, _build_similarity, _build_suggestions
 
 
 class TestExportStaticBundle:
@@ -19,12 +19,14 @@ class TestExportStaticBundle:
         export_static_bundle(mock_store, out)
         assert os.path.isdir(out)
 
-    def test_generates_all_three_files(self, mock_store, tmp_path):
+    def test_generates_all_files(self, mock_store, tmp_path):
         out = str(tmp_path / "data")
         paths = export_static_bundle(mock_store, out)
         assert "repos.json" in paths
         assert "clusters.json" in paths
         assert "search-index.json" in paths
+        assert "similarity.json" in paths
+        assert "suggestions.json" in paths
         for name, path in paths.items():
             assert os.path.isfile(path), f"{name} was not written"
 
@@ -41,6 +43,11 @@ class TestExportStaticBundle:
             with open(os.path.join(out, name)) as f:
                 data = json.load(f)
             assert isinstance(data, list), f"{name} should be a JSON array"
+        # similarity.json and suggestions.json are dicts
+        for name in ("similarity.json", "suggestions.json"):
+            with open(os.path.join(out, name)) as f:
+                data = json.load(f)
+            assert isinstance(data, dict), f"{name} should be a JSON object"
 
 
 class TestBuildRepos:
@@ -53,7 +60,7 @@ class TestBuildRepos:
 
     def test_repo_has_required_fields(self, mock_store):
         repos = _build_repos(mock_store)
-        required = {"name", "description", "language", "topics", "stars", "updated_at", "url"}
+        required = {"name", "description", "language", "topics", "stars", "updated_at", "url", "readme_excerpt"}
         for repo in repos:
             assert required.issubset(repo.keys()), f"Missing fields in {repo['name']}"
 
@@ -172,6 +179,116 @@ class TestBuildSearchIndex:
                 assert len(chunk["text"]) <= 200
 
 
+class TestBuildReposReadmeExcerpt:
+    """Tests for readme_excerpt in repos.json."""
+
+    def test_readme_excerpt_present(self, mock_store):
+        repos = _build_repos(mock_store)
+        for repo in repos:
+            assert "readme_excerpt" in repo
+            assert isinstance(repo["readme_excerpt"], str)
+
+    def test_readme_excerpt_max_length(self, mock_store):
+        repos = _build_repos(mock_store)
+        for repo in repos:
+            assert len(repo["readme_excerpt"]) <= 300
+
+    def test_readme_excerpt_content(self, mock_store):
+        repos = _build_repos(mock_store)
+        ml = next(r for r in repos if r["name"] == "ml-pipeline")
+        assert "machine learning" in ml["readme_excerpt"].lower()
+
+
+class TestBuildSimilarity:
+    """Tests for similarity.json generation."""
+
+    def test_returns_dict(self, mock_store):
+        sim = _build_similarity(mock_store)
+        assert isinstance(sim, dict)
+
+    def test_all_repos_present(self, mock_store):
+        sim = _build_similarity(mock_store)
+        assert set(sim.keys()) == {"ml-pipeline", "web-dashboard", "cli-toolkit"}
+
+    def test_scores_between_0_and_1(self, mock_store):
+        sim = _build_similarity(mock_store)
+        for repo, similar in sim.items():
+            for entry in similar:
+                assert 0 <= entry["score"] <= 1.0, (
+                    f"Score {entry['score']} out of range for {repo} -> {entry['name']}"
+                )
+
+    def test_at_most_8_entries_per_repo(self, mock_store):
+        sim = _build_similarity(mock_store)
+        for repo, similar in sim.items():
+            assert len(similar) <= 8, f"{repo} has {len(similar)} similar repos (max 8)"
+
+    def test_entries_have_name_and_score(self, mock_store):
+        sim = _build_similarity(mock_store)
+        for repo, similar in sim.items():
+            for entry in similar:
+                assert "name" in entry
+                assert "score" in entry
+
+    def test_does_not_include_self(self, mock_store):
+        sim = _build_similarity(mock_store)
+        for repo, similar in sim.items():
+            names = [e["name"] for e in similar]
+            assert repo not in names, f"{repo} listed as similar to itself"
+
+    def test_sorted_by_score_descending(self, mock_store):
+        sim = _build_similarity(mock_store)
+        for repo, similar in sim.items():
+            scores = [e["score"] for e in similar]
+            assert scores == sorted(scores, reverse=True)
+
+    def test_empty_store_returns_empty(self, tmp_path):
+        from ghps.store import VectorStore
+        store = VectorStore(":memory:")
+        store.create_index()
+        sim = _build_similarity(store)
+        assert sim == {}
+        store.close()
+
+
+class TestBuildSuggestions:
+    """Tests for suggestions.json generation."""
+
+    def test_returns_dict_with_correct_keys(self, mock_store):
+        sug = _build_suggestions(mock_store)
+        assert isinstance(sug, dict)
+        assert "repos" in sug
+        assert "topics" in sug
+        assert "queries" in sug
+
+    def test_repos_list_contents(self, mock_store):
+        sug = _build_suggestions(mock_store)
+        assert set(sug["repos"]) == {"ml-pipeline", "web-dashboard", "cli-toolkit"}
+
+    def test_topics_are_sorted_strings(self, mock_store):
+        sug = _build_suggestions(mock_store)
+        assert isinstance(sug["topics"], list)
+        assert sug["topics"] == sorted(sug["topics"])
+        for t in sug["topics"]:
+            assert isinstance(t, str)
+
+    def test_queries_is_list(self, mock_store):
+        sug = _build_suggestions(mock_store)
+        assert isinstance(sug["queries"], list)
+
+    def test_works_without_analytics_db(self, mock_store, monkeypatch):
+        """Suggestions should work even when analytics DB doesn't exist."""
+        monkeypatch.setattr("os.path.exists", lambda p: False if "analytics" in p else os.path.exists(p))
+        sug = _build_suggestions(mock_store)
+        assert isinstance(sug["queries"], list)
+        assert sug["queries"] == []
+
+    def test_topics_include_known_values(self, mock_store):
+        sug = _build_suggestions(mock_store)
+        assert "machine-learning" in sug["topics"]
+        assert "react" in sug["topics"]
+
+
 class TestExportCLI:
     """Tests for the ghps export CLI command."""
 
@@ -226,5 +343,12 @@ class TestExportCLI:
             assert json.load(f) == []
         with open(paths["search-index.json"]) as f:
             assert json.load(f) == []
+        with open(paths["similarity.json"]) as f:
+            assert json.load(f) == {}
+        with open(paths["suggestions.json"]) as f:
+            data = json.load(f)
+            assert data["repos"] == []
+            assert data["topics"] == []
+            assert data["queries"] == []
 
         store.close()

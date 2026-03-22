@@ -5,8 +5,10 @@ from __future__ import annotations
 import json
 import logging
 import os
+import struct
 from collections import Counter
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -50,6 +52,20 @@ def export_static_bundle(store: "VectorStore", output_dir: str) -> dict[str, str
     paths["search-index.json"] = search_path
     logger.info("Exported search index with %d entries to %s", len(search_data), search_path)
 
+    # --- similarity.json ---
+    similarity_data = _build_similarity(store)
+    similarity_path = os.path.join(output_dir, "similarity.json")
+    _write_json(similarity_path, similarity_data)
+    paths["similarity.json"] = similarity_path
+    logger.info("Exported similarity data for %d repos to %s", len(similarity_data), similarity_path)
+
+    # --- suggestions.json ---
+    suggestions_data = _build_suggestions(store)
+    suggestions_path = os.path.join(output_dir, "suggestions.json")
+    _write_json(suggestions_path, suggestions_data)
+    paths["suggestions.json"] = suggestions_path
+    logger.info("Exported suggestions to %s", suggestions_path)
+
     return paths
 
 
@@ -58,6 +74,13 @@ def _build_repos(store: "VectorStore") -> list[dict]:
     from ghps.search import _recency_boost
 
     db = store.connect()
+
+    # Pre-fetch first README chunk per repo for excerpts
+    readme_rows = db.execute(
+        "SELECT repo_name, text FROM chunks WHERE source = 'README' "
+        "GROUP BY repo_name HAVING MIN(id)"
+    ).fetchall()
+    readme_map = {row[0]: row[1][:300] for row in readme_rows}
 
     # Try to read inferred_topics if agentA has added the column
     try:
@@ -105,6 +128,7 @@ def _build_repos(store: "VectorStore") -> list[dict]:
             "url": row[6] or "",
             "last_indexed": last_indexed,
             "relevance_score": relevance_score,
+            "readme_excerpt": readme_map.get(row[0], ""),
         })
 
     # Sort by relevance score descending (stars + recency)
@@ -191,6 +215,98 @@ def _build_search_index(store: "VectorStore") -> list[dict]:
         })
 
     return entries
+
+
+def _build_similarity(store: "VectorStore") -> dict[str, list[dict]]:
+    """Compute pairwise cosine similarity between repos using average embeddings.
+
+    For each repo, returns the top-8 most similar repos with scores.
+    """
+    import numpy as np
+    from ghps.store import EMBEDDING_DIM
+
+    db = store.connect()
+
+    # Get all chunk embeddings grouped by repo
+    rows = db.execute(
+        "SELECT c.repo_name, v.embedding FROM chunks c "
+        "JOIN vec_chunks v ON v.rowid = c.id "
+        "ORDER BY c.repo_name"
+    ).fetchall()
+
+    # Group embeddings by repo name
+    repo_embeddings: dict[str, list[list[float]]] = {}
+    for row in rows:
+        repo_name = row[0]
+        raw = row[1]
+        vec = list(struct.unpack(f"{EMBEDDING_DIM}f", raw))
+        repo_embeddings.setdefault(repo_name, []).append(vec)
+
+    if not repo_embeddings:
+        return {}
+
+    # Compute average embedding per repo
+    repo_names = sorted(repo_embeddings.keys())
+    avg_vectors = []
+    for name in repo_names:
+        vecs = np.array(repo_embeddings[name])
+        avg_vectors.append(vecs.mean(axis=0))
+
+    matrix = np.array(avg_vectors)
+
+    # Cosine similarity: normalize then dot product
+    norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+    norms = np.where(norms == 0, 1, norms)  # avoid division by zero
+    normalized = matrix / norms
+    sim_matrix = normalized @ normalized.T
+
+    # Build result: top-8 similar repos per repo (excluding self)
+    result = {}
+    for i, name in enumerate(repo_names):
+        scores = []
+        for j, other_name in enumerate(repo_names):
+            if i != j:
+                scores.append({"name": other_name, "score": round(float(sim_matrix[i, j]), 4)})
+        scores.sort(key=lambda x: x["score"], reverse=True)
+        result[name] = scores[:8]
+
+    return result
+
+
+def _build_suggestions(store: "VectorStore") -> dict[str, list]:
+    """Build autocomplete suggestions from repo names, topics, and popular queries."""
+    db = store.connect()
+
+    # Collect repo names
+    repo_rows = db.execute("SELECT name FROM repos ORDER BY name").fetchall()
+    repos = [row[0] for row in repo_rows]
+
+    # Collect unique topics
+    topic_rows = db.execute("SELECT topics FROM repos WHERE topics IS NOT NULL").fetchall()
+    all_topics: set[str] = set()
+    for row in topic_rows:
+        try:
+            topics = json.loads(row[0]) if row[0] else []
+        except (json.JSONDecodeError, TypeError):
+            topics = []
+        all_topics.update(topics)
+
+    # Try to read popular queries from analytics DB
+    queries: list[str] = []
+    try:
+        analytics_db_path = os.path.join(Path.home(), ".ghps", "analytics.db")
+        if os.path.exists(analytics_db_path):
+            from ghps.analytics import get_popular_queries
+            popular = get_popular_queries(limit=20, db_path=analytics_db_path)
+            queries = [p["query"] for p in popular]
+    except Exception:
+        logger.debug("Could not read analytics DB for suggestions, using empty queries")
+
+    return {
+        "repos": repos,
+        "topics": sorted(all_topics),
+        "queries": queries,
+    }
 
 
 def _extract_keywords(text: str) -> list[str]:
