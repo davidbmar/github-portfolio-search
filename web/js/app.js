@@ -1,0 +1,522 @@
+/**
+ * Main application for GitHub Portfolio Search.
+ * Handles data loading, hash routing, rendering, and user interaction.
+ *
+ * Security: All dynamic content is escaped via escapeHtml() / escapeAttr()
+ * before DOM insertion. escapeHtml uses createTextNode which is XSS-safe.
+ */
+
+const App = (() => {
+  // State
+  let repos = [];
+  let clusters = [];
+  let currentFilters = { languages: [], topics: [], minStars: 0 };
+  let facets = { languages: [], topics: [], maxStars: 0 };
+  let filtersOpen = false;
+  let debounceTimer = null;
+
+  // Language colors (GitHub-style)
+  const LANG_COLORS = {
+    JavaScript: "#f1e05a",
+    TypeScript: "#3178c6",
+    Python: "#3572A5",
+    Java: "#b07219",
+    Go: "#00ADD8",
+    Rust: "#dea584",
+    C: "#555555",
+    "C++": "#f34b7d",
+    "C#": "#178600",
+    Ruby: "#701516",
+    PHP: "#4F5D95",
+    Swift: "#F05138",
+    Kotlin: "#A97BFF",
+    Shell: "#89e051",
+    HTML: "#e34c26",
+    CSS: "#563d7c",
+    Dart: "#00B4AB",
+    Lua: "#000080",
+    Vim: "#199f4b",
+    HCL: "#844FBA",
+    Makefile: "#427819",
+    Dockerfile: "#384d54",
+  };
+
+  /**
+   * Escape HTML special characters to prevent XSS.
+   * Uses createTextNode which is inherently safe.
+   */
+  function escapeHtml(str) {
+    if (!str) return "";
+    const div = document.createElement("div");
+    div.appendChild(document.createTextNode(String(str)));
+    return div.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  /**
+   * Load repos.json and clusters.json data files.
+   */
+  async function loadData() {
+    const content = document.getElementById("content");
+    content.textContent = "";
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "loading";
+    loadingDiv.textContent = "Loading portfolio data";
+    content.appendChild(loadingDiv);
+
+    try {
+      const [reposRes, clustersRes] = await Promise.all([
+        fetch("repos.json"),
+        fetch("clusters.json"),
+      ]);
+
+      if (!reposRes.ok) throw new Error("Failed to load repos.json");
+      if (!clustersRes.ok) throw new Error("Failed to load clusters.json");
+
+      repos = await reposRes.json();
+      clusters = await clustersRes.json();
+
+      // Ensure topics are arrays
+      repos = repos.map((r) => ({
+        ...r,
+        topics: Array.isArray(r.topics)
+          ? r.topics
+          : typeof r.topics === "string"
+            ? tryParseJSON(r.topics, [])
+            : [],
+      }));
+
+      facets = SearchEngine.extractFacets(repos);
+      route();
+    } catch (err) {
+      content.textContent = "";
+      const errDiv = document.createElement("div");
+      errDiv.className = "empty-state";
+      const h3 = document.createElement("h3");
+      h3.textContent = "Could not load data";
+      const p = document.createElement("p");
+      p.textContent = err.message;
+      errDiv.appendChild(h3);
+      errDiv.appendChild(p);
+      content.appendChild(errDiv);
+    }
+  }
+
+  function tryParseJSON(str, fallback) {
+    try {
+      return JSON.parse(str);
+    } catch {
+      return fallback;
+    }
+  }
+
+  /**
+   * Hash-based router.
+   * Routes: #/ (home), #/search?q=X, #/cluster/name
+   */
+  function route() {
+    const hash = window.location.hash || "#/";
+    const content = document.getElementById("content");
+
+    if (hash.startsWith("#/search")) {
+      const params = new URLSearchParams(hash.split("?")[1] || "");
+      const query = params.get("q") || "";
+      renderSearchResults(query, content);
+    } else if (hash.startsWith("#/cluster/")) {
+      const clusterName = decodeURIComponent(hash.slice("#/cluster/".length));
+      renderClusterDetail(clusterName, content);
+    } else {
+      renderHome(content);
+    }
+  }
+
+  /**
+   * Build sanitized HTML string. All dynamic values MUST pass through
+   * escapeHtml() or escapeAttr() before inclusion.
+   */
+
+  /**
+   * Render the home/landing page with search hero and cluster grid.
+   */
+  function renderHome(container) {
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) searchInput.value = "";
+
+    let html = '<div class="search-hero">';
+    html += "<h2>GitHub Portfolio Search</h2>";
+    html += "<p>Explore repositories by topic, language, or keyword</p>";
+    html += "</div>";
+
+    // Cluster grid
+    if (clusters.length > 0) {
+      html += '<div class="section-header">';
+      html += "<h3>Capability Clusters</h3>";
+      html += '<span class="count">' + escapeHtml(String(clusters.length)) + " clusters</span>";
+      html += "</div>";
+      html += '<div class="cluster-grid">';
+
+      for (const cluster of clusters) {
+        const repoPreview = (cluster.repos || []).slice(0, 3).join(", ");
+        const repoCount = (cluster.repos || []).length;
+        html += '<div class="cluster-card" data-cluster="' + escapeAttr(cluster.name) + '">';
+        html += "<h4>" + escapeHtml(cluster.name) + "</h4>";
+        html += '<span class="repo-count">' + escapeHtml(String(repoCount)) + " repo" + (repoCount !== 1 ? "s" : "") + "</span>";
+        if (repoPreview) {
+          html += '<div class="repo-list-preview">' + escapeHtml(repoPreview) + "</div>";
+        }
+        html += "</div>";
+      }
+
+      html += "</div>";
+    }
+
+    // All repos section
+    if (repos.length > 0) {
+      html += '<div class="section-header">';
+      html += "<h3>All Repositories</h3>";
+      html += '<span class="count">' + escapeHtml(String(repos.length)) + " repos</span>";
+      html += "</div>";
+      html += renderRepoCards(
+        repos.slice().sort((a, b) => (b.stars || 0) - (a.stars || 0)).slice(0, 12)
+      );
+      if (repos.length > 12) {
+        html += '<div class="empty-state"><p>Search to see all ' + escapeHtml(String(repos.length)) + " repositories</p></div>";
+      }
+    }
+
+    // Safe: all dynamic values above are escaped via escapeHtml/escapeAttr
+    container.innerHTML = html;
+    bindClusterClicks();
+  }
+
+  /**
+   * Render search results with filter sidebar.
+   */
+  function renderSearchResults(query, container) {
+    const searchInput = document.getElementById("search-input");
+    if (searchInput && searchInput.value !== query) {
+      searchInput.value = query;
+    }
+
+    // Filter repos first, then search
+    const filtered = SearchEngine.applyFilters(repos, currentFilters);
+    const results = SearchEngine.search(filtered, query);
+
+    let html = '<div class="content-layout">';
+
+    // Filter sidebar
+    html += renderFilterSidebar();
+
+    // Results area
+    html += '<div class="results-area">';
+    html += '<button class="filter-toggle" id="filter-toggle">Filters</button>';
+
+    html += '<div class="section-header">';
+    if (query) {
+      html += '<h3>Results for &ldquo;' + escapeHtml(query) + '&rdquo;</h3>';
+    } else {
+      html += "<h3>All Repositories</h3>";
+    }
+    html += '<span class="count">' + escapeHtml(String(results.length)) + " found</span>";
+    html += "</div>";
+
+    if (results.length === 0) {
+      html += '<div class="empty-state">';
+      html += "<h3>No results found</h3>";
+      html += "<p>Try a different search term or adjust filters</p>";
+      html += "</div>";
+    } else {
+      html += renderRepoCards(results.map((r) => ({ ...r.repo, _score: r.score })));
+    }
+
+    html += "</div>"; // results-area
+    html += "</div>"; // content-layout
+
+    // Safe: all dynamic values are escaped
+    container.innerHTML = html;
+    bindFilterEvents();
+  }
+
+  /**
+   * Render cluster detail view showing repos in that cluster.
+   */
+  function renderClusterDetail(clusterName, container) {
+    const cluster = clusters.find((c) => c.name === clusterName);
+
+    let html = '<a href="#/" class="back-link">&larr; Back to clusters</a>';
+
+    if (!cluster) {
+      html += '<div class="empty-state"><h3>Cluster not found</h3></div>';
+      container.innerHTML = html;
+      return;
+    }
+
+    const clusterRepos = repos.filter((r) => (cluster.repos || []).includes(r.name));
+
+    html += '<div class="section-header">';
+    html += "<h3>" + escapeHtml(cluster.name) + "</h3>";
+    html += '<span class="count">' + escapeHtml(String(clusterRepos.length)) + " repos</span>";
+    html += "</div>";
+
+    if (clusterRepos.length > 0) {
+      html += renderRepoCards(clusterRepos);
+    } else {
+      html += '<div class="empty-state"><p>No repos found in this cluster</p></div>';
+    }
+
+    // Safe: all dynamic values are escaped
+    container.innerHTML = html;
+  }
+
+  /**
+   * Render a list of repo cards as HTML.
+   * All dynamic repo data is escaped before insertion.
+   */
+  function renderRepoCards(repoList) {
+    let html = '<div class="results-list">';
+
+    for (const repo of repoList) {
+      const langColor = LANG_COLORS[repo.language] || "#8b949e";
+
+      html += '<div class="repo-card">';
+      html += '<div class="repo-card-header">';
+
+      if (repo.url) {
+        html += '<a href="' + escapeAttr(repo.url) + '" class="repo-name" target="_blank" rel="noopener">' + escapeHtml(repo.name) + "</a>";
+      } else {
+        html += '<span class="repo-name">' + escapeHtml(repo.name) + "</span>";
+      }
+
+      if (repo._score !== undefined) {
+        html += '<span class="score-badge">' + escapeHtml(repo._score.toFixed(1)) + "</span>";
+      }
+      html += "</div>";
+
+      if (repo.description) {
+        html += '<div class="description">' + escapeHtml(repo.description) + "</div>";
+      }
+
+      // Meta row
+      html += '<div class="repo-meta">';
+
+      if (repo.language) {
+        html += '<span class="language-badge">';
+        html += '<span class="language-dot" style="background:' + escapeAttr(langColor) + '"></span>';
+        html += escapeHtml(repo.language);
+        html += "</span>";
+      }
+
+      if (repo.stars !== undefined && repo.stars !== null) {
+        html += '<span class="stars-badge">&#9733; ' + escapeHtml(String(repo.stars)) + "</span>";
+      }
+
+      if (repo.updated_at) {
+        html += "<span>Updated " + escapeHtml(formatDate(repo.updated_at)) + "</span>";
+      }
+
+      html += "</div>"; // repo-meta
+
+      // Topics
+      const topics = repo.topics || [];
+      if (topics.length > 0) {
+        html += '<div class="topic-tags">';
+        for (const t of topics.slice(0, 8)) {
+          html += '<span class="topic-tag">' + escapeHtml(t) + "</span>";
+        }
+        html += "</div>";
+      }
+
+      html += "</div>"; // repo-card
+    }
+
+    html += "</div>";
+    return html;
+  }
+
+  /**
+   * Render the filter sidebar HTML.
+   */
+  function renderFilterSidebar() {
+    let html = '<div class="filter-sidebar" id="filter-sidebar">';
+
+    // Language filters
+    if (facets.languages.length > 0) {
+      html += '<div class="filter-group">';
+      html += "<h4>Language</h4>";
+      for (const lang of facets.languages.slice(0, 10)) {
+        const checked = currentFilters.languages.includes(lang.name) ? " checked" : "";
+        html += "<label>";
+        html += '<input type="checkbox" data-filter="language" value="' + escapeAttr(lang.name) + '"' + checked + ">";
+        html += " " + escapeHtml(lang.name) + " (" + escapeHtml(String(lang.count)) + ")";
+        html += "</label>";
+      }
+      html += "</div>";
+    }
+
+    // Topic filters
+    if (facets.topics.length > 0) {
+      html += '<div class="filter-group">';
+      html += "<h4>Topics</h4>";
+      for (const topic of facets.topics.slice(0, 10)) {
+        const checked = currentFilters.topics.includes(topic.name) ? " checked" : "";
+        html += "<label>";
+        html += '<input type="checkbox" data-filter="topic" value="' + escapeAttr(topic.name) + '"' + checked + ">";
+        html += " " + escapeHtml(topic.name) + " (" + escapeHtml(String(topic.count)) + ")";
+        html += "</label>";
+      }
+      html += "</div>";
+    }
+
+    // Stars range filter
+    if (facets.maxStars > 0) {
+      html += '<div class="filter-group">';
+      html += "<h4>Min Stars</h4>";
+      html += '<input type="range" id="stars-filter" min="0" max="' + escapeAttr(String(facets.maxStars)) + '" value="' + escapeAttr(String(currentFilters.minStars)) + '">';
+      html += '<div class="range-labels">';
+      html += "<span>0</span>";
+      html += '<span id="stars-value">' + escapeHtml(String(currentFilters.minStars)) + "</span>";
+      html += "<span>" + escapeHtml(String(facets.maxStars)) + "</span>";
+      html += "</div>";
+      html += "</div>";
+    }
+
+    html += "</div>"; // filter-sidebar
+    return html;
+  }
+
+  /**
+   * Bind event listeners for filter checkboxes and range inputs.
+   */
+  function bindFilterEvents() {
+    // Filter toggle (mobile)
+    const toggle = document.getElementById("filter-toggle");
+    const sidebar = document.getElementById("filter-sidebar");
+    if (toggle && sidebar) {
+      toggle.addEventListener("click", () => {
+        filtersOpen = !filtersOpen;
+        sidebar.classList.toggle("open", filtersOpen);
+        toggle.textContent = filtersOpen ? "Hide Filters" : "Filters";
+      });
+    }
+
+    // Language checkboxes
+    document.querySelectorAll('input[data-filter="language"]').forEach((cb) => {
+      cb.addEventListener("change", () => {
+        currentFilters.languages = getCheckedValues("language");
+        route();
+      });
+    });
+
+    // Topic checkboxes
+    document.querySelectorAll('input[data-filter="topic"]').forEach((cb) => {
+      cb.addEventListener("change", () => {
+        currentFilters.topics = getCheckedValues("topic");
+        route();
+      });
+    });
+
+    // Stars range
+    const starsRange = document.getElementById("stars-filter");
+    const starsValue = document.getElementById("stars-value");
+    if (starsRange) {
+      starsRange.addEventListener("input", () => {
+        currentFilters.minStars = parseInt(starsRange.value, 10);
+        if (starsValue) starsValue.textContent = starsRange.value;
+      });
+      starsRange.addEventListener("change", () => {
+        route();
+      });
+    }
+  }
+
+  function getCheckedValues(filterType) {
+    const checked = [];
+    document.querySelectorAll('input[data-filter="' + filterType + '"]:checked').forEach((cb) => {
+      checked.push(cb.value);
+    });
+    return checked;
+  }
+
+  /**
+   * Bind click handlers on cluster cards.
+   */
+  function bindClusterClicks() {
+    document.querySelectorAll(".cluster-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const name = card.getAttribute("data-cluster");
+        window.location.hash = "#/cluster/" + encodeURIComponent(name);
+      });
+    });
+  }
+
+  /**
+   * Handle search input with debounce.
+   */
+  function handleSearchInput(value) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      if (value.trim()) {
+        window.location.hash = "#/search?q=" + encodeURIComponent(value.trim());
+      } else {
+        window.location.hash = "#/";
+      }
+    }, 300);
+  }
+
+  /**
+   * Format an ISO date string to a readable format.
+   */
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch {
+      return dateStr;
+    }
+  }
+
+  /**
+   * Initialize the app.
+   */
+  function init() {
+    window.addEventListener("hashchange", route);
+
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        handleSearchInput(e.target.value);
+      });
+
+      searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          clearTimeout(debounceTimer);
+          const val = searchInput.value.trim();
+          if (val) {
+            window.location.hash = "#/search?q=" + encodeURIComponent(val);
+          }
+        }
+      });
+    }
+
+    loadData();
+  }
+
+  return { init };
+})();
+
+// Start the app when DOM is ready
+document.addEventListener("DOMContentLoaded", App.init);

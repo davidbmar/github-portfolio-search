@@ -1,4 +1,4 @@
-agentA-data-export — Sprint 4
+agentB-web-ui — Sprint 4
 
 Sprint-Level Context
 
@@ -18,20 +18,29 @@ Constraints
 
 
 Objective
-- Fix test failures and build a static JSON data export for the web UI
+- Build a responsive search and browse UI for the public portfolio site
 
 Tasks
-- Fix B-005: CLI test failures on missing index edge cases
-- Fix B-006: JSON decode error in test_e2e.py
-- Create src/ghps/export.py with:
-  - export_static_bundle(store, output_dir) -> generates JSON files for static site
-  - repos.json — all repos with metadata, description, language, topics, stars, url
-  - clusters.json — capability clusters with repo names
-  - search-index.json — pre-computed embeddings or search data for client-side search
-- Add ghps export command to CLI: ghps export --db PATH --output web/data/
-- Create tests/test_export.py
+- Create web/index.html — single page app with:
+  - Search bar (prominent, centered on landing)
+  - Search results with cards: repo name, description, language badge, stars, topics, relevance score
+  - Capability cluster browse view (grid of cluster cards, click to expand)
+  - Faceted filter sidebar: language, topics, stars range, last updated
+  - Mobile responsive: stack layout, collapsible filters
+- Create web/css/style.css — dark theme matching davidbmar.com placeholder aesthetic
+- Create web/js/app.js — vanilla JS:
+  - Fetch repos.json and clusters.json on load
+  - Client-side search using pre-loaded data (filter + sort)
+  - Hash routing: #/ (home), #/search?q=X, #/cluster/name
+  - Debounced search input
+- Create web/js/search.js — client-side search logic:
+  - Text matching across repo name, description, topics, README excerpt
+  - Score and rank results
+  - Filter by facets
 
 Acceptance Criteria
-- python3 -m pytest tests/ -v passes with 0 failures
-- ghps export produces valid JSON files in output directory
-- repos.json contains all indexed repos with metadata
+- index.html loads and shows search bar + cluster grid
+- Typing a query shows filtered results
+- Clicking a cluster shows repos in that cluster
+- Layout works on mobile (375px viewport)
+- Dark theme, clean typography
