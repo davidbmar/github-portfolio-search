@@ -1,46 +1,34 @@
-agentC-web-access — Sprint 5
+agentB-test-infra — Sprint 6
 
 Sprint-Level Context
 
 Goal
-- Deploy the web UI to davidbmar.com (fix B-009)
-- Fix remaining test failures (B-005, B-006)
-- Add data export pipeline so the site has real content
-- Begin gated access foundation (access request UI)
+- CRITICAL: Fix B-010 — davidbmar.com shows "Could not load data" because data files are empty
+- Fix B-005, B-006 — remaining 4 test failures from Sprint 3
+- Add sample data so the site works without a GitHub token
+- Production hardening: proper error handling when data is missing
 
 Constraints
 - No two agents may modify the same files
-- agentA owns deploy pipeline and bug fixes (deploy.sh, tests/test_cli.py, tests/test_e2e.py, src/ghps/cli.py)
-- agentB owns data indexing and export (src/ghps/export.py, src/ghps/indexer.py, scripts/)
-- agentC owns web UI improvements and access request page (web/)
+- agentA owns data pipeline fixes (src/ghps/export.py, web/data/, scripts/)
+- agentB owns test fixes and infrastructure (tests/, pyproject.toml, Makefile)
+- agentC owns web UI error handling and resilience (web/js/app.js, web/js/search.js, web/index.html)
 - Use python3 for all commands
-- Do NOT commit .venv/ or node_modules/ to git
+- Do NOT commit .venv/ to git
 
 
 Objective
-- Improve web UI with real data loading and an access request page
+- Fix all remaining test failures and get to 0 failures / 0 errors
 
 Tasks
-- Update web/js/app.js to:
-  - Fetch web/data/repos.json and web/data/clusters.json on page load
-  - Display repos in search results cards
-  - Display clusters as clickable category cards on the landing page
-  - Show "No results" when search returns empty
-  - Add loading spinner while data loads
-- Update web/index.html:
-  - Add navigation: Home | Search | Clusters | Request Access
-  - Add an "Request Access" page/section with:
-    - Name input, email input, reason textarea
-    - Submit button (posts to /api/access/request or shows "coming soon" message)
-    - "Public tier — browse clusters and search descriptions. Request full access for code snippets."
-- Update web/css/style.css:
-  - Style result cards: repo name, description, language badge, stars count, topics
-  - Style cluster cards: cluster name, repo count, representative repos
-  - Mobile responsive: 375px viewport test
-- Test with Playwright: verify search shows results from repos.json, clusters render
+- Fix B-005: test_cli.py TypeError on missing index — add try/except in cli.py for FileNotFoundError when DB doesn't exist, return helpful error message
+- Fix B-006: test_e2e.py JSON decode error — ensure ghps search --format json outputs valid JSON even when no results found (output empty array, not error text)
+- Add playwright to pyproject.toml [project.optional-dependencies] test group
+- Create Makefile with targets: install, test, serve, index, export, deploy
+- Remove or skip test_web_playwright.py tests if playwright browser not installed (use pytest.importorskip)
 
 Acceptance Criteria
-- Landing page shows cluster cards from clusters.json
-- Search filters repos from repos.json
-- Request Access section is visible with form fields
-- Mobile layout works (375px viewport)
+- python3 -m pytest tests/ -v shows 0 failures, 0 errors (playwright tests skipped if browser not installed)
+- make test runs the full suite
+- make install sets up the venv
+- ghps search --format json returns valid JSON for empty results
