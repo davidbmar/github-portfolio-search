@@ -208,7 +208,7 @@ class TestCLI:
                 from ghps.cli import main
 
                 runner = CliRunner()
-                result = runner.invoke(main, ["search", "python", "--top-k", "5"])
+                result = runner.invoke(main, ["search", "python", "--top-k", "5", "--db", ":memory:"])
 
                 assert result.exit_code == 0, f"CLI failed: {result.output}"
                 assert "test-repo" in result.output
@@ -236,7 +236,7 @@ class TestCLI:
                 from ghps.cli import main
 
                 runner = CliRunner()
-                result = runner.invoke(main, ["search", "nonexistent"])
+                result = runner.invoke(main, ["search", "nonexistent", "--db", ":memory:"])
 
                 assert result.exit_code == 0, f"CLI failed: {result.output}"
                 assert "No results found" in result.output

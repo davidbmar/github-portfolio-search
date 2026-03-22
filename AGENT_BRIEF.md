@@ -1,4 +1,4 @@
-agentB-mcp-server — Sprint 3
+agentC-cli-e2e — Sprint 3
 
 Sprint-Level Context
 
@@ -17,22 +17,25 @@ Constraints
 
 
 Objective
-- Build an MCP server that exposes portfolio search tools for Claude Code and Bob
+- Improve CLI output formatting and add end-to-end tests
 
 Tasks
-- Add mcp dependency to pyproject.toml (or use the lightweight JSON-RPC approach)
-- Create src/ghps/mcp_server.py with MCP server implementing these tools:
-  - portfolio_search(query: str, top_k: int = 10) -> list of results with repo_name, score, snippet, url
-  - portfolio_clusters() -> list of capability clusters with repo names
-  - portfolio_repo_detail(repo_name: str) -> full repo metadata, README excerpt, tech stack
-  - portfolio_reindex(username: str) -> trigger re-indexing, return count
-- Each tool should have clear JSON Schema input/output descriptions
-- Server should accept --db flag for index path (default: ~/.ghps/index.db)
-- Add [project.scripts] entry: ghps-mcp = "ghps.mcp_server:main"
-- Create tests/test_mcp.py with unit tests for each tool
+- Improve src/ghps/cli.py:
+  - Add rich/click formatting for search results (colored scores, truncated snippets)
+  - Add ghps serve command to start the FastAPI server
+  - Add ghps status command showing index stats (repo count, chunk count, last indexed)
+  - Add --format json flag for machine-readable output
+  - Better error messages when index doesn't exist
+- Create tests/test_cli.py with Click CliRunner tests:
+  - Test ghps search with mock store
+  - Test ghps index with mock GitHub API
+  - Test ghps status with mock store
+  - Test --format json output
+- Create tests/test_e2e.py with end-to-end test:
+  - Create temp index → index mock repos → search → verify results → clean up
 
 Acceptance Criteria
-- ghps-mcp starts without errors
-- MCP tool list returns 4 tools with correct schemas
-- portfolio_search returns ranked results
-- portfolio_reindex triggers indexing
+- ghps search "query" shows colored, formatted results
+- ghps serve starts the FastAPI server
+- ghps status shows index statistics
+- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes

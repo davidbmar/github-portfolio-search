@@ -3,17 +3,17 @@
 ## Summary
 
 ### Files changed
-- **`src/ghps/mcp_server.py`** (new) — MCP server implementing JSON-RPC 2.0 over stdio with 4 tools
-- **`tests/test_mcp.py`** (new) — 19 unit tests covering tool definitions, MCP protocol, and all tool handlers
-- **`pyproject.toml`** (modified) — Fixed duplicate `[project.scripts]` section, added `ghps-mcp` entry
+- **`src/ghps/cli.py`** — Rewrote CLI with colored output (`click.style`), `serve` command, `status` command, `--format json` flag, `_db_exists` error handling
+- **`tests/test_cli.py`** — Created 11 CliRunner tests (search: 5, index: 2, status: 3, serve: 1)
+- **`tests/test_e2e.py`** — Created 7 E2E tests with real EmbeddingPipeline and temp DB
+- **`tests/test_search.py`** — Added `--db :memory:` to 2 existing CLI tests for compatibility
+- **`docs/project-memory/sessions/S-2026-03-22-0559-cli-e2e-sprint3.md`** — Session doc
 
 ### Commands run
-- `git pull origin main` — already up to date
-- `python3 -m pytest tests/test_mcp.py -v` — 19 passed
-- `python3 -m pytest tests/ -v` — 81 passed (full suite)
-- `git push -u origin HEAD` — pushed to `agentB-mcp-server`
+- `python3 -m pytest tests/ -v -c /dev/null` — **80 tests passed** (including 18 new CLI + E2E tests)
+- `git push -u origin HEAD` — Pushed to `agentC-cli-e2e` branch
 
 ### Notes / follow-on work
-- **No `mcp` package dependency**: The `mcp` PyPI package requires Python >=3.10, but the project targets >=3.9. Used the lightweight JSON-RPC approach as allowed by the brief. If Python minimum is bumped to 3.10+, could migrate to the `mcp` SDK.
-- **`portfolio_reindex`** calls the github_client module functions directly (not via `Indexer.index_user`) since `github_client.py` uses standalone functions, not a class.
-- **pyproject.toml** had duplicate `[project.scripts]` sections — merged them into one.
+- **pyproject.toml** has duplicate `[project.scripts]` sections — pytest can't parse it. Tests require `-c /dev/null` to bypass. This is agentA's domain to fix.
+- Used `click.style()` instead of `rich` to avoid adding new dependencies outside my file scope.
+- The `ghps serve` command delegates to the existing FastAPI app in `api.py`.
