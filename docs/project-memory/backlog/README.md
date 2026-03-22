@@ -40,8 +40,8 @@ What should happen?
 | B-002 | pyproject.toml missing [project.scripts] entry for ghps CLI | Fixed | High |
 | B-003 | sprint-config.sh DEFAULT_TEST_CMD needs venv prefix | Fixed | High |
 | B-004 | test_embeddings.py and test_store.py fail to collect (import errors) | Fixed | High |
-| B-005 | CLI tests fail on missing index edge cases (3 failures in test_cli.py) | Open | High |
-| B-006 | test_e2e.py json decode error in CLI search JSON output | Open | High |
+| B-005 | CLI tests fail on missing index edge cases (3 failures in test_cli.py) | Fixed | High |
+| B-006 | test_e2e.py json decode error in CLI search JSON output | Fixed | High |
 | B-007 | sprint-run.sh dies during "Collecting project metrics" phase | Open | Medium |
 | F-001 | Add .env support for GITHUB_TOKEN (python-dotenv) | Open | Medium |
 | F-002 | Add progress bar to indexer (tqdm) | Open | Low |

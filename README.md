@@ -65,8 +65,9 @@ docs/
 | 4 | Web UI — public tier + browse | Complete |
 | 5 | Deploy pipeline + data export | Complete |
 | 6 | Stabilization — sample data + web resilience | Complete |
-| 7 | Test fixes + real data indexing | **Next** |
-| 8 | Search relevance + UX polish | Planned |
+| 7 | Test fixes + real data indexing (42 repos) | Complete |
+| 8 | Search relevance + UX polish | **Next** |
+| 9 | Gated access + docs cleanup | Planned |
 
 ## Deployment
 

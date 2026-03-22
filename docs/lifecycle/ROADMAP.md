@@ -41,17 +41,17 @@ PM/customer review checkpoint: Deployed to davidbmar.com — search works (presi
 Backlog triage: B-010 fixed, B-011 fixed, F-003 fixed. B-005 and B-006 (4 test failures) still open — escalated to High.
 Planning input for Sprint 7: Fix remaining 4 test failures (B-005, B-006), then move to real GitHub data indexing.
 
-**Sprint 7: Test Fixes and Real Data Indexing**
-Build goals: Fix B-005 (CLI missing index edge cases — 3 test failures in test_cli.py). Fix B-006 (JSON decode error in test_e2e.py). Fix B-012 (venv symlink breakage). Index all 90+ repos with live GitHub API (requires GITHUB_TOKEN). Generate real repos.json and clusters.json. Deploy with real portfolio data.
-PM/customer review checkpoint: Run full test suite — 0 failures, 0 errors. Visit davidbmar.com — search for "presigned URL" and verify real repo appears. Search for "voice" and verify audio repos. Browse clusters with real groupings.
-Backlog triage: Capture search relevance issues, missing repos, bad cluster groupings.
-Planning input for Sprint 8: Based on real data quality, decide if relevance tuning or UX improvements are higher priority.
+**Sprint 7: Test Fixes and Real Data Indexing (COMPLETED 2026-03-22)**
+Build goals: Fixed B-005 (Click mix_stderr removed in 8.2+) and B-006 (progress bars corrupting JSON output). Indexed 42 real GitHub repos via API. Generated real repos.json (42 repos) and clusters.json (6 clusters). Deployed to davidbmar.com with real portfolio data. Tests: 129 passed, 0 failed, 1 skipped.
+PM/customer review checkpoint: Full test suite passes. davidbmar.com live with real data — search for "presigned URL" returns S3-presignedURL repo (score 38.0). 6 clusters: Voice & Speech (11), Transcription & ASR (6), Browser-Native AI (6), AI & Search Tools (6), AWS Infra (6), Developer Tools (7). Faceted search works with real topics.
+Backlog triage: B-005 fixed, B-006 fixed. B-012 (venv symlinks) still open. 42 of ~90 repos indexed (some may be private/empty).
+Planning input for Sprint 8: Relevance tuning and UX polish — real data is live, now improve the experience.
 
-**Sprint 8: Real Data — Index All 90+ Repos and Deploy**
-Build goals: Run ghps index davidbmar against live GitHub API (requires GITHUB_TOKEN). Generate real repos.json and clusters.json with actual repo data. Deploy to davidbmar.com with real portfolio data. Add index freshness indicator (last indexed timestamp). Create a GitHub Actions workflow or cron job for periodic re-indexing.
-PM/customer review checkpoint: Visit davidbmar.com — search for "presigned URL" and verify S3-presignedURL repo appears. Search for "voice" and verify ~20 repos. Browse clusters and verify groupings make sense. Test as a recruiter: can they understand what David builds?
-Backlog triage: Capture search relevance issues, missing repos, bad cluster groupings, slow queries.
-Planning input for Sprint 9: Based on real data quality, decide if relevance tuning or UX improvements are higher priority.
+**Sprint 8: Search Relevance and UX Polish**
+Build goals: Tune search relevance scoring (chunk weighting, title boost, recency factor). Add result highlighting (bold matched terms in snippets). Improve cluster naming. Add "Related repos" suggestions on detail view. Polish landing page with stats (N repos indexed, M capabilities, last updated). Fix B-012 (venv symlinks). Add index freshness indicator.
+PM/customer review checkpoint: Run the full use-case matrix with real data. Verify semantic matches ("how did I handle auth?" returns auth repos), temporal queries ("recent projects" ranks by date), and recombination queries ("voice + AWS" finds intersection). Test that a non-technical person can understand the portfolio.
+Backlog triage: Search relevance issues, UX friction, accessibility.
+Planning input for Sprint 9: Decide on gated access vs. open access model.
 
 **Sprint 9: Search Relevance and UX Polish**
 Build goals: Tune search relevance scoring (chunk weighting, title boost, recency factor). Add result highlighting (bold matched terms in snippets). Improve cluster naming (auto-generate meaningful names from repo topics). Add "Related repos" suggestions on detail view. Polish the landing page with stats (N repos indexed, M capabilities, last updated).
@@ -74,19 +74,13 @@ Planning input for Sprint 12: Based on user feedback and analytics, decide next 
 
 ### Current Focus
 
-**Sprint 7: Test Fixes and Real Data Indexing (Sprints 1-6 COMPLETE)**
+**Sprint 8: Search Relevance and UX Polish (Sprints 1-7 COMPLETE)**
 
-Sprints 1-6 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, deploy pipeline, data export, sample data, web resilience, and Makefile. Sprint 7 focuses on fixing the last 4 test failures and indexing real GitHub data.
+Sprints 1-7 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, deploy pipeline, data export, sample data, web resilience, Makefile, all test fixes (129 passing), and real data (42 repos, 6 clusters live on davidbmar.com). Sprint 8 focuses on search relevance tuning and UX polish.
 
 ### Next Up
 
-**Sprint 8: Search Relevance and UX Polish**
-
-FastAPI server with search, clusters, and repo detail endpoints. Faceted filtering by capability, tech stack, language, last active date, and maturity level. Auto-generated capability clusters from embedding similarity.
-
-Then **Phase 3: Web UI + Visualization (Sprints 5-6)** — search page with result cards, faceted sidebar, D3.js capability tree (circle-packing), activity timeline/heatmap, and browse-without-searching landing page.
-
-Followed by **Phase 4: MCP + Agent Integration (Sprint 7)** — MCP server for Claude Code and Bob, private repo support.
+**Sprint 9: Gated Access and Docs Cleanup** — access tiers, Google OAuth, approval workflow, documentation cleanup.
 
 Finally **Phase 5: Public Deploy + Gated Access (Sprints 8-9)** — S3/CloudFront at davidbmar.com, Google OAuth, approval workflow with Telegram notifications, public/gated tiers.
 
