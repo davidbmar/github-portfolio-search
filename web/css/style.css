@@ -946,6 +946,63 @@ a:hover {
   border-color: var(--accent);
 }
 
+/* Technology Distribution bars */
+.topic-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+
+.topic-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topic-bar-label {
+  width: 120px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topic-bar-track {
+  flex: 1;
+  height: 20px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.topic-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.topic-bar-count {
+  width: 30px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* Topic filter scrollable list */
+.filter-topic-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-count {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 /* Footer */
 .site-footer {
   text-align: center;
@@ -1039,6 +1096,17 @@ a:hover {
 
   .access-request-page {
     padding: 24px 0;
+  }
+
+  .filter-topic-list {
+    max-height: 240px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .topic-bar-label {
+    width: 90px;
+    font-size: 0.8rem;
   }
 
   .error-banner {

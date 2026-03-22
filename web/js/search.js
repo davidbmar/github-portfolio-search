@@ -199,7 +199,7 @@ const SearchEngine = (() => {
     const topics = Object.entries(topicCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 20); // Cap at top 20 topics
+      .slice(0, 15); // Cap at top 15 topics
 
     return { languages, topics, maxStars };
   }

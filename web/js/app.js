@@ -638,18 +638,24 @@ const App = (() => {
     }
     const topTopics = Object.entries(topicCounts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
+      .slice(0, 15);
 
     if (topTopics.length > 0) {
       const maxTopicCount = topTopics[0][1];
+      const barColors = [
+        'var(--accent)', 'var(--green)', 'var(--purple)',
+        'var(--yellow)', 'var(--orange)', '#f778ba'
+      ];
       html += '<div class="section-header"><h3>Technology Distribution</h3>';
-      html += '<span class="count">top topics</span></div>';
+      html += '<span class="count">' + escapeHtml(String(topTopics.length)) + ' topics</span></div>';
       html += '<div class="topic-distribution">';
-      for (const [topic, count] of topTopics) {
+      for (let i = 0; i < topTopics.length; i++) {
+        const [topic, count] = topTopics[i];
         const pct = Math.round((count / maxTopicCount) * 100);
+        const color = barColors[i % barColors.length];
         html += '<div class="topic-bar-row">';
         html += '<span class="topic-bar-label">' + escapeHtml(topic) + '</span>';
-        html += '<div class="topic-bar-track"><div class="topic-bar-fill" style="width:' + escapeAttr(String(pct)) + '%"></div></div>';
+        html += '<div class="topic-bar-track"><div class="topic-bar-fill" style="width:' + escapeAttr(String(pct)) + '%;background:' + escapeAttr(color) + '"></div></div>';
         html += '<span class="topic-bar-count">' + escapeHtml(String(count)) + '</span>';
         html += '</div>';
       }
@@ -885,15 +891,17 @@ const App = (() => {
 
     // Topic filters
     if (facets.topics.length > 0) {
-      html += '<div class="filter-group">';
+      html += '<div class="filter-group filter-group-topics">';
       html += "<h4>Topics</h4>";
-      for (const topic of facets.topics.slice(0, 10)) {
+      html += '<div class="filter-topic-list">';
+      for (const topic of facets.topics.slice(0, 15)) {
         const checked = currentFilters.topics.includes(topic.name) ? " checked" : "";
         html += "<label>";
         html += '<input type="checkbox" data-filter="topic" value="' + escapeAttr(topic.name) + '"' + checked + ">";
-        html += " " + escapeHtml(topic.name) + " (" + escapeHtml(String(topic.count)) + ")";
+        html += " " + escapeHtml(topic.name) + ' <span class="filter-count">(' + escapeHtml(String(topic.count)) + ")</span>";
         html += "</label>";
       }
+      html += "</div>";
       html += "</div>";
     }
 
@@ -1037,12 +1045,7 @@ const App = (() => {
       .clusters-stats-summary .stat-item { text-align:center; }
       .clusters-stats-summary .stat-number { display:block; font-size:1.1rem; font-weight:600; color:var(--text, #e6edf3); }
       .clusters-stats-summary .stat-label { font-size:0.8rem; color:var(--muted, #8b949e); }
-      .topic-distribution { display:flex; flex-direction:column; gap:8px; margin-bottom:2rem; }
-      .topic-bar-row { display:flex; align-items:center; gap:10px; }
-      .topic-bar-label { width:120px; text-align:right; font-size:0.85rem; color:var(--text, #e6edf3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .topic-bar-track { flex:1; height:20px; background:var(--border, #30363d); border-radius:4px; overflow:hidden; }
-      .topic-bar-fill { height:100%; background:var(--link, #58a6ff); border-radius:4px; transition:width 0.3s ease; }
-      .topic-bar-count { width:30px; font-size:0.85rem; color:var(--muted, #8b949e); }
+      /* topic-distribution styles moved to style.css */
       .sort-controls { display:flex; align-items:center; gap:8px; margin-bottom:0.75rem; }
       .sort-controls label { font-size:0.85rem; color:var(--muted, #8b949e); }
       .sort-select { background:var(--card-bg, #161b22); color:var(--text, #e6edf3); border:1px solid var(--border, #30363d); border-radius:6px; padding:4px 8px; font-size:0.85rem; cursor:pointer; }
