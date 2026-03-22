@@ -66,16 +66,22 @@ Backlog triage: No new bugs. Extended roadmap to Sprint 15.
 Planning input for Sprint 11: Activity visualization with D3.js.
 
 **Sprint 11: Activity Visualization and Portfolio Analytics**
-Build goals: Add D3.js capability tree (circle-packing visualization) showing the full portfolio at a glance. Build activity timeline/heatmap showing commit frequency across repos. Add portfolio analytics: most active repos, tech stack distribution, language breakdown. Create shareable portfolio link with OG tags for social media.
-PM/customer review checkpoint: Visit davidbmar.com — verify capability tree renders and is interactive (click to zoom). Verify heatmap shows real activity data. Share the link on social media and verify OG preview renders correctly. Test on mobile.
-Backlog triage: Visualization performance issues, data accuracy, mobile rendering bugs.
-Planning input for Sprint 12: Based on user feedback and analytics, decide next priorities.
+Build goals: Added D3.js circle-packing visualization on Clusters page. Added Recent Activity section (10 most recent repos). Added cluster stats summary (total repos, largest cluster, top language). Added search sort options. Added OG/Twitter meta tags. Also: indexed all 94 repos (up from 42) with .env token support, fixed cluster naming to be capability-based. Tests: 141 passed, 0 failed.
+PM/customer review checkpoint: D3 viz renders with 6 named clusters. Recent Activity shows 10 repos sorted by date. Search sort works. 94 repos live. Cluster names are capability-oriented. Technology Distribution shows only 3 topics (most repos lack GitHub tags — B-014).
+Backlog triage: Added B-014 (missing topics), B-015 (misclassified repos), F-006 (auto-tag from README).
+Planning input for Sprint 12: Auto-tagging repos from README content would dramatically improve clusters and topic distribution.
 
-**Sprint 12: Gated Access — Google OAuth and Approval Workflow**
+**Sprint 12: Auto-Tagging and Cluster Quality**
+Build goals: Implement F-006 — auto-infer topics from README content during indexing (extract keywords like "voice", "aws", "docker", "react" from README text). Store inferred topics alongside GitHub topics. Re-export with enriched topic data so Technology Distribution and faceted search show meaningful topics. Fix B-015 (misclassified repos in AI & Search cluster). Improve cluster algorithm with better keyword weighting.
+PM/customer review checkpoint: Technology Distribution shows 10+ meaningful topics. Faceted search topic filters are useful. Clusters are accurate — no misclassified repos. All 94 repos have at least 2 inferred topics.
+Backlog triage: Cluster quality issues, topic extraction accuracy.
+Planning input for Sprint 13: With good topic data, gated access becomes the next priority.
+
+**Sprint 13: Gated Access — Google OAuth and Approval Workflow**
 Build goals: Implement Google OAuth login flow. Build access request submission (form data → API → Telegram notification to David). Add admin approve/deny endpoint. Unlock gated content (code snippets, file tree) for approved users. Add session management with JWT.
 PM/customer review checkpoint: Test full workflow with Playwright — request access, receive Telegram notification, approve, verify gated content unlocks. Unauthenticated users see public tier only.
 Backlog triage: OAuth edge cases, session expiry, notification reliability.
-Planning input for Sprint 13: Based on real user access requests, tune the approval flow.
+Planning input for Sprint 14: Based on real user access requests, tune the approval flow.
 
 **Sprint 13: Auto-Refresh and GitHub Webhooks**
 Build goals: Implement GitHub webhook listener for push events. Auto-reindex repos on push. Add periodic re-index fallback (cron or GitHub Actions). Add "freshness" badge on repos (indexed today, this week, stale). Private repo support with token-scoped indexing.
@@ -97,13 +103,13 @@ Planning input for Sprint 16: Based on analytics, prioritize features users actu
 
 ### Current Focus
 
-**Sprint 11: Activity Visualization and Portfolio Analytics (Sprints 1-10 COMPLETE)**
+**Sprint 12: Auto-Tagging and Cluster Quality (Sprints 1-11 COMPLETE)**
 
-Sprints 1-10 delivered: full stack portfolio search with 42 real repos, faceted search, multi-word queries, search highlighting, relevance scoring, capability clusters, Request Access page, repo detail pages, language stats, and mobile support at davidbmar.com. Sprint 11 adds visual portfolio analytics.
+Sprints 1-11 delivered: full stack portfolio search with 94 real repos, D3.js circle-packing visualization, faceted search, multi-word queries, search highlighting, relevance scoring, 6 capability clusters, Recent Activity, Request Access page, repo detail pages, language stats, OG meta tags, and mobile support at davidbmar.com. Sprint 12 improves data quality by auto-tagging repos from README content.
 
 ### Next Up
 
-**Sprint 12: Gated Access** — Google OAuth, approval workflow, Telegram notifications.
+**Sprint 13: Gated Access** — Google OAuth, approval workflow, Telegram notifications.
 
 ## Architecture
 

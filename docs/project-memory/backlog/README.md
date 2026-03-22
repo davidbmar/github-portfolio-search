@@ -43,7 +43,7 @@ What should happen?
 | B-005 | CLI tests fail on missing index edge cases (3 failures in test_cli.py) | Fixed | High |
 | B-006 | test_e2e.py json decode error in CLI search JSON output | Fixed | High |
 | B-007 | sprint-run.sh dies during "Collecting project metrics" phase | Open | Medium |
-| F-001 | Add .env support for GITHUB_TOKEN (python-dotenv) | Partial | Medium |
+| F-001 | Add .env support for GITHUB_TOKEN (python-dotenv) | Fixed | Medium |
 | F-002 | Add progress bar to indexer (tqdm) | Open | Low |
 | F-003 | Add Makefile with install/test/serve/index targets | Fixed | Medium |
 | B-008 | API /search and /clusters return empty when no index exists (no error msg) | Open | Medium |
@@ -54,4 +54,6 @@ What should happen?
 | B-013 | Web search is keyword-only — "voice processing" returns 0 results, needs fuzzy/semantic matching | Fixed | Medium |
 | F-004 | Deploy script should auto-export data before uploading | Open | Medium |
 | F-005 | Web search should support multi-word queries (split terms, match any) | Fixed | High |
-| F-005 | Web search should support multi-word queries (split terms, match any) | Fixed | High |
+| B-014 | Technology Distribution shows only 3 topics — most repos lack GitHub topic tags | Open | Medium |
+| B-015 | AI & Search cluster contains non-AI repos (exampleLoops, Palindrome-Index) | Open | Low |
+| F-006 | Auto-tag repos with topics inferred from README content during indexing | Open | Medium |
