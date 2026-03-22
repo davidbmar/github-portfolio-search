@@ -80,8 +80,11 @@ const SearchEngine = (() => {
   /**
    * Search repos by query string.
    * Returns sorted array of { repo, score } objects.
+   * Handles empty or missing repos array gracefully.
    */
   function search(repos, query) {
+    if (!Array.isArray(repos) || repos.length === 0) return [];
+
     const terms = tokenize(query);
     const results = [];
 
@@ -106,6 +109,7 @@ const SearchEngine = (() => {
    * }
    */
   function applyFilters(repos, filters) {
+    if (!Array.isArray(repos) || repos.length === 0) return [];
     return repos.filter((repo) => {
       // Language filter
       if (filters.languages && filters.languages.length > 0) {
@@ -135,6 +139,9 @@ const SearchEngine = (() => {
    * Returns { languages: [{name, count}], topics: [{name, count}], maxStars }
    */
   function extractFacets(repos) {
+    if (!Array.isArray(repos) || repos.length === 0) {
+      return { languages: [], topics: [], maxStars: 0 };
+    }
     const langCounts = {};
     const topicCounts = {};
     let maxStars = 0;

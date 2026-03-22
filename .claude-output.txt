@@ -1,18 +1,25 @@
+`★ Insight ─────────────────────────────────────`
+- **Defensive JSON parsing**: Instead of calling `.json()` directly (which throws on empty body), we first read `.text()`, check if it's non-empty, then `JSON.parse`. This prevents the confusing "Unexpected end of JSON input" error that was causing B-010.
+- **Graceful degradation pattern**: The `useFallbackData()` function sets the app state to sample data *and* renders the UI, so the site still looks functional even when the backend has no data. The error banner is informational, not blocking.
+`─────────────────────────────────────────────────`
+
+---
+
 ## Summary
 
 ### Files changed
-- **`pyproject.toml`** — Added `test` optional-dependency group with `playwright>=1.40`
-- **`tests/test_web_playwright.py`** — Added `pytest.importorskip("playwright")` at module level for graceful skip
-- **`Makefile`** — Added `export` and `deploy` targets, updated `.PHONY` list
-- **`docs/project-memory/sessions/S-2026-03-22-0711-sprint6-test-infra.md`** — Session doc
+- `web/js/app.js` — Error handling with retry button, sample data fallback, loading skeleton, footer
+- `web/js/search.js` — Guard clauses for empty/null repos in `search()`, `applyFilters()`, `extractFacets()`
+- `web/css/style.css` — Loading skeleton animation, error banner styles, retry button, footer, sticky footer layout, mobile responsive
+- `web/index.html` — Meta description, OG tags, Twitter card, SVG emoji favicon
+- `docs/project-memory/sessions/S-2026-03-22-0712-sprint6-web-resilience.md` — Session doc
 
 ### Commands run
-- `git pull origin main` — ensured up to date
-- `python3 -m pytest tests/ -v` — 137 passed, 0 failures, 0 errors
-- `make test` — confirmed it runs the full suite successfully
+- `git pull origin main` — merged latest
+- `python3 -m pytest tests/ -v` — 137 passed
+- `node -e ...` — verified search.js handles empty/null data
 - `git push -u origin HEAD` — pushed to remote
 
 ### Notes / follow-on work
-- **B-005 and B-006 were already fixed** in `cli.py` from prior sprints. The `_db_exists()` guard handles missing DB (B-005), and the JSON format branch outputs valid JSON even for empty results (B-006).
-- Playwright tests pass on this machine (browser installed). On systems without playwright, all 8 tests will show as **skipped** rather than erroring.
-- The `deploy` target depends on `scripts/deploy.sh` existing — it validates before running.
+- **Playwright tests** mentioned in acceptance criteria (visit site with empty data, sample data, mobile 375px viewport) are not yet implemented — these would be added by the test agent (agentB) per the constraint boundaries
+- The sample fallback data is minimal (1 repo, 1 cluster) — could be enriched with more representative examples
