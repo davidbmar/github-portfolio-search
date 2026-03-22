@@ -7,17 +7,22 @@
  */
 
 // --- Password Gate (session-scoped) ---
+// Wraps password input in a <form> to avoid Chrome "not secure" warning.
+// Sets window.__ghpsGateLocked so App.init() can skip initialization.
 (() => {
   const KEY = "ghps_auth";
   const EXPECTED = "guild";
   if (sessionStorage.getItem(KEY) === "1") return;
+  window.__ghpsGateLocked = true;
   document.addEventListener("DOMContentLoaded", () => {
-    if (sessionStorage.getItem(KEY) === "1") return;
+    if (sessionStorage.getItem(KEY) === "1") { window.__ghpsGateLocked = false; return; }
     document.body.textContent = "";
     const overlay = document.createElement("div");
     overlay.style.cssText = "position:fixed;inset:0;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:9999";
-    const box = document.createElement("div");
-    box.style.cssText = "text-align:center;color:#c9d1d9;font-family:system-ui";
+    const form = document.createElement("form");
+    form.style.cssText = "text-align:center;color:#c9d1d9;font-family:system-ui";
+    form.autocomplete = "off";
+    form.onsubmit = e => { e.preventDefault(); tryLogin(); };
     const h2 = document.createElement("h2");
     h2.textContent = "GitHub Portfolio Search";
     h2.style.marginBottom = "1rem";
@@ -26,9 +31,12 @@
     p.style.cssText = "color:#8b949e;margin-bottom:1.5rem";
     const input = document.createElement("input");
     input.type = "password";
+    input.name = "password";
     input.placeholder = "Password";
+    input.autocomplete = "current-password";
     input.style.cssText = "padding:10px 16px;border-radius:8px;border:1px solid #30363d;background:#161b22;color:#c9d1d9;font-size:16px;width:240px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto";
     const btn = document.createElement("button");
+    btn.type = "submit";
     btn.textContent = "Enter";
     btn.style.cssText = "padding:10px 32px;border-radius:8px;border:none;background:#58a6ff;color:#0d1117;font-weight:600;font-size:16px;cursor:pointer";
     const err = document.createElement("p");
@@ -43,14 +51,12 @@
         input.focus();
       }
     };
-    btn.onclick = tryLogin;
-    input.onkeydown = e => { if (e.key === "Enter") tryLogin(); };
-    box.appendChild(h2);
-    box.appendChild(p);
-    box.appendChild(input);
-    box.appendChild(btn);
-    box.appendChild(err);
-    overlay.appendChild(box);
+    form.appendChild(h2);
+    form.appendChild(p);
+    form.appendChild(input);
+    form.appendChild(btn);
+    form.appendChild(err);
+    overlay.appendChild(form);
     document.body.appendChild(overlay);
     input.focus();
   });
@@ -1107,6 +1113,7 @@ const App = (() => {
    * Initialize the app.
    */
   function init() {
+    if (window.__ghpsGateLocked) return;
     injectActivityStyles();
     window.addEventListener("hashchange", route);
 
