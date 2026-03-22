@@ -1,41 +1,37 @@
-agentC-cli-e2e — Sprint 3
+agentC-deploy — Sprint 4
 
 Sprint-Level Context
 
 Goal
-- Fix remaining packaging and test bugs from Sprint 1-2 (B-001, B-004)
-- Build MCP server for Claude Code and Bob integration
-- Improve CLI with better output formatting and error handling
+- Build the public web UI for davidbmar.com with search and browse capabilities
+- Fix Sprint 3 test failures (B-005, B-006)
+- Deploy static site to S3/CloudFront
 
 Constraints
 - No two agents may modify the same files
-- agentA owns bug fixes and test reliability (pyproject.toml, tests/, Makefile)
-- agentB owns MCP server (src/ghps/mcp_server.py, src/ghps/mcp_tools.py)
-- agentC owns CLI improvements and end-to-end testing (src/ghps/cli.py, tests/test_cli.py, tests/test_e2e.py)
+- agentA owns bug fixes and static data export (tests/, src/ghps/export.py)
+- agentB owns web UI frontend (web/index.html, web/css/, web/js/)
+- agentC owns deployment pipeline and integration (deploy.sh, web/api-proxy.js)
 - Use python3 for all commands
-- MCP server must follow the MCP protocol spec
+- Frontend must be vanilla JS (no build step) — served as static files from S3
+- Mobile-responsive layout required
 
 
 Objective
-- Improve CLI output formatting and add end-to-end tests
+- Build deployment pipeline to push web UI to S3/CloudFront at davidbmar.com
 
 Tasks
-- Improve src/ghps/cli.py:
-  - Add rich/click formatting for search results (colored scores, truncated snippets)
-  - Add ghps serve command to start the FastAPI server
-  - Add ghps status command showing index stats (repo count, chunk count, last indexed)
-  - Add --format json flag for machine-readable output
-  - Better error messages when index doesn't exist
-- Create tests/test_cli.py with Click CliRunner tests:
-  - Test ghps search with mock store
-  - Test ghps index with mock GitHub API
-  - Test ghps status with mock store
-  - Test --format json output
-- Create tests/test_e2e.py with end-to-end test:
-  - Create temp index → index mock repos → search → verify results → clean up
+- Create deploy.sh script that:
+  - Runs ghps export to generate fresh data
+  - Copies web/ files + data/ to a build directory
+  - Uploads to S3 bucket davidbmar-com using aws s3 sync
+  - Invalidates CloudFront cache (distribution E3RCY6XA80ANRT)
+  - Prints the live URL
+- Create web/data/.gitkeep (data dir for export output)
+- Add deploy instructions to README.md
+- Create a simple health check: web/health.json with version and last-deploy timestamp
 
 Acceptance Criteria
-- ghps search "query" shows colored, formatted results
-- ghps serve starts the FastAPI server
-- ghps status shows index statistics
-- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes
+- ./deploy.sh uploads files to S3 and invalidates CloudFront
+- https://davidbmar.com shows the search UI after deploy
+- deploy.sh is idempotent (safe to run multiple times)

@@ -1,19 +1,20 @@
+All tasks complete.
+
 ---
 
-## Summary
+**Files changed:**
+- `deploy.sh` (new) — idempotent deployment script
+- `web/data/.gitkeep` (new) — data directory placeholder
+- `web/health.json` (new) — health check endpoint
+- `.gitignore` — added `_build/` exclusion
+- `README.md` — added Deployment section
+- `docs/project-memory/sessions/S-2026-03-22-0606-sprint4-deploy-pipeline.md` (new) — session doc
 
-### Files changed
-- **`src/ghps/cli.py`** — Rewrote CLI with colored output (`click.style`), `serve` command, `status` command, `--format json` flag, `_db_exists` error handling
-- **`tests/test_cli.py`** — Created 11 CliRunner tests (search: 5, index: 2, status: 3, serve: 1)
-- **`tests/test_e2e.py`** — Created 7 E2E tests with real EmbeddingPipeline and temp DB
-- **`tests/test_search.py`** — Added `--db :memory:` to 2 existing CLI tests for compatibility
-- **`docs/project-memory/sessions/S-2026-03-22-0559-cli-e2e-sprint3.md`** — Session doc
+**Commands run:**
+- `python3 -m pytest tests/ -v` — 99 passed
+- `git commit` + `git push -u origin HEAD`
 
-### Commands run
-- `python3 -m pytest tests/ -v -c /dev/null` — **80 tests passed** (including 18 new CLI + E2E tests)
-- `git push -u origin HEAD` — Pushed to `agentC-cli-e2e` branch
-
-### Notes / follow-on work
-- **pyproject.toml** has duplicate `[project.scripts]` sections — pytest can't parse it. Tests require `-c /dev/null` to bypass. This is agentA's domain to fix.
-- Used `click.style()` instead of `rich` to avoid adding new dependencies outside my file scope.
-- The `ghps serve` command delegates to the existing FastAPI app in `api.py`.
+**Notes / follow-on work:**
+- `deploy.sh` gracefully handles missing `ghps export` command (owned by agentA) — once agentA implements `export.py`, the deploy script will automatically pick it up
+- The `--output-dir` flag passed to `ghps export` may need adjustment depending on agentA's CLI design
+- After sprint merge, run an actual deploy to verify AWS credentials and S3/CloudFront connectivity
