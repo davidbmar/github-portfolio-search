@@ -47,6 +47,11 @@
 **Returns:** Voice repos ranked by maturity signals (commit count, tests present, documentation quality, last activity).
 **Why it matters:** When multiple repos solve the same problem, find the one worth building on.
 
+### I2. Freshness Check
+**Query:** Browse repos and check freshness badges.
+**Returns:** Each repo shows a freshness label (today, this week, this month, stale) based on when it was last indexed.
+**Why it matters:** Know at a glance whether the data for a repo is current. Automated weekly reindexing via GitHub Actions keeps data fresh without manual intervention.
+
 ### J. Negative / Exclusion Search
 **Query:** "Voice repos that DON'T use AWS"
 **Returns:** Filtered results excluding repos with AWS dependencies.

@@ -1,10 +1,10 @@
 # GitHub Portfolio Search
 
-Semantic search across 90+ GitHub repositories. Find patterns, architectures, and solutions from your own code — powered by embeddings.
+Semantic search across 100+ GitHub repositories. Find patterns, architectures, and solutions from your own code — powered by embeddings.
 
 ## Live Site
 
-**[davidbmar.com](https://davidbmar.com)** — browse capability clusters, search descriptions, and explore 42+ indexed repos with faceted filtering.
+**[davidbmar.com](https://davidbmar.com)** — browse capability clusters, search descriptions, and explore 104 indexed repos with faceted filtering. No sign-in required for browsing and search.
 
 ## Features
 
@@ -15,6 +15,9 @@ Semantic search across 90+ GitHub repositories. Find patterns, architectures, an
 - **Relevance scoring** — title boosting (2x for name matches) and recency factor
 - **Search highlighting** — matched terms bolded in results
 - **Mobile responsive** — vertical list layout with slide-out filter panel on small screens
+- **Google OAuth** — sign in with Google to request access to gated features (code snippets, file trees, full semantic search)
+- **Freshness badges** — each repo shows how recently it was indexed (today, this week, this month, stale)
+- **Automated reindexing** — GitHub Actions workflow runs weekly + manual dispatch to keep data fresh
 
 ## Architecture
 
@@ -23,15 +26,20 @@ GitHub API (repos, READMEs, source files)
        |
        v
   Indexing Pipeline (sentence-transformers + SQLite-vec)
+       |                        ^
+       |                        |
+       |              GitHub Actions (weekly cron + manual dispatch)
        |
        +---> REST API (FastAPI)
        |       +-- Search, clusters, repo detail endpoints
+       |       +-- Google OAuth verification
        |
        +---> CLI (ghps) — local terminal search
        +---> MCP Server — AI agent interface
        +---> Static Web UI (S3/CloudFront at davidbmar.com)
-               +-- Browse clusters, search, faceted filtering
-               +-- Request Access page for gated features
+               +-- Browse clusters, search, faceted filtering (public)
+               +-- Google Sign-In + Request Access (gated features)
+               +-- Freshness badges per repo
 ```
 
 ## Quick Start
@@ -122,8 +130,9 @@ Health check endpoint: `https://davidbmar.com/health.json`
 
 ## Tech Stack
 
-- **Python 3.9+**, sentence-transformers, SQLite-vec, Click
-- **Infrastructure:** AWS S3, CloudFront (davidbmar.com)
+- **Python 3.9+**, sentence-transformers, SQLite-vec, Click, FastAPI
+- **Auth:** google-auth for OAuth token verification
+- **Infrastructure:** AWS S3, CloudFront (davidbmar.com), GitHub Actions (reindex workflow)
 - **Framework:** [Afterburner](https://github.com/davidbmar/traceable-searchable-adr-memory-index) for sprint management
 
 ## License
