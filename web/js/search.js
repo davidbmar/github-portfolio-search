@@ -5,6 +5,12 @@
  */
 
 const SearchEngine = (() => {
+  // --- Search index state (populated by loadSearchIndex) ---
+  let _invertedIndex = null; // term -> Set of repo names
+  let _chunkTextMap = null;  // repo_name -> concatenated chunk text (lowercase)
+  let _chunkRawMap = null;   // repo_name -> array of { source, text } (original case)
+  let _totalRepos = 0;       // N for IDF computation
+
   /**
    * Tokenize a query string into lowercase terms.
    */
@@ -17,12 +23,61 @@ const SearchEngine = (() => {
   }
 
   /**
+   * Load a search index (parsed search-index.json array) and build:
+   *  - An inverted index: term -> Set of repo names (for IDF)
+   *  - A per-repo chunk text map: repo_name -> concatenated lowercase text
+   *  - A per-repo raw chunks map for snippet extraction
+   */
+  function loadSearchIndex(data) {
+    if (!Array.isArray(data) || data.length === 0) return;
+
+    _invertedIndex = {};
+    _chunkTextMap = {};
+    _chunkRawMap = {};
+    _totalRepos = data.length;
+
+    for (const entry of data) {
+      const repo = entry.repo;
+      if (!repo) continue;
+
+      // Build inverted index from keywords
+      const keywords = entry.keywords || [];
+      for (const kw of keywords) {
+        const term = kw.toLowerCase();
+        if (!term) continue;
+        if (!_invertedIndex[term]) {
+          _invertedIndex[term] = new Set();
+        }
+        _invertedIndex[term].add(repo);
+      }
+
+      // Build chunk text map (concatenated lowercase for matching)
+      const chunks = entry.chunks || [];
+      const texts = chunks.map((c) => c.text || "");
+      _chunkTextMap[repo] = texts.join(" ").toLowerCase();
+      _chunkRawMap[repo] = chunks;
+    }
+  }
+
+  /**
    * Check if a term matches a text field.
    * For terms longer than 5 characters, also matches as a substring of
    * any word (fuzzy tolerance). For shorter terms, requires exact inclusion.
    */
   function termMatches(term, text) {
     return text.includes(term);
+  }
+
+  /**
+   * Compute IDF weight for a term: log(N / df).
+   * Returns 1.0 if inverted index is not loaded or term not found.
+   */
+  function _idfWeight(term) {
+    if (!_invertedIndex || !_totalRepos) return 1.0;
+    const docSet = _invertedIndex[term];
+    const df = docSet ? docSet.size : 0;
+    if (df === 0) return 1.0;
+    return Math.log(_totalRepos / df);
   }
 
   /**
@@ -35,7 +90,9 @@ const SearchEngine = (() => {
    *  - Topic match: 6 points per term
    *  - Description match: 3 points per term
    *  - README excerpt match: 1 point per term
+   *  - Chunk text match: 2 points per term (when search index loaded)
    *  - Multi-term bonus: extra points when more terms match
+   *  - TF-IDF weighting: all field scores multiplied by IDF when index loaded
    *
    * Uses OR logic: a repo matches if ANY term matches at least one field.
    * Returns 0 only if no terms match at all.
@@ -47,6 +104,7 @@ const SearchEngine = (() => {
     const desc = (repo.description || "").toLowerCase();
     const topics = (repo.topics || []).map((t) => t.toLowerCase());
     const readme = (repo.readme_excerpt || "").toLowerCase();
+    const chunkText = _chunkTextMap ? (_chunkTextMap[repo.name] || "") : "";
 
     let score = 0;
     let matched = 0;
@@ -75,7 +133,15 @@ const SearchEngine = (() => {
         termScore += 1;
       }
 
+      // Chunk text matching (when search index is loaded)
+      if (chunkText && termMatches(term, chunkText)) {
+        termScore += 2;
+      }
+
+      // Apply IDF weighting when search index is loaded
       if (termScore > 0) {
+        const idf = _idfWeight(term);
+        termScore *= idf;
         matched++;
         score += termScore;
       }
@@ -220,7 +286,66 @@ const SearchEngine = (() => {
     return sorted;
   }
 
-  return { search, applyFilters, extractFacets, tokenize, sortResults };
+  /**
+   * Find a ~200 char excerpt from a repo's chunks that best matches the query.
+   * Returns null if no match or search index not loaded.
+   * Does NOT do HTML escaping (caller handles that).
+   */
+  function getSnippet(repoName, query) {
+    if (!_chunkRawMap || !_chunkRawMap[repoName]) return null;
+
+    const terms = tokenize(query);
+    if (terms.length === 0) return null;
+
+    const chunks = _chunkRawMap[repoName];
+    let bestChunk = null;
+    let bestCount = 0;
+
+    // Find the chunk with the most matching terms
+    for (const chunk of chunks) {
+      const text = (chunk.text || "").toLowerCase();
+      let count = 0;
+      for (const term of terms) {
+        if (text.includes(term)) count++;
+      }
+      if (count > bestCount) {
+        bestCount = count;
+        bestChunk = chunk;
+      }
+    }
+
+    if (!bestChunk || bestCount === 0) return null;
+
+    const text = bestChunk.text || "";
+    const textLower = text.toLowerCase();
+
+    // Find position of first matching term
+    let firstPos = text.length;
+    for (const term of terms) {
+      const pos = textLower.indexOf(term);
+      if (pos !== -1 && pos < firstPos) {
+        firstPos = pos;
+      }
+    }
+
+    // Extract ~200 char excerpt centered on the first match
+    const excerptLen = 200;
+    const half = Math.floor(excerptLen / 2);
+    let start = Math.max(0, firstPos - half);
+    let end = Math.min(text.length, start + excerptLen);
+    // Adjust start if we're near the end
+    if (end - start < excerptLen) {
+      start = Math.max(0, end - excerptLen);
+    }
+
+    let snippet = text.slice(start, end).trim();
+    if (start > 0) snippet = "..." + snippet;
+    if (end < text.length) snippet = snippet + "...";
+
+    return snippet;
+  }
+
+  return { search, applyFilters, extractFacets, tokenize, sortResults, loadSearchIndex, getSnippet };
 })();
 
 // Export for testing or module usage
