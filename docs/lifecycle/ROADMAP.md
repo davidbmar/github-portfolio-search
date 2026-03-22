@@ -59,12 +59,11 @@ PM/customer review checkpoint: "voice processing" returns 12 results. "s3 upload
 Backlog triage: B-012 fixed, B-013 fixed, F-005 fixed. Only medium-priority items remain.
 Planning input for Sprint 10: 5th-sprint checkpoint — extend roadmap, docs cleanup.
 
-**Sprint 10: 5th-Sprint Checkpoint — Docs Cleanup and Index All Repos**
-Build goals: Clean up all documentation (README, CLAUDE.md, deployment guide). Index remaining ~50 repos (currently 42 of ~90). Add repo detail page (click repo name → full description, README preview, file list). Improve cluster algorithm (some repos may be miscategorized). Remove stale code and TODOs.
-PM/customer review checkpoint: README is accurate and helpful for new contributors. All ~90 repos indexed. Repo detail page shows useful info. Clusters make sense to a recruiter.
-Backlog triage: Close remaining medium bugs. Capture new issues from docs review.
-Roadmap extension checkpoint: Plan Sprints 12-16 based on usage patterns.
-Planning input for Sprint 11: Prioritize based on portfolio completeness and recruiter feedback.
+**Sprint 10: 5th-Sprint Checkpoint — Docs Cleanup and Repo Detail Page (COMPLETED 2026-03-22)**
+Build goals: Rewrote README with Live Site section, Features list, updated architecture diagram, make commands. Added repo detail page (#/repo/name) with description, language, stars, topics, GitHub link, cluster context, and related repos. Validated data quality. Tests: 141 passed, 0 failed.
+PM/customer review checkpoint: README is accurate. Repo detail page works — grassy-knoll shows description, Voice & Speech Processing cluster, 6 related repos. Related repos link to their own detail pages. "View on GitHub" button works.
+Backlog triage: No new bugs. Extended roadmap to Sprint 15.
+Planning input for Sprint 11: Activity visualization with D3.js.
 
 **Sprint 11: Activity Visualization and Portfolio Analytics**
 Build goals: Add D3.js capability tree (circle-packing visualization) showing the full portfolio at a glance. Build activity timeline/heatmap showing commit frequency across repos. Add portfolio analytics: most active repos, tech stack distribution, language breakdown. Create shareable portfolio link with OG tags for social media.
@@ -98,13 +97,13 @@ Planning input for Sprint 16: Based on analytics, prioritize features users actu
 
 ### Current Focus
 
-**Sprint 10: 5th-Sprint Checkpoint — Docs Cleanup and Index All Repos (Sprints 1-9 COMPLETE)**
+**Sprint 11: Activity Visualization and Portfolio Analytics (Sprints 1-10 COMPLETE)**
 
-Sprints 1-9 delivered: full stack portfolio search with 42 real repos, faceted search, multi-word queries, search highlighting, relevance scoring, capability clusters, Request Access page, language stats, and mobile support at davidbmar.com. Sprint 10 is a checkpoint sprint: docs cleanup, index remaining repos, add repo detail page.
+Sprints 1-10 delivered: full stack portfolio search with 42 real repos, faceted search, multi-word queries, search highlighting, relevance scoring, capability clusters, Request Access page, repo detail pages, language stats, and mobile support at davidbmar.com. Sprint 11 adds visual portfolio analytics.
 
 ### Next Up
 
-**Sprint 11: Activity Visualization** — D3.js capability tree, activity heatmap, portfolio analytics.
+**Sprint 12: Gated Access** — Google OAuth, approval workflow, Telegram notifications.
 
 ## Architecture
 

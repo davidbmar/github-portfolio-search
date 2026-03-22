@@ -1,93 +1,102 @@
-# Sprint 10
+# Sprint 11
 
 Goal
-- 5th-sprint checkpoint: clean up docs, index all ~90 repos, add repo detail page
-- This is a quality/completeness sprint, not a feature sprint
+- Add visual portfolio analytics — help recruiters understand David's capabilities at a glance
+- D3.js capability tree visualization
+- Activity timeline showing recent work
+- Portfolio stats and shareable social preview
 
 Constraints
 - No two agents may modify the same files
-- agentA owns documentation cleanup (README.md, docs/)
-- agentB owns data completeness (src/ghps/, web/data/, scripts/)
-- agentC owns repo detail page (web/js/app.js, web/js/search.js, web/css/style.css)
+- agentA owns D3.js visualization (web/js/d3-viz.js — NEW FILE, web/index.html for D3 script tag)
+- agentB owns activity timeline and stats (web/js/app.js, web/js/search.js)
+- agentC owns social sharing and meta (web/css/style.css, web/index.html — only meta tags and CSS)
 - Use python3 for all commands
 - Do NOT commit .venv/ to git
+- D3.js should be loaded via CDN (https://d3js.org/d3.v7.min.js)
 
 Merge Order
-1. agentA-docs-cleanup
-2. agentB-data-completeness
-3. agentC-repo-detail
+1. agentA-d3-viz
+2. agentB-activity-stats
+3. agentC-social-meta
 
 Merge Verification
 - python3 -m pytest tests/ -v
 
-## agentA-docs-cleanup
+## agentA-d3-viz
 
 Objective
-- Make all documentation accurate, current, and useful
+- Add an interactive D3.js circle-packing visualization of capability clusters
 
 Tasks
-- Rewrite README.md:
-  - Update architecture diagram to show current state (42+ repos, 6 clusters, live site)
-  - Update Quick Start to include make commands (make install, make test, make deploy)
-  - Update roadmap table with all 10 sprints
-  - Add "Live Site" section with link to https://davidbmar.com
-  - Add "Features" section listing: semantic search, faceted filtering, multi-word queries, capability clusters, relevance scoring, search highlighting, mobile responsive
-  - Remove stale references to Sprint 2/3 being "next"
-- Clean up docs/lifecycle/ROADMAP.md:
-  - Remove stale "Phase 2/3/4" references in Next Up section
-  - Ensure all completed sprints have (COMPLETED) dates
-- Review and update CLAUDE.md if it exists
-- Remove any stale TODO comments in documentation files
+- Create web/js/d3-viz.js:
+  - Load clusters.json and repos.json data
+  - Build a circle-packing layout where:
+    - Outer circles = clusters (Voice & Speech, AI & Search, etc.)
+    - Inner circles = repos, sized by stars (min size for 0-star repos)
+    - Colors match cluster gradient theme from CSS
+  - Add interactivity:
+    - Hover on a repo circle → show tooltip with name and description
+    - Click a repo circle → navigate to #/repo/<name>
+    - Click a cluster circle → zoom into that cluster
+  - Add a reset/zoom-out button
+  - Responsive: scale to container width
+- Update web/index.html: add <script src="https://d3js.org/d3.v7.min.js"></script> before app.js
+- The visualization should be rendered in a container on the Clusters page (#/clusters)
 
 Acceptance Criteria
-- README.md is accurate and a new contributor can get started in 5 minutes
-- No references to sprints that haven't happened yet as "complete"
-- Roadmap is internally consistent (no duplicate sprint numbers, no stale phases)
+- Playwright: navigate to #/clusters → circle-packing visualization renders
+- Playwright: hover over a circle → tooltip shows repo name
+- Playwright: click a repo circle → navigates to #/repo/<name>
+- Visualization is responsive (works at 375px width)
+- No JS errors in console
 
-## agentB-data-completeness
+## agentB-activity-stats
 
 Objective
-- Index as many repos as possible and ensure data quality
+- Add activity timeline and enhanced portfolio stats
 
 Tasks
-- Review web/data/repos.json — check for repos with missing descriptions, null languages, or broken URLs
-- Fix any repos with empty/null description: use repo name as fallback
-- Fix any repos with null language: set to "Unknown"
-- Ensure all html_url fields point to valid GitHub URLs (https://github.com/davidbmar/*)
-- Update scripts/index-and-export.sh to validate output JSON after export
-- If GITHUB_TOKEN is available: re-run indexing to capture any new repos since last index
-- Update web/data/clusters.json: verify all repos are assigned to a cluster, no orphans
+- In web/js/app.js, enhance the landing page:
+  - Add "Recent Activity" section showing the 10 most recently updated repos
+  - Each shows: repo name (linked to detail), last updated date, language badge
+  - Sort by updated_at descending
+- In web/js/app.js, enhance the Clusters page (#/clusters):
+  - Add a stats summary above the clusters: total repos, most active cluster, most common language
+  - Add a "Technology Distribution" section showing topic counts as a horizontal bar chart
+  - Show top 10 topics with their repo counts
+- In web/js/search.js:
+  - Add sort options for search results: Relevance (default), Recently Updated, Name A-Z
+  - Add a small dropdown or toggle above search results
 
 Acceptance Criteria
-- web/data/repos.json has 0 repos with null/empty description
-- web/data/repos.json has 0 repos with null language
-- All html_url fields are valid GitHub URLs
-- clusters.json accounts for all repos (sum of repo counts = total repos)
-- python3 -c "import json; d=json.load(open('web/data/repos.json')); print(len(d))" shows 42+
+- Playwright: landing page shows "Recent Activity" with 10 repos sorted by date
+- Playwright: clusters page shows stats summary and topic distribution chart
+- Playwright: search results can be sorted by Relevance, Recently Updated, or Name
+- No JS errors in console
 
-## agentC-repo-detail
+## agentC-social-meta
 
 Objective
-- Add a repo detail view so users can learn more about a specific repository
+- Make the site look great when shared on social media and improve overall polish
 
 Tasks
-- In web/js/app.js, add route handler for #/repo/<name>:
-  - Show repo name as heading
-  - Show full description
-  - Show language, stars, last updated, topics
-  - Show link to GitHub (html_url)
-  - Show which cluster this repo belongs to
-  - Show "Related repos" from same cluster (reuse existing component)
-  - Add "Back to search" link
-- Update web/js/search.js: make repo names in search results link to #/repo/<name> instead of directly to GitHub
-- Update web/js/app.js: make repo names on home page link to #/repo/<name>
 - Update web/css/style.css:
-  - Style repo detail page (consistent with existing theme)
-  - Make the GitHub link prominent with an icon or button style
+  - Style the D3 visualization container (min-height, dark background, border)
+  - Style tooltips for D3 hover (dark tooltip with white text, rounded corners)
+  - Style the "Recent Activity" section (compact card list)
+  - Style sort dropdown for search results
+  - Add a subtle page transition animation when navigating between routes
+  - Ensure all new elements work at 375px mobile viewport
+- Update web/index.html (meta tags only, do NOT modify script tags):
+  - Update og:title to "David Mar — GitHub Portfolio Search"
+  - Update og:description to "42 repositories across 6 capability areas. Explore voice AI, infrastructure, search tools, and more."
+  - Add twitter:card meta tag (summary_large_image)
+  - Add canonical URL meta tag
 
 Acceptance Criteria
-- Playwright: click a repo name from search results → navigates to #/repo/<name>
-- Playwright: repo detail page shows name, description, language, topics, GitHub link
-- Playwright: "Related repos" section shows repos from same cluster
-- Playwright: "Back to search" link works
-- Mobile layout works at 375px
+- Playwright: D3 viz has proper dark background and styled tooltips
+- Playwright: Recent Activity section is compact and readable
+- Playwright: mobile viewport (375px) — all new elements fit without horizontal scroll
+- OG meta tags present in page source with accurate content
+- No layout shifts or visual glitches during route transitions

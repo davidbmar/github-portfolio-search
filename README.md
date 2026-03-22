@@ -87,8 +87,9 @@ docs/
 | 7 | Test fixes + real data indexing (42 repos) | Complete |
 | 8 | Search relevance + UX polish | Complete |
 | 9 | Multi-word search + gated access prep | Complete |
-| 10 | Docs cleanup + index all repos + repo detail page | **In Progress** |
-| 11 | Activity visualization + analytics | Planned |
+| 10 | Docs cleanup + repo detail page | Complete |
+| 11 | Activity visualization + analytics | **Next** |
+| 12 | Gated access — Google OAuth + approval | Planned |
 
 ## Deployment
 
