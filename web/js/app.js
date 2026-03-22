@@ -62,16 +62,53 @@ const App = (() => {
       .replace(/>/g, "&gt;");
   }
 
+  // Sample fallback data shown when fetch fails or data is empty
+  const SAMPLE_REPOS = [
+    {
+      name: "sample-project",
+      description: "This is sample data shown when no real data is available. Run ghps index to populate.",
+      language: "Python",
+      stars: 0,
+      topics: ["sample", "placeholder"],
+      url: "",
+      updated_at: new Date().toISOString(),
+    },
+  ];
+
+  const SAMPLE_CLUSTERS = [
+    {
+      name: "Sample Cluster",
+      repos: ["sample-project"],
+      description: "Sample cluster shown when no data is loaded.",
+    },
+  ];
+
+  /**
+   * Build a loading skeleton using safe DOM methods.
+   */
+  function buildLoadingSkeleton() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "loading-skeleton";
+    const wide = document.createElement("div");
+    wide.className = "skeleton-line skeleton-line-wide";
+    const med = document.createElement("div");
+    med.className = "skeleton-line skeleton-line-medium";
+    const narrow = document.createElement("div");
+    narrow.className = "skeleton-line skeleton-line-narrow";
+    wrapper.appendChild(wide);
+    wrapper.appendChild(med);
+    wrapper.appendChild(narrow);
+    return wrapper;
+  }
+
   /**
    * Load repos.json and clusters.json data files.
+   * Falls back to embedded sample data if fetch fails or data is empty.
    */
   async function loadData() {
     const content = document.getElementById("content");
     content.textContent = "";
-    const loadingDiv = document.createElement("div");
-    loadingDiv.className = "loading";
-    loadingDiv.textContent = "Loading portfolio data";
-    content.appendChild(loadingDiv);
+    content.appendChild(buildLoadingSkeleton());
 
     try {
       const [reposRes, clustersRes] = await Promise.all([
@@ -82,8 +119,19 @@ const App = (() => {
       if (!reposRes.ok) throw new Error("Failed to load repos.json");
       if (!clustersRes.ok) throw new Error("Failed to load clusters.json");
 
-      repos = await reposRes.json();
-      clusters = await clustersRes.json();
+      const reposText = await reposRes.text();
+      const clustersText = await clustersRes.text();
+
+      const parsedRepos = reposText.trim() ? JSON.parse(reposText) : [];
+      const parsedClusters = clustersText.trim() ? JSON.parse(clustersText) : [];
+
+      if (!Array.isArray(parsedRepos) || parsedRepos.length === 0) {
+        useFallbackData(content, "No data available \u2014 run ghps index to populate");
+        return;
+      }
+
+      repos = parsedRepos;
+      clusters = Array.isArray(parsedClusters) ? parsedClusters : [];
 
       // Ensure topics are arrays
       repos = repos.map((r) => ({
@@ -98,17 +146,46 @@ const App = (() => {
       facets = SearchEngine.extractFacets(repos);
       route();
     } catch (err) {
-      content.textContent = "";
-      const errDiv = document.createElement("div");
-      errDiv.className = "empty-state";
-      const h3 = document.createElement("h3");
-      h3.textContent = "Could not load data";
-      const p = document.createElement("p");
-      p.textContent = err.message;
-      errDiv.appendChild(h3);
-      errDiv.appendChild(p);
-      content.appendChild(errDiv);
+      useFallbackData(content, "No data available \u2014 run ghps index to populate");
     }
+  }
+
+  /**
+   * Show a friendly error state with retry button and sample fallback data.
+   */
+  function useFallbackData(content, message) {
+    repos = SAMPLE_REPOS;
+    clusters = SAMPLE_CLUSTERS;
+    facets = SearchEngine.extractFacets(repos);
+
+    content.textContent = "";
+    const banner = document.createElement("div");
+    banner.className = "error-banner";
+
+    const icon = document.createElement("span");
+    icon.className = "error-banner-icon";
+    icon.textContent = "\u26A0";
+    banner.appendChild(icon);
+
+    const text = document.createElement("span");
+    text.textContent = message;
+    banner.appendChild(text);
+
+    const retryBtn = document.createElement("button");
+    retryBtn.className = "retry-btn";
+    retryBtn.textContent = "Retry";
+    retryBtn.addEventListener("click", () => {
+      loadData();
+    });
+    banner.appendChild(retryBtn);
+
+    content.appendChild(banner);
+
+    // Still render sample data below the banner
+    const routeContainer = document.createElement("div");
+    routeContainer.id = "content-inner";
+    content.appendChild(routeContainer);
+    renderHome(routeContainer);
   }
 
   function tryParseJSON(str, fallback) {
@@ -196,6 +273,11 @@ const App = (() => {
         html += '<div class="empty-state"><p>Search to see all ' + escapeHtml(String(repos.length)) + " repositories</p></div>";
       }
     }
+
+    // Footer
+    html += '<footer class="site-footer">';
+    html += "<p>Powered by GitHub Portfolio Search &mdash; Built with Afterburner</p>";
+    html += "</footer>";
 
     // Safe: all dynamic values above are escaped via escapeHtml/escapeAttr
     container.innerHTML = html;

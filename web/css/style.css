@@ -32,6 +32,12 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
 }
 
 a {
@@ -88,11 +94,12 @@ a:hover {
   text-decoration: none;
 }
 
-/* Main content */
+/* Main content — flex: 1 is set above alongside body */
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
+  width: 100%;
 }
 
 /* Landing / Search hero */
@@ -537,6 +544,79 @@ a:hover {
   to { transform: rotate(360deg); }
 }
 
+/* Loading skeleton animation */
+.loading-skeleton {
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.skeleton-line {
+  height: 20px;
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  border-radius: var(--radius);
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-line-wide { width: 80%; }
+.skeleton-line-medium { width: 60%; }
+.skeleton-line-narrow { width: 40%; }
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Error banner (friendly, not scary) */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(210, 153, 34, 0.1);
+  border: 1px solid var(--yellow);
+  border-radius: var(--radius);
+  color: var(--yellow);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.error-banner-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.retry-btn {
+  margin-left: auto;
+  background: var(--yellow);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.retry-btn:hover {
+  opacity: 0.85;
+}
+
+/* Footer */
+.site-footer {
+  text-align: center;
+  padding: 32px 16px;
+  margin-top: 48px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .search-hero {
@@ -590,6 +670,17 @@ a:hover {
 
   .access-request-page {
     padding: 24px 0;
+  }
+
+  .error-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .retry-btn {
+    margin-left: 0;
+    width: 100%;
   }
 }
 
