@@ -272,22 +272,27 @@ const App = (() => {
 
       facets = SearchEngine.extractFacets(repos);
 
-      // Load optional data files (fail silently)
-      const optionalFetches = [
-        fetch("data/search-index.json").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("data/similarity.json").then((r) => r.ok ? r.json() : null).catch(() => null),
-        fetch("data/suggestions.json").then((r) => r.ok ? r.json() : null).catch(() => null),
-      ];
-      const [searchIndex, simData, sugData] = await Promise.all(optionalFetches);
-
-      if (searchIndex && typeof SearchEngine.loadSearchIndex === "function") {
-        SearchEngine.loadSearchIndex(searchIndex);
-      }
-      if (simData) similarity = simData;
-      if (sugData) suggestions = sugData;
-
       route();
+
+      // Load optional data files AFTER route (fail silently, never block main render)
+      try {
+        const optionalFetches = [
+          fetch("data/search-index.json").then((r) => r.ok ? r.json() : null).catch(() => null),
+          fetch("data/similarity.json").then((r) => r.ok ? r.json() : null).catch(() => null),
+          fetch("data/suggestions.json").then((r) => r.ok ? r.json() : null).catch(() => null),
+        ];
+        const [searchIndex, simData, sugData] = await Promise.all(optionalFetches);
+
+        if (searchIndex && typeof SearchEngine.loadSearchIndex === "function") {
+          SearchEngine.loadSearchIndex(searchIndex);
+        }
+        if (simData) similarity = simData;
+        if (sugData) suggestions = sugData;
+      } catch (optErr) {
+        console.warn("[loadData] Optional data failed (non-critical):", optErr);
+      }
     } catch (err) {
+      console.error("[loadData] Error loading data:", err);
       useFallbackData(content, "No data available \u2014 run ghps index to populate");
     }
   }

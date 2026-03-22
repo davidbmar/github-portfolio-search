@@ -31,9 +31,9 @@ const SearchEngine = (() => {
   function loadSearchIndex(data) {
     if (!Array.isArray(data) || data.length === 0) return;
 
-    _invertedIndex = {};
-    _chunkTextMap = {};
-    _chunkRawMap = {};
+    _invertedIndex = Object.create(null);
+    _chunkTextMap = Object.create(null);
+    _chunkRawMap = Object.create(null);
     _totalRepos = data.length;
 
     for (const entry of data) {
