@@ -3,12 +3,24 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any, Optional
 
 from .embeddings import EmbeddingPipeline
 from .store import VectorStore
 
 logger = logging.getLogger(__name__)
+
+# Known technology keywords for topic inference from README content and repo names.
+TOPIC_KEYWORDS: set[str] = {
+    "voice", "aws", "s3", "lambda", "docker", "react", "python", "typescript",
+    "llm", "rag", "whisper", "webrtc", "tts", "stt", "fastapi", "flask",
+    "tensorflow", "pytorch", "kubernetes", "terraform", "cognito", "cloudfront",
+    "sqs", "dynamodb", "api-gateway", "websocket", "grpc", "mcp", "telegram",
+    "whatsapp", "fsm", "state-machine", "scheduler", "browser", "frontend",
+    "backend", "cli", "streaming", "transcription", "diarization", "embeddings",
+    "vector", "search", "semantic",
+}
 
 
 class Indexer:
@@ -21,6 +33,32 @@ class Indexer:
     ) -> None:
         self.store = store
         self.pipeline = pipeline or EmbeddingPipeline()
+
+    @staticmethod
+    def extract_topics(repo_name: str, readme: str) -> list[str]:
+        """Infer topic keywords from a repo name and README text.
+
+        Scans for known technology keywords in:
+        1. The README text (case-insensitive word boundary matching)
+        2. The repo name (split on hyphens and underscores)
+
+        Returns a sorted, deduplicated list of matched keywords.
+        """
+        found: set[str] = set()
+
+        # Scan README text for keyword matches (word-boundary, case-insensitive)
+        if readme:
+            readme_lower = readme.lower()
+            for kw in TOPIC_KEYWORDS:
+                # Use word boundary matching so "class" doesn't match "classification"
+                if re.search(r"(?:^|[\s\-_/,;:.(]){}(?:[\s\-_/,;:.)!?]|$)".format(re.escape(kw)), readme_lower):
+                    found.add(kw)
+
+        # Scan repo name tokens
+        name_tokens = {t.lower() for t in re.split(r"[-_]", repo_name)}
+        found.update(name_tokens & TOPIC_KEYWORDS)
+
+        return sorted(found)
 
     def index_repos(self, repos: list[dict[str, Any]]) -> int:
         """Index a list of repo dicts into the vector store.
@@ -50,12 +88,20 @@ class Indexer:
             texts = [c["text"] for c in chunks]
             embeddings = self.pipeline.embed_batch(texts)
 
+            # Infer topics from README content and repo name
+            inferred = self.extract_topics(name, readme)
+            repo["inferred_topics"] = inferred
+
+            # Merge GitHub topics with inferred topics (deduplicated)
+            github_topics = repo.get("topics", [])
+            merged = sorted(set(github_topics) | set(inferred))
+
             # Store everything
             repo_meta = {
                 "name": name,
                 "description": repo.get("description", ""),
                 "language": repo.get("language", ""),
-                "topics": repo.get("topics", []),
+                "topics": merged,
                 "stars": repo.get("stars", 0),
                 "updated_at": repo.get("updated_at", ""),
                 "url": repo.get("url", ""),
