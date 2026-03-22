@@ -1,0 +1,13 @@
+# Sprint ephemeral files
+.agent-done-*
+.sprint-test-output.txt
+.sprint-timing.txt
+
+# Terraform — never commit provider binaries or local state
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+
+# Node
+node_modules/
