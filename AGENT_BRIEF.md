@@ -1,4 +1,4 @@
-agentA-d3-viz — Sprint 11
+agentB-activity-stats — Sprint 11
 
 Sprint-Level Context
 
@@ -19,27 +19,23 @@ Constraints
 
 
 Objective
-- Add an interactive D3.js circle-packing visualization of capability clusters
+- Add activity timeline and enhanced portfolio stats
 
 Tasks
-- Create web/js/d3-viz.js:
-  - Load clusters.json and repos.json data
-  - Build a circle-packing layout where:
-    - Outer circles = clusters (Voice & Speech, AI & Search, etc.)
-    - Inner circles = repos, sized by stars (min size for 0-star repos)
-    - Colors match cluster gradient theme from CSS
-  - Add interactivity:
-    - Hover on a repo circle → show tooltip with name and description
-    - Click a repo circle → navigate to #/repo/<name>
-    - Click a cluster circle → zoom into that cluster
-  - Add a reset/zoom-out button
-  - Responsive: scale to container width
-- Update web/index.html: add <script src="https://d3js.org/d3.v7.min.js"></script> before app.js
-- The visualization should be rendered in a container on the Clusters page (#/clusters)
+- In web/js/app.js, enhance the landing page:
+  - Add "Recent Activity" section showing the 10 most recently updated repos
+  - Each shows: repo name (linked to detail), last updated date, language badge
+  - Sort by updated_at descending
+- In web/js/app.js, enhance the Clusters page (#/clusters):
+  - Add a stats summary above the clusters: total repos, most active cluster, most common language
+  - Add a "Technology Distribution" section showing topic counts as a horizontal bar chart
+  - Show top 10 topics with their repo counts
+- In web/js/search.js:
+  - Add sort options for search results: Relevance (default), Recently Updated, Name A-Z
+  - Add a small dropdown or toggle above search results
 
 Acceptance Criteria
-- Playwright: navigate to #/clusters → circle-packing visualization renders
-- Playwright: hover over a circle → tooltip shows repo name
-- Playwright: click a repo circle → navigates to #/repo/<name>
-- Visualization is responsive (works at 375px width)
+- Playwright: landing page shows "Recent Activity" with 10 repos sorted by date
+- Playwright: clusters page shows stats summary and topic distribution chart
+- Playwright: search results can be sorted by Relevance, Recently Updated, or Name
 - No JS errors in console

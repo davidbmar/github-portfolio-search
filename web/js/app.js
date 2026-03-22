@@ -14,6 +14,7 @@ const App = (() => {
   let facets = { languages: [], topics: [], maxStars: 0 };
   let filtersOpen = false;
   let debounceTimer = null;
+  let currentSortMode = "relevance";
 
   // Language colors (GitHub-style)
   const LANG_COLORS = {
@@ -310,6 +311,37 @@ const App = (() => {
       html += "</div>";
     }
 
+    // Recent Activity section
+    if (repos.length > 0) {
+      const recentRepos = repos
+        .filter((r) => r.updated_at)
+        .slice()
+        .sort((a, b) => (b.updated_at || "").localeCompare(a.updated_at || ""))
+        .slice(0, 10);
+
+      if (recentRepos.length > 0) {
+        html += '<div class="section-header">';
+        html += "<h3>Recent Activity</h3>";
+        html += '<span class="count">last updated</span>';
+        html += "</div>";
+        html += '<div class="recent-activity">';
+        for (const repo of recentRepos) {
+          const langColor = LANG_COLORS[repo.language] || "#8b949e";
+          html += '<div class="recent-activity-item">';
+          html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="recent-activity-name">' + escapeHtml(repo.name) + '</a>';
+          if (repo.language) {
+            html += '<span class="language-badge">';
+            html += '<span class="language-dot" style="background:' + escapeAttr(langColor) + '"></span>';
+            html += escapeHtml(repo.language);
+            html += '</span>';
+          }
+          html += '<span class="recent-activity-date">' + escapeHtml(formatDate(repo.updated_at)) + '</span>';
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+    }
+
     // All repos section
     if (repos.length > 0) {
       html += '<div class="section-header">';
@@ -375,8 +407,9 @@ const App = (() => {
 
     // Filter repos first, then search
     const filtered = SearchEngine.applyFilters(repos, currentFilters);
-    const results = SearchEngine.search(filtered, query);
-    const maxScore = results.length > 0 ? results[0].score : 1;
+    const rawResults = SearchEngine.search(filtered, query);
+    const results = SearchEngine.sortResults(rawResults, currentSortMode);
+    const maxScore = rawResults.length > 0 ? rawResults[0].score : 1;
 
     // Safe: all dynamic values below pass through escapeHtml/escapeAttr
     let html = '<div class="content-layout">';
@@ -387,6 +420,16 @@ const App = (() => {
     // Results area
     html += '<div class="results-area">';
     html += '<button class="filter-toggle" id="filter-toggle">Filters</button>';
+
+    // Sort dropdown
+    html += '<div class="sort-controls">';
+    html += '<label for="sort-select">Sort by:</label>';
+    html += '<select id="sort-select" class="sort-select">';
+    html += '<option value="relevance"' + (currentSortMode === "relevance" ? " selected" : "") + '>Relevance</option>';
+    html += '<option value="recent"' + (currentSortMode === "recent" ? " selected" : "") + '>Recently Updated</option>';
+    html += '<option value="name"' + (currentSortMode === "name" ? " selected" : "") + '>Name A-Z</option>';
+    html += '</select>';
+    html += '</div>';
 
     html += '<div class="section-header">';
     if (query) {
@@ -565,7 +608,55 @@ const App = (() => {
    * Render clusters listing page.
    */
   function renderClustersPage(container) {
-    let html = '<div class="section-header">';
+    // Stats summary
+    const langCounts = {};
+    let mostActiveCluster = { name: "N/A", count: 0 };
+    for (const r of repos) {
+      if (r.language) langCounts[r.language] = (langCounts[r.language] || 0) + 1;
+    }
+    for (const c of clusters) {
+      const count = (c.repos || []).length;
+      if (count > mostActiveCluster.count) {
+        mostActiveCluster = { name: c.name, count: count };
+      }
+    }
+    const sortedLangs = Object.entries(langCounts).sort((a, b) => b[1] - a[1]);
+    const topLang = sortedLangs.length > 0 ? sortedLangs[0][0] : "N/A";
+
+    let html = '<div class="clusters-stats-summary">';
+    html += '<div class="stat-item"><span class="stat-number">' + escapeHtml(String(repos.length)) + '</span><span class="stat-label">Total Repos</span></div>';
+    html += '<div class="stat-item"><span class="stat-number">' + escapeHtml(mostActiveCluster.name) + '</span><span class="stat-label">Largest Cluster</span></div>';
+    html += '<div class="stat-item"><span class="stat-number">' + escapeHtml(topLang) + '</span><span class="stat-label">Top Language</span></div>';
+    html += '</div>';
+
+    // Technology Distribution — top 10 topics as horizontal bar chart
+    const topicCounts = {};
+    for (const r of repos) {
+      for (const t of (r.topics || [])) {
+        topicCounts[t] = (topicCounts[t] || 0) + 1;
+      }
+    }
+    const topTopics = Object.entries(topicCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+
+    if (topTopics.length > 0) {
+      const maxTopicCount = topTopics[0][1];
+      html += '<div class="section-header"><h3>Technology Distribution</h3>';
+      html += '<span class="count">top topics</span></div>';
+      html += '<div class="topic-distribution">';
+      for (const [topic, count] of topTopics) {
+        const pct = Math.round((count / maxTopicCount) * 100);
+        html += '<div class="topic-bar-row">';
+        html += '<span class="topic-bar-label">' + escapeHtml(topic) + '</span>';
+        html += '<div class="topic-bar-track"><div class="topic-bar-fill" style="width:' + escapeAttr(String(pct)) + '%"></div></div>';
+        html += '<span class="topic-bar-count">' + escapeHtml(String(count)) + '</span>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    html += '<div class="section-header">';
     html += "<h3>All Clusters</h3>";
     html += '<span class="count">' + escapeHtml(String(clusters.length)) + " clusters</span>";
     html += "</div>";
@@ -854,6 +945,15 @@ const App = (() => {
       });
     });
 
+    // Sort select
+    const sortSelect = document.getElementById("sort-select");
+    if (sortSelect) {
+      sortSelect.addEventListener("change", () => {
+        currentSortMode = sortSelect.value;
+        route();
+      });
+    }
+
     // Stars range
     const starsRange = document.getElementById("stars-filter");
     const starsValue = document.getElementById("stars-value");
@@ -920,9 +1020,41 @@ const App = (() => {
   }
 
   /**
+   * Inject styles for activity timeline, cluster stats, and sort controls.
+   * Added via JS because web/css/style.css is owned by another agent.
+   */
+  function injectActivityStyles() {
+    if (document.getElementById("activity-stats-styles")) return;
+    const style = document.createElement("style");
+    style.id = "activity-stats-styles";
+    style.textContent = `
+      .recent-activity { display:flex; flex-direction:column; gap:6px; margin-bottom:2rem; }
+      .recent-activity-item { display:flex; align-items:center; gap:12px; padding:8px 12px; background:var(--card-bg, #161b22); border:1px solid var(--border, #30363d); border-radius:6px; }
+      .recent-activity-name { color:var(--link, #58a6ff); text-decoration:none; font-weight:500; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .recent-activity-name:hover { text-decoration:underline; }
+      .recent-activity-date { color:var(--muted, #8b949e); font-size:0.85rem; white-space:nowrap; }
+      .clusters-stats-summary { display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; padding:1rem; background:var(--card-bg, #161b22); border:1px solid var(--border, #30363d); border-radius:8px; }
+      .clusters-stats-summary .stat-item { text-align:center; }
+      .clusters-stats-summary .stat-number { display:block; font-size:1.1rem; font-weight:600; color:var(--text, #e6edf3); }
+      .clusters-stats-summary .stat-label { font-size:0.8rem; color:var(--muted, #8b949e); }
+      .topic-distribution { display:flex; flex-direction:column; gap:8px; margin-bottom:2rem; }
+      .topic-bar-row { display:flex; align-items:center; gap:10px; }
+      .topic-bar-label { width:120px; text-align:right; font-size:0.85rem; color:var(--text, #e6edf3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .topic-bar-track { flex:1; height:20px; background:var(--border, #30363d); border-radius:4px; overflow:hidden; }
+      .topic-bar-fill { height:100%; background:var(--link, #58a6ff); border-radius:4px; transition:width 0.3s ease; }
+      .topic-bar-count { width:30px; font-size:0.85rem; color:var(--muted, #8b949e); }
+      .sort-controls { display:flex; align-items:center; gap:8px; margin-bottom:0.75rem; }
+      .sort-controls label { font-size:0.85rem; color:var(--muted, #8b949e); }
+      .sort-select { background:var(--card-bg, #161b22); color:var(--text, #e6edf3); border:1px solid var(--border, #30363d); border-radius:6px; padding:4px 8px; font-size:0.85rem; cursor:pointer; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /**
    * Initialize the app.
    */
   function init() {
+    injectActivityStyles();
     window.addEventListener("hashchange", route);
 
     const searchInput = document.getElementById("search-input");

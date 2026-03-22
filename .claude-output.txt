@@ -1,29 +1,17 @@
-`★ Insight ─────────────────────────────────────`
-**Key architectural decisions in this implementation:**
+All done. Here's the summary:
 
-1. **Style injection from JS** — Since `style.css` was owned by another agent (multi-agent sprint constraint), CSS was injected via a self-executing function in `d3-viz.js`. This is a common pattern for encapsulated web components and avoids file ownership conflicts.
+## Files changed
+- **web/js/app.js** — Added Recent Activity section (landing page), cluster stats summary + Technology Distribution bar chart (clusters page), sort dropdown UI, CSS injection via `injectActivityStyles()`
+- **web/js/search.js** — Added `sortResults()` function (relevance/recent/name modes)
+- **docs/project-memory/sessions/S-2026-03-22-1739-sprint11-activity-stats.md** — Session doc
 
-2. **viewBox-based responsiveness** — Instead of setting fixed `width`/`height` on the SVG, using `viewBox` with `width="100%"` lets the browser scale the entire visualization proportionally. This is the standard D3 approach for responsive SVGs and automatically handles the 375px mobile requirement.
+## Commands run
+- `git pull origin main` — already up to date
+- `make test` — 149 tests passed
+- `make lint` — clean
+- `git commit` + `git push -u origin HEAD` — pushed to `agentB-activity-stats`
 
-3. **Safe DOM construction** — Tooltip content uses `createElement`/`createTextNode` rather than `innerHTML` to prevent XSS, even though the data comes from a static JSON file. Defense in depth matters for portfolio sites.
-`─────────────────────────────────────────────────`
-
----
-
-## Summary
-
-**Files changed:**
-- `web/index.html` — Added D3 v7 CDN script tag and `d3-viz.js` script tag
-- `web/js/d3-viz.js` — **New file** — Circle-packing visualization with zoom, tooltips, responsive SVG, injected CSS
-- `web/js/app.js` — Added `#d3-viz-container` div and `D3Viz.render()` call in `renderClustersPage()`
-- `docs/project-memory/sessions/S-2026-03-22-1740-d3-circle-packing.md` — Session doc
-
-**Commands run:**
-- `git pull origin main` — synced with main
-- `python3 -m pytest tests/ -v` — 148 passed, 1 pre-existing failure (unrelated to this work)
-- `git push -u origin HEAD` — pushed branch
-
-**Notes / follow-on work:**
-- Pre-existing test failure: `test_search_no_results` expects "No results" text but the empty state says "Search to see all 42 repositories" — not caused by this change
-- The D3 CDN (`d3js.org`) is loaded externally; for offline usage, consider bundling D3 locally
-- Playwright acceptance tests for hover tooltip and click-to-navigate could be added in a follow-up
+## Notes / follow-on work
+- CSS is injected via JS (`injectActivityStyles()`) to avoid modifying `web/css/style.css` owned by agentC. If file ownership rules change, these styles could move to the CSS file for cleaner separation.
+- The sort state (`currentSortMode`) resets on page reload — could be persisted to `localStorage` if desired.
+- Playwright acceptance tests for the new features (Recent Activity, cluster stats, sort dropdown) should be added in a follow-up sprint.

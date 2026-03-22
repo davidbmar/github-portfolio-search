@@ -204,7 +204,23 @@ const SearchEngine = (() => {
     return { languages, topics, maxStars };
   }
 
-  return { search, applyFilters, extractFacets, tokenize };
+  /**
+   * Sort search results by the given mode.
+   * Modes: "relevance" (default, by score), "recent" (by updated_at desc), "name" (A-Z).
+   */
+  function sortResults(results, mode) {
+    if (!Array.isArray(results)) return [];
+    const sorted = results.slice();
+    if (mode === "recent") {
+      sorted.sort((a, b) => (b.repo.updated_at || "").localeCompare(a.repo.updated_at || ""));
+    } else if (mode === "name") {
+      sorted.sort((a, b) => (a.repo.name || "").localeCompare(b.repo.name || ""));
+    }
+    // "relevance" is the default order from search(), no re-sort needed
+    return sorted;
+  }
+
+  return { search, applyFilters, extractFacets, tokenize, sortResults };
 })();
 
 // Export for testing or module usage
