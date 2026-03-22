@@ -767,10 +767,50 @@ a:hover {
   margin-bottom: 24px;
 }
 
+.repo-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.repo-detail-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.2s, transform 0.1s;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.btn:hover { transform: translateY(-1px); text-decoration: none; }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  color: #fff;
+}
+
 .repo-detail-name {
   font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin: 0;
   word-break: break-word;
 }
 
@@ -780,6 +820,32 @@ a:hover {
   line-height: 1.7;
   margin-bottom: 20px;
 }
+
+.repo-detail-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary, #f0f0f0);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.stat-chip a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.stat-chip a:hover { text-decoration: underline; }
 
 .github-link {
   display: inline-flex;
@@ -801,6 +867,79 @@ a:hover {
   text-decoration: none;
 }
 
+.repo-detail-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.repo-detail-section h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.clone-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-secondary, #1a1a2e);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.clone-box code {
+  flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.btn-copy {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.btn-copy:hover { background: var(--accent-hover); }
+
+.readme-content {
+  background: var(--bg-secondary, #f6f8fa);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.readme-more {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.readme-more:hover { text-decoration: underline; }
+
 .repo-detail-meta {
   display: flex;
   align-items: center;
@@ -816,6 +955,16 @@ a:hover {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 20px;
+}
+
+.repo-detail-topics .topic-tag {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.repo-detail-topics .topic-tag:hover {
+  background: var(--accent);
+  color: #fff;
 }
 
 .repo-detail-cluster {

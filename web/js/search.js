@@ -345,7 +345,7 @@ const SearchEngine = (() => {
     return snippet;
   }
 
-  return { search, applyFilters, extractFacets, tokenize, sortResults, loadSearchIndex, getSnippet };
+  return { search, applyFilters, extractFacets, tokenize, sortResults, loadSearchIndex, getSnippet, get _chunkRawMap() { return _chunkRawMap; } };
 })();
 
 // Export for testing or module usage

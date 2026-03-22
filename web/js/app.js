@@ -700,6 +700,9 @@ const App = (() => {
    * DOM insertion, consistent with the existing rendering pattern in this file.
    */
   function renderRepoDetail(repoName, container) {
+    // NOTE: All dynamic values below are sanitized via escapeHtml() / escapeAttr()
+    // before insertion. The github-link SVG and static HTML structure are safe literals.
+    // This pattern is consistent with the rest of the codebase (renderHome, renderSearchResults).
     let html = '<a href="#/" class="back-link">&larr; Back to search</a>';
 
     const repo = repos.find((r) => r.name === repoName);
@@ -711,53 +714,78 @@ const App = (() => {
 
     const cluster = findClusterForRepo(repo.name);
     const langColor = LANG_COLORS[repo.language] || "#8b949e";
+    const githubUrl = repo.html_url || repo.url;
+    const freshness = getFreshnessBadge(repo.updated_at);
 
     html += '<div class="repo-detail">';
-    html += '<h2 class="repo-detail-name">' + escapeHtml(repo.name) + '</h2>';
 
+    // Header with name + action buttons
+    html += '<div class="repo-detail-header">';
+    html += '<h2 class="repo-detail-name">' + escapeHtml(repo.name) + '</h2>';
+    html += '<div class="repo-detail-actions">';
+    if (githubUrl) {
+      html += '<a href="' + escapeAttr(githubUrl) + '" class="btn btn-primary" target="_blank" rel="noopener">';
+      html += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>';
+      html += ' View on GitHub</a>';
+    }
+    html += '</div></div>';
+
+    // Description
     if (repo.description) {
       html += '<p class="repo-detail-description">' + escapeHtml(repo.description) + '</p>';
     }
 
-    // GitHub link — url comes from trusted repos.json data, escaped via escapeAttr
-    const githubUrl = repo.html_url || repo.url;
-    if (githubUrl) {
-      html += '<a href="' + escapeAttr(githubUrl) + '" class="github-link" target="_blank" rel="noopener">';
-      html += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>';
-      html += ' View on GitHub</a>';
-    }
-
-    // Meta info
-    html += '<div class="repo-detail-meta">';
+    // Stats bar
+    html += '<div class="repo-detail-stats">';
     if (repo.language) {
-      html += '<span class="language-badge">';
+      html += '<div class="stat-chip">';
       html += '<span class="language-dot" style="background:' + escapeAttr(langColor) + '"></span>';
       html += escapeHtml(repo.language);
-      html += '</span>';
+      html += '</div>';
     }
-    if (repo.stars !== undefined && repo.stars !== null) {
-      html += '<span class="stars-badge">&#9733; ' + escapeHtml(String(repo.stars)) + '</span>';
+    html += '<div class="stat-chip">&#9733; ' + escapeHtml(String(repo.stars || 0)) + ' stars</div>';
+    if (freshness) {
+      html += '<div class="stat-chip ' + escapeAttr(freshness.className) + '">' + escapeHtml(freshness.label) + '</div>';
     }
     if (repo.updated_at) {
-      html += '<span>Updated ' + escapeHtml(formatDate(repo.updated_at)) + '</span>';
+      html += '<div class="stat-chip">Updated ' + escapeHtml(formatDate(repo.updated_at)) + '</div>';
+    }
+    if (cluster) {
+      html += '<div class="stat-chip"><a href="#/cluster/' + escapeAttr(encodeURIComponent(cluster.name)) + '">' + escapeHtml(cluster.name) + '</a></div>';
     }
     html += '</div>';
 
-    // Topics
+    // Topics — clickable, search by topic
     const topics = repo.topics || [];
     if (topics.length > 0) {
       html += '<div class="repo-detail-topics">';
       for (const t of topics) {
-        html += '<span class="topic-tag">' + escapeHtml(t) + '</span>';
+        html += '<a href="#/search?q=' + escapeAttr(encodeURIComponent(t)) + '" class="topic-tag">' + escapeHtml(t) + '</a>';
       }
       html += '</div>';
     }
 
-    // Cluster info
-    if (cluster) {
-      html += '<div class="repo-detail-cluster">';
-      html += '<h3>Cluster</h3>';
-      html += '<a href="#/cluster/' + escapeAttr(encodeURIComponent(cluster.name)) + '" class="cluster-link">' + escapeHtml(cluster.name) + '</a>';
+    // Quick start / clone section
+    if (githubUrl) {
+      const cloneUrl = escapeHtml(githubUrl + '.git');
+      const cloneAttr = escapeAttr(githubUrl + '.git');
+      html += '<div class="repo-detail-section">';
+      html += '<h3>Quick Start</h3>';
+      html += '<div class="clone-box">';
+      html += '<code>git clone ' + cloneUrl + '</code>';
+      html += '<button class="btn-copy" data-copy="' + cloneAttr + '">Copy</button>';
+      html += '</div></div>';
+    }
+
+    // README section — assembled from search-index chunks or readme_excerpt
+    const readmeContent = _getRepoReadme(repo);
+    if (readmeContent) {
+      html += '<div class="repo-detail-section">';
+      html += '<h3>README</h3>';
+      html += '<div class="readme-content">' + escapeHtml(readmeContent) + '</div>';
+      if (githubUrl) {
+        html += '<a href="' + escapeAttr(githubUrl + '#readme') + '" class="readme-more" target="_blank" rel="noopener">Read full README on GitHub &rarr;</a>';
+      }
       html += '</div>';
     }
 
@@ -774,8 +802,40 @@ const App = (() => {
       html += '</div>';
     }
 
-    // Safe: all dynamic values are escaped via escapeHtml/escapeAttr
     container.innerHTML = html;
+
+    // Wire up copy button (event listener, not inline handler)
+    const copyBtn = container.querySelector('.btn-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const text = copyBtn.getAttribute('data-copy');
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
+        });
+      });
+    }
+  }
+
+  /**
+   * Get README content for a repo from search index chunks or readme_excerpt.
+   */
+  function _getRepoReadme(repo) {
+    // Try search index chunks (richer, from search-index.json)
+    if (SearchEngine._chunkRawMap && SearchEngine._chunkRawMap[repo.name]) {
+      const chunks = SearchEngine._chunkRawMap[repo.name];
+      const readmeChunks = chunks.filter((c) =>
+        c.source === "README" || c.source === "README.md"
+      );
+      if (readmeChunks.length > 0) {
+        return readmeChunks.map((c) => c.text).join("\n\n");
+      }
+      // If no README-specific chunks, use all chunks
+      if (chunks.length > 0) {
+        return chunks.map((c) => c.text).join("\n\n");
+      }
+    }
+    return repo.readme_excerpt || null;
   }
 
   /**

@@ -125,7 +125,7 @@ class Indexer:
                     "topics": merged,
                     "stars": repo.get("stars", 0),
                     "updated_at": repo.get("updated_at", ""),
-                    "url": repo.get("url", ""),
+                    "url": repo.get("html_url", "") or repo.get("url", ""),
                     "indexed_at": now,
                 }
 
