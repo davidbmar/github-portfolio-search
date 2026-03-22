@@ -2,9 +2,19 @@
 
 Semantic search across 90+ GitHub repositories. Find patterns, architectures, and solutions from your own code — powered by embeddings.
 
-## What It Does
+## Live Site
 
-Index all your GitHub repos by fetching READMEs and source files, generating embeddings with sentence-transformers, and storing them in SQLite-vec. Search semantically — ask "how did I handle auth?" instead of grepping for keywords.
+**[davidbmar.com](https://davidbmar.com)** — browse capability clusters, search descriptions, and explore 42+ indexed repos with faceted filtering.
+
+## Features
+
+- **Semantic search** — ask "how did I handle auth?" instead of grepping for keywords
+- **Multi-word queries** — "voice processing" matches across terms via OR matching
+- **Faceted filtering** — filter by capability, tech stack, language, maturity, and more
+- **Capability clusters** — repos grouped into 6 categories (Voice & Speech, Transcription & ASR, Browser-Native AI, AI & Search Tools, AWS Infra, Developer Tools)
+- **Relevance scoring** — title boosting (2x for name matches) and recency factor
+- **Search highlighting** — matched terms bolded in results
+- **Mobile responsive** — vertical list layout with slide-out filter panel on small screens
 
 ## Architecture
 
@@ -14,27 +24,36 @@ GitHub API (repos, READMEs, source files)
        v
   Indexing Pipeline (sentence-transformers + SQLite-vec)
        |
-       +---> CLI (ghps search/index)
-       +---> REST API (FastAPI) — Sprint 2
-       +---> MCP Server — Sprint 3
-       +---> Web UI (S3/CloudFront at davidbmar.com) — Sprint 4+
+       +---> REST API (FastAPI)
+       |       +-- Search, clusters, repo detail endpoints
+       |
+       +---> CLI (ghps) — local terminal search
+       +---> MCP Server — AI agent interface
+       +---> Static Web UI (S3/CloudFront at davidbmar.com)
+               +-- Browse clusters, search, faceted filtering
+               +-- Request Access page for gated features
 ```
 
 ## Quick Start
 
 ```bash
-# Set up
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
+# Install
+make install
+# — or manually:
+# python3 -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]"
+
+# Run tests
+make test
 
 # Index your repos
 export GITHUB_TOKEN=ghp_xxx
-ghps index davidbmar
+make index USER=davidbmar
 
-# Search
-ghps search "presigned URL pattern"
-ghps search "WebRTC streaming" --top-k 5
+# Export data for web UI
+make export
+
+# Deploy to S3/CloudFront
+make deploy
 ```
 
 ## Project Structure
@@ -68,7 +87,7 @@ docs/
 | 7 | Test fixes + real data indexing (42 repos) | Complete |
 | 8 | Search relevance + UX polish | Complete |
 | 9 | Multi-word search + gated access prep | Complete |
-| 10 | 5th-sprint checkpoint + docs + all repos | **Next** |
+| 10 | Docs cleanup + index all repos + repo detail page | **In Progress** |
 | 11 | Activity visualization + analytics | Planned |
 
 ## Deployment
@@ -79,7 +98,8 @@ Deploy the web UI to S3/CloudFront at davidbmar.com:
 # Prerequisites: AWS CLI configured with appropriate credentials
 # The script is idempotent — safe to run multiple times.
 
-./deploy.sh
+make deploy
+# — or: ./deploy.sh
 ```
 
 The deploy script will:
