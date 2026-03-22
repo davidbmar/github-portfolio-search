@@ -18,7 +18,7 @@ PROJECT_SLUG="${PROJECT_SLUG:-$(basename "$ROOT_CFG")}"
 #   Go:              go test ./...
 #   No-op (default): echo 'No test command configured'
 # Default: safe no-op echo (override to your project's test runner).
-DEFAULT_TEST_CMD="${DEFAULT_TEST_CMD:-echo 'No test command configured — set DEFAULT_TEST_CMD in sprint-config.sh'}"
+DEFAULT_TEST_CMD="${DEFAULT_TEST_CMD:-cd ${ROOT_CFG} && python3 -m pytest tests/ -v}"
 
 # Sprint notes file — agent summaries are appended here.
 SPRINT_NOTES_FILE="${SPRINT_NOTES_FILE:-${ROOT_CFG}/Sprint-Notes.md}"

@@ -1,100 +1,96 @@
-# Sprint 1
+# Sprint 2
 
 Goal
-- Build the indexing pipeline that fetches all ~90 repos via GitHub API, generates embeddings with sentence-transformers, and stores them in SQLite-vec
-- Deliver a working search function that returns ranked results with code snippets
-- Establish the Python project structure with pyproject.toml and proper packaging
+- Fix Sprint 1 packaging bugs so tests pass and CLI works
+- Build the REST API with search, clusters, and repo detail endpoints
+- Wire API to the SQLite-vec index from Sprint 1
 
 Constraints
 - No two agents may modify the same files
-- agentA owns project scaffold and GitHub API client (src/ghps/github_client.py, src/ghps/__init__.py, pyproject.toml)
-- agentB owns embedding pipeline and vector store (src/ghps/embeddings.py, src/ghps/store.py)
-- agentC owns search function and CLI (src/ghps/search.py, src/ghps/cli.py)
+- agentA owns packaging fixes and test fixes (pyproject.toml, tests/, .github/)
+- agentB owns REST API server (src/ghps/api.py, src/ghps/clusters.py)
+- agentC owns API tests and integration (tests/test_api.py, tests/test_integration.py)
 - Use python3 for all commands
-- Use sentence-transformers for embeddings (all-MiniLM-L6-v2 model)
-- Use sqlite-vec for vector storage
+- All API endpoints must return JSON
 
 Merge Order
-1. agentA-github-api
-2. agentB-embedding-store
-3. agentC-search-cli
+1. agentA-packaging-fixes
+2. agentB-rest-api
+3. agentC-api-tests
 
 Merge Verification
 - python3 -m pytest tests/ -v
 
-## agentA-github-api
+## agentA-packaging-fixes
 
 Objective
-- Set up the Python project and build a GitHub API client that fetches all repos, READMEs, and metadata for a given user
+- Fix all Sprint 1 packaging and test bugs so the project installs and tests pass cleanly
 
 Tasks
-- Create pyproject.toml with dependencies: requests, sentence-transformers, sqlite-vec, click, pytest
-- Create src/ghps/__init__.py with version
-- Create src/ghps/github_client.py with:
-  - fetch_repos(username) -> list of repo dicts (name, description, language, topics, stars, updated_at, html_url)
-  - fetch_readme(owner, repo) -> str (README content, empty string if none)
-  - fetch_top_files(owner, repo, extensions=['.py', '.js', '.ts', '.go', '.rs', '.java']) -> list of (path, content) tuples
-  - Support GitHub token via GITHUB_TOKEN env var for authenticated requests (5000 req/hr)
-  - Handle pagination for users with many repos
-- Create tests/test_github_client.py with unit tests (mock HTTP responses)
-- Create a .env.example showing GITHUB_TOKEN=ghp_xxx
+- Fix pyproject.toml: add [project.scripts] ghps = "ghps.cli:main"
+- Fix editable install issue: ensure src layout works with pip install -e .
+- Fix tests/test_embeddings.py import errors — mock sentence_transformers if needed for unit tests
+- Fix tests/test_store.py import errors — mock sqlite_vec if needed for unit tests
+- Ensure all 4 test files pass: test_github_client.py, test_embeddings.py, test_store.py, test_search.py
+- Add .gitignore entries for .venv/, *.egg-info/, __pycache__/, .ghps/
+- Add a Makefile or scripts for common operations: make install, make test, make index
 
 Acceptance Criteria
-- python3 -m pytest tests/test_github_client.py passes
-- fetch_repos returns repo metadata for a user with >50 repos
-- fetch_readme returns content for repos that have READMEs
-- Authenticated requests use GITHUB_TOKEN when available
+- pip install -e ".[dev]" succeeds
+- python3 -m pytest tests/ -v passes all tests
+- ghps --help shows CLI usage
+- .gitignore properly excludes build artifacts
 
-## agentB-embedding-store
+## agentB-rest-api
 
 Objective
-- Build the embedding pipeline and SQLite-vec vector store for indexing repo content
+- Build a FastAPI REST API with search, clusters, and repo detail endpoints
 
 Tasks
-- Create src/ghps/embeddings.py with:
-  - EmbeddingPipeline class using sentence-transformers (all-MiniLM-L6-v2)
-  - embed_text(text: str) -> list[float] (384-dim vector)
-  - embed_batch(texts: list[str]) -> list[list[float]] for efficient batch processing
-  - Chunk long documents (README + source files) into ~512 token segments
-- Create src/ghps/store.py with:
-  - VectorStore class wrapping SQLite-vec
-  - create_index() -> sets up tables: repos (metadata), chunks (text + embedding), repo_files
-  - add_repo(repo_dict, readme_text, source_files) -> indexes all content
-  - Schema: repos table (name, description, language, topics JSON, stars, updated_at, url), chunks table (repo_name, source, text, embedding vec)
-- Create src/ghps/indexer.py with:
-  - Indexer class that ties together github_client + embeddings + store
-  - index_user(username) -> fetches all repos, generates embeddings, stores in SQLite-vec
-  - Progress logging (repo N/total, chunks generated)
-- Create tests/test_store.py with unit tests (in-memory SQLite)
-- Create tests/test_embeddings.py with basic embedding tests
+- Add fastapi and uvicorn to pyproject.toml dependencies
+- Create src/ghps/api.py with FastAPI app:
+  - GET /api/search?q=<query>&top_k=10 — semantic search, returns ranked results with repo name, description, score, snippet, url
+  - GET /api/clusters — capability clusters grouped by embedding similarity
+  - GET /api/repos/<slug> — repo detail with metadata, README excerpt, matched chunks
+  - GET /api/health — health check endpoint
+  - CORS middleware for browser access
+- Create src/ghps/clusters.py with:
+  - ClusterEngine class that groups repos by embedding similarity
+  - cluster_repos(store, n_clusters=10) -> list of Cluster(name, repos, centroid)
+  - Use sklearn KMeans or simple cosine-similarity grouping
+- Add [project.scripts] entry: ghps-server = "ghps.api:main" (uvicorn launcher)
+- Server should accept --port, --db flags
+- All responses follow consistent JSON format: {"ok": true, "data": ...} or {"ok": false, "error": "..."}
 
 Acceptance Criteria
-- python3 -m pytest tests/test_store.py tests/test_embeddings.py passes
-- VectorStore can insert and retrieve vectors by similarity
-- EmbeddingPipeline produces 384-dim float vectors
-- Indexer can process a list of repo dicts into the store
+- python3 -m uvicorn ghps.api:app starts without errors
+- GET /api/search?q=test returns valid JSON with results array
+- GET /api/clusters returns grouped repos
+- GET /api/repos/some-repo returns repo metadata
+- CORS headers present in responses
 
-## agentC-search-cli
+## agentC-api-tests
 
 Objective
-- Build the semantic search function and a basic CLI tool
+- Write comprehensive API tests and an integration test that exercises the full pipeline
 
 Tasks
-- Create src/ghps/search.py with:
-  - SearchEngine class that wraps VectorStore + EmbeddingPipeline
-  - search(query: str, top_k: int = 10) -> list of SearchResult(repo_name, chunk_text, score, source, repo_url)
-  - Results sorted by cosine similarity score descending
-  - Deduplicate results from same repo (return best-scoring chunk per repo)
-- Create src/ghps/cli.py with:
-  - Click-based CLI: ghps search "query" [--top-k N] [--db PATH]
-  - ghps index <username> [--db PATH] [--token TOKEN]
-  - Pretty-print results: repo name, score, snippet (first 200 chars), URL
-  - Default db path: ~/.ghps/index.db
-- Create pyproject.toml [project.scripts] entry: ghps = "ghps.cli:main"
-- Create tests/test_search.py with unit tests (mock store with known vectors)
+- Create tests/test_api.py with:
+  - Test /api/search returns results for known queries
+  - Test /api/search with empty query returns error
+  - Test /api/clusters returns non-empty clusters
+  - Test /api/repos/<slug> returns 404 for unknown repos
+  - Test /api/health returns ok
+  - Use FastAPI TestClient (no server needed)
+- Create tests/test_integration.py with:
+  - End-to-end test: create temp store → add mock repos → search → verify results
+  - Test that indexer + search pipeline produces correct rankings
+  - Test deduplication (same repo, multiple chunks → one result per repo)
+- Create tests/conftest.py with shared fixtures:
+  - mock_store fixture — in-memory SQLite with test data
+  - mock_github_responses fixture — cached API responses for testing
 
 Acceptance Criteria
-- python3 -m pytest tests/test_search.py passes
-- search() returns results ranked by relevance score
-- CLI ghps search prints formatted results to stdout
-- CLI ghps index triggers indexing for a given username
+- python3 -m pytest tests/test_api.py -v passes
+- python3 -m pytest tests/test_integration.py -v passes
+- Integration test demonstrates full index → search pipeline
