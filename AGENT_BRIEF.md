@@ -1,44 +1,30 @@
-agentC-web-resilience — Sprint 6
+agentA-test-fixes — Sprint 7
 
 Sprint-Level Context
 
 Goal
-- CRITICAL: Fix B-010 — davidbmar.com shows "Could not load data" because data files are empty
-- Fix B-005, B-006 — remaining 4 test failures from Sprint 3
-- Add sample data so the site works without a GitHub token
-- Production hardening: proper error handling when data is missing
+- Fix all 4 remaining test failures (B-005, B-006) to reach 0 failures
+- Fix B-012 — .venv symlink breakage after agent merges
+- Index real GitHub data (90+ repos) and deploy to davidbmar.com with real portfolio content
 
 Constraints
 - No two agents may modify the same files
-- agentA owns data pipeline fixes (src/ghps/export.py, web/data/, scripts/)
-- agentB owns test fixes and infrastructure (tests/, pyproject.toml, Makefile)
-- agentC owns web UI error handling and resilience (web/js/app.js, web/js/search.js, web/index.html)
+- agentA owns test fixes (tests/test_cli.py, tests/test_e2e.py, src/ghps/cli.py)
+- agentB owns indexing and data pipeline (src/ghps/embeddings.py, src/ghps/search.py, src/ghps/indexer.py, src/ghps/github_client.py, src/ghps/store.py, src/ghps/export.py, web/data/)
 - Use python3 for all commands
 - Do NOT commit .venv/ to git
+- .sprint/scripts/sprint-init.sh must NOT symlink .venv into worktrees (B-012 fix)
 
 
 Objective
-- Make the web UI handle missing/empty data gracefully and look professional
+- Fix all 4 test failures to reach 0 failures, 0 errors
 
 Tasks
-- Update web/js/app.js:
-  - Handle fetch errors gracefully: show "No data available — run ghps index to populate" instead of JSON parse error
-  - Add retry button when data fails to load
-  - Show sample data inline as fallback if fetch fails (embedded minimal dataset)
-  - Add footer: "Powered by GitHub Portfolio Search — Built with Afterburner"
-- Update web/js/search.js:
-  - Handle empty repos array without crashing
-  - Show "No repositories indexed yet" when data is empty
-- Update web/css/style.css:
-  - Style error states (friendly, not scary)
-  - Add loading skeleton animation while data loads
-  - Ensure footer stays at bottom
-- Update web/index.html:
-  - Add meta description and OG tags for social sharing
-  - Add favicon (simple emoji or SVG)
+- Fix B-005 (3 failures in test_cli.py): The `CliRunner(mix_stderr=False)` call fails because Click 8.2+ removed the `mix_stderr` parameter. Fix by removing `mix_stderr=False` from CliRunner() calls at lines 143, 283, 316 in tests/test_cli.py. Then ensure the tests actually test the missing-index edge case — cli.py should catch FileNotFoundError/TypeError when no SQLite DB exists and return a friendly error message via click.echo instead of crashing.
+- Fix B-006 (1 failure in test_e2e.py): The `ghps search --format json` command outputs model loading progress bars (from sentence-transformers) to stdout, which corrupts the JSON. Fix by redirecting model loading output to stderr in src/ghps/cli.py — set environment variable or configure logging so that tqdm/transformers progress output goes to stderr. The JSON output on stdout must be clean (no progress bars, no warnings, just the JSON array). Alternatively, in the search command, capture stdout and extract only the JSON portion.
+- Verify: python3 -m pytest tests/test_cli.py tests/test_e2e.py -v shows 0 failures
 
 Acceptance Criteria
-- Playwright: visit site with empty data — shows friendly message, no JS errors in console
-- Playwright: visit site with sample data — search works, clusters render
-- Mobile layout works at 375px viewport
-- No uncaught JS errors in console
+- python3 -m pytest tests/ -v shows 0 failures, 0 errors
+- ghps search "test query" --format json outputs valid JSON to stdout (no progress bars mixed in)
+- ghps search with no index returns a friendly error message, not a traceback

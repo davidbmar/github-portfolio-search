@@ -1,25 +1,17 @@
-`★ Insight ─────────────────────────────────────`
-- **Defensive JSON parsing**: Instead of calling `.json()` directly (which throws on empty body), we first read `.text()`, check if it's non-empty, then `JSON.parse`. This prevents the confusing "Unexpected end of JSON input" error that was causing B-010.
-- **Graceful degradation pattern**: The `useFallbackData()` function sets the app state to sample data *and* renders the UI, so the site still looks functional even when the backend has no data. The error banner is informational, not blocking.
-`─────────────────────────────────────────────────`
-
 ---
 
 ## Summary
 
 ### Files changed
-- `web/js/app.js` — Error handling with retry button, sample data fallback, loading skeleton, footer
-- `web/js/search.js` — Guard clauses for empty/null repos in `search()`, `applyFilters()`, `extractFacets()`
-- `web/css/style.css` — Loading skeleton animation, error banner styles, retry button, footer, sticky footer layout, mobile responsive
-- `web/index.html` — Meta description, OG tags, Twitter card, SVG emoji favicon
-- `docs/project-memory/sessions/S-2026-03-22-0712-sprint6-web-resilience.md` — Session doc
+- `tests/test_cli.py` — Removed `mix_stderr=False` from 3 `CliRunner()` calls (lines 143, 283, 316); changed `result.stderr` → `result.output` in assertions
+- `src/ghps/cli.py` — Added environment variable suppression for model-loading progress bars (`TOKENIZERS_PARALLELISM`, `HF_HUB_DISABLE_PROGRESS_BARS`, `TRANSFORMERS_NO_ADVISORY_WARNINGS`) and set `sentence_transformers` logger to WARNING level
 
 ### Commands run
-- `git pull origin main` — merged latest
-- `python3 -m pytest tests/ -v` — 137 passed
-- `node -e ...` — verified search.js handles empty/null data
-- `git push -u origin HEAD` — pushed to remote
+- `git pull origin main` — already up to date
+- `python3 -m pytest tests/test_cli.py tests/test_e2e.py -v` — 18 passed
+- `python3 -m pytest tests/ -v` — **137 passed, 0 failures, 0 errors**
+- `git push -u origin HEAD` — pushed to `agentA-test-fixes`
 
 ### Notes / follow-on work
-- **Playwright tests** mentioned in acceptance criteria (visit site with empty data, sample data, mobile 375px viewport) are not yet implemented — these would be added by the test agent (agentB) per the constraint boundaries
-- The sample fallback data is minimal (1 repo, 1 cluster) — could be enriched with more representative examples
+- The missing-index error handling in `cli.py` was already correct (`click.echo(..., err=True)` + `sys.exit(1)`). Only the test assertions needed updating.
+- If Click is later downgraded below 8.2, these tests will still work since the default `mix_stderr=True` behavior is the same across all Click versions.
