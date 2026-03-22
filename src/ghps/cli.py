@@ -10,6 +10,24 @@ from pathlib import Path
 import click
 
 
+def _load_dotenv() -> None:
+    """Load .env file from project root if it exists."""
+    # Walk up from this file to find .env
+    here = Path(__file__).resolve().parent
+    for candidate in [here.parent.parent, Path.cwd()]:
+        env_file = candidate / ".env"
+        if env_file.is_file():
+            with open(env_file) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        key, _, value = line.partition("=")
+                        os.environ.setdefault(key.strip(), value.strip())
+            break
+
+
+_load_dotenv()
+
 DEFAULT_DB = os.path.join(Path.home(), ".ghps", "index.db")
 
 

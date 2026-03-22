@@ -102,14 +102,25 @@ class Indexer:
     def index_user(self, username: str, github_client: Any = None) -> int:
         """Fetch all repos for a user and index them.
 
-        Requires a github_client with fetch_user_repos(username) method that
-        returns a list of repo dicts.
+        Fetches repo metadata, then enriches each repo with README content
+        so there's actual text to embed and search.
         """
         if github_client is None:
             raise ValueError("github_client is required for index_user")
 
         logger.info("Fetching repos for user: %s", username)
-        repos = github_client.fetch_user_repos(username)
+        repos = github_client.fetch_repos(username)
         logger.info("Found %d repos for %s", len(repos), username)
+
+        # Enrich each repo with README content
+        for i, repo in enumerate(repos, 1):
+            name = repo["name"]
+            logger.info("Fetching README %d/%d: %s", i, len(repos), name)
+            try:
+                readme = github_client.fetch_readme(username, name)
+                repo["readme"] = readme
+            except Exception:
+                logger.warning("Could not fetch README for %s", name)
+                repo["readme"] = ""
 
         return self.index_repos(repos)
