@@ -178,10 +178,19 @@ const Auth = (() => {
     }
   }
 
+  /**
+   * Check if the authenticated user is approved for gated features.
+   * Stub: returns true for now — no server-side check on static site.
+   */
+  function isApproved() {
+    return true;
+  }
+
   return {
     loadConfig,
     isOAuthEnabled,
     isAuthenticated,
+    isApproved,
     getUser,
     renderSignInButton,
     signOut,

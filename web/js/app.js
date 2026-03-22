@@ -6,111 +6,27 @@
  * before DOM insertion. escapeHtml uses createTextNode which is XSS-safe.
  */
 
-// --- Auth Gate ---
-// Uses Auth module (auth.js) for Google OAuth or password fallback.
-// Sets window.__ghpsGateLocked so App.init() can skip initialization
-// until auth is resolved.
+// --- Public-First Initialization ---
+// All content is publicly browsable without sign-in.
+// Sign-in is optional and enables gated features.
 (() => {
-  // Mark as locked until auth check completes
-  window.__ghpsGateLocked = true;
-
   document.addEventListener("DOMContentLoaded", async () => {
     await Auth.loadConfig();
 
-    // If already authenticated, unlock and proceed
-    if (Auth.isAuthenticated()) {
-      window.__ghpsGateLocked = false;
+    // Listen for auth changes (sign-in / sign-out) to update header
+    Auth.onAuthChange(() => {
       _updateHeaderUserInfo();
-      App.init();
-      return;
-    }
+    });
 
-    // Show auth gate
-    document.body.textContent = "";
-
-    // Re-add header so page doesn't look broken
-    const overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;inset:0;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:9999";
-
-    const wrapper = document.createElement("div");
-    wrapper.style.cssText = "text-align:center;color:#c9d1d9;font-family:system-ui;max-width:360px";
-
-    const h2 = document.createElement("h2");
-    h2.textContent = "GitHub Portfolio Search";
-    h2.style.marginBottom = "1rem";
-    wrapper.appendChild(h2);
-
-    if (Auth.isOAuthEnabled()) {
-      // Google Sign-In mode
-      const p = document.createElement("p");
-      p.textContent = "Sign in with Google to continue";
-      p.style.cssText = "color:#8b949e;margin-bottom:1.5rem";
-      wrapper.appendChild(p);
-
-      const btnContainer = document.createElement("div");
-      btnContainer.id = "google-signin-btn";
-      btnContainer.style.cssText = "display:flex;justify-content:center;margin-bottom:1rem";
-      wrapper.appendChild(btnContainer);
-
-      Auth.onAuthChange(() => {
-        window.__ghpsGateLocked = false;
-        location.reload();
-      });
-
-      overlay.appendChild(wrapper);
-      document.body.appendChild(overlay);
-      Auth.renderSignInButton(btnContainer);
-    } else {
-      // Password gate fallback
-      const p = document.createElement("p");
-      p.textContent = "Enter password to continue";
-      p.style.cssText = "color:#8b949e;margin-bottom:1.5rem";
-      wrapper.appendChild(p);
-
-      const form = document.createElement("form");
-      form.autocomplete = "off";
-      form.onsubmit = e => { e.preventDefault(); attemptLogin(); };
-
-      const input = document.createElement("input");
-      input.type = "password";
-      input.name = "password";
-      input.placeholder = "Password";
-      input.autocomplete = "current-password";
-      input.style.cssText = "padding:10px 16px;border-radius:8px;border:1px solid #30363d;background:#161b22;color:#c9d1d9;font-size:16px;width:240px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto";
-
-      const btn = document.createElement("button");
-      btn.type = "submit";
-      btn.textContent = "Enter";
-      btn.style.cssText = "padding:10px 32px;border-radius:8px;border:none;background:#58a6ff;color:#0d1117;font-weight:600;font-size:16px;cursor:pointer";
-
-      const err = document.createElement("p");
-      err.style.cssText = "color:#f85149;margin-top:8px;min-height:1.2em";
-
-      const attemptLogin = () => {
-        if (Auth.tryPasswordLogin(input.value)) {
-          window.__ghpsGateLocked = false;
-          location.reload();
-        } else {
-          err.textContent = "Incorrect password";
-          input.value = "";
-          input.focus();
-        }
-      };
-
-      form.appendChild(input);
-      form.appendChild(btn);
-      form.appendChild(err);
-      wrapper.appendChild(form);
-      overlay.appendChild(wrapper);
-      document.body.appendChild(overlay);
-      input.focus();
-    }
+    _updateHeaderUserInfo();
+    App.init();
   });
 })();
 
 /**
- * Update the header to show user info (avatar + name) and Sign Out button
- * when authenticated via Google OAuth.
+ * Update the header to show auth state:
+ * - Unauthenticated: "Sign In" button in the nav bar
+ * - Authenticated: user avatar + name + "Sign Out" button
  */
 function _updateHeaderUserInfo() {
   const nav = document.querySelector(".site-nav");
@@ -120,41 +36,97 @@ function _updateHeaderUserInfo() {
   const existing = document.getElementById("user-info");
   if (existing) existing.remove();
 
-  if (!Auth.isOAuthEnabled()) return;
-
-  const user = Auth.getUser();
-  if (!user) return;
-
   const userInfo = document.createElement("div");
   userInfo.id = "user-info";
   userInfo.style.cssText = "display:flex;align-items:center;gap:8px;margin-left:auto";
 
-  if (user.picture) {
-    const avatar = document.createElement("img");
-    avatar.src = user.picture.replace(/^http:\/\//, "https://");
-    avatar.alt = user.name || "User avatar";
-    avatar.referrerPolicy = "no-referrer";
-    avatar.style.cssText = "width:28px;height:28px;border-radius:50%;border:1px solid #30363d";
-    userInfo.appendChild(avatar);
-  }
+  if (Auth.isAuthenticated()) {
+    // Authenticated: show avatar + name + Sign Out
+    const user = Auth.getUser();
 
-  if (user.name) {
-    const nameSpan = document.createElement("span");
-    nameSpan.textContent = user.name;
-    nameSpan.style.cssText = "color:#c9d1d9;font-size:14px;white-space:nowrap";
-    userInfo.appendChild(nameSpan);
-  }
+    if (user && user.picture) {
+      const avatar = document.createElement("img");
+      avatar.src = user.picture.replace(/^http:\/\//, "https://");
+      avatar.alt = (user.name || "User") + " avatar";
+      avatar.referrerPolicy = "no-referrer";
+      avatar.style.cssText = "width:28px;height:28px;border-radius:50%;border:1px solid #30363d";
+      userInfo.appendChild(avatar);
+    }
 
-  const signOutBtn = document.createElement("button");
-  signOutBtn.textContent = "Sign Out";
-  signOutBtn.style.cssText = "padding:4px 12px;border-radius:6px;border:1px solid #30363d;background:transparent;color:#8b949e;font-size:13px;cursor:pointer;margin-left:4px";
-  signOutBtn.addEventListener("click", () => {
-    Auth.signOut();
-    location.reload();
-  });
-  userInfo.appendChild(signOutBtn);
+    if (user && user.name) {
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = user.name;
+      nameSpan.style.cssText = "color:#c9d1d9;font-size:14px;white-space:nowrap";
+      userInfo.appendChild(nameSpan);
+    }
+
+    const signOutBtn = document.createElement("button");
+    signOutBtn.textContent = "Sign Out";
+    signOutBtn.style.cssText = "padding:4px 12px;border-radius:6px;border:1px solid #30363d;background:transparent;color:#8b949e;font-size:13px;cursor:pointer;margin-left:4px";
+    signOutBtn.addEventListener("click", () => {
+      Auth.signOut();
+      _updateHeaderUserInfo();
+    });
+    userInfo.appendChild(signOutBtn);
+  } else if (Auth.isOAuthEnabled()) {
+    // Unauthenticated with OAuth configured: show Sign In button
+    const signInBtn = document.createElement("button");
+    signInBtn.textContent = "Sign In";
+    signInBtn.style.cssText = "padding:4px 14px;border-radius:6px;border:1px solid #58a6ff;background:transparent;color:#58a6ff;font-size:13px;cursor:pointer;font-weight:500";
+    signInBtn.addEventListener("click", () => {
+      _showSignInPopup();
+    });
+    userInfo.appendChild(signInBtn);
+  }
 
   nav.parentElement.appendChild(userInfo);
+}
+
+/**
+ * Show a modal dialog with the Google Sign-In button.
+ * Triggered by the nav bar "Sign In" button.
+ */
+function _showSignInPopup() {
+  // Remove any existing popup
+  const existingPopup = document.getElementById("signin-popup-overlay");
+  if (existingPopup) existingPopup.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "signin-popup-overlay";
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999";
+
+  const dialog = document.createElement("div");
+  dialog.style.cssText = "background:#161b22;border:1px solid #30363d;border-radius:12px;padding:2rem;text-align:center;max-width:360px;width:90%;position:relative";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "\u00D7";
+  closeBtn.style.cssText = "position:absolute;top:8px;right:12px;background:none;border:none;color:#8b949e;font-size:24px;cursor:pointer;line-height:1";
+  closeBtn.addEventListener("click", () => overlay.remove());
+  dialog.appendChild(closeBtn);
+
+  const h3 = document.createElement("h3");
+  h3.textContent = "Sign In";
+  h3.style.cssText = "color:#e6edf3;margin:0 0 0.5rem 0";
+  dialog.appendChild(h3);
+
+  const p = document.createElement("p");
+  p.textContent = "Sign in to access gated features like code search and file browsing.";
+  p.style.cssText = "color:#8b949e;margin-bottom:1.5rem;font-size:14px";
+  dialog.appendChild(p);
+
+  const btnContainer = document.createElement("div");
+  btnContainer.style.cssText = "display:flex;justify-content:center;margin-bottom:1rem";
+  dialog.appendChild(btnContainer);
+
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+
+  // Close on overlay click (outside dialog)
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  Auth.renderSignInButton(btnContainer);
 }
 
 const App = (() => {
@@ -878,6 +850,24 @@ const App = (() => {
     tierInfo.textContent = "Public tier \u2014 browse clusters and search descriptions. Gated access provides: Full code search, file tree browsing, and detailed repository analysis. Fill out the form below to request access.";
     page.appendChild(tierInfo);
 
+    // Show sign-in prompt for unauthenticated users
+    if (!Auth.isAuthenticated() && Auth.isOAuthEnabled()) {
+      const signInSection = document.createElement("div");
+      signInSection.style.cssText = "margin:1.5rem 0;padding:1rem;background:var(--card-bg, #161b22);border:1px solid var(--border, #30363d);border-radius:8px;text-align:center";
+
+      const signInMsg = document.createElement("p");
+      signInMsg.textContent = "Sign in with Google to auto-fill your details and request access.";
+      signInMsg.style.cssText = "color:#8b949e;margin-bottom:1rem";
+      signInSection.appendChild(signInMsg);
+
+      const signInContainer = document.createElement("div");
+      signInContainer.style.cssText = "display:flex;justify-content:center";
+      signInSection.appendChild(signInContainer);
+
+      page.appendChild(signInSection);
+      Auth.renderSignInButton(signInContainer);
+    }
+
     const form = document.createElement("form");
     form.className = "access-form";
     form.id = "access-form";
@@ -1247,7 +1237,6 @@ const App = (() => {
    * Initialize the app.
    */
   function init() {
-    if (window.__ghpsGateLocked) return;
     injectActivityStyles();
     _updateHeaderUserInfo();
     window.addEventListener("hashchange", route);
