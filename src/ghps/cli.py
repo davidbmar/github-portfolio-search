@@ -52,7 +52,10 @@ def search(query: str, top_k: int, db: str) -> None:
 @click.option("--token", default=None, help="GitHub personal access token.")
 def index(username: str, db: str, token: str | None) -> None:
     """Index all repos for a GitHub user."""
+    from ghps.embeddings import EmbeddingPipeline
     from ghps.indexer import Indexer
+    from ghps.store import VectorStore
+    from ghps import github_client
 
     if token:
         os.environ["GITHUB_TOKEN"] = token
@@ -61,8 +64,10 @@ def index(username: str, db: str, token: str | None) -> None:
     if db_dir:
         os.makedirs(db_dir, exist_ok=True)
 
-    indexer = Indexer(db_path=db)
-    indexer.index_user(username)
+    store = VectorStore(db)
+    store.create_index()
+    indexer = Indexer(store=store, pipeline=EmbeddingPipeline())
+    indexer.index_user(username, github_client=github_client)
     click.echo(f"Indexing complete. Database: {db}")
 
 
