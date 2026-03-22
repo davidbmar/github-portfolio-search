@@ -109,6 +109,22 @@ class TestBuildClusters:
         for c in clusters:
             assert "centroid" not in c
 
+    def test_clusters_have_unique_names(self, mock_store):
+        """Every cluster must have a distinct name — no duplicates."""
+        clusters = _build_clusters(mock_store)
+        names = [c["name"] for c in clusters]
+        assert len(names) == len(set(names)), f"Duplicate cluster names found: {names}"
+
+    def test_clusters_meet_minimum_size(self, mock_store):
+        """No cluster should have fewer than 3 repos (unless total repos < 3)."""
+        clusters = _build_clusters(mock_store)
+        total_repos = sum(len(c["repos"]) for c in clusters)
+        if total_repos >= 3:
+            for c in clusters:
+                assert len(c["repos"]) >= 3 or len(clusters) == 1, (
+                    f"Cluster '{c['name']}' has only {len(c['repos'])} repos"
+                )
+
 
 class TestBuildSearchIndex:
     """Tests for search-index.json generation."""

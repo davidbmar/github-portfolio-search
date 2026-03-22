@@ -40,13 +40,44 @@ class ClusterEngine:
         """
         db = self.store.connect()
 
-        # Get all repos
-        repos = db.execute("SELECT name, description, language, topics FROM repos").fetchall()
+        # Get all repos — include inferred_topics if agentA has added the column
+        try:
+            repos = db.execute(
+                "SELECT name, description, language, topics, inferred_topics FROM repos"
+            ).fetchall()
+            has_inferred = True
+        except Exception:
+            repos = db.execute(
+                "SELECT name, description, language, topics FROM repos"
+            ).fetchall()
+            has_inferred = False
+
         if not repos:
             return []
 
         repo_names = [r[0] for r in repos]
-        repo_meta = {r[0]: {"description": r[1], "language": r[2], "topics": r[3]} for r in repos}
+        repo_meta = {}
+        for r in repos:
+            topics_raw = r[3]
+            try:
+                topics = json.loads(topics_raw) if topics_raw else []
+            except (json.JSONDecodeError, TypeError):
+                topics = []
+            if has_inferred:
+                inferred_raw = r[4]
+                try:
+                    inferred = json.loads(inferred_raw) if inferred_raw else []
+                except (json.JSONDecodeError, TypeError):
+                    inferred = []
+                all_topics = list(dict.fromkeys(topics + inferred))
+            else:
+                all_topics = topics
+            repo_meta[r[0]] = {
+                "description": r[1],
+                "language": r[2],
+                "topics": r[3],
+                "all_topics": all_topics,
+            }
 
         # Compute average embedding per repo from its chunks
         dim = 384  # EMBEDDING_DIM
@@ -84,11 +115,40 @@ class ClusterEngine:
         for name, label in zip(names, labels):
             clusters_map.setdefault(int(label), []).append(name)
 
+        # Merge small clusters (< min_cluster_size) into nearest neighbor
+        min_cluster_size = 3
+        centroids = kmeans.cluster_centers_
+        merged = True
+        while merged:
+            merged = False
+            small_ids = [
+                lid for lid, reps in clusters_map.items() if len(reps) < min_cluster_size
+            ]
+            if not small_ids or len(clusters_map) <= 1:
+                break
+            for small_id in small_ids:
+                if small_id not in clusters_map or len(clusters_map) <= 1:
+                    continue
+                other_ids = [oid for oid in clusters_map if oid != small_id]
+                if not other_ids:
+                    break
+                # Find nearest cluster by centroid distance
+                small_centroid = centroids[small_id]
+                best_id = min(
+                    other_ids,
+                    key=lambda oid: float(np.linalg.norm(centroids[oid] - small_centroid)),
+                )
+                clusters_map[best_id].extend(clusters_map.pop(small_id))
+                # Recompute centroid as mean of merged repo embeddings
+                merged_vecs = [repo_embeddings[n] for n in clusters_map[best_id]]
+                centroids[best_id] = np.mean(merged_vecs, axis=0)
+                merged = True
+
         # Generate unique names
         used_names: set[str] = set()
         result: list[Cluster] = []
         for label_id, cluster_repos in sorted(clusters_map.items()):
-            centroid = kmeans.cluster_centers_[label_id].tolist()
+            centroid = centroids[label_id].tolist()
             name = _generate_cluster_name(cluster_repos, repo_meta, used_names)
             used_names.add(name)
             result.append(Cluster(name=name, repos=cluster_repos, centroid=centroid))
@@ -119,7 +179,8 @@ def _generate_cluster_name(
     for name in repo_names:
         meta = repo_meta.get(name, {})
         desc = (meta.get("description") or "").lower()
-        searchable = f"{name.lower()} {desc}"
+        topics_str = " ".join(t.lower() for t in meta.get("all_topics", []))
+        searchable = f"{name.lower()} {desc} {topics_str}"
 
         for keywords, capability in _KEYWORD_CAPABILITIES:
             for kw in keywords:
