@@ -1,10 +1,10 @@
 """MCP server for GitHub Portfolio Search.
 
 Implements the Model Context Protocol (MCP) over stdio using JSON-RPC 2.0.
-Exposes portfolio search tools for Claude Code and Bob integration.
+Exposes portfolio search tools for Claude Code and AI agent integration.
 
-Uses the lightweight JSON-RPC approach (no mcp package dependency) so it
-works with Python >=3.9.
+Uses a lightweight JSON-RPC approach so it works with Python >=3.9 without
+requiring the mcp SDK (which needs Python >=3.10).
 """
 
 from __future__ import annotations
@@ -13,8 +13,6 @@ import argparse
 import json
 import logging
 import os
-import signal
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -28,17 +26,20 @@ logger = logging.getLogger(__name__)
 TOOLS: List[Dict[str, Any]] = [
     {
         "name": "portfolio_search",
-        "description": "Search the GitHub portfolio index by semantic similarity. Returns ranked results with repo name, score, snippet, and URL.",
+        "description": (
+            "Search David's GitHub portfolio by semantic similarity. "
+            "Returns ranked results with repo name, description, score, language, and topics."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "Natural-language search query",
+                    "description": "Natural-language search query (e.g. 'presigned URL', 'voice transcription')",
                 },
-                "top_k": {
+                "limit": {
                     "type": "integer",
-                    "description": "Maximum number of results to return",
+                    "description": "Maximum number of results to return (default 10)",
                     "default": 10,
                 },
             },
@@ -47,7 +48,10 @@ TOOLS: List[Dict[str, Any]] = [
     },
     {
         "name": "portfolio_clusters",
-        "description": "Return capability clusters of repos grouped by embedding similarity. Each cluster has a name and list of repo names.",
+        "description": (
+            "Return capability clusters of repos grouped by embedding similarity. "
+            "Each cluster has a name, repo count, and list of repo names."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {},
@@ -55,30 +59,27 @@ TOOLS: List[Dict[str, Any]] = [
     },
     {
         "name": "portfolio_repo_detail",
-        "description": "Get full metadata for a specific repo including description, language, topics, stars, URL, README excerpt, and tech stack.",
+        "description": (
+            "Get full metadata for a specific repo including description, language, "
+            "topics, stars, updated_at, html_url, and cluster assignment."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
-                "repo_name": {
+                "name": {
                     "type": "string",
                     "description": "Name of the repository to look up",
                 },
             },
-            "required": ["repo_name"],
+            "required": ["name"],
         },
     },
     {
         "name": "portfolio_reindex",
-        "description": "Trigger re-indexing of a GitHub user's repositories. Returns the count of chunks indexed.",
+        "description": "Trigger re-indexing of GitHub repositories. Returns a status message.",
         "inputSchema": {
             "type": "object",
-            "properties": {
-                "username": {
-                    "type": "string",
-                    "description": "GitHub username whose repos should be re-indexed",
-                },
-            },
-            "required": ["username"],
+            "properties": {},
         },
     },
 ]
@@ -87,45 +88,82 @@ TOOLS: List[Dict[str, Any]] = [
 # Tool handlers
 # ---------------------------------------------------------------------------
 
+_NO_INDEX_MSG = (
+    "No portfolio index found. Run 'ghps index --user <username>' to build "
+    "the search index first, or use portfolio_reindex() to trigger indexing."
+)
+
+
+def _check_index(store: Any) -> None:
+    """Raise ValueError if the store has no indexed repos."""
+    db = store.connect()
+    try:
+        count = db.execute("SELECT COUNT(*) FROM repos").fetchone()[0]
+    except Exception:
+        raise ValueError(_NO_INDEX_MSG)
+    if count == 0:
+        raise ValueError(_NO_INDEX_MSG)
+
 
 def _handle_portfolio_search(store: Any, embedder: Any, args: dict) -> List[dict]:
     """Execute portfolio_search tool."""
     query = args.get("query", "")
-    top_k = args.get("top_k", 10)
+    limit = args.get("limit", args.get("top_k", 10))
 
     if not query:
         raise ValueError("query is required")
 
+    _check_index(store)
+
     query_vec = embedder.embed_text(query)
-    raw = store.search(query_vec, limit=top_k * 3)
+    raw = store.search(query_vec, limit=limit * 3)
 
     db = store.connect()
-    repo_urls: dict = {}
-    for row in db.execute("SELECT name, url FROM repos").fetchall():
-        repo_urls[row[0]] = row[1]
+    repo_meta: Dict[str, dict] = {}
+    for row in db.execute(
+        "SELECT name, description, language, topics, url FROM repos"
+    ).fetchall():
+        topics = []
+        try:
+            topics = json.loads(row[3]) if row[3] else []
+        except (json.JSONDecodeError, TypeError):
+            pass
+        repo_meta[row[0]] = {
+            "description": row[1] or "",
+            "language": row[2] or "",
+            "topics": topics,
+            "url": row[4] or "",
+        }
 
     best: Dict[str, dict] = {}
     for row in raw:
         repo_name = row["repo_name"]
         score = 1.0 - row["distance"]
         if repo_name not in best or score > best[repo_name]["score"]:
+            meta = repo_meta.get(repo_name, {})
             best[repo_name] = {
+                "name": repo_name,
                 "repo_name": repo_name,
+                "description": meta.get("description", ""),
                 "score": round(score, 4),
+                "language": meta.get("language", ""),
+                "topics": meta.get("topics", []),
                 "snippet": row["text"][:300],
-                "url": repo_urls.get(repo_name, ""),
+                "url": meta.get("url", ""),
             }
 
     results = sorted(best.values(), key=lambda x: x["score"], reverse=True)
-    return results[:top_k]
+    return results[:limit]
 
 
 def _handle_portfolio_clusters(store: Any, _args: dict) -> List[dict]:
     """Execute portfolio_clusters tool."""
+    _check_index(store)
+
     from ghps.clusters import ClusterEngine
 
     engine = ClusterEngine(store)
-    cluster_list = engine.cluster_repos(n_clusters=10)
+    cluster_list = engine.cluster_repos(n_clusters=6)
 
     return [
         {"name": c.name, "repos": c.repos, "size": len(c.repos)}
@@ -135,9 +173,11 @@ def _handle_portfolio_clusters(store: Any, _args: dict) -> List[dict]:
 
 def _handle_portfolio_repo_detail(store: Any, args: dict) -> dict:
     """Execute portfolio_repo_detail tool."""
-    repo_name = args.get("repo_name", "")
+    repo_name = args.get("name", args.get("repo_name", ""))
     if not repo_name:
         raise ValueError("repo_name is required")
+
+    _check_index(store)
 
     db = store.connect()
     repo_row = db.execute(
@@ -160,31 +200,43 @@ def _handle_portfolio_repo_detail(store: Any, args: dict) -> dict:
     ).fetchall()
     readme_excerpt = "\n\n".join(r[0] for r in readme_chunks) if readme_chunks else ""
 
-    # Derive tech stack from file extensions in chunks
     source_rows = db.execute(
         "SELECT DISTINCT source FROM chunks WHERE repo_name = ? AND source != 'README'",
         (repo_name,),
     ).fetchall()
     tech_stack = list({Path(r[0]).suffix.lstrip(".") for r in source_rows if "." in r[0]})
 
+    # Determine cluster assignment
+    cluster = ""
+    try:
+        from ghps.clusters import ClusterEngine
+        engine = ClusterEngine(store)
+        clusters = engine.cluster_repos(n_clusters=6)
+        for c in clusters:
+            if repo_name in c.repos:
+                cluster = c.name
+                break
+    except Exception:
+        pass
+
     return {
         "name": repo_row[0],
-        "description": repo_row[1],
-        "language": repo_row[2],
+        "description": repo_row[1] or "",
+        "language": repo_row[2] or "",
         "topics": topics,
-        "stars": repo_row[4],
-        "updated_at": repo_row[5],
-        "url": repo_row[6],
+        "stars": repo_row[4] or 0,
+        "updated_at": repo_row[5] or "",
+        "html_url": repo_row[6] or "",
+        "url": repo_row[6] or "",
         "readme_excerpt": readme_excerpt[:2000],
         "tech_stack": tech_stack,
+        "cluster": cluster,
     }
 
 
 def _handle_portfolio_reindex(store: Any, args: dict) -> dict:
     """Execute portfolio_reindex tool."""
-    username = args.get("username", "")
-    if not username:
-        raise ValueError("username is required")
+    username = args.get("username", "davidbmar")
 
     from ghps import github_client
     from ghps.embeddings import EmbeddingPipeline
@@ -211,7 +263,11 @@ def _handle_portfolio_reindex(store: Any, args: dict) -> dict:
     indexer = Indexer(store=store, pipeline=pipeline)
     total = indexer.index_repos(repos)
 
-    return {"username": username, "chunks_indexed": total}
+    return {
+        "status": f"Reindex complete: {total} chunks indexed for {username}",
+        "username": username,
+        "chunks_indexed": total,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -307,7 +363,12 @@ def run_stdio(db_path: str) -> None:
     from ghps.store import VectorStore
 
     store = VectorStore(db_path)
-    store.connect()
+    try:
+        store.connect()
+    except Exception as exc:
+        logger.error("Failed to connect to database: %s", exc)
+        logger.info("The server will start but tools will return index-not-found errors.")
+
     embedder = EmbeddingPipeline()
 
     logger.info("ghps-mcp server started — db=%s", db_path)
