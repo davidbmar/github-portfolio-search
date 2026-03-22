@@ -1,4 +1,4 @@
-agentA-search-fix — Sprint 9
+agentB-access-page — Sprint 9
 
 Sprint-Level Context
 
@@ -18,27 +18,24 @@ Constraints
 
 
 Objective
-- Fix multi-word search so "voice processing" returns voice repos
+- Add a "Request Access" page and improve site metadata
 
 Tasks
-- In web/js/search.js, update the search/filter logic:
-  - Split the query into individual terms on whitespace
-  - A repo matches if ANY term appears in its name, description, or topics (OR logic)
-  - Score repos higher when MORE terms match (rank by match count)
-  - Keep existing exact-phrase match as highest priority (if full phrase matches, rank first)
-  - Case-insensitive matching
-- In web/js/app.js, update the search result count to show "N results for term1, term2" when multi-word
-- Add fuzzy tolerance: if a term is >5 chars, also match if the term is a substring of a word (e.g., "process" matches "processing")
-- Test cases to verify manually:
-  - "voice processing" → returns voice repos (voice matches)
-  - "s3 upload" → returns S3-presignedURL repo (s3 matches)
-  - "presigned" → returns presigned-url repo (substring match)
-  - "aws lambda" → returns repos with aws OR lambda topics
-  - Single word "voice" → still works as before (9 results)
+- Create the Request Access page in web/js/app.js (add route handler for #/access):
+  - Show a form with: Name, Email, Reason for access (textarea)
+  - Submit button (disabled for now — shows "Coming soon" message on submit)
+  - Explain what gated access provides: "Full code search, file tree browsing, and detailed repository analysis"
+  - Style with existing CSS variables
+- Update web/index.html:
+  - Ensure OG meta tags use real data: "42 repositories across 6 capability areas"
+  - Add og:image pointing to a screenshot or placeholder
+- Update web/css/style.css:
+  - Style the access request form (consistent with existing dark theme)
+  - Add form input styles: dark background, light text, blue accent border on focus
+  - Style the "Coming soon" message as a friendly info card
 
 Acceptance Criteria
-- Search "voice processing" returns voice-related repos (not 0 results)
-- Search "s3 upload" returns S3/infrastructure repos
-- Search "presigned" returns presigned-url repo
-- Single-word searches still work correctly
-- No JS errors in console
+- Playwright: navigate to https://davidbmar.com/#/access — form renders with 3 fields
+- Playwright: click Submit — shows "Coming soon" message, no errors
+- OG tags are present and accurate in page source
+- Mobile layout works at 375px

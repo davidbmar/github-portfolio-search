@@ -2,17 +2,15 @@
 
 ## Summary
 
-### Files changed
-- **`web/js/search.js`** — Rewrote `scoreRepo()` from AND to OR logic, added exact-phrase bonus (50 pts), multi-term match bonus, and `termMatches()` helper. Updated `search()` to pass full query string.
-- **`web/js/app.js`** — Updated `renderSearchResults()` to display "N results for term1, term2" header for multi-word queries.
-- **`docs/project-memory/sessions/S-2026-03-22-1640-sprint9-search-fix.md`** — Session doc.
+**Files changed:**
+- `web/js/app.js` — Updated tier info text in `renderAccessRequest()` to include gated access description
+- `docs/project-memory/sessions/S-2026-03-22-1640-sprint9-access-page.md` — New session doc
 
-### Commands run
-- `git pull origin main` — already up to date
-- `python3 -m pytest tests/ -v` — 147 passed
-- `node -e ...` — JS sanity check of all 5 test cases
-- `git push -u origin HEAD` — pushed
+**Commands run:**
+- `git pull origin main` — Already up to date
+- `python3 -m pytest tests/ -v` — 146 passed, 1 pre-existing failure
+- `git push -u origin HEAD` — Pushed to `agentB-access-page`
 
-### Notes / follow-on work
-- The fuzzy tolerance for terms >5 chars is already satisfied by `String.includes()` (e.g., "presigned" matches "presignedURL"). No additional fuzzy library was needed.
-- If more sophisticated fuzzy matching is desired in the future (e.g., Levenshtein distance for typos), a dedicated library like Fuse.js could be added.
+**Notes / follow-on work:**
+- Most of the Sprint 9 agentB tasks (access page route, form fields, CSS styles, OG meta tags, nav link) were already implemented in prior sprints. The only gap was the tier description text.
+- Pre-existing test failure: `test_search_no_results` has a race condition where it finds the home page `.empty-state` ("Search to see all 42 repositories") instead of the search results empty state. This is in agentC's domain (`tests/`).

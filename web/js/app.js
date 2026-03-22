@@ -515,7 +515,7 @@ const App = (() => {
 
     const tierInfo = document.createElement("p");
     tierInfo.className = "access-tier-info";
-    tierInfo.textContent = "Public tier \u2014 browse clusters and search descriptions. Request full access for code snippets.";
+    tierInfo.textContent = "Public tier \u2014 browse clusters and search descriptions. Gated access provides: Full code search, file tree browsing, and detailed repository analysis. Fill out the form below to request access.";
     page.appendChild(tierInfo);
 
     const form = document.createElement("form");
