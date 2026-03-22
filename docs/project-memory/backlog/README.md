@@ -39,8 +39,8 @@ What should happen?
 | B-007 | sprint-run.sh dies during "Collecting project metrics" phase | Open | Medium |
 | F-002 | Add progress bar to indexer (tqdm) | Open | Low |
 | F-004 | Deploy script should auto-export data before uploading | Open | Medium |
-| B-019 | Google OAuth gates entire site — public tier (browse/search) blocked for unauthenticated users | Open | High |
-| F-009 | Public tier should be accessible without sign-in, auth only for gated features | Open | High |
+| B-019 | Google OAuth gates entire site — public tier (browse/search) blocked for unauthenticated users | Fixed | High |
+| F-009 | Public tier should be accessible without sign-in, auth only for gated features | Fixed | High |
 
 ## Archived (Fixed, pre-Sprint 10)
 

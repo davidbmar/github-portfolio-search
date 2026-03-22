@@ -100,8 +100,8 @@ docs/
 | 12 | Auto-tagging + cluster quality + password gate | Complete |
 | 13 | Gated access — Google OAuth + approval | Complete |
 | 14 | Auto-refresh + GitHub Actions + freshness badges | Complete |
-| 15 | 5th-sprint checkpoint — public tier UX + polish | **Next** |
-| 16 | MCP integration + agent search | Planned |
+| 15 | 5th-sprint checkpoint — public tier UX + polish | Complete |
+| 16 | MCP integration + agent search | **Next** |
 | 17 | Semantic search upgrade | Planned |
 | 18 | Collaboration and sharing | Planned |
 | 19 | Analytics and insights | Planned |

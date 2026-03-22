@@ -89,12 +89,11 @@ PM/customer review checkpoint: API returns `{"results":[],"error":"No index foun
 Backlog triage: B-008 fixed, B-016 fixed, B-018 fixed, F-007 fixed, F-008 fixed. Added B-019 (public tier blocked by OAuth gate) and F-009 (public browse without auth).
 Planning input for Sprint 15: Public tier UX (B-019/F-009) is highest priority — the site should be browsable without sign-in.
 
-**Sprint 15: 5th-Sprint Checkpoint — Public Tier UX and Polish**
-Build goals: Fix B-019/F-009 (public tier accessible without sign-in — browse clusters, search descriptions without auth; sign-in only for gated features). Performance audit (Lighthouse >90). SEO optimization (structured data, sitemap.xml). Clean up docs, README, CLAUDE.md. Full system review.
-PM/customer review checkpoint: Visit davidbmar.com without signing in — verify clusters, search, and repo detail pages work. Sign in → verify gated features (code snippets, file tree) unlock. Lighthouse score >90. Mobile audit at 375px.
-Backlog triage: Review all open items, close stale bugs, reprioritize.
-Roadmap extension checkpoint: Plan Sprints 16-20.
-Planning input for Sprint 16: Based on real usage, prioritize features users want.
+**Sprint 15: 5th-Sprint Checkpoint — Public Tier UX and Polish (COMPLETED 2026-03-22)**
+Build goals: Fixed B-019/F-009 (public tier now accessible without sign-in). Added "Sign In" button in nav bar. Added JSON-LD structured data (WebSite + Person schema). Updated meta tags to 104 repos. Created sitemap.xml and robots.txt. Added focus styles for keyboard nav and prefers-reduced-motion. Rewrote README with current features/architecture. Cleaned backlog (archived fixed items). Added Sprint 14 session doc. Tests: 212 passed, 0 failed, 1 skipped.
+PM/customer review checkpoint: Visited davidbmar.com without sign-in — landing page shows 104 repos, 6 clusters, search works ("voice processing" → 25 results), mobile clean at 375px. "Sign In" button in top right. Freshness badges showing. SEO structured data deployed.
+Backlog triage: B-019 fixed, F-009 fixed. Remaining: B-007 (Medium), F-002 (Low), F-004 (Medium). Roadmap extended to Sprint 20.
+Planning input for Sprint 16: MCP integration is next — enable AI agents to search the portfolio.
 
 **Sprint 16: MCP Integration and Agent Search**
 Build goals: Expose portfolio search via MCP server for Claude Code and No Prob Bob. Add portfolio_search, portfolio_clusters, portfolio_repo_detail tools. Enable agents to search David's portfolio during conversations. Add search analytics (what people search for, popular repos).
@@ -128,13 +127,13 @@ Planning input for Sprint 21: Based on offline usage and PWA installs, prioritiz
 
 ### Current Focus
 
-**Sprint 15: 5th-Sprint Checkpoint — Public Tier UX and Polish (Sprints 1-14 COMPLETE)**
+**Sprint 16: MCP Integration and Agent Search (Sprints 1-15 COMPLETE)**
 
-Sprints 1-14 delivered: full stack portfolio search with 104 repos, D3.js visualization, faceted search with 15+ inferred topics, multi-word queries, search highlighting, relevance scoring, 6 capability clusters, Google OAuth + auth API + Telegram notifications, GitHub Actions reindex workflow, freshness badges, graceful API error handling, and mobile support at davidbmar.com. 212 tests passing. Sprint 15 fixes the public tier (currently blocked by OAuth gate) and does 5th-sprint polish.
+Sprints 1-15 delivered: full stack portfolio search with 104 repos, D3.js visualization, faceted search, multi-word queries, search highlighting, relevance scoring, 6 capability clusters, Google OAuth + public tier, freshness badges, GitHub Actions reindex, SEO (structured data, sitemap), accessibility, and mobile support at davidbmar.com. 212 tests passing. Sprint 16 adds MCP tools so AI agents can search the portfolio.
 
 ### Next Up
 
-**Sprint 16: MCP Integration and Agent Search** — Expose portfolio search as MCP tools for Claude Code and AI agents. Search analytics.
+**Sprint 17: Semantic Search Upgrade** — Real semantic search via embeddings, related repos, autocomplete, better snippets.
 
 ## Architecture
 
