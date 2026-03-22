@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import struct
+from datetime import datetime, timezone
 from typing import Optional
 
 try:
@@ -50,7 +51,8 @@ class VectorStore:
                 topics TEXT,
                 stars INTEGER DEFAULT 0,
                 updated_at TEXT,
-                url TEXT
+                url TEXT,
+                indexed_at TEXT
             );
 
             CREATE TABLE IF NOT EXISTS chunks (
@@ -96,9 +98,12 @@ class VectorStore:
         db = self.connect()
 
         topics_json = json.dumps(repo_dict.get("topics", []))
+        indexed_at = repo_dict.get(
+            "indexed_at", datetime.now(timezone.utc).isoformat()
+        )
         db.execute(
-            """INSERT OR REPLACE INTO repos (name, description, language, topics, stars, updated_at, url)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT OR REPLACE INTO repos (name, description, language, topics, stars, updated_at, url, indexed_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 repo_dict["name"],
                 repo_dict.get("description", ""),
@@ -107,6 +112,7 @@ class VectorStore:
                 repo_dict.get("stars", 0),
                 repo_dict.get("updated_at", ""),
                 repo_dict.get("url", ""),
+                indexed_at,
             ),
         )
 
@@ -159,6 +165,32 @@ class VectorStore:
             }
             for row in rows
         ]
+
+    def get_index_stats(self) -> dict:
+        """Return index statistics.
+
+        Returns dict with keys: total_repos, last_indexed, oldest_repo.
+        """
+        db = self.connect()
+        total = db.execute("SELECT COUNT(*) FROM repos").fetchone()[0]
+
+        last_row = db.execute(
+            "SELECT indexed_at FROM repos WHERE indexed_at IS NOT NULL "
+            "ORDER BY indexed_at DESC LIMIT 1"
+        ).fetchone()
+        last_indexed = last_row[0] if last_row else None
+
+        oldest_row = db.execute(
+            "SELECT indexed_at FROM repos WHERE indexed_at IS NOT NULL "
+            "ORDER BY indexed_at ASC LIMIT 1"
+        ).fetchone()
+        oldest_repo = oldest_row[0] if oldest_row else None
+
+        return {
+            "total_repos": total,
+            "last_indexed": last_indexed,
+            "oldest_repo": oldest_repo,
+        }
 
     def close(self) -> None:
         if self.db is not None:
