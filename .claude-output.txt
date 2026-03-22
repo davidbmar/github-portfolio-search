@@ -1,6 +1,7 @@
 `★ Insight ─────────────────────────────────────`
-- The page transition uses a CSS `@keyframes pageFadeIn` animation on `.main-content` — this is a lightweight approach that avoids JavaScript animation libraries and won't cause layout shifts because it only animates `opacity` and `transform`, which are compositor-friendly properties.
-- The D3 tooltip uses `position: absolute` with `pointer-events: none` — this is the standard pattern for chart tooltips so they follow the cursor without intercepting mouse events on the underlying SVG elements.
+- **Word-boundary regex vs. simple `in`**: Using `re.search` with boundary-like patterns prevents false positives — e.g., the word "class" inside "classification" won't match. The pattern `(?:^|[\s\-_/,;:.(])kw(?:[\s\-_/,;:.)!?]|$)` handles markdown formatting, punctuation, and hyphenated compound keywords like `api-gateway`.
+- **Static method design**: `extract_topics()` is a pure function with no dependencies on store or embeddings, making it independently testable and reusable (e.g., for export scripts or CLI tools).
+- **Set union merge**: `sorted(set(github_topics) | set(inferred))` ensures deterministic, deduplicated output regardless of source overlap.
 `─────────────────────────────────────────────────`
 
 ---
@@ -8,16 +9,17 @@
 ## Summary
 
 **Files changed:**
-- `web/index.html` — Updated `og:title`, `og:description`, added `<link rel="canonical">`
-- `web/css/style.css` — Added styles for D3 viz container, D3 tooltips, Recent Activity cards, sort dropdown, page fade-in transition, plus mobile overrides at 768px and 375px
-- `docs/project-memory/sessions/S-2026-03-22-1738-sprint11-social-meta.md` — Session doc
+- `src/ghps/indexer.py` — Added `TOPIC_KEYWORDS` constant (40+ keywords), `Indexer.extract_topics()` static method, and integrated topic inference into `index_repos()` with merge/deduplication
+- `tests/test_topic_extraction.py` — New file with 10 unit tests for topic extraction
+- `docs/project-memory/sessions/S-2026-03-22-1810-topic-extraction.md` — Session documentation
 
 **Commands run:**
 - `git pull origin main` — already up to date
-- `make test` — 149/149 passed
-- `git push -u origin HEAD` — pushed to `agentC-social-meta`
+- `python3 -m pytest tests/ -v` — **158 passed** (including 10 new topic extraction tests)
+- `git push -u origin HEAD` — pushed to `agentA-topic-extraction`
 
 **Notes / follow-on work:**
-- `twitter:card` with `summary_large_image` was already present — no change needed
-- CSS class names (`.d3-viz-container`, `.d3-tooltip`, `.activity-card`, `.sort-dropdown`) are conventions that agentA (D3 JS) and agentB (app.js/search.js) should use to get these styles applied
-- The `og-image.png` referenced in meta tags should exist at `https://davidbmar.com/og-image.png` for social previews to render correctly
+- `github_client.py` already correctly preserves `topics` through pagination (line 51) — no changes needed
+- The `inferred_topics` key is set on the repo dict in-memory during indexing, available for downstream consumers (e.g., agentB's export)
+- Merged topics (GitHub API + inferred) are stored in the database via `repo_meta["topics"]`
+- The keyword list can be extended in `TOPIC_KEYWORDS` as new technologies are encountered
