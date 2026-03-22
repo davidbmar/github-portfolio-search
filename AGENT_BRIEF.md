@@ -1,4 +1,4 @@
-agentB-cluster-quality — Sprint 12
+agentC-topic-ui — Sprint 12
 
 Sprint-Level Context
 
@@ -18,20 +18,22 @@ Constraints
 
 
 Objective
-- Improve cluster naming and fix misclassified repos
+- Display enriched topics in the web UI
 
 Tasks
-- In src/ghps/clusters.py, update _generate_cluster_name to use inferred_topics from the database (not just GitHub topics):
-  - Read topics from the repos table (which now includes inferred topics from agentA)
-  - The _KEYWORD_CAPABILITIES mapping should match against these enriched topics
-- In src/ghps/export.py, include inferred_topics in repos.json output:
-  - Each repo should have a "topics" array that combines GitHub topics + inferred topics
-  - This enables the web UI faceted search to filter by meaningful topics
-- In src/ghps/clusters.py, reduce n_clusters to 6 (if not already) and add a minimum cluster size of 3 repos — if a cluster has fewer, merge it into the nearest neighbor
-- Add a test: verify clusters have unique names (no duplicates)
+- In web/js/app.js:
+  - Update the Technology Distribution section on Clusters page to show top 15 topics from repos.json topics arrays (not just GitHub topics)
+  - Show topic count as horizontal bars
+- In web/js/search.js:
+  - Update faceted search to use enriched topics from repos.json
+  - Show top 15 topics in the Topics filter panel (currently shows whatever is in repos.json)
+  - Add topic counts next to each topic in the filter
+- In web/css/style.css:
+  - Style the Technology Distribution bars to match the cluster colors
+  - Ensure topic filter panel doesn't overflow on mobile (scrollable if >10 topics)
 
 Acceptance Criteria
-- clusters.json has 6 clusters with unique, capability-oriented names
-- repos.json has enriched topics for all repos
-- No cluster has fewer than 3 repos
-- python3 -m pytest tests/ -v passes
+- Playwright: Clusters page Technology Distribution shows 10+ meaningful topics with counts
+- Playwright: Search faceted filter shows enriched topics
+- Playwright: mobile viewport (375px) — topic filter is scrollable, no overflow
+- No JS errors in console
