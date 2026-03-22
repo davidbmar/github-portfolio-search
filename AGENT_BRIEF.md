@@ -1,4 +1,4 @@
-agentA-bug-fixes — Sprint 3
+agentB-mcp-server — Sprint 3
 
 Sprint-Level Context
 
@@ -17,18 +17,22 @@ Constraints
 
 
 Objective
-- Fix all test failures and packaging issues so the full test suite passes reliably
+- Build an MCP server that exposes portfolio search tools for Claude Code and Bob
 
 Tasks
-- Fix B-001: editable install — ensure pip install -e ".[dev]" works and ghps is importable
-- Fix B-004: test_embeddings.py and test_store.py collection errors — mock heavy dependencies (sentence-transformers, sqlite-vec) in unit tests so tests run without GPU/native deps
-- Add conftest.py fixtures if not already present for mocking embeddings and store
-- Create a Makefile with targets: install, test, lint, index, serve
-- Add typing stubs or py.typed marker
-- Ensure python3 -m pytest tests/ -v passes all tests with 0 failures
+- Add mcp dependency to pyproject.toml (or use the lightweight JSON-RPC approach)
+- Create src/ghps/mcp_server.py with MCP server implementing these tools:
+  - portfolio_search(query: str, top_k: int = 10) -> list of results with repo_name, score, snippet, url
+  - portfolio_clusters() -> list of capability clusters with repo names
+  - portfolio_repo_detail(repo_name: str) -> full repo metadata, README excerpt, tech stack
+  - portfolio_reindex(username: str) -> trigger re-indexing, return count
+- Each tool should have clear JSON Schema input/output descriptions
+- Server should accept --db flag for index path (default: ~/.ghps/index.db)
+- Add [project.scripts] entry: ghps-mcp = "ghps.mcp_server:main"
+- Create tests/test_mcp.py with unit tests for each tool
 
 Acceptance Criteria
-- pip install -e ".[dev]" succeeds on a clean venv
-- python3 -m pytest tests/ -v passes with 0 errors, 0 failures
-- make test runs the full suite
-- make install sets up a working environment
+- ghps-mcp starts without errors
+- MCP tool list returns 4 tools with correct schemas
+- portfolio_search returns ranked results
+- portfolio_reindex triggers indexing
