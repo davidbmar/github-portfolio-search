@@ -1,0 +1,48 @@
+name: Reindex and Deploy
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly on Sunday at 06:00 UTC
+    - cron: "0 6 * * 0"
+
+concurrency:
+  group: reindex-deploy
+  cancel-in-progress: false
+
+jobs:
+  reindex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e "."
+
+      - name: Index repositories
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ghps index davidbmar --db ghps.db
+
+      - name: Export static data
+        run: ghps export --db ghps.db --output web/data/
+
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: aws s3 sync web/ s3://davidbmar-com/ --delete --exclude "*.pyc"
+
+      - name: Invalidate CloudFront cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: aws cloudfront create-invalidation --distribution-id E3RCY6XA80ANRT --paths "/*"
