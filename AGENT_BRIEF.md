@@ -1,46 +1,33 @@
-agentC-web-access — Sprint 5
+agentA-data-pipeline — Sprint 6
 
 Sprint-Level Context
 
 Goal
-- Deploy the web UI to davidbmar.com (fix B-009)
-- Fix remaining test failures (B-005, B-006)
-- Add data export pipeline so the site has real content
-- Begin gated access foundation (access request UI)
+- CRITICAL: Fix B-010 — davidbmar.com shows "Could not load data" because data files are empty
+- Fix B-005, B-006 — remaining 4 test failures from Sprint 3
+- Add sample data so the site works without a GitHub token
+- Production hardening: proper error handling when data is missing
 
 Constraints
 - No two agents may modify the same files
-- agentA owns deploy pipeline and bug fixes (deploy.sh, tests/test_cli.py, tests/test_e2e.py, src/ghps/cli.py)
-- agentB owns data indexing and export (src/ghps/export.py, src/ghps/indexer.py, scripts/)
-- agentC owns web UI improvements and access request page (web/)
+- agentA owns data pipeline fixes (src/ghps/export.py, web/data/, scripts/)
+- agentB owns test fixes and infrastructure (tests/, pyproject.toml, Makefile)
+- agentC owns web UI error handling and resilience (web/js/app.js, web/js/search.js, web/index.html)
 - Use python3 for all commands
-- Do NOT commit .venv/ or node_modules/ to git
+- Do NOT commit .venv/ to git
 
 
 Objective
-- Improve web UI with real data loading and an access request page
+- Create working sample data and fix the export pipeline so davidbmar.com has content
 
 Tasks
-- Update web/js/app.js to:
-  - Fetch web/data/repos.json and web/data/clusters.json on page load
-  - Display repos in search results cards
-  - Display clusters as clickable category cards on the landing page
-  - Show "No results" when search returns empty
-  - Add loading spinner while data loads
-- Update web/index.html:
-  - Add navigation: Home | Search | Clusters | Request Access
-  - Add an "Request Access" page/section with:
-    - Name input, email input, reason textarea
-    - Submit button (posts to /api/access/request or shows "coming soon" message)
-    - "Public tier — browse clusters and search descriptions. Request full access for code snippets."
-- Update web/css/style.css:
-  - Style result cards: repo name, description, language badge, stars count, topics
-  - Style cluster cards: cluster name, repo count, representative repos
-  - Mobile responsive: 375px viewport test
-- Test with Playwright: verify search shows results from repos.json, clusters render
+- Create web/data/repos.json with realistic sample data: 10 repos representing David's portfolio (e.g., audio-stream-transcription, presigned-url-s3, grassyknoll, FSM-generic, tool-telegram-whatsapp, bot-customerobsessed, traceable-searchable-adr-memory-index, github-portfolio-search, tool-s3-cloudfront-push, everyone-ai). Each repo: name, description, language, topics array, stars, html_url, updated_at
+- Create web/data/clusters.json with 4 capability clusters: "Voice & Audio Processing", "Infrastructure & DevOps", "AI & Search", "Web Applications"
+- Verify src/ghps/export.py produces valid JSON matching this schema
+- Create scripts/generate-sample-data.py that produces realistic sample data
+- Update deploy.sh to check for valid data files before deploying
 
 Acceptance Criteria
-- Landing page shows cluster cards from clusters.json
-- Search filters repos from repos.json
-- Request Access section is visible with form fields
-- Mobile layout works (375px viewport)
+- web/data/repos.json is valid JSON with 10+ repos
+- web/data/clusters.json is valid JSON with 4+ clusters
+- Playwright: visit file:///path/to/web/index.html — search shows results, clusters render
