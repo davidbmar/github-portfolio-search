@@ -1,33 +1,74 @@
 [
   {
-    "name": "Voice & Audio Processing",
+    "name": "Voice & Speech Processing",
     "repos": [
-      "audio-stream-transcription",
-      "grassyknoll"
+      "grassy-knoll",
+      "voice-only-UI-STT-TTS-base",
+      "voice-calendar-scheduler-FSM",
+      "voice-frontend-modules-auth.transport.engine",
+      "sip-voice-transport",
+      "voice-print",
+      "voice-optimal-RAG",
+      "iphone-streaming-plus-Finite-State-Machine",
+      "2026-nano-claw-voice-loop-tts-stt",
+      "speaker-generation-version-1",
+      "opensource_sound_generator_llms"
     ]
   },
   {
-    "name": "Infrastructure & DevOps",
+    "name": "Transcription & ASR",
     "repos": [
-      "presigned-url-s3",
-      "tool-s3-cloudfront-push",
-      "FSM-generic"
+      "smart-transcription-router",
+      "transcription-realtime-whisper-cognito-s3-lambda",
+      "transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14",
+      "nvidia-parakeet",
+      "nvidia-riva-conformer-streaming",
+      "TranscriptionAPI-S3-backend"
     ]
   },
   {
-    "name": "AI & Search",
+    "name": "Browser-Native AI",
+    "repos": [
+      "browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo",
+      "browser-llm-local-ai-chat",
+      "browser-Speech-to-Text-realtime-ASR",
+      "Browser-Text-to-Speech-TTS-Realtime",
+      "browser-whisper-models-local-showcase",
+      "browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript"
+    ]
+  },
+  {
+    "name": "AI & Search Tools",
     "repos": [
       "github-portfolio-search",
-      "bot-customerobsessed",
-      "everyone-ai",
-      "traceable-searchable-adr-memory-index"
+      "search-tool-provider",
+      "bot-customerObsessed-No-Prob-Bob-afterburner",
+      "rag-document-chat",
+      "rag-document-chat-ver2",
+      "mcp-highlighter"
     ]
   },
   {
-    "name": "Web Applications",
+    "name": "AWS Infrastructure & DevOps",
+    "repos": [
+      "tool-s3-cloudfront-push",
+      "S3-presignedURL-Lambda-APIGateway-setup",
+      "cognito-lambda-s3-webserver-cloudfront",
+      "eventbridge-orchestrator",
+      "cloudflare-zero-trust-setup",
+      "2026-FEB-21-K3-App-Builder-Claude-proto"
+    ]
+  },
+  {
+    "name": "Developer Tools & Utilities",
     "repos": [
       "tool-telegram-whatsapp",
-      "everyone-ai"
+      "tool-browserAutomationScripts",
+      "claude-chat-workspace",
+      "cal-provider",
+      "art-starry-night-flowfield",
+      "audio_client_server",
+      "4kUpScalerWorker"
     ]
   }
 ]

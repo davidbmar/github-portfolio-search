@@ -56,21 +56,33 @@ echo ""
 echo "=== Exporting static JSON to ${OUTPUT_DIR} ==="
 ghps export --db "$DB_PATH" --output "$OUTPUT_DIR"
 
-# Step 3: Print summary
+# Step 3: Validate JSON output
+echo ""
+echo "=== Validating output ==="
+for FILE in repos.json clusters.json search-index.json; do
+    FPATH="${OUTPUT_DIR}/${FILE}"
+    if [ ! -f "$FPATH" ]; then
+        echo "Error: ${FILE} was not generated"
+        exit 1
+    fi
+    python3 -c "
+import json, sys
+with open('${FPATH}') as f:
+    data = json.load(f)
+if not isinstance(data, list):
+    print('Error: ${FILE} is not a JSON array', file=sys.stderr)
+    sys.exit(1)
+if len(data) == 0:
+    print('Warning: ${FILE} is empty', file=sys.stderr)
+print(f'  ${FILE}: {len(data)} entries — valid')
+" || exit 1
+done
+
+# Step 4: Print summary
 echo ""
 echo "=== Summary ==="
-REPO_COUNT=$(python3 -c "
-import json
-with open('${OUTPUT_DIR}/repos.json') as f:
-    data = json.load(f)
-print(len(data))
-")
-CLUSTER_COUNT=$(python3 -c "
-import json
-with open('${OUTPUT_DIR}/clusters.json') as f:
-    data = json.load(f)
-print(len(data))
-")
+REPO_COUNT=$(python3 -c "import json; print(len(json.load(open('${OUTPUT_DIR}/repos.json'))))")
+CLUSTER_COUNT=$(python3 -c "import json; print(len(json.load(open('${OUTPUT_DIR}/clusters.json'))))")
 echo "${REPO_COUNT} repos indexed, ${CLUSTER_COUNT} clusters generated"
 echo "Output files:"
 ls -la "${OUTPUT_DIR}"/*.json
