@@ -1,40 +1,44 @@
-agentC-telegram-admin — Sprint 13
+agentB-reindex-actions — Sprint 14
 
 Sprint-Level Context
 
 Goal
-- Replace password gate with Google OAuth for proper authentication
-- Build access request → approval workflow with Telegram notifications
-- Keep the site functional as a static S3/CloudFront deployment
+- Add GitHub Actions workflow to auto-reindex and redeploy on push
+- Add freshness badges to web UI showing when each repo was last indexed
+- Fix API graceful error handling when no index exists (B-008/B-016)
 
 Constraints
 - No two agents may modify the same files
-- agentA owns OAuth frontend (web/js/app.js, web/js/auth.js — NEW FILE)
-- agentB owns backend API (src/ghps/api.py, src/ghps/auth.py — NEW FILE)
-- agentC owns Telegram integration and admin (scripts/approve-access.py — NEW FILE, src/ghps/notifications.py — NEW FILE)
+- agentA owns web UI changes (web/js/app.js, web/css/style.css)
+- agentB owns GitHub Actions and indexing (`.github/workflows/reindex.yml` — NEW FILE, `scripts/reindex.sh` — NEW FILE, src/ghps/api.py)
+- agentC owns data pipeline improvements (src/ghps/indexer.py, src/ghps/store.py, src/ghps/search.py)
 - Use python3 for all commands
 - Do NOT commit .venv/ or .env to git
-- The OAuth flow uses Google Identity Services (client-side only, no server redirect needed)
+- The site is static S3/CloudFront — no running server for webhooks
 
 
 Objective
-- Send Telegram notifications when access is requested and provide approve/deny links
+- Create GitHub Actions workflow for automated reindexing and deployment
 
 Tasks
-- Create src/ghps/notifications.py:
-  - Send Telegram message when access is requested: "🔔 Access Request: {name} ({email}) — {reason}"
-  - Include approve/deny links in the message (pointing to API endpoints)
-  - Use TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID from .env
-  - If Telegram credentials not set, log the request instead (graceful fallback)
-- Create scripts/approve-access.py:
-  - CLI tool: python3 scripts/approve-access.py approve user@example.com
-  - CLI tool: python3 scripts/approve-access.py deny user@example.com
-  - CLI tool: python3 scripts/approve-access.py list (show all pending + approved)
-  - Reads/writes ~/.ghps/access.json
-- Add tests for notification formatting and access list management
+- Create `.github/workflows/reindex.yml`:
+  - Trigger: manual dispatch (workflow_dispatch) + scheduled (weekly cron)
+  - Steps: checkout, setup Python, install deps, run ghps index, run ghps export, deploy to S3
+  - Use secrets: GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+  - Include CloudFront invalidation after S3 sync
+  - Add concurrency group to prevent overlapping runs
+- Create `scripts/reindex.sh`:
+  - Standalone script that runs: index → export → deploy
+  - Reads GITHUB_TOKEN from env
+  - Idempotent — safe to run multiple times
+  - Prints summary: repos indexed, files exported, deploy status
+- Update src/ghps/api.py:
+  - Fix B-008/B-016: when no SQLite index exists, return `{"results": [], "error": "No index found. Run ghps index first."}` with 200 status instead of 500
+  - Apply to /api/search, /api/clusters, /api/repos/<slug> endpoints
+- Add tests for graceful error handling (no index → 200 with empty results)
 
 Acceptance Criteria
-- When TELEGRAM_BOT_TOKEN is set: access request sends Telegram notification
-- When not set: request is logged to console (no crash)
-- scripts/approve-access.py list/approve/deny work correctly
+- `scripts/reindex.sh` runs end-to-end locally (with GITHUB_TOKEN set)
+- API returns empty results with helpful error when no index exists (not 500)
+- GitHub Actions workflow is valid YAML (test with `act` or manual review)
 - python3 -m pytest tests/ -v passes

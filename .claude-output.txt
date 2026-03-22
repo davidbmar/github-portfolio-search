@@ -3,17 +3,17 @@
 ## Summary
 
 ### Files changed
-- **`src/ghps/notifications.py`** (NEW) — Telegram notification module with graceful fallback
-- **`scripts/approve-access.py`** (NEW) — CLI tool for approve/deny/list access management
-- **`tests/test_notifications.py`** (NEW) — 19 tests covering both modules
+- **`.github/workflows/reindex.yml`** (NEW) — GitHub Actions workflow with manual dispatch + weekly cron, Python setup, index/export/S3 deploy/CloudFront invalidation, concurrency group
+- **`scripts/reindex.sh`** (NEW) — Standalone idempotent script: index → export → deploy with summary output
+- **`src/ghps/api.py`** (MODIFIED) — Added `_is_no_table_error()` helper; `/api/search`, `/api/clusters`, `/api/repos/{slug}` now return `{"results": [], "error": "No index found. Run ghps index first."}` with 200 instead of 500 when no index exists
+- **`tests/test_api_no_index.py`** (NEW) — 4 tests verifying graceful error handling on all three endpoints
+- **`docs/project-memory/sessions/S-2026-03-22-2013-reindex-actions.md`** (NEW) — Session doc
 
 ### Commands run
-- `git pull origin main`
-- `python3 -m pytest tests/test_notifications.py -v` — 19 passed
-- `python3 -m pytest tests/ -v` — 164 passed
-- `git commit` + `git push -u origin HEAD`
+- `python3 -m py_compile src/ghps/api.py` — compile check
+- `python3 -m pytest tests/ -v` — 189 passed
+- `git push -u origin HEAD` — pushed to `agentB-reindex-actions`
 
 ### Notes / follow-on work
-- The `approve-access.py` CLI reads/writes `~/.ghps/access.json` with no dependency on the API server — agentB's API endpoints can import `approve_user`/`deny_user` from the script or duplicate the logic
-- `notify_access_request()` accepts an optional `api_base_url` param; when provided, Telegram messages include clickable approve/deny links pointing to agentB's API endpoints
-- When `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` are not set, notifications fall back to `logging.info` — no crash
+- The `_is_no_table_error()` helper uses type-name checking (`"OperationalError" in type(exc).__name__`) because `pysqlite3.dbapi2.OperationalError` doesn't inherit from stdlib `sqlite3.OperationalError`. This is a pragmatic workaround for the dual-sqlite3 import pattern in `store.py`.
+- `scripts/reindex.sh` gracefully skips deploy if AWS CLI is not installed, making it usable for local dev without AWS credentials.
