@@ -1,4 +1,4 @@
-agentA-docs-cleanup — Sprint 10
+agentB-data-completeness — Sprint 10
 
 Sprint-Level Context
 
@@ -16,23 +16,20 @@ Constraints
 
 
 Objective
-- Make all documentation accurate, current, and useful
+- Index as many repos as possible and ensure data quality
 
 Tasks
-- Rewrite README.md:
-  - Update architecture diagram to show current state (42+ repos, 6 clusters, live site)
-  - Update Quick Start to include make commands (make install, make test, make deploy)
-  - Update roadmap table with all 10 sprints
-  - Add "Live Site" section with link to https://davidbmar.com
-  - Add "Features" section listing: semantic search, faceted filtering, multi-word queries, capability clusters, relevance scoring, search highlighting, mobile responsive
-  - Remove stale references to Sprint 2/3 being "next"
-- Clean up docs/lifecycle/ROADMAP.md:
-  - Remove stale "Phase 2/3/4" references in Next Up section
-  - Ensure all completed sprints have (COMPLETED) dates
-- Review and update CLAUDE.md if it exists
-- Remove any stale TODO comments in documentation files
+- Review web/data/repos.json — check for repos with missing descriptions, null languages, or broken URLs
+- Fix any repos with empty/null description: use repo name as fallback
+- Fix any repos with null language: set to "Unknown"
+- Ensure all html_url fields point to valid GitHub URLs (https://github.com/davidbmar/*)
+- Update scripts/index-and-export.sh to validate output JSON after export
+- If GITHUB_TOKEN is available: re-run indexing to capture any new repos since last index
+- Update web/data/clusters.json: verify all repos are assigned to a cluster, no orphans
 
 Acceptance Criteria
-- README.md is accurate and a new contributor can get started in 5 minutes
-- No references to sprints that haven't happened yet as "complete"
-- Roadmap is internally consistent (no duplicate sprint numbers, no stale phases)
+- web/data/repos.json has 0 repos with null/empty description
+- web/data/repos.json has 0 repos with null language
+- All html_url fields are valid GitHub URLs
+- clusters.json accounts for all repos (sum of repo counts = total repos)
+- python3 -c "import json; d=json.load(open('web/data/repos.json')); print(len(d))" shows 42+

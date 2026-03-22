@@ -86,6 +86,41 @@ print(f'  ${FILE}: {len(data)} entries — valid')
 " || exit 1
 done
 
+# Step 3b: Semantic data-quality checks on repos.json
+echo ""
+echo "=== Data quality checks ==="
+python3 -c "
+import json, sys
+repos = json.load(open('${OUTPUT_DIR}/repos.json'))
+clusters = json.load(open('${OUTPUT_DIR}/clusters.json'))
+errors = []
+for r in repos:
+    name = r.get('name', '???')
+    if not r.get('description'):
+        errors.append(f'  repo {name}: null/empty description')
+    if not r.get('language'):
+        errors.append(f'  repo {name}: null language')
+    url = r.get('html_url', '')
+    if not url.startswith('https://github.com/'):
+        errors.append(f'  repo {name}: invalid html_url ({url})')
+clustered = set()
+for cl in clusters:
+    clustered.update(cl.get('repos', []))
+repo_names = set(r['name'] for r in repos)
+orphans = repo_names - clustered
+if orphans:
+    errors.append(f'  repos not in any cluster: {sorted(orphans)}')
+extra = clustered - repo_names
+if extra:
+    errors.append(f'  cluster refs missing from repos.json: {sorted(extra)}')
+if errors:
+    print('Data quality errors:', file=sys.stderr)
+    for e in errors:
+        print(e, file=sys.stderr)
+    sys.exit(1)
+print(f'  All {len(repos)} repos pass quality checks (descriptions, languages, URLs, cluster coverage)')
+" || exit 1
+
 # Step 4: Print summary
 echo ""
 echo "=== Summary ==="
