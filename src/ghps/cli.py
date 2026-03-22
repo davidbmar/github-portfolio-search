@@ -77,6 +77,13 @@ def search(query: str, top_k: int, db: str, fmt: str) -> None:
 
     results = engine.search(query, top_k=top_k)
 
+    # Log search to analytics if available (analytics.py is provided by agentB)
+    try:
+        from ghps.analytics import log_search
+        log_search(query=query, num_results=len(results), source="cli")
+    except (ImportError, Exception):
+        pass  # analytics module not yet available
+
     if fmt == "json":
         data = [
             {
@@ -186,6 +193,41 @@ def status(db: str, fmt: str) -> None:
     click.echo(click.style("  Repos:        ", fg="white") + str(repo_count))
     click.echo(click.style("  Chunks:       ", fg="white") + str(chunk_count))
     click.echo(click.style("  Last indexed: ", fg="white") + last_updated)
+    click.echo()
+
+
+@main.command()
+@click.option("--format", "fmt", type=click.Choice(["text", "json"]), default="text", help="Output format.")
+def stats(fmt: str) -> None:
+    """Show search analytics summary (total searches, top queries, avg results)."""
+    try:
+        from ghps.analytics import get_analytics_summary
+    except ImportError:
+        click.echo(
+            click.style("Error: ", fg="red", bold=True)
+            + "Analytics module not available.\n"
+            + "The analytics feature requires the analytics module (analytics.py).",
+            err=True,
+        )
+        sys.exit(1)
+
+    summary = get_analytics_summary()
+
+    if fmt == "json":
+        click.echo(json.dumps(summary, indent=2))
+        return
+
+    click.echo(click.style("\n  Search Analytics", fg="cyan", bold=True))
+    click.echo(f"  {'='*40}")
+    click.echo(click.style("  Total searches:  ", fg="white") + str(summary.get("total_searches", 0)))
+    click.echo(click.style("  Avg results:     ", fg="white") + f"{summary.get('avg_results', 0):.1f}")
+    top_queries = summary.get("top_queries", [])
+    if top_queries:
+        click.echo(click.style("  Top queries:", fg="white"))
+        for q in top_queries[:5]:
+            click.echo(f"    - {q.get('query', '?')} ({q.get('count', 0)} times)")
+    else:
+        click.echo(click.style("  Top queries:     ", fg="white") + "none yet")
     click.echo()
 
 

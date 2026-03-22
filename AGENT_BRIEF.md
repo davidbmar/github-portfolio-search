@@ -1,4 +1,4 @@
-agentB-analytics — Sprint 16
+agentC-mcp-tests — Sprint 16
 
 Sprint-Level Context
 
@@ -18,23 +18,23 @@ Constraints
 
 
 Objective
-- Track search queries and popular repos for analytics
+- Test MCP tools and improve CLI with analytics integration
 
 Tasks
-- Create src/ghps/analytics.py:
-  - Store search events in a SQLite table: query, timestamp, result_count, source (web/api/mcp/cli)
-  - Functions: log_search(query, result_count, source), get_popular_queries(limit=20), get_search_stats()
-  - get_search_stats() returns: total_searches, unique_queries, avg_results, top_queries, searches_today
-  - Use ~/.ghps/analytics.db for storage (separate from main index)
-- Update src/ghps/api.py:
-  - Log searches in the /api/search endpoint via analytics.log_search()
-  - Add GET /api/analytics/stats — returns search statistics (admin only, or public for now)
-  - Add GET /api/analytics/queries — returns recent queries (last 100)
-- Add tests for analytics logging, stats calculation, and API endpoints
+- Create tests/test_mcp.py:
+  - Test MCP tool registration (all 4 tools exist with correct schemas)
+  - Test portfolio_search with mock store
+  - Test portfolio_clusters with mock store
+  - Test portfolio_repo_detail with mock store
+  - Test error handling when no index exists
+- Update src/ghps/cli.py:
+  - Add `ghps stats` command — shows search analytics summary (total searches, top queries, avg results)
+  - Log CLI searches to analytics (import from analytics.py)
+- Add tests for the new CLI stats command
 
 Acceptance Criteria
-- Search via API logs the query to analytics.db
-- GET /api/analytics/stats returns valid JSON with search counts
-- Analytics DB is separate from main index (~/.ghps/analytics.db)
-- Analytics functions handle empty DB gracefully
+- tests/test_mcp.py covers all 4 MCP tools
+- MCP tools handle edge cases (empty query, missing repo, no index)
+- `ghps stats` shows analytics summary
+- CLI searches are logged to analytics
 - python3 -m pytest tests/ -v passes

@@ -382,3 +382,64 @@ class TestUnknownTool:
         resp = handle_message(msg, mcp_store, embedder)
         assert "error" in resp
         assert resp["error"]["code"] == -32601
+
+
+# ---------------------------------------------------------------------------
+# Tests: no-index / empty-store edge cases
+# ---------------------------------------------------------------------------
+
+class TestNoIndex:
+    """Verify MCP tools handle an empty store (no repos indexed)."""
+
+    @pytest.fixture
+    def empty_store(self):
+        from ghps.store import VectorStore
+        store = VectorStore(":memory:")
+        store.create_index()
+        yield store
+        store.close()
+
+    def test_search_empty_store(self, empty_store, embedder):
+        msg = {
+            "jsonrpc": "2.0",
+            "id": 60,
+            "method": "tools/call",
+            "params": {
+                "name": "portfolio_search",
+                "arguments": {"query": "anything"},
+            },
+        }
+        resp = handle_message(msg, empty_store, embedder)
+        content = resp["result"]["content"]
+        results = json.loads(content[0]["text"])
+        assert isinstance(results, list)
+        assert len(results) == 0
+
+    def test_repo_detail_empty_store(self, empty_store, embedder):
+        msg = {
+            "jsonrpc": "2.0",
+            "id": 61,
+            "method": "tools/call",
+            "params": {
+                "name": "portfolio_repo_detail",
+                "arguments": {"repo_name": "nonexistent"},
+            },
+        }
+        resp = handle_message(msg, empty_store, embedder)
+        assert resp["result"].get("isError") is True
+
+    def test_clusters_empty_store(self, empty_store, embedder):
+        msg = {
+            "jsonrpc": "2.0",
+            "id": 62,
+            "method": "tools/call",
+            "params": {
+                "name": "portfolio_clusters",
+                "arguments": {},
+            },
+        }
+        resp = handle_message(msg, empty_store, embedder)
+        content = resp["result"]["content"]
+        clusters = json.loads(content[0]["text"])
+        assert isinstance(clusters, list)
+        assert len(clusters) == 0
