@@ -131,7 +131,7 @@ function _updateHeaderUserInfo() {
 
   if (user.picture) {
     const avatar = document.createElement("img");
-    avatar.src = user.picture;
+    avatar.src = user.picture.replace(/^http:\/\//, "https://");
     avatar.alt = user.name || "User avatar";
     avatar.referrerPolicy = "no-referrer";
     avatar.style.cssText = "width:28px;height:28px;border-radius:50%;border:1px solid #30363d";
