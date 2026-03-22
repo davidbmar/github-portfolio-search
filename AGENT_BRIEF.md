@@ -1,33 +1,41 @@
-agentC-infra — Sprint 9
+agentC-repo-detail — Sprint 10
 
 Sprint-Level Context
 
 Goal
-- CRITICAL: Fix F-005 — web search fails on multi-word queries ("voice processing" returns 0 results)
-- Fix B-012 — .venv symlinks break after agent merges
-- Add "Request Access" page skeleton for future gated tier
-- Improve search result quality for recruiters
+- 5th-sprint checkpoint: clean up docs, index all ~90 repos, add repo detail page
+- This is a quality/completeness sprint, not a feature sprint
 
 Constraints
 - No two agents may modify the same files
-- agentA owns web search fix (web/js/search.js, web/js/app.js)
-- agentB owns access page and meta improvements (web/index.html, web/css/style.css)
-- agentC owns infrastructure fixes (scripts/, .sprint/, Makefile, tests/)
+- agentA owns documentation cleanup (README.md, docs/)
+- agentB owns data completeness (src/ghps/, web/data/, scripts/)
+- agentC owns repo detail page (web/js/app.js, web/js/search.js, web/css/style.css)
 - Use python3 for all commands
 - Do NOT commit .venv/ to git
 
 
 Objective
-- Fix venv symlink issue and clean up infrastructure
+- Add a repo detail view so users can learn more about a specific repository
 
 Tasks
-- Fix B-012: In .sprint/scripts/ (the local project copy), find where .venv gets symlinked into worktrees and remove that behavior. If sprint-init.sh or sprint-tmux.sh symlinks .venv, change it to skip .venv. Add a comment: "# .venv is NOT symlinked — each worktree uses system python or creates its own venv"
-- Update Makefile: add "deploy" target that runs aws s3 sync + cloudfront invalidation
-- Add a simple smoke test in tests/test_smoke.py: verify ghps --help returns 0, verify ghps search --help returns 0
-- Clean up: remove any .gitkeep files from web/data/ (we have real data now)
+- In web/js/app.js, add route handler for #/repo/<name>:
+  - Show repo name as heading
+  - Show full description
+  - Show language, stars, last updated, topics
+  - Show link to GitHub (html_url)
+  - Show which cluster this repo belongs to
+  - Show "Related repos" from same cluster (reuse existing component)
+  - Add "Back to search" link
+- Update web/js/search.js: make repo names in search results link to #/repo/<name> instead of directly to GitHub
+- Update web/js/app.js: make repo names on home page link to #/repo/<name>
+- Update web/css/style.css:
+  - Style repo detail page (consistent with existing theme)
+  - Make the GitHub link prominent with an icon or button style
 
 Acceptance Criteria
-- python3 -m pytest tests/ -v shows 0 failures, 0 errors
-- make deploy works (syncs to S3 + invalidates CloudFront)
-- .venv is NOT symlinked into worktrees after sprint-init.sh runs
-- No .gitkeep files in web/data/
+- Playwright: click a repo name from search results → navigates to #/repo/<name>
+- Playwright: repo detail page shows name, description, language, topics, GitHub link
+- Playwright: "Related repos" section shows repos from same cluster
+- Playwright: "Back to search" link works
+- Mobile layout works at 375px
