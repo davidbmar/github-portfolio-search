@@ -1,4 +1,4 @@
-agentA-mcp-server — Sprint 16
+agentB-analytics — Sprint 16
 
 Sprint-Level Context
 
@@ -18,28 +18,23 @@ Constraints
 
 
 Objective
-- Create an MCP server that exposes portfolio search tools
+- Track search queries and popular repos for analytics
 
 Tasks
-- Create src/ghps/mcp_server.py:
-  - Use the MCP Python SDK (mcp package) to create a server
-  - Expose these tools:
-    - portfolio_search(query: str, limit: int = 10) → list of matching repos with name, description, score, language, topics
-    - portfolio_clusters() → list of capability clusters with repo counts and names
-    - portfolio_repo_detail(name: str) → full repo info including description, language, topics, stars, updated_at, html_url, cluster
-    - portfolio_reindex() → trigger reindex (returns status message)
-  - Each tool should read from the existing SQLite-vec store (src/ghps/store.py)
-  - If no index exists, return helpful error message
-  - Add proper tool descriptions and parameter schemas for discoverability
-- Add mcp to pyproject.toml dependencies
-- Create a standalone entry point: python3 -m ghps.mcp_server (for Claude Code config)
-- Add __main__.py support so `python -m ghps.mcp_server` works
+- Create src/ghps/analytics.py:
+  - Store search events in a SQLite table: query, timestamp, result_count, source (web/api/mcp/cli)
+  - Functions: log_search(query, result_count, source), get_popular_queries(limit=20), get_search_stats()
+  - get_search_stats() returns: total_searches, unique_queries, avg_results, top_queries, searches_today
+  - Use ~/.ghps/analytics.db for storage (separate from main index)
+- Update src/ghps/api.py:
+  - Log searches in the /api/search endpoint via analytics.log_search()
+  - Add GET /api/analytics/stats — returns search statistics (admin only, or public for now)
+  - Add GET /api/analytics/queries — returns recent queries (last 100)
+- Add tests for analytics logging, stats calculation, and API endpoints
 
 Acceptance Criteria
-- MCP server starts without error: python3 -m ghps.mcp_server
-- Tools are discoverable via MCP protocol
-- portfolio_search("presigned URL") returns relevant repos
-- portfolio_clusters() returns 6 clusters
-- portfolio_repo_detail("github-portfolio-search") returns repo info
-- When no index exists, tools return error message (not crash)
+- Search via API logs the query to analytics.db
+- GET /api/analytics/stats returns valid JSON with search counts
+- Analytics DB is separate from main index (~/.ghps/analytics.db)
+- Analytics functions handle empty DB gracefully
 - python3 -m pytest tests/ -v passes

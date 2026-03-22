@@ -18,7 +18,7 @@ from pydantic import BaseModel
 from ghps.store import VectorStore
 from ghps.embeddings import EmbeddingPipeline
 from ghps.clusters import ClusterEngine
-from ghps import auth
+from ghps import analytics, auth
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +115,12 @@ async def search(q: str = Query(..., min_length=1), top_k: int = Query(10, ge=1,
         item["url"] = repo_row[1] if repo_row else ""
         results.append(item)
 
+    # Log this search for analytics
+    try:
+        analytics.log_search(q, len(results), "api")
+    except Exception:
+        logger.warning("Failed to log search analytics", exc_info=True)
+
     return _ok({"results": results, "query": q, "count": len(results)})
 
 
@@ -187,6 +193,38 @@ async def repo_detail(slug: str):
         "readme_excerpt": readme_excerpt[:2000],
         "chunks": [{"source": c[0], "text": c[1][:500]} for c in all_chunks],
     })
+
+
+# ---------------------------------------------------------------------------
+# Analytics endpoints
+# ---------------------------------------------------------------------------
+
+@app.get("/api/analytics/stats")
+async def analytics_stats():
+    """Return aggregate search statistics."""
+    try:
+        stats = analytics.get_search_stats()
+    except Exception:
+        logger.warning("Failed to fetch analytics stats", exc_info=True)
+        stats = {
+            "total_searches": 0,
+            "unique_queries": 0,
+            "avg_results": 0.0,
+            "top_queries": [],
+            "searches_today": 0,
+        }
+    return _ok(stats)
+
+
+@app.get("/api/analytics/queries")
+async def analytics_queries():
+    """Return recent search queries (last 100)."""
+    try:
+        queries = analytics.get_recent_queries(limit=100)
+    except Exception:
+        logger.warning("Failed to fetch recent queries", exc_info=True)
+        queries = []
+    return _ok({"queries": queries})
 
 
 # ---------------------------------------------------------------------------
