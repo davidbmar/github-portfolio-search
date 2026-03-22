@@ -30,7 +30,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: 1.7;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -190,12 +190,20 @@ a:hover {
   border-radius: var(--radius);
   padding: 20px;
   cursor: pointer;
-  transition: border-color 0.2s, transform 0.15s;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  border-top: 3px solid var(--accent);
 }
+
+.cluster-card:nth-child(2) { border-top-color: var(--green); }
+.cluster-card:nth-child(3) { border-top-color: var(--purple); }
+.cluster-card:nth-child(4) { border-top-color: var(--yellow); }
+.cluster-card:nth-child(5) { border-top-color: var(--orange); }
+.cluster-card:nth-child(6) { border-top-color: #f778ba; }
 
 .cluster-card:hover {
   border-color: var(--accent);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .cluster-card h4 {
@@ -230,12 +238,14 @@ a:hover {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  transition: border-color 0.2s;
+  padding: 24px;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .repo-card:hover {
   border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .repo-card-header {
@@ -259,7 +269,15 @@ a:hover {
 .repo-card .description {
   color: var(--text-secondary);
   font-size: 0.95rem;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.repo-card .description mark {
+  background: rgba(88, 166, 255, 0.2);
+  color: var(--accent);
+  padding: 1px 3px;
+  border-radius: 3px;
 }
 
 .repo-meta {
@@ -607,6 +625,114 @@ a:hover {
   opacity: 0.85;
 }
 
+/* Portfolio stats on landing page */
+.portfolio-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Language stat row */
+.lang-stat-row {
+  max-width: 480px;
+  margin: 0 auto 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lang-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.lang-stat-name {
+  width: 80px;
+  text-align: right;
+}
+
+.lang-stat-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.lang-stat-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.lang-stat-count {
+  width: 24px;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Last updated indicator */
+.last-updated {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* Relevance bar (replaces raw score number) */
+.relevance-bar {
+  width: 80px;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.relevance-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Related repos section */
+.related-repos-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* Results list spacing */
+.results-list {
+  gap: 16px;
+}
+
 /* Footer */
 .site-footer {
   text-align: center;
@@ -666,6 +792,18 @@ a:hover {
 
   .repo-card {
     padding: 16px;
+  }
+
+  .portfolio-stats {
+    gap: 24px;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+
+  .lang-stat-row {
+    max-width: 100%;
   }
 
   .access-request-page {

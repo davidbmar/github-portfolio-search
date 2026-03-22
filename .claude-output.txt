@@ -1,0 +1,19 @@
+---
+
+## Summary
+
+### Files changed
+- **web/js/app.js** — Added `computePortfolioStats()`, `highlightTerms()`, `findRelatedRepos()`. Landing page shows repo/cluster/language stats, language distribution bars, last-updated date. Search results show highlighted terms, relevance bars, and related repos.
+- **web/css/style.css** — New styles for portfolio stats, language bars, relevance bars, related repos section. Improved card hover (lift + shadow), cluster card gradient accents, better typography (line-height 1.7), mark highlight styling, mobile responsive adjustments.
+- **web/index.html** — Updated meta description and OG tags with real stats (42 repos, 6 capability areas), added og:image/twitter:image, changed to summary_large_image card.
+- **docs/project-memory/sessions/S-2026-03-22-1613-sprint8-ui-polish.md** — Session documentation.
+
+### Commands run
+- `git pull origin main`
+- `python3 -m pytest tests/ -v` (136 passed, 1 pre-existing failure)
+- `git commit` + `git push -u origin HEAD`
+
+### Notes / follow-on work
+1. **Pre-existing test failure**: `test_search_no_results` has a race condition — `.empty-state` on home page matches before search route renders. agentC should fix by using `page.wait_for_url()` or a more specific selector like `.empty-state h3:has-text("No results")`.
+2. **OG image**: `og:image` references `/og-image.png` which doesn't exist yet. A real social preview image should be created and deployed.
+3. **search.js was not modified** — all search UI enhancements (highlighting, relevance bars, related repos) are rendering-side changes in app.js, keeping the search engine pure.

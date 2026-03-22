@@ -228,13 +228,60 @@ const App = (() => {
   /**
    * Render the home/landing page with search hero and cluster grid.
    */
+  function computePortfolioStats() {
+    const langCounts = {};
+    let latestDate = "";
+    for (const r of repos) {
+      if (r.language) {
+        langCounts[r.language] = (langCounts[r.language] || 0) + 1;
+      }
+      if (r.updated_at && r.updated_at > latestDate) {
+        latestDate = r.updated_at;
+      }
+    }
+    const sortedLangs = Object.entries(langCounts)
+      .sort((a, b) => b[1] - a[1]);
+    return { langCounts: sortedLangs, latestDate };
+  }
+
   function renderHome(container) {
     const searchInput = document.getElementById("search-input");
     if (searchInput) searchInput.value = "";
 
+    const stats = computePortfolioStats();
+
     let html = '<div class="search-hero">';
     html += "<h2>GitHub Portfolio Search</h2>";
     html += "<p>Explore repositories by topic, language, or keyword</p>";
+
+    // Portfolio stats
+    html += '<div class="portfolio-stats">';
+    html += '<div class="stat-item"><span class="stat-number">' + escapeHtml(String(repos.length)) + '</span><span class="stat-label">Repositories</span></div>';
+    html += '<div class="stat-item"><span class="stat-number">' + escapeHtml(String(clusters.length)) + '</span><span class="stat-label">Capability Areas</span></div>';
+    html += '<div class="stat-item"><span class="stat-number">' + escapeHtml(String(stats.langCounts.length)) + '</span><span class="stat-label">Languages</span></div>';
+    html += "</div>";
+
+    // Language stat row
+    if (stats.langCounts.length > 0) {
+      html += '<div class="lang-stat-row">';
+      for (const [lang, count] of stats.langCounts) {
+        const pct = ((count / repos.length) * 100).toFixed(0);
+        const color = LANG_COLORS[lang] || "#8b949e";
+        html += '<div class="lang-stat-item">';
+        html += '<span class="language-dot" style="background:' + escapeAttr(color) + '"></span>';
+        html += '<span class="lang-stat-name">' + escapeHtml(lang) + '</span>';
+        html += '<span class="lang-stat-bar"><span class="lang-stat-fill" style="width:' + escapeAttr(pct) + '%;background:' + escapeAttr(color) + '"></span></span>';
+        html += '<span class="lang-stat-count">' + escapeHtml(String(count)) + '</span>';
+        html += "</div>";
+      }
+      html += "</div>";
+    }
+
+    // Last updated
+    if (stats.latestDate) {
+      html += '<div class="last-updated">Last updated: ' + escapeHtml(formatDate(stats.latestDate)) + "</div>";
+    }
+
     html += "</div>";
 
     // Cluster grid
@@ -287,6 +334,36 @@ const App = (() => {
   /**
    * Render search results with filter sidebar.
    */
+  /**
+   * Highlight query terms in text. Escapes text first, then wraps matches
+   * in <mark> tags. Safe because we operate on already-escaped strings.
+   */
+  function highlightTerms(text, query) {
+    if (!text || !query) return escapeHtml(text);
+    const terms = SearchEngine.tokenize(query);
+    if (terms.length === 0) return escapeHtml(text);
+    let escaped = escapeHtml(text);
+    for (const term of terms) {
+      const escapedTerm = escapeHtml(term);
+      const regex = new RegExp("(" + escapedTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
+      escaped = escaped.replace(regex, "<mark>$1</mark>");
+    }
+    return escaped;
+  }
+
+  function findRelatedRepos(repo, maxCount) {
+    for (const cluster of clusters) {
+      if ((cluster.repos || []).includes(repo.name)) {
+        return (cluster.repos || [])
+          .filter((n) => n !== repo.name)
+          .slice(0, maxCount || 3)
+          .map((name) => repos.find((r) => r.name === name))
+          .filter(Boolean);
+      }
+    }
+    return [];
+  }
+
   function renderSearchResults(query, container) {
     const searchInput = document.getElementById("search-input");
     if (searchInput && searchInput.value !== query) {
@@ -296,7 +373,9 @@ const App = (() => {
     // Filter repos first, then search
     const filtered = SearchEngine.applyFilters(repos, currentFilters);
     const results = SearchEngine.search(filtered, query);
+    const maxScore = results.length > 0 ? results[0].score : 1;
 
+    // Safe: all dynamic values below pass through escapeHtml/escapeAttr
     let html = '<div class="content-layout">';
 
     // Filter sidebar
@@ -321,13 +400,29 @@ const App = (() => {
       html += "<p>Try a different search term or adjust filters</p>";
       html += "</div>";
     } else {
-      html += renderRepoCards(results.map((r) => ({ ...r.repo, _score: r.score })));
+      html += renderRepoCards(
+        results.map((r) => ({ ...r.repo, _score: r.score, _maxScore: maxScore })),
+        query
+      );
+    }
+
+    // Related repos section
+    if (results.length > 0 && query) {
+      const topRepo = results[0].repo;
+      const related = findRelatedRepos(topRepo, 3);
+      if (related.length > 0) {
+        html += '<div class="related-repos-section">';
+        html += '<div class="section-header"><h3>Related Repositories</h3>';
+        html += '<span class="count">from same cluster</span></div>';
+        html += renderRepoCards(related);
+        html += "</div>";
+      }
     }
 
     html += "</div>"; // results-area
     html += "</div>"; // content-layout
 
-    // Safe: all dynamic values are escaped
+    // Safe: all dynamic values are escaped via escapeHtml/escapeAttr
     container.innerHTML = html;
     bindFilterEvents();
   }
@@ -498,7 +593,13 @@ const App = (() => {
    * Render a list of repo cards as HTML.
    * All dynamic repo data is escaped before insertion.
    */
-  function renderRepoCards(repoList) {
+  /**
+   * Render a list of repo cards as HTML.
+   * All dynamic repo data is escaped before insertion.
+   * @param {Array} repoList - repos to render
+   * @param {string} [query] - optional query for term highlighting
+   */
+  function renderRepoCards(repoList, query) {
     let html = '<div class="results-list">';
 
     for (const repo of repoList) {
@@ -513,13 +614,18 @@ const App = (() => {
         html += '<span class="repo-name">' + escapeHtml(repo.name) + "</span>";
       }
 
-      if (repo._score !== undefined) {
-        html += '<span class="score-badge">' + escapeHtml(repo._score.toFixed(1)) + "</span>";
+      // Relevance bar instead of raw score number
+      if (repo._score !== undefined && repo._maxScore) {
+        const pct = Math.round((repo._score / repo._maxScore) * 100);
+        html += '<div class="relevance-bar" title="Relevance: ' + escapeAttr(repo._score.toFixed(1)) + '">';
+        html += '<div class="relevance-fill" style="width:' + escapeAttr(String(pct)) + '%"></div>';
+        html += "</div>";
       }
       html += "</div>";
 
       if (repo.description) {
-        html += '<div class="description">' + escapeHtml(repo.description) + "</div>";
+        // Safe: highlightTerms escapes text first, then adds <mark> tags
+        html += '<div class="description">' + highlightTerms(repo.description, query) + "</div>";
       }
 
       // Meta row

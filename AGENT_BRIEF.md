@@ -1,4 +1,4 @@
-agentA-search-relevance — Sprint 8
+agentB-ui-polish — Sprint 8
 
 Sprint-Level Context
 
@@ -17,18 +17,28 @@ Constraints
 
 
 Objective
-- Improve search result quality with real data
+- Make davidbmar.com look professional — a recruiter should understand David's capabilities in 10 seconds
 
 Tasks
-- In src/ghps/search.py, add title boosting: if query terms appear in repo name, boost score by 2x
-- In src/ghps/search.py, add recency factor: repos updated in last 6 months get a 1.2x boost, last year 1.0x, older 0.8x
-- In src/ghps/export.py, add "last_indexed" timestamp to repos.json metadata
-- In src/ghps/export.py, sort repos by relevance score (stars + recency) not alphabetically
-- Add a test in tests/test_search.py that verifies title boosting works (search for "presigned" should rank presigned-url repo first)
-- Add a test that verifies recency boosting (recent repos ranked higher than stale ones, all else equal)
+- Update web/js/app.js:
+  - Add portfolio stats on landing page: "N repositories indexed across M capability areas"
+  - Add "Last updated: DATE" indicator from repos.json metadata
+  - Show repo count per language in a small bar chart or stat row
+- Update web/js/search.js:
+  - Bold/highlight matched query terms in search result descriptions
+  - Add "Related repos" section below search results (repos in same cluster)
+  - Show relevance score as a visual bar instead of raw number
+- Update web/css/style.css:
+  - Improve card hover effects (subtle lift + shadow)
+  - Better typography: increase line-height for readability
+  - Add gradient accent to cluster cards matching cluster theme
+  - Improve search result card layout — more whitespace, cleaner hierarchy
+- Update web/index.html:
+  - Update meta description with real portfolio stats
+  - Ensure OG image and description work for social sharing
 
 Acceptance Criteria
-- python3 -m pytest tests/test_search.py -v passes with new relevance tests
-- ghps search "presigned URL" returns S3-presignedURL repo as top result
-- ghps search "voice" returns voice-related repos ranked by relevance
-- repos.json includes last_indexed timestamp
+- Playwright: visit https://davidbmar.com — landing page shows repo count, cluster count, last updated
+- Playwright: search for "voice" — results show highlighted terms, relevance bars
+- Playwright: mobile viewport (375px) — all elements readable, no horizontal scroll
+- No uncaught JS errors in console
