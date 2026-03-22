@@ -1,4 +1,4 @@
-agentA-export-data — Sprint 17
+agentB-enhanced-search — Sprint 17
 
 Sprint-Level Context
 
@@ -20,40 +20,36 @@ Constraints
 
 
 Objective
-- Enhance the export pipeline to produce richer data files for the web UI
+- Upgrade the client-side search engine with TF-IDF scoring and chunk text matching
 
 Tasks
-- Update src/ghps/export.py:
-  - In _build_repos() (or equivalent), add a `readme_excerpt` field to each repo dict:
-    - Query the chunks table for the first README chunk per repo
-    - Truncate to 300 chars
-    - If no README chunk exists, use empty string
-  - Create a new function _build_similarity() that:
-    - Computes the average embedding vector per repo (average of all chunk embeddings)
-    - Calculates pairwise cosine similarity between all repo average embeddings
-    - For each repo, keeps the top-8 most similar repos with their scores
-    - Returns a dict: {"repo_name": [{"name": "other_repo", "score": 0.85}, ...]}
-    - Uses numpy for efficient vector operations (already a dependency via sentence-transformers)
-  - Create a new function _build_suggestions() that:
-    - Collects all repo names from the store
-    - Collects all unique topics across repos
-    - Tries to read top-20 popular queries from analytics DB (~/.ghps/analytics.db)
-    - If analytics DB doesn't exist, uses empty queries list (graceful fallback)
-    - Returns a dict: {"repos": [...], "topics": [...], "queries": [...]}
-  - Update export_static_bundle() to:
-    - Call _build_similarity() and write result to web/data/similarity.json
-    - Call _build_suggestions() and write result to web/data/suggestions.json
-    - Ensure readme_excerpt is included in repos.json output
-- Update tests/test_export.py:
-  - Test that repos.json entries include readme_excerpt field
-  - Test _build_similarity() returns correct format with scores between 0 and 1
-  - Test _build_suggestions() returns correct format
-  - Test _build_suggestions() works when analytics DB doesn't exist
-  - Test similarity matrix has at most 8 entries per repo
+- Update web/js/search.js:
+  - Add a `loadSearchIndex(data)` method to the SearchEngine namespace:
+    - Accepts the parsed search-index.json array
+    - Builds an inverted index: term -> Set of repo names (for IDF calculation)
+    - Builds a per-repo chunk text map: repo_name -> concatenated chunk text
+    - Stores the total number of repos (N) for IDF computation
+  - Add TF-IDF scoring to the `search()` method:
+    - When search index is loaded, compute IDF weight for each query term: log(N / df) where df = number of repos containing the term
+    - Multiply the existing field-match points by the IDF weight
+    - This means rare terms (appearing in few repos) get much higher scores than common terms
+  - Add chunk text matching to the `search()` method:
+    - When search index is loaded, check if query terms appear in the repo's chunk text
+    - Award 2 points per term found in chunk text (README and source file content)
+    - Apply IDF weighting to chunk matches as well
+  - Add a `getSnippet(repoName, query)` method:
+    - Looks up the repo's chunks from the loaded search index
+    - Finds the chunk whose text best matches the query terms (most term matches)
+    - Returns a ~200 char excerpt centered on the first match, or null if no match
+    - Does NOT do HTML escaping (caller handles that)
+  - Ensure backward compatibility:
+    - If loadSearchIndex() was never called, search() works exactly as before
+    - All new code paths are guarded by checking if the inverted index exists
 
 Acceptance Criteria
-- repos.json entries include `readme_excerpt` (string, up to 300 chars)
-- similarity.json exists with top-8 similar repos per repo, each with a float score
-- suggestions.json exists with repos, topics, and queries arrays
-- Export works when analytics DB doesn't exist (no crash)
-- python3 -m pytest tests/test_export.py -v passes
+- SearchEngine.loadSearchIndex(data) builds inverted index from search-index.json
+- Searching "presigned URL" ranks repos with those terms in README chunks higher
+- SearchEngine.getSnippet("S3-presignedURL", "presigned URL") returns a relevant text excerpt
+- Search still works identically when search index is not loaded (backward compat)
+- TF-IDF weighting boosts rare terms ("presigned") over common terms ("python")
+- No global variable pollution (everything stays in SearchEngine namespace)
