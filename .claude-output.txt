@@ -1,26 +1,19 @@
-`★ Insight ─────────────────────────────────────`
-The auth module uses a path parameter on all functions (`path: Path | None = None`) defaulting to `ACCESS_FILE`. This makes the module fully testable with temp files while keeping production behavior zero-config. The API endpoints don't pass a path — they use the default `~/.ghps/access.json` — but tests can monkey-patch the functions to inject a temp path, avoiding pollution of the real access list during testing.
-`─────────────────────────────────────────────────`
-
 ---
 
 ## Summary
 
 ### Files changed
-- **`src/ghps/auth.py`** (NEW) — Google JWT verification via `google-auth`, access list CRUD with JSON persistence at `~/.ghps/access.json`
-- **`src/ghps/api.py`** — Added 5 new endpoints: `/api/auth/verify`, `/api/access/request`, `/api/access/pending`, `/api/access/approve`, `/api/access/deny`
-- **`pyproject.toml`** — Added `google-auth>=2.29` dependency
-- **`tests/test_auth.py`** (NEW) — 21 tests covering unit + API endpoint tests
-- **`docs/project-memory/sessions/S-2026-03-22-1841-auth-api-endpoints.md`** (NEW) — Session doc
+- **`src/ghps/notifications.py`** (NEW) — Telegram notification module with graceful fallback
+- **`scripts/approve-access.py`** (NEW) — CLI tool for approve/deny/list access management
+- **`tests/test_notifications.py`** (NEW) — 19 tests covering both modules
 
 ### Commands run
 - `git pull origin main`
-- `pip install google-auth`
-- `python3 -m pytest tests/test_auth.py -v` (21 passed)
-- `python3 -m pytest tests/ -v --ignore=tests/test_web_playwright.py` (173 passed)
-- `git push -u origin HEAD`
+- `python3 -m pytest tests/test_notifications.py -v` — 19 passed
+- `python3 -m pytest tests/ -v` — 164 passed
+- `git commit` + `git push -u origin HEAD`
 
 ### Notes / follow-on work
-- **Pre-existing playwright test failures**: `test_web_playwright.py` has 3 failures for UI elements (cluster cards, access request page) that depend on other agents' frontend work — not related to this change
-- **GHPS_ADMIN_TOKEN**: Must be set in the server environment for admin endpoints to work. agentC's Telegram bot will need this same token to call approve/deny endpoints
-- **No Google Client ID validation**: `verify_token` currently doesn't restrict to a specific `audience` (Google Client ID). Once agentA's frontend is wired up, consider adding `audience=` parameter to `verify_oauth2_token` for tighter validation
+- The `approve-access.py` CLI reads/writes `~/.ghps/access.json` with no dependency on the API server — agentB's API endpoints can import `approve_user`/`deny_user` from the script or duplicate the logic
+- `notify_access_request()` accepts an optional `api_base_url` param; when provided, Telegram messages include clickable approve/deny links pointing to agentB's API endpoints
+- When `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` are not set, notifications fall back to `logging.info` — no crash

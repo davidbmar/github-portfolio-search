@@ -1,4 +1,4 @@
-agentB-auth-api — Sprint 13
+agentC-telegram-admin — Sprint 13
 
 Sprint-Level Context
 
@@ -18,24 +18,23 @@ Constraints
 
 
 Objective
-- Add authentication endpoints to the FastAPI server
+- Send Telegram notifications when access is requested and provide approve/deny links
 
 Tasks
-- Create src/ghps/auth.py:
-  - Verify Google JWT tokens (using google-auth library or manual JWT decode)
-  - Maintain an access list in a JSON file (~/.ghps/access.json): list of approved emails
-  - Functions: verify_token(token) → user_info, is_approved(email) → bool, approve_email(email), deny_email(email)
-- Update src/ghps/api.py:
-  - Add POST /api/auth/verify — accepts Google JWT, returns { approved: bool, user: {...} }
-  - Add POST /api/access/request — accepts { email, name, reason }, stores in pending list, triggers notification
-  - Add GET /api/access/pending — returns pending requests (admin only, check Authorization header)
-  - Add POST /api/access/approve — accepts { email }, moves from pending to approved
-  - Add POST /api/access/deny — accepts { email }, removes from pending
-- Add google-auth to pyproject.toml dependencies
-- Add tests: verify token validation, access list CRUD, request/approve flow
+- Create src/ghps/notifications.py:
+  - Send Telegram message when access is requested: "🔔 Access Request: {name} ({email}) — {reason}"
+  - Include approve/deny links in the message (pointing to API endpoints)
+  - Use TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID from .env
+  - If Telegram credentials not set, log the request instead (graceful fallback)
+- Create scripts/approve-access.py:
+  - CLI tool: python3 scripts/approve-access.py approve user@example.com
+  - CLI tool: python3 scripts/approve-access.py deny user@example.com
+  - CLI tool: python3 scripts/approve-access.py list (show all pending + approved)
+  - Reads/writes ~/.ghps/access.json
+- Add tests for notification formatting and access list management
 
 Acceptance Criteria
-- POST /api/auth/verify with valid Google JWT returns user info + approval status
-- POST /api/access/request stores request and returns 200
-- Access list persists in ~/.ghps/access.json
+- When TELEGRAM_BOT_TOKEN is set: access request sends Telegram notification
+- When not set: request is logged to console (no crash)
+- scripts/approve-access.py list/approve/deny work correctly
 - python3 -m pytest tests/ -v passes
