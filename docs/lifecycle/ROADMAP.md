@@ -16,7 +16,7 @@ PM/customer review checkpoint: Use Playwright to simulate key use cases — sema
 Backlog triage: Capture relevance tuning issues, missing metadata, and malformed API responses.
 Planning input for Sprint 3: Confirm API contract is stable enough to build the Web UI and CLI against.
 
-**Sprint 3: CLI and MCP Server**
+**Sprint 3: CLI and MCP Server (COMPLETED 2026-03-22)**
 Build goals: Implement the `ghps` CLI tool supporting `search`, `clusters`, `repos`, and `reindex` commands. Implement the MCP server exposing `portfolio_search`, `portfolio_clusters`, `portfolio_repo_detail`, and `portfolio_reindex` tools. Both should call the REST API or read the local vector store directly. Test MCP integration with Claude Code.
 PM/customer review checkpoint: Run Playwright/agent tests simulating Bob mid-conversation calling `portfolio_search('presigned URL')` and receiving structured JSON. Test CLI from terminal for all supported commands. Verify exclusion search ('voice NOT aws') works.
 Backlog triage: Log MCP tool schema gaps, CLI UX friction, and any agent integration issues discovered.

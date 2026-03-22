@@ -1,90 +1,95 @@
-# Sprint 3
+# Sprint 4
 
 Goal
-- Fix remaining packaging and test bugs from Sprint 1-2 (B-001, B-004)
-- Build MCP server for Claude Code and Bob integration
-- Improve CLI with better output formatting and error handling
+- Build the public web UI for davidbmar.com with search and browse capabilities
+- Fix Sprint 3 test failures (B-005, B-006)
+- Deploy static site to S3/CloudFront
 
 Constraints
 - No two agents may modify the same files
-- agentA owns bug fixes and test reliability (pyproject.toml, tests/, Makefile)
-- agentB owns MCP server (src/ghps/mcp_server.py, src/ghps/mcp_tools.py)
-- agentC owns CLI improvements and end-to-end testing (src/ghps/cli.py, tests/test_cli.py, tests/test_e2e.py)
+- agentA owns bug fixes and static data export (tests/, src/ghps/export.py)
+- agentB owns web UI frontend (web/index.html, web/css/, web/js/)
+- agentC owns deployment pipeline and integration (deploy.sh, web/api-proxy.js)
 - Use python3 for all commands
-- MCP server must follow the MCP protocol spec
+- Frontend must be vanilla JS (no build step) — served as static files from S3
+- Mobile-responsive layout required
 
 Merge Order
-1. agentA-bug-fixes
-2. agentB-mcp-server
-3. agentC-cli-e2e
+1. agentA-data-export
+2. agentB-web-ui
+3. agentC-deploy
 
 Merge Verification
 - python3 -m pytest tests/ -v
 
-## agentA-bug-fixes
+## agentA-data-export
 
 Objective
-- Fix all test failures and packaging issues so the full test suite passes reliably
+- Fix test failures and build a static JSON data export for the web UI
 
 Tasks
-- Fix B-001: editable install — ensure pip install -e ".[dev]" works and ghps is importable
-- Fix B-004: test_embeddings.py and test_store.py collection errors — mock heavy dependencies (sentence-transformers, sqlite-vec) in unit tests so tests run without GPU/native deps
-- Add conftest.py fixtures if not already present for mocking embeddings and store
-- Create a Makefile with targets: install, test, lint, index, serve
-- Add typing stubs or py.typed marker
-- Ensure python3 -m pytest tests/ -v passes all tests with 0 failures
+- Fix B-005: CLI test failures on missing index edge cases
+- Fix B-006: JSON decode error in test_e2e.py
+- Create src/ghps/export.py with:
+  - export_static_bundle(store, output_dir) -> generates JSON files for static site
+  - repos.json — all repos with metadata, description, language, topics, stars, url
+  - clusters.json — capability clusters with repo names
+  - search-index.json — pre-computed embeddings or search data for client-side search
+- Add ghps export command to CLI: ghps export --db PATH --output web/data/
+- Create tests/test_export.py
 
 Acceptance Criteria
-- pip install -e ".[dev]" succeeds on a clean venv
-- python3 -m pytest tests/ -v passes with 0 errors, 0 failures
-- make test runs the full suite
-- make install sets up a working environment
+- python3 -m pytest tests/ -v passes with 0 failures
+- ghps export produces valid JSON files in output directory
+- repos.json contains all indexed repos with metadata
 
-## agentB-mcp-server
+## agentB-web-ui
 
 Objective
-- Build an MCP server that exposes portfolio search tools for Claude Code and Bob
+- Build a responsive search and browse UI for the public portfolio site
 
 Tasks
-- Add mcp dependency to pyproject.toml (or use the lightweight JSON-RPC approach)
-- Create src/ghps/mcp_server.py with MCP server implementing these tools:
-  - portfolio_search(query: str, top_k: int = 10) -> list of results with repo_name, score, snippet, url
-  - portfolio_clusters() -> list of capability clusters with repo names
-  - portfolio_repo_detail(repo_name: str) -> full repo metadata, README excerpt, tech stack
-  - portfolio_reindex(username: str) -> trigger re-indexing, return count
-- Each tool should have clear JSON Schema input/output descriptions
-- Server should accept --db flag for index path (default: ~/.ghps/index.db)
-- Add [project.scripts] entry: ghps-mcp = "ghps.mcp_server:main"
-- Create tests/test_mcp.py with unit tests for each tool
+- Create web/index.html — single page app with:
+  - Search bar (prominent, centered on landing)
+  - Search results with cards: repo name, description, language badge, stars, topics, relevance score
+  - Capability cluster browse view (grid of cluster cards, click to expand)
+  - Faceted filter sidebar: language, topics, stars range, last updated
+  - Mobile responsive: stack layout, collapsible filters
+- Create web/css/style.css — dark theme matching davidbmar.com placeholder aesthetic
+- Create web/js/app.js — vanilla JS:
+  - Fetch repos.json and clusters.json on load
+  - Client-side search using pre-loaded data (filter + sort)
+  - Hash routing: #/ (home), #/search?q=X, #/cluster/name
+  - Debounced search input
+- Create web/js/search.js — client-side search logic:
+  - Text matching across repo name, description, topics, README excerpt
+  - Score and rank results
+  - Filter by facets
 
 Acceptance Criteria
-- ghps-mcp starts without errors
-- MCP tool list returns 4 tools with correct schemas
-- portfolio_search returns ranked results
-- portfolio_reindex triggers indexing
+- index.html loads and shows search bar + cluster grid
+- Typing a query shows filtered results
+- Clicking a cluster shows repos in that cluster
+- Layout works on mobile (375px viewport)
+- Dark theme, clean typography
 
-## agentC-cli-e2e
+## agentC-deploy
 
 Objective
-- Improve CLI output formatting and add end-to-end tests
+- Build deployment pipeline to push web UI to S3/CloudFront at davidbmar.com
 
 Tasks
-- Improve src/ghps/cli.py:
-  - Add rich/click formatting for search results (colored scores, truncated snippets)
-  - Add ghps serve command to start the FastAPI server
-  - Add ghps status command showing index stats (repo count, chunk count, last indexed)
-  - Add --format json flag for machine-readable output
-  - Better error messages when index doesn't exist
-- Create tests/test_cli.py with Click CliRunner tests:
-  - Test ghps search with mock store
-  - Test ghps index with mock GitHub API
-  - Test ghps status with mock store
-  - Test --format json output
-- Create tests/test_e2e.py with end-to-end test:
-  - Create temp index → index mock repos → search → verify results → clean up
+- Create deploy.sh script that:
+  - Runs ghps export to generate fresh data
+  - Copies web/ files + data/ to a build directory
+  - Uploads to S3 bucket davidbmar-com using aws s3 sync
+  - Invalidates CloudFront cache (distribution E3RCY6XA80ANRT)
+  - Prints the live URL
+- Create web/data/.gitkeep (data dir for export output)
+- Add deploy instructions to README.md
+- Create a simple health check: web/health.json with version and last-deploy timestamp
 
 Acceptance Criteria
-- ghps search "query" shows colored, formatted results
-- ghps serve starts the FastAPI server
-- ghps status shows index statistics
-- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes
+- ./deploy.sh uploads files to S3 and invalidates CloudFront
+- https://davidbmar.com shows the search UI after deploy
+- deploy.sh is idempotent (safe to run multiple times)
