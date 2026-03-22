@@ -57,3 +57,7 @@ What should happen?
 | B-014 | Technology Distribution shows only 3 topics — most repos lack GitHub topic tags | Fixed | Medium |
 | B-015 | AI & Search cluster contains non-AI repos (exampleLoops, Palindrome-Index) | Fixed | Low |
 | F-006 | Auto-tag repos with topics inferred from README content during indexing | Fixed | Medium |
+| B-016 | API /search and /clusters return 500 when no SQLite index exists (no graceful error) | Open | Medium |
+| B-017 | google-auth not installed after sprint merge — pyproject.toml updated but venv not synced | Fixed | High |
+| F-007 | Google Sign-In button not visible — needs googleClientId configured in web/config.json | Open | Medium |
+| F-008 | Request Access form should show Google Sign-In when clientId is configured | Open | Medium |

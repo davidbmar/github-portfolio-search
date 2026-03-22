@@ -90,8 +90,9 @@ docs/
 | 10 | Docs cleanup + repo detail page | Complete |
 | 11 | Activity visualization + D3.js + 94 repos | Complete |
 | 12 | Auto-tagging + cluster quality + password gate | Complete |
-| 13 | Gated access — Google OAuth + approval | **Next** |
-| 14 | Auto-refresh + GitHub webhooks | Planned |
+| 13 | Gated access — Google OAuth + approval | Complete |
+| 14 | Auto-refresh + GitHub webhooks | **Next** |
+| 15 | 5th-sprint checkpoint — performance + polish | Planned |
 
 ## Deployment
 

@@ -77,11 +77,11 @@ PM/customer review checkpoint: Technology Distribution shows 15+ topics. Faceted
 Backlog triage: B-014 fixed, B-015 fixed, F-006 fixed. Only medium/low items remain.
 Planning input for Sprint 13: Gated access with OAuth is next priority.
 
-**Sprint 13: Gated Access — Google OAuth and Approval Workflow**
-Build goals: Implement Google OAuth login flow (replace password gate). Build access request submission (form data → API → Telegram notification to David). Add admin approve/deny endpoint. Unlock gated content (code snippets, file tree) for approved users. Add session management with JWT.
-PM/customer review checkpoint: Test full workflow with Playwright — request access, receive Telegram notification, approve, verify gated content unlocks. Unauthenticated users see public tier only.
-Backlog triage: OAuth edge cases, session expiry, notification reliability.
-Planning input for Sprint 14: Based on real user access requests, tune the approval flow.
+**Sprint 13: Gated Access — Google OAuth and Approval Workflow (COMPLETED 2026-03-22)**
+Build goals: Added Google OAuth frontend (web/js/auth.js) with GIS initialization, JWT decode, localStorage auth state, and password gate fallback when no clientId configured. Added FastAPI auth endpoints (POST /api/auth/verify, POST /api/access/request, GET /api/access/pending, POST /api/access/approve, POST /api/access/deny). Added Telegram notification module and CLI access management tool (scripts/approve-access.py). Tests: 192 passed, 0 failed, 1 skipped.
+PM/customer review checkpoint: Request Access page renders with Name/Email/Reason form. Auth endpoints work (verify rejects invalid tokens, access request returns 200). Password gate fallback works when googleClientId is empty. Search returns 25 results for "voice processing". Mobile layout clean at 375px. Live site at davidbmar.com updated.
+Backlog triage: B-017 fixed (google-auth not installed post-merge). Added F-007 (configure googleClientId), F-008 (Google Sign-In button activation). No critical bugs.
+Planning input for Sprint 14: Need to configure Google Cloud OAuth client ID to activate Sign-In. Auto-refresh and webhooks are next priority per roadmap.
 
 **Sprint 14: Auto-Refresh and GitHub Webhooks**
 Build goals: Implement GitHub webhook listener for push events. Auto-reindex repos on push. Add periodic re-index fallback (cron or GitHub Actions). Add "freshness" badge on repos (indexed today, this week, stale). Private repo support with token-scoped indexing.
@@ -103,13 +103,13 @@ Planning input for Sprint 16: Based on analytics, prioritize features users actu
 
 ### Current Focus
 
-**Sprint 13: Gated Access — Google OAuth and Approval Workflow (Sprints 1-12 COMPLETE)**
+**Sprint 14: Auto-Refresh and GitHub Webhooks (Sprints 1-13 COMPLETE)**
 
-Sprints 1-12 delivered: full stack portfolio search with 104 repos (including private), D3.js visualization, faceted search with 15+ inferred topics, multi-word queries, search highlighting, relevance scoring, 6 capability clusters, Recent Activity, Request Access page, repo detail pages, password gate, language stats, and mobile support at davidbmar.com. Sprint 13 replaces the password gate with proper OAuth.
+Sprints 1-13 delivered: full stack portfolio search with 104 repos (including private), D3.js visualization, faceted search with 15+ inferred topics, multi-word queries, search highlighting, relevance scoring, 6 capability clusters, Recent Activity, Request Access page, repo detail pages, Google OAuth frontend + auth API + Telegram notifications + CLI access management, and mobile support at davidbmar.com. 192 tests passing. Sprint 14 adds auto-refresh via GitHub webhooks.
 
 ### Next Up
 
-**Sprint 14: Auto-Refresh and Webhooks** — GitHub webhook listener, periodic re-index, freshness badges.
+**Sprint 15: 5th-Sprint Checkpoint — Performance and Polish** — Lighthouse audit, accessibility, SEO, browser-native offline mode. Full system review + roadmap extension to Sprint 20.
 
 ## Architecture
 
