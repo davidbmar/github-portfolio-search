@@ -1,4 +1,4 @@
-agentB-activity-stats — Sprint 11
+agentC-social-meta — Sprint 11
 
 Sprint-Level Context
 
@@ -19,23 +19,25 @@ Constraints
 
 
 Objective
-- Add activity timeline and enhanced portfolio stats
+- Make the site look great when shared on social media and improve overall polish
 
 Tasks
-- In web/js/app.js, enhance the landing page:
-  - Add "Recent Activity" section showing the 10 most recently updated repos
-  - Each shows: repo name (linked to detail), last updated date, language badge
-  - Sort by updated_at descending
-- In web/js/app.js, enhance the Clusters page (#/clusters):
-  - Add a stats summary above the clusters: total repos, most active cluster, most common language
-  - Add a "Technology Distribution" section showing topic counts as a horizontal bar chart
-  - Show top 10 topics with their repo counts
-- In web/js/search.js:
-  - Add sort options for search results: Relevance (default), Recently Updated, Name A-Z
-  - Add a small dropdown or toggle above search results
+- Update web/css/style.css:
+  - Style the D3 visualization container (min-height, dark background, border)
+  - Style tooltips for D3 hover (dark tooltip with white text, rounded corners)
+  - Style the "Recent Activity" section (compact card list)
+  - Style sort dropdown for search results
+  - Add a subtle page transition animation when navigating between routes
+  - Ensure all new elements work at 375px mobile viewport
+- Update web/index.html (meta tags only, do NOT modify script tags):
+  - Update og:title to "David Mar — GitHub Portfolio Search"
+  - Update og:description to "42 repositories across 6 capability areas. Explore voice AI, infrastructure, search tools, and more."
+  - Add twitter:card meta tag (summary_large_image)
+  - Add canonical URL meta tag
 
 Acceptance Criteria
-- Playwright: landing page shows "Recent Activity" with 10 repos sorted by date
-- Playwright: clusters page shows stats summary and topic distribution chart
-- Playwright: search results can be sorted by Relevance, Recently Updated, or Name
-- No JS errors in console
+- Playwright: D3 viz has proper dark background and styled tooltips
+- Playwright: Recent Activity section is compact and readable
+- Playwright: mobile viewport (375px) — all new elements fit without horizontal scroll
+- OG meta tags present in page source with accurate content
+- No layout shifts or visual glitches during route transitions
