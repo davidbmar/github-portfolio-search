@@ -15,6 +15,8 @@ import threading
 
 import pytest
 
+pytest.importorskip("playwright", reason="playwright not installed — skipping web UI tests")
+
 WEB_DIR = os.path.join(os.path.dirname(__file__), "..", "web")
 PORT = 8787
 
