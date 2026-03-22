@@ -1,22 +1,23 @@
 `★ Insight ─────────────────────────────────────`
-- The `renderRepoCards()` function is the single rendering path for repo cards across both home page and search results. By changing the link target there, one edit covered two requirements from the brief.
-- The GitHub link uses an inline SVG of the GitHub octocat logo rather than an external image — this avoids an extra HTTP request and works offline.
+- The page transition uses a CSS `@keyframes pageFadeIn` animation on `.main-content` — this is a lightweight approach that avoids JavaScript animation libraries and won't cause layout shifts because it only animates `opacity` and `transform`, which are compositor-friendly properties.
+- The D3 tooltip uses `position: absolute` with `pointer-events: none` — this is the standard pattern for chart tooltips so they follow the cursor without intercepting mouse events on the underlying SVG elements.
 `─────────────────────────────────────────────────`
 
 ---
 
 ## Summary
 
-### Files changed
-- **`web/js/app.js`** — Added `#/repo/<name>` route, `findClusterForRepo()`, `renderRepoDetail()` function; changed repo card links from GitHub URLs to detail page
-- **`web/css/style.css`** — Added styles for repo detail page (`.repo-detail`, `.github-link` button, `.repo-detail-meta`, `.repo-detail-topics`, `.repo-detail-cluster`, mobile responsive)
-- **`docs/project-memory/sessions/S-2026-03-22-1710-sprint10-repo-detail.md`** — Session doc
+**Files changed:**
+- `web/index.html` — Updated `og:title`, `og:description`, added `<link rel="canonical">`
+- `web/css/style.css` — Added styles for D3 viz container, D3 tooltips, Recent Activity cards, sort dropdown, page fade-in transition, plus mobile overrides at 768px and 375px
+- `docs/project-memory/sessions/S-2026-03-22-1738-sprint11-social-meta.md` — Session doc
 
-### Commands run
-- `git pull origin main` — up to date
-- `python3 -m pytest tests/ -v` — 149 passed
-- `git push -u origin HEAD` — pushed to `agentC-repo-detail`
+**Commands run:**
+- `git pull origin main` — already up to date
+- `make test` — 149/149 passed
+- `git push -u origin HEAD` — pushed to `agentC-social-meta`
 
-### Notes / follow-on work
-- The `search.js` file was **not modified** — repo name linking was handled entirely in `renderRepoCards()` within `app.js`, which is the shared renderer for both search results and home page cards
-- Playwright tests for the new detail page (click repo → see detail, verify fields, back link, mobile) are not yet added — the acceptance criteria mention Playwright tests but those would need to be added in a follow-up or by another agent
+**Notes / follow-on work:**
+- `twitter:card` with `summary_large_image` was already present — no change needed
+- CSS class names (`.d3-viz-container`, `.d3-tooltip`, `.activity-card`, `.sort-dropdown`) are conventions that agentA (D3 JS) and agentB (app.js/search.js) should use to get these styles applied
+- The `og-image.png` referenced in meta tags should exist at `https://davidbmar.com/og-image.png` for social previews to render correctly

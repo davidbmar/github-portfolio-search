@@ -1,41 +1,43 @@
-agentC-repo-detail — Sprint 10
+agentC-social-meta — Sprint 11
 
 Sprint-Level Context
 
 Goal
-- 5th-sprint checkpoint: clean up docs, index all ~90 repos, add repo detail page
-- This is a quality/completeness sprint, not a feature sprint
+- Add visual portfolio analytics — help recruiters understand David's capabilities at a glance
+- D3.js capability tree visualization
+- Activity timeline showing recent work
+- Portfolio stats and shareable social preview
 
 Constraints
 - No two agents may modify the same files
-- agentA owns documentation cleanup (README.md, docs/)
-- agentB owns data completeness (src/ghps/, web/data/, scripts/)
-- agentC owns repo detail page (web/js/app.js, web/js/search.js, web/css/style.css)
+- agentA owns D3.js visualization (web/js/d3-viz.js — NEW FILE, web/index.html for D3 script tag)
+- agentB owns activity timeline and stats (web/js/app.js, web/js/search.js)
+- agentC owns social sharing and meta (web/css/style.css, web/index.html — only meta tags and CSS)
 - Use python3 for all commands
 - Do NOT commit .venv/ to git
+- D3.js should be loaded via CDN (https://d3js.org/d3.v7.min.js)
 
 
 Objective
-- Add a repo detail view so users can learn more about a specific repository
+- Make the site look great when shared on social media and improve overall polish
 
 Tasks
-- In web/js/app.js, add route handler for #/repo/<name>:
-  - Show repo name as heading
-  - Show full description
-  - Show language, stars, last updated, topics
-  - Show link to GitHub (html_url)
-  - Show which cluster this repo belongs to
-  - Show "Related repos" from same cluster (reuse existing component)
-  - Add "Back to search" link
-- Update web/js/search.js: make repo names in search results link to #/repo/<name> instead of directly to GitHub
-- Update web/js/app.js: make repo names on home page link to #/repo/<name>
 - Update web/css/style.css:
-  - Style repo detail page (consistent with existing theme)
-  - Make the GitHub link prominent with an icon or button style
+  - Style the D3 visualization container (min-height, dark background, border)
+  - Style tooltips for D3 hover (dark tooltip with white text, rounded corners)
+  - Style the "Recent Activity" section (compact card list)
+  - Style sort dropdown for search results
+  - Add a subtle page transition animation when navigating between routes
+  - Ensure all new elements work at 375px mobile viewport
+- Update web/index.html (meta tags only, do NOT modify script tags):
+  - Update og:title to "David Mar — GitHub Portfolio Search"
+  - Update og:description to "42 repositories across 6 capability areas. Explore voice AI, infrastructure, search tools, and more."
+  - Add twitter:card meta tag (summary_large_image)
+  - Add canonical URL meta tag
 
 Acceptance Criteria
-- Playwright: click a repo name from search results → navigates to #/repo/<name>
-- Playwright: repo detail page shows name, description, language, topics, GitHub link
-- Playwright: "Related repos" section shows repos from same cluster
-- Playwright: "Back to search" link works
-- Mobile layout works at 375px
+- Playwright: D3 viz has proper dark background and styled tooltips
+- Playwright: Recent Activity section is compact and readable
+- Playwright: mobile viewport (375px) — all new elements fit without horizontal scroll
+- OG meta tags present in page source with accurate content
+- No layout shifts or visual glitches during route transitions
