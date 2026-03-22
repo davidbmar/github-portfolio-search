@@ -12,6 +12,9 @@ dependencies = [
     "sentence-transformers>=2.2",
     "sqlite-vec>=0.1.1",
     "click>=8.1",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "scikit-learn>=1.4",
 ]
 
 [project.scripts]
@@ -21,6 +24,9 @@ ghps = "ghps.cli:main"
 dev = [
     "pytest>=7.0",
 ]
+
+[project.scripts]
+ghps-server = "ghps.api:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
