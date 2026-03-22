@@ -70,7 +70,7 @@ def _build_repos(store: "VectorStore") -> list[dict]:
         repos.append({
             "name": row[0],
             "description": row[1] or "",
-            "language": row[2] or "",
+            "language": row[2] or "Unknown",
             "topics": topics,
             "stars": row[4],
             "updated_at": row[5] or "",
