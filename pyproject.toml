@@ -1,0 +1,28 @@
+# NOTE: agentA owns the main pyproject.toml. This file will be merged
+# after agentA's version. The [project.scripts] section below must be
+# added to the final pyproject.toml during merge.
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "ghps"
+version = "0.1.0"
+description = "GitHub Portfolio Search — semantic search over your GitHub repos"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "sentence-transformers",
+    "sqlite-vec",
+    "click",
+]
+
+[project.scripts]
+ghps = "ghps.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
