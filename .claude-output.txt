@@ -1,20 +1,21 @@
-All tasks complete.
-
 ---
 
-**Files changed:**
-- `deploy.sh` (new) — idempotent deployment script
-- `web/data/.gitkeep` (new) — data directory placeholder
-- `web/health.json` (new) — health check endpoint
-- `.gitignore` — added `_build/` exclusion
-- `README.md` — added Deployment section
-- `docs/project-memory/sessions/S-2026-03-22-0606-sprint4-deploy-pipeline.md` (new) — session doc
+## Summary
 
-**Commands run:**
-- `python3 -m pytest tests/ -v` — 99 passed
-- `git commit` + `git push -u origin HEAD`
+### Files changed
+- **`scripts/index-and-export.sh`** (new) — Executable pipeline script: sets up venv, runs `ghps index`, runs `ghps export`, prints summary
+- **`web/data/repos.json`** (new) — 5 sample repos for development without GitHub token
+- **`web/data/clusters.json`** (new) — 2 sample clusters matching export format
+- **`docs/project-memory/sessions/S-2026-03-22-0639-sprint5-index-export.md`** (new) — Session doc
 
-**Notes / follow-on work:**
-- `deploy.sh` gracefully handles missing `ghps export` command (owned by agentA) — once agentA implements `export.py`, the deploy script will automatically pick it up
-- The `--output-dir` flag passed to `ghps export` may need adjustment depending on agentA's CLI design
-- After sprint merge, run an actual deploy to verify AWS credentials and S3/CloudFront connectivity
+### Commands run
+- `git fetch origin main && git merge origin/main` — synced with main
+- `python3 -m pytest tests/test_export.py -v` — 24 passed
+- `python3 -m pytest tests/ -v` — 123 passed, 1 warning
+- `git push -u origin HEAD` — pushed branch
+
+### Notes / follow-on work
+- **export.py was already complete** — no fixes needed, all tests pass
+- **.gitignore already had `.ghps/`** — no change needed
+- The `index-and-export.sh` script requires `GITHUB_TOKEN` for real data; sample data in `web/data/` works without it
+- The `github_client` module exposes `fetch_repos()` but the indexer's `index_user()` calls `github_client.fetch_user_repos()` — this mismatch is in agentA's domain (cli.py)
