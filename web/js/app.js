@@ -134,6 +134,8 @@ const App = (() => {
   // State
   let repos = [];
   let clusters = [];
+  let similarity = null;
+  let suggestions = null;
   let currentFilters = { languages: [], topics: [], minStars: 0 };
   let facets = { languages: [], topics: [], maxStars: 0 };
   let filtersOpen = false;
@@ -269,6 +271,21 @@ const App = (() => {
       }));
 
       facets = SearchEngine.extractFacets(repos);
+
+      // Load optional data files (fail silently)
+      const optionalFetches = [
+        fetch("data/search-index.json").then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("data/similarity.json").then((r) => r.ok ? r.json() : null).catch(() => null),
+        fetch("data/suggestions.json").then((r) => r.ok ? r.json() : null).catch(() => null),
+      ];
+      const [searchIndex, simData, sugData] = await Promise.all(optionalFetches);
+
+      if (searchIndex && typeof SearchEngine.loadSearchIndex === "function") {
+        SearchEngine.loadSearchIndex(searchIndex);
+      }
+      if (simData) similarity = simData;
+      if (sugData) suggestions = sugData;
+
       route();
     } catch (err) {
       useFallbackData(content, "No data available \u2014 run ghps index to populate");
@@ -517,13 +534,33 @@ const App = (() => {
   }
 
   function findRelatedRepos(repo, maxCount) {
+    const max = maxCount || 3;
+
+    // Try embedding-based similarity first
+    if (similarity && similarity[repo.name] && similarity[repo.name].length > 0) {
+      const simEntries = similarity[repo.name].slice(0, max);
+      const related = simEntries
+        .map((entry) => {
+          const name = typeof entry === "string" ? entry : entry.name || entry.repo;
+          return repos.find((r) => r.name === name);
+        })
+        .filter(Boolean);
+      if (related.length > 0) {
+        related._source = "similarity";
+        return related;
+      }
+    }
+
+    // Fall back to cluster-based lookup
     for (const cluster of clusters) {
       if ((cluster.repos || []).includes(repo.name)) {
-        return (cluster.repos || [])
+        const related = (cluster.repos || [])
           .filter((n) => n !== repo.name)
-          .slice(0, maxCount || 3)
+          .slice(0, max)
           .map((name) => repos.find((r) => r.name === name))
           .filter(Boolean);
+        related._source = "cluster";
+        return related;
       }
     }
     return [];
@@ -592,9 +629,10 @@ const App = (() => {
       const topRepo = results[0].repo;
       const related = findRelatedRepos(topRepo, 3);
       if (related.length > 0) {
+        const relLabel = related._source === "similarity" ? "Semantically similar" : "from same cluster";
         html += '<div class="related-repos-section">';
         html += '<div class="section-header"><h3>Related Repositories</h3>';
-        html += '<span class="count">from same cluster</span></div>';
+        html += '<span class="count">' + escapeHtml(relLabel) + '</span></div>';
         html += renderRepoCards(related);
         html += "</div>";
       }
@@ -720,12 +758,13 @@ const App = (() => {
 
     html += '</div>'; // repo-detail
 
-    // Related repos from same cluster
+    // Related repos (similarity-based or cluster-based)
     const related = findRelatedRepos(repo, 6);
     if (related.length > 0) {
+      const relLabel = related._source === "similarity" ? "Semantically similar" : "from same cluster";
       html += '<div class="related-repos-section">';
       html += '<div class="section-header"><h3>Related Repositories</h3>';
-      html += '<span class="count">from same cluster</span></div>';
+      html += '<span class="count">' + escapeHtml(relLabel) + '</span></div>';
       html += renderRepoCards(related);
       html += '</div>';
     }
@@ -987,6 +1026,14 @@ const App = (() => {
         html += '<div class="description">' + highlightTerms(repo.description, query) + "</div>";
       }
 
+      // Snippet from README chunks (if search-index loaded)
+      if (query && typeof SearchEngine.getSnippet === "function") {
+        const snippet = SearchEngine.getSnippet(repo.name, query);
+        if (snippet) {
+          html += '<div class="search-snippet">' + highlightTerms(snippet, query) + '</div>';
+        }
+      }
+
       // Meta row
       html += '<div class="repo-meta">';
 
@@ -1158,6 +1205,120 @@ const App = (() => {
   }
 
   /**
+   * Autocomplete: filter suggestions and render dropdown.
+   * Uses safe DOM methods (createElement, textContent) — no innerHTML with user data.
+   */
+  function renderAutocomplete(inputElement) {
+    const dropdown = document.getElementById("autocomplete-dropdown");
+    if (!dropdown) return;
+
+    let activeIndex = -1;
+
+    function updateDropdown() {
+      const text = inputElement.value.trim().toLowerCase();
+      dropdown.textContent = "";
+      activeIndex = -1;
+
+      if (!text || !suggestions) {
+        dropdown.classList.remove("visible");
+        return;
+      }
+
+      const matches = [];
+      const seen = new Set();
+
+      // Collect matches from repos, topics, and queries arrays
+      const sources = [
+        { items: suggestions.repos || [], type: "repo" },
+        { items: suggestions.topics || [], type: "topic" },
+        { items: suggestions.queries || [], type: "query" },
+      ];
+
+      for (const source of sources) {
+        for (const item of source.items) {
+          const val = typeof item === "string" ? item : (item.name || item.query || "");
+          if (val.toLowerCase().startsWith(text) && !seen.has(val.toLowerCase())) {
+            seen.add(val.toLowerCase());
+            matches.push({ value: val, type: source.type });
+          }
+          if (matches.length >= 8) break;
+        }
+        if (matches.length >= 8) break;
+      }
+
+      if (matches.length === 0) {
+        dropdown.classList.remove("visible");
+        return;
+      }
+
+      for (let i = 0; i < matches.length; i++) {
+        const item = document.createElement("div");
+        item.className = "autocomplete-item";
+        item.setAttribute("role", "option");
+
+        const label = document.createElement("span");
+        label.textContent = matches[i].value;
+        item.appendChild(label);
+
+        const badge = document.createElement("span");
+        badge.className = "autocomplete-type";
+        badge.textContent = matches[i].type;
+        item.appendChild(badge);
+
+        item.addEventListener("mousedown", (e) => {
+          e.preventDefault(); // Prevent blur before click fires
+          inputElement.value = matches[i].value;
+          dropdown.classList.remove("visible");
+          clearTimeout(debounceTimer);
+          window.location.hash = "#/search?q=" + encodeURIComponent(matches[i].value);
+        });
+
+        dropdown.appendChild(item);
+      }
+
+      dropdown.classList.add("visible");
+    }
+
+    function setActive(items) {
+      for (let i = 0; i < items.length; i++) {
+        items[i].classList.toggle("active", i === activeIndex);
+      }
+    }
+
+    inputElement.addEventListener("input", updateDropdown);
+
+    inputElement.addEventListener("keydown", (e) => {
+      const items = dropdown.querySelectorAll(".autocomplete-item");
+      if (!dropdown.classList.contains("visible") || items.length === 0) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeIndex = (activeIndex + 1) % items.length;
+        setActive(items);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeIndex = activeIndex <= 0 ? items.length - 1 : activeIndex - 1;
+        setActive(items);
+      } else if (e.key === "Enter" && activeIndex >= 0) {
+        e.preventDefault();
+        items[activeIndex].dispatchEvent(new MouseEvent("mousedown"));
+      } else if (e.key === "Escape") {
+        dropdown.classList.remove("visible");
+        activeIndex = -1;
+      }
+    });
+
+    inputElement.addEventListener("blur", () => {
+      // Delay to allow mousedown on dropdown items to fire
+      setTimeout(() => dropdown.classList.remove("visible"), 150);
+    });
+
+    inputElement.addEventListener("focus", () => {
+      if (inputElement.value.trim()) updateDropdown();
+    });
+  }
+
+  /**
    * Handle search input with debounce.
    */
   function handleSearchInput(value) {
@@ -1250,13 +1411,21 @@ const App = (() => {
 
       searchInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-          clearTimeout(debounceTimer);
-          const val = searchInput.value.trim();
-          if (val) {
-            window.location.hash = "#/search?q=" + encodeURIComponent(val);
+          // Only handle Enter for direct search when autocomplete isn't handling it
+          const dropdown = document.getElementById("autocomplete-dropdown");
+          const hasActiveItem = dropdown && dropdown.querySelector(".autocomplete-item.active");
+          if (!hasActiveItem) {
+            clearTimeout(debounceTimer);
+            const val = searchInput.value.trim();
+            if (val) {
+              if (dropdown) dropdown.classList.remove("visible");
+              window.location.hash = "#/search?q=" + encodeURIComponent(val);
+            }
           }
         }
       });
+
+      renderAutocomplete(searchInput);
     }
 
     loadData();

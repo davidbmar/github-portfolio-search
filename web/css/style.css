@@ -1146,6 +1146,11 @@ a:hover {
     font-size: 0.8rem;
   }
 
+  .autocomplete-item {
+    padding: 12px 16px;
+    min-height: 44px;
+  }
+
   .error-banner {
     flex-direction: column;
     text-align: center;
@@ -1195,6 +1200,74 @@ a:hover {
   .sort-dropdown select {
     max-width: 120px;
   }
+}
+
+/* Autocomplete dropdown */
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  max-height: 320px;
+  overflow-y: auto;
+  display: none;
+}
+
+.autocomplete-dropdown.visible {
+  display: block;
+}
+
+.autocomplete-item {
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.autocomplete-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.autocomplete-item.active {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.autocomplete-item .autocomplete-type {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+/* Search snippet in results */
+.search-snippet {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.search-snippet mark {
+  background: rgba(88, 166, 255, 0.2);
+  color: var(--accent);
+  padding: 1px 3px;
+  border-radius: 3px;
 }
 
 /* ── Accessibility: visible focus styles for keyboard navigation (WCAG 2.1 AA) ── */
