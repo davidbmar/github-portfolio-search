@@ -47,5 +47,8 @@ What should happen?
 | F-002 | Add progress bar to indexer (tqdm) | Open | Low |
 | F-003 | Add Makefile with install/test/serve/index targets | Open | Medium |
 | B-008 | API /search and /clusters return empty when no index exists (no error msg) | Open | Medium |
-| B-009 | davidbmar.com still shows placeholder — web UI not deployed | Open | High |
+| B-009 | davidbmar.com still shows placeholder — web UI not deployed | Fixed | High |
+| B-010 | davidbmar.com "Could not load data" — data/repos.json is empty (.gitkeep only) | Open | Critical |
+| B-011 | test_web_playwright.py errors — playwright not in dev dependencies | Open | High |
+| B-012 | .venv symlinks break after agent merges (too many levels of symbolic links) | Open | High |
 | F-004 | Deploy script should auto-export data before uploading | Open | Medium |

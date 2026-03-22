@@ -1,100 +1,86 @@
-# Sprint 5
+# Sprint 6
 
 Goal
-- Deploy the web UI to davidbmar.com (fix B-009)
-- Fix remaining test failures (B-005, B-006)
-- Add data export pipeline so the site has real content
-- Begin gated access foundation (access request UI)
+- CRITICAL: Fix B-010 — davidbmar.com shows "Could not load data" because data files are empty
+- Fix B-005, B-006 — remaining 4 test failures from Sprint 3
+- Add sample data so the site works without a GitHub token
+- Production hardening: proper error handling when data is missing
 
 Constraints
 - No two agents may modify the same files
-- agentA owns deploy pipeline and bug fixes (deploy.sh, tests/test_cli.py, tests/test_e2e.py, src/ghps/cli.py)
-- agentB owns data indexing and export (src/ghps/export.py, src/ghps/indexer.py, scripts/)
-- agentC owns web UI improvements and access request page (web/)
+- agentA owns data pipeline fixes (src/ghps/export.py, web/data/, scripts/)
+- agentB owns test fixes and infrastructure (tests/, pyproject.toml, Makefile)
+- agentC owns web UI error handling and resilience (web/js/app.js, web/js/search.js, web/index.html)
 - Use python3 for all commands
-- Do NOT commit .venv/ or node_modules/ to git
+- Do NOT commit .venv/ to git
 
 Merge Order
-1. agentA-deploy-fixes
-2. agentB-index-export
-3. agentC-web-access
+1. agentA-data-pipeline
+2. agentB-test-infra
+3. agentC-web-resilience
 
 Merge Verification
 - python3 -m pytest tests/ -v
 
-## agentA-deploy-fixes
+## agentA-data-pipeline
 
 Objective
-- Fix test failures and create a working deploy script for davidbmar.com
+- Create working sample data and fix the export pipeline so davidbmar.com has content
 
 Tasks
-- Fix B-005: test_cli.py failures on missing index — add proper error handling in cli.py for when index DB doesn't exist
-- Fix B-006: test_e2e.py JSON decode error — fix CLI --format json to output valid JSON
-- Create deploy.sh in project root:
-  - Check for web/ directory
-  - If src/ghps/export.py exists, run ghps export --output web/data/
-  - Run: aws s3 sync web/ s3://davidbmar-com/ --delete --exclude "*.pyc"
-  - Run: aws cloudfront create-invalidation --distribution-id E3RCY6XA80ANRT --paths "/*"
-  - Print: "Deployed to https://davidbmar.com"
-- Make deploy.sh executable (chmod +x)
-- Create tests/test_deploy.py — verify deploy.sh exists, is executable, has correct bucket name
+- Create web/data/repos.json with realistic sample data: 10 repos representing David's portfolio (e.g., audio-stream-transcription, presigned-url-s3, grassyknoll, FSM-generic, tool-telegram-whatsapp, bot-customerobsessed, traceable-searchable-adr-memory-index, github-portfolio-search, tool-s3-cloudfront-push, everyone-ai). Each repo: name, description, language, topics array, stars, html_url, updated_at
+- Create web/data/clusters.json with 4 capability clusters: "Voice & Audio Processing", "Infrastructure & DevOps", "AI & Search", "Web Applications"
+- Verify src/ghps/export.py produces valid JSON matching this schema
+- Create scripts/generate-sample-data.py that produces realistic sample data
+- Update deploy.sh to check for valid data files before deploying
 
 Acceptance Criteria
-- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes with 0 failures
-- ./deploy.sh runs without errors (when AWS credentials are available)
-- Playwright test: after deploy, https://davidbmar.com shows search UI not placeholder
+- web/data/repos.json is valid JSON with 10+ repos
+- web/data/clusters.json is valid JSON with 4+ clusters
+- Playwright: visit file:///path/to/web/index.html — search shows results, clusters render
 
-## agentB-index-export
+## agentB-test-infra
 
 Objective
-- Create a working index + export pipeline so the web UI has real data
+- Fix all remaining test failures and get to 0 failures / 0 errors
 
 Tasks
-- Verify src/ghps/export.py works end-to-end:
-  - export_static_bundle should produce repos.json, clusters.json in output dir
-  - If export.py is broken or incomplete, fix it
-- Create scripts/index-and-export.sh:
-  - Set up venv if missing
-  - Run ghps index davidbmar --db .ghps/index.db (requires GITHUB_TOKEN)
-  - Run ghps export --db .ghps/index.db --output web/data/
-  - Print summary: N repos indexed, M clusters generated
-- Add sample/mock data to web/data/ for development:
-  - web/data/repos.json with 5 sample repos (for testing without GitHub token)
-  - web/data/clusters.json with 2 sample clusters
-- Update .gitignore: add .ghps/ (index database)
+- Fix B-005: test_cli.py TypeError on missing index — add try/except in cli.py for FileNotFoundError when DB doesn't exist, return helpful error message
+- Fix B-006: test_e2e.py JSON decode error — ensure ghps search --format json outputs valid JSON even when no results found (output empty array, not error text)
+- Add playwright to pyproject.toml [project.optional-dependencies] test group
+- Create Makefile with targets: install, test, serve, index, export, deploy
+- Remove or skip test_web_playwright.py tests if playwright browser not installed (use pytest.importorskip)
 
 Acceptance Criteria
-- web/data/repos.json exists with valid JSON (sample or real data)
-- web/data/clusters.json exists with valid JSON
-- scripts/index-and-export.sh is executable and documents the pipeline
-- ghps export --output web/data/ produces valid JSON files
+- python3 -m pytest tests/ -v shows 0 failures, 0 errors (playwright tests skipped if browser not installed)
+- make test runs the full suite
+- make install sets up the venv
+- ghps search --format json returns valid JSON for empty results
 
-## agentC-web-access
+## agentC-web-resilience
 
 Objective
-- Improve web UI with real data loading and an access request page
+- Make the web UI handle missing/empty data gracefully and look professional
 
 Tasks
-- Update web/js/app.js to:
-  - Fetch web/data/repos.json and web/data/clusters.json on page load
-  - Display repos in search results cards
-  - Display clusters as clickable category cards on the landing page
-  - Show "No results" when search returns empty
-  - Add loading spinner while data loads
-- Update web/index.html:
-  - Add navigation: Home | Search | Clusters | Request Access
-  - Add an "Request Access" page/section with:
-    - Name input, email input, reason textarea
-    - Submit button (posts to /api/access/request or shows "coming soon" message)
-    - "Public tier — browse clusters and search descriptions. Request full access for code snippets."
+- Update web/js/app.js:
+  - Handle fetch errors gracefully: show "No data available — run ghps index to populate" instead of JSON parse error
+  - Add retry button when data fails to load
+  - Show sample data inline as fallback if fetch fails (embedded minimal dataset)
+  - Add footer: "Powered by GitHub Portfolio Search — Built with Afterburner"
+- Update web/js/search.js:
+  - Handle empty repos array without crashing
+  - Show "No repositories indexed yet" when data is empty
 - Update web/css/style.css:
-  - Style result cards: repo name, description, language badge, stars count, topics
-  - Style cluster cards: cluster name, repo count, representative repos
-  - Mobile responsive: 375px viewport test
-- Test with Playwright: verify search shows results from repos.json, clusters render
+  - Style error states (friendly, not scary)
+  - Add loading skeleton animation while data loads
+  - Ensure footer stays at bottom
+- Update web/index.html:
+  - Add meta description and OG tags for social sharing
+  - Add favicon (simple emoji or SVG)
 
 Acceptance Criteria
-- Landing page shows cluster cards from clusters.json
-- Search filters repos from repos.json
-- Request Access section is visible with form fields
-- Mobile layout works (375px viewport)
+- Playwright: visit site with empty data — shows friendly message, no JS errors in console
+- Playwright: visit site with sample data — search works, clusters render
+- Mobile layout works at 375px viewport
+- No uncaught JS errors in console

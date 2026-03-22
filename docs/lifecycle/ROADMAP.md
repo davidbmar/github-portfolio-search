@@ -28,7 +28,7 @@ PM/customer review checkpoint: Use Playwright to simulate a recruiter visiting t
 Backlog triage: Capture visual design issues, facet count accuracy, dead-end facet values, and mobile layout bugs.
 Planning input for Sprint 5: Define scope for gated tier and approval workflow.
 
-**Sprint 5: Gated Tier, Approval Workflow, and Roadmap Extension Checkpoint**
+**Sprint 5: Deploy Pipeline, Data Export, and Web UI Improvements (COMPLETED 2026-03-22)**
 Build goals: Implement Google OAuth login flow. Build the access request form (note field, PENDING state). Integrate Telegram notifications via tool-telegram-whatsapp for approval alerts. Implement admin endpoints (`GET /api/access/pending`, `POST /api/access/approve/<id>`). Unlock code snippets, file tree browsing, and full-text semantic search for approved users. Build the activity timeline/heatmap view.
 PM/customer review checkpoint: Use Playwright to simulate the full approval workflow — visitor requests access, David receives Telegram notification, approves, user gains gated access with code snippets visible. Test that unauthenticated users cannot see snippets. Verify heatmap renders correctly.
 Backlog triage: Capture OAuth edge cases, Telegram integration failures, token/session management issues.
@@ -41,18 +41,44 @@ PM/customer review checkpoint: Use Playwright to push a commit to a test repo, v
 Backlog triage: Capture webhook reliability issues, stale index edge cases, deployment configuration bugs, and performance under full 90-repo load.
 Planning input for Sprint 7+: Based on roadmap extension checkpoint from Sprint 5, prioritize from: Afterburner dashboard integration, MCP Skill wrapper, browser-native offline mode, advanced recombination search, and deeper source file indexing.
 
+**Sprint 7: Stabilization — Fix Data Pipeline and Test Infrastructure**
+Build goals: Fix B-010 (empty data files on deployed site), B-011 (playwright dev dep), B-012 (venv symlink breakage). Create sample data generator that produces realistic repos.json and clusters.json for development. Fix all 4 remaining test failures (B-005, B-006). Add playwright to dev dependencies and get all test_web_playwright tests passing.
+PM/customer review checkpoint: Visit davidbmar.com with Playwright — verify search returns results from sample data, clusters page shows categories, mobile layout works at 375px. Run full test suite with 0 failures and 0 errors.
+Backlog triage: Close all fixed bugs. Identify any remaining UX friction from customer testing.
+Planning input for Sprint 8: With stable infrastructure, prioritize real GitHub data indexing vs. UX polish.
+
+**Sprint 8: Real Data — Index All 90+ Repos and Deploy**
+Build goals: Run ghps index davidbmar against live GitHub API (requires GITHUB_TOKEN). Generate real repos.json and clusters.json with actual repo data. Deploy to davidbmar.com with real portfolio data. Add index freshness indicator (last indexed timestamp). Create a GitHub Actions workflow or cron job for periodic re-indexing.
+PM/customer review checkpoint: Visit davidbmar.com — search for "presigned URL" and verify S3-presignedURL repo appears. Search for "voice" and verify ~20 repos. Browse clusters and verify groupings make sense. Test as a recruiter: can they understand what David builds?
+Backlog triage: Capture search relevance issues, missing repos, bad cluster groupings, slow queries.
+Planning input for Sprint 9: Based on real data quality, decide if relevance tuning or UX improvements are higher priority.
+
+**Sprint 9: Search Relevance and UX Polish**
+Build goals: Tune search relevance scoring (chunk weighting, title boost, recency factor). Add result highlighting (bold matched terms in snippets). Improve cluster naming (auto-generate meaningful names from repo topics). Add "Related repos" suggestions on detail view. Polish the landing page with stats (N repos indexed, M capabilities, last updated).
+PM/customer review checkpoint: Run the full use-case matrix from use-cases.md with real data. Verify semantic matches ("how did I handle auth?" returns auth repos), temporal queries ("recent projects" ranks by date), and recombination queries ("voice + AWS" finds intersection). Test that a non-technical person can understand the portfolio.
+Backlog triage: Final UX polish items, accessibility issues, performance on slow connections.
+Planning input for Sprint 10: Decide on gated access vs. open access model for the public site.
+
+**Sprint 10: 5th-Sprint Checkpoint — Gated Access and Docs Cleanup**
+Build goals: Implement access tiers (public: browse + search descriptions, gated: full code snippets). Add Google OAuth login flow. Build simple approval workflow (Telegram notification to David, approve/deny via link). Clean up all documentation — README, CLAUDE.md, API docs, deployment guide. Remove stale code and TODOs.
+PM/customer review checkpoint: Test full approval workflow with Playwright — request access, receive notification, approve, verify gated content unlocks. Verify public tier shows no code snippets. Test that rejected users stay on public tier.
+Backlog triage: OAuth edge cases, session management issues, notification reliability.
+Roadmap extension checkpoint: Plan Sprints 12-16 based on usage patterns and feedback.
+Planning input for Sprint 11: Prioritize based on real user feedback from gated access rollout.
+
+**Sprint 11: Activity Visualization and Portfolio Analytics**
+Build goals: Add D3.js capability tree (circle-packing visualization) showing the full portfolio at a glance. Build activity timeline/heatmap showing commit frequency across repos. Add portfolio analytics: most active repos, tech stack distribution, language breakdown. Create shareable portfolio link with OG tags for social media.
+PM/customer review checkpoint: Visit davidbmar.com — verify capability tree renders and is interactive (click to zoom). Verify heatmap shows real activity data. Share the link on social media and verify OG preview renders correctly. Test on mobile.
+Backlog triage: Visualization performance issues, data accuracy, mobile rendering bugs.
+Planning input for Sprint 12: Based on user feedback and analytics, decide next priorities.
+
 ### Current Focus
 
-**Sprint 5: Gated Tier, Approval Workflow, and Roadmap Extension (Sprints 1-4 COMPLETE)**
+**Sprint 6: Auto-Refresh, Webhooks, and Production Hardening (Sprints 1-5 COMPLETE)**
 
-Sprints 1-4 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, and deploy pipeline. Sprint 5 adds authentication, gated access tiers, and extends the roadmap with 5 more sprints.
+Sprints 1-5 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, deploy pipeline, and data export. Sprint 6 focuses on production hardening with webhooks and auto-refresh.
 
-Key deliverables:
-- Google OAuth login flow
-- Access request + approval workflow with Telegram notifications
-- Gated tier unlocking code snippets and full search
-- Activity timeline/heatmap view
-- Roadmap extension checkpoint: plan Sprints 7-11
+However, B-010 (site shows "Could not load data") is critical — Sprint 7 is a **stabilization sprint** to fix the data pipeline before adding more features.
 
 ### Next Up
 
