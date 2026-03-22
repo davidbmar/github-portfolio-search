@@ -332,6 +332,43 @@ a:hover {
   font-size: 0.75rem;
 }
 
+/* Freshness badges — small pills next to language tag */
+.freshness-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.freshness-today {
+  background: rgba(63, 185, 80, 0.15);
+  color: var(--green);
+}
+
+.freshness-week {
+  background: rgba(56, 139, 253, 0.15);
+  color: var(--accent);
+}
+
+.freshness-month {
+  background: rgba(139, 148, 158, 0.15);
+  color: var(--text-secondary);
+}
+
+.freshness-stale {
+  background: rgba(248, 81, 73, 0.15);
+  color: #f85149;
+}
+
+/* Last indexed info in footer */
+.last-indexed-info {
+  margin-bottom: 4px;
+  color: var(--text-muted);
+}
+
 /* Filter sidebar */
 .content-layout {
   display: flex;

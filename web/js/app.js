@@ -507,8 +507,14 @@ const App = (() => {
       }
     }
 
-    // Footer
+    // Footer with last-indexed timestamp
     html += '<footer class="site-footer">';
+    const lastIndexed = repos.reduce((latest, r) => {
+      return r.last_indexed && r.last_indexed > latest ? r.last_indexed : latest;
+    }, "");
+    if (lastIndexed) {
+      html += '<p class="last-indexed-info">Last indexed: ' + escapeHtml(formatDate(lastIndexed)) + '</p>';
+    }
     html += "<p>Powered by GitHub Portfolio Search &mdash; Built with Afterburner</p>";
     html += "</footer>";
 
@@ -1000,6 +1006,12 @@ const App = (() => {
         html += "</span>";
       }
 
+      // Freshness badge
+      const badge = getFreshnessBadge(repo.updated_at);
+      if (badge) {
+        html += '<span class="' + escapeAttr(badge.className) + '">' + escapeHtml(badge.label) + '</span>';
+      }
+
       if (repo.stars !== undefined && repo.stars !== null) {
         html += '<span class="stars-badge">&#9733; ' + escapeHtml(String(repo.stars)) + "</span>";
       }
@@ -1166,6 +1178,26 @@ const App = (() => {
         window.location.hash = "#/";
       }
     }, 300);
+  }
+
+  /**
+   * Compute freshness tier from an ISO date string.
+   * Returns { label, className } for badge rendering.
+   */
+  function getFreshnessBadge(dateStr) {
+    if (!dateStr) return null;
+    try {
+      const updated = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - updated;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays <= 0) return { label: "Updated today", className: "freshness-badge freshness-today" };
+      if (diffDays <= 7) return { label: "This week", className: "freshness-badge freshness-week" };
+      if (diffDays <= 30) return { label: "This month", className: "freshness-badge freshness-month" };
+      return { label: "Stale (>30 days)", className: "freshness-badge freshness-stale" };
+    } catch {
+      return null;
+    }
   }
 
   /**

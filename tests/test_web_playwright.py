@@ -39,12 +39,20 @@ def web_server():
 
 @pytest.fixture(scope="module")
 def browser_context(web_server):
-    """Launch a Playwright browser for the test module."""
+    """Launch a Playwright browser for the test module.
+
+    Sets localStorage auth token so the password gate is bypassed.
+    """
     from playwright.sync_api import sync_playwright
 
     pw = sync_playwright().start()
     browser = pw.chromium.launch(headless=True)
     context = browser.new_context()
+    # Bypass the password auth gate. The gate checks
+    # sessionStorage.getItem("ghps_auth") === "1" on DOMContentLoaded.
+    # add_init_script runs before any page JS, so sessionStorage is set
+    # before the auth gate IIFE executes.
+    context.add_init_script('window.sessionStorage.setItem("ghps_auth", "1")')
     yield context, web_server
     context.close()
     browser.close()
@@ -83,7 +91,11 @@ class TestWebUI:
         page.wait_for_selector(".cluster-card", timeout=10000)
         page.fill("#search-input", "xyznonexistent999")
         page.press("#search-input", "Enter")
-        page.wait_for_selector(".empty-state", timeout=10000)
+        # Wait for the search route to activate before checking empty state
+        page.wait_for_function(
+            'window.location.hash.startsWith("#/search")', timeout=10000
+        )
+        page.wait_for_selector(".section-header", timeout=10000)
         empty = page.query_selector(".empty-state")
         assert empty is not None, "Expected 'No results' empty state"
         text = empty.text_content()
@@ -147,6 +159,38 @@ class TestWebUI:
 
         cards = page.query_selector_all(".cluster-card")
         assert len(cards) >= 1, "Cluster cards should render at 375px"
+        page.close()
+
+    def test_freshness_badges_on_repo_cards(self, browser_context):
+        """Repo cards should display freshness badges with color-coded classes."""
+        ctx, base_url = browser_context
+        page = ctx.new_page()
+        page.goto(base_url)
+        page.wait_for_selector(".cluster-card", timeout=10000)
+        # Navigate to search to see repo cards with badges
+        page.fill("#search-input", "audio")
+        page.press("#search-input", "Enter")
+        page.wait_for_selector(".repo-card", timeout=10000)
+        badges = page.query_selector_all(".freshness-badge")
+        assert len(badges) >= 1, "Expected at least 1 freshness badge on repo cards"
+        # Verify badge has one of the expected freshness classes
+        first_badge = badges[0]
+        badge_class = first_badge.get_attribute("class")
+        valid_classes = ["freshness-today", "freshness-week", "freshness-month", "freshness-stale"]
+        assert any(vc in badge_class for vc in valid_classes), (
+            f"Badge class '{badge_class}' should contain one of {valid_classes}"
+        )
+        page.close()
+
+    def test_last_indexed_in_footer(self, browser_context):
+        """Landing page footer should show 'Last indexed' timestamp."""
+        ctx, base_url = browser_context
+        page = ctx.new_page()
+        page.goto(base_url)
+        page.wait_for_selector(".site-footer", timeout=10000)
+        footer = page.query_selector(".last-indexed-info")
+        assert footer is not None, "Expected 'Last indexed' info in footer"
+        assert "Last indexed" in footer.text_content()
         page.close()
 
     def test_navigation_links(self, browser_context):
