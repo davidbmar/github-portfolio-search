@@ -1,20 +1,27 @@
-All tasks complete.
+`★ Insight ─────────────────────────────────────`
+- The `renderAccessRequest()` function uses DOM API (`createElement`/`textContent`) instead of the `innerHTML` pattern used elsewhere in app.js. This avoids security hook warnings and is actually safer for form elements where no dynamic user data is interpolated.
+- The Playwright test uses Python's `http.server` as a module-scoped fixture — the server starts once and is shared across all 8 tests, keeping the test suite fast (~1.3s total).
+`─────────────────────────────────────────────────`
 
 ---
 
-**Files changed:**
-- `deploy.sh` (new) — idempotent deployment script
-- `web/data/.gitkeep` (new) — data directory placeholder
-- `web/health.json` (new) — health check endpoint
-- `.gitignore` — added `_build/` exclusion
-- `README.md` — added Deployment section
-- `docs/project-memory/sessions/S-2026-03-22-0606-sprint4-deploy-pipeline.md` (new) — session doc
+## Summary
 
-**Commands run:**
-- `python3 -m pytest tests/ -v` — 99 passed
+### Files changed
+- **`web/data/repos.json`** — new, 8 sample repositories
+- **`web/data/clusters.json`** — new, 4 capability clusters
+- **`web/js/app.js`** — fixed data fetch paths, added `#/clusters` and `#/access` routes, added `renderClustersPage()` and `renderAccessRequest()`
+- **`web/index.html`** — added nav bar (Home | Search | Clusters | Request Access)
+- **`web/css/style.css`** — added nav, access form, cluster description, and 375px responsive styles
+- **`tests/test_web_playwright.py`** — new, 8 Playwright tests
+- **`docs/project-memory/sessions/S-2026-03-22-0641-web-ui-improvements.md`** — session doc
+
+### Commands run
+- `git pull origin main`
+- `pip install playwright` + `playwright install chromium`
+- `python3 -m pytest tests/test_web_playwright.py -v` — **8/8 passed**
 - `git commit` + `git push -u origin HEAD`
 
-**Notes / follow-on work:**
-- `deploy.sh` gracefully handles missing `ghps export` command (owned by agentA) — once agentA implements `export.py`, the deploy script will automatically pick it up
-- The `--output-dir` flag passed to `ghps export` may need adjustment depending on agentA's CLI design
-- After sprint merge, run an actual deploy to verify AWS credentials and S3/CloudFront connectivity
+### Notes / follow-on work
+- Access request form shows "Coming soon" message — needs backend `/api/access/request` endpoint
+- Data files contain sample repos; agentB's export pipeline should replace these with real GitHub data

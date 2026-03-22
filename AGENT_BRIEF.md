@@ -1,37 +1,46 @@
-agentC-deploy — Sprint 4
+agentC-web-access — Sprint 5
 
 Sprint-Level Context
 
 Goal
-- Build the public web UI for davidbmar.com with search and browse capabilities
-- Fix Sprint 3 test failures (B-005, B-006)
-- Deploy static site to S3/CloudFront
+- Deploy the web UI to davidbmar.com (fix B-009)
+- Fix remaining test failures (B-005, B-006)
+- Add data export pipeline so the site has real content
+- Begin gated access foundation (access request UI)
 
 Constraints
 - No two agents may modify the same files
-- agentA owns bug fixes and static data export (tests/, src/ghps/export.py)
-- agentB owns web UI frontend (web/index.html, web/css/, web/js/)
-- agentC owns deployment pipeline and integration (deploy.sh, web/api-proxy.js)
+- agentA owns deploy pipeline and bug fixes (deploy.sh, tests/test_cli.py, tests/test_e2e.py, src/ghps/cli.py)
+- agentB owns data indexing and export (src/ghps/export.py, src/ghps/indexer.py, scripts/)
+- agentC owns web UI improvements and access request page (web/)
 - Use python3 for all commands
-- Frontend must be vanilla JS (no build step) — served as static files from S3
-- Mobile-responsive layout required
+- Do NOT commit .venv/ or node_modules/ to git
 
 
 Objective
-- Build deployment pipeline to push web UI to S3/CloudFront at davidbmar.com
+- Improve web UI with real data loading and an access request page
 
 Tasks
-- Create deploy.sh script that:
-  - Runs ghps export to generate fresh data
-  - Copies web/ files + data/ to a build directory
-  - Uploads to S3 bucket davidbmar-com using aws s3 sync
-  - Invalidates CloudFront cache (distribution E3RCY6XA80ANRT)
-  - Prints the live URL
-- Create web/data/.gitkeep (data dir for export output)
-- Add deploy instructions to README.md
-- Create a simple health check: web/health.json with version and last-deploy timestamp
+- Update web/js/app.js to:
+  - Fetch web/data/repos.json and web/data/clusters.json on page load
+  - Display repos in search results cards
+  - Display clusters as clickable category cards on the landing page
+  - Show "No results" when search returns empty
+  - Add loading spinner while data loads
+- Update web/index.html:
+  - Add navigation: Home | Search | Clusters | Request Access
+  - Add an "Request Access" page/section with:
+    - Name input, email input, reason textarea
+    - Submit button (posts to /api/access/request or shows "coming soon" message)
+    - "Public tier — browse clusters and search descriptions. Request full access for code snippets."
+- Update web/css/style.css:
+  - Style result cards: repo name, description, language badge, stars count, topics
+  - Style cluster cards: cluster name, repo count, representative repos
+  - Mobile responsive: 375px viewport test
+- Test with Playwright: verify search shows results from repos.json, clusters render
 
 Acceptance Criteria
-- ./deploy.sh uploads files to S3 and invalidates CloudFront
-- https://davidbmar.com shows the search UI after deploy
-- deploy.sh is idempotent (safe to run multiple times)
+- Landing page shows cluster cards from clusters.json
+- Search filters repos from repos.json
+- Request Access section is visible with form fields
+- Mobile layout works (375px viewport)
