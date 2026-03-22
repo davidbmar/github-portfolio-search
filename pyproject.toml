@@ -21,6 +21,7 @@ dependencies = [
 [project.scripts]
 ghps = "ghps.cli:main"
 ghps-server = "ghps.api:main"
+ghps-mcp = "ghps.mcp_server:main"
 
 [project.optional-dependencies]
 dev = [
@@ -33,6 +34,9 @@ test = [
     "httpx>=0.24",
     "numpy>=1.24",
     "playwright>=1.40",
+]
+mcp = [
+    "mcp>=1.0; python_version>='3.10'",
 ]
 
 [tool.setuptools.packages.find]
