@@ -10,15 +10,20 @@ import subprocess
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Header, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from ghps.store import VectorStore
 from ghps.embeddings import EmbeddingPipeline
 from ghps.clusters import ClusterEngine
+from ghps import auth
 
 logger = logging.getLogger(__name__)
+
+# Admin token from environment variable for protecting admin endpoints
+ADMIN_TOKEN = os.environ.get("GHPS_ADMIN_TOKEN", "")
 
 # Module-level state, initialized during lifespan
 _store: VectorStore | None = None
@@ -159,6 +164,88 @@ async def repo_detail(slug: str):
         "readme_excerpt": readme_excerpt[:2000],
         "chunks": [{"source": c[0], "text": c[1][:500]} for c in all_chunks],
     })
+
+
+# ---------------------------------------------------------------------------
+# Auth & access request models
+# ---------------------------------------------------------------------------
+
+class AuthVerifyRequest(BaseModel):
+    token: str
+
+class AccessRequestBody(BaseModel):
+    email: str
+    name: str
+    reason: str = ""
+
+class AccessActionBody(BaseModel):
+    email: str
+
+
+def _check_admin(authorization: str | None) -> bool:
+    """Return True if the Authorization header carries a valid admin token."""
+    if not ADMIN_TOKEN:
+        return False
+    if not authorization:
+        return False
+    # Accept "Bearer <token>" or raw token
+    token = authorization.removeprefix("Bearer ").strip()
+    return token == ADMIN_TOKEN
+
+
+# ---------------------------------------------------------------------------
+# Auth endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/api/auth/verify")
+async def auth_verify(body: AuthVerifyRequest):
+    """Verify a Google OAuth JWT and return user info + approval status."""
+    try:
+        user_info = auth.verify_token(body.token)
+    except ValueError as exc:
+        return _err(str(exc), 401)
+    approved = auth.is_approved(user_info["email"])
+    return _ok({"user": user_info, "approved": approved})
+
+
+@app.post("/api/access/request")
+async def access_request(body: AccessRequestBody):
+    """Submit an access request (stores in pending list)."""
+    auth.add_pending_request(body.email, body.name, body.reason)
+    return _ok({"message": "Access request submitted"})
+
+
+@app.get("/api/access/pending")
+async def access_pending(authorization: str | None = Header(default=None)):
+    """Return pending access requests (admin only)."""
+    if not _check_admin(authorization):
+        return _err("Unauthorized", 403)
+    pending = auth.get_pending_requests()
+    return _ok({"pending": pending})
+
+
+@app.post("/api/access/approve")
+async def access_approve(
+    body: AccessActionBody,
+    authorization: str | None = Header(default=None),
+):
+    """Approve an email for access (admin only)."""
+    if not _check_admin(authorization):
+        return _err("Unauthorized", 403)
+    auth.approve_email(body.email)
+    return _ok({"message": f"{body.email} approved"})
+
+
+@app.post("/api/access/deny")
+async def access_deny(
+    body: AccessActionBody,
+    authorization: str | None = Header(default=None),
+):
+    """Deny/remove a pending access request (admin only)."""
+    if not _check_admin(authorization):
+        return _err("Unauthorized", 403)
+    auth.deny_email(body.email)
+    return _ok({"message": f"{body.email} denied"})
 
 
 def _kill_stale_server(port: int) -> None:
