@@ -1,23 +1,16 @@
-All tasks complete.
-
 ---
 
 ## Summary
 
-### Files changed
-| File | Change |
-|------|--------|
-| `.sprint/scripts/sprint-init.sh` | Removed `.venv` symlink creation, added comment explaining why (B-012) |
-| `.env.example` | Added clear setup instructions for `GITHUB_TOKEN` |
-| `scripts/index-and-export.sh` | Added `.env` sourcing with `set -a`/`set +a` |
-| `tests/test_cli.py` | Added `TestCLISmoke::test_help_works` smoke test |
-| `Makefile` | Added `reindex` target that runs full index-and-export pipeline |
+**Files changed:**
+- `web/js/app.js` — Updated tier info text in `renderAccessRequest()` to include gated access description
+- `docs/project-memory/sessions/S-2026-03-22-1640-sprint9-access-page.md` — New session doc
 
-### Commands run
-- `git pull origin main` — already up to date
-- `python3 -m pytest tests/ -v` — **138 passed**, 0 failures
-- `git push -u origin HEAD` — pushed to `agentC-infra-fixes`
+**Commands run:**
+- `git pull origin main` — Already up to date
+- `python3 -m pytest tests/ -v` — 146 passed, 1 pre-existing failure
+- `git push -u origin HEAD` — Pushed to `agentB-access-page`
 
-### Notes / follow-on work
-- The `node_modules` symlink in `sprint-init.sh` was left as-is since it wasn't part of B-012 and JS symlinks don't have the same absolute-path issue as Python venvs
-- The `.gitignore` should already exclude `.env` — verify if it doesn't, to prevent accidental token commits
+**Notes / follow-on work:**
+- Most of the Sprint 9 agentB tasks (access page route, form fields, CSS styles, OG meta tags, nav link) were already implemented in prior sprints. The only gap was the tier description text.
+- Pre-existing test failure: `test_search_no_results` has a race condition where it finds the home page `.empty-state` ("Search to see all 42 repositories") instead of the search results empty state. This is in agentC's domain (`tests/`).

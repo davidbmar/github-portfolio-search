@@ -1,33 +1,41 @@
-agentC-infra-fixes — Sprint 8
+agentB-access-page — Sprint 9
 
 Sprint-Level Context
 
 Goal
-- Search relevance tuning — make semantic search return better results with real data
-- UX polish — make the site look professional for recruiters and hiring managers
+- CRITICAL: Fix F-005 — web search fails on multi-word queries ("voice processing" returns 0 results)
 - Fix B-012 — .venv symlinks break after agent merges
+- Add "Request Access" page skeleton for future gated tier
+- Improve search result quality for recruiters
 
 Constraints
 - No two agents may modify the same files
-- agentA owns search relevance (src/ghps/search.py, src/ghps/embeddings.py, src/ghps/export.py)
-- agentB owns web UI polish (web/js/app.js, web/js/search.js, web/css/style.css, web/index.html)
-- agentC owns infrastructure fixes (tests/, scripts/, .sprint/, Makefile, pyproject.toml)
+- agentA owns web search fix (web/js/search.js, web/js/app.js)
+- agentB owns access page and meta improvements (web/index.html, web/css/style.css)
+- agentC owns infrastructure fixes (scripts/, .sprint/, Makefile, tests/)
 - Use python3 for all commands
 - Do NOT commit .venv/ to git
 
 
 Objective
-- Fix venv symlink issue and improve developer experience
+- Add a "Request Access" page and improve site metadata
 
 Tasks
-- Fix B-012: Update .sprint/scripts/sprint-init.sh (or the local copy) to NOT symlink .venv into worktrees. Instead, each worktree should create its own venv or use the system python. Add a comment explaining why.
-- Add .env.example file with GITHUB_TOKEN=ghp_xxx placeholder (for F-001)
-- Update scripts/index-and-export.sh to source .env if it exists (python-dotenv style)
-- Add a test that verifies ghps CLI --help works without a venv (basic smoke test)
-- Update Makefile: add "reindex" target that runs the full index-and-export pipeline
+- Create the Request Access page in web/js/app.js (add route handler for #/access):
+  - Show a form with: Name, Email, Reason for access (textarea)
+  - Submit button (disabled for now — shows "Coming soon" message on submit)
+  - Explain what gated access provides: "Full code search, file tree browsing, and detailed repository analysis"
+  - Style with existing CSS variables
+- Update web/index.html:
+  - Ensure OG meta tags use real data: "42 repositories across 6 capability areas"
+  - Add og:image pointing to a screenshot or placeholder
+- Update web/css/style.css:
+  - Style the access request form (consistent with existing dark theme)
+  - Add form input styles: dark background, light text, blue accent border on focus
+  - Style the "Coming soon" message as a friendly info card
 
 Acceptance Criteria
-- python3 -m pytest tests/ -v shows 0 failures, 0 errors
-- make reindex works when GITHUB_TOKEN is set
-- .env.example exists with clear instructions
-- After sprint-init.sh creates worktrees, .venv is NOT symlinked (verify manually)
+- Playwright: navigate to https://davidbmar.com/#/access — form renders with 3 fields
+- Playwright: click Submit — shows "Coming soon" message, no errors
+- OG tags are present and accurate in page source
+- Mobile layout works at 375px
