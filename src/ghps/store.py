@@ -12,8 +12,6 @@ try:
 except ImportError:
     import sqlite3
 
-import sqlite_vec
-
 logger = logging.getLogger(__name__)
 
 EMBEDDING_DIM = 384
@@ -33,6 +31,7 @@ class VectorStore:
 
     def connect(self) -> sqlite3.Connection:
         if self.db is None:
+            import sqlite_vec
             self.db = sqlite3.connect(self.db_path)
             self.db.enable_load_extension(True)
             sqlite_vec.load(self.db)
