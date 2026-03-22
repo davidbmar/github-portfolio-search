@@ -1,70 +1,66 @@
-agentC-ui-autocomplete — Sprint 17
+agentC-export-embed — Sprint 18
 
 Sprint-Level Context
 
 Goal
-- Upgrade web UI from keyword-only search to TF-IDF + chunk-text matching using search-index.json
-- Add embedding-powered "related repos" via pre-computed similarity matrix
-- Add autocomplete/search suggestions dropdown
-- Improve search result snippets with README excerpts
+- Shareable search result links (deep links with query + filters in URL)
+- Export search results as markdown or JSON
+- "Collections" — save groups of repos as named lists (localStorage)
+- Public portfolio embed widget (iframe-embeddable mini view)
 
 Constraints
 - No two agents may modify the same files
-- agentA owns the export pipeline (src/ghps/export.py, tests/test_export.py)
-- agentB owns the JS search engine (web/js/search.js)
-- agentC owns the UI integration (web/js/app.js, web/index.html, web/css/style.css)
+- agentA owns sharing/deep links (web/js/app.js)
+- agentB owns collections feature (web/js/collections.js — NEW, web/css/style.css)
+- agentC owns export + embed widget (web/embed.html — NEW, web/js/export.js — NEW, web/index.html)
 - Use python3 for all commands
 - Do NOT commit .venv/ or .env to git
 - All features must work in static mode (no API server required)
-- Web UI loads data from web/data/ JSON files only
+- Use localStorage for persistence (no backend needed)
 
 
 Objective
-- Wire together the new data files, autocomplete UI, similarity-based related repos, and snippet rendering
+- Export search results and create an embeddable portfolio widget
 
 Tasks
-- Update web/js/app.js:
-  - In App.init() or the data loading section:
-    - Fetch web/data/search-index.json and pass to SearchEngine.loadSearchIndex()
-    - Fetch web/data/similarity.json and store as App.similarity
-    - Fetch web/data/suggestions.json and store as App.suggestions
-    - All three fetches should fail silently (existing behavior preserved if files missing)
-  - Replace findRelatedRepos() implementation:
-    - If App.similarity exists and has data for the repo, use it to return top-N similar repos
-    - Map similarity entries back to full repo objects from App.repos
-    - Update the "Related Repositories" label from "from same cluster" to "Semantically similar"
-    - Fall back to cluster-based lookup if similarity data unavailable
-  - Add autocomplete functionality:
-    - Create a renderAutocomplete(inputElement) function
-    - On input event, filter App.suggestions entries matching current text (case-insensitive prefix)
-    - Combine matches from repos, topics, and queries arrays
-    - Show top-8 matches in a dropdown div positioned below the search input
-    - Handle keyboard: ArrowDown/ArrowUp to navigate, Enter to select, Escape to close
-    - Handle mouse: click to select
-    - Handle blur: close dropdown after short delay (allow click events to fire first)
-    - Call renderAutocomplete() on the search input after init
-  - Update search result rendering:
-    - After getting search results, call SearchEngine.getSnippet(repo.name, query)
-    - If a snippet is returned, display it (with highlighted terms) below the description
-    - If no snippet, fall back to repo.description as before
-    - Escape HTML in snippets before inserting (use existing escapeHtml function)
+- Create web/js/export.js:
+  - ExportManager namespace (IIFE pattern):
+    - exportAsMarkdown(results, query) → generates markdown string:
+      ```
+      # Search Results: "query"
+
+      ## repo-name
+      - **Language:** Python
+      - **Stars:** 5
+      - **Description:** ...
+      - **GitHub:** https://github.com/...
+      - **Topics:** aws, voice, ...
+
+      ---
+      ```
+    - exportAsJSON(results, query) → generates JSON string with repos array
+    - downloadFile(content, filename, mimeType) → triggers browser file download
+  - Export via global ExportManager and module.exports
+- Create web/embed.html:
+  - Standalone HTML page that renders a mini portfolio view
+  - Loads repos.json and clusters.json from data/ directory
+  - Shows: portfolio title, repo count, top 5 clusters, top 10 repos by relevance
+  - Compact styling (no nav bar, no search, just a browsable snapshot)
+  - Designed to be embedded via iframe: <iframe src="https://davidbmar.com/embed.html" width="400" height="600"></iframe>
+  - Add a "View full portfolio" link to the main site
+  - Self-contained: inline CSS, no external dependencies except data files
+  - Security: set appropriate X-Frame-Options considerations in comments
 - Update web/index.html:
-  - Add a container div for autocomplete dropdown adjacent to the search input
-  - Ensure the search input wrapper has position: relative for dropdown positioning
-- Update web/css/style.css:
-  - Style .autocomplete-dropdown: absolute position, white background, border, shadow, z-index, max-height with overflow-y scroll
-  - Style .autocomplete-item: padding, hover highlight, cursor pointer
-  - Style .autocomplete-item.active: background highlight for keyboard-selected item
-  - Style .search-snippet: smaller font, muted color, max 3 lines with ellipsis overflow
-  - Ensure autocomplete works on mobile (full width, touch-friendly tap targets)
+  - Add <script src="js/collections.js"></script> before app.js
+  - Add <script src="js/export.js"></script> before app.js
+  - Add a "Collections" link in the nav bar (href="#/collections")
 
 Acceptance Criteria
-- Typing in search shows autocomplete dropdown with matching suggestions
-- Arrow keys navigate suggestions, Enter selects, Escape closes
-- Clicking a suggestion navigates to search results for that term
-- Related repos section shows embedding-similar repos from similarity.json
-- Related repos falls back to cluster-based if similarity.json not loaded
-- Search results show README snippet excerpts with highlighted query terms
-- All features degrade gracefully if data files are missing
-- No XSS — all user input and snippet text is escaped before DOM insertion
-- Mobile-friendly autocomplete (full-width, adequate tap targets)
+- ExportManager.exportAsMarkdown(results, "voice") returns valid markdown
+- ExportManager.exportAsJSON(results, "voice") returns valid JSON
+- ExportManager.downloadFile() triggers a browser download
+- embed.html loads and renders portfolio summary standalone
+- embed.html works in an iframe without errors
+- index.html includes script tags for collections.js and export.js
+- Nav bar includes Collections link
+- python3 -m pytest tests/ -v passes
