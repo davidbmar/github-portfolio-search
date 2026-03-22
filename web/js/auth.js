@@ -110,19 +110,37 @@ const Auth = (() => {
    * Renders the Google Sign-In button into the given container element.
    */
   function renderSignInButton(containerEl) {
-    if (!isOAuthEnabled() || typeof google === "undefined") return;
+    if (!isOAuthEnabled()) return;
 
-    google.accounts.id.initialize({
-      client_id: _config.googleClientId,
-      callback: handleGoogleCallback,
-    });
+    function _render() {
+      if (typeof google === "undefined" || !google.accounts || !google.accounts.id) return false;
+      google.accounts.id.initialize({
+        client_id: _config.googleClientId,
+        callback: handleGoogleCallback,
+      });
+      google.accounts.id.renderButton(containerEl, {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "rectangular",
+      });
+      return true;
+    }
 
-    google.accounts.id.renderButton(containerEl, {
-      theme: "outline",
-      size: "large",
-      text: "signin_with",
-      shape: "rectangular",
-    });
+    // Try immediately, then retry until GIS script loads (up to 5s)
+    if (!_render()) {
+      containerEl.textContent = "Loading Google Sign-In...";
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (_render()) {
+          clearInterval(interval);
+        } else if (attempts > 25) {
+          clearInterval(interval);
+          containerEl.textContent = "Google Sign-In unavailable. Try refreshing.";
+        }
+      }, 200);
+    }
   }
 
   /**
