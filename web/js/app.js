@@ -75,8 +75,8 @@ const App = (() => {
 
     try {
       const [reposRes, clustersRes] = await Promise.all([
-        fetch("repos.json"),
-        fetch("clusters.json"),
+        fetch("data/repos.json"),
+        fetch("data/clusters.json"),
       ]);
 
       if (!reposRes.ok) throw new Error("Failed to load repos.json");
@@ -134,6 +134,10 @@ const App = (() => {
     } else if (hash.startsWith("#/cluster/")) {
       const clusterName = decodeURIComponent(hash.slice("#/cluster/".length));
       renderClusterDetail(clusterName, content);
+    } else if (hash === "#/clusters") {
+      renderClustersPage(content);
+    } else if (hash === "#/access") {
+      renderAccessRequest(content);
     } else {
       renderHome(content);
     }
@@ -275,6 +279,137 @@ const App = (() => {
 
     // Safe: all dynamic values are escaped
     container.innerHTML = html;
+  }
+
+  /**
+   * Render clusters listing page.
+   */
+  function renderClustersPage(container) {
+    let html = '<div class="section-header">';
+    html += "<h3>All Clusters</h3>";
+    html += '<span class="count">' + escapeHtml(String(clusters.length)) + " clusters</span>";
+    html += "</div>";
+
+    if (clusters.length > 0) {
+      html += '<div class="cluster-grid">';
+      for (const cluster of clusters) {
+        const repoPreview = (cluster.repos || []).slice(0, 3).join(", ");
+        const repoCount = (cluster.repos || []).length;
+        html += '<div class="cluster-card" data-cluster="' + escapeAttr(cluster.name) + '">';
+        html += "<h4>" + escapeHtml(cluster.name) + "</h4>";
+        html += '<span class="repo-count">' + escapeHtml(String(repoCount)) + " repo" + (repoCount !== 1 ? "s" : "") + "</span>";
+        if (cluster.description) {
+          html += '<div class="cluster-description">' + escapeHtml(cluster.description) + "</div>";
+        }
+        if (repoPreview) {
+          html += '<div class="repo-list-preview">' + escapeHtml(repoPreview) + "</div>";
+        }
+        html += "</div>";
+      }
+      html += "</div>";
+    } else {
+      html += '<div class="empty-state"><p>No clusters available</p></div>';
+    }
+
+    // Safe: all dynamic values escaped via escapeHtml/escapeAttr
+    container.innerHTML = html;
+    bindClusterClicks();
+  }
+
+  /**
+   * Render the Request Access page with form fields.
+   * Note: This form contains only static HTML — no user-controlled values
+   * are interpolated, so innerHTML is safe here.
+   */
+  function renderAccessRequest(container) {
+    container.textContent = "";
+
+    const page = document.createElement("div");
+    page.className = "access-request-page";
+
+    const h2 = document.createElement("h2");
+    h2.textContent = "Request Access";
+    page.appendChild(h2);
+
+    const tierInfo = document.createElement("p");
+    tierInfo.className = "access-tier-info";
+    tierInfo.textContent = "Public tier \u2014 browse clusters and search descriptions. Request full access for code snippets.";
+    page.appendChild(tierInfo);
+
+    const form = document.createElement("form");
+    form.className = "access-form";
+    form.id = "access-form";
+
+    // Name field
+    const nameGroup = document.createElement("div");
+    nameGroup.className = "form-group";
+    const nameLabel = document.createElement("label");
+    nameLabel.setAttribute("for", "access-name");
+    nameLabel.textContent = "Name";
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.id = "access-name";
+    nameInput.name = "name";
+    nameInput.placeholder = "Your name";
+    nameInput.required = true;
+    nameGroup.appendChild(nameLabel);
+    nameGroup.appendChild(nameInput);
+    form.appendChild(nameGroup);
+
+    // Email field
+    const emailGroup = document.createElement("div");
+    emailGroup.className = "form-group";
+    const emailLabel = document.createElement("label");
+    emailLabel.setAttribute("for", "access-email");
+    emailLabel.textContent = "Email";
+    const emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.id = "access-email";
+    emailInput.name = "email";
+    emailInput.placeholder = "you@example.com";
+    emailInput.required = true;
+    emailGroup.appendChild(emailLabel);
+    emailGroup.appendChild(emailInput);
+    form.appendChild(emailGroup);
+
+    // Reason field
+    const reasonGroup = document.createElement("div");
+    reasonGroup.className = "form-group";
+    const reasonLabel = document.createElement("label");
+    reasonLabel.setAttribute("for", "access-reason");
+    reasonLabel.textContent = "Reason for access";
+    const reasonTextarea = document.createElement("textarea");
+    reasonTextarea.id = "access-reason";
+    reasonTextarea.name = "reason";
+    reasonTextarea.placeholder = "Why would you like full access?";
+    reasonTextarea.rows = 4;
+    reasonTextarea.required = true;
+    reasonGroup.appendChild(reasonLabel);
+    reasonGroup.appendChild(reasonTextarea);
+    form.appendChild(reasonGroup);
+
+    // Submit button
+    const submitBtn = document.createElement("button");
+    submitBtn.type = "submit";
+    submitBtn.className = "submit-btn";
+    submitBtn.id = "access-submit";
+    submitBtn.textContent = "Submit Request";
+    form.appendChild(submitBtn);
+
+    // Message area
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "form-message";
+    msgDiv.id = "form-message";
+    form.appendChild(msgDiv);
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      msgDiv.textContent = "Coming soon \u2014 access request API is under development. Your interest has been noted!";
+      msgDiv.className = "form-message visible";
+    });
+
+    page.appendChild(form);
+    container.appendChild(page);
   }
 
   /**

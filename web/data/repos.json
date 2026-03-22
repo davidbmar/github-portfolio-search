@@ -1,0 +1,82 @@
+[
+  {
+    "name": "audio-client-server",
+    "description": "Real-time audio streaming client-server architecture using WebSockets and AWS",
+    "language": "Python",
+    "stars": 12,
+    "topics": ["audio", "websockets", "aws", "streaming", "real-time"],
+    "url": "https://github.com/davidbmar/audio-client-server",
+    "updated_at": "2025-11-15T10:30:00Z",
+    "readme_excerpt": "A production-grade audio streaming system that captures microphone input, streams via WebSockets, and processes through AWS services."
+  },
+  {
+    "name": "audio_client_server",
+    "description": "Audio transcription pipeline with S3 and SQS integration",
+    "language": "Python",
+    "stars": 8,
+    "topics": ["audio", "transcription", "aws", "s3", "sqs"],
+    "url": "https://github.com/davidbmar/audio_client_server",
+    "updated_at": "2025-10-20T14:00:00Z",
+    "readme_excerpt": "Processes audio files through an S3 upload pipeline with SQS message queuing for reliable transcription workflows."
+  },
+  {
+    "name": "def_orchestrator",
+    "description": "Distributed workflow orchestration engine for cloud-native applications",
+    "language": "Python",
+    "stars": 5,
+    "topics": ["orchestration", "distributed-systems", "workflow", "cloud"],
+    "url": "https://github.com/davidbmar/def_orchestrator",
+    "updated_at": "2025-09-18T08:45:00Z",
+    "readme_excerpt": "Orchestrates complex multi-step workflows across distributed services with retry logic and state management."
+  },
+  {
+    "name": "github-portfolio-search",
+    "description": "Search and explore GitHub portfolio with clustering and faceted search",
+    "language": "JavaScript",
+    "stars": 3,
+    "topics": ["portfolio", "search", "github", "web", "clustering"],
+    "url": "https://github.com/davidbmar/github-portfolio-search",
+    "updated_at": "2026-03-22T00:00:00Z",
+    "readme_excerpt": "A web application that indexes GitHub repositories and provides clustered browsing with full-text search capabilities."
+  },
+  {
+    "name": "s3-presigned-url-upload",
+    "description": "Secure file upload system using S3 pre-signed URLs with Lambda backend",
+    "language": "Python",
+    "stars": 15,
+    "topics": ["aws", "s3", "lambda", "upload", "security"],
+    "url": "https://github.com/davidbmar/s3-presigned-url-upload",
+    "updated_at": "2025-12-01T16:20:00Z",
+    "readme_excerpt": "Generates time-limited pre-signed URLs for direct browser-to-S3 uploads, avoiding server-side file handling."
+  },
+  {
+    "name": "terraform-infra",
+    "description": "Infrastructure as code for AWS environments using Terraform",
+    "language": "HCL",
+    "stars": 4,
+    "topics": ["terraform", "aws", "infrastructure", "iac", "devops"],
+    "url": "https://github.com/davidbmar/terraform-infra",
+    "updated_at": "2025-08-10T12:00:00Z",
+    "readme_excerpt": "Terraform modules for provisioning VPCs, ECS clusters, RDS instances, and CI/CD pipelines on AWS."
+  },
+  {
+    "name": "delete_old_branches",
+    "description": "CLI tool to clean up stale git branches safely",
+    "language": "Shell",
+    "stars": 2,
+    "topics": ["git", "cli", "automation", "devops"],
+    "url": "https://github.com/davidbmar/delete_old_branches",
+    "updated_at": "2025-07-05T09:30:00Z",
+    "readme_excerpt": "Identifies and removes merged or stale branches from local and remote repositories with safety checks."
+  },
+  {
+    "name": "ml-pipeline",
+    "description": "End-to-end machine learning pipeline with model training and deployment",
+    "language": "Python",
+    "stars": 7,
+    "topics": ["machine-learning", "pipeline", "deployment", "python", "aws"],
+    "url": "https://github.com/davidbmar/ml-pipeline",
+    "updated_at": "2025-11-28T11:15:00Z",
+    "readme_excerpt": "Automated ML pipeline covering data ingestion, feature engineering, model training, evaluation, and deployment to SageMaker."
+  }
+]
