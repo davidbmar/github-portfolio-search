@@ -1,10 +1,11 @@
-# Sprint 7 — Agent Notes
+# Sprint 8 — Agent Notes
 
-*Started: 2026-03-22 15:32 UTC*
+*Started: 2026-03-22 16:07 UTC*
 
-Phase 1 Agents: 2
-- agentA-test-fixes
-- agentB-real-data
+Phase 1 Agents: 3
+- agentA-search-relevance
+- agentB-ui-polish
+- agentC-infra-fixes
 
 Phase 2 Agents: 0
 (none)
@@ -13,48 +14,58 @@ Automated summaries from each agent are appended below as they complete.
 
 ---
 
-## agentA-test-fixes
+## agentC-infra-fixes
 
-*Completed: 2026-03-22 15:35 UTC*
+*Completed: 2026-03-22 16:10 UTC*
 
 ### Files changed
-- `tests/test_cli.py` — Removed `mix_stderr=False` from 3 `CliRunner()` calls (lines 143, 283, 316); changed `result.stderr` → `result.output` in assertions
-- `src/ghps/cli.py` — Added environment variable suppression for model-loading progress bars (`TOKENIZERS_PARALLELISM`, `HF_HUB_DISABLE_PROGRESS_BARS`, `TRANSFORMERS_NO_ADVISORY_WARNINGS`) and set `sentence_transformers` logger to WARNING level
+| File | Change |
+|------|--------|
+| `.sprint/scripts/sprint-init.sh` | Removed `.venv` symlink creation, added comment explaining why (B-012) |
+| `.env.example` | Added clear setup instructions for `GITHUB_TOKEN` |
+| `scripts/index-and-export.sh` | Added `.env` sourcing with `set -a`/`set +a` |
+| `tests/test_cli.py` | Added `TestCLISmoke::test_help_works` smoke test |
+| `Makefile` | Added `reindex` target that runs full index-and-export pipeline |
 
 ### Commands run
 - `git pull origin main` — already up to date
-- `python3 -m pytest tests/test_cli.py tests/test_e2e.py -v` — 18 passed
-- `python3 -m pytest tests/ -v` — **137 passed, 0 failures, 0 errors**
-- `git push -u origin HEAD` — pushed to `agentA-test-fixes`
+- `python3 -m pytest tests/ -v` — **138 passed**, 0 failures
+- `git push -u origin HEAD` — pushed to `agentC-infra-fixes`
 
 ### Notes / follow-on work
-- The missing-index error handling in `cli.py` was already correct (`click.echo(..., err=True)` + `sys.exit(1)`). Only the test assertions needed updating.
-- If Click is later downgraded below 8.2, these tests will still work since the default `mix_stderr=True` behavior is the same across all Click versions.
+- The `node_modules` symlink in `sprint-init.sh` was left as-is since it wasn't part of B-012 and JS symlinks don't have the same absolute-path issue as Python venvs
+- The `.gitignore` should already exclude `.env` — verify if it doesn't, to prevent accidental token commits
 
 
 ---
 
-## agentB-real-data
+## agentA-search-relevance
 
-*Completed: 2026-03-22 15:38 UTC*
+*Completed: 2026-03-22 16:13 UTC*
+
+```
+```
+
+
+---
+
+## agentB-ui-polish
+
+*Completed: 2026-03-22 16:14 UTC*
 
 ### Files changed
-- **`src/ghps/export.py`** — Language fallback: `""` → `"Unknown"` for repos with no language detected
-- **`scripts/generate-sample-data.py`** — Replaced 10 fictional repos with 42 real repos from davidbmar's GitHub account
-- **`scripts/index-and-export.sh`** — Added JSON validation step (checks files exist, are valid arrays, are non-empty)
-- **`web/data/repos.json`** — Regenerated with 42 real repos, accurate descriptions and `html_url` links
-- **`web/data/clusters.json`** — Regenerated with 6 logical clusters (Voice & Speech, Transcription & ASR, Browser-Native AI, AI & Search Tools, AWS Infrastructure, Developer Tools)
-- **`docs/project-memory/sessions/S-2026-03-22-1538-real-data-pipeline.md`** — Session doc
+- **web/js/app.js** — Added `computePortfolioStats()`, `highlightTerms()`, `findRelatedRepos()`. Landing page shows repo/cluster/language stats, language distribution bars, last-updated date. Search results show highlighted terms, relevance bars, and related repos.
+- **web/css/style.css** — New styles for portfolio stats, language bars, relevance bars, related repos section. Improved card hover (lift + shadow), cluster card gradient accents, better typography (line-height 1.7), mark highlight styling, mobile responsive adjustments.
+- **web/index.html** — Updated meta description and OG tags with real stats (42 repos, 6 capability areas), added og:image/twitter:image, changed to summary_large_image card.
+- **docs/project-memory/sessions/S-2026-03-22-1613-sprint8-ui-polish.md** — Session documentation.
 
 ### Commands run
 - `git pull origin main`
-- `curl` GitHub public API to fetch real repo metadata (106 repos across 2 pages)
-- `python3 scripts/generate-sample-data.py --output web/data`
-- `python3 -m pytest tests/ -v` — **129 passed, 0 failures**
-- `git push -u origin HEAD`
+- `python3 -m pytest tests/ -v` (136 passed, 1 pre-existing failure)
+- `git commit` + `git push -u origin HEAD`
 
 ### Notes / follow-on work
-- **GITHUB_TOKEN not available** — used public API for metadata only. When token is available, run `GITHUB_TOKEN=ghp_xxx scripts/index-and-export.sh davidbmar` for full indexing with embeddings and `search-index.json` generation
-- The `ORDER BY name` in `_build_repos` SQL already ensures deterministic output (no code change needed)
-- Repos with no README are already handled — description is pulled from the DB `repos` table, not from README content
+1. **Pre-existing test failure**: `test_search_no_results` has a race condition — `.empty-state` on home page matches before search route renders. agentC should fix by using `page.wait_for_url()` or a more specific selector like `.empty-state h3:has-text("No results")`.
+2. **OG image**: `og:image` references `/og-image.png` which doesn't exist yet. A real social preview image should be created and deployed.
+3. **search.js was not modified** — all search UI enhancements (highlighting, relevance bars, related repos) are rendering-side changes in app.js, keeping the search engine pure.
 
