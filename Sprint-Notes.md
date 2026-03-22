@@ -1,11 +1,11 @@
-# Sprint 12 — Agent Notes
+# Sprint 13 — Agent Notes
 
-*Started: 2026-03-22 18:07 UTC*
+*Started: 2026-03-22 18:36 UTC*
 
 Phase 1 Agents: 3
-- agentA-topic-extraction
-- agentB-cluster-quality
-- agentC-topic-ui
+- agentA-oauth-frontend
+- agentB-auth-api
+- agentC-telegram-admin
 
 Phase 2 Agents: 0
 (none)
@@ -14,56 +14,74 @@ Automated summaries from each agent are appended below as they complete.
 
 ---
 
-## agentA-topic-extraction
+## agentC-telegram-admin
 
-*Completed: 2026-03-22 18:11 UTC*
+*Completed: 2026-03-22 18:39 UTC*
 
-**Files changed:**
-- `src/ghps/indexer.py` — Added `TOPIC_KEYWORDS` constant (40+ keywords), `Indexer.extract_topics()` static method, and integrated topic inference into `index_repos()` with merge/deduplication
-- `tests/test_topic_extraction.py` — New file with 10 unit tests for topic extraction
-- `docs/project-memory/sessions/S-2026-03-22-1810-topic-extraction.md` — Session documentation
+### Files changed
+- **`src/ghps/notifications.py`** (NEW) — Telegram notification module with graceful fallback
+- **`scripts/approve-access.py`** (NEW) — CLI tool for approve/deny/list access management
+- **`tests/test_notifications.py`** (NEW) — 19 tests covering both modules
 
-**Commands run:**
-- `git pull origin main` — already up to date
-- `python3 -m pytest tests/ -v` — **158 passed** (including 10 new topic extraction tests)
-- `git push -u origin HEAD` — pushed to `agentA-topic-extraction`
-
-**Notes / follow-on work:**
-- `github_client.py` already correctly preserves `topics` through pagination (line 51) — no changes needed
-- The `inferred_topics` key is set on the repo dict in-memory during indexing, available for downstream consumers (e.g., agentB's export)
-- Merged topics (GitHub API + inferred) are stored in the database via `repo_meta["topics"]`
-- The keyword list can be extended in `TOPIC_KEYWORDS` as new technologies are encountered
-
-
----
-
-## agentB-cluster-quality
-
-*Completed: 2026-03-22 18:11 UTC*
-
-## Files changed
-- **`src/ghps/clusters.py`** — Read topics + inferred_topics from DB, include topics in keyword matching, add small-cluster merging (< 3 repos → nearest neighbor)
-- **`src/ghps/export.py`** — Merge inferred_topics into repos.json topics array (graceful fallback if column missing)
-- **`tests/test_export.py`** — Added `test_clusters_have_unique_names` and `test_clusters_meet_minimum_size`
-- **`docs/project-memory/sessions/S-2026-03-22-1810-cluster-quality.md`** — Session doc
-
-## Commands run
-- `git pull origin main` — already up to date
-- `python3 -m pytest tests/ -v` — 151 passed
+### Commands run
+- `git pull origin main`
+- `python3 -m pytest tests/test_notifications.py -v` — 19 passed
+- `python3 -m pytest tests/ -v` — 164 passed
 - `git commit` + `git push -u origin HEAD`
 
-## Notes / follow-on work
-- The `inferred_topics` column access uses try/except fallback — once agentA's migration merges, the enriched topics will automatically flow into cluster naming and repos.json export
-- The minimum cluster size merging recomputes centroids after each merge for accuracy
-- With only 3 test repos, KMeans produces 1 cluster (k adjusted to min of n_clusters and repo count), which trivially satisfies the min-size constraint. With real data (94 repos), 6 clusters with merging will produce meaningful groupings
+### Notes / follow-on work
+- The `approve-access.py` CLI reads/writes `~/.ghps/access.json` with no dependency on the API server — agentB's API endpoints can import `approve_user`/`deny_user` from the script or duplicate the logic
+- `notify_access_request()` accepts an optional `api_base_url` param; when provided, Telegram messages include clickable approve/deny links pointing to agentB's API endpoints
+- When `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` are not set, notifications fall back to `logging.info` — no crash
 
 
 ---
 
-## agentC-topic-ui
+## agentA-oauth-frontend
 
-*Completed: 2026-03-22 18:12 UTC*
+*Completed: 2026-03-22 18:41 UTC*
 
-```
-```
+### Files changed
+- **`web/js/auth.js`** (NEW) — Auth module with Google Identity Services integration
+- **`web/config.json`** (NEW) — Configuration with `googleClientId` and `apiUrl` placeholders
+- **`web/js/app.js`** — Replaced password gate IIFE with auth-aware gate; added user avatar/name/sign-out in header; auto-fill access request form from Google profile
+- **`web/index.html`** — Added GIS script tag and auth.js script tag
+- **`docs/project-memory/sessions/S-2026-03-22-1840-oauth-frontend.md`** (NEW) — Session doc
+
+### Commands run
+- `git pull origin main` — up to date
+- `make test` — 152 tests passed (8 Playwright errors are pre-existing port conflict, unrelated)
+- `make lint` — passed
+- `git push -u origin HEAD` — pushed
+
+### Notes / follow-on work
+- **Backward compatible**: When `googleClientId` is empty in config.json, the password gate ("guild") still works exactly as before
+- **Access request form**: Currently shows "coming soon" on submit — agentB/agentC will implement the API endpoint and Telegram notification
+- The 8 Playwright test errors (`OSError: Address already in use` on port 8765) are pre-existing and unrelated to these changes
+
+
+---
+
+## agentB-auth-api
+
+*Completed: 2026-03-22 18:42 UTC*
+
+### Files changed
+- **`src/ghps/auth.py`** (NEW) — Google JWT verification via `google-auth`, access list CRUD with JSON persistence at `~/.ghps/access.json`
+- **`src/ghps/api.py`** — Added 5 new endpoints: `/api/auth/verify`, `/api/access/request`, `/api/access/pending`, `/api/access/approve`, `/api/access/deny`
+- **`pyproject.toml`** — Added `google-auth>=2.29` dependency
+- **`tests/test_auth.py`** (NEW) — 21 tests covering unit + API endpoint tests
+- **`docs/project-memory/sessions/S-2026-03-22-1841-auth-api-endpoints.md`** (NEW) — Session doc
+
+### Commands run
+- `git pull origin main`
+- `pip install google-auth`
+- `python3 -m pytest tests/test_auth.py -v` (21 passed)
+- `python3 -m pytest tests/ -v --ignore=tests/test_web_playwright.py` (173 passed)
+- `git push -u origin HEAD`
+
+### Notes / follow-on work
+- **Pre-existing playwright test failures**: `test_web_playwright.py` has 3 failures for UI elements (cluster cards, access request page) that depend on other agents' frontend work — not related to this change
+- **GHPS_ADMIN_TOKEN**: Must be set in the server environment for admin endpoints to work. agentC's Telegram bot will need this same token to call approve/deny endpoints
+- **No Google Client ID validation**: `verify_token` currently doesn't restrict to a specific `audience` (Google Client ID). Once agentA's frontend is wired up, consider adding `audience=` parameter to `verify_oauth2_token` for tighter validation
 
