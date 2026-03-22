@@ -3,18 +3,15 @@ All tasks complete.
 ---
 
 **Files changed:**
-- `deploy.sh` (new) — idempotent deployment script
-- `web/data/.gitkeep` (new) — data directory placeholder
-- `web/health.json` (new) — health check endpoint
-- `.gitignore` — added `_build/` exclusion
-- `README.md` — added Deployment section
-- `docs/project-memory/sessions/S-2026-03-22-0606-sprint4-deploy-pipeline.md` (new) — session doc
+- `deploy.sh` — rewritten to match sprint 5 spec (check web/ dir, conditional ghps export, s3 sync with `--exclude *.pyc`, CloudFront invalidation)
+- `tests/test_deploy.py` — new file: 6 tests verifying deploy.sh exists, is executable, has correct bucket name, CloudFront distribution ID, web/ reference, and .pyc exclusion
 
 **Commands run:**
-- `python3 -m pytest tests/ -v` — 99 passed
+- `git pull origin main` — already up to date
+- `python3 -m pytest tests/test_cli.py tests/test_e2e.py tests/test_deploy.py -v` — 24 passed
+- `chmod +x deploy.sh`
 - `git commit` + `git push -u origin HEAD`
 
 **Notes / follow-on work:**
-- `deploy.sh` gracefully handles missing `ghps export` command (owned by agentA) — once agentA implements `export.py`, the deploy script will automatically pick it up
-- The `--output-dir` flag passed to `ghps export` may need adjustment depending on agentA's CLI design
-- After sprint merge, run an actual deploy to verify AWS credentials and S3/CloudFront connectivity
+- B-005 and B-006 were already fixed in a prior sprint — cli.py has `_db_exists()` checks and proper `json.dumps()` output. All 18 existing tests passed before any changes.
+- The Playwright acceptance test ("after deploy, davidbmar.com shows search UI") requires a live deployment and is not runnable in CI without AWS credentials.
