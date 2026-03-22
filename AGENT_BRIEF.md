@@ -1,4 +1,4 @@
-agentA-public-tier — Sprint 15
+agentB-seo-perf — Sprint 15
 
 Sprint-Level Context
 
@@ -18,25 +18,27 @@ Constraints
 
 
 Objective
-- Make the site publicly browsable without sign-in (B-019, F-009)
+- Improve SEO, page performance, and web standards compliance
 
 Tasks
-- Update web/js/app.js:
-  - Remove the full-page auth gate overlay that blocks all content
-  - Instead: load and display all public content (clusters, search, repo detail) WITHOUT requiring sign-in
-  - Add a "Sign In" button in the nav bar (next to Request Access) that triggers Google Sign-In
-  - After sign-in: show user avatar + name in header, show "Sign Out" button
-  - Gated features (if any future gated content exists): check Auth.isAuthenticated() before showing
-  - The Request Access page (#/access) should still show the sign-in flow for unauthenticated users
-- Update web/js/auth.js:
-  - Add isApproved() function stub (returns true for now — no server-side check on static site)
-  - Ensure signOut() properly clears state and reloads without breaking public content
+- Update web/index.html:
+  - Add structured data (JSON-LD) for WebSite and Person schema
+  - Update meta description and OG tags to reflect 104 repos (currently says 42)
+  - Add robots meta tag (index, follow)
+  - Ensure all external scripts have integrity/crossorigin attributes where possible
+- Create web/sitemap.xml:
+  - Include main pages: /, /search, /clusters, /access
+  - Add lastmod dates
+- Update web/css/style.css:
+  - Add prefers-reduced-motion media query for animations
+  - Ensure focus styles are visible for keyboard navigation (WCAG 2.1 AA)
+  - Optimize any large CSS selectors
+- Add web/robots.txt with sitemap reference
 
 Acceptance Criteria
-- Visit https://davidbmar.com without signing in → see landing page with 104 repos, clusters, search
-- Search works without sign-in: "voice processing" returns results
-- Mobile works without sign-in (375px viewport)
-- "Sign In" button in nav bar triggers Google OAuth popup
-- After sign-in: avatar + name in header, "Sign Out" works
-- Request Access page shows sign-in for unauthenticated users
+- Structured data validates (test with Google Rich Results Test)
+- Meta descriptions accurate (104 repos, not 42)
+- sitemap.xml and robots.txt served correctly
+- Focus styles visible on tab navigation
+- Animations respect prefers-reduced-motion
 - python3 -m pytest tests/ -v passes
