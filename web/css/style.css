@@ -721,6 +721,89 @@ a:hover {
   transition: width 0.3s ease;
 }
 
+/* Repo detail page */
+.repo-detail {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.repo-detail-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+.repo-detail-description {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  margin-bottom: 20px;
+}
+
+.github-link:hover {
+  background: var(--accent-hover);
+  color: #fff;
+  text-decoration: none;
+}
+
+.repo-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.repo-detail-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.repo-detail-cluster {
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.repo-detail-cluster h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.cluster-link {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.cluster-link:hover {
+  text-decoration: underline;
+}
+
 /* Related repos section */
 .related-repos-section {
   margin-top: 32px;
@@ -804,6 +887,14 @@ a:hover {
 
   .lang-stat-row {
     max-width: 100%;
+  }
+
+  .repo-detail {
+    padding: 20px;
+  }
+
+  .repo-detail-name {
+    font-size: 1.25rem;
   }
 
   .access-request-page {
