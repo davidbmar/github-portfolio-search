@@ -570,6 +570,9 @@ const App = (() => {
     html += '<span class="count">' + escapeHtml(String(clusters.length)) + " clusters</span>";
     html += "</div>";
 
+    // D3 circle-packing visualization container
+    html += '<div id="d3-viz-container" class="d3-viz-wrapper"></div>';
+
     if (clusters.length > 0) {
       html += '<div class="cluster-grid">';
       for (const cluster of clusters) {
@@ -594,6 +597,11 @@ const App = (() => {
     // Safe: all dynamic values escaped via escapeHtml/escapeAttr
     container.innerHTML = html;
     bindClusterClicks();
+
+    // Render D3 circle-packing after DOM is ready
+    if (typeof D3Viz !== "undefined") {
+      D3Viz.render(container, clusters, repos);
+    }
   }
 
   /**
