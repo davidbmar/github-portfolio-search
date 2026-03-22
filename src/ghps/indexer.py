@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 from .embeddings import EmbeddingPipeline
@@ -60,65 +61,99 @@ class Indexer:
 
         return sorted(found)
 
-    def index_repos(self, repos: list[dict[str, Any]]) -> int:
+    def index_repos(
+        self, repos: list[dict[str, Any]], *, dry_run: bool = False
+    ) -> int:
         """Index a list of repo dicts into the vector store.
 
         Each repo dict should have keys: name, description, language, topics,
         stars, updated_at, url, readme (str), source_files (list of {path, content}).
 
-        Returns the total number of chunks indexed.
+        Args:
+            repos: List of repo metadata dicts.
+            dry_run: If True, show what would be indexed without making changes.
+
+        Returns the total number of chunks indexed (or that would be indexed).
         """
         total_chunks = 0
+        indexed_count = 0
+        failed_count = 0
+        skipped_count = 0
+        now = datetime.now(timezone.utc).isoformat()
 
         for i, repo in enumerate(repos, 1):
             name = repo.get("name", "unknown")
             logger.info("Indexing repo %d/%d: %s", i, len(repos), name)
 
-            readme = repo.get("readme", "")
-            source_files = repo.get("source_files", [])
+            try:
+                readme = repo.get("readme", "")
+                source_files = repo.get("source_files", [])
 
-            # Build chunks from readme and source files
-            chunks = self._build_chunks(name, readme, source_files)
+                # Build chunks from readme and source files
+                chunks = self._build_chunks(name, readme, source_files)
 
-            if not chunks:
-                logger.warning("No content to index for repo %s", name)
-                continue
+                if not chunks:
+                    logger.warning("No content to index for repo %s", name)
+                    skipped_count += 1
+                    continue
 
-            # Generate embeddings for all chunk texts
-            texts = [c["text"] for c in chunks]
-            embeddings = self.pipeline.embed_batch(texts)
+                if dry_run:
+                    logger.info(
+                        "[dry-run] Would index %s: %d chunks", name, len(chunks)
+                    )
+                    total_chunks += len(chunks)
+                    indexed_count += 1
+                    continue
 
-            # Infer topics from README content and repo name
-            inferred = self.extract_topics(name, readme)
-            repo["inferred_topics"] = inferred
+                # Generate embeddings for all chunk texts
+                texts = [c["text"] for c in chunks]
+                embeddings = self.pipeline.embed_batch(texts)
 
-            # Merge GitHub topics with inferred topics (deduplicated)
-            github_topics = repo.get("topics", [])
-            merged = sorted(set(github_topics) | set(inferred))
+                # Infer topics from README content and repo name
+                inferred = self.extract_topics(name, readme)
+                repo["inferred_topics"] = inferred
 
-            # Store everything
-            repo_meta = {
-                "name": name,
-                "description": repo.get("description", ""),
-                "language": repo.get("language", ""),
-                "topics": merged,
-                "stars": repo.get("stars", 0),
-                "updated_at": repo.get("updated_at", ""),
-                "url": repo.get("url", ""),
-            }
+                # Merge GitHub topics with inferred topics (deduplicated)
+                github_topics = repo.get("topics", [])
+                merged = sorted(set(github_topics) | set(inferred))
 
-            self.store.add_repo(
-                repo_dict=repo_meta,
-                readme_text=readme,
-                source_files=source_files,
-                embeddings=embeddings,
-                chunks=chunks,
-            )
+                # Store everything
+                repo_meta = {
+                    "name": name,
+                    "description": repo.get("description", ""),
+                    "language": repo.get("language", ""),
+                    "topics": merged,
+                    "stars": repo.get("stars", 0),
+                    "updated_at": repo.get("updated_at", ""),
+                    "url": repo.get("url", ""),
+                    "indexed_at": now,
+                }
 
-            total_chunks += len(chunks)
-            logger.info("Repo %s: %d chunks generated", name, len(chunks))
+                self.store.add_repo(
+                    repo_dict=repo_meta,
+                    readme_text=readme,
+                    source_files=source_files,
+                    embeddings=embeddings,
+                    chunks=chunks,
+                )
 
-        logger.info("Indexing complete: %d repos, %d total chunks", len(repos), total_chunks)
+                total_chunks += len(chunks)
+                indexed_count += 1
+                logger.info("Repo %s: %d chunks generated", name, len(chunks))
+
+            except Exception:
+                failed_count += 1
+                logger.warning("Failed to index repo %s, skipping", name, exc_info=True)
+
+        prefix = "[dry-run] " if dry_run else ""
+        logger.info(
+            "%sIndexing complete: %d repos indexed, %d failed, %d skipped, %d total chunks",
+            prefix,
+            indexed_count,
+            failed_count,
+            skipped_count,
+            total_chunks,
+        )
         return total_chunks
 
     def _build_chunks(
@@ -145,7 +180,9 @@ class Indexer:
 
         return chunks
 
-    def index_user(self, username: str, github_client: Any = None) -> int:
+    def index_user(
+        self, username: str, github_client: Any = None, *, dry_run: bool = False
+    ) -> int:
         """Fetch all repos for a user and index them.
 
         Fetches repo metadata, then enriches each repo with README content
@@ -169,4 +206,4 @@ class Indexer:
                 logger.warning("Could not fetch README for %s", name)
                 repo["readme"] = ""
 
-        return self.index_repos(repos)
+        return self.index_repos(repos, dry_run=dry_run)

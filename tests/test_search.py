@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ghps.search import SearchEngine, SearchResult, _recency_boost, _title_boost
+from ghps.search import SearchEngine, SearchResult, _freshness_label, _recency_boost, _title_boost
 
 
 # ---------------------------------------------------------------------------
@@ -39,10 +39,10 @@ def _make_mock_store(rows: list[dict], repo_meta: dict | None = None) -> MagicMo
             for name, url in _REPO_URLS.items()
         }
 
-    # Mock the connect() call — SearchEngine queries (name, url, updated_at)
+    # Mock the connect() call — SearchEngine queries (name, url, updated_at, indexed_at)
     mock_db = MagicMock()
     meta_rows = [
-        (name, meta.get("url", ""), meta.get("updated_at", ""))
+        (name, meta.get("url", ""), meta.get("updated_at", ""), meta.get("indexed_at", ""))
         for name, meta in repo_meta.items()
     ]
     mock_db.execute.return_value.fetchall.return_value = meta_rows
