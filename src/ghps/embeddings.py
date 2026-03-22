@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
-
-from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
 
@@ -20,11 +17,12 @@ class EmbeddingPipeline:
 
     def __init__(self, model_name: str = DEFAULT_MODEL) -> None:
         self.model_name = model_name
-        self._model: Optional[SentenceTransformer] = None
+        self._model = None
 
     @property
-    def model(self) -> SentenceTransformer:
+    def model(self):
         if self._model is None:
+            from sentence_transformers import SentenceTransformer
             logger.info("Loading model %s", self.model_name)
             self._model = SentenceTransformer(self.model_name)
         return self._model

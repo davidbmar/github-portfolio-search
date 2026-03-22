@@ -19,14 +19,14 @@ dependencies = [
 
 [project.scripts]
 ghps = "ghps.cli:main"
+ghps-server = "ghps.api:main"
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
+    "httpx>=0.24",
+    "numpy>=1.24",
 ]
-
-[project.scripts]
-ghps-server = "ghps.api:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
