@@ -1,11 +1,11 @@
-# Sprint 14 — Agent Notes
+# Sprint 15 — Agent Notes
 
-*Started: 2026-03-22 20:08 UTC*
+*Started: 2026-03-22 20:37 UTC*
 
 Phase 1 Agents: 3
-- agentA-freshness-ui
-- agentB-reindex-actions
-- agentC-data-pipeline
+- agentA-public-tier
+- agentB-seo-perf
+- agentC-docs-cleanup
 
 Phase 2 Agents: 0
 (none)
@@ -14,57 +14,67 @@ Automated summaries from each agent are appended below as they complete.
 
 ---
 
-## agentB-reindex-actions
+## agentB-seo-perf
 
-*Completed: 2026-03-22 20:14 UTC*
+*Completed: 2026-03-22 20:42 UTC*
 
-### Files changed
-- **`.github/workflows/reindex.yml`** (NEW) — GitHub Actions workflow with manual dispatch + weekly cron, Python setup, index/export/S3 deploy/CloudFront invalidation, concurrency group
-- **`scripts/reindex.sh`** (NEW) — Standalone idempotent script: index → export → deploy with summary output
-- **`src/ghps/api.py`** (MODIFIED) — Added `_is_no_table_error()` helper; `/api/search`, `/api/clusters`, `/api/repos/{slug}` now return `{"results": [], "error": "No index found. Run ghps index first."}` with 200 instead of 500 when no index exists
-- **`tests/test_api_no_index.py`** (NEW) — 4 tests verifying graceful error handling on all three endpoints
-- **`docs/project-memory/sessions/S-2026-03-22-2013-reindex-actions.md`** (NEW) — Session doc
-
-### Commands run
-- `python3 -m py_compile src/ghps/api.py` — compile check
-- `python3 -m pytest tests/ -v` — 189 passed
-- `git push -u origin HEAD` — pushed to `agentB-reindex-actions`
-
-### Notes / follow-on work
-- The `_is_no_table_error()` helper uses type-name checking (`"OperationalError" in type(exc).__name__`) because `pysqlite3.dbapi2.OperationalError` doesn't inherit from stdlib `sqlite3.OperationalError`. This is a pragmatic workaround for the dual-sqlite3 import pattern in `store.py`.
-- `scripts/reindex.sh` gracefully skips deploy if AWS CLI is not installed, making it usable for local dev without AWS credentials.
+```
+This is the background task notification for the test run I already reviewed. The exit code 1 is from the 10 pre-existing Playwright test failures (port conflicts/missing browsers) — all 212 non-Playwright tests passed. I verified these same failures occur on `main` as well. No action needed; the work is already committed and pushed.
+```
 
 
 ---
 
-## agentC-data-pipeline
+## agentC-docs-cleanup
 
-*Completed: 2026-03-22 20:15 UTC*
+*Completed: 2026-03-22 20:43 UTC*
 
-### Files changed
-- **`src/ghps/store.py`** — Added `indexed_at TEXT` column to repos table, auto-populated in `add_repo()`, added `get_index_stats()` method
-- **`src/ghps/indexer.py`** — Added `dry_run` parameter to `index_repos()`/`index_user()`, try/except per-repo error handling, summary logging (indexed/failed/skipped)
-- **`src/ghps/search.py`** — Added `indexed_at` and `freshness` fields to `SearchResult`, added `_freshness_label()` function (today/this_week/this_month/stale)
-- **`tests/test_data_pipeline.py`** — New: 14 tests covering indexed_at storage, get_index_stats(), freshness labels, dry-run mode, error handling
-- **`tests/test_search.py`** — Updated mock store helper to include `indexed_at` in metadata rows
-- **`docs/project-memory/sessions/S-2026-03-22-2013-sprint14-data-pipeline.md`** — Session doc
+## Files changed
 
-### Commands run
-- `git pull origin main`
-- `python3 -m pytest tests/ -v` — 208 passed, 8 errors (pre-existing port conflicts in playwright tests)
-- `git push -u origin HEAD`
+| File | Action |
+|------|--------|
+| `README.md` | Updated Features (Google OAuth, freshness badges, 104 repos), Architecture (GitHub Actions), Tech Stack (google-auth, FastAPI) |
+| `docs/project-memory/backlog/README.md` | Archived 18 fixed items into two historical tables, kept 5 open items |
+| `docs/project-memory/sessions/S-2026-03-22-2039-sprint14-summary.md` | **New** — Sprint 14 session doc summarizing all 3 agents' work |
+| `docs/seed/use-cases.md` | Added freshness check use case (I2) |
+| `.gitignore` | Added sprint ephemera: `Sprint-Notes.md`, `.claude-output.txt`, `dashboard.json`, `ghps.db` |
+| `.claude-output.txt`, `Sprint-Notes.md`, `dashboard.json`, `ghps.db` | Removed from git tracking (still on disk for sprint tooling) |
 
-### Notes / follow-on work
-- The `--dry-run` flag is wired in `indexer.py` but not yet exposed as a CLI option in `cli.py`. The CLI is not owned by agentC per the brief constraints, but the indexer API fully supports it.
-- Pre-existing test isolation issue: `test_web_playwright.py` fails with port-in-use errors (unrelated to this work).
+## Commands run
+
+- `git pull origin main` — already up to date
+- `make -n install/test/lint/export/deploy` — verified all make targets resolve
+- `python3 -m pytest tests/ -v --ignore=tests/test_web_playwright.py` — **212 passed**, 0 failures
+- `git push -u origin HEAD` — pushed to `agentC-docs-cleanup`
+
+## Notes / follow-on work
+
+- **Playwright tests** (`test_web_playwright.py`) have 9 pre-existing failures due to port conflicts — not related to this work. Tracked since Sprint 14.
+- **B-019 / F-009** (public tier vs gated access separation) remain open — these are Sprint 15 agentA scope per the brief.
+- **F-002** (progress bar for indexer) and **F-004** (auto-export before deploy) are low-priority open items that could be addressed in a future sprint.
 
 
 ---
 
-## agentA-freshness-ui
+## agentA-public-tier
 
-*Completed: 2026-03-22 20:20 UTC*
+*Completed: 2026-03-22 20:44 UTC*
 
-```
-```
+### Files changed
+| File | Change |
+|---|---|
+| `web/js/app.js` | Replaced 97-line auth gate IIFE with 15-line public-first init; rewrote `_updateHeaderUserInfo()` to show Sign In/avatar; added `_showSignInPopup()` modal; added sign-in section to Request Access page; removed `__ghpsGateLocked` check |
+| `web/js/auth.js` | Added `isApproved()` stub (returns `true`); exported it in the module return |
+| `tests/test_web_playwright.py` | Fixed `test_search_no_results` race condition — wait for search route DOM render instead of just hash change |
+| `AGENT_BRIEF.md` | Already modified (pre-existing) |
+
+### Commands run
+- `git pull origin main` — already up to date
+- `python3 -m pytest tests/ -v` — **222 passed**, 3 warnings
+- `git push -u origin HEAD` — pushed to `agentA-public-tier`
+
+### Notes / follow-on work
+- **`Auth.isApproved()` is a stub** — returns `true` always. When a server-side access check is implemented, this should call the API to verify approval status.
+- **No gated features currently exist** — the code checks `Auth.isAuthenticated()` in the access page and header, ready for future gated content gates using `Auth.isApproved()`.
+- **Sign-out no longer reloads the page** — it just updates the header in-place since all content is public. This preserves scroll position and current route.
 
