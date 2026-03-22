@@ -67,8 +67,9 @@ docs/
 | 6 | Stabilization — sample data + web resilience | Complete |
 | 7 | Test fixes + real data indexing (42 repos) | Complete |
 | 8 | Search relevance + UX polish | Complete |
-| 9 | Multi-word search + gated access prep | **Next** |
-| 10 | 5th-sprint checkpoint + docs cleanup | Planned |
+| 9 | Multi-word search + gated access prep | Complete |
+| 10 | 5th-sprint checkpoint + docs + all repos | **Next** |
+| 11 | Activity visualization + analytics | Planned |
 
 ## Deployment
 

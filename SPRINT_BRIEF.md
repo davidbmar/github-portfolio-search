@@ -1,93 +1,93 @@
-# Sprint 9
+# Sprint 10
 
 Goal
-- CRITICAL: Fix F-005 — web search fails on multi-word queries ("voice processing" returns 0 results)
-- Fix B-012 — .venv symlinks break after agent merges
-- Add "Request Access" page skeleton for future gated tier
-- Improve search result quality for recruiters
+- 5th-sprint checkpoint: clean up docs, index all ~90 repos, add repo detail page
+- This is a quality/completeness sprint, not a feature sprint
 
 Constraints
 - No two agents may modify the same files
-- agentA owns web search fix (web/js/search.js, web/js/app.js)
-- agentB owns access page and meta improvements (web/index.html, web/css/style.css)
-- agentC owns infrastructure fixes (scripts/, .sprint/, Makefile, tests/)
+- agentA owns documentation cleanup (README.md, docs/)
+- agentB owns data completeness (src/ghps/, web/data/, scripts/)
+- agentC owns repo detail page (web/js/app.js, web/js/search.js, web/css/style.css)
 - Use python3 for all commands
 - Do NOT commit .venv/ to git
 
 Merge Order
-1. agentA-search-fix
-2. agentB-access-page
-3. agentC-infra
+1. agentA-docs-cleanup
+2. agentB-data-completeness
+3. agentC-repo-detail
 
 Merge Verification
 - python3 -m pytest tests/ -v
 
-## agentA-search-fix
+## agentA-docs-cleanup
 
 Objective
-- Fix multi-word search so "voice processing" returns voice repos
+- Make all documentation accurate, current, and useful
 
 Tasks
-- In web/js/search.js, update the search/filter logic:
-  - Split the query into individual terms on whitespace
-  - A repo matches if ANY term appears in its name, description, or topics (OR logic)
-  - Score repos higher when MORE terms match (rank by match count)
-  - Keep existing exact-phrase match as highest priority (if full phrase matches, rank first)
-  - Case-insensitive matching
-- In web/js/app.js, update the search result count to show "N results for term1, term2" when multi-word
-- Add fuzzy tolerance: if a term is >5 chars, also match if the term is a substring of a word (e.g., "process" matches "processing")
-- Test cases to verify manually:
-  - "voice processing" → returns voice repos (voice matches)
-  - "s3 upload" → returns S3-presignedURL repo (s3 matches)
-  - "presigned" → returns presigned-url repo (substring match)
-  - "aws lambda" → returns repos with aws OR lambda topics
-  - Single word "voice" → still works as before (9 results)
+- Rewrite README.md:
+  - Update architecture diagram to show current state (42+ repos, 6 clusters, live site)
+  - Update Quick Start to include make commands (make install, make test, make deploy)
+  - Update roadmap table with all 10 sprints
+  - Add "Live Site" section with link to https://davidbmar.com
+  - Add "Features" section listing: semantic search, faceted filtering, multi-word queries, capability clusters, relevance scoring, search highlighting, mobile responsive
+  - Remove stale references to Sprint 2/3 being "next"
+- Clean up docs/lifecycle/ROADMAP.md:
+  - Remove stale "Phase 2/3/4" references in Next Up section
+  - Ensure all completed sprints have (COMPLETED) dates
+- Review and update CLAUDE.md if it exists
+- Remove any stale TODO comments in documentation files
 
 Acceptance Criteria
-- Search "voice processing" returns voice-related repos (not 0 results)
-- Search "s3 upload" returns S3/infrastructure repos
-- Search "presigned" returns presigned-url repo
-- Single-word searches still work correctly
-- No JS errors in console
+- README.md is accurate and a new contributor can get started in 5 minutes
+- No references to sprints that haven't happened yet as "complete"
+- Roadmap is internally consistent (no duplicate sprint numbers, no stale phases)
 
-## agentB-access-page
+## agentB-data-completeness
 
 Objective
-- Add a "Request Access" page and improve site metadata
+- Index as many repos as possible and ensure data quality
 
 Tasks
-- Create the Request Access page in web/js/app.js (add route handler for #/access):
-  - Show a form with: Name, Email, Reason for access (textarea)
-  - Submit button (disabled for now — shows "Coming soon" message on submit)
-  - Explain what gated access provides: "Full code search, file tree browsing, and detailed repository analysis"
-  - Style with existing CSS variables
-- Update web/index.html:
-  - Ensure OG meta tags use real data: "42 repositories across 6 capability areas"
-  - Add og:image pointing to a screenshot or placeholder
+- Review web/data/repos.json — check for repos with missing descriptions, null languages, or broken URLs
+- Fix any repos with empty/null description: use repo name as fallback
+- Fix any repos with null language: set to "Unknown"
+- Ensure all html_url fields point to valid GitHub URLs (https://github.com/davidbmar/*)
+- Update scripts/index-and-export.sh to validate output JSON after export
+- If GITHUB_TOKEN is available: re-run indexing to capture any new repos since last index
+- Update web/data/clusters.json: verify all repos are assigned to a cluster, no orphans
+
+Acceptance Criteria
+- web/data/repos.json has 0 repos with null/empty description
+- web/data/repos.json has 0 repos with null language
+- All html_url fields are valid GitHub URLs
+- clusters.json accounts for all repos (sum of repo counts = total repos)
+- python3 -c "import json; d=json.load(open('web/data/repos.json')); print(len(d))" shows 42+
+
+## agentC-repo-detail
+
+Objective
+- Add a repo detail view so users can learn more about a specific repository
+
+Tasks
+- In web/js/app.js, add route handler for #/repo/<name>:
+  - Show repo name as heading
+  - Show full description
+  - Show language, stars, last updated, topics
+  - Show link to GitHub (html_url)
+  - Show which cluster this repo belongs to
+  - Show "Related repos" from same cluster (reuse existing component)
+  - Add "Back to search" link
+- Update web/js/search.js: make repo names in search results link to #/repo/<name> instead of directly to GitHub
+- Update web/js/app.js: make repo names on home page link to #/repo/<name>
 - Update web/css/style.css:
-  - Style the access request form (consistent with existing dark theme)
-  - Add form input styles: dark background, light text, blue accent border on focus
-  - Style the "Coming soon" message as a friendly info card
+  - Style repo detail page (consistent with existing theme)
+  - Make the GitHub link prominent with an icon or button style
 
 Acceptance Criteria
-- Playwright: navigate to https://davidbmar.com/#/access — form renders with 3 fields
-- Playwright: click Submit — shows "Coming soon" message, no errors
-- OG tags are present and accurate in page source
+- Playwright: click a repo name from search results → navigates to #/repo/<name>
+- Playwright: repo detail page shows name, description, language, topics, GitHub link
+- Playwright: "Related repos" section shows repos from same cluster
+- Playwright: "Back to search" link works
 - Mobile layout works at 375px
-
-## agentC-infra
-
-Objective
-- Fix venv symlink issue and clean up infrastructure
-
-Tasks
-- Fix B-012: In .sprint/scripts/ (the local project copy), find where .venv gets symlinked into worktrees and remove that behavior. If sprint-init.sh or sprint-tmux.sh symlinks .venv, change it to skip .venv. Add a comment: "# .venv is NOT symlinked — each worktree uses system python or creates its own venv"
-- Update Makefile: add "deploy" target that runs aws s3 sync + cloudfront invalidation
-- Add a simple smoke test in tests/test_smoke.py: verify ghps --help returns 0, verify ghps search --help returns 0
-- Clean up: remove any .gitkeep files from web/data/ (we have real data now)
-
-Acceptance Criteria
-- python3 -m pytest tests/ -v shows 0 failures, 0 errors
-- make deploy works (syncs to S3 + invalidates CloudFront)
-- .venv is NOT symlinked into worktrees after sprint-init.sh runs
-- No .gitkeep files in web/data/

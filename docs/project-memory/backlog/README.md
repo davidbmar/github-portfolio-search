@@ -50,8 +50,8 @@ What should happen?
 | B-009 | davidbmar.com still shows placeholder — web UI not deployed | Fixed | High |
 | B-010 | davidbmar.com "Could not load data" — data/repos.json is empty (.gitkeep only) | Fixed | Critical |
 | B-011 | test_web_playwright.py errors — playwright not in dev dependencies | Fixed | High |
-| B-012 | .venv symlinks break after agent merges (too many levels of symbolic links) | Open | High |
-| B-013 | Web search is keyword-only — "voice processing" returns 0 results, needs fuzzy/semantic matching | Open | Medium |
+| B-012 | .venv symlinks break after agent merges (too many levels of symbolic links) | Fixed | High |
+| B-013 | Web search is keyword-only — "voice processing" returns 0 results, needs fuzzy/semantic matching | Fixed | Medium |
 | F-004 | Deploy script should auto-export data before uploading | Open | Medium |
-| F-005 | Web search should support multi-word queries (split terms, match any) | Open | High |
-| F-005 | Web search should support multi-word queries (split terms, match any) | Open | High |
+| F-005 | Web search should support multi-word queries (split terms, match any) | Fixed | High |
+| F-005 | Web search should support multi-word queries (split terms, match any) | Fixed | High |

@@ -53,18 +53,18 @@ PM/customer review checkpoint: Live site shows polished UI with stats, search hi
 Backlog triage: B-012 still open. Added B-013 (keyword-only search) and F-005 (multi-word query support).
 Planning input for Sprint 9: Fix multi-word search (F-005), then gated access.
 
-**Sprint 9: Multi-Word Search Fix and Gated Access Prep**
-Build goals: Fix F-005 (web search should split multi-word queries and match any term). Fix B-012 (venv symlinks). Add search result count to page title. Implement basic access request form (name, email, reason). Add "Request Access" page skeleton for gated tier. Clean up stale roadmap entries.
-PM/customer review checkpoint: Search for "voice processing" should return voice repos. Search for "s3 upload" should return presigned URL repo. Request Access page shows form (no backend yet). All tests pass.
-Backlog triage: Remaining UX friction, accessibility gaps.
-Planning input for Sprint 10: 5th-sprint checkpoint — extend roadmap, full docs cleanup.
+**Sprint 9: Multi-Word Search Fix and Gated Access Prep (COMPLETED 2026-03-22)**
+Build goals: Fixed F-005 (multi-word search — "voice processing" now returns 12 results via OR matching). Fixed B-012 (venv symlinks not created in worktrees). Added Request Access page with form (Name, Email, Reason). Added smoke tests. Cleaned up .gitkeep files. Tests: 141 passed, 0 failed.
+PM/customer review checkpoint: "voice processing" returns 12 results. "s3 upload" returns S3 repos. Request Access page renders with 3 fields and Submit button. Mobile works. All tests pass.
+Backlog triage: B-012 fixed, B-013 fixed, F-005 fixed. Only medium-priority items remain.
+Planning input for Sprint 10: 5th-sprint checkpoint — extend roadmap, docs cleanup.
 
-**Sprint 10: 5th-Sprint Checkpoint — Gated Access and Docs Cleanup**
-Build goals: Implement access tiers (public: browse + search descriptions, gated: full code snippets). Add Google OAuth login flow. Build simple approval workflow (Telegram notification to David, approve/deny via link). Clean up all documentation — README, CLAUDE.md, API docs, deployment guide. Remove stale code and TODOs.
-PM/customer review checkpoint: Test full approval workflow with Playwright — request access, receive notification, approve, verify gated content unlocks. Verify public tier shows no code snippets. Test that rejected users stay on public tier.
-Backlog triage: OAuth edge cases, session management issues, notification reliability.
-Roadmap extension checkpoint: Plan Sprints 12-16 based on usage patterns and feedback.
-Planning input for Sprint 11: Prioritize based on real user feedback from gated access rollout.
+**Sprint 10: 5th-Sprint Checkpoint — Docs Cleanup and Index All Repos**
+Build goals: Clean up all documentation (README, CLAUDE.md, deployment guide). Index remaining ~50 repos (currently 42 of ~90). Add repo detail page (click repo name → full description, README preview, file list). Improve cluster algorithm (some repos may be miscategorized). Remove stale code and TODOs.
+PM/customer review checkpoint: README is accurate and helpful for new contributors. All ~90 repos indexed. Repo detail page shows useful info. Clusters make sense to a recruiter.
+Backlog triage: Close remaining medium bugs. Capture new issues from docs review.
+Roadmap extension checkpoint: Plan Sprints 12-16 based on usage patterns.
+Planning input for Sprint 11: Prioritize based on portfolio completeness and recruiter feedback.
 
 **Sprint 11: Activity Visualization and Portfolio Analytics**
 Build goals: Add D3.js capability tree (circle-packing visualization) showing the full portfolio at a glance. Build activity timeline/heatmap showing commit frequency across repos. Add portfolio analytics: most active repos, tech stack distribution, language breakdown. Create shareable portfolio link with OG tags for social media.
@@ -72,15 +72,39 @@ PM/customer review checkpoint: Visit davidbmar.com — verify capability tree re
 Backlog triage: Visualization performance issues, data accuracy, mobile rendering bugs.
 Planning input for Sprint 12: Based on user feedback and analytics, decide next priorities.
 
+**Sprint 12: Gated Access — Google OAuth and Approval Workflow**
+Build goals: Implement Google OAuth login flow. Build access request submission (form data → API → Telegram notification to David). Add admin approve/deny endpoint. Unlock gated content (code snippets, file tree) for approved users. Add session management with JWT.
+PM/customer review checkpoint: Test full workflow with Playwright — request access, receive Telegram notification, approve, verify gated content unlocks. Unauthenticated users see public tier only.
+Backlog triage: OAuth edge cases, session expiry, notification reliability.
+Planning input for Sprint 13: Based on real user access requests, tune the approval flow.
+
+**Sprint 13: Auto-Refresh and GitHub Webhooks**
+Build goals: Implement GitHub webhook listener for push events. Auto-reindex repos on push. Add periodic re-index fallback (cron or GitHub Actions). Add "freshness" badge on repos (indexed today, this week, stale). Private repo support with token-scoped indexing.
+PM/customer review checkpoint: Push a commit to a test repo → verify index updates within 5 minutes. Freshness badges display correctly. Private repos indexed but excluded from public view.
+Backlog triage: Webhook reliability, rate limiting, stale index edge cases.
+Planning input for Sprint 14: Based on webhook reliability, decide on push vs. poll strategy.
+
+**Sprint 14: MCP Integration and Agent Search**
+Build goals: Expose portfolio search via MCP server for Claude Code and No Prob Bob. Add portfolio_search, portfolio_clusters, portfolio_repo_detail tools. Enable agents to search David's portfolio during conversations. Add search analytics (what people search for, popular repos).
+PM/customer review checkpoint: Call portfolio_search("presigned URL") from Claude Code — verify structured JSON response. Test MCP tool discovery. Verify analytics capture search queries.
+Backlog triage: MCP schema gaps, agent integration issues.
+Planning input for Sprint 15: 5th-sprint checkpoint — review full system, plan next phase.
+
+**Sprint 15: 5th-Sprint Checkpoint — Performance and Polish**
+Build goals: Performance audit (page load time, search latency, mobile performance). Accessibility audit (WCAG 2.1 AA). SEO optimization (structured data, sitemap). Browser-native offline mode exploration (transformers.js for local embeddings). Full system review and cleanup.
+PM/customer review checkpoint: Lighthouse score >90. All WCAG AA issues resolved. Search works offline with cached data. Full end-to-end test of every feature.
+Roadmap extension checkpoint: Plan Sprints 16-20 based on production usage and feedback.
+Planning input for Sprint 16: Based on analytics, prioritize features users actually want.
+
 ### Current Focus
 
-**Sprint 9: Multi-Word Search Fix and Gated Access Prep (Sprints 1-8 COMPLETE)**
+**Sprint 10: 5th-Sprint Checkpoint — Docs Cleanup and Index All Repos (Sprints 1-9 COMPLETE)**
 
-Sprints 1-8 delivered: full indexing pipeline, REST API, MCP server, CLI, web UI with faceted search, deploy pipeline, 42 real repos live on davidbmar.com, search highlighting, relevance scoring, language stats, and portfolio overview. Sprint 9 focuses on multi-word search support and gated access scaffolding.
+Sprints 1-9 delivered: full stack portfolio search with 42 real repos, faceted search, multi-word queries, search highlighting, relevance scoring, capability clusters, Request Access page, language stats, and mobile support at davidbmar.com. Sprint 10 is a checkpoint sprint: docs cleanup, index remaining repos, add repo detail page.
 
 ### Next Up
 
-**Sprint 10: 5th-Sprint Checkpoint** — roadmap extension, full docs cleanup, gated access with OAuth.
+**Sprint 11: Activity Visualization** — D3.js capability tree, activity heatmap, portfolio analytics.
 
 Finally **Phase 5: Public Deploy + Gated Access (Sprints 8-9)** — S3/CloudFront at davidbmar.com, Google OAuth, approval workflow with Telegram notifications, public/gated tiers.
 
