@@ -32,7 +32,7 @@ class ClusterEngine:
     def __init__(self, store: "VectorStore") -> None:
         self.store = store
 
-    def cluster_repos(self, n_clusters: int = 10) -> list[Cluster]:
+    def cluster_repos(self, n_clusters: int = 6) -> list[Cluster]:
         """Group repos into clusters based on their average embedding.
 
         Each repo's embedding is the mean of its chunk embeddings.
@@ -84,41 +84,74 @@ class ClusterEngine:
         for name, label in zip(names, labels):
             clusters_map.setdefault(int(label), []).append(name)
 
+        # Generate unique names
+        used_names: set[str] = set()
         result: list[Cluster] = []
         for label_id, cluster_repos in sorted(clusters_map.items()):
             centroid = kmeans.cluster_centers_[label_id].tolist()
-            name = _generate_cluster_name(cluster_repos, repo_meta)
+            name = _generate_cluster_name(cluster_repos, repo_meta, used_names)
+            used_names.add(name)
             result.append(Cluster(name=name, repos=cluster_repos, centroid=centroid))
 
         return result
 
 
-def _generate_cluster_name(repo_names: list[str], repo_meta: dict) -> str:
-    """Generate a human-readable cluster name from repo metadata."""
-    languages: dict[str, int] = {}
-    topics: dict[str, int] = {}
+# Keywords to scan for in repo names + descriptions → capability labels
+_KEYWORD_CAPABILITIES: list[tuple[list[str], str]] = [
+    (["voice", "speech", "tts", "stt", "piper", "whisper", "diarization"], "Voice & Speech Processing"),
+    (["transcri", "asr", "speech-to-text", "whisper"], "Transcription & ASR"),
+    (["browser", "webrtc", "webassembly", "wasm", "frontend", "webgpu"], "Browser & Frontend"),
+    (["s3", "lambda", "cloudfront", "aws", "presigned", "api-gateway", "sqs", "cloudformation"], "AWS Infrastructure"),
+    (["llm", "rag", "vector", "embedding", "search", "semantic", "ai", "gpt", "claude", "chatbot"], "AI & Search"),
+    (["docker", "deploy", "ci", "cd", "terraform", "k8s", "kubernetes"], "Infrastructure & DevOps"),
+    (["mcp", "cli", "tool", "telegram", "whatsapp", "bot"], "Developer Tools & Bots"),
+    (["fsm", "state-machine", "scheduler", "workflow", "calendar"], "Workflow & Automation"),
+    (["video", "audio", "stream", "media", "youtube", "commercial"], "Media Processing"),
+]
+
+
+def _generate_cluster_name(
+    repo_names: list[str], repo_meta: dict, used_names: set[str]
+) -> str:
+    """Generate a capability name by scanning repo names and descriptions for keywords."""
+    capability_votes: dict[str, int] = {}
 
     for name in repo_names:
         meta = repo_meta.get(name, {})
-        lang = meta.get("language")
-        if lang:
-            languages[lang] = languages.get(lang, 0) + 1
-        raw_topics = meta.get("topics", "[]")
-        try:
-            topic_list = json.loads(raw_topics) if isinstance(raw_topics, str) else (raw_topics or [])
-        except (json.JSONDecodeError, TypeError):
-            topic_list = []
-        for t in topic_list:
-            topics[t] = topics.get(t, 0) + 1
+        desc = (meta.get("description") or "").lower()
+        searchable = f"{name.lower()} {desc}"
 
-    parts: list[str] = []
-    if languages:
-        top_lang = max(languages, key=languages.get)  # type: ignore[arg-type]
-        parts.append(top_lang)
-    if topics:
-        top_topic = max(topics, key=topics.get)  # type: ignore[arg-type]
-        parts.append(top_topic)
+        for keywords, capability in _KEYWORD_CAPABILITIES:
+            for kw in keywords:
+                if kw in searchable:
+                    capability_votes[capability] = capability_votes.get(capability, 0) + 1
+                    break  # one vote per capability per repo
 
-    if parts:
-        return " / ".join(parts)
-    return f"cluster-{repo_names[0]}" if repo_names else "unknown"
+    # Pick the highest-voted capability that hasn't been used
+    if capability_votes:
+        for cap, _ in sorted(capability_votes.items(), key=lambda x: -x[1]):
+            if cap not in used_names:
+                return cap
+
+    # Fallback: find the most common meaningful word in descriptions
+    words: dict[str, int] = {}
+    stop = {
+        "the", "a", "an", "and", "or", "for", "to", "of", "with", "in", "on",
+        "is", "it", "this", "that", "from", "using", "based", "simple", "basic",
+        "new", "test", "repo", "project", "file", "files", "code", "app",
+    }
+    for name in repo_names:
+        meta = repo_meta.get(name, {})
+        desc = (meta.get("description") or "").lower()
+        for w in desc.split():
+            w = w.strip(".,;:!?()-/\"'")
+            if len(w) > 3 and w not in stop:
+                words[w] = words.get(w, 0) + 1
+
+    if words:
+        top_words = sorted(words, key=words.get, reverse=True)[:2]  # type: ignore[arg-type]
+        candidate = " & ".join(w.title() for w in top_words)
+        if candidate not in used_names:
+            return candidate
+
+    return f"Other Projects ({len(repo_names)} repos)"
