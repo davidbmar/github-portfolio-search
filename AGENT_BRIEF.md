@@ -1,42 +1,40 @@
-agentC-docs-cleanup — Sprint 15
+agentB-analytics — Sprint 16
 
 Sprint-Level Context
 
 Goal
-- Fix public tier: browse clusters, search descriptions, view repos WITHOUT sign-in
-- Sign-in required only for gated features (code snippets, file trees, full semantic search)
-- 5th-sprint checkpoint: SEO, performance, docs cleanup
+- Expose portfolio search as MCP tools for Claude Code and AI agents
+- Add search analytics (track queries, popular repos)
+- Enable agents to search David's portfolio during conversations
 
 Constraints
 - No two agents may modify the same files
-- agentA owns auth UX flow (web/js/app.js, web/js/auth.js)
-- agentB owns SEO and performance (web/index.html, web/css/style.css, web/sitemap.xml — NEW FILE)
-- agentC owns docs and cleanup (README.md, docs/lifecycle/ROADMAP.md, docs/project-memory/)
+- agentA owns the MCP server (src/ghps/mcp_server.py — NEW FILE)
+- agentB owns search analytics (src/ghps/analytics.py — NEW FILE, src/ghps/api.py)
+- agentC owns MCP integration tests and CLI improvements (tests/test_mcp.py — NEW FILE, src/ghps/cli.py)
 - Use python3 for all commands
 - Do NOT commit .venv/ or .env to git
-- The Google OAuth client ID is already configured — do not change web/config.json
+- The MCP server should use the existing search engine (src/ghps/search.py) and store (src/ghps/store.py)
 
 
 Objective
-- 5th-sprint checkpoint docs cleanup and project memory maintenance
+- Track search queries and popular repos for analytics
 
 Tasks
-- Update README.md:
-  - Rewrite Features section to reflect current state (Google OAuth, 104 repos, freshness badges)
-  - Update Architecture diagram to include GitHub Actions reindex
-  - Update Tech Stack to include google-auth
-  - Verify all make commands still work
-- Review and update docs/project-memory/backlog/README.md:
-  - Verify all Fixed items are actually fixed
-  - Remove or archive items older than Sprint 10
-  - Ensure priority assignments are accurate
-- Add a session doc for Sprint 14 in docs/project-memory/sessions/
-- Verify docs/seed/use-cases.md is still accurate — update if needed
-- Clean up any stale files in the repo root (.agent-done-*, old logs)
+- Create src/ghps/analytics.py:
+  - Store search events in a SQLite table: query, timestamp, result_count, source (web/api/mcp/cli)
+  - Functions: log_search(query, result_count, source), get_popular_queries(limit=20), get_search_stats()
+  - get_search_stats() returns: total_searches, unique_queries, avg_results, top_queries, searches_today
+  - Use ~/.ghps/analytics.db for storage (separate from main index)
+- Update src/ghps/api.py:
+  - Log searches in the /api/search endpoint via analytics.log_search()
+  - Add GET /api/analytics/stats — returns search statistics (admin only, or public for now)
+  - Add GET /api/analytics/queries — returns recent queries (last 100)
+- Add tests for analytics logging, stats calculation, and API endpoints
 
 Acceptance Criteria
-- README.md accurately describes current features and architecture
-- Backlog is clean and current
-- Sprint 14 session doc exists
-- No stale files in repo root
+- Search via API logs the query to analytics.db
+- GET /api/analytics/stats returns valid JSON with search counts
+- Analytics DB is separate from main index (~/.ghps/analytics.db)
+- Analytics functions handle empty DB gracefully
 - python3 -m pytest tests/ -v passes
