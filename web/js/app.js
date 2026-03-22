@@ -13,9 +13,10 @@
   document.addEventListener("DOMContentLoaded", async () => {
     await Auth.loadConfig();
 
-    // Listen for auth changes (sign-in / sign-out) to update header
+    // Listen for auth changes (sign-in / sign-out)
     Auth.onAuthChange(() => {
-      _updateHeaderUserInfo();
+      // Full reload ensures clean state after sign-in/sign-out
+      location.reload();
     });
 
     _updateHeaderUserInfo();
