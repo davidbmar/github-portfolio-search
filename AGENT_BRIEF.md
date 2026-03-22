@@ -1,4 +1,4 @@
-agentB-seo-perf — Sprint 15
+agentC-docs-cleanup — Sprint 15
 
 Sprint-Level Context
 
@@ -18,27 +18,25 @@ Constraints
 
 
 Objective
-- Improve SEO, page performance, and web standards compliance
+- 5th-sprint checkpoint docs cleanup and project memory maintenance
 
 Tasks
-- Update web/index.html:
-  - Add structured data (JSON-LD) for WebSite and Person schema
-  - Update meta description and OG tags to reflect 104 repos (currently says 42)
-  - Add robots meta tag (index, follow)
-  - Ensure all external scripts have integrity/crossorigin attributes where possible
-- Create web/sitemap.xml:
-  - Include main pages: /, /search, /clusters, /access
-  - Add lastmod dates
-- Update web/css/style.css:
-  - Add prefers-reduced-motion media query for animations
-  - Ensure focus styles are visible for keyboard navigation (WCAG 2.1 AA)
-  - Optimize any large CSS selectors
-- Add web/robots.txt with sitemap reference
+- Update README.md:
+  - Rewrite Features section to reflect current state (Google OAuth, 104 repos, freshness badges)
+  - Update Architecture diagram to include GitHub Actions reindex
+  - Update Tech Stack to include google-auth
+  - Verify all make commands still work
+- Review and update docs/project-memory/backlog/README.md:
+  - Verify all Fixed items are actually fixed
+  - Remove or archive items older than Sprint 10
+  - Ensure priority assignments are accurate
+- Add a session doc for Sprint 14 in docs/project-memory/sessions/
+- Verify docs/seed/use-cases.md is still accurate — update if needed
+- Clean up any stale files in the repo root (.agent-done-*, old logs)
 
 Acceptance Criteria
-- Structured data validates (test with Google Rich Results Test)
-- Meta descriptions accurate (104 repos, not 42)
-- sitemap.xml and robots.txt served correctly
-- Focus styles visible on tab navigation
-- Animations respect prefers-reduced-motion
+- README.md accurately describes current features and architecture
+- Backlog is clean and current
+- Sprint 14 session doc exists
+- No stale files in repo root
 - python3 -m pytest tests/ -v passes
