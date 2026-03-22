@@ -1,25 +1,21 @@
-`★ Insight ─────────────────────────────────────`
-- **Defensive JSON parsing**: Instead of calling `.json()` directly (which throws on empty body), we first read `.text()`, check if it's non-empty, then `JSON.parse`. This prevents the confusing "Unexpected end of JSON input" error that was causing B-010.
-- **Graceful degradation pattern**: The `useFallbackData()` function sets the app state to sample data *and* renders the UI, so the site still looks functional even when the backend has no data. The error banner is informational, not blocking.
-`─────────────────────────────────────────────────`
-
----
-
 ## Summary
 
 ### Files changed
-- `web/js/app.js` — Error handling with retry button, sample data fallback, loading skeleton, footer
-- `web/js/search.js` — Guard clauses for empty/null repos in `search()`, `applyFilters()`, `extractFacets()`
-- `web/css/style.css` — Loading skeleton animation, error banner styles, retry button, footer, sticky footer layout, mobile responsive
-- `web/index.html` — Meta description, OG tags, Twitter card, SVG emoji favicon
-- `docs/project-memory/sessions/S-2026-03-22-0712-sprint6-web-resilience.md` — Session doc
+- **`src/ghps/export.py`** — Language fallback: `""` → `"Unknown"` for repos with no language detected
+- **`scripts/generate-sample-data.py`** — Replaced 10 fictional repos with 42 real repos from davidbmar's GitHub account
+- **`scripts/index-and-export.sh`** — Added JSON validation step (checks files exist, are valid arrays, are non-empty)
+- **`web/data/repos.json`** — Regenerated with 42 real repos, accurate descriptions and `html_url` links
+- **`web/data/clusters.json`** — Regenerated with 6 logical clusters (Voice & Speech, Transcription & ASR, Browser-Native AI, AI & Search Tools, AWS Infrastructure, Developer Tools)
+- **`docs/project-memory/sessions/S-2026-03-22-1538-real-data-pipeline.md`** — Session doc
 
 ### Commands run
-- `git pull origin main` — merged latest
-- `python3 -m pytest tests/ -v` — 137 passed
-- `node -e ...` — verified search.js handles empty/null data
-- `git push -u origin HEAD` — pushed to remote
+- `git pull origin main`
+- `curl` GitHub public API to fetch real repo metadata (106 repos across 2 pages)
+- `python3 scripts/generate-sample-data.py --output web/data`
+- `python3 -m pytest tests/ -v` — **129 passed, 0 failures**
+- `git push -u origin HEAD`
 
 ### Notes / follow-on work
-- **Playwright tests** mentioned in acceptance criteria (visit site with empty data, sample data, mobile 375px viewport) are not yet implemented — these would be added by the test agent (agentB) per the constraint boundaries
-- The sample fallback data is minimal (1 repo, 1 cluster) — could be enriched with more representative examples
+- **GITHUB_TOKEN not available** — used public API for metadata only. When token is available, run `GITHUB_TOKEN=ghp_xxx scripts/index-and-export.sh davidbmar` for full indexing with embeddings and `search-index.json` generation
+- The `ORDER BY name` in `_build_repos` SQL already ensures deterministic output (no code change needed)
+- Repos with no README are already handled — description is pulled from the DB `repos` table, not from README content
