@@ -1,22 +1,17 @@
-`★ Insight ─────────────────────────────────────`
-- The `renderRepoCards()` function is the single rendering path for repo cards across both home page and search results. By changing the link target there, one edit covered two requirements from the brief.
-- The GitHub link uses an inline SVG of the GitHub octocat logo rather than an external image — this avoids an extra HTTP request and works offline.
-`─────────────────────────────────────────────────`
+All done. Here's the summary:
 
----
+## Files changed
+- **web/js/app.js** — Added Recent Activity section (landing page), cluster stats summary + Technology Distribution bar chart (clusters page), sort dropdown UI, CSS injection via `injectActivityStyles()`
+- **web/js/search.js** — Added `sortResults()` function (relevance/recent/name modes)
+- **docs/project-memory/sessions/S-2026-03-22-1739-sprint11-activity-stats.md** — Session doc
 
-## Summary
+## Commands run
+- `git pull origin main` — already up to date
+- `make test` — 149 tests passed
+- `make lint` — clean
+- `git commit` + `git push -u origin HEAD` — pushed to `agentB-activity-stats`
 
-### Files changed
-- **`web/js/app.js`** — Added `#/repo/<name>` route, `findClusterForRepo()`, `renderRepoDetail()` function; changed repo card links from GitHub URLs to detail page
-- **`web/css/style.css`** — Added styles for repo detail page (`.repo-detail`, `.github-link` button, `.repo-detail-meta`, `.repo-detail-topics`, `.repo-detail-cluster`, mobile responsive)
-- **`docs/project-memory/sessions/S-2026-03-22-1710-sprint10-repo-detail.md`** — Session doc
-
-### Commands run
-- `git pull origin main` — up to date
-- `python3 -m pytest tests/ -v` — 149 passed
-- `git push -u origin HEAD` — pushed to `agentC-repo-detail`
-
-### Notes / follow-on work
-- The `search.js` file was **not modified** — repo name linking was handled entirely in `renderRepoCards()` within `app.js`, which is the shared renderer for both search results and home page cards
-- Playwright tests for the new detail page (click repo → see detail, verify fields, back link, mobile) are not yet added — the acceptance criteria mention Playwright tests but those would need to be added in a follow-up or by another agent
+## Notes / follow-on work
+- CSS is injected via JS (`injectActivityStyles()`) to avoid modifying `web/css/style.css` owned by agentC. If file ownership rules change, these styles could move to the CSS file for cleaner separation.
+- The sort state (`currentSortMode`) resets on page reload — could be persisted to `localStorage` if desired.
+- Playwright acceptance tests for the new features (Recent Activity, cluster stats, sort dropdown) should be added in a follow-up sprint.
