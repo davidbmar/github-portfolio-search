@@ -106,8 +106,6 @@ Sprints 1-9 delivered: full stack portfolio search with 42 real repos, faceted s
 
 **Sprint 11: Activity Visualization** — D3.js capability tree, activity heatmap, portfolio analytics.
 
-Finally **Phase 5: Public Deploy + Gated Access (Sprints 8-9)** — S3/CloudFront at davidbmar.com, Google OAuth, approval workflow with Telegram notifications, public/gated tiers.
-
 ## Architecture
 
 ### System Overview

@@ -2,14 +2,22 @@
 
 ## Project Overview
 
-TODO: Describe your project here
+Semantic search engine for 90+ GitHub repositories. Indexes READMEs and source files using sentence-transformers, stores embeddings in SQLite-vec, and serves results via CLI, REST API, MCP server, and a static web UI deployed at davidbmar.com.
 
 ### Tech Stack
-TODO: List your tech stack
+- Python 3.9+, FastAPI, sentence-transformers, SQLite-vec, Click
+- Vanilla JS + CSS for web UI
+- AWS S3 + CloudFront for hosting
 
 ### Key Commands
 ```bash
-TODO: Add your key commands
+make install     # Install dependencies
+make test        # Run test suite (pytest)
+make lint        # Compile-check Python files
+make index USER=davidbmar  # Index repos from GitHub
+make export      # Export data for web UI
+make deploy      # Deploy to S3/CloudFront
+make serve       # Run local API server
 ```
 
 ---
