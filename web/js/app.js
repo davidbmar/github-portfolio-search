@@ -6,61 +6,156 @@
  * before DOM insertion. escapeHtml uses createTextNode which is XSS-safe.
  */
 
-// --- Password Gate (session-scoped) ---
-// Wraps password input in a <form> to avoid Chrome "not secure" warning.
-// Sets window.__ghpsGateLocked so App.init() can skip initialization.
+// --- Auth Gate ---
+// Uses Auth module (auth.js) for Google OAuth or password fallback.
+// Sets window.__ghpsGateLocked so App.init() can skip initialization
+// until auth is resolved.
 (() => {
-  const KEY = "ghps_auth";
-  const EXPECTED = "guild";
-  if (sessionStorage.getItem(KEY) === "1") return;
+  // Mark as locked until auth check completes
   window.__ghpsGateLocked = true;
-  document.addEventListener("DOMContentLoaded", () => {
-    if (sessionStorage.getItem(KEY) === "1") { window.__ghpsGateLocked = false; return; }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    await Auth.loadConfig();
+
+    // If already authenticated, unlock and proceed
+    if (Auth.isAuthenticated()) {
+      window.__ghpsGateLocked = false;
+      _updateHeaderUserInfo();
+      App.init();
+      return;
+    }
+
+    // Show auth gate
     document.body.textContent = "";
+
+    // Re-add header so page doesn't look broken
     const overlay = document.createElement("div");
     overlay.style.cssText = "position:fixed;inset:0;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:9999";
-    const form = document.createElement("form");
-    form.style.cssText = "text-align:center;color:#c9d1d9;font-family:system-ui";
-    form.autocomplete = "off";
-    form.onsubmit = e => { e.preventDefault(); tryLogin(); };
+
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = "text-align:center;color:#c9d1d9;font-family:system-ui;max-width:360px";
+
     const h2 = document.createElement("h2");
     h2.textContent = "GitHub Portfolio Search";
     h2.style.marginBottom = "1rem";
-    const p = document.createElement("p");
-    p.textContent = "Enter password to continue";
-    p.style.cssText = "color:#8b949e;margin-bottom:1.5rem";
-    const input = document.createElement("input");
-    input.type = "password";
-    input.name = "password";
-    input.placeholder = "Password";
-    input.autocomplete = "current-password";
-    input.style.cssText = "padding:10px 16px;border-radius:8px;border:1px solid #30363d;background:#161b22;color:#c9d1d9;font-size:16px;width:240px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto";
-    const btn = document.createElement("button");
-    btn.type = "submit";
-    btn.textContent = "Enter";
-    btn.style.cssText = "padding:10px 32px;border-radius:8px;border:none;background:#58a6ff;color:#0d1117;font-weight:600;font-size:16px;cursor:pointer";
-    const err = document.createElement("p");
-    err.style.cssText = "color:#f85149;margin-top:8px;min-height:1.2em";
-    const tryLogin = () => {
-      if (input.value === EXPECTED) {
-        sessionStorage.setItem(KEY, "1");
+    wrapper.appendChild(h2);
+
+    if (Auth.isOAuthEnabled()) {
+      // Google Sign-In mode
+      const p = document.createElement("p");
+      p.textContent = "Sign in with Google to continue";
+      p.style.cssText = "color:#8b949e;margin-bottom:1.5rem";
+      wrapper.appendChild(p);
+
+      const btnContainer = document.createElement("div");
+      btnContainer.id = "google-signin-btn";
+      btnContainer.style.cssText = "display:flex;justify-content:center;margin-bottom:1rem";
+      wrapper.appendChild(btnContainer);
+
+      Auth.onAuthChange(() => {
+        window.__ghpsGateLocked = false;
         location.reload();
-      } else {
-        err.textContent = "Incorrect password";
-        input.value = "";
-        input.focus();
-      }
-    };
-    form.appendChild(h2);
-    form.appendChild(p);
-    form.appendChild(input);
-    form.appendChild(btn);
-    form.appendChild(err);
-    overlay.appendChild(form);
-    document.body.appendChild(overlay);
-    input.focus();
+      });
+
+      overlay.appendChild(wrapper);
+      document.body.appendChild(overlay);
+      Auth.renderSignInButton(btnContainer);
+    } else {
+      // Password gate fallback
+      const p = document.createElement("p");
+      p.textContent = "Enter password to continue";
+      p.style.cssText = "color:#8b949e;margin-bottom:1.5rem";
+      wrapper.appendChild(p);
+
+      const form = document.createElement("form");
+      form.autocomplete = "off";
+      form.onsubmit = e => { e.preventDefault(); attemptLogin(); };
+
+      const input = document.createElement("input");
+      input.type = "password";
+      input.name = "password";
+      input.placeholder = "Password";
+      input.autocomplete = "current-password";
+      input.style.cssText = "padding:10px 16px;border-radius:8px;border:1px solid #30363d;background:#161b22;color:#c9d1d9;font-size:16px;width:240px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto";
+
+      const btn = document.createElement("button");
+      btn.type = "submit";
+      btn.textContent = "Enter";
+      btn.style.cssText = "padding:10px 32px;border-radius:8px;border:none;background:#58a6ff;color:#0d1117;font-weight:600;font-size:16px;cursor:pointer";
+
+      const err = document.createElement("p");
+      err.style.cssText = "color:#f85149;margin-top:8px;min-height:1.2em";
+
+      const attemptLogin = () => {
+        if (Auth.tryPasswordLogin(input.value)) {
+          window.__ghpsGateLocked = false;
+          location.reload();
+        } else {
+          err.textContent = "Incorrect password";
+          input.value = "";
+          input.focus();
+        }
+      };
+
+      form.appendChild(input);
+      form.appendChild(btn);
+      form.appendChild(err);
+      wrapper.appendChild(form);
+      overlay.appendChild(wrapper);
+      document.body.appendChild(overlay);
+      input.focus();
+    }
   });
 })();
+
+/**
+ * Update the header to show user info (avatar + name) and Sign Out button
+ * when authenticated via Google OAuth.
+ */
+function _updateHeaderUserInfo() {
+  const nav = document.querySelector(".site-nav");
+  if (!nav) return;
+
+  // Remove any existing user-info element
+  const existing = document.getElementById("user-info");
+  if (existing) existing.remove();
+
+  if (!Auth.isOAuthEnabled()) return;
+
+  const user = Auth.getUser();
+  if (!user) return;
+
+  const userInfo = document.createElement("div");
+  userInfo.id = "user-info";
+  userInfo.style.cssText = "display:flex;align-items:center;gap:8px;margin-left:auto";
+
+  if (user.picture) {
+    const avatar = document.createElement("img");
+    avatar.src = user.picture;
+    avatar.alt = user.name || "User avatar";
+    avatar.referrerPolicy = "no-referrer";
+    avatar.style.cssText = "width:28px;height:28px;border-radius:50%;border:1px solid #30363d";
+    userInfo.appendChild(avatar);
+  }
+
+  if (user.name) {
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = user.name;
+    nameSpan.style.cssText = "color:#c9d1d9;font-size:14px;white-space:nowrap";
+    userInfo.appendChild(nameSpan);
+  }
+
+  const signOutBtn = document.createElement("button");
+  signOutBtn.textContent = "Sign Out";
+  signOutBtn.style.cssText = "padding:4px 12px;border-radius:6px;border:1px solid #30363d;background:transparent;color:#8b949e;font-size:13px;cursor:pointer;margin-left:4px";
+  signOutBtn.addEventListener("click", () => {
+    Auth.signOut();
+    location.reload();
+  });
+  userInfo.appendChild(signOutBtn);
+
+  nav.parentElement.appendChild(userInfo);
+}
 
 const App = (() => {
   // State
@@ -813,6 +908,13 @@ const App = (() => {
     emailGroup.appendChild(emailInput);
     form.appendChild(emailGroup);
 
+    // Auto-fill from Google profile if authenticated
+    const user = Auth.getUser();
+    if (user) {
+      if (user.name) nameInput.value = user.name;
+      if (user.email) emailInput.value = user.email;
+    }
+
     // Reason field
     const reasonGroup = document.createElement("div");
     reasonGroup.className = "form-group";
@@ -1115,6 +1217,7 @@ const App = (() => {
   function init() {
     if (window.__ghpsGateLocked) return;
     injectActivityStyles();
+    _updateHeaderUserInfo();
     window.addEventListener("hashchange", route);
 
     const searchInput = document.getElementById("search-input");
@@ -1139,6 +1242,3 @@ const App = (() => {
 
   return { init };
 })();
-
-// Start the app when DOM is ready
-document.addEventListener("DOMContentLoaded", App.init);
