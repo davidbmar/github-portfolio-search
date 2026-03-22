@@ -58,9 +58,18 @@ def _build_repos(store: "VectorStore") -> list[dict]:
     from ghps.search import _recency_boost
 
     db = store.connect()
-    rows = db.execute(
-        "SELECT name, description, language, topics, stars, updated_at, url FROM repos"
-    ).fetchall()
+
+    # Try to read inferred_topics if agentA has added the column
+    try:
+        rows = db.execute(
+            "SELECT name, description, language, topics, stars, updated_at, url, inferred_topics FROM repos"
+        ).fetchall()
+        has_inferred = True
+    except Exception:
+        rows = db.execute(
+            "SELECT name, description, language, topics, stars, updated_at, url FROM repos"
+        ).fetchall()
+        has_inferred = False
 
     last_indexed = datetime.now(timezone.utc).isoformat()
 
@@ -71,6 +80,15 @@ def _build_repos(store: "VectorStore") -> list[dict]:
             topics = json.loads(topics_raw) if topics_raw else []
         except (json.JSONDecodeError, TypeError):
             topics = []
+
+        # Merge inferred topics if available
+        if has_inferred:
+            inferred_raw = row[7]
+            try:
+                inferred = json.loads(inferred_raw) if inferred_raw else []
+            except (json.JSONDecodeError, TypeError):
+                inferred = []
+            topics = list(dict.fromkeys(topics + inferred))
 
         stars = row[4] or 0
         updated_at = row[5] or ""
