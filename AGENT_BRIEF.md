@@ -1,37 +1,38 @@
-agentC-deploy — Sprint 4
+agentA-deploy-fixes — Sprint 5
 
 Sprint-Level Context
 
 Goal
-- Build the public web UI for davidbmar.com with search and browse capabilities
-- Fix Sprint 3 test failures (B-005, B-006)
-- Deploy static site to S3/CloudFront
+- Deploy the web UI to davidbmar.com (fix B-009)
+- Fix remaining test failures (B-005, B-006)
+- Add data export pipeline so the site has real content
+- Begin gated access foundation (access request UI)
 
 Constraints
 - No two agents may modify the same files
-- agentA owns bug fixes and static data export (tests/, src/ghps/export.py)
-- agentB owns web UI frontend (web/index.html, web/css/, web/js/)
-- agentC owns deployment pipeline and integration (deploy.sh, web/api-proxy.js)
+- agentA owns deploy pipeline and bug fixes (deploy.sh, tests/test_cli.py, tests/test_e2e.py, src/ghps/cli.py)
+- agentB owns data indexing and export (src/ghps/export.py, src/ghps/indexer.py, scripts/)
+- agentC owns web UI improvements and access request page (web/)
 - Use python3 for all commands
-- Frontend must be vanilla JS (no build step) — served as static files from S3
-- Mobile-responsive layout required
+- Do NOT commit .venv/ or node_modules/ to git
 
 
 Objective
-- Build deployment pipeline to push web UI to S3/CloudFront at davidbmar.com
+- Fix test failures and create a working deploy script for davidbmar.com
 
 Tasks
-- Create deploy.sh script that:
-  - Runs ghps export to generate fresh data
-  - Copies web/ files + data/ to a build directory
-  - Uploads to S3 bucket davidbmar-com using aws s3 sync
-  - Invalidates CloudFront cache (distribution E3RCY6XA80ANRT)
-  - Prints the live URL
-- Create web/data/.gitkeep (data dir for export output)
-- Add deploy instructions to README.md
-- Create a simple health check: web/health.json with version and last-deploy timestamp
+- Fix B-005: test_cli.py failures on missing index — add proper error handling in cli.py for when index DB doesn't exist
+- Fix B-006: test_e2e.py JSON decode error — fix CLI --format json to output valid JSON
+- Create deploy.sh in project root:
+  - Check for web/ directory
+  - If src/ghps/export.py exists, run ghps export --output web/data/
+  - Run: aws s3 sync web/ s3://davidbmar-com/ --delete --exclude "*.pyc"
+  - Run: aws cloudfront create-invalidation --distribution-id E3RCY6XA80ANRT --paths "/*"
+  - Print: "Deployed to https://davidbmar.com"
+- Make deploy.sh executable (chmod +x)
+- Create tests/test_deploy.py — verify deploy.sh exists, is executable, has correct bucket name
 
 Acceptance Criteria
-- ./deploy.sh uploads files to S3 and invalidates CloudFront
-- https://davidbmar.com shows the search UI after deploy
-- deploy.sh is idempotent (safe to run multiple times)
+- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes with 0 failures
+- ./deploy.sh runs without errors (when AWS credentials are available)
+- Playwright test: after deploy, https://davidbmar.com shows search UI not placeholder
