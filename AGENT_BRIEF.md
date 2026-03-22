@@ -1,4 +1,4 @@
-agentB-ui-polish — Sprint 8
+agentC-infra-fixes — Sprint 8
 
 Sprint-Level Context
 
@@ -17,28 +17,17 @@ Constraints
 
 
 Objective
-- Make davidbmar.com look professional — a recruiter should understand David's capabilities in 10 seconds
+- Fix venv symlink issue and improve developer experience
 
 Tasks
-- Update web/js/app.js:
-  - Add portfolio stats on landing page: "N repositories indexed across M capability areas"
-  - Add "Last updated: DATE" indicator from repos.json metadata
-  - Show repo count per language in a small bar chart or stat row
-- Update web/js/search.js:
-  - Bold/highlight matched query terms in search result descriptions
-  - Add "Related repos" section below search results (repos in same cluster)
-  - Show relevance score as a visual bar instead of raw number
-- Update web/css/style.css:
-  - Improve card hover effects (subtle lift + shadow)
-  - Better typography: increase line-height for readability
-  - Add gradient accent to cluster cards matching cluster theme
-  - Improve search result card layout — more whitespace, cleaner hierarchy
-- Update web/index.html:
-  - Update meta description with real portfolio stats
-  - Ensure OG image and description work for social sharing
+- Fix B-012: Update .sprint/scripts/sprint-init.sh (or the local copy) to NOT symlink .venv into worktrees. Instead, each worktree should create its own venv or use the system python. Add a comment explaining why.
+- Add .env.example file with GITHUB_TOKEN=ghp_xxx placeholder (for F-001)
+- Update scripts/index-and-export.sh to source .env if it exists (python-dotenv style)
+- Add a test that verifies ghps CLI --help works without a venv (basic smoke test)
+- Update Makefile: add "reindex" target that runs the full index-and-export pipeline
 
 Acceptance Criteria
-- Playwright: visit https://davidbmar.com — landing page shows repo count, cluster count, last updated
-- Playwright: search for "voice" — results show highlighted terms, relevance bars
-- Playwright: mobile viewport (375px) — all elements readable, no horizontal scroll
-- No uncaught JS errors in console
+- python3 -m pytest tests/ -v shows 0 failures, 0 errors
+- make reindex works when GITHUB_TOKEN is set
+- .env.example exists with clear instructions
+- After sprint-init.sh creates worktrees, .venv is NOT symlinked (verify manually)

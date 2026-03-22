@@ -307,6 +307,25 @@ def _mock_status_execute(sql: str) -> MagicMock:
 # ghps serve
 # ---------------------------------------------------------------------------
 
+class TestCLISmoke:
+    """Basic smoke tests that verify the CLI works without any venv or external deps."""
+
+    def test_help_works(self):
+        """ghps --help should print usage info and exit 0."""
+        sys.modules.pop("ghps.cli", None)
+        from ghps.cli import main
+
+        runner = CliRunner()
+        result = runner.invoke(main, ["--help"])
+
+        assert result.exit_code == 0, f"CLI --help failed: {result.output}"
+        assert "ghps" in result.output.lower()
+        assert "search" in result.output
+        assert "index" in result.output
+
+        sys.modules.pop("ghps.cli", None)
+
+
 class TestServeCommand:
     def test_serve_missing_index(self):
         """Serve should fail with a helpful message when the DB doesn't exist."""

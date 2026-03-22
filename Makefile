@@ -1,4 +1,4 @@
-.PHONY: install test lint index serve export deploy clean
+.PHONY: install test lint index serve export deploy clean reindex
 
 install:
 	pip install -e ".[dev]"
@@ -24,6 +24,11 @@ deploy:
 	@test -d web/ || (echo "Error: web/ directory not found" && exit 1)
 	@test -f scripts/deploy.sh || (echo "Error: scripts/deploy.sh not found" && exit 1)
 	bash scripts/deploy.sh
+
+reindex:
+	@echo "Usage: make reindex USER=<github-username>"
+	@test -n "$(USER)" || (echo "Error: USER is required. Example: make reindex USER=davidbmar" && exit 1)
+	bash scripts/index-and-export.sh $(USER)
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

@@ -10,6 +10,14 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Source .env if it exists (python-dotenv style)
+if [ -f "${REPO_ROOT}/.env" ]; then
+    set -a
+    # shellcheck disable=SC1091
+    source "${REPO_ROOT}/.env"
+    set +a
+fi
 DB_PATH="${REPO_ROOT}/.ghps/index.db"
 OUTPUT_DIR="${REPO_ROOT}/web/data"
 VENV_DIR="${REPO_ROOT}/.venv"

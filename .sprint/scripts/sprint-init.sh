@@ -102,10 +102,10 @@ for agent in "${INIT_AGENTS[@]}"; do
       fi
     fi
     git worktree add "${WT}" -b "${agent}"
-    # Symlink .venv so agents can run tests in the worktree
-    if [ -d "${ROOT}/.venv" ] && [ ! -e "${WT}/.venv" ]; then
-      ln -sf "${ROOT}/.venv" "${WT}/.venv"
-    fi
+    # B-012: Do NOT symlink .venv into worktrees.
+    # Python venvs embed absolute paths in pyvenv.cfg and bin/python,
+    # so a symlinked venv breaks after merges or path changes.
+    # Agents should use system python3 or create their own venv.
     # Symlink node_modules if present (JS projects)
     if [ -d "${ROOT}/node_modules" ] && [ ! -e "${WT}/node_modules" ]; then
       ln -sf "${ROOT}/node_modules" "${WT}/node_modules"
