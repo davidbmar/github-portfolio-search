@@ -1,39 +1,44 @@
-agentA-freshness-ui — Sprint 14
+agentB-seo-perf — Sprint 15
 
 Sprint-Level Context
 
 Goal
-- Add GitHub Actions workflow to auto-reindex and redeploy on push
-- Add freshness badges to web UI showing when each repo was last indexed
-- Fix API graceful error handling when no index exists (B-008/B-016)
+- Fix public tier: browse clusters, search descriptions, view repos WITHOUT sign-in
+- Sign-in required only for gated features (code snippets, file trees, full semantic search)
+- 5th-sprint checkpoint: SEO, performance, docs cleanup
 
 Constraints
 - No two agents may modify the same files
-- agentA owns web UI changes (web/js/app.js, web/css/style.css)
-- agentB owns GitHub Actions and indexing (`.github/workflows/reindex.yml` — NEW FILE, `scripts/reindex.sh` — NEW FILE, src/ghps/api.py)
-- agentC owns data pipeline improvements (src/ghps/indexer.py, src/ghps/store.py, src/ghps/search.py)
+- agentA owns auth UX flow (web/js/app.js, web/js/auth.js)
+- agentB owns SEO and performance (web/index.html, web/css/style.css, web/sitemap.xml — NEW FILE)
+- agentC owns docs and cleanup (README.md, docs/lifecycle/ROADMAP.md, docs/project-memory/)
 - Use python3 for all commands
 - Do NOT commit .venv/ or .env to git
-- The site is static S3/CloudFront — no running server for webhooks
+- The Google OAuth client ID is already configured — do not change web/config.json
 
 
 Objective
-- Add freshness badges and last-indexed timestamps to the web UI
+- Improve SEO, page performance, and web standards compliance
 
 Tasks
-- Update web/js/app.js:
-  - Add freshness badge to each repo card: "Updated today", "This week", "This month", "Stale (>30 days)"
-  - Badge color: green (today), blue (this week), gray (this month), red (stale)
-  - Calculate from the `updated_at` field in repos.json
-  - Add "Last indexed" timestamp in the footer or stats section
-  - Add sort option: "Recently Updated" should use actual dates, not alphabetical
+- Update web/index.html:
+  - Add structured data (JSON-LD) for WebSite and Person schema
+  - Update meta description and OG tags to reflect 104 repos (currently says 42)
+  - Add robots meta tag (index, follow)
+  - Ensure all external scripts have integrity/crossorigin attributes where possible
+- Create web/sitemap.xml:
+  - Include main pages: /, /search, /clusters, /access
+  - Add lastmod dates
 - Update web/css/style.css:
-  - Style freshness badges with appropriate colors
-  - Badges should be small pills next to the repo language tag
+  - Add prefers-reduced-motion media query for animations
+  - Ensure focus styles are visible for keyboard navigation (WCAG 2.1 AA)
+  - Optimize any large CSS selectors
+- Add web/robots.txt with sitemap reference
 
 Acceptance Criteria
-- Each repo card shows a freshness badge
-- Badges are color-coded by recency
-- "Recently Updated" sort works correctly
-- Mobile layout not broken by new badges
-- Playwright test: visit davidbmar.com, verify badges render on repo cards
+- Structured data validates (test with Google Rich Results Test)
+- Meta descriptions accurate (104 repos, not 42)
+- sitemap.xml and robots.txt served correctly
+- Focus styles visible on tab navigation
+- Animations respect prefers-reduced-motion
+- python3 -m pytest tests/ -v passes
