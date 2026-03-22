@@ -1,21 +1,23 @@
+All tasks complete.
+
+---
+
 ## Summary
 
 ### Files changed
-- **`src/ghps/export.py`** — Language fallback: `""` → `"Unknown"` for repos with no language detected
-- **`scripts/generate-sample-data.py`** — Replaced 10 fictional repos with 42 real repos from davidbmar's GitHub account
-- **`scripts/index-and-export.sh`** — Added JSON validation step (checks files exist, are valid arrays, are non-empty)
-- **`web/data/repos.json`** — Regenerated with 42 real repos, accurate descriptions and `html_url` links
-- **`web/data/clusters.json`** — Regenerated with 6 logical clusters (Voice & Speech, Transcription & ASR, Browser-Native AI, AI & Search Tools, AWS Infrastructure, Developer Tools)
-- **`docs/project-memory/sessions/S-2026-03-22-1538-real-data-pipeline.md`** — Session doc
+| File | Change |
+|------|--------|
+| `.sprint/scripts/sprint-init.sh` | Removed `.venv` symlink creation, added comment explaining why (B-012) |
+| `.env.example` | Added clear setup instructions for `GITHUB_TOKEN` |
+| `scripts/index-and-export.sh` | Added `.env` sourcing with `set -a`/`set +a` |
+| `tests/test_cli.py` | Added `TestCLISmoke::test_help_works` smoke test |
+| `Makefile` | Added `reindex` target that runs full index-and-export pipeline |
 
 ### Commands run
-- `git pull origin main`
-- `curl` GitHub public API to fetch real repo metadata (106 repos across 2 pages)
-- `python3 scripts/generate-sample-data.py --output web/data`
-- `python3 -m pytest tests/ -v` — **129 passed, 0 failures**
-- `git push -u origin HEAD`
+- `git pull origin main` — already up to date
+- `python3 -m pytest tests/ -v` — **138 passed**, 0 failures
+- `git push -u origin HEAD` — pushed to `agentC-infra-fixes`
 
 ### Notes / follow-on work
-- **GITHUB_TOKEN not available** — used public API for metadata only. When token is available, run `GITHUB_TOKEN=ghp_xxx scripts/index-and-export.sh davidbmar` for full indexing with embeddings and `search-index.json` generation
-- The `ORDER BY name` in `_build_repos` SQL already ensures deterministic output (no code change needed)
-- Repos with no README are already handled — description is pulled from the DB `repos` table, not from README content
+- The `node_modules` symlink in `sprint-init.sh` was left as-is since it wasn't part of B-012 and JS symlinks don't have the same absolute-path issue as Python venvs
+- The `.gitignore` should already exclude `.env` — verify if it doesn't, to prevent accidental token commits
