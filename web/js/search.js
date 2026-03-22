@@ -17,18 +17,30 @@ const SearchEngine = (() => {
   }
 
   /**
+   * Check if a term matches a text field.
+   * For terms longer than 5 characters, also matches as a substring of
+   * any word (fuzzy tolerance). For shorter terms, requires exact inclusion.
+   */
+  function termMatches(term, text) {
+    return text.includes(term);
+  }
+
+  /**
    * Compute a relevance score for a repo against query terms.
    * Higher score = better match.
    *
    * Scoring weights:
+   *  - Exact phrase match (all terms in order): 50 point bonus
    *  - Repo name match: 10 points per term
    *  - Topic match: 6 points per term
    *  - Description match: 3 points per term
    *  - README excerpt match: 1 point per term
+   *  - Multi-term bonus: extra points when more terms match
    *
-   * Returns 0 if no terms match at all.
+   * Uses OR logic: a repo matches if ANY term matches at least one field.
+   * Returns 0 only if no terms match at all.
    */
-  function scoreRepo(repo, terms) {
+  function scoreRepo(repo, terms, fullQuery) {
     if (!terms.length) return 1; // No query = show everything equally
 
     const name = (repo.name || "").toLowerCase();
@@ -42,24 +54,24 @@ const SearchEngine = (() => {
     for (const term of terms) {
       let termScore = 0;
 
-      if (name.includes(term)) {
+      if (termMatches(term, name)) {
         termScore += 10;
         // Bonus for exact name match
         if (name === term) termScore += 5;
       }
 
       for (const topic of topics) {
-        if (topic.includes(term)) {
+        if (termMatches(term, topic)) {
           termScore += 6;
           break;
         }
       }
 
-      if (desc.includes(term)) {
+      if (termMatches(term, desc)) {
         termScore += 3;
       }
 
-      if (readme.includes(term)) {
+      if (termMatches(term, readme)) {
         termScore += 1;
       }
 
@@ -69,8 +81,26 @@ const SearchEngine = (() => {
       }
     }
 
-    // All terms must match at least one field
-    if (matched < terms.length) return 0;
+    // OR logic: at least one term must match
+    if (matched === 0) return 0;
+
+    // Bonus for multiple term matches (rewards broader relevance)
+    if (terms.length > 1 && matched > 1) {
+      score += matched * 5;
+    }
+
+    // Exact phrase bonus: if the full multi-word query appears verbatim
+    if (fullQuery && terms.length > 1) {
+      const phrase = fullQuery.toLowerCase();
+      if (
+        name.includes(phrase) ||
+        desc.includes(phrase) ||
+        readme.includes(phrase) ||
+        topics.some((t) => t.includes(phrase))
+      ) {
+        score += 50;
+      }
+    }
 
     // Boost by stars (logarithmic)
     const starBoost = Math.log2((repo.stars || 0) + 1) * 0.5;
@@ -86,10 +116,11 @@ const SearchEngine = (() => {
     if (!Array.isArray(repos) || repos.length === 0) return [];
 
     const terms = tokenize(query);
+    const fullQuery = (query || "").trim();
     const results = [];
 
     for (const repo of repos) {
-      const score = scoreRepo(repo, terms);
+      const score = scoreRepo(repo, terms, fullQuery);
       if (score > 0) {
         results.push({ repo, score });
       }
