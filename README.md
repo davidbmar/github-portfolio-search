@@ -63,8 +63,10 @@ docs/
 | 2 | REST API + core search endpoint | Complete |
 | 3 | CLI improvements + MCP server | Complete |
 | 4 | Web UI — public tier + browse | Complete |
-| 5 | Gated access + approval workflow | **Next** |
-| 6 | Auto-refresh + production hardening | Planned |
+| 5 | Deploy pipeline + data export | Complete |
+| 6 | Stabilization — sample data + web resilience | Complete |
+| 7 | Test fixes + real data indexing | **Next** |
+| 8 | Search relevance + UX polish | Planned |
 
 ## Deployment
 

@@ -35,17 +35,17 @@ Backlog triage: Capture OAuth edge cases, Telegram integration failures, token/s
 Roadmap extension checkpoint: Review remaining open questions (browser-native vs. server-side embeddings final decision, Afterburner dashboard integration, auto-refresh via GitHub webhooks, MCP Skill wrapper). Plan Sprints 7+ based on production feedback and priority.
 Planning input for Sprint 6: Confirm auto-refresh and GitHub webhook integration is the next priority.
 
-**Sprint 6: Auto-Refresh, Webhooks, and Production Hardening**
-Build goals: Implement GitHub webhook listener to trigger re-indexing when repos are updated. Add periodic re-index fallback (cron). Deploy full stack to production (S3/CloudFront for static site, REST API on server). Build public and private data bundles (filtered vs. full). Add relevance indicators to result cards (semantic match score, freshness indicator, maturity badge, match source icon). Finalize private repo strategy — index with GitHub token, exclude from public bundle.
-PM/customer review checkpoint: Use Playwright to push a commit to a test repo, verify the index updates and new content appears in search results within the expected window. Run all acceptance tests from the use-cases document (semantic match, temporal, recombination, maturity ranking, offline/browser, MCP tool call). Verify the full system end-to-end.
-Backlog triage: Capture webhook reliability issues, stale index edge cases, deployment configuration bugs, and performance under full 90-repo load.
-Planning input for Sprint 7+: Based on roadmap extension checkpoint from Sprint 5, prioritize from: Afterburner dashboard integration, MCP Skill wrapper, browser-native offline mode, advanced recombination search, and deeper source file indexing.
+**Sprint 6: Stabilization — Fix Data Pipeline, Web Resilience, and Test Infrastructure (COMPLETED 2026-03-22)**
+Build goals: Fix B-010 (empty data files — created sample repos.json with 10 repos and clusters.json with 4 clusters). Fix B-011 (playwright added to dev dependencies). Create Makefile with install/test/serve/index/export/deploy targets (F-003). Add web UI error handling — graceful fetch failures, sample data fallback, retry button, loading states. Add meta tags, OG tags, and favicon.
+PM/customer review checkpoint: Deployed to davidbmar.com — search works (presigned URL returns correct repo with score 28.4), clusters render (4 categories), mobile layout works at 375px. 125 tests pass.
+Backlog triage: B-010 fixed, B-011 fixed, F-003 fixed. B-005 and B-006 (4 test failures) still open — escalated to High.
+Planning input for Sprint 7: Fix remaining 4 test failures (B-005, B-006), then move to real GitHub data indexing.
 
-**Sprint 7: Stabilization — Fix Data Pipeline and Test Infrastructure**
-Build goals: Fix B-010 (empty data files on deployed site), B-011 (playwright dev dep), B-012 (venv symlink breakage). Create sample data generator that produces realistic repos.json and clusters.json for development. Fix all 4 remaining test failures (B-005, B-006). Add playwright to dev dependencies and get all test_web_playwright tests passing.
-PM/customer review checkpoint: Visit davidbmar.com with Playwright — verify search returns results from sample data, clusters page shows categories, mobile layout works at 375px. Run full test suite with 0 failures and 0 errors.
-Backlog triage: Close all fixed bugs. Identify any remaining UX friction from customer testing.
-Planning input for Sprint 8: With stable infrastructure, prioritize real GitHub data indexing vs. UX polish.
+**Sprint 7: Test Fixes and Real Data Indexing**
+Build goals: Fix B-005 (CLI missing index edge cases — 3 test failures in test_cli.py). Fix B-006 (JSON decode error in test_e2e.py). Fix B-012 (venv symlink breakage). Index all 90+ repos with live GitHub API (requires GITHUB_TOKEN). Generate real repos.json and clusters.json. Deploy with real portfolio data.
+PM/customer review checkpoint: Run full test suite — 0 failures, 0 errors. Visit davidbmar.com — search for "presigned URL" and verify real repo appears. Search for "voice" and verify audio repos. Browse clusters with real groupings.
+Backlog triage: Capture search relevance issues, missing repos, bad cluster groupings.
+Planning input for Sprint 8: Based on real data quality, decide if relevance tuning or UX improvements are higher priority.
 
 **Sprint 8: Real Data — Index All 90+ Repos and Deploy**
 Build goals: Run ghps index davidbmar against live GitHub API (requires GITHUB_TOKEN). Generate real repos.json and clusters.json with actual repo data. Deploy to davidbmar.com with real portfolio data. Add index freshness indicator (last indexed timestamp). Create a GitHub Actions workflow or cron job for periodic re-indexing.
@@ -74,15 +74,13 @@ Planning input for Sprint 12: Based on user feedback and analytics, decide next 
 
 ### Current Focus
 
-**Sprint 6: Auto-Refresh, Webhooks, and Production Hardening (Sprints 1-5 COMPLETE)**
+**Sprint 7: Test Fixes and Real Data Indexing (Sprints 1-6 COMPLETE)**
 
-Sprints 1-5 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, deploy pipeline, and data export. Sprint 6 focuses on production hardening with webhooks and auto-refresh.
-
-However, B-010 (site shows "Could not load data") is critical — Sprint 7 is a **stabilization sprint** to fix the data pipeline before adding more features.
+Sprints 1-6 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, deploy pipeline, data export, sample data, web resilience, and Makefile. Sprint 7 focuses on fixing the last 4 test failures and indexing real GitHub data.
 
 ### Next Up
 
-**Phase 2: REST API + Faceted Search (Sprints 3-4)**
+**Sprint 8: Search Relevance and UX Polish**
 
 FastAPI server with search, clusters, and repo detail endpoints. Faceted filtering by capability, tech stack, language, last active date, and maturity level. Auto-generated capability clusters from embedding similarity.
 
