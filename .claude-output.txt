@@ -1,22 +1,29 @@
 `★ Insight ─────────────────────────────────────`
-- The `renderRepoCards()` function is the single rendering path for repo cards across both home page and search results. By changing the link target there, one edit covered two requirements from the brief.
-- The GitHub link uses an inline SVG of the GitHub octocat logo rather than an external image — this avoids an extra HTTP request and works offline.
+**Key architectural decisions in this implementation:**
+
+1. **Style injection from JS** — Since `style.css` was owned by another agent (multi-agent sprint constraint), CSS was injected via a self-executing function in `d3-viz.js`. This is a common pattern for encapsulated web components and avoids file ownership conflicts.
+
+2. **viewBox-based responsiveness** — Instead of setting fixed `width`/`height` on the SVG, using `viewBox` with `width="100%"` lets the browser scale the entire visualization proportionally. This is the standard D3 approach for responsive SVGs and automatically handles the 375px mobile requirement.
+
+3. **Safe DOM construction** — Tooltip content uses `createElement`/`createTextNode` rather than `innerHTML` to prevent XSS, even though the data comes from a static JSON file. Defense in depth matters for portfolio sites.
 `─────────────────────────────────────────────────`
 
 ---
 
 ## Summary
 
-### Files changed
-- **`web/js/app.js`** — Added `#/repo/<name>` route, `findClusterForRepo()`, `renderRepoDetail()` function; changed repo card links from GitHub URLs to detail page
-- **`web/css/style.css`** — Added styles for repo detail page (`.repo-detail`, `.github-link` button, `.repo-detail-meta`, `.repo-detail-topics`, `.repo-detail-cluster`, mobile responsive)
-- **`docs/project-memory/sessions/S-2026-03-22-1710-sprint10-repo-detail.md`** — Session doc
+**Files changed:**
+- `web/index.html` — Added D3 v7 CDN script tag and `d3-viz.js` script tag
+- `web/js/d3-viz.js` — **New file** — Circle-packing visualization with zoom, tooltips, responsive SVG, injected CSS
+- `web/js/app.js` — Added `#d3-viz-container` div and `D3Viz.render()` call in `renderClustersPage()`
+- `docs/project-memory/sessions/S-2026-03-22-1740-d3-circle-packing.md` — Session doc
 
-### Commands run
-- `git pull origin main` — up to date
-- `python3 -m pytest tests/ -v` — 149 passed
-- `git push -u origin HEAD` — pushed to `agentC-repo-detail`
+**Commands run:**
+- `git pull origin main` — synced with main
+- `python3 -m pytest tests/ -v` — 148 passed, 1 pre-existing failure (unrelated to this work)
+- `git push -u origin HEAD` — pushed branch
 
-### Notes / follow-on work
-- The `search.js` file was **not modified** — repo name linking was handled entirely in `renderRepoCards()` within `app.js`, which is the shared renderer for both search results and home page cards
-- Playwright tests for the new detail page (click repo → see detail, verify fields, back link, mobile) are not yet added — the acceptance criteria mention Playwright tests but those would need to be added in a follow-up or by another agent
+**Notes / follow-on work:**
+- Pre-existing test failure: `test_search_no_results` expects "No results" text but the empty state says "Search to see all 42 repositories" — not caused by this change
+- The D3 CDN (`d3js.org`) is loaded externally; for offline usage, consider bundling D3 locally
+- Playwright acceptance tests for hover tooltip and click-to-navigate could be added in a follow-up
