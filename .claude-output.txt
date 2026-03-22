@@ -1,0 +1,21 @@
+---
+
+## Summary
+
+### Files changed
+| File | Change |
+|---|---|
+| `web/js/app.js` | Replaced 97-line auth gate IIFE with 15-line public-first init; rewrote `_updateHeaderUserInfo()` to show Sign In/avatar; added `_showSignInPopup()` modal; added sign-in section to Request Access page; removed `__ghpsGateLocked` check |
+| `web/js/auth.js` | Added `isApproved()` stub (returns `true`); exported it in the module return |
+| `tests/test_web_playwright.py` | Fixed `test_search_no_results` race condition — wait for search route DOM render instead of just hash change |
+| `AGENT_BRIEF.md` | Already modified (pre-existing) |
+
+### Commands run
+- `git pull origin main` — already up to date
+- `python3 -m pytest tests/ -v` — **222 passed**, 3 warnings
+- `git push -u origin HEAD` — pushed to `agentA-public-tier`
+
+### Notes / follow-on work
+- **`Auth.isApproved()` is a stub** — returns `true` always. When a server-side access check is implemented, this should call the API to verify approval status.
+- **No gated features currently exist** — the code checks `Auth.isAuthenticated()` in the access page and header, ready for future gated content gates using `Auth.isApproved()`.
+- **Sign-out no longer reloads the page** — it just updates the header in-place since all content is public. This preserves scroll position and current route.

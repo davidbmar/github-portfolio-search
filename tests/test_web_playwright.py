@@ -91,11 +91,13 @@ class TestWebUI:
         page.wait_for_selector(".cluster-card", timeout=10000)
         page.fill("#search-input", "xyznonexistent999")
         page.press("#search-input", "Enter")
-        # Wait for the search route to activate before checking empty state
+        # Wait for the search route to fully render (not just hash change).
+        # renderSearchResults generates h3 with "Results for" or "results for".
         page.wait_for_function(
-            'window.location.hash.startsWith("#/search")', timeout=10000
+            'document.querySelector(".section-header h3") && '
+            'document.querySelector(".section-header h3").textContent.toLowerCase().includes("results")',
+            timeout=10000,
         )
-        page.wait_for_selector(".section-header", timeout=10000)
         empty = page.query_selector(".empty-state")
         assert empty is not None, "Expected 'No results' empty state"
         text = empty.text_content()
