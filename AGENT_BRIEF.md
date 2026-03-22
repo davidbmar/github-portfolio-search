@@ -1,39 +1,42 @@
-agentA-freshness-ui — Sprint 14
+agentC-docs-cleanup — Sprint 15
 
 Sprint-Level Context
 
 Goal
-- Add GitHub Actions workflow to auto-reindex and redeploy on push
-- Add freshness badges to web UI showing when each repo was last indexed
-- Fix API graceful error handling when no index exists (B-008/B-016)
+- Fix public tier: browse clusters, search descriptions, view repos WITHOUT sign-in
+- Sign-in required only for gated features (code snippets, file trees, full semantic search)
+- 5th-sprint checkpoint: SEO, performance, docs cleanup
 
 Constraints
 - No two agents may modify the same files
-- agentA owns web UI changes (web/js/app.js, web/css/style.css)
-- agentB owns GitHub Actions and indexing (`.github/workflows/reindex.yml` — NEW FILE, `scripts/reindex.sh` — NEW FILE, src/ghps/api.py)
-- agentC owns data pipeline improvements (src/ghps/indexer.py, src/ghps/store.py, src/ghps/search.py)
+- agentA owns auth UX flow (web/js/app.js, web/js/auth.js)
+- agentB owns SEO and performance (web/index.html, web/css/style.css, web/sitemap.xml — NEW FILE)
+- agentC owns docs and cleanup (README.md, docs/lifecycle/ROADMAP.md, docs/project-memory/)
 - Use python3 for all commands
 - Do NOT commit .venv/ or .env to git
-- The site is static S3/CloudFront — no running server for webhooks
+- The Google OAuth client ID is already configured — do not change web/config.json
 
 
 Objective
-- Add freshness badges and last-indexed timestamps to the web UI
+- 5th-sprint checkpoint docs cleanup and project memory maintenance
 
 Tasks
-- Update web/js/app.js:
-  - Add freshness badge to each repo card: "Updated today", "This week", "This month", "Stale (>30 days)"
-  - Badge color: green (today), blue (this week), gray (this month), red (stale)
-  - Calculate from the `updated_at` field in repos.json
-  - Add "Last indexed" timestamp in the footer or stats section
-  - Add sort option: "Recently Updated" should use actual dates, not alphabetical
-- Update web/css/style.css:
-  - Style freshness badges with appropriate colors
-  - Badges should be small pills next to the repo language tag
+- Update README.md:
+  - Rewrite Features section to reflect current state (Google OAuth, 104 repos, freshness badges)
+  - Update Architecture diagram to include GitHub Actions reindex
+  - Update Tech Stack to include google-auth
+  - Verify all make commands still work
+- Review and update docs/project-memory/backlog/README.md:
+  - Verify all Fixed items are actually fixed
+  - Remove or archive items older than Sprint 10
+  - Ensure priority assignments are accurate
+- Add a session doc for Sprint 14 in docs/project-memory/sessions/
+- Verify docs/seed/use-cases.md is still accurate — update if needed
+- Clean up any stale files in the repo root (.agent-done-*, old logs)
 
 Acceptance Criteria
-- Each repo card shows a freshness badge
-- Badges are color-coded by recency
-- "Recently Updated" sort works correctly
-- Mobile layout not broken by new badges
-- Playwright test: visit davidbmar.com, verify badges render on repo cards
+- README.md accurately describes current features and architecture
+- Backlog is clean and current
+- Sprint 14 session doc exists
+- No stale files in repo root
+- python3 -m pytest tests/ -v passes
