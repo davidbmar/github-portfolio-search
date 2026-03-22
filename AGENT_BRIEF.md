@@ -1,4 +1,4 @@
-agentB-reindex-actions — Sprint 14
+agentA-freshness-ui — Sprint 14
 
 Sprint-Level Context
 
@@ -18,27 +18,22 @@ Constraints
 
 
 Objective
-- Create GitHub Actions workflow for automated reindexing and deployment
+- Add freshness badges and last-indexed timestamps to the web UI
 
 Tasks
-- Create `.github/workflows/reindex.yml`:
-  - Trigger: manual dispatch (workflow_dispatch) + scheduled (weekly cron)
-  - Steps: checkout, setup Python, install deps, run ghps index, run ghps export, deploy to S3
-  - Use secrets: GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-  - Include CloudFront invalidation after S3 sync
-  - Add concurrency group to prevent overlapping runs
-- Create `scripts/reindex.sh`:
-  - Standalone script that runs: index → export → deploy
-  - Reads GITHUB_TOKEN from env
-  - Idempotent — safe to run multiple times
-  - Prints summary: repos indexed, files exported, deploy status
-- Update src/ghps/api.py:
-  - Fix B-008/B-016: when no SQLite index exists, return `{"results": [], "error": "No index found. Run ghps index first."}` with 200 status instead of 500
-  - Apply to /api/search, /api/clusters, /api/repos/<slug> endpoints
-- Add tests for graceful error handling (no index → 200 with empty results)
+- Update web/js/app.js:
+  - Add freshness badge to each repo card: "Updated today", "This week", "This month", "Stale (>30 days)"
+  - Badge color: green (today), blue (this week), gray (this month), red (stale)
+  - Calculate from the `updated_at` field in repos.json
+  - Add "Last indexed" timestamp in the footer or stats section
+  - Add sort option: "Recently Updated" should use actual dates, not alphabetical
+- Update web/css/style.css:
+  - Style freshness badges with appropriate colors
+  - Badges should be small pills next to the repo language tag
 
 Acceptance Criteria
-- `scripts/reindex.sh` runs end-to-end locally (with GITHUB_TOKEN set)
-- API returns empty results with helpful error when no index exists (not 500)
-- GitHub Actions workflow is valid YAML (test with `act` or manual review)
-- python3 -m pytest tests/ -v passes
+- Each repo card shows a freshness badge
+- Badges are color-coded by recency
+- "Recently Updated" sort works correctly
+- Mobile layout not broken by new badges
+- Playwright test: visit davidbmar.com, verify badges render on repo cards
