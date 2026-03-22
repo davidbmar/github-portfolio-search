@@ -164,6 +164,34 @@ def status(db: str, fmt: str) -> None:
 
 
 @main.command()
+@click.option("--db", default=DEFAULT_DB, help="Path to the SQLite-vec database.")
+@click.option("--output", default="web/data", help="Output directory for JSON files.")
+def export(db: str, output: str) -> None:
+    """Export static JSON bundle for the web UI."""
+    from ghps.export import export_static_bundle
+    from ghps.store import VectorStore
+
+    if not _db_exists(db):
+        click.echo(
+            click.style("Error: ", fg="red", bold=True)
+            + f"Index not found at {db}\n"
+            + "Run 'ghps index <username>' first to create the index.",
+            err=True,
+        )
+        sys.exit(1)
+
+    store = VectorStore(db)
+    store.connect()
+
+    paths = export_static_bundle(store, output)
+    store.close()
+
+    click.echo(click.style("Export complete!", fg="green", bold=True))
+    for name, path in paths.items():
+        click.echo(f"  {name} -> {path}")
+
+
+@main.command()
 @click.option("--port", default=8000, help="Port to listen on.")
 @click.option("--db", default=DEFAULT_DB, help="Path to the SQLite-vec database.")
 def serve(port: int, db: str) -> None:

@@ -3,17 +3,15 @@
 ## Summary
 
 ### Files changed
-- **`src/ghps/cli.py`** — Rewrote CLI with colored output (`click.style`), `serve` command, `status` command, `--format json` flag, `_db_exists` error handling
-- **`tests/test_cli.py`** — Created 11 CliRunner tests (search: 5, index: 2, status: 3, serve: 1)
-- **`tests/test_e2e.py`** — Created 7 E2E tests with real EmbeddingPipeline and temp DB
-- **`tests/test_search.py`** — Added `--db :memory:` to 2 existing CLI tests for compatibility
-- **`docs/project-memory/sessions/S-2026-03-22-0559-cli-e2e-sprint3.md`** — Session doc
+- **`src/ghps/export.py`** (new) — Static JSON export module with `export_static_bundle()` producing `repos.json`, `clusters.json`, `search-index.json`
+- **`src/ghps/cli.py`** (modified) — Added `ghps export --db PATH --output DIR` command
+- **`tests/test_export.py`** (new) — 24 tests covering repos/clusters/search-index generation, CLI integration, empty store edge case
 
 ### Commands run
-- `python3 -m pytest tests/ -v -c /dev/null` — **80 tests passed** (including 18 new CLI + E2E tests)
-- `git push -u origin HEAD` — Pushed to `agentC-cli-e2e` branch
+- `python3 -m pytest tests/ -v` — **123 passed** (99 existing + 24 new), 0 failures
+- `git push -u origin HEAD` — pushed to `agentA-data-export`
 
 ### Notes / follow-on work
-- **pyproject.toml** has duplicate `[project.scripts]` sections — pytest can't parse it. Tests require `-c /dev/null` to bypass. This is agentA's domain to fix.
-- Used `click.style()` instead of `rich` to avoid adding new dependencies outside my file scope.
-- The `ghps serve` command delegates to the existing FastAPI app in `api.py`.
+- **B-005 and B-006** were already fixed in Sprint 3 — all 99 pre-existing tests pass without changes
+- The `search-index.json` uses a keyword-based approach (extracted tokens from chunk text + metadata) for client-side search. If agentB's web UI needs embedding-based search instead, the format can be extended later
+- `clusters.json` omits centroids (large float arrays) to keep the payload lightweight for the browser

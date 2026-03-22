@@ -1,41 +1,37 @@
-agentC-cli-e2e — Sprint 3
+agentA-data-export — Sprint 4
 
 Sprint-Level Context
 
 Goal
-- Fix remaining packaging and test bugs from Sprint 1-2 (B-001, B-004)
-- Build MCP server for Claude Code and Bob integration
-- Improve CLI with better output formatting and error handling
+- Build the public web UI for davidbmar.com with search and browse capabilities
+- Fix Sprint 3 test failures (B-005, B-006)
+- Deploy static site to S3/CloudFront
 
 Constraints
 - No two agents may modify the same files
-- agentA owns bug fixes and test reliability (pyproject.toml, tests/, Makefile)
-- agentB owns MCP server (src/ghps/mcp_server.py, src/ghps/mcp_tools.py)
-- agentC owns CLI improvements and end-to-end testing (src/ghps/cli.py, tests/test_cli.py, tests/test_e2e.py)
+- agentA owns bug fixes and static data export (tests/, src/ghps/export.py)
+- agentB owns web UI frontend (web/index.html, web/css/, web/js/)
+- agentC owns deployment pipeline and integration (deploy.sh, web/api-proxy.js)
 - Use python3 for all commands
-- MCP server must follow the MCP protocol spec
+- Frontend must be vanilla JS (no build step) — served as static files from S3
+- Mobile-responsive layout required
 
 
 Objective
-- Improve CLI output formatting and add end-to-end tests
+- Fix test failures and build a static JSON data export for the web UI
 
 Tasks
-- Improve src/ghps/cli.py:
-  - Add rich/click formatting for search results (colored scores, truncated snippets)
-  - Add ghps serve command to start the FastAPI server
-  - Add ghps status command showing index stats (repo count, chunk count, last indexed)
-  - Add --format json flag for machine-readable output
-  - Better error messages when index doesn't exist
-- Create tests/test_cli.py with Click CliRunner tests:
-  - Test ghps search with mock store
-  - Test ghps index with mock GitHub API
-  - Test ghps status with mock store
-  - Test --format json output
-- Create tests/test_e2e.py with end-to-end test:
-  - Create temp index → index mock repos → search → verify results → clean up
+- Fix B-005: CLI test failures on missing index edge cases
+- Fix B-006: JSON decode error in test_e2e.py
+- Create src/ghps/export.py with:
+  - export_static_bundle(store, output_dir) -> generates JSON files for static site
+  - repos.json — all repos with metadata, description, language, topics, stars, url
+  - clusters.json — capability clusters with repo names
+  - search-index.json — pre-computed embeddings or search data for client-side search
+- Add ghps export command to CLI: ghps export --db PATH --output web/data/
+- Create tests/test_export.py
 
 Acceptance Criteria
-- ghps search "query" shows colored, formatted results
-- ghps serve starts the FastAPI server
-- ghps status shows index statistics
-- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes
+- python3 -m pytest tests/ -v passes with 0 failures
+- ghps export produces valid JSON files in output directory
+- repos.json contains all indexed repos with metadata
