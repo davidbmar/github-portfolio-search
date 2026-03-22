@@ -6,6 +6,7 @@ import json
 import logging
 import os
 from collections import Counter
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -53,11 +54,15 @@ def export_static_bundle(store: "VectorStore", output_dir: str) -> dict[str, str
 
 
 def _build_repos(store: "VectorStore") -> list[dict]:
-    """Build the repos list from the store."""
+    """Build the repos list from the store, sorted by relevance score."""
+    from ghps.search import _recency_boost
+
     db = store.connect()
     rows = db.execute(
-        "SELECT name, description, language, topics, stars, updated_at, url FROM repos ORDER BY name"
+        "SELECT name, description, language, topics, stars, updated_at, url FROM repos"
     ).fetchall()
+
+    last_indexed = datetime.now(timezone.utc).isoformat()
 
     repos = []
     for row in rows:
@@ -67,15 +72,25 @@ def _build_repos(store: "VectorStore") -> list[dict]:
         except (json.JSONDecodeError, TypeError):
             topics = []
 
+        stars = row[4] or 0
+        updated_at = row[5] or ""
+        recency = _recency_boost(updated_at)
+        relevance_score = stars + recency
+
         repos.append({
             "name": row[0],
             "description": row[1] or "",
             "language": row[2] or "Unknown",
             "topics": topics,
-            "stars": row[4],
-            "updated_at": row[5] or "",
+            "stars": stars,
+            "updated_at": updated_at,
             "url": row[6] or "",
+            "last_indexed": last_indexed,
+            "relevance_score": relevance_score,
         })
+
+    # Sort by relevance score descending (stars + recency)
+    repos.sort(key=lambda r: r["relevance_score"], reverse=True)
     return repos
 
 

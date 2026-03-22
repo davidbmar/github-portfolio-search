@@ -67,10 +67,10 @@ class TestBuildRepos:
         for repo in repos:
             assert isinstance(repo["stars"], int), f"Stars should be int for {repo['name']}"
 
-    def test_repos_sorted_by_name(self, mock_store):
+    def test_repos_sorted_by_relevance_score(self, mock_store):
         repos = _build_repos(mock_store)
-        names = [r["name"] for r in repos]
-        assert names == sorted(names)
+        scores = [r["relevance_score"] for r in repos]
+        assert scores == sorted(scores, reverse=True)
 
     def test_ml_pipeline_metadata(self, mock_store):
         repos = _build_repos(mock_store)

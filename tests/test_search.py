@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import sys
 import types
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ghps.search import SearchEngine, SearchResult
+from ghps.search import SearchEngine, SearchResult, _recency_boost, _title_boost
 
 
 # ---------------------------------------------------------------------------
@@ -22,14 +23,29 @@ _REPO_URLS = {
 }
 
 
-def _make_mock_store(rows: list[dict]) -> MagicMock:
-    """Return a mock VectorStore whose search() returns *rows*."""
+def _make_mock_store(rows: list[dict], repo_meta: dict | None = None) -> MagicMock:
+    """Return a mock VectorStore whose search() returns *rows*.
+
+    *repo_meta* maps repo name to dict with optional keys: url, updated_at.
+    Defaults to _REPO_URLS with recent updated_at dates.
+    """
     store = MagicMock()
     store.search.return_value = rows
-    # Mock the connect() call used by SearchEngine to look up repo URLs
+
+    if repo_meta is None:
+        recent = datetime.now(timezone.utc).isoformat()
+        repo_meta = {
+            name: {"url": url, "updated_at": recent}
+            for name, url in _REPO_URLS.items()
+        }
+
+    # Mock the connect() call — SearchEngine queries (name, url, updated_at)
     mock_db = MagicMock()
-    url_rows = [(name, url) for name, url in _REPO_URLS.items()]
-    mock_db.execute.return_value.fetchall.return_value = url_rows
+    meta_rows = [
+        (name, meta.get("url", ""), meta.get("updated_at", ""))
+        for name, meta in repo_meta.items()
+    ]
+    mock_db.execute.return_value.fetchall.return_value = meta_rows
     store.connect.return_value = mock_db
     return store
 
@@ -107,7 +123,10 @@ class TestSearchEngine:
         assert len(repo_names) == len(set(repo_names)), "Duplicate repos in results"
 
     def test_dedup_keeps_best_score(self):
-        """For repo-alpha, the lowest-distance (0.05) chunk should win."""
+        """For repo-alpha, the lowest-distance (0.05) chunk should win.
+
+        Base score = 0.95, recency boost = 1.2 (recent mock date) → 1.14
+        """
         store = _make_mock_store(SAMPLE_ROWS)
         embedder = _make_mock_embedder()
         engine = SearchEngine(store, embedder)
@@ -115,7 +134,7 @@ class TestSearchEngine:
         results = engine.search("query")
 
         alpha = next(r for r in results if r.repo_name == "repo-alpha")
-        assert alpha.score == pytest.approx(0.95)
+        assert alpha.score == pytest.approx(0.95 * 1.2)
         assert alpha.source == "README.md"
 
     def test_respects_top_k(self):
@@ -156,9 +175,90 @@ class TestSearchEngine:
         r = results[0]
         assert r.repo_name == "repo-alpha"
         assert r.chunk_text == "Alpha README content about machine learning pipelines"
-        assert r.score == pytest.approx(0.95)
+        assert r.score == pytest.approx(0.95 * 1.2)  # base * recency boost
         assert r.source == "README.md"
         assert r.repo_url == "https://github.com/user/repo-alpha"
+
+
+# ---------------------------------------------------------------------------
+# Title boosting tests
+# ---------------------------------------------------------------------------
+
+class TestTitleBoosting:
+    def test_title_boost_matches(self):
+        """_title_boost returns 2.0 when query term is in repo name."""
+        assert _title_boost("presigned URL", "S3-presignedURL") == 2.0
+
+    def test_title_boost_no_match(self):
+        assert _title_boost("machine learning", "repo-alpha") == 1.0
+
+    def test_title_boost_case_insensitive(self):
+        assert _title_boost("Voice", "voice-assistant") == 2.0
+
+    def test_presigned_ranks_first(self):
+        """Searching 'presigned' should rank a presigned-url repo first."""
+        recent = datetime.now(timezone.utc).isoformat()
+        repo_meta = {
+            "S3-presignedURL": {"url": "https://github.com/user/S3-presignedURL", "updated_at": recent},
+            "generic-api": {"url": "https://github.com/user/generic-api", "updated_at": recent},
+        }
+        rows = [
+            {"repo_name": "generic-api", "text": "An API that uses presigned URLs internally", "distance": 0.10, "source": "README.md"},
+            {"repo_name": "S3-presignedURL", "text": "S3 presigned URL generation library", "distance": 0.12, "source": "README.md"},
+        ]
+        store = _make_mock_store(rows, repo_meta=repo_meta)
+        embedder = _make_mock_embedder()
+        engine = SearchEngine(store, embedder)
+
+        results = engine.search("presigned")
+
+        assert results[0].repo_name == "S3-presignedURL"
+
+
+# ---------------------------------------------------------------------------
+# Recency boosting tests
+# ---------------------------------------------------------------------------
+
+class TestRecencyBoosting:
+    def test_recent_repo_boost(self):
+        """Repos updated within 6 months get 1.2x."""
+        recent = datetime.now(timezone.utc).isoformat()
+        assert _recency_boost(recent) == 1.2
+
+    def test_mid_age_repo_boost(self):
+        """Repos updated 6-12 months ago get 1.0x."""
+        nine_months_ago = (datetime.now(timezone.utc) - timedelta(days=270)).isoformat()
+        assert _recency_boost(nine_months_ago) == 1.0
+
+    def test_old_repo_boost(self):
+        """Repos older than 1 year get 0.8x."""
+        two_years_ago = (datetime.now(timezone.utc) - timedelta(days=730)).isoformat()
+        assert _recency_boost(two_years_ago) == 0.8
+
+    def test_empty_date_gets_penalty(self):
+        assert _recency_boost("") == 0.8
+
+    def test_recent_repo_ranked_higher(self):
+        """A recent repo should rank higher than a stale one, all else equal."""
+        recent = datetime.now(timezone.utc).isoformat()
+        stale = (datetime.now(timezone.utc) - timedelta(days=800)).isoformat()
+        repo_meta = {
+            "fresh-repo": {"url": "https://github.com/user/fresh-repo", "updated_at": recent},
+            "stale-repo": {"url": "https://github.com/user/stale-repo", "updated_at": stale},
+        }
+        rows = [
+            {"repo_name": "fresh-repo", "text": "Fresh content about APIs", "distance": 0.15, "source": "README.md"},
+            {"repo_name": "stale-repo", "text": "Stale content about APIs", "distance": 0.15, "source": "README.md"},
+        ]
+        store = _make_mock_store(rows, repo_meta=repo_meta)
+        embedder = _make_mock_embedder()
+        engine = SearchEngine(store, embedder)
+
+        results = engine.search("APIs")
+
+        assert results[0].repo_name == "fresh-repo"
+        assert results[1].repo_name == "stale-repo"
+        assert results[0].score > results[1].score
 
 
 # ---------------------------------------------------------------------------

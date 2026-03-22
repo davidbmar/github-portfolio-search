@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -45,18 +46,29 @@ class SearchEngine:
         # after deduplication.
         raw = self.store.search(query_vec, limit=top_k * 3)
 
-        # Look up repo URLs from the repos table
+        # Look up repo metadata from the repos table
         repo_urls: dict[str, str] = {}
+        repo_updated: dict[str, str] = {}
         db = self.store.connect()
-        for row in db.execute("SELECT name, url FROM repos").fetchall():
+        for row in db.execute("SELECT name, url, updated_at FROM repos").fetchall():
             repo_urls[row[0]] = row[1]
+            repo_updated[row[0]] = row[2] or ""
 
         # Deduplicate: keep only the best-scoring chunk per repo.
         # VectorStore returns distance (lower = more similar), convert to score.
         best_per_repo: dict[str, SearchResult] = {}
         for row in raw:
             repo_name = row["repo_name"]
-            score = 1.0 - row["distance"]
+            base_score = 1.0 - row["distance"]
+
+            # Title boosting: 2x if any query term appears in repo name
+            title_boost = _title_boost(query, repo_name)
+
+            # Recency boosting: 1.2x (< 6 months), 1.0x (< 1 year), 0.8x (older)
+            recency_boost = _recency_boost(repo_updated.get(repo_name, ""))
+
+            score = base_score * title_boost * recency_boost
+
             if repo_name not in best_per_repo or score > best_per_repo[repo_name].score:
                 best_per_repo[repo_name] = SearchResult(
                     repo_name=repo_name,
@@ -68,3 +80,36 @@ class SearchEngine:
 
         results = sorted(best_per_repo.values(), key=lambda r: r.score, reverse=True)
         return results[:top_k]
+
+
+def _title_boost(query: str, repo_name: str) -> float:
+    """Return 2.0 if any query term appears in the repo name, else 1.0."""
+    query_terms = query.lower().split()
+    name_lower = repo_name.lower()
+    for term in query_terms:
+        if term in name_lower:
+            return 2.0
+    return 1.0
+
+
+def _recency_boost(updated_at: str) -> float:
+    """Return a boost factor based on how recently the repo was updated.
+
+    - Updated within 6 months: 1.2x
+    - Updated within 1 year: 1.0x
+    - Older or unknown: 0.8x
+    """
+    if not updated_at:
+        return 0.8
+    try:
+        updated = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+        now = datetime.now(timezone.utc)
+        days_ago = (now - updated).days
+        if days_ago <= 182:
+            return 1.2
+        elif days_ago <= 365:
+            return 1.0
+        else:
+            return 0.8
+    except (ValueError, TypeError):
+        return 0.8
