@@ -1,0 +1,19 @@
+---
+
+## Summary
+
+### Files changed
+- **`src/ghps/mcp_server.py`** (new) — MCP server implementing JSON-RPC 2.0 over stdio with 4 tools
+- **`tests/test_mcp.py`** (new) — 19 unit tests covering tool definitions, MCP protocol, and all tool handlers
+- **`pyproject.toml`** (modified) — Fixed duplicate `[project.scripts]` section, added `ghps-mcp` entry
+
+### Commands run
+- `git pull origin main` — already up to date
+- `python3 -m pytest tests/test_mcp.py -v` — 19 passed
+- `python3 -m pytest tests/ -v` — 81 passed (full suite)
+- `git push -u origin HEAD` — pushed to `agentB-mcp-server`
+
+### Notes / follow-on work
+- **No `mcp` package dependency**: The `mcp` PyPI package requires Python >=3.10, but the project targets >=3.9. Used the lightweight JSON-RPC approach as allowed by the brief. If Python minimum is bumped to 3.10+, could migrate to the `mcp` SDK.
+- **`portfolio_reindex`** calls the github_client module functions directly (not via `Indexer.index_user`) since `github_client.py` uses standalone functions, not a class.
+- **pyproject.toml** had duplicate `[project.scripts]` sections — merged them into one.
