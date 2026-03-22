@@ -43,20 +43,27 @@ class SearchEngine:
 
         # Fetch more candidates than top_k so we still have enough
         # after deduplication.
-        raw = self.store.search(query_vec, top_k=top_k * 3)
+        raw = self.store.search(query_vec, limit=top_k * 3)
+
+        # Look up repo URLs from the repos table
+        repo_urls: dict[str, str] = {}
+        db = self.store.connect()
+        for row in db.execute("SELECT name, url FROM repos").fetchall():
+            repo_urls[row[0]] = row[1]
 
         # Deduplicate: keep only the best-scoring chunk per repo.
+        # VectorStore returns distance (lower = more similar), convert to score.
         best_per_repo: dict[str, SearchResult] = {}
         for row in raw:
             repo_name = row["repo_name"]
-            score = row["score"]
+            score = 1.0 - row["distance"]
             if repo_name not in best_per_repo or score > best_per_repo[repo_name].score:
                 best_per_repo[repo_name] = SearchResult(
                     repo_name=repo_name,
                     chunk_text=row["text"],
                     score=score,
                     source=row["source"],
-                    repo_url=row["url"],
+                    repo_url=repo_urls.get(repo_name, ""),
                 )
 
         results = sorted(best_per_repo.values(), key=lambda r: r.score, reverse=True)
