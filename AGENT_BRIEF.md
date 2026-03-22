@@ -1,4 +1,4 @@
-agentA-data-pipeline — Sprint 6
+agentB-test-infra — Sprint 6
 
 Sprint-Level Context
 
@@ -18,16 +18,17 @@ Constraints
 
 
 Objective
-- Create working sample data and fix the export pipeline so davidbmar.com has content
+- Fix all remaining test failures and get to 0 failures / 0 errors
 
 Tasks
-- Create web/data/repos.json with realistic sample data: 10 repos representing David's portfolio (e.g., audio-stream-transcription, presigned-url-s3, grassyknoll, FSM-generic, tool-telegram-whatsapp, bot-customerobsessed, traceable-searchable-adr-memory-index, github-portfolio-search, tool-s3-cloudfront-push, everyone-ai). Each repo: name, description, language, topics array, stars, html_url, updated_at
-- Create web/data/clusters.json with 4 capability clusters: "Voice & Audio Processing", "Infrastructure & DevOps", "AI & Search", "Web Applications"
-- Verify src/ghps/export.py produces valid JSON matching this schema
-- Create scripts/generate-sample-data.py that produces realistic sample data
-- Update deploy.sh to check for valid data files before deploying
+- Fix B-005: test_cli.py TypeError on missing index — add try/except in cli.py for FileNotFoundError when DB doesn't exist, return helpful error message
+- Fix B-006: test_e2e.py JSON decode error — ensure ghps search --format json outputs valid JSON even when no results found (output empty array, not error text)
+- Add playwright to pyproject.toml [project.optional-dependencies] test group
+- Create Makefile with targets: install, test, serve, index, export, deploy
+- Remove or skip test_web_playwright.py tests if playwright browser not installed (use pytest.importorskip)
 
 Acceptance Criteria
-- web/data/repos.json is valid JSON with 10+ repos
-- web/data/clusters.json is valid JSON with 4+ clusters
-- Playwright: visit file:///path/to/web/index.html — search shows results, clusters render
+- python3 -m pytest tests/ -v shows 0 failures, 0 errors (playwright tests skipped if browser not installed)
+- make test runs the full suite
+- make install sets up the venv
+- ghps search --format json returns valid JSON for empty results

@@ -1,4 +1,4 @@
-.PHONY: install test lint index serve clean
+.PHONY: install test lint index serve export deploy clean
 
 install:
 	pip install -e ".[dev]"
@@ -16,6 +16,14 @@ index:
 
 serve:
 	python3 -m uvicorn ghps.api:app --reload --port 8000
+
+export:
+	ghps export
+
+deploy:
+	@test -d web/ || (echo "Error: web/ directory not found" && exit 1)
+	@test -f scripts/deploy.sh || (echo "Error: scripts/deploy.sh not found" && exit 1)
+	bash scripts/deploy.sh
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

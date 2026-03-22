@@ -27,6 +27,12 @@ dev = [
     "httpx>=0.24",
     "numpy>=1.24",
 ]
+test = [
+    "pytest>=7.0",
+    "httpx>=0.24",
+    "numpy>=1.24",
+    "playwright>=1.40",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
