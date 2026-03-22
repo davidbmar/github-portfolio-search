@@ -1,33 +1,33 @@
-agentC-infra-fixes — Sprint 8
+agentC-infra — Sprint 9
 
 Sprint-Level Context
 
 Goal
-- Search relevance tuning — make semantic search return better results with real data
-- UX polish — make the site look professional for recruiters and hiring managers
+- CRITICAL: Fix F-005 — web search fails on multi-word queries ("voice processing" returns 0 results)
 - Fix B-012 — .venv symlinks break after agent merges
+- Add "Request Access" page skeleton for future gated tier
+- Improve search result quality for recruiters
 
 Constraints
 - No two agents may modify the same files
-- agentA owns search relevance (src/ghps/search.py, src/ghps/embeddings.py, src/ghps/export.py)
-- agentB owns web UI polish (web/js/app.js, web/js/search.js, web/css/style.css, web/index.html)
-- agentC owns infrastructure fixes (tests/, scripts/, .sprint/, Makefile, pyproject.toml)
+- agentA owns web search fix (web/js/search.js, web/js/app.js)
+- agentB owns access page and meta improvements (web/index.html, web/css/style.css)
+- agentC owns infrastructure fixes (scripts/, .sprint/, Makefile, tests/)
 - Use python3 for all commands
 - Do NOT commit .venv/ to git
 
 
 Objective
-- Fix venv symlink issue and improve developer experience
+- Fix venv symlink issue and clean up infrastructure
 
 Tasks
-- Fix B-012: Update .sprint/scripts/sprint-init.sh (or the local copy) to NOT symlink .venv into worktrees. Instead, each worktree should create its own venv or use the system python. Add a comment explaining why.
-- Add .env.example file with GITHUB_TOKEN=ghp_xxx placeholder (for F-001)
-- Update scripts/index-and-export.sh to source .env if it exists (python-dotenv style)
-- Add a test that verifies ghps CLI --help works without a venv (basic smoke test)
-- Update Makefile: add "reindex" target that runs the full index-and-export pipeline
+- Fix B-012: In .sprint/scripts/ (the local project copy), find where .venv gets symlinked into worktrees and remove that behavior. If sprint-init.sh or sprint-tmux.sh symlinks .venv, change it to skip .venv. Add a comment: "# .venv is NOT symlinked — each worktree uses system python or creates its own venv"
+- Update Makefile: add "deploy" target that runs aws s3 sync + cloudfront invalidation
+- Add a simple smoke test in tests/test_smoke.py: verify ghps --help returns 0, verify ghps search --help returns 0
+- Clean up: remove any .gitkeep files from web/data/ (we have real data now)
 
 Acceptance Criteria
 - python3 -m pytest tests/ -v shows 0 failures, 0 errors
-- make reindex works when GITHUB_TOKEN is set
-- .env.example exists with clear instructions
-- After sprint-init.sh creates worktrees, .venv is NOT symlinked (verify manually)
+- make deploy works (syncs to S3 + invalidates CloudFront)
+- .venv is NOT symlinked into worktrees after sprint-init.sh runs
+- No .gitkeep files in web/data/
