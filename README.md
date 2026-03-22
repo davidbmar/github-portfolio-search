@@ -89,8 +89,9 @@ docs/
 | 9 | Multi-word search + gated access prep | Complete |
 | 10 | Docs cleanup + repo detail page | Complete |
 | 11 | Activity visualization + D3.js + 94 repos | Complete |
-| 12 | Auto-tagging + cluster quality | **Next** |
-| 13 | Gated access — Google OAuth + approval | Planned |
+| 12 | Auto-tagging + cluster quality + password gate | Complete |
+| 13 | Gated access — Google OAuth + approval | **Next** |
+| 14 | Auto-refresh + GitHub webhooks | Planned |
 
 ## Deployment
 

@@ -54,6 +54,6 @@ What should happen?
 | B-013 | Web search is keyword-only — "voice processing" returns 0 results, needs fuzzy/semantic matching | Fixed | Medium |
 | F-004 | Deploy script should auto-export data before uploading | Open | Medium |
 | F-005 | Web search should support multi-word queries (split terms, match any) | Fixed | High |
-| B-014 | Technology Distribution shows only 3 topics — most repos lack GitHub topic tags | Open | Medium |
-| B-015 | AI & Search cluster contains non-AI repos (exampleLoops, Palindrome-Index) | Open | Low |
-| F-006 | Auto-tag repos with topics inferred from README content during indexing | Open | Medium |
+| B-014 | Technology Distribution shows only 3 topics — most repos lack GitHub topic tags | Fixed | Medium |
+| B-015 | AI & Search cluster contains non-AI repos (exampleLoops, Palindrome-Index) | Fixed | Low |
+| F-006 | Auto-tag repos with topics inferred from README content during indexing | Fixed | Medium |
