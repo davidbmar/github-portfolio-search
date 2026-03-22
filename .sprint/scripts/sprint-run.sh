@@ -20,6 +20,11 @@ set -euo pipefail
 # =============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+# Defaults for optional features (must be set before set -u bites)
+WHATSUP_ENABLED="${WHATSUP_ENABLED:-false}"
+WHATSUP_CMD="${WHATSUP_CMD:-}"
+
 # shellcheck source=./sprint-parse.sh
 source "${SCRIPT_DIR}/sprint-parse.sh"
 
@@ -184,8 +189,8 @@ wait_for_agents() {
   done
   echo ""
 
-  # Track which agents we've already sent notifications for
-  local -A notified_agents=()
+  # Track which agents we've already sent notifications for (bash 3 compatible)
+  local notified_agents=""
 
   while true; do
     local done_count=0
@@ -197,8 +202,8 @@ wait_for_agents() {
       if [ -f "${ROOT}/.agent-done-${agent}" ]; then
         done_count=$((done_count + 1))
         # Send whatsup notification once per agent completion
-        if [ -z "${notified_agents[$agent]+x}" ]; then
-          notified_agents[$agent]=1
+        if ! echo "$notified_agents" | grep -qF "|${agent}|"; then
+          notified_agents="${notified_agents}|${agent}|"
           if [ "$WHATSUP_ENABLED" = "true" ] && [ -x "$WHATSUP_CMD" ]; then
             "$WHATSUP_CMD" notify "${PROJECT_SLUG}" agent-completed --sprint "${SPRINT_NUM}" --agent "${agent}" 2>/dev/null || true
           fi
