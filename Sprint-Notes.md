@@ -1,11 +1,11 @@
-# Sprint 10 — Agent Notes
+# Sprint 11 — Agent Notes
 
-*Started: 2026-03-22 17:07 UTC*
+*Started: 2026-03-22 17:36 UTC*
 
 Phase 1 Agents: 3
-- agentA-docs-cleanup
-- agentB-data-completeness
-- agentC-repo-detail
+- agentA-d3-viz
+- agentB-activity-stats
+- agentC-social-meta
 
 Phase 2 Agents: 0
 (none)
@@ -14,59 +14,68 @@ Automated summaries from each agent are appended below as they complete.
 
 ---
 
-## agentB-data-completeness
+## agentC-social-meta
 
-*Completed: 2026-03-22 17:09 UTC*
+*Completed: 2026-03-22 17:39 UTC*
 
-### Files changed
-- `scripts/index-and-export.sh` — Added Step 3b: semantic data-quality validation (null descriptions, null languages, invalid URLs, cluster orphan detection)
-- `docs/project-memory/sessions/S-2026-03-22-1709-sprint10-data-completeness.md` — Session doc
+**Files changed:**
+- `web/index.html` — Updated `og:title`, `og:description`, added `<link rel="canonical">`
+- `web/css/style.css` — Added styles for D3 viz container, D3 tooltips, Recent Activity cards, sort dropdown, page fade-in transition, plus mobile overrides at 768px and 375px
+- `docs/project-memory/sessions/S-2026-03-22-1738-sprint11-social-meta.md` — Session doc
 
-### Commands run
-- `python3` validation scripts against `repos.json` and `clusters.json`
-- `python3 -m pytest tests/test_smoke.py tests/test_export.py` — 26 tests passed
-- `git push -u origin HEAD`
+**Commands run:**
+- `git pull origin main` — already up to date
+- `make test` — 149/149 passed
+- `git push -u origin HEAD` — pushed to `agentC-social-meta`
 
-### Acceptance criteria status
-- **repos.json: 0 null/empty descriptions** — PASS (42/42 have descriptions)
-- **repos.json: 0 null languages** — PASS (42/42 have languages)
-- **All html_url fields valid GitHub URLs** — PASS
-- **clusters.json accounts for all repos** — PASS (42 repos in 6 clusters, no orphans)
-- **Repo count >= 42** — PASS (exactly 42)
-
-### Notes / follow-on work
-- No data fixes were needed — the existing data was already clean
-- The new validation in `index-and-export.sh` Step 3b will catch regressions in future indexing runs
-- If `GITHUB_TOKEN` is available in a future run, re-indexing may pick up new repos beyond the current 42
+**Notes / follow-on work:**
+- `twitter:card` with `summary_large_image` was already present — no change needed
+- CSS class names (`.d3-viz-container`, `.d3-tooltip`, `.activity-card`, `.sort-dropdown`) are conventions that agentA (D3 JS) and agentB (app.js/search.js) should use to get these styles applied
+- The `og-image.png` referenced in meta tags should exist at `https://davidbmar.com/og-image.png` for social previews to render correctly
 
 
 ---
 
-## agentA-docs-cleanup
+## agentB-activity-stats
 
-*Completed: 2026-03-22 17:10 UTC*
+*Completed: 2026-03-22 17:40 UTC*
 
-```
-```
+## Files changed
+- **web/js/app.js** — Added Recent Activity section (landing page), cluster stats summary + Technology Distribution bar chart (clusters page), sort dropdown UI, CSS injection via `injectActivityStyles()`
+- **web/js/search.js** — Added `sortResults()` function (relevance/recent/name modes)
+- **docs/project-memory/sessions/S-2026-03-22-1739-sprint11-activity-stats.md** — Session doc
+
+## Commands run
+- `git pull origin main` — already up to date
+- `make test` — 149 tests passed
+- `make lint` — clean
+- `git commit` + `git push -u origin HEAD` — pushed to `agentB-activity-stats`
+
+## Notes / follow-on work
+- CSS is injected via JS (`injectActivityStyles()`) to avoid modifying `web/css/style.css` owned by agentC. If file ownership rules change, these styles could move to the CSS file for cleaner separation.
+- The sort state (`currentSortMode`) resets on page reload — could be persisted to `localStorage` if desired.
+- Playwright acceptance tests for the new features (Recent Activity, cluster stats, sort dropdown) should be added in a follow-up sprint.
 
 
 ---
 
-## agentC-repo-detail
+## agentA-d3-viz
 
-*Completed: 2026-03-22 17:11 UTC*
+*Completed: 2026-03-22 17:41 UTC*
 
-### Files changed
-- **`web/js/app.js`** — Added `#/repo/<name>` route, `findClusterForRepo()`, `renderRepoDetail()` function; changed repo card links from GitHub URLs to detail page
-- **`web/css/style.css`** — Added styles for repo detail page (`.repo-detail`, `.github-link` button, `.repo-detail-meta`, `.repo-detail-topics`, `.repo-detail-cluster`, mobile responsive)
-- **`docs/project-memory/sessions/S-2026-03-22-1710-sprint10-repo-detail.md`** — Session doc
+**Files changed:**
+- `web/index.html` — Added D3 v7 CDN script tag and `d3-viz.js` script tag
+- `web/js/d3-viz.js` — **New file** — Circle-packing visualization with zoom, tooltips, responsive SVG, injected CSS
+- `web/js/app.js` — Added `#d3-viz-container` div and `D3Viz.render()` call in `renderClustersPage()`
+- `docs/project-memory/sessions/S-2026-03-22-1740-d3-circle-packing.md` — Session doc
 
-### Commands run
-- `git pull origin main` — up to date
-- `python3 -m pytest tests/ -v` — 149 passed
-- `git push -u origin HEAD` — pushed to `agentC-repo-detail`
+**Commands run:**
+- `git pull origin main` — synced with main
+- `python3 -m pytest tests/ -v` — 148 passed, 1 pre-existing failure (unrelated to this work)
+- `git push -u origin HEAD` — pushed branch
 
-### Notes / follow-on work
-- The `search.js` file was **not modified** — repo name linking was handled entirely in `renderRepoCards()` within `app.js`, which is the shared renderer for both search results and home page cards
-- Playwright tests for the new detail page (click repo → see detail, verify fields, back link, mobile) are not yet added — the acceptance criteria mention Playwright tests but those would need to be added in a follow-up or by another agent
+**Notes / follow-on work:**
+- Pre-existing test failure: `test_search_no_results` expects "No results" text but the empty state says "Search to see all 42 repositories" — not caused by this change
+- The D3 CDN (`d3js.org`) is loaded externally; for offline usage, consider bundling D3 locally
+- Playwright acceptance tests for hover tooltip and click-to-navigate could be added in a follow-up
 
