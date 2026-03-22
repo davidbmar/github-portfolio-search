@@ -11,3 +11,14 @@ terraform/.terraform.lock.hcl
 
 # Node
 node_modules/
+
+# Python
+.venv/
+*.egg-info/
+__pycache__/
+*.pyc
+dist/
+build/
+
+# ghps
+.ghps/

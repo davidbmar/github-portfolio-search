@@ -1,13 +1,8 @@
 """Tests for the vector store."""
 
-import sys
-import os
-
-# Add src to path so imports work without pyproject.toml installed
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+from __future__ import annotations
 
 from ghps.store import VectorStore, _serialize_f32, EMBEDDING_DIM
-from ghps.embeddings import EmbeddingPipeline
 
 
 class TestVectorStoreSchema:
@@ -15,7 +10,6 @@ class TestVectorStoreSchema:
         store = VectorStore(":memory:")
         store.create_index()
         db = store.connect()
-        # Verify tables exist
         tables = {
             row[0]
             for row in db.execute(
@@ -115,31 +109,28 @@ class TestSearch:
         store = VectorStore(":memory:")
         store.create_index()
 
-        pipeline = EmbeddingPipeline()
-
-        # Index two chunks with different content
         repo = {"name": "myrepo"}
         chunks = [
             {"repo_name": "myrepo", "source": "README", "text": "python machine learning library"},
             {"repo_name": "myrepo", "source": "README", "text": "cooking recipes for dinner"},
         ]
-        texts = [c["text"] for c in chunks]
-        embeddings = pipeline.embed_batch(texts)
+        # Use fake but distinct embeddings (normalised unit-ish vectors)
+        import math
+        dim = EMBEDDING_DIM
+        emb1 = [1.0 / math.sqrt(dim)] * dim
+        emb2 = [-1.0 / math.sqrt(dim)] * dim
 
         store.add_repo(
             repo_dict=repo,
             readme_text="",
             source_files=[],
-            embeddings=embeddings,
+            embeddings=[emb1, emb2],
             chunks=chunks,
         )
 
-        # Search for something related to ML
-        query_vec = pipeline.embed_text("data science and AI")
-        results = store.search(query_vec, limit=2)
-
+        # Query with emb1-like vector — should match first chunk (smaller distance)
+        results = store.search(emb1, limit=2)
         assert len(results) == 2
-        # The ML chunk should be closer (lower distance)
         assert results[0]["text"] == "python machine learning library"
 
     def test_search_empty_store(self):
@@ -153,14 +144,12 @@ class TestSearch:
         store = VectorStore(":memory:")
         store.create_index()
 
-        pipeline = EmbeddingPipeline()
         repo = {"name": "myrepo"}
         chunks = [
             {"repo_name": "myrepo", "source": "README", "text": f"chunk {i}"}
             for i in range(5)
         ]
-        texts = [c["text"] for c in chunks]
-        embeddings = pipeline.embed_batch(texts)
+        embeddings = [[float(i) / 10.0] * EMBEDDING_DIM for i in range(5)]
 
         store.add_repo(
             repo_dict=repo,
@@ -170,7 +159,7 @@ class TestSearch:
             chunks=chunks,
         )
 
-        query_vec = pipeline.embed_text("test")
+        query_vec = [0.0] * EMBEDDING_DIM
         results = store.search(query_vec, limit=2)
         assert len(results) == 2
 
