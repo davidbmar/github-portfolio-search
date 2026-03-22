@@ -47,17 +47,17 @@ PM/customer review checkpoint: Full test suite passes. davidbmar.com live with r
 Backlog triage: B-005 fixed, B-006 fixed. B-012 (venv symlinks) still open. 42 of ~90 repos indexed (some may be private/empty).
 Planning input for Sprint 8: Relevance tuning and UX polish — real data is live, now improve the experience.
 
-**Sprint 8: Search Relevance and UX Polish**
-Build goals: Tune search relevance scoring (chunk weighting, title boost, recency factor). Add result highlighting (bold matched terms in snippets). Improve cluster naming. Add "Related repos" suggestions on detail view. Polish landing page with stats (N repos indexed, M capabilities, last updated). Fix B-012 (venv symlinks). Add index freshness indicator.
-PM/customer review checkpoint: Run the full use-case matrix with real data. Verify semantic matches ("how did I handle auth?" returns auth repos), temporal queries ("recent projects" ranks by date), and recombination queries ("voice + AWS" finds intersection). Test that a non-technical person can understand the portfolio.
-Backlog triage: Search relevance issues, UX friction, accessibility.
-Planning input for Sprint 9: Decide on gated access vs. open access model.
+**Sprint 8: Search Relevance and UX Polish (COMPLETED 2026-03-22)**
+Build goals: Added title boosting (2x for name matches) and recency factor to search scoring. Added result highlighting (bold matched terms). Added "Related repos" section from same cluster. Added landing page stats (42 repos, 6 clusters, 5 languages), language bar chart, last updated timestamp. Improved card styling with hover effects and gradient accents. Added .env.example for GITHUB_TOKEN. Tests: 139 passed, 0 failed.
+PM/customer review checkpoint: Live site shows polished UI with stats, search highlighting, and relevance bars. "voice" returns 9 repos with highlighted terms. "presigned URL" returns correct repo. Mobile works. New finding: multi-word queries like "voice processing" return 0 results — web search is keyword-exact, not fuzzy (F-005).
+Backlog triage: B-012 still open. Added B-013 (keyword-only search) and F-005 (multi-word query support).
+Planning input for Sprint 9: Fix multi-word search (F-005), then gated access.
 
-**Sprint 9: Search Relevance and UX Polish**
-Build goals: Tune search relevance scoring (chunk weighting, title boost, recency factor). Add result highlighting (bold matched terms in snippets). Improve cluster naming (auto-generate meaningful names from repo topics). Add "Related repos" suggestions on detail view. Polish the landing page with stats (N repos indexed, M capabilities, last updated).
-PM/customer review checkpoint: Run the full use-case matrix from use-cases.md with real data. Verify semantic matches ("how did I handle auth?" returns auth repos), temporal queries ("recent projects" ranks by date), and recombination queries ("voice + AWS" finds intersection). Test that a non-technical person can understand the portfolio.
-Backlog triage: Final UX polish items, accessibility issues, performance on slow connections.
-Planning input for Sprint 10: Decide on gated access vs. open access model for the public site.
+**Sprint 9: Multi-Word Search Fix and Gated Access Prep**
+Build goals: Fix F-005 (web search should split multi-word queries and match any term). Fix B-012 (venv symlinks). Add search result count to page title. Implement basic access request form (name, email, reason). Add "Request Access" page skeleton for gated tier. Clean up stale roadmap entries.
+PM/customer review checkpoint: Search for "voice processing" should return voice repos. Search for "s3 upload" should return presigned URL repo. Request Access page shows form (no backend yet). All tests pass.
+Backlog triage: Remaining UX friction, accessibility gaps.
+Planning input for Sprint 10: 5th-sprint checkpoint — extend roadmap, full docs cleanup.
 
 **Sprint 10: 5th-Sprint Checkpoint — Gated Access and Docs Cleanup**
 Build goals: Implement access tiers (public: browse + search descriptions, gated: full code snippets). Add Google OAuth login flow. Build simple approval workflow (Telegram notification to David, approve/deny via link). Clean up all documentation — README, CLAUDE.md, API docs, deployment guide. Remove stale code and TODOs.
@@ -74,13 +74,13 @@ Planning input for Sprint 12: Based on user feedback and analytics, decide next 
 
 ### Current Focus
 
-**Sprint 8: Search Relevance and UX Polish (Sprints 1-7 COMPLETE)**
+**Sprint 9: Multi-Word Search Fix and Gated Access Prep (Sprints 1-8 COMPLETE)**
 
-Sprints 1-7 delivered: indexing pipeline, REST API, MCP server, CLI, web UI, deploy pipeline, data export, sample data, web resilience, Makefile, all test fixes (129 passing), and real data (42 repos, 6 clusters live on davidbmar.com). Sprint 8 focuses on search relevance tuning and UX polish.
+Sprints 1-8 delivered: full indexing pipeline, REST API, MCP server, CLI, web UI with faceted search, deploy pipeline, 42 real repos live on davidbmar.com, search highlighting, relevance scoring, language stats, and portfolio overview. Sprint 9 focuses on multi-word search support and gated access scaffolding.
 
 ### Next Up
 
-**Sprint 9: Gated Access and Docs Cleanup** — access tiers, Google OAuth, approval workflow, documentation cleanup.
+**Sprint 10: 5th-Sprint Checkpoint** — roadmap extension, full docs cleanup, gated access with OAuth.
 
 Finally **Phase 5: Public Deploy + Gated Access (Sprints 8-9)** — S3/CloudFront at davidbmar.com, Google OAuth, approval workflow with Telegram notifications, public/gated tiers.
 

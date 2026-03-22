@@ -66,8 +66,9 @@ docs/
 | 5 | Deploy pipeline + data export | Complete |
 | 6 | Stabilization — sample data + web resilience | Complete |
 | 7 | Test fixes + real data indexing (42 repos) | Complete |
-| 8 | Search relevance + UX polish | **Next** |
-| 9 | Gated access + docs cleanup | Planned |
+| 8 | Search relevance + UX polish | Complete |
+| 9 | Multi-word search + gated access prep | **Next** |
+| 10 | 5th-sprint checkpoint + docs cleanup | Planned |
 
 ## Deployment
 
