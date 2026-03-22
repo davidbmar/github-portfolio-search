@@ -1,17 +1,21 @@
-All tasks complete.
-
 ---
 
-**Files changed:**
-- `deploy.sh` — rewritten to match sprint 5 spec (check web/ dir, conditional ghps export, s3 sync with `--exclude *.pyc`, CloudFront invalidation)
-- `tests/test_deploy.py` — new file: 6 tests verifying deploy.sh exists, is executable, has correct bucket name, CloudFront distribution ID, web/ reference, and .pyc exclusion
+## Summary
 
-**Commands run:**
-- `git pull origin main` — already up to date
-- `python3 -m pytest tests/test_cli.py tests/test_e2e.py tests/test_deploy.py -v` — 24 passed
-- `chmod +x deploy.sh`
-- `git commit` + `git push -u origin HEAD`
+### Files changed
+- **`scripts/index-and-export.sh`** (new) — Executable pipeline script: sets up venv, runs `ghps index`, runs `ghps export`, prints summary
+- **`web/data/repos.json`** (new) — 5 sample repos for development without GitHub token
+- **`web/data/clusters.json`** (new) — 2 sample clusters matching export format
+- **`docs/project-memory/sessions/S-2026-03-22-0639-sprint5-index-export.md`** (new) — Session doc
 
-**Notes / follow-on work:**
-- B-005 and B-006 were already fixed in a prior sprint — cli.py has `_db_exists()` checks and proper `json.dumps()` output. All 18 existing tests passed before any changes.
-- The Playwright acceptance test ("after deploy, davidbmar.com shows search UI") requires a live deployment and is not runnable in CI without AWS credentials.
+### Commands run
+- `git fetch origin main && git merge origin/main` — synced with main
+- `python3 -m pytest tests/test_export.py -v` — 24 passed
+- `python3 -m pytest tests/ -v` — 123 passed, 1 warning
+- `git push -u origin HEAD` — pushed branch
+
+### Notes / follow-on work
+- **export.py was already complete** — no fixes needed, all tests pass
+- **.gitignore already had `.ghps/`** — no change needed
+- The `index-and-export.sh` script requires `GITHUB_TOKEN` for real data; sample data in `web/data/` works without it
+- The `github_client` module exposes `fetch_repos()` but the indexer's `index_user()` calls `github_client.fetch_user_repos()` — this mismatch is in agentA's domain (cli.py)

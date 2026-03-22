@@ -1,4 +1,4 @@
-agentA-deploy-fixes — Sprint 5
+agentB-index-export — Sprint 5
 
 Sprint-Level Context
 
@@ -18,21 +18,24 @@ Constraints
 
 
 Objective
-- Fix test failures and create a working deploy script for davidbmar.com
+- Create a working index + export pipeline so the web UI has real data
 
 Tasks
-- Fix B-005: test_cli.py failures on missing index — add proper error handling in cli.py for when index DB doesn't exist
-- Fix B-006: test_e2e.py JSON decode error — fix CLI --format json to output valid JSON
-- Create deploy.sh in project root:
-  - Check for web/ directory
-  - If src/ghps/export.py exists, run ghps export --output web/data/
-  - Run: aws s3 sync web/ s3://davidbmar-com/ --delete --exclude "*.pyc"
-  - Run: aws cloudfront create-invalidation --distribution-id E3RCY6XA80ANRT --paths "/*"
-  - Print: "Deployed to https://davidbmar.com"
-- Make deploy.sh executable (chmod +x)
-- Create tests/test_deploy.py — verify deploy.sh exists, is executable, has correct bucket name
+- Verify src/ghps/export.py works end-to-end:
+  - export_static_bundle should produce repos.json, clusters.json in output dir
+  - If export.py is broken or incomplete, fix it
+- Create scripts/index-and-export.sh:
+  - Set up venv if missing
+  - Run ghps index davidbmar --db .ghps/index.db (requires GITHUB_TOKEN)
+  - Run ghps export --db .ghps/index.db --output web/data/
+  - Print summary: N repos indexed, M clusters generated
+- Add sample/mock data to web/data/ for development:
+  - web/data/repos.json with 5 sample repos (for testing without GitHub token)
+  - web/data/clusters.json with 2 sample clusters
+- Update .gitignore: add .ghps/ (index database)
 
 Acceptance Criteria
-- python3 -m pytest tests/test_cli.py tests/test_e2e.py -v passes with 0 failures
-- ./deploy.sh runs without errors (when AWS credentials are available)
-- Playwright test: after deploy, https://davidbmar.com shows search UI not placeholder
+- web/data/repos.json exists with valid JSON (sample or real data)
+- web/data/clusters.json exists with valid JSON
+- scripts/index-and-export.sh is executable and documents the pipeline
+- ghps export --output web/data/ produces valid JSON files
