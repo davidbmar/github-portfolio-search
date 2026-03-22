@@ -1,21 +1,19 @@
+---
+
 ## Summary
 
 ### Files changed
-- **`src/ghps/export.py`** — Language fallback: `""` → `"Unknown"` for repos with no language detected
-- **`scripts/generate-sample-data.py`** — Replaced 10 fictional repos with 42 real repos from davidbmar's GitHub account
-- **`scripts/index-and-export.sh`** — Added JSON validation step (checks files exist, are valid arrays, are non-empty)
-- **`web/data/repos.json`** — Regenerated with 42 real repos, accurate descriptions and `html_url` links
-- **`web/data/clusters.json`** — Regenerated with 6 logical clusters (Voice & Speech, Transcription & ASR, Browser-Native AI, AI & Search Tools, AWS Infrastructure, Developer Tools)
-- **`docs/project-memory/sessions/S-2026-03-22-1538-real-data-pipeline.md`** — Session doc
+- **web/js/app.js** — Added `computePortfolioStats()`, `highlightTerms()`, `findRelatedRepos()`. Landing page shows repo/cluster/language stats, language distribution bars, last-updated date. Search results show highlighted terms, relevance bars, and related repos.
+- **web/css/style.css** — New styles for portfolio stats, language bars, relevance bars, related repos section. Improved card hover (lift + shadow), cluster card gradient accents, better typography (line-height 1.7), mark highlight styling, mobile responsive adjustments.
+- **web/index.html** — Updated meta description and OG tags with real stats (42 repos, 6 capability areas), added og:image/twitter:image, changed to summary_large_image card.
+- **docs/project-memory/sessions/S-2026-03-22-1613-sprint8-ui-polish.md** — Session documentation.
 
 ### Commands run
 - `git pull origin main`
-- `curl` GitHub public API to fetch real repo metadata (106 repos across 2 pages)
-- `python3 scripts/generate-sample-data.py --output web/data`
-- `python3 -m pytest tests/ -v` — **129 passed, 0 failures**
-- `git push -u origin HEAD`
+- `python3 -m pytest tests/ -v` (136 passed, 1 pre-existing failure)
+- `git commit` + `git push -u origin HEAD`
 
 ### Notes / follow-on work
-- **GITHUB_TOKEN not available** — used public API for metadata only. When token is available, run `GITHUB_TOKEN=ghp_xxx scripts/index-and-export.sh davidbmar` for full indexing with embeddings and `search-index.json` generation
-- The `ORDER BY name` in `_build_repos` SQL already ensures deterministic output (no code change needed)
-- Repos with no README are already handled — description is pulled from the DB `repos` table, not from README content
+1. **Pre-existing test failure**: `test_search_no_results` has a race condition — `.empty-state` on home page matches before search route renders. agentC should fix by using `page.wait_for_url()` or a more specific selector like `.empty-state h3:has-text("No results")`.
+2. **OG image**: `og:image` references `/og-image.png` which doesn't exist yet. A real social preview image should be created and deployed.
+3. **search.js was not modified** — all search UI enhancements (highlighting, relevance bars, related repos) are rendering-side changes in app.js, keeping the search engine pure.
