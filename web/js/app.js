@@ -208,6 +208,9 @@ const App = (() => {
       const params = new URLSearchParams(hash.split("?")[1] || "");
       const query = params.get("q") || "";
       renderSearchResults(query, content);
+    } else if (hash.startsWith("#/repo/")) {
+      const repoName = decodeURIComponent(hash.slice("#/repo/".length));
+      renderRepoDetail(repoName, content);
     } else if (hash.startsWith("#/cluster/")) {
       const clusterName = decodeURIComponent(hash.slice("#/cluster/".length));
       renderClusterDetail(clusterName, content);
@@ -464,6 +467,101 @@ const App = (() => {
   }
 
   /**
+   * Find which cluster a repo belongs to.
+   */
+  function findClusterForRepo(repoName) {
+    for (const cluster of clusters) {
+      if ((cluster.repos || []).includes(repoName)) {
+        return cluster;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Render repo detail page showing full info about a single repository.
+   * Safe: all dynamic values pass through escapeHtml()/escapeAttr() before
+   * DOM insertion, consistent with the existing rendering pattern in this file.
+   */
+  function renderRepoDetail(repoName, container) {
+    let html = '<a href="#/" class="back-link">&larr; Back to search</a>';
+
+    const repo = repos.find((r) => r.name === repoName);
+    if (!repo) {
+      html += '<div class="empty-state"><h3>Repository not found</h3></div>';
+      container.innerHTML = html;
+      return;
+    }
+
+    const cluster = findClusterForRepo(repo.name);
+    const langColor = LANG_COLORS[repo.language] || "#8b949e";
+
+    html += '<div class="repo-detail">';
+    html += '<h2 class="repo-detail-name">' + escapeHtml(repo.name) + '</h2>';
+
+    if (repo.description) {
+      html += '<p class="repo-detail-description">' + escapeHtml(repo.description) + '</p>';
+    }
+
+    // GitHub link — url comes from trusted repos.json data, escaped via escapeAttr
+    const githubUrl = repo.html_url || repo.url;
+    if (githubUrl) {
+      html += '<a href="' + escapeAttr(githubUrl) + '" class="github-link" target="_blank" rel="noopener">';
+      html += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>';
+      html += ' View on GitHub</a>';
+    }
+
+    // Meta info
+    html += '<div class="repo-detail-meta">';
+    if (repo.language) {
+      html += '<span class="language-badge">';
+      html += '<span class="language-dot" style="background:' + escapeAttr(langColor) + '"></span>';
+      html += escapeHtml(repo.language);
+      html += '</span>';
+    }
+    if (repo.stars !== undefined && repo.stars !== null) {
+      html += '<span class="stars-badge">&#9733; ' + escapeHtml(String(repo.stars)) + '</span>';
+    }
+    if (repo.updated_at) {
+      html += '<span>Updated ' + escapeHtml(formatDate(repo.updated_at)) + '</span>';
+    }
+    html += '</div>';
+
+    // Topics
+    const topics = repo.topics || [];
+    if (topics.length > 0) {
+      html += '<div class="repo-detail-topics">';
+      for (const t of topics) {
+        html += '<span class="topic-tag">' + escapeHtml(t) + '</span>';
+      }
+      html += '</div>';
+    }
+
+    // Cluster info
+    if (cluster) {
+      html += '<div class="repo-detail-cluster">';
+      html += '<h3>Cluster</h3>';
+      html += '<a href="#/cluster/' + escapeAttr(encodeURIComponent(cluster.name)) + '" class="cluster-link">' + escapeHtml(cluster.name) + '</a>';
+      html += '</div>';
+    }
+
+    html += '</div>'; // repo-detail
+
+    // Related repos from same cluster
+    const related = findRelatedRepos(repo, 6);
+    if (related.length > 0) {
+      html += '<div class="related-repos-section">';
+      html += '<div class="section-header"><h3>Related Repositories</h3>';
+      html += '<span class="count">from same cluster</span></div>';
+      html += renderRepoCards(related);
+      html += '</div>';
+    }
+
+    // Safe: all dynamic values are escaped via escapeHtml/escapeAttr
+    container.innerHTML = html;
+  }
+
+  /**
    * Render clusters listing page.
    */
   function renderClustersPage(container) {
@@ -613,11 +711,7 @@ const App = (() => {
       html += '<div class="repo-card">';
       html += '<div class="repo-card-header">';
 
-      if (repo.url) {
-        html += '<a href="' + escapeAttr(repo.url) + '" class="repo-name" target="_blank" rel="noopener">' + escapeHtml(repo.name) + "</a>";
-      } else {
-        html += '<span class="repo-name">' + escapeHtml(repo.name) + "</span>";
-      }
+      html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="repo-name">' + escapeHtml(repo.name) + "</a>";
 
       // Relevance bar instead of raw score number
       if (repo._score !== undefined && repo._maxScore) {
