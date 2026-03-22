@@ -326,6 +326,169 @@ class TestCLISmoke:
         sys.modules.pop("ghps.cli", None)
 
 
+# ---------------------------------------------------------------------------
+# ghps stats
+# ---------------------------------------------------------------------------
+
+class TestStatsCommand:
+    def test_stats_shows_summary(self):
+        fake = _install_fake_modules()
+        try:
+            # Mock analytics module
+            import types
+            analytics_mod = types.ModuleType("ghps.analytics")
+            analytics_mod.get_analytics_summary = lambda: {
+                "total_searches": 42,
+                "avg_results": 7.3,
+                "top_queries": [
+                    {"query": "machine learning", "count": 10},
+                    {"query": "react dashboard", "count": 5},
+                ],
+            }
+            sys.modules["ghps.analytics"] = analytics_mod
+
+            main = _reload_cli()
+            runner = CliRunner()
+            result = runner.invoke(main, ["stats"])
+
+            assert result.exit_code == 0, f"CLI failed: {result.output}"
+            assert "42" in result.output
+            assert "7.3" in result.output
+            assert "machine learning" in result.output
+            assert "10 times" in result.output
+        finally:
+            sys.modules.pop("ghps.analytics", None)
+            _cleanup(fake)
+
+    def test_stats_json_format(self):
+        fake = _install_fake_modules()
+        try:
+            import types
+            analytics_mod = types.ModuleType("ghps.analytics")
+            analytics_mod.get_analytics_summary = lambda: {
+                "total_searches": 42,
+                "avg_results": 7.3,
+                "top_queries": [
+                    {"query": "machine learning", "count": 10},
+                ],
+            }
+            sys.modules["ghps.analytics"] = analytics_mod
+
+            main = _reload_cli()
+            runner = CliRunner()
+            result = runner.invoke(main, ["stats", "--format", "json"])
+
+            assert result.exit_code == 0, f"CLI failed: {result.output}"
+            data = json.loads(result.output)
+            assert data["total_searches"] == 42
+            assert data["avg_results"] == 7.3
+            assert len(data["top_queries"]) == 1
+        finally:
+            sys.modules.pop("ghps.analytics", None)
+            _cleanup(fake)
+
+    def test_stats_no_analytics_module(self):
+        """Stats should fail gracefully when analytics module is not available."""
+        # Ensure analytics module is NOT available
+        sys.modules.pop("ghps.analytics", None)
+        sys.modules.pop("ghps.cli", None)
+        from ghps.cli import main
+
+        runner = CliRunner()
+        result = runner.invoke(main, ["stats"])
+
+        assert result.exit_code != 0
+        assert "Analytics module not available" in result.output
+
+        sys.modules.pop("ghps.cli", None)
+
+    def test_stats_empty_queries(self):
+        fake = _install_fake_modules()
+        try:
+            import types
+            analytics_mod = types.ModuleType("ghps.analytics")
+            analytics_mod.get_analytics_summary = lambda: {
+                "total_searches": 0,
+                "avg_results": 0.0,
+                "top_queries": [],
+            }
+            sys.modules["ghps.analytics"] = analytics_mod
+
+            main = _reload_cli()
+            runner = CliRunner()
+            result = runner.invoke(main, ["stats"])
+
+            assert result.exit_code == 0, f"CLI failed: {result.output}"
+            assert "0" in result.output
+            assert "none yet" in result.output
+        finally:
+            sys.modules.pop("ghps.analytics", None)
+            _cleanup(fake)
+
+
+# ---------------------------------------------------------------------------
+# ghps search analytics logging
+# ---------------------------------------------------------------------------
+
+class TestSearchAnalyticsLogging:
+    def test_search_logs_to_analytics(self):
+        """Verify that search command calls log_search when analytics is available."""
+        fake = _install_fake_modules()
+        try:
+            mock_engine_cls = MagicMock()
+            mock_engine_cls.return_value.search.return_value = SAMPLE_RESULTS
+
+            sys.modules["ghps.store"].VectorStore = MagicMock()
+            sys.modules["ghps.embeddings"].EmbeddingPipeline = MagicMock()
+
+            # Mock analytics module with log_search
+            import types
+            analytics_mod = types.ModuleType("ghps.analytics")
+            log_calls = []
+            analytics_mod.log_search = lambda **kwargs: log_calls.append(kwargs)
+            sys.modules["ghps.analytics"] = analytics_mod
+
+            with patch("ghps.search.SearchEngine", mock_engine_cls):
+                main = _reload_cli()
+                runner = CliRunner()
+                result = runner.invoke(main, ["search", "test query", "--db", ":memory:"])
+
+                assert result.exit_code == 0, f"CLI failed: {result.output}"
+                assert len(log_calls) == 1
+                assert log_calls[0]["query"] == "test query"
+                assert log_calls[0]["num_results"] == 2
+                assert log_calls[0]["source"] == "cli"
+        finally:
+            sys.modules.pop("ghps.analytics", None)
+            _cleanup(fake)
+
+    def test_search_works_without_analytics(self):
+        """Search should still work when analytics module is not available."""
+        fake = _install_fake_modules()
+        try:
+            mock_engine_cls = MagicMock()
+            mock_engine_cls.return_value.search.return_value = SAMPLE_RESULTS
+
+            sys.modules["ghps.store"].VectorStore = MagicMock()
+            sys.modules["ghps.embeddings"].EmbeddingPipeline = MagicMock()
+            sys.modules.pop("ghps.analytics", None)
+
+            with patch("ghps.search.SearchEngine", mock_engine_cls):
+                main = _reload_cli()
+                runner = CliRunner()
+                result = runner.invoke(main, ["search", "test query", "--db", ":memory:"])
+
+                assert result.exit_code == 0, f"CLI failed: {result.output}"
+                assert "ml-pipeline" in result.output
+        finally:
+            sys.modules.pop("ghps.analytics", None)
+            _cleanup(fake)
+
+
+# ---------------------------------------------------------------------------
+# ghps serve
+# ---------------------------------------------------------------------------
+
 class TestServeCommand:
     def test_serve_missing_index(self):
         """Serve should fail with a helpful message when the DB doesn't exist."""
