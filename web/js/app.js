@@ -6,6 +6,56 @@
  * before DOM insertion. escapeHtml uses createTextNode which is XSS-safe.
  */
 
+// --- Password Gate (session-scoped) ---
+(() => {
+  const KEY = "ghps_auth";
+  const EXPECTED = "guild";
+  if (sessionStorage.getItem(KEY) === "1") return;
+  document.addEventListener("DOMContentLoaded", () => {
+    if (sessionStorage.getItem(KEY) === "1") return;
+    document.body.textContent = "";
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:9999";
+    const box = document.createElement("div");
+    box.style.cssText = "text-align:center;color:#c9d1d9;font-family:system-ui";
+    const h2 = document.createElement("h2");
+    h2.textContent = "GitHub Portfolio Search";
+    h2.style.marginBottom = "1rem";
+    const p = document.createElement("p");
+    p.textContent = "Enter password to continue";
+    p.style.cssText = "color:#8b949e;margin-bottom:1.5rem";
+    const input = document.createElement("input");
+    input.type = "password";
+    input.placeholder = "Password";
+    input.style.cssText = "padding:10px 16px;border-radius:8px;border:1px solid #30363d;background:#161b22;color:#c9d1d9;font-size:16px;width:240px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto";
+    const btn = document.createElement("button");
+    btn.textContent = "Enter";
+    btn.style.cssText = "padding:10px 32px;border-radius:8px;border:none;background:#58a6ff;color:#0d1117;font-weight:600;font-size:16px;cursor:pointer";
+    const err = document.createElement("p");
+    err.style.cssText = "color:#f85149;margin-top:8px;min-height:1.2em";
+    const tryLogin = () => {
+      if (input.value === EXPECTED) {
+        sessionStorage.setItem(KEY, "1");
+        location.reload();
+      } else {
+        err.textContent = "Incorrect password";
+        input.value = "";
+        input.focus();
+      }
+    };
+    btn.onclick = tryLogin;
+    input.onkeydown = e => { if (e.key === "Enter") tryLogin(); };
+    box.appendChild(h2);
+    box.appendChild(p);
+    box.appendChild(input);
+    box.appendChild(btn);
+    box.appendChild(err);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    input.focus();
+  });
+})();
+
 const App = (() => {
   // State
   let repos = [];

@@ -616,6 +616,30 @@
       {
         "source": "README",
         "text": "Step 0 git clone + repo exists ← done Step 1 scripts/install-k3s.sh k3s + Traefik on 80/443 Step 2 scripts/setup-registry.sh registry on localhost:5050 Step 3 export ANTHROPIC_API_KEY=... scripts/boot"
+      },
+      {
+        "source": "README",
+        "text": "# k3s App Builder Platform **Describe → Preview → Publish** — A self-contained platform for deploying apps with plain language + Claude, entirely within k3s on a single EC2 instance. Project: `2026-FE"
+      },
+      {
+        "source": "README",
+        "text": "also handles networking, restarts crashed containers, and enforces resource limits. ### Traffic Flow ``` Your Browser → DNS lookup: myapp.52.91.12.83.nip.io → 52.91.12.83 (nip.io magic) → TCP connect "
+      },
+      {
+        "source": "README",
+        "text": "address → pod) ├── Ingress: myapp-preview myapp-preview.IP.nip.io → preview svc ├── Ingress: myapp-prod myapp.IP.nip.io → prod svc ├── ResourceQuota max 1 CPU, 512 MB RAM, 6 pods └── NetworkPolicy blo"
+      },
+      {
+        "source": "README",
+        "text": "k3s (`builder-system` namespace). It is a FastAPI Python application that: - Calls the **Anthropic API** to stream Claude-generated code - Runs `docker build` via the Docker socket mounted from the ho"
+      },
+      {
+        "source": "README",
+        "text": "— all routes │ ├── k8s_ops.py kubectl wrapper (namespace/deploy lifecycle) │ ├── claude_ops.py Claude API streaming code generation │ ├── build_ops.py docker build + push, git operations │ ├── require"
+      },
+      {
+        "source": "README",
+        "text": "Step 0 git clone + repo exists ← done Step 1 scripts/install-k3s.sh k3s + Traefik on 80/443 Step 2 scripts/setup-registry.sh registry on localhost:5050 Step 3 export ANTHROPIC_API_KEY=... scripts/boot"
       }
     ]
   },
@@ -852,6 +876,14 @@
       "|----------|---------|-------------|"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Remote Dev UI A web-based dual-pane file browser with an integrated terminal, designed for managing files on local machines and EC2 instances through a browser. Connect to remote servers via SSH/SFT"
+      },
+      {
+        "source": "README",
+        "text": "integrated terminal automatically opens an SSH shell session to the connected host. ## Production Build ```bash # Build client and server npm run build # Run production server npm run start ``` The bu"
+      },
       {
         "source": "README",
         "text": "# Remote Dev UI A web-based dual-pane file browser with an integrated terminal, designed for managing files on local machines and EC2 instances through a browser. Connect to remote servers via SSH/SFT"
@@ -1380,6 +1412,26 @@
       {
         "source": "README",
         "text": "```bash cd terraform/envs/tier5 terraform destroy # Start fresh ``` ## Clean Up To destroy all resources: ```bash cd terraform/envs/tier5 terraform destroy ``` This will remove: - EC2 instance - ALB a"
+      },
+      {
+        "source": "README",
+        "text": "# Employee Access Portal A minimal MVP \"Employee Access Portal\" built on AWS using Cognito + ALB authentication + EC2. The ALB handles authentication using Cognito's authenticate-cognito action, and t"
+      },
+      {
+        "source": "README",
+        "text": "└── deploy.sh # Deployment script ├── terraform/ │ └── envs/ │ └── tier5/ │ ├── main.tf # Main Terraform configuration │ ├── variables.tf # Input variables │ ├── outputs.tf # Output values │ └── user_"
+      },
+      {
+        "source": "README",
+        "text": "$USER_POOL_ID \\ --username abckjY@xxxxxxxx.com \\ --password \"YourSecurepw23!\" \\ --permanent \\ --region us-east-1 # Set password for sxxxxxxxxx@myuser.com aws cognito-idp admin-set-user-password \\ --us"
+      },
+      {
+        "source": "README",
+        "text": "The EC2 instance has an IAM role with minimal permissions: - `cognito-idp:AdminListGroupsForUser` (scoped to the User Pool) - `cognito-idp:AdminGetUser` (optional, scoped to the User Pool) ### Securit"
+      },
+      {
+        "source": "README",
+        "text": "```bash cd terraform/envs/tier5 terraform destroy # Start fresh ``` ## Clean Up To destroy all resources: ```bash cd terraform/envs/tier5 terraform destroy ``` This will remove: - EC2 instance - ALB a"
       }
     ]
   },
@@ -1505,6 +1557,10 @@
       "wer"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Real-Time ASR Service (Phase 1) Production-ready streaming ASR using NVIDIA Nemotron Parakeet 0.6B. ## Quick Start ```bash # Install dependencies pip install -r requirements.txt # Download models py"
+      },
       {
         "source": "README",
         "text": "# Real-Time ASR Service (Phase 1) Production-ready streaming ASR using NVIDIA Nemotron Parakeet 0.6B. ## Quick Start ```bash # Install dependencies pip install -r requirements.txt # Download models py"
@@ -2064,6 +2120,26 @@
       {
         "source": "README",
         "text": "Docker is running and port 9090 isn't in use | | STT service won't start | Check Python 3.10+ is installed: `python3 --version` | ## Server Logs **STT service terminal** shows transcription requests: "
+      },
+      {
+        "source": "README",
+        "text": "<div align=\"center\"> <h1>nano-claw voice loop</h1> <p> A voice-powered AI agent you talk to in your browser. Ask questions, approve tool calls, hear responses — all by voice. </p> <p> <img src=\"https:"
+      },
+      {
+        "source": "README",
+        "text": "Metal GPU is not passed through. This is a hard limitation — there is no workaround. Whisper running on Docker CPU takes 1-2 seconds for a short clip and 30 seconds to load the model the first time. R"
+      },
+      {
+        "source": "README",
+        "text": "tool approval, and speak its answer back. ### 6. Stop Press `Ctrl-C` — this stops both the Docker container and the STT service. ## How It Works <p align=\"center\"> <img src=\"docs/voice-ui-connected.pn"
+      },
+      {
+        "source": "README",
+        "text": "limit | See **[docs/DEBUG-PANEL.md](docs/DEBUG-PANEL.md)** for the full observability guide. ## Component Details | Component | Where it runs | Role | |-----------|--------------|------| | **STT Servi"
+      },
+      {
+        "source": "README",
+        "text": "Docker is running and port 9090 isn't in use | | STT service won't start | Check Python 3.10+ is installed: `python3 --version` | ## Server Logs **STT service terminal** shows transcription requests: "
       }
     ]
   },
@@ -2122,6 +2198,7 @@
       "remote",
       "run",
       "runpod.io",
+      "s3",
       "select",
       "set",
       "set-url",
@@ -2150,6 +2227,10 @@
       {
         "source": "README",
         "text": "# 4kUpScalerWorker The idea behind this is to 4k upscale a given picture. Pictures can be put to an S3 bucket. When that picture is PUT into the bucket, it then creates an event which adds this to an "
+      },
+      {
+        "source": "README",
+        "text": "# 4kUpScalerWorker The idea behind this is to 4k upscale a given picture. Pictures can be put to an S3 bucket. When that picture is PUT into the bucket, it then creates an event which adds this to an "
       }
     ]
   },
@@ -2162,6 +2243,10 @@
       "tools"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# AWS_tools_for_pricing"
+      },
       {
         "source": "README",
         "text": "# AWS_tools_for_pricing"
@@ -2197,6 +2282,10 @@
       "which"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Audio2ScriptViewer This service takes takes the output from the transcriber and provides the view of the sound files to txt which they contain. to setup the infrastucture run: terraform init terrafo"
+      },
       {
         "source": "README",
         "text": "# Audio2ScriptViewer This service takes takes the output from the transcriber and provides the view of the sound files to txt which they contain. to setup the infrastucture run: terraform init terrafo"
@@ -2293,6 +2382,7 @@
       "registration",
       "returns",
       "robust",
+      "s3",
       "s3**",
       "scalability",
       "scenario",
@@ -2325,6 +2415,10 @@
       "|<---------|"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "Here’s a more detailed flow chart that outlines the high-level approach for mapping user logins (email addresses) to individual S3 buckets using Auth0 for authentication. This visualization will help "
+      },
       {
         "source": "README",
         "text": "Here’s a more detailed flow chart that outlines the high-level approach for mapping user logins (email addresses) to individual S3 buckets using Auth0 for authentication. This visualization will help "
@@ -2905,6 +2999,378 @@
       {
         "source": "README",
         "text": "in latest version) **Models not loading:** - Check browser console for CORS errors - Ensure COOP/COEP headers are being set (automatic in this server) - Try clearing browser cache and reloading **Poor"
+      },
+      {
+        "source": "README",
+        "text": "# Browser TTS - Real-time Text to Speech A high-performance, browser-based text-to-speech system that runs **100% client-side** using WebAssembly and ONNX neural models. This project demonstrates real"
+      },
+      {
+        "source": "README",
+        "text": "**Custom port:** `http://localhost:3344` (or whatever port you specified) ### First-Time Setup Notes - **Model Download:** On first use, the browser will download the selected voice model (~20-50MB). "
+      },
+      {
+        "source": "README",
+        "text": "generation | | `autoWarmUp` | boolean | `false` | Pre-load model on mount for instant playback | #### Returns **Methods:** | Method | Description | |--------|-------------| | `speak(text)` | Start spe"
+      },
+      {
+        "source": "README",
+        "text": "How are you? I'm doing great.\" Generation: [Sentence 1]---->[Ready] [Sentence 2]------->[Ready] [Sentence 3]---------->[Ready] Playback: [Playing 1][Playing 2][Playing 3] ↑ Audio starts here, before a"
+      },
+      {
+        "source": "README",
+        "text": "in latest version) **Models not loading:** - Check browser console for CORS errors - Ensure COOP/COEP headers are being set (automatic in this server) - Try clearing browser cache and reloading **Poor"
+      }
+    ]
+  },
+  {
+    "repo": "FSM-generic",
+    "keywords": [
+      "",
+      "###",
+      "**[docs/use-cases.md](docs/use-cases.md)**",
+      "**anthropic",
+      "**auth:**",
+      "**eventbus**",
+      "**git**",
+      "**missiontemplate**",
+      "**node.js",
+      "**python",
+      "**toolregistry**",
+      "**voicesession**",
+      "**workflowdef**",
+      "--recurse-submodules",
+      "--reporter=list",
+      "/api",
+      "/scripts/run.sh",
+      "/scripts/setup.sh",
+      "18+**",
+      "3.11+**",
+      "5175",
+      "8080",
+      "9090",
+      "<repo-url>",
+      "add",
+      "admin",
+      "all",
+      "also",
+      "always",
+      "anthropic_api_key=sk-ant-",
+      "anthropic_api_key=sk-ant-your-key",
+      "api",
+      "app-specific",
+      "apps",
+      "apps/",
+      "architecture",
+      "auth",
+      "auth.py",
+      "backend",
+      "base",
+      "bash",
+      "brave_api_key",
+      "briefing",
+      "briefings",
+      "browser",
+      "browser-based",
+      "building",
+      "bus",
+      "bypass",
+      "callable",
+      "calls",
+      "ceo",
+      "channel",
+      "channels",
+      "channels/",
+      "chat",
+      "chat_demo.py",
+      "checkout",
+      "classifier",
+      "claude",
+      "cli",
+      "client",
+      "clone",
+      "collection",
+      "communication",
+      "concepts",
+      "config",
+      "config.py",
+      "configurations",
+      "console.anthropic.com](https://console.anthropic.com/",
+      "conversational",
+      "core",
+      "create",
+      "credentials",
+      "custom",
+      "dashboard",
+      "dashboard](docs/screenshots/dashboard-overview.png",
+      "debug=1",
+      "debugging",
+      "deep_research",
+      "default",
+      "define",
+      "defined",
+      "definition",
+      "definitions",
+      "delete",
+      "demo",
+      "deps",
+      "dev",
+      "diagrams",
+      "don't",
+      "during",
+      "e2e",
+      "each",
+      "echo",
+      "editor",
+      "endpoints",
+      "engine",
+      "engine-repo/",
+      "engine-repo/engine/",
+      "engine/",
+      "entry",
+      "env",
+      "environment",
+      "event",
+      "evidence",
+      "example",
+      "example/",
+      "example/chat_demo.py",
+      "examples",
+      "fastapi",
+      "faster-whisper",
+      "file",
+      "file_io",
+      "files",
+      "findings",
+      "flow",
+      "framework",
+      "frontend",
+      "frontends",
+      "fsm",
+      "fsm-generic",
+      "fully",
+      "gateway/",
+      "generic",
+      "get",
+      "git",
+      "gitignored",
+      "gotchas",
+      "handles",
+      "http",
+      "http://localhost:5175](http://localhost:5175",
+      "http://localhost:8080/",
+      "http://localhost:8080](http://localhost:8080",
+      "implemented",
+      "includes",
+      "individually",
+      "infrastructure",
+      "install",
+      "installed",
+      "instance",
+      "integration",
+      "integrations",
+      "intelligence-gathering",
+      "intent",
+      "inter-component",
+      "interactive",
+      "investigate",
+      "invoke",
+      "journal",
+      "js",
+      "jsonl",
+      "jsonls",
+      "kernel",
+      "kernel/",
+      "key",
+      "key**",
+      "layer",
+      "llm",
+      "llm_provider=claude",
+      "loader",
+      "local",
+      "localhost:8080",
+      "machine",
+      "machines",
+      "management",
+      "manager",
+      "managing",
+      "meeting_scribe",
+      "memory",
+      "middleware",
+      "mission",
+      "missions",
+      "mode",
+      "modes",
+      "morning",
+      "must",
+      "notify",
+      "npm",
+      "npx",
+      "observability",
+      "ollama",
+      "one",
+      "open",
+      "openai",
+      "operating",
+      "operations",
+      "optional",
+      "orchestration",
+      "orchestrator",
+      "package",
+      "packages",
+      "passes",
+      "pipeline",
+      "piper-tts",
+      "playwright",
+      "point",
+      "port",
+      "port=8080",
+      "predefined",
+      "prerequisites",
+      "project",
+      "projects",
+      "prompt",
+      "provides",
+      "proxies",
+      "pub/sub",
+      "pydantic",
+      "pytest",
+      "python",
+      "pythonpath=\".:engine-repo",
+      "quick",
+      "react",
+      "react/zustand/tailwind",
+      "read",
+      "register",
+      "registry",
+      "require",
+      "required",
+      "requires",
+      "research",
+      "root",
+      "router",
+      "run",
+      "run.sh",
+      "runner",
+      "running",
+      "runs",
+      "runtime",
+      "runtime_settings",
+      "schema",
+      "screenshots",
+      "scripts",
+      "scripts/",
+      "search",
+      "second",
+      "see",
+      "serper_api_key",
+      "served",
+      "server",
+      "server.py",
+      "services",
+      "services/",
+      "session",
+      "sessions",
+      "set",
+      "settings",
+      "setup",
+      "setup.sh",
+      "shell",
+      "shell/",
+      "signaling",
+      "skip",
+      "stack",
+      "start",
+      "state",
+      "states",
+      "statically",
+      "structure",
+      "stt",
+      "submodule",
+      "submodules",
+      "suite",
+      "suspend/resume",
+      "switcher",
+      "switcher](docs/screenshots/mission-switcher.png",
+      "symlink",
+      "system",
+      "tavily_api_key=",
+      "templates",
+      "terminal",
+      "test",
+      "test/",
+      "test/e2e",
+      "test/integration/",
+      "test/run-all.sh",
+      "tests",
+      "tests/",
+      "text",
+      "them",
+      "these",
+      "three-tier",
+      "through",
+      "tiers",
+      "timer",
+      "together",
+      "token",
+      "tool",
+      "tools",
+      "tools/",
+      "transcribe",
+      "transcript",
+      "transitions",
+      "trigger",
+      "tts",
+      "turn",
+      "twilio",
+      "twilio_account_sid=",
+      "twilio_auth_token=",
+      "typescript",
+      "typescript/vite",
+      "unit",
+      "use",
+      "vanilla",
+      "variables",
+      "venv",
+      "venv/bin/python",
+      "verify",
+      "view",
+      "visual",
+      "vite_admin_token",
+      "vitest",
+      "voice",
+      "voice-first",
+      "voiceos/",
+      "walks",
+      "web",
+      "web/app.js",
+      "web/editor",
+      "web/editor/",
+      "web/research",
+      "web/research/",
+      "web/research/.env",
+      "webrtc",
+      "when",
+      "whisper",
+      "wires",
+      "without",
+      "wizard",
+      "wizard](docs/screenshots/wizard.png",
+      "worked",
+      "workflow",
+      "workflows",
+      "workflows/",
+      "working",
+      "works",
+      "your"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# Voice OS (FSM-generic) A generic voice-first operating system framework. Define conversational apps as workflow state machines — the kernel handles FSM runtime, LLM orchestration, event bus, and ses"
+      },
+      {
+        "source": "README",
+        "text": "For Twilio voice channel TWILIO_AUTH_TOKEN=... ``` ## Running Tests Three-tier test infrastructure: ```bash # Run all tiers test/run-all.sh # Or individually: PYTHONPATH=\".:engine-repo\" .venv/bin/pyth"
       }
     ]
   },
@@ -2967,6 +3433,10 @@
       "youtube"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Huberman-Lab-Podcast-Transcripts MS Word and Markdown transcripts covering most of Episodes 1 - 30 of the Huberman Lab Podcast (https://www.youtube.com/channel/UC2D2CMWXMOVWx7giW1n3LIg) by Dr. Andre"
+      },
       {
         "source": "README",
         "text": "# Huberman-Lab-Podcast-Transcripts MS Word and Markdown transcripts covering most of Episodes 1 - 30 of the Huberman Lab Podcast (https://www.youtube.com/channel/UC2D2CMWXMOVWx7giW1n3LIg) by Dr. Andre"
@@ -3052,6 +3522,10 @@
       "zero-indexed"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Palindrome-Index Given a string, , of lowercase letters, determine the index of the character whose removal will make a palindrome. If is already a palindrome or no such character exists, then print"
+      },
       {
         "source": "README",
         "text": "# Palindrome-Index Given a string, , of lowercase letters, determine the index of the character whose removal will make a palindrome. If is already a palindrome or no such character exists, then print"
@@ -3287,6 +3761,7 @@
       "role",
       "roles/policies",
       "route",
+      "s3",
       "s3**",
       "s3-presignedurl-lambda-apigateway-setup",
       "s3://$bucket_name",
@@ -3359,6 +3834,14 @@
       "≥16.x"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# S3 Pre-Signed URL Template **This is the template to setup S3 pre-signed URL, Lambda, API Gateway and API Key management** A lightweight Serverless Framework template that provisions: * An **S3 buck"
+      },
+      {
+        "source": "README",
+        "text": "key tied to the Usage Plan: 1. **Set your service and stage variables** (for reuse): ```bash # Capture both stdout and stderr so 'sls info' output is parsed correctly export SLS_SERVICE=$(sls info --v"
+      },
       {
         "source": "README",
         "text": "# S3 Pre-Signed URL Template **This is the template to setup S3 pre-signed URL, Lambda, API Gateway and API Key management** A lightweight Serverless Framework template that provisions: * An **S3 buck"
@@ -3591,6 +4074,7 @@
       "later",
       "limit",
       "live",
+      "llm",
       "loaded",
       "localhost",
       "make",
@@ -3799,6 +4283,22 @@
       "~/.cache/whisper-live/"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# WhisperLive <h2 align=\"center\"> <a href=\"https://www.youtube.com/watch?v=0PHWCApIcCI\"><img src=\"https://img.youtube.com/vi/0PHWCApIcCI/0.jpg\" style=\"background-color:rgba(0,0,0,0);\" height=300 alt=\""
+      },
+      {
+        "source": "README",
+        "text": "tested the models uploaded to [huggingface by OpenVINO](https://huggingface.co/OpenVINO?search_models=whisper). - > **Docker Recommended:** Running WhisperLive with OpenVINO inside Docker automaticall"
+      },
+      {
+        "source": "README",
+        "text": "`.wav` file path where the microphone input will be saved if `save_output_recording` is set to `True`. - `mute_audio_playback`: Whether to mute audio playback when transcribing an audio file. Defaults"
+      },
+      {
+        "source": "README",
+        "text": "build_whisper_tensorrt.sh /app/TensorRT-LLM-examples small.en int4 # int4 weight only quantization # Run server with small.en python3 run_server.py --port 9090 \\ --backend tensorrt \\ --trt_model_path "
+      },
       {
         "source": "README",
         "text": "# WhisperLive <h2 align=\"center\"> <a href=\"https://www.youtube.com/watch?v=0PHWCApIcCI\"><img src=\"https://img.youtube.com/vi/0PHWCApIcCI/0.jpg\" style=\"background-color:rgba(0,0,0,0);\" height=300 alt=\""
@@ -4070,6 +4570,14 @@
       {
         "source": "README",
         "text": "/ Line Size | Particle movement speed and stroke thickness | | Trail Fade | How quickly particle trails fade (lower = longer trails) | | Gradient Sky | Toggle gradient background in sky region | | Ima"
+      },
+      {
+        "source": "README",
+        "text": "# Starry Night Flow Field A real-time particle flow field visualization inspired by Van Gogh's *The Starry Night*, powered by WebGPU for 100K+ particles at 60 FPS. ![Default View](screenshots/default-"
+      },
+      {
+        "source": "README",
+        "text": "/ Line Size | Particle movement speed and stroke thickness | | Trail Fade | How quickly particle trails fade (lower = longer trails) | | Gradient Sky | Toggle gradient background in sky region | | Ima"
       }
     ]
   },
@@ -4146,6 +4654,7 @@
       "rest",
       "routes.py",
       "run",
+      "s3",
       "s3.py",
       "secrets",
       "sensitive",
@@ -4185,6 +4694,10 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "Project Structure ``` audio-orchestrator/ ├── README.md ├── requirements.txt ├── orchestrator_config.yaml ├── orchestrator/ │ ├── __init__.py │ ├── main.py │ ├── api/ │ │ ├── __init__.py │ │ └── route"
+      },
       {
         "source": "README",
         "text": "Project Structure ``` audio-orchestrator/ ├── README.md ├── requirements.txt ├── orchestrator_config.yaml ├── orchestrator/ │ ├── __init__.py │ ├── main.py │ ├── api/ │ │ ├── __init__.py │ │ └── route"
@@ -4733,6 +5246,22 @@
       {
         "source": "README",
         "text": "the repository 2. Create a feature branch 3. Edit `.template` files (not generated files) 4. Test on both desktop and mobile 5. Submit a pull request ## 📄 License MIT License - see [LICENSE](LICENSE) "
+      },
+      {
+        "source": "README",
+        "text": "# This is more deprecated, use cognito-lambda-s3-webserver-cloudfront instead. # CloudDrive with Audio Recording - Serverless Personal Cloud Platform A modern, secure personal cloud platform built wit"
+      },
+      {
+        "source": "README",
+        "text": "React-based SPA with in-browser Babel compilation - **Authentication**: AWS Cognito User Pools + Identity Pools - **API**: AWS Lambda functions via API Gateway - **Storage**: S3 with user-scoped prefi"
+      },
+      {
+        "source": "README",
+        "text": "panels hide for mobile recording - **Touch Targets**: 36px+ buttons optimized for finger interaction - **Compact Layout**: Vertical optimization for more visible recordings - **Native Feel**: iOS acti"
+      },
+      {
+        "source": "README",
+        "text": "the repository 2. Create a feature branch 3. Edit `.template` files (not generated files) 4. Test on both desktop and mobile 5. Submit a pull request ## 📄 License MIT License - see [LICENSE](LICENSE) "
       }
     ]
   },
@@ -4894,6 +5423,7 @@
       "batch",
       "between",
       "branch",
+      "browser",
       "browser-based",
       "build",
       "built",
@@ -5369,6 +5899,26 @@
       {
         "source": "README",
         "text": "and permissions - [ ] **Custom Vocabularies**: Domain-specific transcription accuracy - [ ] **API Integration**: Third-party app integration capabilities - [ ] **Advanced Analytics**: Usage patterns a"
+      },
+      {
+        "source": "README",
+        "text": "# Real-Time Audio Intelligence Platform A serverless platform for intelligent audio recording with real-time transcription, analysis, and semantic search capabilities. Built for meeting intelligence, "
+      },
+      {
+        "source": "README",
+        "text": "# Frontend application │ ├── index.html # File manager interface ✅ │ ├── audio.html.template # Audio recorder (React) ✅ │ ├── app.js.template # Main application logic ✅ │ ├── styles.css # Main UI styl"
+      },
+      {
+        "source": "README",
+        "text": "Create a `.env` file from the template: ```bash cp .env.template .env ``` Key configurations: ```env # AWS Configuration AWS_REGION=us-east-1 S3_BUCKET_NAME=your-audio-bucket # API Endpoints API_ENDPO"
+      },
+      {
+        "source": "README",
+        "text": "Typical costs for moderate usage (1000 hours/month): - **Lambda**: ~$5-10 (processing) - **S3**: ~$25 (storage + requests) - **Transcription**: ~$50 (Whisper API) - **Data Transfer**: ~$10 - **Total**"
+      },
+      {
+        "source": "README",
+        "text": "and permissions - [ ] **Custom Vocabularies**: Domain-specific transcription accuracy - [ ] **API Integration**: Third-party app integration capabilities - [ ] **Advanced Analytics**: Usage patterns a"
       }
     ]
   },
@@ -5379,6 +5929,10 @@
       "python"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# audio-workernode # audio-workernode"
+      },
       {
         "source": "README",
         "text": "# audio-workernode # audio-workernode"
@@ -5430,6 +5984,10 @@
       "width=\"1573"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# audio_client_server Using a web browser send a sound recording to a server. <img width=\"1573\" alt=\"Schematic\" src=\"https://github.com/davidbmar/audio_client_server/assets/32729467/ab19d948-1074-4fe6"
+      },
       {
         "source": "README",
         "text": "# audio_client_server Using a web browser send a sound recording to a server. <img width=\"1573\" alt=\"Schematic\" src=\"https://github.com/davidbmar/audio_client_server/assets/32729467/ab19d948-1074-4fe6"
@@ -6168,6 +6726,7 @@
       "running",
       "runs",
       "runtime",
+      "s3",
       "safety",
       "same",
       "sample",
@@ -6378,6 +6937,7 @@
       "web",
       "webm/opus",
       "what",
+      "whatsapp",
       "when",
       "which",
       "while",
@@ -6431,6 +6991,46 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# No Prob Bob — Customer Discovery Agent > Talk to customers first, build later. This bot obsessively understands the problem before a single line of code is written. A conversational AI agent that gu"
+      },
+      {
+        "source": "README",
+        "text": "**Option A — Simple start:** ```bash source .venv/bin/activate python3 -m bot.server ``` **Option B — Production launcher with watchdog** (recommended): ```bash bash scripts/run.sh ``` The production "
+      },
+      {
+        "source": "README",
+        "text": "happens | |----------|--------|-------------| | **Mobile (iPhone/Android)** | Touch and hold | Records while held, transcribes on release | | **Desktop** | Click and hold | Same — records while mouse "
+      },
+      {
+        "source": "README",
+        "text": "Spanish | Voice models are downloaded from HuggingFace on first use and cached in the `models/` directory. ### Voice Without Dependencies If `piper-tts` or `faster-whisper` are not installed, the serv"
+      },
+      {
+        "source": "README",
+        "text": "Google Sign-In button. After signing in, your name and avatar appear in the header bar. ### Auth Database User data is stored in `data/bot.db` (SQLite). Tables: | Table | Purpose | |-------|---------|"
+      },
+      {
+        "source": "README",
+        "text": "| ~$0.005/msg | ~2s | Great | For Claude, you need an API key. Set it in the Settings panel or in your `.env` file. **Important:** Switching providers in the web UI also changes the provider for Teleg"
+      },
+      {
+        "source": "README",
+        "text": "├── Executes tools │ │ └── Auto-synthesizes at 5 turns │ └──────────┬───────────────────────┘ │ ┌────────┼────────┐ ▼ ▼ ▼ Ollama Claude ChatGPT ┌──────────────────────────────────┐ │ Voice Pipeline │ "
+      },
+      {
+        "source": "README",
+        "text": "Checks current sprint progress via dashboard API | Read | | `feedback_on_sprint` | \"Here's what shipped — does it match?\" | Read | | `read_project_doc` | Reads README.md or any file from a project | R"
+      },
+      {
+        "source": "README",
+        "text": "Endpoint | Method | Body | Description | |----------|--------|------|-------------| | `/api/llm/providers` | GET | — | Available LLM providers + which is active | | `/api/llm/switch` | POST | `{provid"
+      },
+      {
+        "source": "README",
+        "text": "dependencies aren't installed. Run: ```bash pip install \"piper-tts>=1.4\" \"faster-whisper>=1.0\" \"numpy>=1.24\" \"scipy>=1.11\" ``` **First voice request is slow:** The Whisper model (~75MB) and Piper voic"
+      },
       {
         "source": "README",
         "text": "# No Prob Bob — Customer Discovery Agent > Talk to customers first, build later. This bot obsessively understands the problem before a single line of code is written. A conversational AI agent that gu"
@@ -6955,6 +7555,22 @@
       {
         "source": "README",
         "text": "Performance | Metric | Value | |---|---| | Embedding latency (browser, WASM) | ~4–80 ms per query | | Embedding latency (browser, WebGPU) | ~5–15 ms per query | | Vector search, 35 chunks | < 1 ms | |"
+      },
+      {
+        "source": "README",
+        "text": "# browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters A fully offline, in-browser vector database for real-time transcription RAG retrieval using **SQL"
+      },
+      {
+        "source": "README",
+        "text": "cd indexer && npm install && cd .. # Install web app deps (sql.js, transformers, vite) cd web-app && npm install && cd .. ``` ### 2. Build the database The sample dataset (`data/sample.jsonl`) include"
+      },
+      {
+        "source": "README",
+        "text": "Xenova/all-MiniLM-L6-v2) --dim <int> Embedding dimensions (default: 384) --batch <int> Batch size for embedding generation (default: 32) ``` --- ## Nightly / Incremental Updates 1. Add new transcript "
+      },
+      {
+        "source": "README",
+        "text": "Performance | Metric | Value | |---|---| | Embedding latency (browser, WASM) | ~4–80 ms per query | | Embedding latency (browser, WebGPU) | ~5–15 ms per query | | Vector search, 35 chunks | < 1 ms | |"
       }
     ]
   },
@@ -7442,6 +8058,22 @@
       {
         "source": "README",
         "text": "| Subsequent queries (warm) | **~18ms embed + 0.06ms search** | | Model download (first visit) | ~2–5s (23MB, then cached) | | Model load (cached) | ~500–1500ms | | Artifact fetch (network) | ~50–100m"
+      },
+      {
+        "source": "README",
+        "text": "# Browser-Native RAG Retrieval Layer A production-shaped prototype of a **fully local RAG retrieval system** for real-time transcription apps. Every piece of the retrieval pipeline — embedding and vec"
+      },
+      {
+        "source": "README",
+        "text": "install cd .. ``` ### 2. Build the search index ```bash cd indexer-node npm run build-index -- --input ../data --out ../artifacts ``` This reads the sample transcript (40 chunks from a simulated tech "
+      },
+      {
+        "source": "README",
+        "text": "indexer CLI │ ├── package.json │ └── src/ │ ├── cli.ts # CLI entry point │ ├── validate.ts # Chunk validation & normalization │ ├── embed.ts # Embedding generation (@xenova/transformers) │ └── build-i"
+      },
+      {
+        "source": "README",
+        "text": "| Subsequent queries (warm) | **~18ms embed + 0.06ms search** | | Model download (first visit) | ~2–5s (23MB, then cached) | | Model load (cached) | ~500–1500ms | | Artifact fetch (network) | ~50–100m"
       }
     ]
   },
@@ -7814,6 +8446,18 @@
       {
         "source": "README",
         "text": "│ │ ├── live-transcription.tsx │ │ ├── transcript-display.tsx │ │ └── waveform-visualizer.tsx │ └── pages/ # Application pages │ ├── dashboard.tsx │ ├── getting-started.tsx │ ├── examples.tsx │ └── do"
+      },
+      {
+        "source": "README",
+        "text": "# VoiceStream ASR ![UI Screenshot](UI.png) A production-ready real-time Automatic Speech Recognition (ASR) service for building voice-enabled applications. Use this as a foundation for voice assistant"
+      },
+      {
+        "source": "README",
+        "text": "`GET` | `/api/sessions/:id` | Get session details | | `POST` | `/api/sessions/:id/end` | End a session | | `GET` | `/api/sessions/:id/transcripts` | Get session transcripts | | `POST` | `/api/sessions"
+      },
+      {
+        "source": "README",
+        "text": "│ │ ├── live-transcription.tsx │ │ ├── transcript-display.tsx │ │ └── waveform-visualizer.tsx │ └── pages/ # Application pages │ ├── dashboard.tsx │ ├── getting-started.tsx │ ├── examples.tsx │ └── do"
       }
     ]
   },
@@ -8012,6 +8656,7 @@
       "libs",
       "license",
       "limit",
+      "llm",
       "loaded",
       "local",
       "local-only",
@@ -8207,6 +8852,18 @@
       "|------|-------------|----------|"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Local AI Chat Multi-backend AI chat that runs in the browser. Connect to **Ollama**, **OpenAI**, **Anthropic**, or run models **entirely in-browser** via WebGPU/WASM. No build step, no framework — v"
+      },
+      {
+        "source": "README",
+        "text": "error formatting providers/ # Ollama, OpenAI, Anthropic, In-Browser engines/ # WebLLM (WebGPU), Wllama (WASM) file-processing/ parse-tabular.js # CSV/TSV parsing file-types.js # Statistical vs tabular"
+      },
+      {
+        "source": "README",
+        "text": "connection - **No analytics** — zero tracking, zero telemetry - **XSS prevention** — all user content rendered via `textContent` or escaped - **Self-contained** — no CDN dependencies, all vendor libs "
+      },
       {
         "source": "README",
         "text": "# Local AI Chat Multi-backend AI chat that runs in the browser. Connect to **Ollama**, **OpenAI**, **Anthropic**, or run models **entirely in-browser** via WebGPU/WASM. No build step, no framework — v"
@@ -8649,6 +9306,18 @@
       {
         "source": "README",
         "text": "│ │ └─────────────────────────────────────────────────────┘ ``` | Stage | What happens | |-------|-------------| | **LISTENING** | Mic active, Web Speech API transcribes in real-time | | **SIGNAL_DETE"
+      },
+      {
+        "source": "README",
+        "text": "# Browser Voice Agent > A fully browser-native voice agent powered by local LLMs, text-to-speech, and speech recognition. No server required — everything runs on your device. ![Desktop Dashboard](docs"
+      },
+      {
+        "source": "README",
+        "text": "opened in Safari. ### Mobile optimizations - ONNX/VITS skipped entirely on iOS — native `speechSynthesis` used from the start - Audio unlock on first tap (iOS requires user gesture for speech output) "
+      },
+      {
+        "source": "README",
+        "text": "│ │ └─────────────────────────────────────────────────────┘ ``` | Stage | What happens | |-------|-------------| | **LISTENING** | Mic active, Web Speech API transcribes in real-time | | **SIGNAL_DETE"
       }
     ]
   },
@@ -8904,6 +9573,14 @@
       {
         "source": "README",
         "text": "English-only models (`.en`) are slightly more accurate for English content. ## Quick Start 1. Open `index.html` in a modern browser (Chrome 113+, Edge 113+) 2. Select your preferred engine (transforme"
+      },
+      {
+        "source": "README",
+        "text": "# Browser Whisper **Local speech-to-text transcription running entirely in your browser.** ![Browser Whisper Main Interface](screenshots/main-interface.png) ## Features - **100% Local Processing** - A"
+      },
+      {
+        "source": "README",
+        "text": "English-only models (`.en`) are slightly more accurate for English content. ## Quick Start 1. Open `index.html` in a modern browser (Chrome 113+, Edge 113+) 2. Select your preferred engine (transforme"
       }
     ]
   },
@@ -9005,6 +9682,7 @@
       "reports",
       "returns",
       "running",
+      "s3",
       "screen",
       "send",
       "sending",
@@ -9038,6 +9716,10 @@
       "your"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# browser-mobile-debug-panel One-tap \"Send Debug Report\" button for mobile web apps. Captures console logs, browser info, and app-specific state, then uploads JSON to S3 via presigned URL. ## Install "
+      },
       {
         "source": "README",
         "text": "# browser-mobile-debug-panel One-tap \"Send Debug Report\" button for mobile web apps. Captures console logs, browser info, and app-specific state, then uploads JSON to S3 via presigned URL. ## Install "
@@ -9561,6 +10243,26 @@
       {
         "source": "README",
         "text": "py.typed PEP 561 marker providers/ google.py Google Calendar API v3 (service account) caldav_provider.py CalDAV (iCloud, Nextcloud, Fastmail) mcp/ server.py FastMCP server (6 tools) config.py Env var "
+      },
+      {
+        "source": "README",
+        "text": "# cal-provider Unified async calendar API for Python. One interface across Google Calendar and CalDAV (iCloud, Nextcloud, Fastmail), with an optional MCP server for AI agents and an admin UI for setup"
+      },
+      {
+        "source": "README",
+        "text": "returned datetimes via `astimezone()`. Pass any `tzinfo` object. When omitted, times come back as-is from the backend. ### Handle errors gracefully ```python from cal_provider import ( CalendarProvide"
+      },
+      {
+        "source": "README",
+        "text": "and enable the Google Calendar API. 2. **Create a service account** -- In IAM & Admin > Service Accounts, create one and download the JSON key file. 3. **Share your calendar** -- In Google Calendar se"
+      },
+      {
+        "source": "README",
+        "text": "### Pages | Path | Purpose | |------|---------| | `/setup` | 4-step setup wizard (choose provider, enter credentials, test, generate config) | | `/dashboard` | Browse calendars, view events, check ava"
+      },
+      {
+        "source": "README",
+        "text": "py.typed PEP 561 marker providers/ google.py Google Calendar API v3 (service account) caldav_provider.py CalDAV (iCloud, Nextcloud, Fastmail) mcp/ server.py FastMCP server (6 tools) config.py Env var "
       }
     ]
   },
@@ -10052,6 +10754,22 @@
       {
         "source": "README",
         "text": "| Subsequent queries (warm) | **~18ms embed + 0.06ms search** | | Model download (first visit) | ~2–5s (23MB, then cached) | | Model load (cached) | ~500–1500ms | | Artifact fetch (network) | ~50–100m"
+      },
+      {
+        "source": "README",
+        "text": "# Browser-Native RAG Retrieval Layer A production-shaped prototype of a **fully local RAG retrieval system** for real-time transcription apps. Every piece of the retrieval pipeline — embedding and vec"
+      },
+      {
+        "source": "README",
+        "text": "install cd .. ``` ### 2. Build the search index ```bash cd indexer-node npm run build-index -- --input ../data --out ../artifacts ``` This reads the sample transcript (40 chunks from a simulated tech "
+      },
+      {
+        "source": "README",
+        "text": "indexer CLI │ ├── package.json │ └── src/ │ ├── cli.ts # CLI entry point │ ├── validate.ts # Chunk validation & normalization │ ├── embed.ts # Embedding generation (@xenova/transformers) │ └── build-i"
+      },
+      {
+        "source": "README",
+        "text": "| Subsequent queries (warm) | **~18ms embed + 0.06ms search** | | Model download (first visit) | ~2–5s (23MB, then cached) | | Model load (cached) | ~500–1500ms | | Artifact fetch (network) | ~50–100m"
       }
     ]
   },
@@ -10203,6 +10921,14 @@
       {
         "source": "README",
         "text": "You are young. You are young. You are young. You are a teenager. You are a teenager. You are old. You are old. You are old. Explanation Test Case 0: Because , our code must set to and print the \"Age i"
+      },
+      {
+        "source": "README",
+        "text": "# classVsInstance Python Examples on Class vs Instance # For details read: https://docs.python.org/3.5/tutorial/classes.html?highlight=instance#class-and-instance-variables # For a Java example read: "
+      },
+      {
+        "source": "README",
+        "text": "You are young. You are young. You are young. You are a teenager. You are a teenager. You are old. You are old. You are old. Explanation Test Case 0: Because , our code must set to and print the \"Age i"
       }
     ]
   },
@@ -10324,6 +11050,10 @@
       "|---|---|---|"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Claude Chat Workspace ## What It Is A lightweight, self-hosted chat interface for Claude. Runs as a Node.js/Express server with Server-Sent Events (SSE) streaming, per-session conversation history, "
+      },
       {
         "source": "README",
         "text": "# Claude Chat Workspace ## What It Is A lightweight, self-hosted chat interface for Claude. Runs as a Node.js/Express server with Server-Sent Events (SSE) streaming, per-session conversation history, "
@@ -10486,6 +11216,7 @@
       "click",
       "clickable",
       "cloudfront",
+      "cognito",
       "cognito_user_pools",
       "color",
       "communication",
@@ -10850,6 +11581,26 @@
       {
         "source": "README",
         "text": "} ``` ## 📝 Setup Instructions ### Chrome Extension Installation 1. Create folder: `claude-memory-bridge` 2. Add all 5 files above 3. Go to `chrome://extensions/` 4. Enable \"Developer mode\" 5. Click \"L"
+      },
+      {
+        "source": "README",
+        "text": "# Claude Memory Bridge - Complete Project A Chrome extension that enables Claude AI to persist memories across conversations by bridging Claude's sandboxed environment with external storage systems. #"
+      },
+      {
+        "source": "README",
+        "text": "DATA!'); indicator.style.background = '#00ff00'; indicator.innerHTML = '🧠 MEMORY FOUND!'; // Configuration: Update this URL to your endpoint const apiUrl = 'https://webhook.site/248725c7-80b2-499e-861"
+      },
+      {
+        "source": "README",
+        "text": "Memory Bridge</h3> <p>Extension is loaded!</p> <button class=\"test-btn\" id=\"testBtn\">Test Extension</button> <button class=\"webhook-btn\" id=\"webhookBtn\">Get Webhook URL</button> <script src=\"popup.js\""
+      },
+      {
+        "source": "README",
+        "text": "// Parse the request body const memoryData = JSON.parse(event.body); // Get bucket name from environment variable const bucketName = process.env.S3_BUCKET_NAME; if (!bucketName) { throw new Error('S3_"
+      },
+      {
+        "source": "README",
+        "text": "} ``` ## 📝 Setup Instructions ### Chrome Extension Installation 1. Create folder: `claude-memory-bridge` 2. Add all 5 files above 3. Go to `chrome://extensions/` 4. Enable \"Developer mode\" 5. Click \"L"
       }
     ]
   },
@@ -11140,6 +11891,7 @@
       "uvicorn",
       "variables",
       "vite",
+      "voice",
       "want",
       "web",
       "webrtc",
@@ -11178,6 +11930,34 @@
       {
         "source": "README",
         "text": "CF edge | Cloudflare dashboard | | DNS route | CNAME pointing to your tunnel | Your domain's DNS | | Access app | Identity gate (email OTP) | Cloudflare Zero Trust | | Access policy | Who's allowed in"
+      },
+      {
+        "source": "README",
+        "text": "# Cloudflare Zero Trust Setup Secure external access to your localhost services — without opening ports, without exposing your IP, with an identity gate in front. You run something on `localhost:8090`"
+      },
+      {
+        "source": "README",
+        "text": "CF edge | Cloudflare dashboard | | DNS route | CNAME pointing to your tunnel | Your domain's DNS | | Access app | Identity gate (email OTP) | Cloudflare Zero Trust | | Access policy | Who's allowed in"
+      }
+    ]
+  },
+  {
+    "repo": "codefresh",
+    "keywords": [
+      "codefresh",
+      "determine",
+      "each",
+      "helps",
+      "number",
+      "python",
+      "releases",
+      "selector",
+      "stats"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "This helps determine the number of releases for each selector. # codefresh"
       }
     ]
   },
@@ -11784,6 +12564,22 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# CloudDrive with Audio Recording - Serverless Personal Cloud Platform A modern, secure personal cloud platform built with AWS serverless technologies. Features file management, audio recording, and E"
+      },
+      {
+        "source": "README",
+        "text": "Management**: Cognito IAM roles configured with proper S3 access - **Safe Cleanup**: `./step-990-cleanup.sh` preserves existing buckets by default ### 3. Create Your First User ```bash # Get your User"
+      },
+      {
+        "source": "README",
+        "text": "- **step-030**: Create test Cognito users - **step-040**: Application testing - **step-050**: EventBridge configuration - **step-990**: Safe cleanup (preserves existing buckets) ### Template System - "
+      },
+      {
+        "source": "README",
+        "text": "AWS resources and avoid charges: ```bash ./step-990-cleanup.sh ``` This will safely delete: - CloudFormation stack and all resources - S3 buckets (after emptying) - CloudFront distribution - Cognito U"
+      },
       {
         "source": "README",
         "text": "# CloudDrive with Audio Recording - Serverless Personal Cloud Platform A modern, secure personal cloud platform built with AWS serverless technologies. Features file management, audio recording, and E"
@@ -12772,6 +13568,42 @@
       {
         "source": "README",
         "text": "2. **Test thoroughly**: Ensure all features work after changes 3. **Update docs**: Keep README and docs/ in sync with code 4. **Follow patterns**: Match existing code style and structure ## 📄 License "
+      },
+      {
+        "source": "README",
+        "text": "# Deploy Portal (Capsule Cloud) A self-service web portal for provisioning SSH access and deploying applications to an EC2 gateway instance protected by AWS Cognito authentication. ## 🌟 Features - **🔐"
+      },
+      {
+        "source": "README",
+        "text": "keys and deployment instructions - **Tracks** deployed applications in JSON registry - **Provides** automation scripts for nginx/systemd configuration ## 📋 Prerequisites - EC2 instance with IAM role a"
+      },
+      {
+        "source": "README",
+        "text": "**Quick Install:** ```bash cd /home/ubuntu/src/deploy-portal/infrastructure sudo ./install-infrastructure.sh ``` This installs: - **Port Registry System** - Central port allocation tracking at `/var/l"
+      },
+      {
+        "source": "README",
+        "text": "# Server infrastructure setup (NEW) │ ├── README.md # Infrastructure documentation │ ├── install-infrastructure.sh # Master installation script │ ├── bin/ # System-level executables │ │ ├── capsule-ng"
+      },
+      {
+        "source": "README",
+        "text": "def get_instance_ip(): # Auto-detects public IP from EC2 metadata ``` ## 🌐 Web UI Routes | Route | Description | |-------|-------------| | `/` | Landing page with overview | | `/deploy/` | Provision S"
+      },
+      {
+        "source": "README",
+        "text": "code - **Easy Updates**: Modify routes without touching the central gateway config - **No Conflicts**: Each app manages its own namespace (/ssh, /cloner, etc.) ### Routes Managed by this App - `/` - D"
+      },
+      {
+        "source": "README",
+        "text": "for deployment automation: ### port-allocator.sh Allocates available ports from the configured range (8000-8999). ```bash ./automation/port-allocator.sh allocate my-app # Output: 8042 ``` ### nginx-re"
+      },
+      {
+        "source": "README",
+        "text": "attached: ```bash curl http://169.254.169.254/latest/meta-data/iam/security-credentials/ ``` 4. Test configuration: ```bash bash scripts/test-aws-config.sh ``` ### Issue: \"Permission denied\" when prov"
+      },
+      {
+        "source": "README",
+        "text": "2. **Test thoroughly**: Ensure all features work after changes 3. **Update docs**: Keep README and docs/ in sync with code 4. **Follow patterns**: Match existing code style and structure ## 📄 License "
       }
     ]
   },
@@ -13198,6 +14030,22 @@
       "├──→"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Easy Cognito Nginx Gateway Auth **Simple, production-ready AWS Cognito authentication gateway using nginx and oauth2-proxy** Why this architecture works so well: 1. Single Responsibility: Each repo "
+      },
+      {
+        "source": "README",
+        "text": "\\ --domain=your-domain.com \\ --cognito-region=us-east-1 \\ --cognito-pool-id=us-east-1_XXXXXXXXX \\ --cognito-client-id=YOUR_CLIENT_ID \\ --cognito-client-secret=YOUR_CLIENT_SECRET \\ --app-port=3000 ``` "
+      },
+      {
+        "source": "README",
+        "text": "✅ Token validation - ✅ Session management (24-hour expiry) - ✅ No secrets in application code ## 🛠️ What Gets Installed The installation script will: 1. Install **oauth2-proxy** v7.5.1 2. Configure **"
+      },
+      {
+        "source": "README",
+        "text": "- For production, use Let's Encrypt: `certbot --nginx` See [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for more help. ## 📦 Examples Check out the `examples/` directory for: - **basic-app/** - Sim"
+      },
       {
         "source": "README",
         "text": "# Easy Cognito Nginx Gateway Auth **Simple, production-ready AWS Cognito authentication gateway using nginx and oauth2-proxy** Why this architecture works so well: 1. Single Responsibility: Each repo "
@@ -13785,6 +14633,7 @@
       "rule",
       "rules",
       "run",
+      "s3",
       "s3/cdn",
       "s3/cdn):**",
       "s3location",
@@ -13951,6 +14800,315 @@
       {
         "source": "README",
         "text": "by step-020 for EventBridge permissions 2. Reference the schemas in `/schemas/` for event structure 3. See integration examples in the audio upload system repository ### **Q: What's new in the enhance"
+      },
+      {
+        "source": "README",
+        "text": "# **EventBridge Orchestrator** This repository is the **central nervous system** of our system. It defines **how services talk to each other** using AWS EventBridge, ensures events are consistent usin"
+      },
+      {
+        "source": "README",
+        "text": "**Key Points** * The **Lambda listener** is triggered by EventBridge when it receives an `AudioUploaded` event. * Jobs are pushed into an **SQS queue** to decouple GPU workloads from EventBridge and a"
+      },
+      {
+        "source": "README",
+        "text": "renaming them. 3. **Version your schemas:** `v1`, `v2`, etc. Never change an existing version. 4. **Test with example events:** Each schema has an example JSON you can use for tests. 5. **Use dead-let"
+      },
+      {
+        "source": "README",
+        "text": "Features | |------|------|-------------|-------------------| | **001** | **Preflight Check** | Validates system prerequisites | ✅ Tool validation, AWS credentials, disk space | | **000** | Interactive"
+      },
+      {
+        "source": "README",
+        "text": "affected - ✅ **Action:** No action needed - deployment proceeds normally #### **Terraform Destroy Hanging** ``` Error: Rule can't be deleted since it has targets ``` **Solution:** Use the two-phase de"
+      },
+      {
+        "source": "README",
+        "text": "by step-020 for EventBridge permissions 2. Reference the schemas in `/schemas/` for event structure 3. See integration examples in the audio upload system repository ### **Q: What's new in the enhance"
+      }
+    ]
+  },
+  {
+    "repo": "everyone-ai",
+    "keywords": [
+      "",
+      "###",
+      "*(ip",
+      "**app",
+      "**fleet**",
+      "**frontend",
+      "**k8s",
+      "**launch**",
+      "**portal",
+      "**static",
+      "**targets**",
+      "**under",
+      "**usage**",
+      "**workspaces**",
+      "--ec2-ip",
+      "--only",
+      "--team-slug",
+      "/",
+      "/api/config",
+      "/api/workspaces",
+      "/docs.html",
+      "/health",
+      "/how_to_make_an_app.html",
+      "/people-ops-overview.html",
+      "/walkthrough.html",
+      "10.100.32.91",
+      "10.100.38.231",
+      "10.100.39.119",
+      "10.100.42.160",
+      "18",
+      "404",
+      "76",
+      "<new-slug>",
+      "above",
+      "access",
+      "across",
+      "active",
+      "add",
+      "against",
+      "agent",
+      "all",
+      "all-hyphen",
+      "any",
+      "api",
+      "app",
+      "appears",
+      "apps",
+      "architecture",
+      "array",
+      "assertions",
+      "audit",
+      "automation",
+      "backed",
+      "bash",
+      "blank",
+      "brand",
+      "browse",
+      "browser",
+      "build",
+      "case",
+      "catalog",
+      "catalog**",
+      "checks",
+      "choose",
+      "claude",
+      "click",
+      "client**",
+      "code",
+      "code-server",
+      "code](https://claude.ai/code",
+      "configuration",
+      "connect",
+      "containerised",
+      "content",
+      "contract",
+      "counts",
+      "covering",
+      "creates/manages",
+      "creation",
+      "credentials",
+      "cross-portal",
+      "date",
+      "defined",
+      "deploy",
+      "deployment",
+      "description",
+      "display",
+      "docker",
+      "docs",
+      "documentation",
+      "does",
+      "each",
+      "ec2",
+      "empty",
+      "endpoints",
+      "enter",
+      "environment",
+      "environments",
+      "etc",
+      "events",
+      "everyone-ai",
+      "express",
+      "fallback",
+      "few",
+      "finance",
+      "first",
+      "fleet",
+      "form",
+      "full",
+      "getting",
+      "go",
+      "guide",
+      "handling",
+      "hash",
+      "host",
+      "hr",
+      "hr/people",
+      "https",
+      "https://automation.ai.internal.capsule.com",
+      "https://finance.ai.internal.capsule.com",
+      "https://hr.ai.internal.capsule.com",
+      "https://it.ai.internal.capsule.com",
+      "https://legal.ai.internal.capsule.com",
+      "hub",
+      "identity",
+      "ingressroute",
+      "injected",
+      "inside",
+      "installed",
+      "into",
+      "javascript",
+      "jump",
+      "k3s",
+      "k8s",
+      "key",
+      "laptop",
+      "launch",
+      "leaking",
+      "legal",
+      "lets",
+      "link",
+      "live",
+      "main",
+      "manifest",
+      "maxlength",
+      "members",
+      "monitor",
+      "name",
+      "names",
+      "new",
+      "no",
+      "node.js",
+      "node/express",
+      "npx",
+      "onboarding",
+      "opens",
+      "operators",
+      "ops",
+      "overview",
+      "page",
+      "pages",
+      "pages**",
+      "peer",
+      "pem",
+      "pending)*",
+      "people-ops",
+      "persistent",
+      "personal",
+      "platform",
+      "playwright",
+      "playwright.config.cjs",
+      "pod",
+      "pods",
+      "portal",
+      "portal/k8s/deployment.yaml",
+      "portal/public/*.html",
+      "portal/public/js/",
+      "portal/src/config.js",
+      "portal/src/k8s.js",
+      "portal/src/server.js",
+      "portal/src/templates.js",
+      "portal:3000",
+      "portals",
+      "pre-configured",
+      "prerequisites",
+      "press",
+      "provision",
+      "purpose",
+      "python",
+      "quick",
+      "reads",
+      "ready",
+      "require",
+      "required",
+      "requires",
+      "resolved",
+      "router",
+      "run",
+      "running",
+      "runs",
+      "script",
+      "scripts/deploy-all-portals.sh",
+      "scripts/deploy-portal.sh",
+      "seconds",
+      "seconds**",
+      "see",
+      "self-service",
+      "server**",
+      "set",
+      "setup",
+      "shown",
+      "single",
+      "slug",
+      "smoke",
+      "spa",
+      "spa**",
+      "specifies",
+      "ssh",
+      "start",
+      "started",
+      "startup",
+      "static",
+      "step",
+      "stop",
+      "suite",
+      "target",
+      "target-{name",
+      "targets",
+      "task",
+      "team",
+      "team's",
+      "team-specific",
+      "team_display_names",
+      "team_slug",
+      "template",
+      "templates",
+      "terminal",
+      "test",
+      "tests",
+      "tests/e2e/smoke-all-portals.spec.js",
+      "traefik",
+      "type",
+      "ubuntu@something.ai.internal.capsule.com",
+      "ui",
+      "unicode",
+      "url",
+      "urls",
+      "usage",
+      "use",
+      "user",
+      "user-facing",
+      "username",
+      "users",
+      "validation",
+      "vanilla",
+      "variable",
+      "via",
+      "vpn",
+      "wait",
+      "walkthrough",
+      "what",
+      "when",
+      "workspace",
+      "workspace-{user}-{team",
+      "workspaces",
+      "your",
+      "|------|---------|",
+      "|------|-----|--------|",
+      "~/desktop/login/deployment-portal-vibeland-us-east-1.pem",
+      "┌──────────┴──────────┐"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# everyone-ai — AI Platform Portal A self-service AI workspace platform that lets team members launch [Claude Code](https://claude.ai/code) environments in seconds — no setup, no credentials, no lapto"
+      },
+      {
+        "source": "README",
+        "text": "IP to `scripts/deploy-all-portals.sh` PORTALS array 3. Add the slug to `portal/src/config.js` TEAM_DISPLAY_NAMES 4. Add to `playwright.config.cjs` PORTALS array 5. Run `bash scripts/deploy-all-portals"
       }
     ]
   },
@@ -14006,6 +15164,10 @@
       {
         "source": "README",
         "text": "# exampleLoops Loops example in python and java Objective In this challenge, we're going to use loops to help us do some simple math. Check out the Tutorial tab to learn more. Task Given an integer, ,"
+      },
+      {
+        "source": "README",
+        "text": "# exampleLoops Loops example in python and java Objective In this challenge, we're going to use loops to help us do some simple math. Check out the Tutorial tab to learn more. Task Given an integer, ,"
       }
     ]
   },
@@ -14052,6 +15214,7 @@
       "asr",
       "assets",
       "auth",
+      "auto-tagging",
       "available",
       "aws",
       "backlog",
@@ -14059,6 +15222,7 @@
       "bolded",
       "boosting",
       "browse",
+      "browser",
       "browser-native",
       "bucket",
       "build",
@@ -14073,6 +15237,7 @@
       "click-based",
       "client",
       "cloudfront",
+      "cluster",
       "clusters",
       "clusters**",
       "code",
@@ -14081,6 +15246,7 @@
       "copy",
       "core",
       "credentials",
+      "d3.js",
       "data",
       "david",
       "davidbmar-com",
@@ -14194,6 +15360,7 @@
       "public",
       "python",
       "python3",
+      "quality",
       "queries**",
       "quick",
       "readmes",
@@ -14275,6 +15442,14 @@
       "|--------|-------|--------|"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# GitHub Portfolio Search Semantic search across 90+ GitHub repositories. Find patterns, architectures, and solutions from your own code — powered by embeddings. ## Live Site **[davidbmar.com](https:/"
+      },
+      {
+        "source": "README",
+        "text": "| Focus | Status | |--------|-------|--------| | 1 | Indexing pipeline + search + CLI | Complete | | 2 | REST API + core search endpoint | Complete | | 3 | CLI improvements + MCP server | Complete | |"
+      },
       {
         "source": "README",
         "text": "# GitHub Portfolio Search Semantic search across 90+ GitHub repositories. Find patterns, architectures, and solutions from your own code — powered by embeddings. ## Live Site **[davidbmar.com](https:/"
@@ -14399,6 +15574,7 @@
       "latest",
       "launch",
       "like",
+      "llm",
       "load",
       "local",
       "look",
@@ -14525,6 +15701,14 @@
       "your"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# GPT-4 & LangChain - Create a ChatGPT Chatbot for Your PDF Files Use the new GPT-4 api to build a chatGPT chatbot for multiple Large PDF files. Tech stack used includes LangChain, Pinecone, Typescrip"
+      },
+      {
+        "source": "README",
+        "text": "the embeddings and content have been successfully added to your Pinecone, you can run the app `pnpm run dev` to launch the local dev environment, and then type a question in the chat interface. ## Tro"
+      },
       {
         "source": "README",
         "text": "# GPT-4 & LangChain - Create a ChatGPT Chatbot for Your PDF Files Use the new GPT-4 api to build a chatGPT chatbot for multiple Large PDF files. Tech stack used includes LangChain, Pinecone, Typescrip"
@@ -14742,6 +15926,7 @@
       "walks",
       "webrtc",
       "where",
+      "whisper",
       "wires",
       "without",
       "worked",
@@ -14762,6 +15947,485 @@
       {
         "source": "README",
         "text": "diagrams — from a simple restaurant reservation (pure data) to a morning briefing with dynamic routing (data + code). Shows exactly where the line is between data-driven and code-driven workflows. ## "
+      },
+      {
+        "source": "README",
+        "text": "# Voice OS (FSM-generic) A generic voice-first operating system framework. Define conversational apps as workflow state machines — the kernel handles FSM runtime, LLM orchestration, event bus, and ses"
+      },
+      {
+        "source": "README",
+        "text": "diagrams — from a simple restaurant reservation (pure data) to a morning briefing with dynamic routing (data + code). Shows exactly where the line is between data-driven and code-driven workflows. ## "
+      }
+    ]
+  },
+  {
+    "repo": "headshots-starter-clone",
+    "keywords": [
+      "",
+      "###",
+      "&type=email\">log",
+      "**[here](https://getheadshots.ai)**",
+      "**note**",
+      "/auth/confirm?token_hash=",
+      "10",
+      "1024x1024",
+      "11",
+      "1:1",
+      "512x512",
+      "</a>",
+      "<h2>magic",
+      "<img",
+      "<p><a",
+      "<p>follow",
+      "<stripe-pricing-table",
+      "></stripe-pricing-table>",
+      "@/components/stripe/stripetable.tsx",
+      "accessories",
+      "account",
+      "active",
+      "adapted",
+      "add",
+      "additional",
+      "after",
+      "ai",
+      "ai](https://headshots-starter.vercel.app/",
+      "all",
+      "also",
+      "anime",
+      "anime](https://blog.tryleap.ai/transforming-images-into-anime-with-leap-ai/",
+      "any",
+      "api",
+      "api](https://cloudinary.com/documentation/face_detection_based_transformations?ref=blog.tryleap.ai",
+      "app",
+      "applications",
+      "appreciate",
+      "arbitrary",
+      "aspect",
+      "assets](https://blog.tryleap.ai/how-to-generate-style-consistent-assets-finetuning-on-leap/",
+      "astria",
+      "astria.ai",
+      "astria](https://www.astria.ai/",
+      "auth",
+      "authentication",
+      "available",
+      "avatars",
+      "avoid",
+      "based",
+      "bash",
+      "basis",
+      "before",
+      "below",
+      "bill",
+      "billing",
+      "blob",
+      "blob](https://vercel.com/docs/storage/vercel-blob/quickstart#client-uploads",
+      "blob_read_write_token",
+      "blog",
+      "bottom",
+      "branch",
+      "browser",
+      "build",
+      "building",
+      "built",
+      "button",
+      "catalog",
+      "catch",
+      "centered",
+      "chance",
+      "change",
+      "changes",
+      "checked",
+      "checkout",
+      "checkout.session.completed",
+      "clearly",
+      "click",
+      "client-reference-id={user.id",
+      "clone",
+      "close-ups",
+      "cloudinary",
+      "code",
+      "codebase",
+      "collaboration",
+      "columns",
+      "community",
+      "complete",
+      "configuration",
+      "configure",
+      "connect",
+      "consider",
+      "continue",
+      "contribute",
+      "contributing",
+      "contribution",
+      "contributors",
+      "copy",
+      "create",
+      "created",
+      "creating",
+      "creation",
+      "credit",
+      "credits",
+      "critical",
+      "cropping",
+      "css](https://tailwindcss.com/",
+      "current",
+      "customer-email={user.email",
+      "dashboard",
+      "dashboard](https://dashboard.stripe.com/test/apikeys",
+      "dashboard](https://supabase.com/dashboard/",
+      "database",
+      "default",
+      "demo",
+      "demo](/public/anime.png)](https://www.astria.ai/",
+      "demo](/public/demo.png)](https://headshots-starter.vercel.app/",
+      "demo](/public/good_results.png)](https://blog.tryleap.ai/create-an-ai-headshot-generator-fine-tune-stable-diffusion-with-leap-api/#step-1-gather-your-image-samples-%f0%9f%93%b8",
+      "demo](/public/icons.png)](https://www.astria.ai/",
+      "demo](/public/pet.png)](https://www.astria.ai/",
+      "demo](/public/products.png)](https://www.astria.ai/",
+      "dependencies",
+      "deploy",
+      "deployment",
+      "deployments",
+      "detection",
+      "dev",
+      "developers",
+      "development",
+      "dimensions",
+      "directory",
+      "discord",
+      "discord](https://discord.gg/mtw9gbgsmx",
+      "distorted",
+      "double",
+      "each",
+      "easily",
+      "editor",
+      "eg",
+      "eg.`shadf892yr398hq23h",
+      "email",
+      "enable",
+      "enforce",
+      "ensure",
+      "enter",
+      "env",
+      "env.local",
+      "environment",
+      "etc",
+      "event",
+      "example",
+      "explainer](/public/explainer.png)](https://www.astria.ai/",
+      "face",
+      "faces",
+      "faces](/public/multiple_faces.png)](https://blog.tryleap.ai/create-an-ai-headshot-generator-fine-tune-stable-diffusion-with-leap-api/#how-to-avoid-multiple-faces-in-results-%e2%9d%8c",
+      "feel",
+      "few",
+      "fields",
+      "file",
+      "fill",
+      "finished",
+      "follow",
+      "following",
+      "food",
+      "fork",
+      "found",
+      "frame",
+      "free",
+      "friendly",
+      "garbage",
+      "generates",
+      "generating",
+      "get",
+      "git",
+      "github",
+      "give",
+      "good",
+      "great",
+      "guide",
+      "happening",
+      "hats",
+      "headshot",
+      "headshots",
+      "height",
+      "help",
+      "here",
+      "here](/public/stripe/",
+      "here](https://blog.tryleap.ai/create-an-ai-headshot-generator-fine-tune-stable-diffusion-with-leap-api/#step-1-gather-your-image-samples-%f0%9f%93%b8",
+      "hosted",
+      "how",
+      "href=",
+      "href=\"https://github.com/leap-ai/headshots-starter/graphs/contributors\">",
+      "http://localhost:3000",
+      "https://headshots-starter.vercel.app",
+      "https://headshots-starter.vercel.app/**",
+      "https://{your-hosted-url}/astria/train-webhook",
+      "icons",
+      "ids",
+      "illustrations](https://blog.tryleap.ai/novel-ai-image-generator-using-leap-ai-a-comprehensive-guide/",
+      "image",
+      "images",
+      "important",
+      "improve",
+      "improvement",
+      "in</a></p>",
+      "including",
+      "inference",
+      "information",
+      "inspect",
+      "install",
+      "integration",
+      "into",
+      "introducing",
+      "issue",
+      "js",
+      "key",
+      "key](<[url](https://www.astria.ai/pricing)>",
+      "key](https://www.astria.ai/users/edit#api",
+      "landing",
+      "launch",
+      "leave",
+      "license",
+      "license](https://choosealicense.com/licenses/mit/",
+      "like",
+      "limbs",
+      "link",
+      "link</h2>",
+      "listening",
+      "live",
+      "locally",
+      "login:</p>",
+      "look",
+      "looks",
+      "magic",
+      "make",
+      "makers",
+      "many",
+      "might",
+      "migrations",
+      "mind",
+      "minimize",
+      "minutes",
+      "mit",
+      "model",
+      "models",
+      "modify",
+      "more",
+      "multiple",
+      "necessary",
+      "need",
+      "negative",
+      "new",
+      "newly",
+      "next.js](https://nextjs.org/",
+      "next_public_stripe_is_enabled=false",
+      "ngrok",
+      "npm",
+      "offer",
+      "one",
+      "one-click",
+      "only",
+      "open",
+      "open-source",
+      "option",
+      "optional",
+      "other",
+      "our",
+      "out",
+      "own",
+      "package",
+      "pad",
+      "page",
+      "paid",
+      "paste",
+      "payments",
+      "people",
+      "person",
+      "pet",
+      "photography",
+      "plans",
+      "point",
+      "points",
+      "pole",
+      "policies",
+      "popular",
+      "portraits",
+      "portraits](https://blog.tryleap.ai/ai-time-machine-images-a-glimpse-into-the-future-with-leap-ai/",
+      "powered",
+      "price",
+      "price](https://dashboard.stripe.com/test/products",
+      "pricing",
+      "pricing-table-id=\"your-stripe-pricing-table-id",
+      "product",
+      "products",
+      "professional",
+      "project",
+      "project's",
+      "prompt",
+      "publishable-key=\"your-stripe-publishable-key",
+      "pull",
+      "quality",
+      "ratio",
+      "ratios",
+      "read",
+      "ready",
+      "redirect",
+      "released",
+      "repeated",
+      "replace",
+      "repo",
+      "repo's",
+      "repository",
+      "request",
+      "resend",
+      "resend](https://resend.com/",
+      "resources",
+      "respective",
+      "results",
+      "right",
+      "rls",
+      "run",
+      "running",
+      "saas",
+      "same",
+      "sample",
+      "samples",
+      "schema",
+      "screen",
+      "script",
+      "search",
+      "secret",
+      "see",
+      "select",
+      "server",
+      "set",
+      "settings",
+      "setup",
+      "shadcn](https://ui.shadcn.com/",
+      "shots",
+      "should",
+      "shown",
+      "significant",
+      "site",
+      "siteurl",
+      "sql",
+      "src=\"https://contrib.rocks/image?repo=leap-ai/headshots-starter",
+      "start",
+      "starting",
+      "step",
+      "steps",
+      "storage",
+      "store](https://vercel.com/docs/storage/vercel-blob/quickstart#create-a-blob-store",
+      "story",
+      "string",
+      "stripe",
+      "stripe](https://stripe.com",
+      "stripe](https://stripe.com/",
+      "stripe_price_id_five_credits=your-stripe-price-id-five-credit",
+      "stripe_price_id_one_credit=your-stripe-price-id-one-credit",
+      "stripe_price_id_three_credits=your-stripe-price-id-three-credit",
+      "stripe_secret_key=your-stripe-secret-key",
+      "stripe_webhook_secret=your-stripe-webhook-secret",
+      "style-consistent",
+      "styles",
+      "subjects",
+      "suggestions",
+      "sunglasses",
+      "supabase",
+      "supabase/vercel",
+      "supabase](https://supabase.com/",
+      "support",
+      "support@astria.ai",
+      "sure",
+      "system",
+      "tab",
+      "table",
+      "table](https://dashboard.stripe.com/test/pricing-tables",
+      "tables",
+      "tailwind",
+      "take",
+      "teach",
+      "template",
+      "templates",
+      "thanks",
+      "their",
+      "them",
+      "then",
+      "these",
+      "things",
+      "through",
+      "time",
+      "token",
+      "tokenhash",
+      "too",
+      "tools",
+      "top",
+      "torso",
+      "totem",
+      "train",
+      "training",
+      "true",
+      "tunnel",
+      "typescript",
+      "under",
+      "update",
+      "uploaded",
+      "uploads",
+      "url",
+      "urls",
+      "use",
+      "use-cases",
+      "used",
+      "user",
+      "users",
+      "using",
+      "values",
+      "variables",
+      "vercel",
+      "vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3a%2f%2fgithub.com%2fleap-ai%2fheadshots-starter%2ftree%2fmain&env=astria_api_key,app_webhook_secret&envdescription=set%20up%20environment%20variables%20for%20leap%20ai%20and%20redirect%20url%20in%20supabase%20auth%20dashboard.%20see%20.env.local.example%20for%20full%20config%20with%20resend%20and%20stripe.&envlink=https%3a%2f%2fgithub.com%2fleap-ai%2fheadshots-starter%2fblob%2fmain%2f.env.local.example&project-name=headshots-starter-clone&repository-name=headshots-starter-clone&demo-title=ai%20headshot%20generator&demo-description=a%20professional%20ai%20headshot%20generator%20starter%20kit%20powered%20by%20next.js%2c%20leap%20ai%2c%20and%20vercel&demo-url=https%3a%2f%2fwww.getheadshots.ai%2f&demo-image=https%3a%2f%2fimages.ctfassets.net%2fe5382hct74si%2f1cedftwo5vpeinmgn2y1t6%2f245d1e0c11c4d8e734fbe345b9ecdc7c%2fdemo.png&integration-ids=oac_vqogbhqheoftpzgkpd7l0ih6&external-id=https%3a%2f%2fgithub.com%2fleap-ai%2fheadshots-starter%2ftree%2fmain",
+      "vercel](https://vercel.com/new/clone?repository-url=https%3a%2f%2fgithub.com%2fleap-ai%2fheadshots-starter%2ftree%2fmain&env=astria_api_key,app_webhook_secret&envdescription=set%20up%20environment%20variables%20for%20leap%20ai%20and%20redirect%20url%20in%20supabase%20auth%20dashboard.%20see%20.env.local.example%20for%20full%20config%20with%20resend%20and%20stripe.&envlink=https%3a%2f%2fgithub.com%2fleap-ai%2fheadshots-starter%2fblob%2fmain%2f.env.local.example&project-name=headshots-starter-clone&repository-name=headshots-starter-clone&demo-title=ai%20headshot%20generator&demo-description=a%20professional%20ai%20headshot%20generator%20starter%20kit%20powered%20by%20next.js%2c%20leap%20ai%2c%20and%20vercel&demo-url=https%3a%2f%2fwww.getheadshots.ai%2f&demo-image=https%3a%2f%2fimages.ctfassets.net%2fe5382hct74si%2f1cedftwo5vpeinmgn2y1t6%2f245d1e0c11c4d8e734fbe345b9ecdc7c%2fdemo.png&integration-ids=oac_vqogbhqheoftpzgkpd7l0ih6&external-id=https%3a%2f%2fgithub.com%2fleap-ai%2fheadshots-starter%2ftree%2fmain",
+      "visible",
+      "visit",
+      "want",
+      "webhook",
+      "webhook](https://dashboard.stripe.com/test/webhooks",
+      "webhooks",
+      "welcome",
+      "what",
+      "when",
+      "width",
+      "wish",
+      "working",
+      "works",
+      "yarn",
+      "you",
+      "you'll",
+      "your",
+      "your-blob-read-write-token",
+      "your-hosted-url/stripe/subscription-webhook",
+      "your-repo-name",
+      "your-resend-api-key",
+      "your-stripe-price-id-five-credit",
+      "your-stripe-price-id-one-credit",
+      "your-stripe-price-id-three-credit",
+      "your-vercel-url",
+      "your-webhook-secret",
+      "your_api_key",
+      "👨‍💼"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# 👨‍💼 [Headshot AI](https://headshots-starter.vercel.app/) - Professional Headshots with AI (powered by Astria.ai) Introducing Headshot AI, an open-source project from [Astria](https://www.astria.ai/)"
+      },
+      {
+        "source": "README",
+        "text": "``` For yarn: ```bash yarn ``` ### 5. Magic Link Auth (Supabase) In your supabase [dashboard](https://supabase.com/dashboard/), select newly created project, go to Authentication -> Email Templates ->"
+      },
+      {
+        "source": "README",
+        "text": "Webhook](https://dashboard.stripe.com/test/webhooks) that will point to your hosted URL. The webhook should be listening for the `checkout.session.completed` event. The webhook should point to `your-h"
+      },
+      {
+        "source": "README",
+        "text": "samples uploaded are the same 1:1 height / width aspect ratio, for example 512x512, 1024x1024, etc. - Avoid multiple people in the samples uploaded. - Add \"double torso, totem pole\" to the negative pr"
       }
     ]
   },
@@ -14779,6 +16443,7 @@
       "hello-world",
       "mar",
       "running",
+      "s3",
       "service",
       "services",
       "team",
@@ -14789,6 +16454,10 @@
       "world"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# hello-world This is the tutorial for Hello World. I am David Mar, I work in Amazon Web Services running a group called the Customer Experience Engineering group within the S3 Service team."
+      },
       {
         "source": "README",
         "text": "# hello-world This is the tutorial for Hello World. I am David Mar, I work in Amazon Web Services running a group called the Customer Experience Engineering group within the S3 Service team."
@@ -14807,6 +16476,10 @@
       "test"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# hello-world-test # David Mar was here, this is a test on the readme-edits branch."
+      },
       {
         "source": "README",
         "text": "# hello-world-test # David Mar was here, this is a test on the readme-edits branch."
@@ -14952,6 +16625,10 @@
       "you’ve"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# interviewnotes Interview has 5 parts. #1 : Code review assessment ---------------------------- Review code, and see what the team is doing, and watch how employees and team are interacting together."
+      },
       {
         "source": "README",
         "text": "# interviewnotes Interview has 5 parts. #1 : Code review assessment ---------------------------- Review code, and see what the team is doing, and watch how employees and team are interacting together."
@@ -15900,6 +17577,34 @@
       {
         "source": "README",
         "text": "SQLite - **Saved preferences** &mdash; voice, model, and search settings persist across sessions - **Session tokens** &mdash; 7-day browser sessions (no re-login on refresh) - **Usage tracking** &mdas"
+      },
+      {
+        "source": "README",
+        "text": "# Voice Agent + Finite State Machine Workflow Engine Mac-hosted Python voice assistant that streams TTS audio to iPhone Safari via WebRTC, with a **hybrid FSM workflow engine** that decomposes complex"
+      },
+      {
+        "source": "README",
+        "text": "&mdash; LLM reads all per-entity results, produces ranked conversational answer ### 2. Deep Research Triggered by: *\"tell me about\"*, *\"research\"*, *\"deep dive\"*, *\"comprehensive\"*, *\"what's happening"
+      },
+      {
+        "source": "README",
+        "text": "via TURN relay ┌─────────────────────────▼───────────────────────────────────┐ │ iPhone Safari │ │ ├─ Hold-to-talk walkie-talkie UI │ │ ├─ Workflow activity card (step progress, timer, debug) │ │ ├─ W"
+      },
+      {
+        "source": "README",
+        "text": "Editing | Feature | What it does | |---------|-------------| | **Persistent JSON storage** (F-006) | Transcripts saved to `data/transcripts/` as self-contained JSON files. DB placeholder replaced with"
+      },
+      {
+        "source": "README",
+        "text": ".env.example .env # Add at least one LLM provider: echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env # Claude # OR echo 'OPENAI_API_KEY=sk-...' >> .env # OpenAI # OR just use Ollama (free, local): brew inst"
+      },
+      {
+        "source": "README",
+        "text": "| Decision | Choice | Why | |----------|--------|-----| | Workflow routing | Precompiled regex keywords | Sub-millisecond, no LLM call needed for routing | | Step prompts | One-shot (no conversation h"
+      },
+      {
+        "source": "README",
+        "text": "SQLite - **Saved preferences** &mdash; voice, model, and search settings persist across sessions - **Session tokens** &mdash; 7-day browser sessions (no re-login on refresh) - **Usage tracking** &mdas"
       }
     ]
   },
@@ -16358,6 +18063,7 @@
       "step",
       "steps",
       "stream",
+      "streaming",
       "streams",
       "structure",
       "stt",
@@ -16483,6 +18189,26 @@
       "◄───────────────────┘"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Voice Agent + Finite State Machine Workflow Engine Mac-hosted Python voice assistant that streams TTS audio to iPhone Safari via WebRTC, with a **hybrid FSM workflow engine** that decomposes complex"
+      },
+      {
+        "source": "README",
+        "text": "&mdash; LLM reads all per-entity results, produces ranked conversational answer ### 2. Deep Research Triggered by: *\"tell me about\"*, *\"research\"*, *\"deep dive\"*, *\"comprehensive\"*, *\"what's happening"
+      },
+      {
+        "source": "README",
+        "text": "via TURN relay ┌─────────────────────────▼───────────────────────────────────┐ │ iPhone Safari │ │ ├─ Hold-to-talk walkie-talkie UI │ │ ├─ Workflow activity card (step progress, timer, debug) │ │ ├─ W"
+      },
+      {
+        "source": "README",
+        "text": "RTCPeerConnection lifecycle, mic, TTS queue ├── turn.py # Twilio TURN ephemeral credentials └── audio/ # PCMRingBuffer, AudioQueue, WebRTCAudioSource web/ ├── index.html # Two-screen mobile UI (connec"
+      },
+      {
+        "source": "README",
+        "text": "`devtoken` | WebSocket auth token | | `LLM_PROVIDER` | (auto) | `claude`, `openai`, or `ollama` | | `ANTHROPIC_API_KEY` | &mdash; | Enables Claude | | `OPENAI_API_KEY` | &mdash; | Enables OpenAI | | `"
+      },
       {
         "source": "README",
         "text": "# Voice Agent + Finite State Machine Workflow Engine Mac-hosted Python voice assistant that streams TTS audio to iPhone Safari via WebRTC, with a **hybrid FSM workflow engine** that decomposes complex"
@@ -17069,6 +18795,87 @@
       {
         "source": "README",
         "text": "| `LOCAL_IP` | `192.168.1.1` | LAN IP for self-signed cert SAN | ## Key Technical Decisions | Decision | Choice | Why | |----------|--------|-----| | TTS engine | Piper TTS (ONNX) | Fast offline neura"
+      },
+      {
+        "source": "README",
+        "text": "# Voice Agent — WebRTC + TURN Speaker Streaming Voice agent running on a Mac host: speak into iPhone mic → Whisper STT → LLM (Claude/OpenAI/Ollama) → Piper TTS → hear response through iPhone speaker v"
+      },
+      {
+        "source": "README",
+        "text": "Mac (behind NAT) │ │ │ │── STUN discover public IP ────▶│ │ │◀── relay candidate ────────────│ │ │ │◀── STUN discover public IP ────│ │ │── relay candidate ────────────▶│ │ │ │ │◀═══════ WebRTC audio "
+      },
+      {
+        "source": "README",
+        "text": "LLM provider list │ llm_providers} ──────────│ │ │ │─── webrtc_offer {sdp} ──────▶│ Set remote, create answer │◀── webrtc_answer {sdp} ──────│ ICE candidates bundled in SDP │ │ │─── set_provider {prov"
+      },
+      {
+        "source": "README",
+        "text": "Git pre-commit hook installer │ ├── docs/ │ ├── screenshots/ # UI screenshots │ └── project-memory/ # Session docs, ADRs, architecture │ ├── CLAUDE.md # AI project guide + memory system rules ├── requ"
+      },
+      {
+        "source": "README",
+        "text": "| `LOCAL_IP` | `192.168.1.1` | LAN IP for self-signed cert SAN | ## Key Technical Decisions | Decision | Choice | Why | |----------|--------|-----| | TTS engine | Piper TTS (ONNX) | Fast offline neura"
+      }
+    ]
+  },
+  {
+    "repo": "liveblocks-starter-kit",
+    "keywords": [
+      "</a>",
+      "</p>",
+      "<img",
+      "<p>",
+      "alt=\"next.js",
+      "alt=\"open",
+      "alt=\"react",
+      "app",
+      "auth0",
+      "authentication",
+      "auto-revalidation",
+      "codesandbox",
+      "collaborative",
+      "compatible",
+      "dashboard",
+      "document",
+      "documents",
+      "drafts",
+      "features",
+      "fully-featured",
+      "get",
+      "github",
+      "google",
+      "groups",
+      "guide](http://liveblocks.io/docs/guides/nextjs-starter-kit",
+      "href=\"https://codesandbox.io/s/github/liveblocks/liveblocks/tree/main/starter-kits/nextjs-starter-kit\">",
+      "https://user-images.githubusercontent.com/33033422/216776250-04ef297b-f61a-42ec-a7b9-b08e46dddf8f.mp4",
+      "kickstart",
+      "kit",
+      "kit](https://liveblocks.io/starter-kit",
+      "menu",
+      "more",
+      "next.js",
+      "pagination",
+      "permissions",
+      "public",
+      "react",
+      "read",
+      "scoped",
+      "share",
+      "src=\"https://img.shields.io/badge/next.js-message?style=flat&logo=next.js&color=07f&logocolor=fff",
+      "src=\"https://img.shields.io/badge/open%20in%20codesandbox-message?style=flat&logo=codesandbox&color=333&logocolor=fff",
+      "src=\"https://img.shields.io/badge/react-message?style=flat&logo=react&color=0bd&logocolor=fff",
+      "start",
+      "started",
+      "starter",
+      "typescript",
+      "users",
+      "whiteboard",
+      "your"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "https://user-images.githubusercontent.com/33033422/216776250-04ef297b-f61a-42ec-a7b9-b08e46dddf8f.mp4 # [Next.js Starter Kit](https://liveblocks.io/starter-kit) <p> <a href=\"https://codesandbox.io/s/g"
       }
     ]
   },
@@ -17159,6 +18966,7 @@
       "larger",
       "later",
       "like",
+      "llm",
       "llm_gpt3.5-vs-gpt4-comparison",
       "llm_setup.sh",
       "logical",
@@ -17257,6 +19065,14 @@
       {
         "source": "README",
         "text": "So if someone sends a 1K prompt and gets a 1K response, aka completion, their cost for GPT-3.5-turbo is 2 x $0.002 = $0.004. Whereas the same token count for GPT4 8K model would be. 1K prompt + 1K com"
+      },
+      {
+        "source": "README",
+        "text": "The purpose here is to show that you can get better summarization than GPT 4 at 22.5 times cheaper the cost. You can accomplish this assuming that you dont need to parallize (ie do the summary super q"
+      },
+      {
+        "source": "README",
+        "text": "So if someone sends a 1K prompt and gets a 1K response, aka completion, their cost for GPT-3.5-turbo is 2 x $0.002 = $0.004. Whereas the same token count for GPT4 8K model would be. 1K prompt + 1K com"
       }
     ]
   },
@@ -17270,6 +19086,10 @@
       "template"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# login-system Template Login System"
+      },
       {
         "source": "README",
         "text": "# login-system Template Login System"
@@ -17682,6 +19502,22 @@
       {
         "source": "README",
         "text": "│ └── build/ ├── mcp-servers/ │ ├── memory-server/ # Local File Storage │ │ ├── package.json │ │ ├── src/index.ts │ │ ├── build/ │ │ └── data/memories.json │ └── s3-server/ # S3 Storage (Optional) │ ├"
+      },
+      {
+        "source": "README",
+        "text": "# MCP Memory System - Complete Setup Guide > **🧠 Persistent Memory for Claude Across Sessions** This system enables Claude to maintain persistent memory across conversations using the Model Context Pr"
+      },
+      {
+        "source": "README",
+        "text": "browser. You should see the MCP client web interface. ### Step 3: Install Chrome Extension *Objective: Enable memory capture from web pages* 1. **Open Chrome Extensions**: - Go to `chrome://extensions"
+      },
+      {
+        "source": "README",
+        "text": "🔧 Advanced Configuration ### Using S3 Storage (Optional) 1. **Set up S3 server**: ```bash cd mcp-servers/s3-server npm install npm run build ``` 2. **Configure AWS credentials**: ```bash export S3_BUC"
+      },
+      {
+        "source": "README",
+        "text": "│ └── build/ ├── mcp-servers/ │ ├── memory-server/ # Local File Storage │ │ ├── package.json │ │ ├── src/index.ts │ │ ├── build/ │ │ └── data/memories.json │ └── s3-server/ # S3 Storage (Optional) │ ├"
       }
     ]
   },
@@ -17695,6 +19531,10 @@
       "writing"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# my-blog Writing of my blog This basically is the readme for my blog."
+      },
       {
         "source": "README",
         "text": "# my-blog Writing of my blog This basically is the readme for my blog."
@@ -17845,6 +19685,10 @@
       {
         "source": "README",
         "text": "# Parakeet RNN-T Transcription System A high-performance, ultra-low latency speech-to-text transcription system using NVIDIA's Parakeet RNN-T model via Riva framework. ## Features - **Ultra-Low Latenc"
+      },
+      {
+        "source": "README",
+        "text": "# Parakeet RNN-T Transcription System A high-performance, ultra-low latency speech-to-text transcription system using NVIDIA's Parakeet RNN-T model via Riva framework. ## Features - **Ultra-Low Latenc"
       }
     ]
   },
@@ -17969,6 +19813,7 @@
       "better",
       "both",
       "boundaries",
+      "browser",
       "browser/app",
       "cat",
       "check",
@@ -18100,6 +19945,7 @@
       "latency**",
       "latest",
       "lines",
+      "llm",
       "llm-guided",
       "local",
       "locked**",
@@ -18221,6 +20067,7 @@
       "run",
       "runtime",
       "runtime**",
+      "s3",
       "scores",
       "script",
       "script-name]_[timestamp]_pid[pid].log",
@@ -18324,6 +20171,22 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# NVIDIA Parakeet Riva ASR Deployment System 🚀 **Production-ready NVIDIA Parakeet RNNT via Riva ASR with comprehensive infrastructure** ## Current Status (M2 Complete - Client Wrapper Ready) ✅ **M0 - "
+      },
+      {
+        "source": "README",
+        "text": "security groups ./scripts/riva-020-configure-aws-security-groups.sh # 4. Setup NVIDIA drivers (if needed) ./scripts/riva-025-download-nvidia-gpu-drivers.sh ./scripts/riva-030-transfer-drivers-to-gpu-i"
+      },
+      {
+        "source": "README",
+        "text": "and exit codes - **Error Details**: Complete error output with context - **Final Summary**: Success/failure status with recommendations ## 🔗 API Endpoints ### Riva Health Check ```bash GET http://your"
+      },
+      {
+        "source": "README",
+        "text": "✅ **Dual Deployment Modes**: NIM containers (latest) + traditional Riva server options ✅ **Real NVIDIA Parakeet**: Actual Riva ASR with Parakeet RNNT model + mock fallback ✅ **M0-M5 Milestone Structur"
+      },
       {
         "source": "README",
         "text": "# NVIDIA Parakeet Riva ASR Deployment System 🚀 **Production-ready NVIDIA Parakeet RNNT via Riva ASR with comprehensive infrastructure** ## Current Status (M2 Complete - Client Wrapper Ready) ✅ **M0 - "
@@ -18463,6 +20326,7 @@
       "better",
       "both",
       "boundaries",
+      "browser",
       "browser/app",
       "cat",
       "check",
@@ -18594,6 +20458,7 @@
       "latency**",
       "latest",
       "lines",
+      "llm",
       "llm-guided",
       "local",
       "locked**",
@@ -18716,6 +20581,7 @@
       "run",
       "runtime",
       "runtime**",
+      "s3",
       "scores",
       "script",
       "script-name]_[timestamp]_pid[pid].log",
@@ -18818,6 +20684,22 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# NVIDIA Parakeet Riva ASR Deployment System 🚀 **Production-ready NVIDIA Parakeet RNNT via Riva ASR with comprehensive infrastructure** ## Current Status (M2 Complete - Client Wrapper Ready) ✅ **M0 - "
+      },
+      {
+        "source": "README",
+        "text": "security groups ./scripts/riva-020-configure-aws-security-groups.sh # 4. Setup NVIDIA drivers (if needed) ./scripts/riva-025-download-nvidia-gpu-drivers.sh ./scripts/riva-030-transfer-drivers-to-gpu-i"
+      },
+      {
+        "source": "README",
+        "text": "and exit codes - **Error Details**: Complete error output with context - **Final Summary**: Success/failure status with recommendations ## 🔗 API Endpoints ### Riva Health Check ```bash GET http://your"
+      },
+      {
+        "source": "README",
+        "text": "✅ **Dual Deployment Modes**: NIM containers (latest) + traditional Riva server options ✅ **Real NVIDIA Parakeet**: Actual Riva ASR with Parakeet RNNT model + mock fallback ✅ **M0-M5 Milestone Structur"
+      },
       {
         "source": "README",
         "text": "# NVIDIA Parakeet Riva ASR Deployment System 🚀 **Production-ready NVIDIA Parakeet RNNT via Riva ASR with comprehensive infrastructure** ## Current Status (M2 Complete - Client Wrapper Ready) ✅ **M0 - "
@@ -19149,6 +21031,7 @@
       "run",
       "running",
       "runtime",
+      "s3",
       "save",
       "saves",
       "scratch",
@@ -19271,6 +21154,549 @@
       {
         "source": "README",
         "text": "### GPU Won't Start ```bash # Check GPU status ./scripts/018-status-gpu-instance.sh # If stopped, start it ./scripts/210-startup-restore.sh ``` ### No Transcriptions ```bash # Check RIVA health ssh -i"
+      },
+      {
+        "source": "README",
+        "text": "# NVIDIA Riva Conformer-CTC Streaming ASR **Production-ready real-time speech transcription using NVIDIA Riva 2.19 with Conformer-CTC streaming model.** ## What This Delivers - ✅ **Real-time browser s"
+      },
+      {
+        "source": "README",
+        "text": "aws ec2 describe-instances \\ --region us-east-2 \\ --filters \"Name=instance-type,Values=g4dn.*\" \\ --output table # 2. Start the GPU and configure .env ./scripts/730-start-gpu-instance.sh --instance-id "
+      },
+      {
+        "source": "README",
+        "text": "│ ├── 020-create-gpu-instance.sh # AWS GPU deployment │ ├── 030-configure-security.sh # Security groups + SSH │ ├── 100-deploy-conformer-streaming.sh # Model deployment │ ├── 110-setup-websocket-bridg"
+      },
+      {
+        "source": "README",
+        "text": "### GPU Won't Start ```bash # Check GPU status ./scripts/018-status-gpu-instance.sh # If stopped, start it ./scripts/210-startup-restore.sh ``` ### No Transcriptions ```bash # Check RIVA health ssh -i"
+      }
+    ]
+  },
+  {
+    "repo": "nvidia-riva-rnnt-transcription",
+    "keywords": [
+      "",
+      "###",
+      "####",
+      "$oauthtoken",
+      "**14x",
+      "**6",
+      "**60-79%",
+      "**80%+",
+      "**<60%",
+      "**[architecture.md](architecture.md)**",
+      "**[claude.md](claude.md)**",
+      "**[deployment.md](deployment.md)**",
+      "**api",
+      "**auto-generated",
+      "**auto-shutdown**",
+      "**automated",
+      "**batch",
+      "**check",
+      "**common",
+      "**connection",
+      "**container",
+      "**core",
+      "**cost",
+      "**duration**",
+      "**ec2**",
+      "**encryption**",
+      "**fastapi**",
+      "**file",
+      "**getting",
+      "**gpu",
+      "**health",
+      "**iam**",
+      "**instance",
+      "**interactive",
+      "**latency**",
+      "**model",
+      "**monitor",
+      "**network",
+      "**ngc",
+      "**performance",
+      "**real-time",
+      "**requirements**",
+      "**resource",
+      "**review",
+      "**right-size**",
+      "**riva",
+      "**s3",
+      "**s3**",
+      "**scoring",
+      "**script",
+      "**security",
+      "**ssh",
+      "**step",
+      "**streaming**",
+      "**test",
+      "**throughput**",
+      "**total",
+      "**ultra-low",
+      "**use",
+      "**validate",
+      "**vpc**",
+      "**websocket",
+      "**☁️",
+      "**⚡",
+      "**🎤",
+      "**💰",
+      "**🔧",
+      "---",
+      "-h",
+      "/health-check.sh",
+      "/opt/riva-deployment",
+      "/scripts/step-001-download-riva-to-s3.sh",
+      "/scripts/step-002-organize-s3-bintarball.sh",
+      "/scripts/step-003-prepare-gpu-instance.sh",
+      "/scripts/step-004-install-riva-from-s3.sh",
+      "/scripts/step-005-configure-riva-services.sh",
+      "/scripts/step-006-test-riva-deployment.sh",
+      "/start-riva.sh",
+      "/stop-riva.sh",
+      "/transcribe/file",
+      "/transcribe/s3",
+      "0.05-0.1",
+      "0.3-0.5",
+      "001",
+      "001!**",
+      "002",
+      "003",
+      "004",
+      "005",
+      "006",
+      "006)**",
+      "10-15",
+      "10-20x",
+      "100-200ms",
+      "1400ms",
+      "14x",
+      "15-20",
+      "2-3",
+      "2-3x",
+      "2.19.0",
+      "22",
+      "3-4",
+      "40gb+",
+      "5-10",
+      "50-70%",
+      "50051",
+      "8-10",
+      "8001",
+      "9001",
+      "<gpu-ip>:50051",
+      "access",
+      "access**",
+      "account",
+      "achieve",
+      "additional",
+      "addresses",
+      "advanced",
+      "after",
+      "aggressive",
+      "alerts",
+      "all",
+      "allow",
+      "allows",
+      "api",
+      "architecture",
+      "architecture.md",
+      "asr",
+      "attention",
+      "audio",
+      "audio_bucket=\"dbm-cf-2-web",
+      "automatically",
+      "aws",
+      "aws_region=\"us-east-2",
+      "bash",
+      "batch",
+      "benchmarking",
+      "benefits",
+      "best",
+      "billing",
+      "binary",
+      "bintarball",
+      "bintarball**",
+      "bucket",
+      "built",
+      "built-in",
+      "caching**",
+      "catalog",
+      "check",
+      "check**",
+      "claude.md",
+      "cli",
+      "clone",
+      "coding",
+      "commit",
+      "comparison",
+      "compose",
+      "comprehensive",
+      "compressed",
+      "configs",
+      "configuration",
+      "configuration**",
+      "configure",
+      "configured",
+      "configures",
+      "connections",
+      "connectivity",
+      "connectivity**",
+      "container",
+      "correct",
+      "cost",
+      "cost**",
+      "create",
+      "creates",
+      "credentials",
+      "curl",
+      "dbm-cf-2-web",
+      "debugging",
+      "deep",
+      "deploy",
+      "deployed",
+      "deployment",
+      "deployment**",
+      "detailed",
+      "details",
+      "development",
+      "df",
+      "direct",
+      "directory",
+      "disk",
+      "dive",
+      "docker",
+      "docker/",
+      "docs**",
+      "docs/",
+      "documentation",
+      "download",
+      "downloads",
+      "drivers",
+      "each",
+      "ec2",
+      "effective**",
+      "efficient",
+      "enable",
+      "encryption",
+      "endpoint",
+      "endpoints",
+      "ensure",
+      "enterprise-grade",
+      "env",
+      "env.template",
+      "environment",
+      "error",
+      "error-handling.sh",
+      "existing",
+      "exists",
+      "external",
+      "factor**",
+      "failures**",
+      "fallback",
+      "fast-api-rnnt/",
+      "fastapi",
+      "faster",
+      "features**",
+      "file",
+      "files",
+      "format",
+      "free",
+      "full",
+      "function",
+      "functionality",
+      "g4dn.xlarge",
+      "generate",
+      "generates",
+      "git",
+      "gpu",
+      "gpu-accelerated",
+      "group",
+      "groups",
+      "grpc",
+      "grpc**",
+      "guidelines",
+      "handles",
+      "handling",
+      "health",
+      "health**",
+      "help**",
+      "helper",
+      "helpers",
+      "high",
+      "http://<gpu-ip>:8001",
+      "http://<gpu-ip>:8001/docs",
+      "http://<gpu-ip>:8001/health",
+      "https://github.com/davidbmar/nvidia-riva-rnnt-transcription.git",
+      "https://ngc.nvidia.com",
+      "iam",
+      "idle",
+      "image",
+      "improvement**",
+      "inbound",
+      "includes",
+      "infrastructure",
+      "install",
+      "installation",
+      "installed",
+      "installs",
+      "instance",
+      "instance**",
+      "instances",
+      "instances**",
+      "instead",
+      "inventory",
+      "ips",
+      "issues",
+      "issues**",
+      "keep",
+      "key",
+      "keys",
+      "keys**",
+      "known",
+      "lambda",
+      "lambdas/",
+      "latency",
+      "latency**",
+      "launch",
+      "launches",
+      "live",
+      "loaded",
+      "loads",
+      "local",
+      "login",
+      "logs",
+      "logs**",
+      "main",
+      "management",
+      "management**",
+      "manifest",
+      "memory",
+      "messages",
+      "met",
+      "metric",
+      "metrics**",
+      "minor",
+      "minutes",
+      "models",
+      "monitoring",
+      "monitoring**",
+      "must",
+      "navigation",
+      "needed",
+      "network",
+      "networking",
+      "never",
+      "ngc",
+      "ngc_api_key=\"nvapi-your-key-here",
+      "non-critical",
+      "nvapi-",
+      "nvcr.io",
+      "nvidia",
+      "nvidia-riva-rnnt-transcription",
+      "nvidia-smi",
+      "once",
+      "one",
+      "only",
+      "optimization**",
+      "optimized**",
+      "order",
+      "organize",
+      "organized",
+      "output",
+      "output**",
+      "over",
+      "pair",
+      "performance",
+      "permissions",
+      "personal",
+      "phase",
+      "placement",
+      "pooling**",
+      "populate",
+      "port",
+      "ports",
+      "post",
+      "practices**",
+      "prepare",
+      "prerequisites",
+      "prerequisites**",
+      "problems**",
+      "process",
+      "processing**",
+      "production",
+      "project",
+      "provide",
+      "provides",
+      "questions",
+      "queue",
+      "quick",
+      "quick-access",
+      "quotas",
+      "readme.md",
+      "ready",
+      "ready**",
+      "real-time",
+      "recognition",
+      "region",
+      "repositories",
+      "repository",
+      "requests/minute",
+      "required",
+      "required)**",
+      "requirements",
+      "requires",
+      "resource",
+      "response",
+      "rest",
+      "restart",
+      "restrict",
+      "reuse",
+      "riva",
+      "riva-rnnt-gpu/",
+      "riva-speech-server",
+      "rnn-t",
+      "rnn-t/",
+      "rnn-t/riva",
+      "roles",
+      "router│───▶│",
+      "run",
+      "s3",
+      "s3**",
+      "savings",
+      "scenarios",
+      "score**",
+      "script",
+      "scripts",
+      "scripts**",
+      "scripts/",
+      "security",
+      "selected",
+      "sequence",
+      "sequential",
+      "server",
+      "service",
+      "services",
+      "services**",
+      "set",
+      "setup",
+      "shell",
+      "sign",
+      "similar-length",
+      "skills",
+      "space",
+      "speech",
+      "spot",
+      "sqs",
+      "ssh",
+      "standards",
+      "start",
+      "starts",
+      "status",
+      "step",
+      "step-001-download-riva-to-s3.sh",
+      "step-002-organize-s3-bintarball.sh",
+      "step-003-prepare-gpu-instance.sh",
+      "step-004-install-riva-from-s3.sh",
+      "step-005-configure-riva-services.sh",
+      "step-006-test-riva-deployment.sh",
+      "step-navigation.sh",
+      "steps",
+      "stop",
+      "storage",
+      "stored",
+      "streaming",
+      "streaming**",
+      "streams/gpu",
+      "structure",
+      "subnet",
+      "support",
+      "system",
+      "system**",
+      "technical",
+      "technology",
+      "technology**",
+      "template",
+      "test",
+      "testing",
+      "tests",
+      "than",
+      "these",
+      "throughput",
+      "time",
+      "time**",
+      "timeout",
+      "timeouts",
+      "tips",
+      "tracking",
+      "transcript",
+      "transcription",
+      "transcription-router/",
+      "troubleshooting",
+      "ubuntu@<gpu-ip>",
+      "ultra-fast",
+      "ultra-low",
+      "upload",
+      "upload**",
+      "uploads",
+      "usage",
+      "usage**",
+      "use",
+      "uses",
+      "using",
+      "utilities",
+      "utilization",
+      "validate",
+      "validates",
+      "validation",
+      "variables",
+      "verification",
+      "verify",
+      "via",
+      "view",
+      "vpc",
+      "vs",
+      "websocket",
+      "whisper",
+      "workloads",
+      "wrapper",
+      "ws://<gpu-ip>:8001/transcribe/stream",
+      "your",
+      "your-key.pem",
+      "|--------|---------------------|---------|",
+      "~$0.50/hour",
+      "~$1-2",
+      "~100-200ms",
+      "~1400ms",
+      "~45-60",
+      "~500",
+      "│───▶│",
+      "┌─────────────────┐",
+      "┌──────────────┐",
+      "┌─────────────┐",
+      "└──",
+      "└─────────────────┘",
+      "└─────────────┘",
+      "└──────┬───────┘",
+      "├──"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# 🚀 NVIDIA RNN-T Real-Time Transcription System **Ultra-low latency real-time audio transcription using NVIDIA Riva RNN-T technology** Achieve **14x performance improvement** over Whisper with 100-200"
+      },
+      {
+        "source": "README",
+        "text": "Speech Skills container (2.19.0) - Uploads compressed container to S3 bintarball directory - **Duration**: 15-20 minutes - **Requirements**: NGC API key, 40GB+ free disk space ### **Step 002: Organize"
+      },
+      {
+        "source": "README",
+        "text": "`http://<gpu-ip>:8001/docs` ## 🧪 Testing & Validation The deployment includes comprehensive testing: ### **Automated Tests (Step 006)** - ✅ Container status and health - ✅ Port connectivity (50051, 80"
+      },
+      {
+        "source": "README",
+        "text": "Reuse gRPC connections 3. **Model Caching**: Keep models loaded in memory 4. **Network Optimization**: Use placement groups for high throughput ### **Security Best Practices** 1. **Network Access**: R"
       }
     ]
   },
@@ -19368,6 +21794,7 @@
       "direct",
       "directory",
       "disk**",
+      "docker",
       "docker/",
       "docs",
       "docs/",
@@ -19461,6 +21888,7 @@
       "rnnt-server.py",
       "router",
       "run",
+      "s3",
       "samples",
       "scripts",
       "scripts/",
@@ -19525,6 +21953,14 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Production RNN-T Deployment System 🚀 **One-click deployment of production-ready NVIDIA RNN-T speech recognition system** ## What This Delivers - **Real RNN-T Transcription**: Not mock - actual Speec"
+      },
+      {
+        "source": "README",
+        "text": "http://your-gpu-instance:8000/transcribe/file Content-Type: multipart/form-data file: audio.wav language: en (optional) ``` ### Response Format ```json { \"text\": \"TRANSCRIBED SPEECH TEXT\", \"confidence"
+      },
       {
         "source": "README",
         "text": "# Production RNN-T Deployment System 🚀 **One-click deployment of production-ready NVIDIA RNN-T speech recognition system** ## What This Delivers - **Real RNN-T Transcription**: Not mock - actual Speec"
@@ -20019,6 +22455,7 @@
       "rain",
       "rain.wav",
       "rate",
+      "react",
       "react/vite",
       "ready",
       "real-time",
@@ -20051,6 +22488,7 @@
       "seconds",
       "see",
       "selector",
+      "semantic",
       "semantic/coarse/fine",
       "separately",
       "server",
@@ -20143,6 +22581,7 @@
       "tracks",
       "transformers",
       "true",
+      "tts",
       "type",
       "types.ts",
       "typescript",
@@ -20221,6 +22660,30 @@
       {
         "source": "README",
         "text": "speaker presets: - `v2/en_speaker_0` through `v2/en_speaker_9` (English voices) - Also supports Chinese, French, German, Spanish, Japanese speakers - Include non-speech tokens in prompts: `[laughs]`, "
+      },
+      {
+        "source": "README",
+        "text": "# Open Source Sound Generator LLMs A browser app for testing, comparing, and benchmarking open-source audio generation models -- sound effects, music, and speech -- powered by a local Python backend ("
+      },
+      {
+        "source": "README",
+        "text": "**Parler-TTS Mini** | 1.0 GB | 44.1 kHz | parler-tts | Describe the voice you want in natural language. | ## Benchmark Results (Apple Silicon M3 Max, MPS) ![Compare Table](docs/screenshots/compare-tab"
+      },
+      {
+        "source": "README",
+        "text": "frontend fetches the WAV binary separately via `/api/audio/{id}`, avoiding large SSE payloads that break through the Vite dev proxy. - **SSE streaming for model loading**: The `/api/models/{id}/load-s"
+      },
+      {
+        "source": "README",
+        "text": "You'll see a progress bar with step count and elapsed timer. - Diffusion models (AudioLDM, Stable Audio) show ~20 steps. Speech models (Bark) show 3 stages. - Generation takes 5-50 seconds depending o"
+      },
+      {
+        "source": "README",
+        "text": "\"duration\": 5.0}' \\ --output output.wav # Check timing from response headers curl -v -X POST http://localhost:8000/api/generate \\ -H \"Content-Type: application/json\" \\ -d '{\"model_id\": \"audioldm-s-ful"
+      },
+      {
+        "source": "README",
+        "text": "speaker presets: - `v2/en_speaker_0` through `v2/en_speaker_9` (English voices) - Also supports Chinese, French, German, Spanish, Japanese speakers - Include non-speech tokens in prompts: `[laughs]`, "
       }
     ]
   },
@@ -20270,6 +22733,10 @@
       "where"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# pythonArrays2 Objective Today, we're learning about the Array data structure. Check out the Tutorial tab for learning materials and an instructional video! Task Given an array, , of integers, print "
+      },
       {
         "source": "README",
         "text": "# pythonArrays2 Objective Today, we're learning about the Array data structure. Check out the Tutorial tab for learning materials and an instructional video! Task Given an array, , of integers, print "
@@ -20814,6 +23281,26 @@
       {
         "source": "README",
         "text": "Create a feature branch 3. Add tests for new functionality 4. Ensure code quality checks pass 5. Submit a pull request ## 📄 License MIT License - see LICENSE file for details. ## 🙋 Support For issues "
+      },
+      {
+        "source": "README",
+        "text": "# RAG Document Chat System v2 A modular, production-ready Retrieval-Augmented Generation (RAG) system for intelligent document chat with hierarchical processing and paragraph-aware search. ## 🚀 Featur"
+      },
+      {
+        "source": "README",
+        "text": "install -y python3 python3-pip python3-venv docker.io docker-compose ``` 3. **Set up Python environment** ```bash python3 -m venv rag_env source rag_env/bin/activate pip install -r requirements.txt ``"
+      },
+      {
+        "source": "README",
+        "text": "procedures\" # Ask questions ./rag ask \"How many vacation days do employees get?\" ./rag ask \"Can employees work remotely?\" # System management ./rag list # List all documents ./rag status # Check syste"
+      },
+      {
+        "source": "README",
+        "text": "Summaries) - **When**: Logical summaries are available (no paragraphs) - **How**: Combines 10:1 compressed summaries with detailed chunks - **Best for**: Conceptual questions and logical reasoning ###"
+      },
+      {
+        "source": "README",
+        "text": "Create a feature branch 3. Add tests for new functionality 4. Ensure code quality checks pass 5. Submit a pull request ## 📄 License MIT License - see LICENSE file for details. ## 🙋 Support For issues "
       }
     ]
   },
@@ -20986,6 +23473,14 @@
       "zero"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# riot These are the following programs: A server: The server.py is a basic server which keeps track of all of the Thumbs up from the TAXIs client applications. It stores these in a lightweight databa"
+      },
+      {
+        "source": "README",
+        "text": "the application automatically. It cleans up the db and resets it to zero. It also kills the server and launches the test application and reads the datafile in. ------------------------------- test_tax"
+      },
       {
         "source": "README",
         "text": "# riot These are the following programs: A server: The server.py is a basic server which keeps track of all of the Thumbs up from the TAXIs client applications. It stores these in a lightweight databa"
@@ -21539,6 +24034,22 @@
       {
         "source": "README",
         "text": "each provider - **Save .env** — one-click config persistence with safe merge (preserves existing keys) - **Search playground** — test queries, see results with scores - **Provider health** — live stat"
+      },
+      {
+        "source": "README",
+        "text": "# search-tool-provider Unified async web search across 6+ backends. One interface, swap providers freely. ```python from search_tool_provider import get_provider provider = get_provider(\"duckduckgo\") "
+      },
+      {
+        "source": "README",
+        "text": "Tries: serper → tavily → brave → bing → duckduckgo ``` Or build from environment variables: ```python from search_tool_provider.providers.fallback import FallbackProvider provider = FallbackProvider.f"
+      },
+      {
+        "source": "README",
+        "text": "Setup | Provider | Free Tier | API Key Env Var | Get Key | |----------|-----------|-----------------|---------| | DuckDuckGo | Unlimited (rate limited) | None needed | — | | Tavily | 1,000/month | `TA"
+      },
+      {
+        "source": "README",
+        "text": "each provider - **Save .env** — one-click config persistence with safe merge (preserves existing keys) - **Search playground** — test queries, see results with scores - **Provider health** — live stat"
       }
     ]
   },
@@ -22012,6 +24523,22 @@
       {
         "source": "README",
         "text": "## Project Structure ``` src/sip_voice_transport/ ├── __init__.py # Public API exports ├── base_transport.py # BaseTransport ABC + canonical constants ├── base_sip_provider.py # BaseSipProvider ABC ├─"
+      },
+      {
+        "source": "README",
+        "text": "# sip-voice-transport PSTN phone call transport for Mac-local voice AI. Connect real phone calls to your local AI pipeline over Telnyx or Twilio. ``` Phone Call → Telnyx/Twilio → WebSocket → sip-voice"
+      },
+      {
+        "source": "README",
+        "text": "helpful voice assistant.\" tts_voice: \"en-us-ryan-medium\" ``` ### 3. Start the server ```bash sip-voice-server --port 8765 ``` ### 4. Test with the simulator ```bash python test_call.py --port 8765 ```"
+      },
+      {
+        "source": "README",
+        "text": "message and exit ``` ## API Reference ### Core Classes **`SipTransport`** — the main interface your code uses: ```python transport = SipTransport(provider) async for chunk in transport.receive_audio()"
+      },
+      {
+        "source": "README",
+        "text": "## Project Structure ``` src/sip_voice_transport/ ├── __init__.py # Public API exports ├── base_transport.py # BaseTransport ABC + canonical constants ├── base_sip_provider.py # BaseSipProvider ABC ├─"
       }
     ]
   },
@@ -22202,6 +24729,7 @@
       "run",
       "running",
       "runs",
+      "s3",
       "s3://bucket/audio.mp3",
       "s3_input_path",
       "schedule",
@@ -22255,6 +24783,14 @@
       "└────┬─────┘"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Smart Transcription Router A hybrid transcription service that intelligently routes audio transcription requests either directly to a GPU-powered FastAPI server (when available) or to an SQS queue f"
+      },
+      {
+        "source": "README",
+        "text": "is offline - Enables batch processing during scheduled windows - Provides reliable message delivery ### 4. Batch Worker - Processes SQS queue messages - Can be triggered on schedule (e.g., midnight) -"
+      },
       {
         "source": "README",
         "text": "# Smart Transcription Router A hybrid transcription service that intelligently routes audio transcription requests either directly to a GPU-powered FastAPI server (when available) or to an SQS queue f"
@@ -22347,6 +24883,10 @@
       "your"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# React/JavaScript: Basic User Authentication Code Sample This JavaScript code sample demonstrates **how to implement user authentication** in React applications using Auth0. This React code sample bu"
+      },
       {
         "source": "README",
         "text": "# React/JavaScript: Basic User Authentication Code Sample This JavaScript code sample demonstrates **how to implement user authentication** in React applications using Auth0. This React code sample bu"
@@ -22657,6 +25197,444 @@
       {
         "source": "README",
         "text": "WebGPU support (Chrome 113+, Edge 113+). Larger models need more VRAM. ## Supported Models | Model | Size | VRAM | Tags | |-------|------|------|------| | SmolLM2 135M | ~80MB | 0.3 GB | fast, mobile "
+      },
+      {
+        "source": "README",
+        "text": "# Iris Kade Noir-cyberpunk conversational AI — runs entirely in your browser. Zero network calls. ![Live Demo](docs/screenshots/live-demo.png) ## What is this? Iris Kade is a fully local conversationa"
+      },
+      {
+        "source": "README",
+        "text": "WebGPU support (Chrome 113+, Edge 113+). Larger models need more VRAM. ## Supported Models | Model | Size | VRAM | Tags | |-------|------|------|------| | SmolLM2 135M | ~80MB | 0.3 GB | fast, mobile "
+      }
+    ]
+  },
+  {
+    "repo": "speaker-generation-version-2-intents",
+    "keywords": [
+      "",
+      "###",
+      "**4-state",
+      "**72",
+      "**adaptive",
+      "**add",
+      "**build:**",
+      "**built-in",
+      "**color-coded",
+      "**declarative",
+      "**embeddings:**",
+      "**interactive",
+      "**linked",
+      "**llm:**",
+      "**local",
+      "**multi-lane",
+      "**named",
+      "**pack-only",
+      "**requirements:**",
+      "**speech-to-text**",
+      "**state",
+      "**streaming",
+      "**stt:**",
+      "**template",
+      "**tests:**",
+      "**tts:**",
+      "**workflow",
+      "0.3",
+      "0.5",
+      "0.6",
+      "0.6b",
+      "0.8",
+      "1.0",
+      "1.2",
+      "1.4",
+      "1.5b",
+      "1.7b",
+      "100%",
+      "113+",
+      "135m",
+      "17+",
+      "2.0",
+      "2.5",
+      "2.8",
+      "3.1",
+      "3.2",
+      "3.5",
+      "360m",
+      "384-dim",
+      "4-state",
+      "4.5",
+      "5.0",
+      "5gb",
+      "80mb",
+      "@diffusionstudio/vits-web](https://github.com/niclas-niclasen/vits-web",
+      "@huggingface/transformers](https://huggingface.co/docs/transformers.js",
+      "@mlc-ai/web-llm](https://github.com/mlc-ai/web-llm",
+      "abort",
+      "accumulate",
+      "add",
+      "add-state",
+      "adjust",
+      "all",
+      "analysis",
+      "any",
+      "api",
+      "architecture",
+      "arrow",
+      "arrow](docs/screenshots/workflow/code-view-highlight-arrow.png",
+      "arrows",
+      "automatic",
+      "backlog](docs/project-memory/backlog/readme.md",
+      "balanced",
+      "bash",
+      "between",
+      "bias**",
+      "bidirectional",
+      "block",
+      "browser",
+      "buffer",
+      "bullets",
+      "calls",
+      "cap",
+      "capture",
+      "chrome",
+      "classifier",
+      "clean",
+      "cleanly",
+      "click",
+      "clickable",
+      "client",
+      "client](docs/project-memory/backlog/f-001-phone-remote-client.md",
+      "clone",
+      "cloud",
+      "code",
+      "coder",
+      "communication",
+      "complete",
+      "complete](docs/screenshots/diagnostic-complete.png",
+      "compose",
+      "composes",
+      "concurrent",
+      "config**",
+      "configure",
+      "connect",
+      "connects",
+      "context",
+      "conversation",
+      "conversational",
+      "conversations",
+      "coverage",
+      "custom",
+      "data",
+      "data-driven",
+      "declarative",
+      "deep",
+      "deepseek",
+      "default",
+      "defense",
+      "define",
+      "demo](docs/screenshots/live-demo.png",
+      "depth",
+      "design.md](src/speaker-workflow-system-transcribe-mode/design.md",
+      "detail",
+      "detailed",
+      "dev",
+      "diagnostic",
+      "downloading",
+      "dropdown",
+      "dual-llm",
+      "e2e",
+      "edge",
+      "editor",
+      "editors",
+      "element",
+      "embedder-based",
+      "encryption",
+      "engine",
+      "entirely",
+      "every",
+      "everything",
+      "exactly",
+      "exit",
+      "f-001",
+      "f-002",
+      "fast",
+      "fast-think",
+      "features",
+      "feeds",
+      "flows",
+      "format",
+      "framework",
+      "freeform",
+      "fsm",
+      "fsm**",
+      "full",
+      "fully",
+      "gemma",
+      "generation",
+      "git",
+      "graph",
+      "graph**",
+      "graphs",
+      "handlers",
+      "handlers**",
+      "handling",
+      "hands-free",
+      "harness**",
+      "highlight",
+      "highlighted",
+      "highlighting",
+      "history",
+      "history](docs/screenshots/history-view.png",
+      "how",
+      "http://localhost:5173](http://localhost:5173",
+      "http://localhost:5174](http://localhost:5174",
+      "https://github.com/<your-username>/speaker-generation-version-1.git",
+      "idle",
+      "including",
+      "inference",
+      "inference**",
+      "info",
+      "initial",
+      "initial](docs/screenshots/diagnostic-initial.png",
+      "input",
+      "install",
+      "instant",
+      "intent",
+      "interact",
+      "interact](docs/screenshots/workflow/interact-mode.png",
+      "interactive",
+      "interrupted",
+      "interrupting",
+      "iris",
+      "jsonl",
+      "kade",
+      "keys",
+      "knowledge",
+      "lanes",
+      "larger",
+      "leaves",
+      "left",
+      "lexical",
+      "license",
+      "lifecycle",
+      "linked",
+      "live",
+      "llama",
+      "llm",
+      "loading",
+      "loads",
+      "local",
+      "lore",
+      "machine",
+      "map**",
+      "matching",
+      "messages",
+      "mini",
+      "mini-graph",
+      "mit",
+      "mobile",
+      "mode",
+      "mode**",
+      "model",
+      "modeling",
+      "models",
+      "more",
+      "multi-lane",
+      "multi-turn",
+      "need",
+      "network",
+      "new",
+      "node",
+      "nodes",
+      "noir-cyberpunk",
+      "npm",
+      "one-click",
+      "onnx/wasm",
+      "open",
+      "opsec",
+      "opsec](docs/screenshots/opsec-response.png",
+      "owns",
+      "pack",
+      "passing",
+      "per-turn",
+      "persona",
+      "phi",
+      "phone",
+      "phrases",
+      "pipeline",
+      "pipeline**",
+      "playback",
+      "playbook",
+      "playwright](https://playwright.dev/",
+      "preview",
+      "privacy",
+      "processing",
+      "pseudocode",
+      "pseudocode**",
+      "quick",
+      "qwen2.5",
+      "qwen3",
+      "rag",
+      "re-wiring",
+      "real-time",
+      "reasoning",
+      "remote",
+      "rename",
+      "renaming**",
+      "renders",
+      "rerank",
+      "reranking",
+      "resets",
+      "response",
+      "responses",
+      "retrieval",
+      "retrieve",
+      "right",
+      "roadmap",
+      "run",
+      "running",
+      "runs",
+      "screenshots",
+      "security",
+      "see",
+      "select",
+      "sentence",
+      "sentences",
+      "services",
+      "showing",
+      "shows",
+      "size",
+      "slow-think](docs/project-memory/backlog/f-002-fast-slow-think.md",
+      "smart",
+      "smollm2",
+      "speaker",
+      "speaker-generation-version-1/web-app",
+      "speaking",
+      "specialist",
+      "specification",
+      "speech",
+      "spoken",
+      "src/speaker-workflow-system-transcribe-mode",
+      "stack",
+      "start",
+      "state",
+      "state's",
+      "state](docs/screenshots/workflow/add-state-editor.png",
+      "state](docs/screenshots/workflow/code-view-highlight-state.png",
+      "stateful",
+      "stategate",
+      "states",
+      "streams",
+      "stt",
+      "style",
+      "support",
+      "supported",
+      "system",
+      "tags",
+      "talk",
+      "talking",
+      "teaches",
+      "tech",
+      "template",
+      "test",
+      "testing",
+      "tests**",
+      "text-to-speech**",
+      "them",
+      "thin",
+      "threat",
+      "through",
+      "token",
+      "token](docs/screenshots/token-cap-512.png",
+      "tokens",
+      "tracked",
+      "transcribe",
+      "transition",
+      "transitions",
+      "triggers",
+      "tts",
+      "tts+audio",
+      "turn",
+      "turn](docs/screenshots/turn-detail.png",
+      "turncount",
+      "typed",
+      "typescript",
+      "update",
+      "use",
+      "user",
+      "using",
+      "v2",
+      "vanilla",
+      "variables",
+      "variables**",
+      "vector",
+      "verbosity",
+      "via",
+      "view",
+      "view**",
+      "view](docs/screenshots/workflow/code-view-default.png",
+      "visual",
+      "vite](https://vitejs.dev/",
+      "vits-web",
+      "vits-web](https://github.com/niclas-niclasen/vits-web",
+      "vram",
+      "warmth",
+      "web",
+      "web-llm",
+      "web-llm](https://github.com/mlc-ai/web-llm",
+      "webgpu",
+      "webgpu/wasm",
+      "websocket",
+      "what",
+      "where",
+      "which",
+      "who",
+      "without",
+      "wordcount",
+      "workflow",
+      "xenova/all-minilm-l6-v2",
+      "your",
+      "zero",
+      "|-------|------|------|------|",
+      "|:---:|:---:|",
+      "|:---:|:---:|:---:|",
+      "~1.2gb",
+      "~1.8gb",
+      "~1gb",
+      "~2.2gb",
+      "~2.5gb",
+      "~200mb",
+      "~4.5gb",
+      "~400mb",
+      "~5gb",
+      "~600mb",
+      "~80mb",
+      "~900mb",
+      "│───▶│",
+      "│◀────────────┘",
+      "┌──────────────┐",
+      "┌──────────┐",
+      "┌─────────┐",
+      "┌───▼────────┐",
+      "└──────────────┘",
+      "└──────────┘",
+      "└─────────┘",
+      "└────────◀│",
+      "└────┬─────┘",
+      "└────┬────┘",
+      "└───┬────────┘"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# Iris Kade Noir-cyberpunk conversational AI — runs entirely in your browser. Zero network calls. ![Live Demo](docs/screenshots/live-demo.png) ## What is this? Iris Kade is a fully local conversationa"
+      },
+      {
+        "source": "README",
+        "text": "WebGPU support (Chrome 113+, Edge 113+). Larger models need more VRAM. ## Supported Models | Model | Size | VRAM | Tags | |-------|------|------|------| | SmolLM2 135M | ~80MB | 0.3 GB | fast, mobile "
+      },
+      {
+        "source": "README",
+        "text": "on the graph to highlight the matching code block. Click the highlighted code to open the editor for that state. | Code View (default) | Highlight State | Highlight Arrow | |:---:|:---:|:---:| | ![Cod"
       }
     ]
   },
@@ -22900,6 +25878,7 @@
       "start",
       "started",
       "state",
+      "state-machine",
       "state](docs/screenshots/add-state-editor.png",
       "state](docs/screenshots/code-view-highlight-state.png",
       "statehighlight.ts",
@@ -22977,6 +25956,14 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Speaker Workflow System A visual editor and runtime engine for declarative, multi-turn conversational workflows. Define flows in JSONL — the editor renders them as interactive graphs with linked pse"
+      },
+      {
+        "source": "README",
+        "text": "(one JSON object per line) ├── tests/ │ ├── workflow.test.ts # Engine tests (72 passing) │ ├── transcribe.test.ts # Transcribe workflow integration tests │ └── editor.test.ts # Editor parse/serialize "
+      },
       {
         "source": "README",
         "text": "# Speaker Workflow System A visual editor and runtime engine for declarative, multi-turn conversational workflows. Define flows in JSONL — the editor renders them as interactive graphs with linked pse"
@@ -23516,6 +26503,26 @@
       {
         "source": "README",
         "text": "(port 4180) - [x] HTTPS certificate valid (self-signed for development) - [x] Port 8080 accessible from localhost only - [x] Logs verified: Service running successfully **Deployment Date:** 2026-01-12"
+      },
+      {
+        "source": "README",
+        "text": "# SSH Helper - Web-Based Terminal A lightweight web-based SSH terminal with IP whitelisting support. Provides secure browser-based access to a shell terminal. ## Features - 🖥️ **Full Terminal Emulatio"
+      },
+      {
+        "source": "README",
+        "text": "sudo systemctl status ssh-helper sudo journalctl -u ssh-helper -f ``` The SSH helper will be accessible at `https://YOUR_IP/ssh/`. ## Configuration Edit `config.json` to customize behavior: ```json { "
+      },
+      {
+        "source": "README",
+        "text": "$host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; # Pass authenticated user info to backend proxy"
+      },
+      {
+        "source": "README",
+        "text": "``` ssh-helper/ ├── server.js # Main application server ├── package.json # Dependencies and scripts ├── config.json # Configuration file ├── .gitignore # Git ignore rules ├── README.md # This file └──"
+      },
+      {
+        "source": "README",
+        "text": "(port 4180) - [x] HTTPS certificate valid (self-signed for development) - [x] Port 8080 accessible from localhost only - [x] Logs verified: Service running successfully **Deployment Date:** 2026-01-12"
       }
     ]
   },
@@ -23599,6 +26606,10 @@
       "where"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# stringsAndLoops Objective Today we're expanding our knowledge of Strings and combining it with what we've already learned about loops. Check out the Tutorial tab for learning materials and an instru"
+      },
       {
         "source": "README",
         "text": "# stringsAndLoops Objective Today we're expanding our knowledge of Strings and combining it with what we've already learned about loops. Check out the Tutorial tab for learning materials and an instru"
@@ -23706,6 +26717,10 @@
       "your"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Create a virtual env Use a virtual environment if you don't want to mess up your existing env. ```console python3 -m venv myenv source myenv/bin/activate ``` # Then install the Stripe CLI. Informati"
+      },
       {
         "source": "README",
         "text": "# Create a virtual env Use a virtual environment if you don't want to mess up your existing env. ```console python3 -m venv myenv source myenv/bin/activate ``` # Then install the Stripe CLI. Informati"
@@ -23927,6 +26942,7 @@
       "rules",
       "run",
       "running",
+      "s3",
       "sample_docker_container_setup.sh",
       "scp",
       "script",
@@ -23972,6 +26988,7 @@
       "testing**",
       "them",
       "tools",
+      "transcription",
       "transcription-service/",
       "ubuntu",
       "ubuntu@<your-ec2-ip>:/home/ubuntu/",
@@ -24001,6 +27018,18 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "Here’s a comprehensive documentation of everything we’ve done, including setup steps, commands, and explanations for running the SuperTokens-based authentication system: --- # **SuperTokens Authentica"
+      },
+      {
+        "source": "README",
+        "text": "└── handlers.go │ ├── storage/ # S3 operations this is not here yet but eventually we would build more out. │ │ └── storage.go ├── config/ │ └── config.go # Configuration management ├── scripts/ │ └──"
+      },
+      {
+        "source": "README",
+        "text": "Testing** - **Send login request**: ```bash curl -X POST http://<your-ec2-public-ip>:8080/auth/login \\ -H \"Content-Type: application/json\" \\ -d '{\"email\": \"test@example.com\"}' ``` --- ## **Next Steps*"
+      },
       {
         "source": "README",
         "text": "Here’s a comprehensive documentation of everything we’ve done, including setup steps, commands, and explanations for running the SuperTokens-based authentication system: --- # **SuperTokens Authentica"
@@ -24288,6 +27317,298 @@
       {
         "source": "README",
         "text": "Common Issues 1. **Docker Issues** ```bash # Restart containers docker-compose down docker-compose up -d # Check logs docker logs supertokens-core docker logs supertokens-db ``` 2. **Magic Link Not Wo"
+      },
+      {
+        "source": "README",
+        "text": "# SuperTokens Passwordless Authentication Demo This project demonstrates passwordless authentication using SuperTokens with magic links. It includes a Node.js backend, SuperTokens Core running in Dock"
+      },
+      {
+        "source": "README",
+        "text": "Login:** ``` Clear browser cookies → Enter email → Use magic link → Should succeed ``` 2. **Expired Link:** ``` Wait 15+ minutes → Use magic link → Should fail with expiration error ``` 3. **Reused Li"
+      },
+      {
+        "source": "README",
+        "text": "Common Issues 1. **Docker Issues** ```bash # Restart containers docker-compose down docker-compose up -d # Check logs docker logs supertokens-core docker logs supertokens-db ``` 2. **Magic Link Not Wo"
+      }
+    ]
+  },
+  {
+    "repo": "tool-RAG-for-split-personalities",
+    "keywords": [
+      "",
+      "###",
+      "####",
+      "**4",
+      "**6",
+      "**api",
+      "**asr",
+      "**chat",
+      "**cli",
+      "**conversation",
+      "**key",
+      "**persona",
+      "**persona-weighted",
+      "**roundtable",
+      "**tts",
+      "**two-pass",
+      "**voice",
+      "**web",
+      "--dry-run",
+      "-v",
+      "/chat",
+      "/health",
+      "/personas",
+      "/roundtable",
+      "/sessions",
+      "2-pass",
+      "3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/",
+      "active",
+      "all",
+      "anthropic",
+      "anthropic_api_key=\"sk-ant-",
+      "api",
+      "architecture",
+      "asr",
+      "asr/tts",
+      "assassination",
+      "automatic",
+      "available",
+      "based",
+      "bash",
+      "branch",
+      "built",
+      "changes",
+      "chat",
+      "chat**",
+      "chat:**",
+      "check",
+      "checkout",
+      "choose",
+      "chroma",
+      "chromadb",
+      "classes",
+      "claude",
+      "cli",
+      "clone",
+      "commit",
+      "configure",
+      "consult",
+      "context",
+      "contributing",
+      "conversation",
+      "conversationsession",
+      "core",
+      "corpus",
+      "create",
+      "cross-contamination",
+      "curated",
+      "debate",
+      "debateentry",
+      "defines",
+      "demo",
+      "dependencies",
+      "description",
+      "design:**",
+      "details",
+      "dev",
+      "differently",
+      "directs",
+      "distinct",
+      "each",
+      "endpoints",
+      "engine",
+      "evaluation",
+      "evidence",
+      "evidenceitem",
+      "expert",
+      "export",
+      "fastapi",
+      "feature",
+      "feature/amazing-feature",
+      "features",
+      "file",
+      "first",
+      "flash-takes",
+      "fork",
+      "four",
+      "frame",
+      "full",
+      "generation",
+      "generation**",
+      "generationresult",
+      "get",
+      "git",
+      "health",
+      "history",
+      "hosts",
+      "http://localhost:8000",
+      "https://github.com/davidbmar/tool-rag-for-split-personalities.git",
+      "identity",
+      "import",
+      "ingest",
+      "input",
+      "install",
+      "integration**",
+      "interaction",
+      "interactive",
+      "interface",
+      "interface**",
+      "into",
+      "isolation",
+      "jfk",
+      "key",
+      "license",
+      "license](license",
+      "licensed",
+      "list",
+      "load",
+      "locally",
+      "loop",
+      "maintains",
+      "manages",
+      "memory",
+      "message",
+      "method",
+      "mit",
+      "mit](https://img.shields.io/badge/license-mit-yellow.svg)](license",
+      "mode**",
+      "models",
+      "moderation",
+      "moderator",
+      "most",
+      "multi-turn",
+      "no",
+      "open",
+      "originally",
+      "output",
+      "over",
+      "path",
+      "per-persona",
+      "persona",
+      "persona's",
+      "persona-driven",
+      "persona-rag",
+      "persona-rag[voice",
+      "persona-specific",
+      "persona-weighted",
+      "persona_rag.conversation",
+      "persona_rag.generator",
+      "persona_rag.models",
+      "persona_rag.personas",
+      "persona_rag.stores",
+      "personacard",
+      "personas",
+      "perspective",
+      "pip",
+      "pipeline",
+      "post",
+      "profiles**",
+      "project",
+      "provides",
+      "pull",
+      "push",
+      "pydantic",
+      "pytest",
+      "python",
+      "questions",
+      "quick",
+      "rag",
+      "ranker",
+      "ranks",
+      "reasoning",
+      "recognition",
+      "reference",
+      "relevant",
+      "repository",
+      "request",
+      "response",
+      "rest",
+      "result",
+      "retrieval**",
+      "retrieval-augmented",
+      "root",
+      "roundtable",
+      "router",
+      "routing**",
+      "run",
+      "scenarios",
+      "scripts/chat.py",
+      "scripts/demo.py",
+      "scripts/ingest_evidence.py",
+      "scripts/ingest_persona_memory.py",
+      "scripts/run_evaluation.sh",
+      "scripts/run_isolation_check.py",
+      "scripts/serve.py",
+      "scripts/stress_test.py",
+      "see",
+      "selector**",
+      "send",
+      "serve",
+      "server",
+      "server:**",
+      "session",
+      "sessions",
+      "sessionstate",
+      "set",
+      "shared",
+      "simulation",
+      "source",
+      "specific",
+      "speech",
+      "speech-to-text",
+      "start",
+      "starts",
+      "state",
+      "storemanager",
+      "storemanager(persist_dir=\"./chroma_data",
+      "stores",
+      "stores**",
+      "stress",
+      "style",
+      "styled",
+      "suite",
+      "summarization",
+      "supports",
+      "switching",
+      "synthesis**",
+      "test",
+      "tests",
+      "tests/",
+      "tests](https://img.shields.io/badge/tests-425%20passing-brightgreen.svg",
+      "text-to-speech",
+      "their",
+      "then",
+      "tool-rag-for-split-personalities",
+      "topic",
+      "tts",
+      "two-pass",
+      "ui:**",
+      "under",
+      "usage",
+      "via",
+      "view**",
+      "voice",
+      "watch",
+      "web",
+      "web/index.html",
+      "which",
+      "your",
+      "|--------|------|-------------|",
+      "│generator",
+      "┌─────────────────────────────────────────────────────────┐",
+      "└──────────┴──────────┴───────────┴───────────────────────┘",
+      "├─────────────────────────────────────────────────────────┤",
+      "├──────────┬──────────┬───────────┬───────────────────────┤",
+      "├──────────┴──────────┴───────────┴───────────────────────┤"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# Persona RAG [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) ["
+      },
+      {
+        "source": "README",
+        "text": "GenerationResult ``` ### API Models (Pydantic) ```python from persona_rag.models import EvidenceItem, PersonaCard, DebateEntry, SessionState ``` ### REST API Endpoints | Method | Path | Description | "
       }
     ]
   },
@@ -24384,6 +27705,10 @@
       "uses"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Browser Automation Scripts (bas) Chrome profile launcher, cookie decryption, and CLI for browser automation on macOS. ## Requirements - macOS - Node.js >= 18 - Google Chrome installed ## Installatio"
+      },
       {
         "source": "README",
         "text": "# Browser Automation Scripts (bas) Chrome profile launcher, cookie decryption, and CLI for browser automation on macOS. ## Requirements - macOS - Node.js >= 18 - Google Chrome installed ## Installatio"
@@ -24988,6 +28313,199 @@
       {
         "source": "README",
         "text": "step 2 Your IAM user is missing permissions. Go to AWS Console → IAM → your user → check that the `StaticSiteDeployPolicy` is attached. Compare it with the `iam-policy.json` file in this repo. ### \"Di"
+      },
+      {
+        "source": "README",
+        "text": "# Static Site Deployer **Put any website on the internet for basically free.** This tool takes a running website (on your computer or anywhere), makes a static copy of it, and deploys it to Amazon's c"
+      },
+      {
+        "source": "README",
+        "text": "CDN) CloudFront is a **network of servers spread across the world** (called \"edge locations\"). When someone visits your site, they connect to the nearest server instead of going all the way to the S3 "
+      },
+      {
+        "source": "README",
+        "text": "regular files in a folder called `crawl-output/`. **You run this every time** you make changes to your site and want to deploy them. **Before running**: Make sure your site is running! If it's a local"
+      },
+      {
+        "source": "README",
+        "text": "a URL like: `https://d1234abcde.cloudfront.net` That's your site's public URL! (You can later add a custom domain.) --- ### Step 3: Deploy (Upload Files + Refresh Cache) ```bash ./step3-deploy-upload-"
+      },
+      {
+        "source": "README",
+        "text": "Generated: saved settings │ # (gitignored) └── README.md # You are here ``` --- ## How the Security Works ``` The Internet Your AWS Account ───────────── ──────────────── Visitor types URL │ ▼ ┌──────"
+      },
+      {
+        "source": "README",
+        "text": "step 2 Your IAM user is missing permissions. Go to AWS Console → IAM → your user → check that the `StaticSiteDeployPolicy` is attached. Compare it with the `iam-policy.json` file in this repo. ### \"Di"
+      }
+    ]
+  },
+  {
+    "repo": "tool-software-video-picture-annotator-review",
+    "keywords": [
+      "",
+      "###",
+      "**image",
+      "**screenshot",
+      "--help",
+      "--json",
+      "--output-dir",
+      "--port",
+      "--quiet",
+      "--save-image",
+      "--spec",
+      "/",
+      "/api/diff",
+      "/api/reports/<name>",
+      "/api/screenshot",
+      "/api/uploads/<name>",
+      "127.0.0.1",
+      "248",
+      "7070",
+      "9090",
+      "after",
+      "after.png",
+      "agents",
+      "also",
+      "analyze",
+      "annotate",
+      "annotation",
+      "annotations",
+      "annotations.json",
+      "annotator",
+      "annotator_host",
+      "annotator_port",
+      "api",
+      "bash",
+      "before",
+      "before.png",
+      "before/after/overlay",
+      "bind",
+      "body",
+      "browser",
+      "capture",
+      "capture**",
+      "change",
+      "claude",
+      "cli",
+      "click",
+      "commands",
+      "compare",
+      "complete",
+      "console",
+      "custom",
+      "default",
+      "description",
+      "dev",
+      "developers",
+      "development",
+      "diff",
+      "diff**",
+      "diff-report.html",
+      "docs/project_status_*.md",
+      "drag-and-drop",
+      "elements",
+      "endpoint",
+      "endpoints",
+      "enter",
+      "environment",
+      "exposes",
+      "extract",
+      "f-007",
+      "files",
+      "form",
+      "frames",
+      "frames/",
+      "full",
+      "generate",
+      "generated",
+      "get",
+      "history",
+      "host",
+      "html",
+      "http://localhost:7070",
+      "https://example.com",
+      "image",
+      "images",
+      "import",
+      "install",
+      "interface",
+      "interfaces",
+      "json",
+      "library",
+      "listen",
+      "load",
+      "machine-readable",
+      "mcp",
+      "method",
+      "multipart",
+      "output",
+      "page",
+      "percentage",
+      "picture",
+      "pip",
+      "pipeline",
+      "pixel",
+      "planned",
+      "playwright",
+      "playwright-style",
+      "port",
+      "post",
+      "provides",
+      "pytest",
+      "python",
+      "quick",
+      "recording.mp4",
+      "recordings",
+      "report",
+      "report.html",
+      "reports",
+      "requires",
+      "review",
+      "score",
+      "screen",
+      "screenshot",
+      "see",
+      "serve",
+      "server",
+      "shot.png",
+      "spec.json",
+      "specification",
+      "sprint",
+      "ssim",
+      "start",
+      "status",
+      "suppress",
+      "terminal",
+      "tests",
+      "tool",
+      "two",
+      "uploaded",
+      "url",
+      "usage",
+      "users",
+      "using",
+      "variable",
+      "variables",
+      "video",
+      "video-annotator",
+      "video_annotator",
+      "videoagent",
+      "views",
+      "visual",
+      "web",
+      "|-----------|-----|-------|",
+      "|----------|---------|-------------|",
+      "|--------|----------|-------------|"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# Video Picture Annotator Review Playwright-style video and image annotation review tool. Analyze screen recordings, annotate UI elements, and generate visual reports — from Python, CLI, browser, or C"
+      },
+      {
+        "source": "README",
+        "text": "Environment Variables | Variable | Default | Description | |----------|---------|-------------| | `ANNOTATOR_HOST` | `127.0.0.1` | Host to bind to | | `ANNOTATOR_PORT` | `7070` | Port to listen on | #"
       }
     ]
   },
@@ -25418,6 +28936,488 @@
       {
         "source": "README",
         "text": "| | `whatsup_status` | Check transport connection status | _(none)_ | ## Claude Skill The `/whatsup` skill lets you send messages from Claude Code: ``` /whatsup grassyknoll Deployed auth service to st"
+      },
+      {
+        "source": "README",
+        "text": "# whatsup Per-project group-chat messaging for [Afterburner](https://github.com/anthropics/afterburner) sprints — Telegram, WhatsApp (planned), and a console transport for local testing. <!-- badges p"
+      },
+      {
+        "source": "README",
+        "text": "core.py │ transport/ (pluggable) ┌──────┼──────────┐ telegram console whatsapp (planned) ``` Every interface calls `core.send()` or `core.notify()`. The core loads config, picks a transport, formats t"
+      },
+      {
+        "source": "README",
+        "text": "| Test status (`passed` / `failed`) | | `--summary` | string | Summary text | | `--agent` | string | Agent name | | `--exit-code` | int | Exit code | ### `whatsup projects` List all configured project"
+      },
+      {
+        "source": "README",
+        "text": "| | `whatsup_status` | Check transport connection status | _(none)_ | ## Claude Skill The `/whatsup` skill lets you send messages from Claude Code: ``` /whatsup grassyknoll Deployed auth service to st"
+      }
+    ]
+  },
+  {
+    "repo": "traceable-searchable-adr-memory-index",
+    "keywords": [
+      "",
+      "###",
+      "*(must",
+      "*(optional)*",
+      "**agents",
+      "**auto-fix",
+      "**backend:**",
+      "**configuration",
+      "**data:**",
+      "**framework**",
+      "**frontend:**",
+      "**full-text",
+      "**initialize**",
+      "**key",
+      "**launch**",
+      "**merge**",
+      "**product",
+      "**session",
+      "**sprint",
+      "**testing:**",
+      "**write",
+      "--project=integration",
+      "--project=unit",
+      "--project=user",
+      "/",
+      "/.sprint/scripts/check-upstream.sh",
+      "/.sprint/scripts/sprint-fix.sh",
+      "/.sprint/scripts/sprint-init.sh",
+      "/.sprint/scripts/sprint-merge.sh",
+      "/.sprint/scripts/sprint-run.sh",
+      "/.sprint/scripts/sprint-tmux.sh",
+      "/.sprint/scripts/sprint-validate.sh",
+      "/path/to/your/project",
+      "/toolkit/setup.sh",
+      "0001-use-jwt.md",
+      "8-stage",
+      "absolute",
+      "across",
+      "adr",
+      "adr/",
+      "adr/_template.md",
+      "adrs",
+      "after",
+      "against",
+      "agent",
+      "agent_brief.md",
+      "agents",
+      "all",
+      "any",
+      "api",
+      "app.js",
+      "apt",
+      "architecture",
+      "archived",
+      "archives",
+      "auto-archives",
+      "auto-fix",
+      "auto-resolved",
+      "automated",
+      "automatic",
+      "automation",
+      "autonomously",
+      "autonomously**",
+      "b-001-login-crash.md",
+      "backend",
+      "backlog",
+      "backlog/",
+      "backlog/readme.md",
+      "badges",
+      "bash",
+      "before",
+      "body",
+      "branches",
+      "breakdowns",
+      "brew",
+      "brief",
+      "brief**",
+      "briefs",
+      "browser",
+      "browser**",
+      "build",
+      "build-generated",
+      "build-sprint-data.sh",
+      "canonical",
+      "cargo",
+      "catch",
+      "change",
+      "check",
+      "check-upstream.sh",
+      "check-zero-commit-agents.sh",
+      "claude",
+      "claude-output.txt",
+      "claude.md",
+      "claude_run_prompt.txt",
+      "clear",
+      "cli",
+      "code",
+      "code-only",
+      "coding",
+      "command",
+      "commit",
+      "commits",
+      "committed",
+      "components",
+      "components/",
+      "config",
+      "config.sh",
+      "configuration",
+      "configure",
+      "conflicts",
+      "convention",
+      "copied",
+      "counts",
+      "create",
+      "creates",
+      "creating",
+      "cross-linked",
+      "css",
+      "css/style.css",
+      "current",
+      "custom",
+      "dashboard",
+      "dashboard/",
+      "dashboard/server.py",
+      "data",
+      "data/",
+      "dated",
+      "decision",
+      "default",
+      "default_test_cmd",
+      "default_test_cmd=\"npm",
+      "define",
+      "describing",
+      "development",
+      "directly",
+      "directory",
+      "disk",
+      "dist/",
+      "distributed",
+      "doc",
+      "docs",
+      "docs/",
+      "docs/lifecycle",
+      "docs/lifecycle/",
+      "docs/project-memory/",
+      "docs/project-memory/adr/",
+      "docs/project-memory/backlog/",
+      "docs/project-memory/sessions/",
+      "document",
+      "documentation",
+      "documents",
+      "don't",
+      "done",
+      "during",
+      "e2e",
+      "each",
+      "echo",
+      "edit",
+      "editor",
+      "endpoints",
+      "ephemeral",
+      "ephemeral_files",
+      "ephemeral_files=",
+      "errors",
+      "etc",
+      "every",
+      "everything",
+      "execution",
+      "existing",
+      "f-001-dark-mode.md",
+      "false",
+      "fast",
+      "features",
+      "files",
+      "filter",
+      "formatting",
+      "framework",
+      "framework's",
+      "full",
+      "generate_sprint_report",
+      "generation",
+      "get",
+      "gets",
+      "git",
+      "github",
+      "grep",
+      "guide",
+      "guide**",
+      "guide](docs/screenshots/config-guide.png",
+      "hash",
+      "here",
+      "hhmm",
+      "history",
+      "history/",
+      "how",
+      "html",
+      "http.server",
+      "http://127.0.0.1:1201",
+      "id",
+      "implement",
+      "in-app",
+      "index.html",
+      "initialization",
+      "install",
+      "installs",
+      "integration",
+      "into",
+      "its",
+      "javascript",
+      "jq",
+      "js",
+      "js/",
+      "json",
+      "keyboard",
+      "keyword",
+      "launch",
+      "launching",
+      "levels",
+      "libraries",
+      "license",
+      "lifecycle",
+      "lifecycle**",
+      "lifecycle/",
+      "lifecycle](docs/screenshots/lifecycle.png",
+      "like",
+      "line",
+      "localstorage",
+      "log",
+      "lost",
+      "main",
+      "markdown",
+      "memory",
+      "merge",
+      "merges",
+      "mit",
+      "monitoring",
+      "multi-agent",
+      "multiple",
+      "my-project/",
+      "name",
+      "names",
+      "needs",
+      "never",
+      "new",
+      "no",
+      "no-op",
+      "npx",
+      "one",
+      "open",
+      "opens",
+      "opt-in",
+      "optional",
+      "orchestration",
+      "order",
+      "output",
+      "overview](docs/screenshots/overview.png",
+      "own",
+      "owns",
+      "page",
+      "parallel",
+      "parallelize",
+      "past",
+      "path",
+      "per",
+      "per-agent",
+      "pipeline",
+      "pipeline**",
+      "plan",
+      "plan.md",
+      "playwright",
+      "post-merge",
+      "principle:**",
+      "priority",
+      "processor",
+      "product",
+      "project",
+      "project's",
+      "project-memory/",
+      "project-specific",
+      "project_slug",
+      "projects",
+      "properties",
+      "provides",
+      "purpose",
+      "pytest",
+      "python",
+      "python3",
+      "quick",
+      "rebuild",
+      "records",
+      "reference",
+      "repo",
+      "report",
+      "repos",
+      "requirements",
+      "roadmap",
+      "roadmap.md",
+      "root",
+      "route",
+      "router",
+      "run",
+      "s-2026-03-08-1930-consent-api",
+      "s-2026-03-09-1430-auth.md",
+      "s-yyyy-mm-dd-hhmm-<slug>",
+      "safe",
+      "same",
+      "scaffolding",
+      "scaffolds",
+      "screenshots",
+      "scripts",
+      "scripts/",
+      "search",
+      "search**",
+      "searchable",
+      "separation",
+      "served",
+      "server",
+      "server.py",
+      "session",
+      "sessions",
+      "sessions/",
+      "sessions/_template.md",
+      "sessions/adrs",
+      "sessions](docs/screenshots/sessions.png",
+      "set",
+      "set)*",
+      "setting",
+      "settings",
+      "setup.sh",
+      "shared",
+      "shell",
+      "shortcut",
+      "sibling",
+      "source",
+      "spec",
+      "specs",
+      "sprint",
+      "sprint-*.sh",
+      "sprint-01-brief.md",
+      "sprint-01-report.md",
+      "sprint-checkpoint.sh",
+      "sprint-config.sh",
+      "sprint-fix.sh",
+      "sprint-init.sh",
+      "sprint-launch.sh",
+      "sprint-merge.sh",
+      "sprint-parse.sh",
+      "sprint-run.sh",
+      "sprint-tmux.sh",
+      "sprint-validate.sh",
+      "sprint/",
+      "sprint/config.sh",
+      "sprint/history/",
+      "sprint/history/sprint-14-brief.md",
+      "sprint/scripts/",
+      "sprint_brief.md",
+      "sprint_brief_spec.md",
+      "sprint_brief_template.md",
+      "sprints",
+      "sprints](docs/screenshots/sprints.png",
+      "src/",
+      "stack",
+      "standard",
+      "start",
+      "starting",
+      "status",
+      "step",
+      "stored",
+      "structure",
+      "structured",
+      "stylesheet",
+      "subfolder",
+      "subject",
+      "sync",
+      "sync-dashboard.sh",
+      "synced",
+      "systems",
+      "tab",
+      "tabbed",
+      "tabs",
+      "tasks",
+      "tech",
+      "templates",
+      "templates/",
+      "test",
+      "testing",
+      "tests",
+      "their",
+      "then",
+      "third-party",
+      "three",
+      "tmux",
+      "token",
+      "tool",
+      "toolkit",
+      "toolkit/",
+      "toolkit/setup.sh",
+      "tools/",
+      "traceable",
+      "traceable-searchable-adr-memory-index/",
+      "tracking",
+      "tracking**",
+      "two",
+      "unit",
+      "unix",
+      "updates",
+      "use",
+      "utc",
+      "validate",
+      "validate**",
+      "vanilla",
+      "variable",
+      "vendor/",
+      "verification",
+      "versioning",
+      "via",
+      "views",
+      "views/",
+      "vim",
+      "vision",
+      "vision.md",
+      "visualize",
+      "web",
+      "when",
+      "where",
+      "work",
+      "workflow",
+      "working",
+      "works",
+      "worktree",
+      "worktrees",
+      "write",
+      "you",
+      "your",
+      "|-------------------|--------------|",
+      "|----------|---------|---------|",
+      "|---------|----------|",
+      "|---------|---------|---------|",
+      "──→",
+      "───",
+      "─────────────────────────────",
+      "└──",
+      "├──"
+    ],
+    "chunks": [
+      {
+        "source": "README",
+        "text": "# Sprint Dashboard & Traceable Project Memory A framework for traceable, searchable project memory with multi-agent sprint automation. Install it into any project to get structured session tracking, a"
+      },
+      {
+        "source": "README",
+        "text": "│ └── lifecycle/ ← vision, plan, roadmap │ │ └── views/ │ ├── VISION.md │ └── vendor/ │ ├── PLAN.md ├── scripts/ │ └── ROADMAP.md │ ├── build-sprint-data.sh └── CLAUDE.md │ └── sync-dashboard.sh ├── d"
+      },
+      {
+        "source": "README",
+        "text": "traceable Session ID: ``` S-YYYY-MM-DD-HHMM-<slug> (HHMM is UTC) ``` Commits reference their session in the body: ``` Subject line describing the change Session: S-2026-03-08-1930-consent-api ``` Sess"
+      },
+      {
+        "source": "README",
+        "text": "| Absolute path to your project on disk | *(must be set)* | | Document Output Path | Subfolder for lifecycle documents | `docs/lifecycle` | | GitHub Token | For creating sessions/ADRs via API | *(opti"
       }
     ]
   },
@@ -25657,6 +29657,7 @@
       "javascript",
       "journalctl",
       "key**",
+      "lambda",
       "launch",
       "learning:**",
       "license",
@@ -25739,6 +29740,7 @@
       "run",
       "running",
       "runtime",
+      "s3",
       "save",
       "saves",
       "scratch",
@@ -25866,6 +29868,22 @@
       {
         "source": "README",
         "text": "### GPU Won't Start ```bash # Check GPU status ./scripts/018-status-gpu-instance.sh # If stopped, start it ./scripts/210-startup-restore.sh ``` ### No Transcriptions ```bash # Check RIVA health ssh -i"
+      },
+      {
+        "source": "README",
+        "text": "# NVIDIA Riva Conformer-CTC Streaming ASR **Production-ready real-time speech transcription using NVIDIA Riva 2.19 with Conformer-CTC streaming model.** ## What This Delivers - ✅ **Real-time browser s"
+      },
+      {
+        "source": "README",
+        "text": "aws ec2 describe-instances \\ --region us-east-2 \\ --filters \"Name=instance-type,Values=g4dn.*\" \\ --output table # 2. Start the GPU and configure .env ./scripts/730-start-gpu-instance.sh --instance-id "
+      },
+      {
+        "source": "README",
+        "text": "│ ├── 020-create-gpu-instance.sh # AWS GPU deployment │ ├── 030-configure-security.sh # Security groups + SSH │ ├── 100-deploy-conformer-streaming.sh # Model deployment │ ├── 110-setup-websocket-bridg"
+      },
+      {
+        "source": "README",
+        "text": "### GPU Won't Start ```bash # Check GPU status ./scripts/018-status-gpu-instance.sh # If stopped, start it ./scripts/210-startup-restore.sh ``` ### No Transcriptions ```bash # Check RIVA health ssh -i"
       }
     ]
   },
@@ -25908,6 +29926,8 @@
       "change",
       "clean",
       "clone",
+      "cloudfront",
+      "cognito",
       "controller",
       "create",
       "created",
@@ -25996,6 +30016,7 @@
       "rule",
       "rules**",
       "run",
+      "s3",
       "safe",
       "schema",
       "schemas",
@@ -26056,6 +30077,10 @@
       "you"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# transcription-end-to-end-docs These are the docs to integrate three repos. create the root directory. 1. git clone https://github.com/davidbmar/smart-transcription-router.git 2. git clone https://gi"
+      },
       {
         "source": "README",
         "text": "# transcription-end-to-end-docs These are the docs to integrate three repos. create the root directory. 1. git clone https://github.com/davidbmar/smart-transcription-router.git 2. git clone https://gi"
@@ -26745,6 +30770,7 @@
       "run",
       "running",
       "runtime",
+      "s3",
       "samplerate",
       "samples",
       "saved",
@@ -26941,6 +30967,46 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Real-Time Speech Transcription System **Production-ready real-time speech recognition with dual architecture support: NVIDIA Riva and WhisperLive** [![Architecture](https://img.shields.io/badge/Arch"
+      },
+      {
+        "source": "README",
+        "text": ":8444 │ Build Box │ │ GPU EC2 │ │ │◀─── Transcriptions ──│ WebSocket │◀── Transcriptions ─│ RIVA 2.19 │ │ │ │ Bridge │ │ Conformer-CTC │ └─────────────────┘ └──────────────────┘ └─────────────────┘ ``"
+      },
+      {
+        "source": "README",
+        "text": "✅ System dependencies installed ✅ Python 3.10.12 (OK) ✅ Virtual environment created at /opt/riva/venv ✅ Python dependencies installed ✅ SSL certificates created ✅ Directory structure created ``` **Fil"
+      },
+      {
+        "source": "README",
+        "text": "🌐 031: Configure Build Box Security **Purpose**: Configure security groups for build box (client allowlist) **Run on**: Build box **What it does**: 1. Creates/updates security group for build box 2. M"
+      },
+      {
+        "source": "README",
+        "text": "- `~/transcription-realtime-whisper/.env-http` - `~/transcription-realtime-whisper/Caddyfile` - `~/transcription-realtime-whisper/docker-compose.yml` - `~/transcription-realtime-whisper/site/` (placeh"
+      },
+      {
+        "source": "README",
+        "text": "→ GPU communication working ✓ Browser client accessible at https://YOUR_EDGE_IP/ ``` **What's Tested**: - WebSocket connection establishment - WhisperLive protocol (config message) - Audio streaming ("
+      },
+      {
+        "source": "README",
+        "text": "Range** | -1.0 to +1.0 | | **Chunk Size** | 4096 samples | | **Chunk Bytes** | 16,384 bytes (4096 × 4) | ### Browser Implementation **✅ CORRECT Implementation**: ```javascript // Use AudioContext with"
+      },
+      {
+        "source": "README",
+        "text": "instance cd ~/transcription-realtime-whisper ./scripts/210-shutdown-gpu.sh ``` **Startup in the morning**: ```bash # Start GPU and restore services cd ~/transcription-realtime-whisper ./scripts/220-st"
+      },
+      {
+        "source": "README",
+        "text": "Documentation ### Quick Start Guides - **[README_300_SERIES.md](README_300_SERIES.md)** - WhisperLive quick start - **[DEPLOYMENT_GUIDE_300_SERIES.md](DEPLOYMENT_GUIDE_300_SERIES.md)** - Detailed Whis"
+      },
+      {
+        "source": "README",
+        "text": "https://github.com/davidbmar/transcription-realtime-whisper/issues ### External Resources - **NVIDIA Riva Docs**: https://docs.nvidia.com/deeplearning/riva/user-guide/ - **WhisperLive GitHub**: https:"
+      },
       {
         "source": "README",
         "text": "# Real-Time Speech Transcription System **Production-ready real-time speech recognition with dual architecture support: NVIDIA Riva and WhisperLive** [![Architecture](https://img.shields.io/badge/Arch"
@@ -27338,6 +31404,7 @@
       "rights",
       "run",
       "running",
+      "s3",
       "s3.js",
       "s3/lambda",
       "s3://{bucket}/",
@@ -27352,6 +31419,7 @@
       "script-template/",
       "scripts",
       "scripts/",
+      "search",
       "security",
       "see",
       "server-side",
@@ -27435,6 +31503,7 @@
       "wake",
       "web/",
       "websocket",
+      "whisper",
       "whisperlive",
       "whisperlive:9090",
       "whisperlive_ws_url",
@@ -27455,6 +31524,22 @@
       "🧑‍💻"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# CloudDrive - Real-Time Transcription Platform **Version:** 6.10.0 **Production-Ready Speech-to-Text Service with Real-Time Transcription** --- ## 🎯 Overview CloudDrive is a real-time audio transcrip"
+      },
+      {
+        "source": "README",
+        "text": "├── s3.js # File operations │ │ ├── audio.js # Audio chunk upload │ │ ├── transcription.js # Batch transcription │ │ └── google-docs.js # Google Docs integration │ └── web/ # ⚠️ AUTO-GENERATED (DO NOT"
+      },
+      {
+        "source": "README",
+        "text": "**Testing:** - **[AUTOMATED-TESTING.md](AUTOMATED-TESTING.md)** - Browser automation - **[BROWSER-DEBUG.md](BROWSER-DEBUG.md)** - Debugging guide **Setup:** - **[DNS-LETSENCRYPT-SETUP.md](DNS-LETSENCR"
+      },
+      {
+        "source": "README",
+        "text": "- Verify GPU is running: `./scripts/537-test-gpu-ssh.sh` - Check Caddy proxy: `docker ps` on Edge Box ### UI Changes Not Appearing - Edit `ui-source/*.template` (not cognito-stack/web/*) - Run `./scri"
+      },
       {
         "source": "README",
         "text": "# CloudDrive - Real-Time Transcription Platform **Version:** 6.10.0 **Production-Ready Speech-to-Text Service with Real-Time Transcription** --- ## 🎯 Overview CloudDrive is a real-time audio transcrip"
@@ -28049,6 +32134,26 @@
       {
         "source": "README",
         "text": "## 🔄 Migration Between Paths You can switch between deployment methods: ```bash # Switch from Traditional to Docker ./scripts/step-060-choose-deployment-path.sh # Choose Docker (B) ./scripts/step-200-"
+      },
+      {
+        "source": "README",
+        "text": "# 🎙️ Audio Transcription System Scalable, production-ready audio transcription using AWS SQS, EC2 instances, and WhisperX. Supports both GPU acceleration and CPU fallback with automatic format convers"
+      },
+      {
+        "source": "README",
+        "text": "```bash # Send a transcription job python3 scripts/send_to_queue.py \\ --s3_input_path \"s3://your-bucket/audio.mp3\" \\ --s3_output_path \"s3://your-bucket/transcript.json\" ``` ### Performance Benchmarkin"
+      },
+      {
+        "source": "README",
+        "text": "GPU vs CPU performance testing | | `test-gpu-autoshutdown.sh` | Test worker auto-shutdown functionality | | `launch-spot-worker-cpu.sh` | Launch CPU-only worker for benchmarking | | `step-999-terminat"
+      },
+      {
+        "source": "README",
+        "text": "WhisperX + Tesla T4 ``` *Results vary by audio complexity and content type.* ## 🚨 Cost Management ### Estimated Costs (us-east-2): - **g4dn.xlarge spot**: ~$0.15-0.30/hour - **g4dn.xlarge on-demand**:"
+      },
+      {
+        "source": "README",
+        "text": "## 🔄 Migration Between Paths You can switch between deployment methods: ```bash # Switch from Traditional to Docker ./scripts/step-060-choose-deployment-path.sh # Choose Docker (B) ./scripts/step-200-"
       }
     ]
   },
@@ -28115,6 +32220,7 @@
       "clear",
       "click",
       "clone",
+      "cloudfront",
       "cloudfront)”",
       "const",
       "container",
@@ -28353,6 +32459,14 @@
       "“play"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "![Screenshot of the working per-chunk recorder](images/ui-waveform-chunked-indexdb.png) ![Screenshot of the working per-chunk recorder](images/demo-screenshot.png) --- This is meant as a reference for"
+      },
+      {
+        "source": "README",
+        "text": "plays correctly. --- ## ⚙️ How It Works 1. **Acquire mic stream once** ```js const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); ```` 2. **Start a new recorder for each chunk** "
+      },
       {
         "source": "README",
         "text": "![Screenshot of the working per-chunk recorder](images/ui-waveform-chunked-indexdb.png) ![Screenshot of the working per-chunk recorder](images/demo-screenshot.png) --- This is meant as a reference for"
@@ -29356,6 +33470,42 @@
       {
         "source": "README",
         "text": "setup (venv, deps, hooks) │ ├── start.sh # Start everything (RAG + Backend + Editor) │ └── run.sh # Start backend only ├── services.conf # External service paths (RAG repo location) ├── docker-compose"
+      },
+      {
+        "source": "README",
+        "text": "# Voice Calendar Scheduler FSM A 24/7 voice-driven apartment viewing scheduling assistant. Callers dial a Twilio phone number or connect via browser WebRTC, describe what apartment they're looking for"
+      },
+      {
+        "source": "README",
+        "text": "# Clone with submodules git clone --recursive <repo-url> cd voice-calendar-scheduler-FSM # Run setup (creates venv, installs deps, runs tests) ./scripts/setup.sh # Configure — copy the example and add"
+      },
+      {
+        "source": "README",
+        "text": "container (apartment search won't work) ./scripts/start.sh --no-rag # Skip the editor dev server ./scripts/start.sh --no-editor # Just validate config without starting anything ./scripts/start.sh --ch"
+      },
+      {
+        "source": "README",
+        "text": "start the container: ```bash docker compose up -d rag # Wait ~30s for model load, then it's ready with all previously ingested data curl -sf http://localhost:8000/health # → {\"status\":\"healthy\",\"docum"
+      },
+      {
+        "source": "README",
+        "text": "share it: 1. Open [Google Calendar](https://calendar.google.com/) 2. Find the calendar you want to use in the left sidebar 3. Click the three dots → **Settings and sharing** 4. Under **Share with spec"
+      },
+      {
+        "source": "README",
+        "text": "|----------|-----|------| | iCloud | `https://caldav.icloud.com/` | Apple ID + [app-specific password](https://appleid.apple.com/) | | Nextcloud | `https://your-server/remote.php/dav/` | Account usern"
+      },
+      {
+        "source": "README",
+        "text": "(prevents Pydantic internal injection) - **PII redaction**: Phone numbers and caller details are masked in log output; full utterances logged only at DEBUG level ## Admin Panel The admin panel at `/ad"
+      },
+      {
+        "source": "README",
+        "text": "FSM, response quality | ### Browser WebRTC Test 1. Start the server: `./scripts/run.sh` 2. Open http://localhost:8090 in Chrome/Firefox 3. Click **Call**, grant microphone access 4. Check the event lo"
+      },
+      {
+        "source": "README",
+        "text": "setup (venv, deps, hooks) │ ├── start.sh # Start everything (RAG + Backend + Editor) │ └── run.sh # Start backend only ├── services.conf # External service paths (RAG repo location) ├── docker-compose"
       }
     ]
   },
@@ -29410,6 +33560,7 @@
       "engine_starter",
       "everything",
       "fastapi",
+      "frontend",
       "fsm",
       "full",
       "gathering",
@@ -29460,6 +33611,7 @@
       "reference",
       "response",
       "role",
+      "scheduler",
       "scheduling",
       "session",
       "session.listen(stt",
@@ -29525,6 +33677,10 @@
       "└──────┬────────┘"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# voice-frontend-modules — auth . transport . engine Shared infrastructure for voice AI applications. Three independent, composable packages. ## Packages | Package | Purpose | Status | |---------|----"
+      },
       {
         "source": "README",
         "text": "# voice-frontend-modules — auth . transport . engine Shared infrastructure for voice AI applications. Three independent, composable packages. ## Packages | Package | Purpose | Status | |---------|----"
@@ -30003,6 +34159,22 @@
       {
         "source": "README",
         "text": "playback, mic audio is monitored; if energy exceeds the barge-in threshold for enough consecutive frames, playback stops and the new speech is processed ## Available Voices The default voice catalog i"
+      },
+      {
+        "source": "README",
+        "text": "# Voice Base — Browser-to-Server Voice UI A minimal, self-contained voice conversation system that connects your browser microphone to Claude via WebRTC. Everything runs locally (STT + TTS) except the"
+      },
+      {
+        "source": "README",
+        "text": "all runtime settings | All changes take effect immediately — no server restart needed. ## Configuration ### Environment Variables | Variable | Required | Description | |----------|----------|---------"
+      },
+      {
+        "source": "README",
+        "text": "getUserMedia() FastAPI + uvicorn │ │ ├─ WebRTC offer ──── /ws ───────►│ │ ├─ aiortc PeerConnection │◄── WebRTC answer ─────────────┤ │ │ ├─ Audio frames (Opus) ────────►│─► VAD (energy-based) │ │ │ │ "
+      },
+      {
+        "source": "README",
+        "text": "playback, mic audio is monitored; if energy exceeds the barge-in threshold for enough consecutive frames, playback stops and the new speech is processed ## Available Voices The default voice catalog i"
       }
     ]
   },
@@ -30295,6 +34467,7 @@
       "storage",
       "store",
       "stores",
+      "streaming",
       "strong",
       "structure",
       "survives",
@@ -30349,6 +34522,18 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# RAG Service Self-contained document retrieval service. Upload files (PDF, Markdown, TXT, DOCX, HTML), get semantic vector search back. Runs as a single Docker container with no external dependencies"
+      },
+      {
+        "source": "README",
+        "text": "```bash # Manual run bash scripts/index-github-repos.sh # Cron is pre-configured to run at 2 AM daily # Check logs after a run: cat /tmp/rag-nightly-index.log ``` The cron wrapper (`scripts/nightly-in"
+      },
+      {
+        "source": "README",
+        "text": "Embedded (no server process), stores in a directory, zero ops | | Text splitting | Recursive character splitter | Preserves paragraph/sentence boundaries, tiktoken token counting | | PDF parsing | PyM"
+      },
       {
         "source": "README",
         "text": "# RAG Service Self-contained document retrieval service. Upload files (PDF, Markdown, TXT, DOCX, HTML), get semantic vector search back. Runs as a single Docker container with no external dependencies"
@@ -30653,6 +34838,14 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Voice Print Real-time speaker diarization and voice fingerprinting system. Identifies **who is speaking** in live audio streams and recorded files using state-of-the-art speaker embedding models. !["
+      },
+      {
+        "source": "README",
+        "text": "(default) | 256 | Fast | Best accuracy (0.45% EER on VoxCeleb1), ONNX | | **CAM++** | 512 | Fast | ONNX-based, no PyTorch needed at inference | | **Resemblyzer** | 256 | Fast | Lightweight (~17MB), go"
+      },
       {
         "source": "README",
         "text": "# Voice Print Real-time speaker diarization and voice fingerprinting system. Identifies **who is speaking** in live audio streams and recorded files using state-of-the-art speaker embedding models. !["
@@ -31324,6 +35517,30 @@
       {
         "source": "README",
         "text": "the gateway: ```bash # Copy upstream configuration sudo cp /home/ubuntu/src/website-cloner/nginx/upstream.conf \\ /etc/nginx/conf.d/system-upstreams/website-cloner.conf # Copy routes configuration sudo"
+      },
+      {
+        "source": "README",
+        "text": "# Website Cloner A complete website cloning tool with 6 phases: enumerate URLs, download assets, rewrite links, detect dynamic content, and deploy to S3. ## Features ✅ All Phases Complete - **Phase 2 "
+      },
+      {
+        "source": "README",
+        "text": "nginx integration: 1. **Ensure auth gateway is set up first** (required for nginx includes) 2. **Install dependencies** (if not already done): ```bash bash setup.sh ``` 3. **Run bootstrap service scri"
+      },
+      {
+        "source": "README",
+        "text": "Enable/disable S3 upload (default: false) - `s3.bucket`: S3 bucket name (e.g., \"my-landing-page-1768022354\") - `s3.region`: AWS region (e.g., \"us-east-1\") - `s3.prefix`: Optional S3 key prefix (folder"
+      },
+      {
+        "source": "README",
+        "text": "node clone-website.js --config=config.json --full --skip-s3 # Verbose logging node clone-website.js --config=config.json --enumerate -v ``` ## Two-Phase Approach ### Why Two Phases? 1. **Cost Estimati"
+      },
+      {
+        "source": "README",
+        "text": "output/manifest.json ``` ## Implementation Status ### ✅ Completed - [x] Project setup - [x] Configuration system - [x] Logger with colors and file output - [x] URL utilities (normalization, validation"
+      },
+      {
+        "source": "README",
+        "text": "the gateway: ```bash # Copy upstream configuration sudo cp /home/ubuntu/src/website-cloner/nginx/upstream.conf \\ /etc/nginx/conf.d/system-upstreams/website-cloner.conf # Copy routes configuration sudo"
       }
     ]
   },
@@ -31359,6 +35576,7 @@
       "check",
       "cloud",
       "code",
+      "cognito",
       "components",
       "configured",
       "container",
@@ -31433,6 +35651,7 @@
       "running",
       "runpod.io",
       "runpod.io:**",
+      "s3",
       "s3://your-bucket/path/to/audio.mp3",
       "same",
       "script",
@@ -31475,6 +35694,14 @@
       "yourusername/whisper-runpod:latest"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# Faster Whisper Transcription Service A containerized solution for running an automated speech-to-text transcription service using Faster Whisper. ## What This Project Does This project provides: - A"
+      },
+      {
+        "source": "README",
+        "text": "## Troubleshooting - If the service isn't responding, check container logs with `docker logs <container-id>` - Verify AWS credentials are properly configured if using S3 integration - Ensure the audio"
+      },
       {
         "source": "README",
         "text": "# Faster Whisper Transcription Service A containerized solution for running an automated speech-to-text transcription service using Faster Whisper. ## What This Project Does This project provides: - A"
@@ -31795,6 +36022,7 @@
       "when",
       "which",
       "while",
+      "whisper",
       "whisper_model",
       "whisperx-runpod",
       "whisperx](https://github.com/m-bain/whisperx",
@@ -31832,6 +36060,18 @@
       "├─────────────────────────────────────────────────────────────────────────────┤"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# WhisperX-RunPod Batch transcription with speaker diarization on GPU cloud (RunPod or AWS EC2). ## Features - **35x Realtime Speed** - 56-minute podcast transcribed in 95 seconds - **Word-Level Times"
+      },
+      {
+        "source": "README",
+        "text": "cd ~/event-b/whisperX-runpod # Run interactive setup ./scripts/010-setup--configure-environment.sh ``` ### 2. Build & Push ```bash ./scripts/100-build--docker-image.sh # Build Docker image ./scripts/1"
+      },
+      {
+        "source": "README",
+        "text": "| Test HTTP API (works for any host) | | `240-ec2--view-logs.sh` | View container logs on EC2 | | `250-ec2--stop-container.sh` | Stop container (keep instance) | ### RunPod (300) | Script | Descriptio"
+      },
       {
         "source": "README",
         "text": "# WhisperX-RunPod Batch transcription with speaker diarization on GPU cloud (RunPod or AWS EC2). ## Features - **35x Realtime Speed** - 56-minute podcast transcribed in 95 seconds - **Word-Level Times"
@@ -32066,6 +36306,14 @@
       {
         "source": "README",
         "text": "`small.en` model - it only uses ~2-4GB VRAM. Spot/Interruptible pricing can be ~50% cheaper. ## Configuration Options Environment variables (set in `.env` or at runtime): | Variable | Default | Descri"
+      },
+      {
+        "source": "README",
+        "text": "# WhisperLive on RunPod Real-time speech-to-text transcription using OpenAI's Whisper model, optimized for deployment on RunPod GPU Pods. ## Quick Start ### 1. Configure ```bash ./scripts/000-question"
+      },
+      {
+        "source": "README",
+        "text": "`small.en` model - it only uses ~2-4GB VRAM. Spot/Interruptible pricing can be ~50% cheaper. ## Configuration Options Environment variables (set in `.env` or at runtime): | Variable | Default | Descri"
       }
     ]
   },
@@ -32292,6 +36540,7 @@
       "later",
       "limit",
       "live",
+      "llm",
       "loaded",
       "localhost",
       "make",
@@ -32516,6 +36765,22 @@
       {
         "source": "README",
         "text": "build_whisper_tensorrt.sh /app/TensorRT-LLM-examples small.en int4 # int4 weight only quantization # Run server with small.en python3 run_server.py --port 9090 \\ --backend tensorrt \\ --trt_model_path "
+      },
+      {
+        "source": "README",
+        "text": "# WhisperLive <h2 align=\"center\"> <a href=\"https://www.youtube.com/watch?v=0PHWCApIcCI\"><img src=\"https://img.youtube.com/vi/0PHWCApIcCI/0.jpg\" style=\"background-color:rgba(0,0,0,0);\" height=300 alt=\""
+      },
+      {
+        "source": "README",
+        "text": "tested the models uploaded to [huggingface by OpenVINO](https://huggingface.co/OpenVINO?search_models=whisper). - > **Docker Recommended:** Running WhisperLive with OpenVINO inside Docker automaticall"
+      },
+      {
+        "source": "README",
+        "text": "`.wav` file path where the microphone input will be saved if `save_output_recording` is set to `True`. - `mute_audio_playback`: Whether to mute audio playback when transcribing an audio file. Defaults"
+      },
+      {
+        "source": "README",
+        "text": "build_whisper_tensorrt.sh /app/TensorRT-LLM-examples small.en int4 # int4 weight only quantization # Run server with small.en python3 run_server.py --port 9090 \\ --backend tensorrt \\ --trt_model_path "
       }
     ]
   },
@@ -32536,6 +36801,10 @@
       "youtube_commercial_detector"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# youtube_commercial_detector This downloads youtube then attempts to find the amount of times a commercial is played by txt transcription."
+      },
       {
         "source": "README",
         "text": "# youtube_commercial_detector This downloads youtube then attempts to find the amount of times a commercial is played by txt transcription."
@@ -32914,6 +37183,18 @@
       {
         "source": "README",
         "text": "\\ --batch_size 10 \\ --poll_interval 30 # Run using CPU instead of GPU python worker.py --queue_url YOUR_SQS_QUEUE_URL --cpu ``` ### Sending Videos to the Queue ```bash # Add a video to the processing "
+      },
+      {
+        "source": "README",
+        "text": "# YouTube Phrase Scanner A robust, serverless system for downloading YouTube videos, transcribing them, and scanning for specific phrases. ## Overview This tool processes YouTube videos from an SQS qu"
+      },
+      {
+        "source": "README",
+        "text": "└── failed/ │ └── {job_id}.json ├── transcripts/ │ └── {video_id}/ │ ├── full_transcript.json │ └── segments/ │ └── chunk_{XXXX}.json ├── results/ │ └── {video_id}/ │ └── {timestamp}-results.json ├── "
+      },
+      {
+        "source": "README",
+        "text": "\\ --batch_size 10 \\ --poll_interval 30 # Run using CPU instead of GPU python worker.py --queue_url YOUR_SQS_QUEUE_URL --cpu ``` ### Sending Videos to the Queue ```bash # Add a video to the processing "
       }
     ]
   },
@@ -32964,6 +37245,7 @@
       "integration",
       "job",
       "job_tracker.py",
+      "lambda",
       "lambda-based",
       "main",
       "management",
@@ -32989,6 +37271,7 @@
       "runpod",
       "runpod-lambda",
       "runpod/",
+      "s3",
       "scanner",
       "scanner.py",
       "scanning",
@@ -33037,6 +37320,10 @@
       "├──"
     ],
     "chunks": [
+      {
+        "source": "README",
+        "text": "# YouTube Phrase Scanner A robust, serverless system for downloading YouTube videos, transcribing them using WhisperX, and scanning for specific phrases. ## Overview This tool processes YouTube videos"
+      },
       {
         "source": "README",
         "text": "# YouTube Phrase Scanner A robust, serverless system for downloading YouTube videos, transcribing them using WhisperX, and scanning for specific phrases. ## Overview This tool processes YouTube videos"

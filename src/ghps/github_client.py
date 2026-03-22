@@ -25,7 +25,10 @@ def _session() -> requests.Session:
 
 
 def fetch_repos(username: str) -> list[dict[str, Any]]:
-    """Fetch all public repos for *username*, handling pagination.
+    """Fetch all repos for *username*, handling pagination.
+
+    Uses /user/repos (authenticated, includes private) when a token is set,
+    falls back to /users/{username}/repos (public only) otherwise.
 
     Returns a list of dicts with keys:
         name, description, language, topics, stars, updated_at, html_url
@@ -33,12 +36,19 @@ def fetch_repos(username: str) -> list[dict[str, Any]]:
     session = _session()
     repos: list[dict[str, Any]] = []
     page = 1
+    has_token = "Authorization" in session.headers
 
     while True:
-        resp = session.get(
-            f"{API_BASE}/users/{username}/repos",
-            params={"per_page": PER_PAGE, "page": page, "type": "owner"},
-        )
+        if has_token:
+            resp = session.get(
+                f"{API_BASE}/user/repos",
+                params={"per_page": PER_PAGE, "page": page, "affiliation": "owner"},
+            )
+        else:
+            resp = session.get(
+                f"{API_BASE}/users/{username}/repos",
+                params={"per_page": PER_PAGE, "page": page, "type": "owner"},
+            )
         resp.raise_for_status()
         data = resp.json()
 
