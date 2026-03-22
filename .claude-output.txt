@@ -1,6 +1,6 @@
 `★ Insight ─────────────────────────────────────`
-- The `renderAccessRequest()` function uses DOM API (`createElement`/`textContent`) instead of the `innerHTML` pattern used elsewhere in app.js. This avoids security hook warnings and is actually safer for form elements where no dynamic user data is interpolated.
-- The Playwright test uses Python's `http.server` as a module-scoped fixture — the server starts once and is shared across all 8 tests, keeping the test suite fast (~1.3s total).
+- **Defensive JSON parsing**: Instead of calling `.json()` directly (which throws on empty body), we first read `.text()`, check if it's non-empty, then `JSON.parse`. This prevents the confusing "Unexpected end of JSON input" error that was causing B-010.
+- **Graceful degradation pattern**: The `useFallbackData()` function sets the app state to sample data *and* renders the UI, so the site still looks functional even when the backend has no data. The error banner is informational, not blocking.
 `─────────────────────────────────────────────────`
 
 ---
@@ -8,20 +8,18 @@
 ## Summary
 
 ### Files changed
-- **`web/data/repos.json`** — new, 8 sample repositories
-- **`web/data/clusters.json`** — new, 4 capability clusters
-- **`web/js/app.js`** — fixed data fetch paths, added `#/clusters` and `#/access` routes, added `renderClustersPage()` and `renderAccessRequest()`
-- **`web/index.html`** — added nav bar (Home | Search | Clusters | Request Access)
-- **`web/css/style.css`** — added nav, access form, cluster description, and 375px responsive styles
-- **`tests/test_web_playwright.py`** — new, 8 Playwright tests
-- **`docs/project-memory/sessions/S-2026-03-22-0641-web-ui-improvements.md`** — session doc
+- `web/js/app.js` — Error handling with retry button, sample data fallback, loading skeleton, footer
+- `web/js/search.js` — Guard clauses for empty/null repos in `search()`, `applyFilters()`, `extractFacets()`
+- `web/css/style.css` — Loading skeleton animation, error banner styles, retry button, footer, sticky footer layout, mobile responsive
+- `web/index.html` — Meta description, OG tags, Twitter card, SVG emoji favicon
+- `docs/project-memory/sessions/S-2026-03-22-0712-sprint6-web-resilience.md` — Session doc
 
 ### Commands run
-- `git pull origin main`
-- `pip install playwright` + `playwright install chromium`
-- `python3 -m pytest tests/test_web_playwright.py -v` — **8/8 passed**
-- `git commit` + `git push -u origin HEAD`
+- `git pull origin main` — merged latest
+- `python3 -m pytest tests/ -v` — 137 passed
+- `node -e ...` — verified search.js handles empty/null data
+- `git push -u origin HEAD` — pushed to remote
 
 ### Notes / follow-on work
-- Access request form shows "Coming soon" message — needs backend `/api/access/request` endpoint
-- Data files contain sample repos; agentB's export pipeline should replace these with real GitHub data
+- **Playwright tests** mentioned in acceptance criteria (visit site with empty data, sample data, mobile 375px viewport) are not yet implemented — these would be added by the test agent (agentB) per the constraint boundaries
+- The sample fallback data is minimal (1 repo, 1 cluster) — could be enriched with more representative examples
