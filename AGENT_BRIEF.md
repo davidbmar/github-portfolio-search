@@ -1,4 +1,4 @@
-agentA-github-api — Sprint 1
+agentC-search-cli — Sprint 1
 
 Sprint-Level Context
 
@@ -18,22 +18,24 @@ Constraints
 
 
 Objective
-- Set up the Python project and build a GitHub API client that fetches all repos, READMEs, and metadata for a given user
+- Build the semantic search function and a basic CLI tool
 
 Tasks
-- Create pyproject.toml with dependencies: requests, sentence-transformers, sqlite-vec, click, pytest
-- Create src/ghps/__init__.py with version
-- Create src/ghps/github_client.py with:
-  - fetch_repos(username) -> list of repo dicts (name, description, language, topics, stars, updated_at, html_url)
-  - fetch_readme(owner, repo) -> str (README content, empty string if none)
-  - fetch_top_files(owner, repo, extensions=['.py', '.js', '.ts', '.go', '.rs', '.java']) -> list of (path, content) tuples
-  - Support GitHub token via GITHUB_TOKEN env var for authenticated requests (5000 req/hr)
-  - Handle pagination for users with many repos
-- Create tests/test_github_client.py with unit tests (mock HTTP responses)
-- Create a .env.example showing GITHUB_TOKEN=ghp_xxx
+- Create src/ghps/search.py with:
+  - SearchEngine class that wraps VectorStore + EmbeddingPipeline
+  - search(query: str, top_k: int = 10) -> list of SearchResult(repo_name, chunk_text, score, source, repo_url)
+  - Results sorted by cosine similarity score descending
+  - Deduplicate results from same repo (return best-scoring chunk per repo)
+- Create src/ghps/cli.py with:
+  - Click-based CLI: ghps search "query" [--top-k N] [--db PATH]
+  - ghps index <username> [--db PATH] [--token TOKEN]
+  - Pretty-print results: repo name, score, snippet (first 200 chars), URL
+  - Default db path: ~/.ghps/index.db
+- Create pyproject.toml [project.scripts] entry: ghps = "ghps.cli:main"
+- Create tests/test_search.py with unit tests (mock store with known vectors)
 
 Acceptance Criteria
-- python3 -m pytest tests/test_github_client.py passes
-- fetch_repos returns repo metadata for a user with >50 repos
-- fetch_readme returns content for repos that have READMEs
-- Authenticated requests use GITHUB_TOKEN when available
+- python3 -m pytest tests/test_search.py passes
+- search() returns results ranked by relevance score
+- CLI ghps search prints formatted results to stdout
+- CLI ghps index triggers indexing for a given username
