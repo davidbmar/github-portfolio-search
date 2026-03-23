@@ -1,4 +1,4 @@
-agentB-collections — Sprint 18
+agentC-export-embed — Sprint 18
 
 Sprint-Level Context
 
@@ -20,36 +20,47 @@ Constraints
 
 
 Objective
-- Let users save groups of repos as named collections in localStorage
+- Export search results and create an embeddable portfolio widget
 
 Tasks
-- Create web/js/collections.js:
-  - CollectionsManager namespace (IIFE pattern, like SearchEngine):
-    - Storage key: "ghps_collections" in localStorage
-    - Data format: { collections: [ { name: "My AI Projects", repos: ["repo1", "repo2"], created: "ISO date" } ] }
-    - Functions:
-      - getAll() → returns all collections
-      - create(name) → creates new empty collection, returns it
-      - addRepo(collectionName, repoName) → adds repo to collection
-      - removeRepo(collectionName, repoName) → removes repo from collection
-      - deleteCollection(name) → deletes entire collection
-      - getCollection(name) → returns single collection
-    - All functions persist to localStorage immediately
-  - Export via global CollectionsManager and module.exports
-- Update web/css/style.css:
-  - Style .collections-panel: sidebar or modal for managing collections
-  - Style .collection-card: card showing collection name, repo count, created date
-  - Style .add-to-collection-btn: small button on repo cards and detail pages
-  - Style .collection-detail: list of repos in a collection with remove buttons
-  - Style .collections-nav-link: nav bar link to collections page
-  - Mobile-friendly: full-width on small screens
-- Note: agentB must NOT modify app.js or index.html (those belong to agentA and agentC)
+- Create web/js/export.js:
+  - ExportManager namespace (IIFE pattern):
+    - exportAsMarkdown(results, query) → generates markdown string:
+      ```
+      # Search Results: "query"
+
+      ## repo-name
+      - **Language:** Python
+      - **Stars:** 5
+      - **Description:** ...
+      - **GitHub:** https://github.com/...
+      - **Topics:** aws, voice, ...
+
+      ---
+      ```
+    - exportAsJSON(results, query) → generates JSON string with repos array
+    - downloadFile(content, filename, mimeType) → triggers browser file download
+  - Export via global ExportManager and module.exports
+- Create web/embed.html:
+  - Standalone HTML page that renders a mini portfolio view
+  - Loads repos.json and clusters.json from data/ directory
+  - Shows: portfolio title, repo count, top 5 clusters, top 10 repos by relevance
+  - Compact styling (no nav bar, no search, just a browsable snapshot)
+  - Designed to be embedded via iframe: <iframe src="https://davidbmar.com/embed.html" width="400" height="600"></iframe>
+  - Add a "View full portfolio" link to the main site
+  - Self-contained: inline CSS, no external dependencies except data files
+  - Security: set appropriate X-Frame-Options considerations in comments
+- Update web/index.html:
+  - Add <script src="js/collections.js"></script> before app.js
+  - Add <script src="js/export.js"></script> before app.js
+  - Add a "Collections" link in the nav bar (href="#/collections")
 
 Acceptance Criteria
-- CollectionsManager.create("My Projects") creates a collection
-- CollectionsManager.addRepo("My Projects", "voice-print") adds a repo
-- Collections persist across page refreshes (localStorage)
-- CollectionsManager.getAll() returns all collections with repo lists
-- Deleting a collection removes it from localStorage
-- CSS styles exist for collections UI components
+- ExportManager.exportAsMarkdown(results, "voice") returns valid markdown
+- ExportManager.exportAsJSON(results, "voice") returns valid JSON
+- ExportManager.downloadFile() triggers a browser download
+- embed.html loads and renders portfolio summary standalone
+- embed.html works in an iframe without errors
+- index.html includes script tags for collections.js and export.js
+- Nav bar includes Collections link
 - python3 -m pytest tests/ -v passes
