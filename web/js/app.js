@@ -987,185 +987,20 @@ const App = (() => {
 
     const tierInfo = document.createElement("p");
     tierInfo.className = "access-tier-info";
-    tierInfo.textContent = "Public tier \u2014 browse clusters and search descriptions. Gated access provides: Full code search, file tree browsing, and detailed repository analysis. Fill out the form below to request access.";
+    tierInfo.textContent = "Public tier \u2014 browse clusters and search descriptions freely. For full access to private repositories and code search, reach out to me directly.";
     page.appendChild(tierInfo);
 
-    // Show sign-in prompt for unauthenticated users
-    if (!Auth.isAuthenticated() && Auth.isOAuthEnabled()) {
-      const signInSection = document.createElement("div");
-      signInSection.style.cssText = "margin:1.5rem 0;padding:1rem;background:var(--card-bg, #161b22);border:1px solid var(--border, #30363d);border-radius:8px;text-align:center";
-
-      const signInMsg = document.createElement("p");
-      signInMsg.textContent = "Sign in with Google to auto-fill your details and request access.";
-      signInMsg.style.cssText = "color:#8b949e;margin-bottom:1rem";
-      signInSection.appendChild(signInMsg);
-
-      const signInContainer = document.createElement("div");
-      signInContainer.style.cssText = "display:flex;justify-content:center";
-      signInSection.appendChild(signInContainer);
-
-      page.appendChild(signInSection);
-      Auth.renderSignInButton(signInContainer);
-    }
-
-    const form = document.createElement("form");
-    form.className = "access-form";
-    form.id = "access-form";
-
-    // Name field
-    const nameGroup = document.createElement("div");
-    nameGroup.className = "form-group";
-    const nameLabel = document.createElement("label");
-    nameLabel.setAttribute("for", "access-name");
-    nameLabel.textContent = "Name";
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.id = "access-name";
-    nameInput.name = "name";
-    nameInput.placeholder = "Your name";
-    nameInput.required = true;
-    nameGroup.appendChild(nameLabel);
-    nameGroup.appendChild(nameInput);
-    form.appendChild(nameGroup);
-
-    // Email field
-    const emailGroup = document.createElement("div");
-    emailGroup.className = "form-group";
-    const emailLabel = document.createElement("label");
-    emailLabel.setAttribute("for", "access-email");
-    emailLabel.textContent = "Email";
-    const emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.id = "access-email";
-    emailInput.name = "email";
-    emailInput.placeholder = "you@example.com";
-    emailInput.required = true;
-    emailGroup.appendChild(emailLabel);
-    emailGroup.appendChild(emailInput);
-    form.appendChild(emailGroup);
-
-    // Auto-fill from Google profile if authenticated
-    const user = Auth.getUser();
-    if (user) {
-      if (user.name) nameInput.value = user.name;
-      if (user.email) emailInput.value = user.email;
-    }
-
-    // Reason field
-    const reasonGroup = document.createElement("div");
-    reasonGroup.className = "form-group";
-    const reasonLabel = document.createElement("label");
-    reasonLabel.setAttribute("for", "access-reason");
-    reasonLabel.textContent = "Reason for access";
-    const reasonTextarea = document.createElement("textarea");
-    reasonTextarea.id = "access-reason";
-    reasonTextarea.name = "reason";
-    reasonTextarea.placeholder = "Why would you like full access?";
-    reasonTextarea.rows = 4;
-    reasonTextarea.required = true;
-    reasonGroup.appendChild(reasonLabel);
-    reasonGroup.appendChild(reasonTextarea);
-    form.appendChild(reasonGroup);
-
-    // Submit button
-    const submitBtn = document.createElement("button");
-    submitBtn.type = "submit";
-    submitBtn.className = "submit-btn";
-    submitBtn.id = "access-submit";
-    submitBtn.textContent = "Submit Request";
-    form.appendChild(submitBtn);
-
-    // Message area
-    const msgDiv = document.createElement("div");
-    msgDiv.className = "form-message";
-    msgDiv.id = "form-message";
-    form.appendChild(msgDiv);
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = nameInput.value.trim();
-      const email = emailInput.value.trim();
-      const reason = reasonTextarea.value.trim();
-      if (!name || !email || !reason) return;
-
-      const added = Auth.submitAccessRequest(name, email, reason);
-      if (added) {
-        msgDiv.textContent = "Access request submitted! The admin will review your request.";
-        msgDiv.className = "form-message visible success";
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Submitted";
-      } else {
-        msgDiv.textContent = "You have already submitted a request. The admin will review it.";
-        msgDiv.className = "form-message visible";
-      }
-    });
-
-    page.appendChild(form);
-
-    // Admin panel: show pending requests if signed in as admin
-    if (Auth.isAdmin()) {
-      const adminSection = document.createElement("div");
-      adminSection.className = "admin-panel";
-
-      const adminTitle = document.createElement("h3");
-      adminTitle.textContent = "Admin: Pending Access Requests";
-      adminSection.appendChild(adminTitle);
-
-      const pending = Auth.getPendingRequests();
-      if (pending.length === 0) {
-        const emptyMsg = document.createElement("p");
-        emptyMsg.textContent = "No pending requests.";
-        emptyMsg.style.color = "var(--text-muted)";
-        adminSection.appendChild(emptyMsg);
-      } else {
-        for (const req of pending) {
-          const card = document.createElement("div");
-          card.className = "access-request-card";
-
-          const info = document.createElement("div");
-          info.innerHTML =
-            '<strong>' + escapeHtml(req.name) + '</strong> &mdash; ' +
-            escapeHtml(req.email) +
-            '<br><span style="color:var(--text-muted);font-size:0.85rem">' +
-            escapeHtml(req.reason) + '</span>';
-          card.appendChild(info);
-
-          const actions = document.createElement("div");
-          actions.className = "access-request-actions";
-
-          const approveBtn = document.createElement("button");
-          approveBtn.textContent = "Approve";
-          approveBtn.className = "btn btn-primary";
-          approveBtn.style.cssText = "padding:6px 16px;font-size:0.85rem";
-          approveBtn.addEventListener("click", () => {
-            Auth.approveAccess(req.email);
-            card.remove();
-            if (adminSection.querySelectorAll(".access-request-card").length === 0) {
-              const done = document.createElement("p");
-              done.textContent = "No pending requests.";
-              done.style.color = "var(--text-muted)";
-              adminSection.appendChild(done);
-            }
-          });
-
-          const denyBtn = document.createElement("button");
-          denyBtn.textContent = "Deny";
-          denyBtn.className = "btn";
-          denyBtn.style.cssText = "padding:6px 16px;font-size:0.85rem;background:var(--text-muted);color:#fff";
-          denyBtn.addEventListener("click", () => {
-            Auth.denyAccess(req.email);
-            card.remove();
-          });
-
-          actions.appendChild(approveBtn);
-          actions.appendChild(denyBtn);
-          card.appendChild(actions);
-          adminSection.appendChild(card);
-        }
-      }
-
-      page.appendChild(adminSection);
-    }
+    // Contact info instead of form
+    const contactSection = document.createElement("div");
+    contactSection.className = "access-contact";
+    contactSection.innerHTML =
+      '<h3>Get in Touch</h3>' +
+      '<p>Interested in seeing the full portfolio including private repositories? Reach out to me:</p>' +
+      '<ul>' +
+      '<li><strong>GitHub:</strong> <a href="https://github.com/davidbmar" target="_blank" rel="noopener">github.com/davidbmar</a></li>' +
+      '<li><strong>Email:</strong> <a href="mailto:david.bryan.mar@gmail.com">david.bryan.mar@gmail.com</a></li>' +
+      '</ul>';
+    page.appendChild(contactSection);
 
     container.appendChild(page);
   }
