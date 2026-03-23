@@ -52,6 +52,7 @@ class VectorStore:
                 stars INTEGER DEFAULT 0,
                 updated_at TEXT,
                 url TEXT,
+                private INTEGER DEFAULT 0,
                 indexed_at TEXT
             );
 
@@ -102,8 +103,8 @@ class VectorStore:
             "indexed_at", datetime.now(timezone.utc).isoformat()
         )
         db.execute(
-            """INSERT OR REPLACE INTO repos (name, description, language, topics, stars, updated_at, url, indexed_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT OR REPLACE INTO repos (name, description, language, topics, stars, updated_at, url, private, indexed_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 repo_dict["name"],
                 repo_dict.get("description", ""),
@@ -112,6 +113,7 @@ class VectorStore:
                 repo_dict.get("stars", 0),
                 repo_dict.get("updated_at", ""),
                 repo_dict.get("url", ""),
+                1 if repo_dict.get("private") else 0,
                 indexed_at,
             ),
         )

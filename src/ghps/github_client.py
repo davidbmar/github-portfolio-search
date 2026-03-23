@@ -62,6 +62,7 @@ def fetch_repos(username: str) -> list[dict[str, Any]]:
                     "stars": r.get("stargazers_count", 0),
                     "updated_at": r.get("updated_at", ""),
                     "html_url": r.get("html_url", ""),
+                    "private": r.get("private", False),
                 }
             )
 

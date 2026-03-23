@@ -126,6 +126,7 @@ class Indexer:
                     "stars": repo.get("stars", 0),
                     "updated_at": repo.get("updated_at", ""),
                     "url": repo.get("html_url", "") or repo.get("url", ""),
+                    "private": repo.get("private", False),
                     "indexed_at": now,
                 }
 

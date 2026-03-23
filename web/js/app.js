@@ -721,7 +721,11 @@ const App = (() => {
 
     // Header with name + action buttons
     html += '<div class="repo-detail-header">';
-    html += '<h2 class="repo-detail-name">' + escapeHtml(repo.name) + '</h2>';
+    html += '<h2 class="repo-detail-name">' + escapeHtml(repo.name);
+    if (repo.private) {
+      html += ' <span class="secured-badge">Secured</span>';
+    }
+    html += '</h2>';
     html += '<div class="repo-detail-actions">';
     if (githubUrl) {
       html += '<a href="' + escapeAttr(githubUrl) + '" class="btn btn-primary" target="_blank" rel="noopener">';
@@ -1076,6 +1080,9 @@ const App = (() => {
       html += '<div class="repo-card-header">';
 
       html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="repo-name">' + escapeHtml(repo.name) + "</a>";
+      if (repo.private) {
+        html += '<span class="secured-badge" title="Private repository — secured access only">Secured</span>';
+      }
 
       // Relevance bar instead of raw score number
       if (repo._score !== undefined && repo._maxScore) {

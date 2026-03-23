@@ -82,6 +82,15 @@ def _build_repos(store: "VectorStore") -> list[dict]:
     ).fetchall()
     readme_map = {row[0]: row[1][:300] for row in readme_rows}
 
+    # Pre-fetch private flag (column may not exist in older DBs)
+    private_map: dict[str, bool] = {}
+    try:
+        priv_rows = db.execute("SELECT name, private FROM repos WHERE private = 1").fetchall()
+        for pr in priv_rows:
+            private_map[pr[0]] = True
+    except Exception:
+        pass
+
     # Try to read inferred_topics if agentA has added the column
     try:
         rows = db.execute(
@@ -133,6 +142,7 @@ def _build_repos(store: "VectorStore") -> list[dict]:
             "stars": stars,
             "updated_at": updated_at,
             "url": row[6] or "",
+            "private": private_map.get(row[0], False),
             "last_indexed": last_indexed,
             "relevance_score": relevance_score,
             "readme_excerpt": readme_excerpt,
