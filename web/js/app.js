@@ -13,10 +13,15 @@
   document.addEventListener("DOMContentLoaded", async () => {
     await Auth.loadConfig();
 
-    // Listen for auth changes (sign-in / sign-out)
+    // Track auth state to detect actual changes (prevent reload loops)
+    const initialAuth = Auth.isAuthenticated();
     Auth.onAuthChange(() => {
-      // Full reload ensures clean state after sign-in/sign-out
-      location.reload();
+      const nowAuth = Auth.isAuthenticated();
+      if (nowAuth !== initialAuth) {
+        location.reload();
+      } else {
+        _updateHeaderUserInfo();
+      }
     });
 
     _updateHeaderUserInfo();
