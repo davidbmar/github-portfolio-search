@@ -1,66 +1,68 @@
-agentC-export-embed — Sprint 18
+agentA-deploy-manifest — Sprint 19
 
 Sprint-Level Context
 
 Goal
-- Shareable search result links (deep links with query + filters in URL)
-- Export search results as markdown or JSON
-- "Collections" — save groups of repos as named lists (localStorage)
-- Public portfolio embed widget (iframe-embeddable mini view)
+- Deploy manifest: every deploy writes deploy-manifest.json to S3 with commit, timestamp, counts
+- portfolio.json schema: per-repo config declaring relationships, live URLs, showcase status
+- Indexer reads portfolio.json from each repo during indexing
+- Web UI shows linked projects, showcase section, live demo buttons
 
 Constraints
 - No two agents may modify the same files
-- agentA owns sharing/deep links (web/js/app.js)
-- agentB owns collections feature (web/js/collections.js — NEW, web/css/style.css)
-- agentC owns export + embed widget (web/embed.html — NEW, web/js/export.js — NEW, web/index.html)
+- agentA owns deploy tracking (deploy.sh)
+- agentB owns the indexer pipeline (src/ghps/github_client.py, src/ghps/indexer.py, src/ghps/store.py, src/ghps/export.py)
+- agentC owns the web UI (web/js/app.js, web/css/style.css)
 - Use python3 for all commands
 - Do NOT commit .venv/ or .env to git
-- All features must work in static mode (no API server required)
-- Use localStorage for persistence (no backend needed)
+- All web UI features must work in static mode (no API server required)
+- portfolio.json is optional per repo — repos without it index normally
 
 
 Objective
-- Export search results and create an embeddable portfolio widget
+- Add deploy tracking so every deploy records what was deployed
 
 Tasks
-- Create web/js/export.js:
-  - ExportManager namespace (IIFE pattern):
-    - exportAsMarkdown(results, query) → generates markdown string:
-      ```
-      # Search Results: "query"
-
-      ## repo-name
-      - **Language:** Python
-      - **Stars:** 5
-      - **Description:** ...
-      - **GitHub:** https://github.com/...
-      - **Topics:** aws, voice, ...
-
-      ---
-      ```
-    - exportAsJSON(results, query) → generates JSON string with repos array
-    - downloadFile(content, filename, mimeType) → triggers browser file download
-  - Export via global ExportManager and module.exports
-- Create web/embed.html:
-  - Standalone HTML page that renders a mini portfolio view
-  - Loads repos.json and clusters.json from data/ directory
-  - Shows: portfolio title, repo count, top 5 clusters, top 10 repos by relevance
-  - Compact styling (no nav bar, no search, just a browsable snapshot)
-  - Designed to be embedded via iframe: <iframe src="https://davidbmar.com/embed.html" width="400" height="600"></iframe>
-  - Add a "View full portfolio" link to the main site
-  - Self-contained: inline CSS, no external dependencies except data files
-  - Security: set appropriate X-Frame-Options considerations in comments
-- Update web/index.html:
-  - Add <script src="js/collections.js"></script> before app.js
-  - Add <script src="js/export.js"></script> before app.js
-  - Add a "Collections" link in the nav bar (href="#/collections")
+- Update deploy.sh:
+  - After the data validation step and before the S3 sync, generate deploy metadata:
+    - Get current git commit hash: git rev-parse --short HEAD
+    - Get current branch: git rev-parse --abbrev-ref HEAD
+    - Get current UTC timestamp
+    - Count repos in repos.json: python3 -c "import json; print(len(json.load(open('web/data/repos.json'))))"
+    - Count clusters in clusters.json similarly
+    - Count files in web/ directory
+  - Write web/deploy-manifest.json with this structure:
+    ```json
+    {
+      "project": "github-portfolio-search",
+      "commit": "16a046ce",
+      "branch": "main",
+      "deployedAt": "2026-03-23T16:12:29Z",
+      "repoCount": 104,
+      "clusterCount": 6,
+      "fileCount": 14
+    }
+    ```
+  - Update web/health.json with:
+    ```json
+    {
+      "status": "ok",
+      "commit": "16a046ce",
+      "last_deploy": "2026-03-23T16:12:29Z",
+      "repos": 104
+    }
+    ```
+  - Both files are written BEFORE the S3 sync so they get uploaded with everything else
+  - After the S3 sync and CloudFront invalidation, also append a line to a local deploy log file at .sprint/history/deploy-log.jsonl:
+    - Same fields as deploy-manifest.json, one JSON line per deploy
+    - Create the file if it doesn't exist
+  - Print a summary after deploy: "Deployed commit XXXXX (104 repos, 6 clusters) to https://davidbmar.com"
 
 Acceptance Criteria
-- ExportManager.exportAsMarkdown(results, "voice") returns valid markdown
-- ExportManager.exportAsJSON(results, "voice") returns valid JSON
-- ExportManager.downloadFile() triggers a browser download
-- embed.html loads and renders portfolio summary standalone
-- embed.html works in an iframe without errors
-- index.html includes script tags for collections.js and export.js
-- Nav bar includes Collections link
+- deploy.sh generates web/deploy-manifest.json before S3 sync
+- deploy.sh updates web/health.json before S3 sync
+- deploy.sh appends to .sprint/history/deploy-log.jsonl after deploy
+- deploy-manifest.json has correct commit hash, timestamp, repo/cluster counts
+- health.json has status, commit, last_deploy, repos fields
+- Running deploy.sh twice produces two lines in deploy-log.jsonl
 - python3 -m pytest tests/ -v passes
