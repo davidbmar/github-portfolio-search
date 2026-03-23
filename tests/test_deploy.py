@@ -41,3 +41,46 @@ class TestDeployScript:
         """deploy.sh should exclude .pyc files from the S3 sync."""
         content = DEPLOY_SCRIPT.read_text()
         assert "*.pyc" in content, "deploy.sh does not exclude .pyc files"
+
+    def test_deploy_script_generates_deploy_manifest(self):
+        """deploy.sh must generate web/deploy-manifest.json before S3 sync."""
+        content = DEPLOY_SCRIPT.read_text()
+        assert "deploy-manifest.json" in content, "deploy.sh does not generate deploy-manifest.json"
+        # Manifest generation must appear before the S3 sync command
+        manifest_pos = content.index("deploy-manifest.json")
+        sync_pos = content.index("aws s3 sync")
+        assert manifest_pos < sync_pos, "deploy-manifest.json must be generated before S3 sync"
+
+    def test_deploy_script_generates_health_json(self):
+        """deploy.sh must generate web/health.json before S3 sync."""
+        content = DEPLOY_SCRIPT.read_text()
+        assert "health.json" in content, "deploy.sh does not generate health.json"
+        health_pos = content.index("health.json")
+        sync_pos = content.index("aws s3 sync")
+        assert health_pos < sync_pos, "health.json must be generated before S3 sync"
+
+    def test_deploy_script_appends_deploy_log(self):
+        """deploy.sh must append to .sprint/history/deploy-log.jsonl after deploy."""
+        content = DEPLOY_SCRIPT.read_text()
+        assert "deploy-log.jsonl" in content, "deploy.sh does not write to deploy-log.jsonl"
+        # Deploy log must appear after S3 sync
+        log_pos = content.index("deploy-log.jsonl")
+        sync_pos = content.index("aws s3 sync")
+        assert log_pos > sync_pos, "deploy-log.jsonl must be written after S3 sync"
+
+    def test_deploy_manifest_has_required_fields(self):
+        """deploy-manifest.json generation must include all required fields."""
+        content = DEPLOY_SCRIPT.read_text()
+        for field in ["project", "commit", "branch", "deployedAt", "repoCount", "clusterCount", "fileCount"]:
+            assert field in content, f"deploy.sh missing '{field}' in deploy manifest"
+
+    def test_health_json_has_required_fields(self):
+        """health.json generation must include all required fields."""
+        content = DEPLOY_SCRIPT.read_text()
+        for field in ["status", "commit", "last_deploy", "repos"]:
+            assert field in content, f"deploy.sh missing '{field}' in health.json"
+
+    def test_deploy_script_prints_summary(self):
+        """deploy.sh must print a summary with commit, repo count, and cluster count."""
+        content = DEPLOY_SCRIPT.read_text()
+        assert "Deployed commit" in content, "deploy.sh does not print deploy summary"

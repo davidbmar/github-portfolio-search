@@ -56,6 +56,45 @@ echo "Validating data files..."
 validate_json "web/data/repos.json" 1 "repos.json" || exit 1
 validate_json "web/data/clusters.json" 1 "clusters.json" || exit 1
 
+# 4. Generate deploy metadata
+COMMIT=$(git rev-parse --short HEAD)
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+REPO_COUNT=$(python3 -c "import json; print(len(json.load(open('web/data/repos.json'))))")
+CLUSTER_COUNT=$(python3 -c "import json; print(len(json.load(open('web/data/clusters.json'))))")
+FILE_COUNT=$(find web/ -type f | wc -l | tr -d ' ')
+
+echo "Generating deploy-manifest.json..."
+python3 -c "
+import json
+manifest = {
+    'project': 'github-portfolio-search',
+    'commit': '${COMMIT}',
+    'branch': '${BRANCH}',
+    'deployedAt': '${DEPLOYED_AT}',
+    'repoCount': ${REPO_COUNT},
+    'clusterCount': ${CLUSTER_COUNT},
+    'fileCount': ${FILE_COUNT}
+}
+with open('web/deploy-manifest.json', 'w') as f:
+    json.dump(manifest, f, indent=2)
+    f.write('\n')
+"
+
+echo "Generating health.json..."
+python3 -c "
+import json
+health = {
+    'status': 'ok',
+    'commit': '${COMMIT}',
+    'last_deploy': '${DEPLOYED_AT}',
+    'repos': ${REPO_COUNT}
+}
+with open('web/health.json', 'w') as f:
+    json.dump(health, f, indent=2)
+    f.write('\n')
+"
+
 # 5. Sync to S3
 echo "Syncing web/ to ${S3_BUCKET}..."
 aws s3 sync web/ "$S3_BUCKET" --delete --exclude "*.pyc"
@@ -64,5 +103,22 @@ aws s3 sync web/ "$S3_BUCKET" --delete --exclude "*.pyc"
 echo "Invalidating CloudFront distribution ${CF_DISTRIBUTION}..."
 aws cloudfront create-invalidation --distribution-id "$CF_DISTRIBUTION" --paths "/*"
 
-# 7. Done
-echo "Deployed to https://davidbmar.com"
+# 7. Append to local deploy log
+mkdir -p .sprint/history
+python3 -c "
+import json
+entry = {
+    'project': 'github-portfolio-search',
+    'commit': '${COMMIT}',
+    'branch': '${BRANCH}',
+    'deployedAt': '${DEPLOYED_AT}',
+    'repoCount': ${REPO_COUNT},
+    'clusterCount': ${CLUSTER_COUNT},
+    'fileCount': ${FILE_COUNT}
+}
+with open('.sprint/history/deploy-log.jsonl', 'a') as f:
+    f.write(json.dumps(entry) + '\n')
+"
+
+# 8. Done
+echo "Deployed commit ${COMMIT} (${REPO_COUNT} repos, ${CLUSTER_COUNT} clusters) to https://davidbmar.com"
