@@ -17,9 +17,13 @@ fi
 # 2. If export module exists, run data export
 if [ -f "src/ghps/export.py" ]; then
     echo "Running ghps export..."
-    python3 -m ghps export --output web/data/ || {
-        echo "WARNING: ghps export failed — deploying with existing data"
-    }
+    if [ -x ".venv/bin/ghps" ]; then
+        .venv/bin/ghps export || echo "WARNING: ghps export failed — deploying with existing data"
+    elif command -v ghps &>/dev/null; then
+        ghps export || echo "WARNING: ghps export failed — deploying with existing data"
+    else
+        echo "WARNING: ghps not found — deploying with existing data"
+    fi
 fi
 
 # 3. Validate data files before deploying
