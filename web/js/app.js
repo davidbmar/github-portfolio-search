@@ -458,6 +458,56 @@ const App = (() => {
 
     html += "</div>";
 
+    // Showcase section — repos with showcase === true
+    const showcaseRepos = repos.filter(function(r) { return r.showcase === true; });
+    if (showcaseRepos.length > 0) {
+      html += '<div class="showcase-section">';
+      html += '<div class="section-header">';
+      html += '<h3>Featured Projects</h3>';
+      html += '<span class="count">' + escapeHtml(String(showcaseRepos.length)) + ' featured</span>';
+      html += '</div>';
+      html += '<div class="showcase-grid">';
+
+      for (const repo of showcaseRepos) {
+        const langColor = LANG_COLORS[repo.language] || "#8b949e";
+        const githubUrl = repo.html_url || repo.url;
+        html += '<div class="showcase-card">';
+        html += '<div class="showcase-card-header">';
+        html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="repo-name">' + escapeHtml(repo.name) + '</a>';
+        html += '<span class="featured-badge">Featured</span>';
+        html += '</div>';
+        if (repo.highlight) {
+          html += '<div class="highlight-text">' + escapeHtml(repo.highlight) + '</div>';
+        }
+        if (repo.role) {
+          html += '<div class="showcase-role">' + escapeHtml(repo.role) + '</div>';
+        }
+        html += '<div class="repo-meta">';
+        if (repo.language) {
+          html += '<span class="language-badge">';
+          html += '<span class="language-dot" style="background:' + escapeAttr(langColor) + '"></span>';
+          html += escapeHtml(repo.language);
+          html += '</span>';
+        }
+        if (repo.stars !== undefined && repo.stars !== null) {
+          html += '<span class="stars-badge">&#9733; ' + escapeHtml(String(repo.stars)) + '</span>';
+        }
+        html += '</div>';
+        html += '<div class="showcase-card-actions">';
+        if (repo.liveUrl) {
+          html += '<a href="' + escapeAttr(repo.liveUrl) + '" class="live-demo-btn live-demo-btn-sm" target="_blank" rel="noopener">Live Demo</a>';
+        }
+        if (githubUrl) {
+          html += '<a href="' + escapeAttr(githubUrl) + '" class="btn btn-primary" style="padding:6px 14px;font-size:0.85rem" target="_blank" rel="noopener">View on GitHub</a>';
+        }
+        html += '</div>';
+        html += '</div>';
+      }
+
+      html += '</div>'; // showcase-grid
+      html += '</div>'; // showcase-section
+    }
+
     // Cluster grid
     if (clusters.length > 0) {
       html += '<div class="section-header">';
@@ -752,8 +802,14 @@ const App = (() => {
     if (repo.private) {
       html += ' <span class="secured-badge">Secured</span>';
     }
+    if (repo.showcase === true) {
+      html += ' <span class="featured-badge">Featured</span>';
+    }
     html += '</h2>';
     html += '<div class="repo-detail-actions">';
+    if (repo.liveUrl) {
+      html += '<a href="' + escapeAttr(repo.liveUrl) + '" class="live-demo-btn" target="_blank" rel="noopener">Live Demo</a>';
+    }
     if (githubUrl) {
       html += '<a href="' + escapeAttr(githubUrl) + '" class="btn btn-primary" target="_blank" rel="noopener">';
       html += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>';
@@ -763,6 +819,11 @@ const App = (() => {
     html += '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>';
     html += ' Share</button>';
     html += '</div></div>';
+
+    // Highlight / tagline
+    if (repo.highlight) {
+      html += '<div class="highlight-text">' + escapeHtml(repo.highlight) + '</div>';
+    }
 
     // Description
     if (repo.description) {
@@ -820,6 +881,41 @@ const App = (() => {
       if (githubUrl) {
         html += '<a href="' + escapeAttr(githubUrl + '#readme') + '" class="readme-more" target="_blank" rel="noopener">Read full README on GitHub &rarr;</a>';
       }
+      html += '</div>';
+    }
+
+    // Tech Stack (builtWith)
+    const builtWith = Array.isArray(repo.builtWith) ? repo.builtWith : [];
+    if (builtWith.length > 0) {
+      html += '<div class="tech-stack">';
+      html += '<h3>Tech Stack</h3>';
+      html += '<div class="tech-stack-badges">';
+      for (const tech of builtWith) {
+        html += '<span class="tech-badge">' + escapeHtml(tech) + '</span>';
+      }
+      html += '</div>';
+      html += '</div>';
+    }
+
+    // Connected Projects (relatedProjects from portfolio.json)
+    const relatedProjects = Array.isArray(repo.relatedProjects) ? repo.relatedProjects : [];
+    if (relatedProjects.length > 0) {
+      html += '<div class="connected-projects">';
+      html += '<h3>Connected Projects</h3>';
+      html += '<div class="connected-projects-list">';
+      for (const rp of relatedProjects) {
+        const rpName = typeof rp === 'string' ? rp : (rp.name || '');
+        const rpRelationship = (typeof rp === 'object' && rp.relationship) ? rp.relationship : '';
+        if (!rpName) continue;
+        html += '<div class="connected-project-item">';
+        html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(rpName)) + '">' + escapeHtml(rpName) + '</a>';
+        if (rpRelationship) {
+          html += '<span class="relationship-separator">&mdash;</span>';
+          html += '<span class="relationship-label">' + escapeHtml(rpRelationship) + '</span>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
       html += '</div>';
     }
 
@@ -1032,6 +1128,12 @@ const App = (() => {
       html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="repo-name">' + escapeHtml(repo.name) + "</a>";
       if (repo.private) {
         html += '<span class="secured-badge" title="Private repository — secured access only">Secured</span>';
+      }
+      if (repo.showcase === true) {
+        html += '<span class="featured-badge">Featured</span>';
+      }
+      if (repo.liveUrl) {
+        html += '<a href="' + escapeAttr(repo.liveUrl) + '" class="demo-badge" target="_blank" rel="noopener" title="Live Demo">Demo</a>';
       }
 
       // Relevance bar instead of raw score number
