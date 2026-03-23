@@ -1,0 +1,12 @@
+{
+  "showcase": true,
+  "liveUrl": "https://davidbmar.com",
+  "role": "Semantic search engine for GitHub portfolios",
+  "highlight": "Search 104 repos by natural language — TF-IDF, embeddings, autocomplete",
+  "builtWith": ["sentence-transformers", "SQLite-vec", "FastAPI", "D3.js", "vanilla JS"],
+  "relatedProjects": [
+    { "repo": "tool-s3-cloudfront-push", "relationship": "deploys this project to S3/CloudFront" },
+    { "repo": "traceable-searchable-adr-memory-index", "relationship": "sprint framework (Afterburner)" }
+  ],
+  "category": "Developer Tools"
+}

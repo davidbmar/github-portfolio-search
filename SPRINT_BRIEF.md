@@ -1,155 +1,179 @@
-# Sprint 17
+# Sprint 19
 
 Goal
-- Upgrade web UI from keyword-only search to TF-IDF + chunk-text matching using search-index.json
-- Add embedding-powered "related repos" via pre-computed similarity matrix
-- Add autocomplete/search suggestions dropdown
-- Improve search result snippets with README excerpts
+- Deploy manifest: every deploy writes deploy-manifest.json to S3 with commit, timestamp, counts
+- portfolio.json schema: per-repo config declaring relationships, live URLs, showcase status
+- Indexer reads portfolio.json from each repo during indexing
+- Web UI shows linked projects, showcase section, live demo buttons
 
 Constraints
 - No two agents may modify the same files
-- agentA owns the export pipeline (src/ghps/export.py, tests/test_export.py)
-- agentB owns the JS search engine (web/js/search.js)
-- agentC owns the UI integration (web/js/app.js, web/index.html, web/css/style.css)
+- agentA owns deploy tracking (deploy.sh)
+- agentB owns the indexer pipeline (src/ghps/github_client.py, src/ghps/indexer.py, src/ghps/store.py, src/ghps/export.py)
+- agentC owns the web UI (web/js/app.js, web/css/style.css)
 - Use python3 for all commands
 - Do NOT commit .venv/ or .env to git
-- All features must work in static mode (no API server required)
-- Web UI loads data from web/data/ JSON files only
+- All web UI features must work in static mode (no API server required)
+- portfolio.json is optional per repo — repos without it index normally
 
 Merge Order
-1. agentA-export-data
-2. agentB-enhanced-search
-3. agentC-ui-autocomplete
+1. agentA-deploy-manifest
+2. agentB-portfolio-indexer
+3. agentC-portfolio-ui
 
 Merge Verification
 - python3 -m pytest tests/ -v
 
-## agentA-export-data
+## agentA-deploy-manifest
 
 Objective
-- Enhance the export pipeline to produce richer data files for the web UI
+- Add deploy tracking so every deploy records what was deployed
 
 Tasks
+- Update deploy.sh:
+  - After the data validation step and before the S3 sync, generate deploy metadata:
+    - Get current git commit hash: git rev-parse --short HEAD
+    - Get current branch: git rev-parse --abbrev-ref HEAD
+    - Get current UTC timestamp
+    - Count repos in repos.json: python3 -c "import json; print(len(json.load(open('web/data/repos.json'))))"
+    - Count clusters in clusters.json similarly
+    - Count files in web/ directory
+  - Write web/deploy-manifest.json with this structure:
+    ```json
+    {
+      "project": "github-portfolio-search",
+      "commit": "16a046ce",
+      "branch": "main",
+      "deployedAt": "2026-03-23T16:12:29Z",
+      "repoCount": 104,
+      "clusterCount": 6,
+      "fileCount": 14
+    }
+    ```
+  - Update web/health.json with:
+    ```json
+    {
+      "status": "ok",
+      "commit": "16a046ce",
+      "last_deploy": "2026-03-23T16:12:29Z",
+      "repos": 104
+    }
+    ```
+  - Both files are written BEFORE the S3 sync so they get uploaded with everything else
+  - After the S3 sync and CloudFront invalidation, also append a line to a local deploy log file at .sprint/history/deploy-log.jsonl:
+    - Same fields as deploy-manifest.json, one JSON line per deploy
+    - Create the file if it doesn't exist
+  - Print a summary after deploy: "Deployed commit XXXXX (104 repos, 6 clusters) to https://davidbmar.com"
+
+Acceptance Criteria
+- deploy.sh generates web/deploy-manifest.json before S3 sync
+- deploy.sh updates web/health.json before S3 sync
+- deploy.sh appends to .sprint/history/deploy-log.jsonl after deploy
+- deploy-manifest.json has correct commit hash, timestamp, repo/cluster counts
+- health.json has status, commit, last_deploy, repos fields
+- Running deploy.sh twice produces two lines in deploy-log.jsonl
+- python3 -m pytest tests/ -v passes
+
+## agentB-portfolio-indexer
+
+Objective
+- Read portfolio.json from each repo during indexing and export the data
+
+Tasks
+- Update src/ghps/github_client.py:
+  - Add a function fetch_portfolio_json(owner: str, repo: str) -> dict | None:
+    - Calls GitHub Contents API: GET /repos/{owner}/{repo}/contents/portfolio.json
+    - If the file exists, decode the base64 content and parse as JSON
+    - Return the parsed dict, or None if the file doesn't exist (404) or fails to parse
+    - Handle errors gracefully (log warning, return None)
+  - The function should use the same session/auth as other fetch functions
+
+- Update src/ghps/store.py:
+  - Add a "portfolio" TEXT column to the repos table CREATE TABLE statement
+  - In add_repo(), accept and store repo_dict.get("portfolio", "") as JSON string
+  - Update the INSERT statement to include the portfolio column
+
+- Update src/ghps/indexer.py:
+  - In index_repos() or index_user(), after fetching README for each repo:
+    - Call github_client.fetch_portfolio_json(username, repo_name)
+    - If portfolio data exists, add it to repo_meta as "portfolio": json.dumps(portfolio_data)
+    - If not, set "portfolio": ""
+
 - Update src/ghps/export.py:
-  - In _build_repos() (or equivalent), add a `readme_excerpt` field to each repo dict:
-    - Query the chunks table for the first README chunk per repo
-    - Truncate to 300 chars
-    - If no README chunk exists, use empty string
-  - Create a new function _build_similarity() that:
-    - Computes the average embedding vector per repo (average of all chunk embeddings)
-    - Calculates pairwise cosine similarity between all repo average embeddings
-    - For each repo, keeps the top-8 most similar repos with their scores
-    - Returns a dict: {"repo_name": [{"name": "other_repo", "score": 0.85}, ...]}
-    - Uses numpy for efficient vector operations (already a dependency via sentence-transformers)
-  - Create a new function _build_suggestions() that:
-    - Collects all repo names from the store
-    - Collects all unique topics across repos
-    - Tries to read top-20 popular queries from analytics DB (~/.ghps/analytics.db)
-    - If analytics DB doesn't exist, uses empty queries list (graceful fallback)
-    - Returns a dict: {"repos": [...], "topics": [...], "queries": [...]}
-  - Update export_static_bundle() to:
-    - Call _build_similarity() and write result to web/data/similarity.json
-    - Call _build_suggestions() and write result to web/data/suggestions.json
-    - Ensure readme_excerpt is included in repos.json output
-- Update tests/test_export.py:
-  - Test that repos.json entries include readme_excerpt field
-  - Test _build_similarity() returns correct format with scores between 0 and 1
-  - Test _build_suggestions() returns correct format
-  - Test _build_suggestions() works when analytics DB doesn't exist
-  - Test similarity matrix has at most 8 entries per repo
+  - In _build_repos(), read the portfolio column from the repos table
+  - Parse the JSON string back to a dict
+  - Add these fields to each repo in repos.json (only if portfolio data exists):
+    - "showcase": bool (default false)
+    - "liveUrl": string (default "")
+    - "role": string (default "")
+    - "builtWith": array of strings (default [])
+    - "relatedProjects": array of {repo: string, relationship: string} (default [])
+    - "highlight": string (default "")
+    - "category": string (default "")
+  - If no portfolio data, these fields are omitted or set to defaults
+  - Update the SQL query to include the portfolio column (with try/except fallback for older DBs)
 
 Acceptance Criteria
-- repos.json entries include `readme_excerpt` (string, up to 300 chars)
-- similarity.json exists with top-8 similar repos per repo, each with a float score
-- suggestions.json exists with repos, topics, and queries arrays
-- Export works when analytics DB doesn't exist (no crash)
-- python3 -m pytest tests/test_export.py -v passes
+- fetch_portfolio_json returns parsed dict when portfolio.json exists in a repo
+- fetch_portfolio_json returns None gracefully when file doesn't exist
+- Indexing stores portfolio JSON in the repos table
+- repos.json includes portfolio fields (showcase, liveUrl, role, builtWith, relatedProjects, highlight) for repos that have portfolio.json
+- repos.json still works correctly for repos without portfolio.json (no extra fields or empty defaults)
+- Indexing doesn't crash if portfolio.json is malformed
+- python3 -m pytest tests/ -v passes
 
-## agentB-enhanced-search
-
-Objective
-- Upgrade the client-side search engine with TF-IDF scoring and chunk text matching
-
-Tasks
-- Update web/js/search.js:
-  - Add a `loadSearchIndex(data)` method to the SearchEngine namespace:
-    - Accepts the parsed search-index.json array
-    - Builds an inverted index: term -> Set of repo names (for IDF calculation)
-    - Builds a per-repo chunk text map: repo_name -> concatenated chunk text
-    - Stores the total number of repos (N) for IDF computation
-  - Add TF-IDF scoring to the `search()` method:
-    - When search index is loaded, compute IDF weight for each query term: log(N / df) where df = number of repos containing the term
-    - Multiply the existing field-match points by the IDF weight
-    - This means rare terms (appearing in few repos) get much higher scores than common terms
-  - Add chunk text matching to the `search()` method:
-    - When search index is loaded, check if query terms appear in the repo's chunk text
-    - Award 2 points per term found in chunk text (README and source file content)
-    - Apply IDF weighting to chunk matches as well
-  - Add a `getSnippet(repoName, query)` method:
-    - Looks up the repo's chunks from the loaded search index
-    - Finds the chunk whose text best matches the query terms (most term matches)
-    - Returns a ~200 char excerpt centered on the first match, or null if no match
-    - Does NOT do HTML escaping (caller handles that)
-  - Ensure backward compatibility:
-    - If loadSearchIndex() was never called, search() works exactly as before
-    - All new code paths are guarded by checking if the inverted index exists
-
-Acceptance Criteria
-- SearchEngine.loadSearchIndex(data) builds inverted index from search-index.json
-- Searching "presigned URL" ranks repos with those terms in README chunks higher
-- SearchEngine.getSnippet("S3-presignedURL", "presigned URL") returns a relevant text excerpt
-- Search still works identically when search index is not loaded (backward compat)
-- TF-IDF weighting boosts rare terms ("presigned") over common terms ("python")
-- No global variable pollution (everything stays in SearchEngine namespace)
-
-## agentC-ui-autocomplete
+## agentC-portfolio-ui
 
 Objective
-- Wire together the new data files, autocomplete UI, similarity-based related repos, and snippet rendering
+- Show linked projects, showcase badges, and live demo buttons in the web UI
 
 Tasks
 - Update web/js/app.js:
-  - In App.init() or the data loading section:
-    - Fetch web/data/search-index.json and pass to SearchEngine.loadSearchIndex()
-    - Fetch web/data/similarity.json and store as App.similarity
-    - Fetch web/data/suggestions.json and store as App.suggestions
-    - All three fetches should fail silently (existing behavior preserved if files missing)
-  - Replace findRelatedRepos() implementation:
-    - If App.similarity exists and has data for the repo, use it to return top-N similar repos
-    - Map similarity entries back to full repo objects from App.repos
-    - Update the "Related Repositories" label from "from same cluster" to "Semantically similar"
-    - Fall back to cluster-based lookup if similarity data unavailable
-  - Add autocomplete functionality:
-    - Create a renderAutocomplete(inputElement) function
-    - On input event, filter App.suggestions entries matching current text (case-insensitive prefix)
-    - Combine matches from repos, topics, and queries arrays
-    - Show top-8 matches in a dropdown div positioned below the search input
-    - Handle keyboard: ArrowDown/ArrowUp to navigate, Enter to select, Escape to close
-    - Handle mouse: click to select
-    - Handle blur: close dropdown after short delay (allow click events to fire first)
-    - Call renderAutocomplete() on the search input after init
-  - Update search result rendering:
-    - After getting search results, call SearchEngine.getSnippet(repo.name, query)
-    - If a snippet is returned, display it (with highlighted terms) below the description
-    - If no snippet, fall back to repo.description as before
-    - Escape HTML in snippets before inserting (use existing escapeHtml function)
-- Update web/index.html:
-  - Add a container div for autocomplete dropdown adjacent to the search input
-  - Ensure the search input wrapper has position: relative for dropdown positioning
+  - In renderHome():
+    - Before the "Capability Clusters" section, add a "Showcase" section
+    - Filter repos where repo.showcase === true
+    - Render showcase repos as larger featured cards with:
+      - Repo name + "Featured" badge (gold/amber, like the "Secured" badge)
+      - repo.highlight text as a tagline (if present)
+      - repo.role as a subtitle (if present)
+      - "Live Demo" button linking to repo.liveUrl (if present)
+      - "View on GitHub" button
+      - Language badge + star count
+    - If no showcase repos exist, don't render the section at all
+  - In renderRepoDetail():
+    - If repo.liveUrl exists, add a "Live Demo" button next to "View on GitHub" in the actions area
+      - Style: green background, opens in new tab
+    - If repo.highlight exists, show it as a tagline/callout above the description
+      - Style: slightly larger text, accent color
+    - If repo.builtWith exists and has items, show a "Tech Stack" section
+      - Render as a row of badges/pills
+    - If repo.relatedProjects exists and has items, show a "Connected Projects" section BEFORE the "Related Repositories" (similarity-based) section
+      - Each entry shows: linked repo name (clickable → #/repo/name) + relationship label
+      - Example: "FSM-generic — powers the state machine engine"
+    - If repo.showcase is true, show a "Featured" badge next to the repo name (like "Secured")
+  - In renderRepoCards():
+    - If repo.showcase is true, add a "Featured" badge next to the repo name
+    - If repo.liveUrl exists, show a small "Demo" link/badge
+
 - Update web/css/style.css:
-  - Style .autocomplete-dropdown: absolute position, white background, border, shadow, z-index, max-height with overflow-y scroll
-  - Style .autocomplete-item: padding, hover highlight, cursor pointer
-  - Style .autocomplete-item.active: background highlight for keyboard-selected item
-  - Style .search-snippet: smaller font, muted color, max 3 lines with ellipsis overflow
-  - Ensure autocomplete works on mobile (full width, touch-friendly tap targets)
+  - Style .showcase-section: prominent section with distinct background
+  - Style .showcase-card: larger card with gradient accent, more padding
+  - Style .featured-badge: gold/amber pill badge (similar to .secured-badge but different color)
+  - Style .live-demo-btn: green button for live demo links
+  - Style .highlight-text: tagline/callout styling (larger, accent colored)
+  - Style .tech-stack: row of small badges for builtWith items
+  - Style .connected-projects: list of linked repos with relationship labels
+  - Style .demo-badge: small badge for repo cards
+  - Ensure mobile responsive for all new elements
 
 Acceptance Criteria
-- Typing in search shows autocomplete dropdown with matching suggestions
-- Arrow keys navigate suggestions, Enter selects, Escape closes
-- Clicking a suggestion navigates to search results for that term
-- Related repos section shows embedding-similar repos from similarity.json
-- Related repos falls back to cluster-based if similarity.json not loaded
-- Search results show README snippet excerpts with highlighted query terms
-- All features degrade gracefully if data files are missing
-- No XSS — all user input and snippet text is escaped before DOM insertion
-- Mobile-friendly autocomplete (full-width, adequate tap targets)
+- Showcase section appears on homepage when repos have showcase: true
+- Showcase section is hidden when no repos have showcase: true
+- Featured badge appears on showcase repo cards and detail pages
+- Live Demo button appears on detail page when liveUrl is set
+- Connected Projects section shows linked repos with relationship labels
+- Tech Stack section shows builtWith items as badges
+- Highlight text shows as tagline on detail page
+- All elements are mobile responsive
+- Graceful degradation: no errors if portfolio fields are missing
+- python3 -m pytest tests/ -v passes
