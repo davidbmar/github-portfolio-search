@@ -1,4 +1,4 @@
-agentA-sharing — Sprint 18
+agentB-collections — Sprint 18
 
 Sprint-Level Context
 
@@ -20,32 +20,36 @@ Constraints
 
 
 Objective
-- Make search URLs shareable and persist filter state in the URL
+- Let users save groups of repos as named collections in localStorage
 
 Tasks
-- Update web/js/app.js:
-  - Persist filter state in URL hash parameters:
-    - Current: #/search?q=voice
-    - New: #/search?q=voice&lang=Python,Shell&topic=aws,whisper&stars=1&sort=recent
-    - When filters change, update the hash (replaceState to avoid history spam)
-    - When page loads with filter params, restore them
-  - Add a "Share" button next to the sort dropdown on search results page:
-    - Clicking copies the current URL (with query + filters) to clipboard
-    - Show brief "Link copied!" toast notification (2s, then fade)
-  - Add a "Share" button on repo detail pages:
-    - Copies the #/repo/name URL to clipboard
-  - Implement a simple toast notification system:
-    - Create a showToast(message) function
-    - Toast appears at bottom-center, auto-dismisses after 2s
-    - Style: dark background, white text, rounded, subtle slide-up animation
-  - Ensure deep links work:
-    - Visiting #/search?q=voice&lang=Python should show search results filtered to Python repos matching "voice"
-    - Visiting #/repo/voice-print should show the repo detail page
+- Create web/js/collections.js:
+  - CollectionsManager namespace (IIFE pattern, like SearchEngine):
+    - Storage key: "ghps_collections" in localStorage
+    - Data format: { collections: [ { name: "My AI Projects", repos: ["repo1", "repo2"], created: "ISO date" } ] }
+    - Functions:
+      - getAll() → returns all collections
+      - create(name) → creates new empty collection, returns it
+      - addRepo(collectionName, repoName) → adds repo to collection
+      - removeRepo(collectionName, repoName) → removes repo from collection
+      - deleteCollection(name) → deletes entire collection
+      - getCollection(name) → returns single collection
+    - All functions persist to localStorage immediately
+  - Export via global CollectionsManager and module.exports
+- Update web/css/style.css:
+  - Style .collections-panel: sidebar or modal for managing collections
+  - Style .collection-card: card showing collection name, repo count, created date
+  - Style .add-to-collection-btn: small button on repo cards and detail pages
+  - Style .collection-detail: list of repos in a collection with remove buttons
+  - Style .collections-nav-link: nav bar link to collections page
+  - Mobile-friendly: full-width on small screens
+- Note: agentB must NOT modify app.js or index.html (those belong to agentA and agentC)
 
 Acceptance Criteria
-- Search URL includes query, language filters, topic filters, min stars, and sort mode
-- Sharing a URL and opening it in a new tab shows the same results with same filters
-- "Share" button copies URL to clipboard and shows toast
-- Repo detail pages have a share button
-- Filter changes update the URL without adding history entries
+- CollectionsManager.create("My Projects") creates a collection
+- CollectionsManager.addRepo("My Projects", "voice-print") adds a repo
+- Collections persist across page refreshes (localStorage)
+- CollectionsManager.getAll() returns all collections with repo lists
+- Deleting a collection removes it from localStorage
+- CSS styles exist for collections UI components
 - python3 -m pytest tests/ -v passes
