@@ -75,6 +75,7 @@ const Auth = (() => {
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(authState));
+    _logSignIn(authState);
 
     if (_onAuthChange) _onAuthChange();
   }
@@ -163,6 +164,7 @@ const Auth = (() => {
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(authState));
+      _logSignIn(authState);
       if (_onAuthChange) _onAuthChange();
       return true;
     } catch (err) {
@@ -307,6 +309,24 @@ const Auth = (() => {
   }
 
   // --- Private helpers ---
+
+  /**
+   * Log a sign-in event to the remote logging endpoint (fire-and-forget).
+   */
+  function _logSignIn(authState) {
+    const url = _config.signinLogUrl;
+    if (!url) return;
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: authState.email || "",
+        name: authState.name || "",
+        provider: authState.provider || "",
+        githubUsername: authState.githubUsername || "",
+      }),
+    }).catch(() => { /* fire-and-forget */ });
+  }
 
   function _getAuthState() {
     try {
