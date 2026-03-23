@@ -118,9 +118,16 @@ def _build_repos(store: "VectorStore") -> list[dict]:
         recency = _recency_boost(updated_at)
         relevance_score = stars + recency
 
+        description = row[1] or ""
+        readme_excerpt = readme_map.get(row[0], "")
+
+        # Auto-generate description from README if GitHub description is empty
+        if not description and readme_excerpt:
+            description = _description_from_readme(readme_excerpt, row[0])
+
         repos.append({
             "name": row[0],
-            "description": row[1] or "",
+            "description": description,
             "language": row[2] or "Unknown",
             "topics": topics,
             "stars": stars,
@@ -128,7 +135,7 @@ def _build_repos(store: "VectorStore") -> list[dict]:
             "url": row[6] or "",
             "last_indexed": last_indexed,
             "relevance_score": relevance_score,
-            "readme_excerpt": readme_map.get(row[0], ""),
+            "readme_excerpt": readme_excerpt,
         })
 
     # Sort by relevance score descending (stars + recency)
@@ -307,6 +314,63 @@ def _build_suggestions(store: "VectorStore") -> dict[str, list]:
         "topics": sorted(all_topics),
         "queries": queries,
     }
+
+
+def _description_from_readme(readme_text: str, repo_name: str) -> str:
+    """Extract a description from README text when GitHub description is empty.
+
+    Strips the markdown heading (# repo-name), takes the first meaningful
+    sentence or ~150 chars as the description.
+    """
+    import re
+
+    lines = readme_text.strip().splitlines()
+    useful = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        # Skip markdown headings that are just the repo name
+        if stripped.startswith("#"):
+            heading = re.sub(r"^#+\s*", "", stripped)
+            # If heading is just the repo name (with optional punctuation/dashes), skip it
+            name_clean = repo_name.lower().replace("-", " ").replace("_", " ")
+            heading_clean = heading.lower().replace("-", " ").replace("_", " ").strip(" —–-:")
+            if heading_clean == name_clean:
+                continue
+            # If heading starts with repo name + separator, strip the name part
+            if heading_clean.startswith(name_clean):
+                remainder = heading[len(repo_name):].lstrip(" —–-:")
+                if remainder:
+                    useful.append(remainder.strip())
+                    continue
+            # Otherwise use the heading text (without #)
+            useful.append(heading)
+            continue
+        # Skip badges, images, links-only lines
+        if stripped.startswith("![") or stripped.startswith("[![") or stripped.startswith("<img"):
+            continue
+        useful.append(stripped)
+        # Stop after we have enough text
+        if sum(len(u) for u in useful) > 200:
+            break
+
+    if not useful:
+        return ""
+
+    text = " ".join(useful)
+    # Clean up markdown artifacts
+    text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)  # bold
+    text = re.sub(r"\*([^*]+)\*", r"\1", text)  # italic
+    text = re.sub(r"`([^`]+)`", r"\1", text)  # inline code
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)  # links
+    text = re.sub(r"\s+", " ", text).strip()
+
+    # Truncate to ~150 chars at a word boundary
+    if len(text) > 150:
+        text = text[:150].rsplit(" ", 1)[0] + "..."
+
+    return text
 
 
 def _extract_keywords(text: str) -> list[str]:
