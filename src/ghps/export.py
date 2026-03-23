@@ -91,6 +91,18 @@ def _build_repos(store: "VectorStore") -> list[dict]:
     except Exception:
         pass
 
+    # Pre-fetch portfolio data (column may not exist in older DBs)
+    portfolio_map: dict[str, dict] = {}
+    try:
+        port_rows = db.execute("SELECT name, portfolio FROM repos WHERE portfolio IS NOT NULL AND portfolio != ''").fetchall()
+        for pr in port_rows:
+            try:
+                portfolio_map[pr[0]] = json.loads(pr[1])
+            except (json.JSONDecodeError, TypeError):
+                pass
+    except Exception:
+        pass
+
     # Try to read inferred_topics if agentA has added the column
     try:
         rows = db.execute(
@@ -134,7 +146,7 @@ def _build_repos(store: "VectorStore") -> list[dict]:
         if not description and readme_excerpt:
             description = _description_from_readme(readme_excerpt, row[0])
 
-        repos.append({
+        repo_entry = {
             "name": row[0],
             "description": description,
             "language": row[2] or "Unknown",
@@ -146,7 +158,19 @@ def _build_repos(store: "VectorStore") -> list[dict]:
             "last_indexed": last_indexed,
             "relevance_score": relevance_score,
             "readme_excerpt": readme_excerpt,
-        })
+        }
+
+        portfolio = portfolio_map.get(row[0])
+        if portfolio:
+            repo_entry["showcase"] = bool(portfolio.get("showcase", False))
+            repo_entry["liveUrl"] = portfolio.get("liveUrl", "")
+            repo_entry["role"] = portfolio.get("role", "")
+            repo_entry["builtWith"] = portfolio.get("builtWith", [])
+            repo_entry["relatedProjects"] = portfolio.get("relatedProjects", [])
+            repo_entry["highlight"] = portfolio.get("highlight", "")
+            repo_entry["category"] = portfolio.get("category", "")
+
+        repos.append(repo_entry)
 
     # Sort by relevance score descending (stars + recency)
     repos.sort(key=lambda r: r["relevance_score"], reverse=True)
