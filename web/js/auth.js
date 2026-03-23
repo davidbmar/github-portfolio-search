@@ -197,11 +197,69 @@ const Auth = (() => {
   }
 
   /**
+   * Check if the authenticated user is the admin.
+   */
+  function isAdmin() {
+    const user = getUser();
+    if (!user || !user.email) return false;
+    const adminEmail = (_config.adminEmail || "").toLowerCase();
+    return adminEmail && user.email.toLowerCase() === adminEmail;
+  }
+
+  /**
    * Check if the authenticated user is approved for gated features.
-   * Stub: returns true for now — no server-side check on static site.
+   * Admin is always approved. Others check the local approved list.
    */
   function isApproved() {
+    if (isAdmin()) return true;
+    const user = getUser();
+    if (!user || !user.email) return false;
+    const approved = _getApprovedList();
+    return approved.includes(user.email.toLowerCase());
+  }
+
+  // --- Access request management (localStorage-based for static site) ---
+  const ACCESS_STORAGE_KEY = "ghps_access_requests";
+  const APPROVED_STORAGE_KEY = "ghps_approved_emails";
+
+  function _getApprovedList() {
+    try {
+      return JSON.parse(localStorage.getItem(APPROVED_STORAGE_KEY) || "[]");
+    } catch { return []; }
+  }
+
+  function _getAccessRequests() {
+    try {
+      return JSON.parse(localStorage.getItem(ACCESS_STORAGE_KEY) || "[]");
+    } catch { return []; }
+  }
+
+  function submitAccessRequest(name, email, reason) {
+    const requests = _getAccessRequests();
+    const emailLower = email.toLowerCase();
+    if (requests.some((r) => r.email === emailLower)) return false;
+    requests.push({ name, email: emailLower, reason, date: new Date().toISOString() });
+    localStorage.setItem(ACCESS_STORAGE_KEY, JSON.stringify(requests));
     return true;
+  }
+
+  function getPendingRequests() {
+    const approved = _getApprovedList();
+    return _getAccessRequests().filter((r) => !approved.includes(r.email));
+  }
+
+  function approveAccess(email) {
+    const approved = _getApprovedList();
+    const emailLower = email.toLowerCase();
+    if (!approved.includes(emailLower)) {
+      approved.push(emailLower);
+      localStorage.setItem(APPROVED_STORAGE_KEY, JSON.stringify(approved));
+    }
+  }
+
+  function denyAccess(email) {
+    const requests = _getAccessRequests().filter((r) => r.email !== email.toLowerCase());
+    localStorage.setItem(ACCESS_STORAGE_KEY, JSON.stringify(requests));
   }
 
   return {
@@ -209,11 +267,16 @@ const Auth = (() => {
     isOAuthEnabled,
     isAuthenticated,
     isApproved,
+    isAdmin,
     getUser,
     renderSignInButton,
     signOut,
     tryPasswordLogin,
     onAuthChange,
     getApiUrl,
+    submitAccessRequest,
+    getPendingRequests,
+    approveAccess,
+    denyAccess,
   };
 })();

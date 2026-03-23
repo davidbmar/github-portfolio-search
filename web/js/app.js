@@ -1083,11 +1083,90 @@ const App = (() => {
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      msgDiv.textContent = "Coming soon \u2014 access request API is under development. Your interest has been noted!";
-      msgDiv.className = "form-message visible";
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const reason = reasonTextarea.value.trim();
+      if (!name || !email || !reason) return;
+
+      const added = Auth.submitAccessRequest(name, email, reason);
+      if (added) {
+        msgDiv.textContent = "Access request submitted! The admin will review your request.";
+        msgDiv.className = "form-message visible success";
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitted";
+      } else {
+        msgDiv.textContent = "You have already submitted a request. The admin will review it.";
+        msgDiv.className = "form-message visible";
+      }
     });
 
     page.appendChild(form);
+
+    // Admin panel: show pending requests if signed in as admin
+    if (Auth.isAdmin()) {
+      const adminSection = document.createElement("div");
+      adminSection.className = "admin-panel";
+
+      const adminTitle = document.createElement("h3");
+      adminTitle.textContent = "Admin: Pending Access Requests";
+      adminSection.appendChild(adminTitle);
+
+      const pending = Auth.getPendingRequests();
+      if (pending.length === 0) {
+        const emptyMsg = document.createElement("p");
+        emptyMsg.textContent = "No pending requests.";
+        emptyMsg.style.color = "var(--text-muted)";
+        adminSection.appendChild(emptyMsg);
+      } else {
+        for (const req of pending) {
+          const card = document.createElement("div");
+          card.className = "access-request-card";
+
+          const info = document.createElement("div");
+          info.innerHTML =
+            '<strong>' + escapeHtml(req.name) + '</strong> &mdash; ' +
+            escapeHtml(req.email) +
+            '<br><span style="color:var(--text-muted);font-size:0.85rem">' +
+            escapeHtml(req.reason) + '</span>';
+          card.appendChild(info);
+
+          const actions = document.createElement("div");
+          actions.className = "access-request-actions";
+
+          const approveBtn = document.createElement("button");
+          approveBtn.textContent = "Approve";
+          approveBtn.className = "btn btn-primary";
+          approveBtn.style.cssText = "padding:6px 16px;font-size:0.85rem";
+          approveBtn.addEventListener("click", () => {
+            Auth.approveAccess(req.email);
+            card.remove();
+            if (adminSection.querySelectorAll(".access-request-card").length === 0) {
+              const done = document.createElement("p");
+              done.textContent = "No pending requests.";
+              done.style.color = "var(--text-muted)";
+              adminSection.appendChild(done);
+            }
+          });
+
+          const denyBtn = document.createElement("button");
+          denyBtn.textContent = "Deny";
+          denyBtn.className = "btn";
+          denyBtn.style.cssText = "padding:6px 16px;font-size:0.85rem;background:var(--text-muted);color:#fff";
+          denyBtn.addEventListener("click", () => {
+            Auth.denyAccess(req.email);
+            card.remove();
+          });
+
+          actions.appendChild(approveBtn);
+          actions.appendChild(denyBtn);
+          card.appendChild(actions);
+          adminSection.appendChild(card);
+        }
+      }
+
+      page.appendChild(adminSection);
+    }
+
     container.appendChild(page);
   }
 
