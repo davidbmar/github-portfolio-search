@@ -1643,6 +1643,299 @@ button:focus-visible,
   }
 }
 
+/* ── Portfolio: Showcase section ── */
+.showcase-section {
+  margin-bottom: 40px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, rgba(56, 139, 253, 0.06), rgba(188, 140, 255, 0.06));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.showcase-section .section-header {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 20px;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.showcase-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  position: relative;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--accent), var(--purple)) 1;
+  border-image-slice: 1;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.showcase-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-color: var(--accent);
+}
+
+.showcase-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.showcase-card-header .repo-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.showcase-card-header .repo-name:hover {
+  text-decoration: underline;
+}
+
+.showcase-card .highlight-text {
+  font-size: 1rem;
+  color: var(--purple);
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.showcase-card .showcase-role {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.showcase-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.showcase-card .repo-meta {
+  margin-top: 12px;
+}
+
+/* Featured badge (gold/amber pill) */
+.featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
+.repo-detail-name .featured-badge {
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  margin-left: 8px;
+}
+
+/* Live Demo button (green) */
+.live-demo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  background: var(--green);
+  color: #fff;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.live-demo-btn:hover {
+  background: #2ea043;
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.live-demo-btn-sm {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+}
+
+/* Demo badge (small, for repo cards) */
+.demo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(63, 185, 80, 0.15);
+  color: var(--green);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  text-decoration: none;
+}
+
+.demo-badge:hover {
+  background: rgba(63, 185, 80, 0.3);
+  text-decoration: none;
+  color: var(--green);
+}
+
+/* Highlight text / tagline on detail page */
+.highlight-text {
+  font-size: 1.15rem;
+  color: var(--purple);
+  line-height: 1.5;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+/* Tech Stack badges */
+.tech-stack {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.tech-stack h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.tech-stack-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+  transition: border-color 0.15s;
+}
+
+.tech-badge:hover {
+  border-color: var(--accent);
+}
+
+/* Connected Projects section */
+.connected-projects {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.connected-projects h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.connected-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.connected-project-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  transition: border-color 0.15s;
+}
+
+.connected-project-item:hover {
+  border-color: var(--accent);
+}
+
+.connected-project-item a {
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.connected-project-item a:hover {
+  text-decoration: underline;
+}
+
+.connected-project-item .relationship-label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.connected-project-item .relationship-separator {
+  color: var(--text-muted);
+}
+
+/* Portfolio mobile responsive */
+@media (max-width: 768px) {
+  .showcase-section {
+    padding: 20px 16px;
+  }
+
+  .showcase-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .showcase-card {
+    padding: 20px;
+  }
+
+  .tech-stack-badges {
+    gap: 6px;
+  }
+
+  .connected-project-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .connected-project-item .relationship-separator {
+    display: none;
+  }
+}
+
 /* ── Accessibility: prefers-reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
