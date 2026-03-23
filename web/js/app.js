@@ -354,6 +354,25 @@ const App = (() => {
     if (hash.startsWith("#/search")) {
       const params = new URLSearchParams(hash.split("?")[1] || "");
       const query = params.get("q") || "";
+
+      // Restore filters from URL params (deep link support)
+      const langParam = params.get("lang");
+      if (langParam) {
+        currentFilters.languages = langParam.split(",").filter(Boolean);
+      }
+      const topicParam = params.get("topic");
+      if (topicParam) {
+        currentFilters.topics = topicParam.split(",").filter(Boolean);
+      }
+      const starsParam = params.get("stars");
+      if (starsParam) {
+        currentFilters.minStars = parseInt(starsParam, 10) || 0;
+      }
+      const sortParam = params.get("sort");
+      if (sortParam) {
+        currentSortMode = sortParam;
+      }
+
       renderSearchResults(query, content);
     } else if (hash.startsWith("#/repo/")) {
       const repoName = decodeURIComponent(hash.slice("#/repo/".length));
@@ -601,6 +620,9 @@ const App = (() => {
     html += '<option value="recent"' + (currentSortMode === "recent" ? " selected" : "") + '>Recently Updated</option>';
     html += '<option value="name"' + (currentSortMode === "name" ? " selected" : "") + '>Name A-Z</option>';
     html += '</select>';
+    html += '<button class="share-btn" id="share-search-btn" title="Copy link to these results">';
+    html += '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>';
+    html += ' Share</button>';
     html += '</div>';
 
     html += '<div class="section-header">';
@@ -732,6 +754,9 @@ const App = (() => {
       html += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>';
       html += ' View on GitHub</a>';
     }
+    html += '<button class="share-btn" id="share-repo-btn" title="Copy link to this repo">';
+    html += '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>';
+    html += ' Share</button>';
     html += '</div></div>';
 
     // Description
@@ -818,6 +843,12 @@ const App = (() => {
           setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
         });
       });
+    }
+
+    // Wire up share button
+    const shareRepoBtn = container.querySelector('#share-repo-btn');
+    if (shareRepoBtn) {
+      shareRepoBtn.addEventListener('click', shareCurrentUrl);
     }
   }
 
@@ -1221,6 +1252,7 @@ const App = (() => {
     document.querySelectorAll('input[data-filter="language"]').forEach((cb) => {
       cb.addEventListener("change", () => {
         currentFilters.languages = getCheckedValues("language");
+        updateHashWithFilters();
         route();
       });
     });
@@ -1229,6 +1261,7 @@ const App = (() => {
     document.querySelectorAll('input[data-filter="topic"]').forEach((cb) => {
       cb.addEventListener("change", () => {
         currentFilters.topics = getCheckedValues("topic");
+        updateHashWithFilters();
         route();
       });
     });
@@ -1238,6 +1271,7 @@ const App = (() => {
     if (sortSelect) {
       sortSelect.addEventListener("change", () => {
         currentSortMode = sortSelect.value;
+        updateHashWithFilters();
         route();
       });
     }
@@ -1251,8 +1285,15 @@ const App = (() => {
         if (starsValue) starsValue.textContent = starsRange.value;
       });
       starsRange.addEventListener("change", () => {
+        updateHashWithFilters();
         route();
       });
+    }
+
+    // Share button
+    const shareBtn = document.getElementById("share-search-btn");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", shareCurrentUrl);
     }
   }
 
@@ -1397,7 +1438,12 @@ const App = (() => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       if (value.trim()) {
-        window.location.hash = "#/search?q=" + encodeURIComponent(value.trim());
+        const parts = ["q=" + encodeURIComponent(value.trim())];
+        if (currentFilters.languages.length > 0) parts.push("lang=" + encodeURIComponent(currentFilters.languages.join(",")));
+        if (currentFilters.topics.length > 0) parts.push("topic=" + encodeURIComponent(currentFilters.topics.join(",")));
+        if (currentFilters.minStars > 0) parts.push("stars=" + currentFilters.minStars);
+        if (currentSortMode && currentSortMode !== "relevance") parts.push("sort=" + encodeURIComponent(currentSortMode));
+        window.location.hash = "#/search?" + parts.join("&");
       } else {
         window.location.hash = "#/";
       }
@@ -1463,8 +1509,69 @@ const App = (() => {
       .sort-controls { display:flex; align-items:center; gap:8px; margin-bottom:0.75rem; }
       .sort-controls label { font-size:0.85rem; color:var(--muted, #8b949e); }
       .sort-select { background:var(--card-bg, #161b22); color:var(--text, #e6edf3); border:1px solid var(--border, #30363d); border-radius:6px; padding:4px 8px; font-size:0.85rem; cursor:pointer; }
+      .share-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:6px; border:1px solid var(--border, #30363d); background:var(--card-bg, #161b22); color:var(--text, #e6edf3); font-size:0.85rem; cursor:pointer; transition:border-color 0.15s; }
+      .share-btn:hover { border-color:var(--accent, #58a6ff); color:var(--accent, #58a6ff); }
+      .share-btn svg { width:14px; height:14px; fill:currentColor; }
+      .toast-container { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:10000; pointer-events:none; }
+      .toast { background:#1f2937; color:#f3f4f6; padding:10px 20px; border-radius:8px; font-size:0.9rem; box-shadow:0 4px 12px rgba(0,0,0,0.4); opacity:0; transform:translateY(12px); animation:toast-in 0.25s ease forwards; pointer-events:auto; }
+      .toast.toast-out { animation:toast-out 0.3s ease forwards; }
+      @keyframes toast-in { to { opacity:1; transform:translateY(0); } }
+      @keyframes toast-out { to { opacity:0; transform:translateY(12px); } }
     `;
     document.head.appendChild(style);
+  }
+
+  /**
+   * Show a toast notification at bottom-center of the screen.
+   */
+  function showToast(message) {
+    let container = document.querySelector(".toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.className = "toast-container";
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add("toast-out");
+      toast.addEventListener("animationend", () => toast.remove());
+    }, 2000);
+  }
+
+  /**
+   * Build hash string from current search state and update URL without adding history.
+   */
+  function updateHashWithFilters() {
+    const hash = window.location.hash || "#/";
+    if (!hash.startsWith("#/search")) return;
+
+    const params = new URLSearchParams(hash.split("?")[1] || "");
+    const q = params.get("q") || "";
+
+    const parts = [];
+    if (q) parts.push("q=" + encodeURIComponent(q));
+    if (currentFilters.languages.length > 0) parts.push("lang=" + encodeURIComponent(currentFilters.languages.join(",")));
+    if (currentFilters.topics.length > 0) parts.push("topic=" + encodeURIComponent(currentFilters.topics.join(",")));
+    if (currentFilters.minStars > 0) parts.push("stars=" + currentFilters.minStars);
+    if (currentSortMode && currentSortMode !== "relevance") parts.push("sort=" + encodeURIComponent(currentSortMode));
+
+    const newHash = "#/search" + (parts.length > 0 ? "?" + parts.join("&") : "");
+    history.replaceState(null, "", newHash);
+  }
+
+  /**
+   * Copy the current page URL to clipboard and show a toast.
+   */
+  function shareCurrentUrl() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      showToast("Link copied!");
+    }).catch(() => {
+      showToast("Could not copy link");
+    });
   }
 
   /**
