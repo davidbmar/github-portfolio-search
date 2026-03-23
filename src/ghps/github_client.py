@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import base64
+import json
+import logging
 import os
 from typing import Any
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 API_BASE = "https://api.github.com"
 PER_PAGE = 100
@@ -92,6 +96,37 @@ def fetch_readme(owner: str, repo: str) -> str:
     if encoding == "base64" and content:
         return base64.b64decode(content).decode("utf-8", errors="replace")
     return content
+
+
+def fetch_portfolio_json(owner: str, repo: str) -> dict | None:
+    """Fetch and parse portfolio.json from a repo's root.
+
+    Calls the GitHub Contents API for portfolio.json. Returns the parsed
+    dict if the file exists and is valid JSON, or None otherwise.
+    """
+    session = _session()
+    resp = session.get(f"{API_BASE}/repos/{owner}/{repo}/contents/portfolio.json")
+
+    if resp.status_code == 404:
+        return None
+    if resp.status_code != 200:
+        logger.warning("Unexpected status %d fetching portfolio.json for %s/%s", resp.status_code, owner, repo)
+        return None
+
+    try:
+        data = resp.json()
+        content = data.get("content", "")
+        encoding = data.get("encoding", "base64")
+
+        if encoding == "base64" and content:
+            raw = base64.b64decode(content).decode("utf-8", errors="replace")
+        else:
+            raw = content
+
+        return json.loads(raw)
+    except (json.JSONDecodeError, KeyError, TypeError) as exc:
+        logger.warning("Failed to parse portfolio.json for %s/%s: %s", owner, repo, exc)
+        return None
 
 
 def fetch_top_files(

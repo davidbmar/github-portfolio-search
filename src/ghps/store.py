@@ -53,7 +53,8 @@ class VectorStore:
                 updated_at TEXT,
                 url TEXT,
                 private INTEGER DEFAULT 0,
-                indexed_at TEXT
+                indexed_at TEXT,
+                portfolio TEXT DEFAULT ''
             );
 
             CREATE TABLE IF NOT EXISTS chunks (
@@ -102,9 +103,10 @@ class VectorStore:
         indexed_at = repo_dict.get(
             "indexed_at", datetime.now(timezone.utc).isoformat()
         )
+        portfolio = repo_dict.get("portfolio", "")
         db.execute(
-            """INSERT OR REPLACE INTO repos (name, description, language, topics, stars, updated_at, url, private, indexed_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT OR REPLACE INTO repos (name, description, language, topics, stars, updated_at, url, private, indexed_at, portfolio)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 repo_dict["name"],
                 repo_dict.get("description", ""),
@@ -115,6 +117,7 @@ class VectorStore:
                 repo_dict.get("url", ""),
                 1 if repo_dict.get("private") else 0,
                 indexed_at,
+                portfolio,
             ),
         )
 

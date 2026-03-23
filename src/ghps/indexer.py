@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 from datetime import datetime, timezone
@@ -128,6 +129,7 @@ class Indexer:
                     "url": repo.get("html_url", "") or repo.get("url", ""),
                     "private": repo.get("private", False),
                     "indexed_at": now,
+                    "portfolio": repo.get("portfolio", ""),
                 }
 
                 self.store.add_repo(
@@ -196,7 +198,7 @@ class Indexer:
         repos = github_client.fetch_repos(username)
         logger.info("Found %d repos for %s", len(repos), username)
 
-        # Enrich each repo with README content
+        # Enrich each repo with README content and portfolio.json
         for i, repo in enumerate(repos, 1):
             name = repo["name"]
             logger.info("Fetching README %d/%d: %s", i, len(repos), name)
@@ -206,5 +208,16 @@ class Indexer:
             except Exception:
                 logger.warning("Could not fetch README for %s", name)
                 repo["readme"] = ""
+
+            try:
+                portfolio_data = github_client.fetch_portfolio_json(username, name)
+                if portfolio_data is not None:
+                    repo["portfolio"] = json.dumps(portfolio_data)
+                    logger.info("Found portfolio.json for %s", name)
+                else:
+                    repo["portfolio"] = ""
+            except Exception:
+                logger.warning("Could not fetch portfolio.json for %s", name)
+                repo["portfolio"] = ""
 
         return self.index_repos(repos, dry_run=dry_run)
