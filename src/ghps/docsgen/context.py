@@ -7,12 +7,30 @@ only NON-default branches against the default branch (bounds API cost).
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from ghps import github_client as _default_gh
 
 # Treat a repo as "thin" when there is essentially nothing to document.
 _THIN_README_CHARS = 80
+
+# Markdown image:  ![alt](url)   and HTML <img src="url">
+_MD_IMAGE = re.compile(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)")
+_HTML_IMAGE = re.compile(r"""<img[^>]+src\s*=\s*["']([^"']+)""", re.IGNORECASE)
+
+# Substrings that mark an image as a badge/CI shield rather than a UI screenshot.
+_BADGE_MARKERS = (
+    "shields.io",
+    "badge",
+    "/workflows/",
+    "travis-ci",
+    "circleci",
+    "codecov",
+    "coveralls",
+    "app.netlify.com",
+    "/actions/workflow",
+)
 
 
 @dataclass
@@ -31,6 +49,39 @@ class RepoContext:
     branch_status: list[dict] = field(default_factory=list)  # non-default branches
     open_prs: list[dict] = field(default_factory=list)
     thin: bool = False
+    screenshot_url: str = ""  # first non-badge README image (absolute URL), or ""
+
+
+def first_readme_image(readme: str, owner: str, repo: str, branch: str) -> str:
+    """Return an absolute URL for the first non-badge image in *readme*, or "".
+
+    Markdown (``![](...)``) and HTML (``<img src=...>``) images are considered in
+    document order. Badge/CI-shield images are skipped. Relative paths are
+    resolved against raw.githubusercontent.com for the repo's default branch so
+    the image loads on the published page (which is NOT on github.com).
+    """
+    if not readme:
+        return ""
+
+    candidates: list[tuple[int, str]] = []
+    for pattern in (_MD_IMAGE, _HTML_IMAGE):
+        for m in pattern.finditer(readme):
+            candidates.append((m.start(), m.group(1).strip()))
+    candidates.sort(key=lambda c: c[0])
+
+    for _pos, url in candidates:
+        low = url.lower()
+        if any(marker in low for marker in _BADGE_MARKERS):
+            continue
+        if url.startswith(("http://", "https://")):
+            return url
+        if url.startswith("//"):
+            return "https:" + url
+        # Relative path → resolve to the raw content host.
+        rel = url.lstrip("./")
+        return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{rel}"
+
+    return ""
 
 
 def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext:
@@ -77,6 +128,8 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
         len((readme or "").strip()) < _THIN_README_CHARS and not source_files
     )
 
+    screenshot_url = first_readme_image(readme or "", owner, name, default_branch)
+
     return RepoContext(
         slug=name,
         owner=owner,
@@ -92,4 +145,5 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
         branch_status=branch_status,
         open_prs=open_prs,
         thin=thin,
+        screenshot_url=screenshot_url,
     )

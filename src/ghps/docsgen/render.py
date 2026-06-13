@@ -83,6 +83,41 @@ def _json_ld(record: dict) -> str:
     return json.dumps(data, indent=2).replace("</", "<\\/")
 
 
+def _screenshot(record: dict) -> str:
+    """A UI screenshot figure for human readers, or "" when none/unsafe."""
+    url = record.get("screenshot_url", "")
+    # Defense-in-depth: only ever emit an http(s) image src (the generator only
+    # ever derives such URLs, but never trust a record blindly).
+    if not url.startswith(("http://", "https://")):
+        return ""
+    alt = html.escape(record.get("title", record.get("slug", "")), quote=True)
+    return (
+        '<figure class="screenshot">'
+        f'<img src="{html.escape(url, quote=True)}" alt="{alt} screenshot" loading="lazy">'
+        "</figure>"
+    )
+
+
+def _quickstart(record: dict) -> str:
+    """A 'get it running' block for human readers, or "" when none."""
+    qs = record.get("quickstart", "")
+    if not qs.strip():
+        return ""
+    return (
+        '<section><h2>Quickstart</h2>'
+        f'<pre class="quickstart">{html.escape(qs)}</pre></section>'
+    )
+
+
+def _features(record: dict) -> str:
+    """A human-facing feature overview list, or "" when none."""
+    feats = record.get("features", [])
+    if not feats:
+        return ""
+    items = "".join(f"<li>{html.escape(f)}</li>" for f in feats)
+    return f'<section><h2>Features</h2><ul class="features">{items}</ul></section>'
+
+
 def render_page(record: dict) -> str:
     """Return a complete HTML document for *record*."""
     title = html.escape(record.get("title", record.get("slug", "")))
@@ -118,6 +153,12 @@ def render_page(record: dict) -> str:
               background: #f4fbf7; }}
   .hygiene.needs-attention {{ border-color: #d33; background: #fdf4f4; }}
   pre.mermaid {{ background: #fafafa; padding: 1rem; border-radius: 8px; }}
+  pre.quickstart {{ background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }}
+  figure.screenshot {{ margin: 1.5rem 0; }}
+  figure.screenshot img {{ max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }}
+  ul.features li {{ margin: .25rem 0; }}
   a {{ color: #2563eb; }}
 </style>
 </head>
@@ -129,7 +170,13 @@ def render_page(record: dict) -> str:
      &nbsp;·&nbsp; {visibility} &nbsp;·&nbsp; {status}</p>
 </header>
 
+{_screenshot(record)}
+
 <section><h2>What it is</h2><p>{html.escape(record.get("what_it_is", ""))}</p></section>
+
+{_features(record)}
+
+{_quickstart(record)}
 
 <section><h2>Architecture</h2>
   <pre class="mermaid">{_mermaid(record.get("diagram_architecture", ""))}</pre>

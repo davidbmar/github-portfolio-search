@@ -13,7 +13,7 @@
 
 This is a *dual-audience* system from the start:
 
-- **For humans** — beautiful, genuinely readable project pages: *what it is · how it's built (with diagrams) · how to apply & reuse it.*
+- **For humans** — beautiful, genuinely readable project pages: *what it is · a UI screenshot · a feature overview · a quickstart · how it's built (with diagrams) · how to apply & reuse it.* The screenshot is generator-derived from the repo's README (first non-badge image, relative paths resolved to raw.githubusercontent.com); the quickstart and feature overview are LLM-authored.
 - **For AI** — a discoverable corpus of every project, so an agent (Claude Code, a future you, a collaborator) can ask *"have we built this before?"* and find it. The AI both **writes** these docs and **consumes** them.
 
 ### The full stack (context — only L0 is in scope here)
@@ -132,6 +132,9 @@ Record schema (v1):
   "what_it_is": "…",
   "how_its_built": "…",
   "how_to_apply": "…",
+  "quickstart": "pip install … && … run",   // how to get running quickly (LLM)
+  "features": ["fast search", "static deploy"], // human-facing overview (LLM)
+  "screenshot_url": "https://raw.githubusercontent.com/…/shot.png", // UI photo (generator-derived from README; "" if none)
 
   // --- diagrams (Mermaid source; rendered client-side) ---
   "diagram_architecture": "flowchart LR; …",

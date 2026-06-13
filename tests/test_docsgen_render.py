@@ -20,9 +20,12 @@ def _record(**overrides) -> dict:
         "what_it_is": "A demonstration with <script>danger</script>.",
         "how_its_built": "With Python.",
         "how_to_apply": "Copy it.",
+        "quickstart": "pip install demo\ndemo run",
+        "screenshot_url": "https://raw.githubusercontent.com/davidbmar/demo/main/shot.png",
         "diagram_architecture": "flowchart LR; A-->B",
         "diagram_sequence": "sequenceDiagram; A->>B: hi",
         "capabilities": ["demoing"],
+        "features": ["fast search", "static deploy"],
         "components": ["main"],
         "tech": ["python"],
         "depends_on": [],
@@ -82,6 +85,49 @@ def test_renders_all_clear_when_no_todos():
 def test_thin_badge_when_thin():
     html = render.render_page(_record(thin=True))
     assert "thin" in html.lower()
+
+
+def test_renders_screenshot_when_present():
+    html = render.render_page(_record())
+    assert 'figure class="screenshot"' in html
+    assert 'src="https://raw.githubusercontent.com/davidbmar/demo/main/shot.png"' in html
+
+
+def test_omits_screenshot_when_absent():
+    html = render.render_page(_record(screenshot_url=""))
+    assert 'figure class="screenshot"' not in html
+
+
+def test_omits_non_http_screenshot_url():
+    html = render.render_page(_record(screenshot_url="javascript:alert(1)"))
+    # the figure is omitted entirely and the value is never used as an img src
+    # (it may still appear inert inside the #project-data JSON island)
+    assert 'figure class="screenshot"' not in html
+    assert "src=\"javascript:" not in html
+    assert "<img" not in html
+
+
+def test_renders_quickstart_section():
+    html = render.render_page(_record())
+    assert "Quickstart" in html
+    assert "pip install demo" in html
+
+
+def test_omits_quickstart_when_empty():
+    html = render.render_page(_record(quickstart="  "))
+    assert "<h2>Quickstart</h2>" not in html
+
+
+def test_renders_features_list():
+    html = render.render_page(_record())
+    assert "<h2>Features</h2>" in html
+    assert "fast search" in html
+    assert "static deploy" in html
+
+
+def test_omits_features_when_empty():
+    html = render.render_page(_record(features=[]))
+    assert "<h2>Features</h2>" not in html
 
 
 def test_json_ld_cannot_break_out_of_script_tag():

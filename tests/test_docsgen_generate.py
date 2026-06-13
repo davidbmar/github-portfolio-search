@@ -9,7 +9,8 @@ from ghps.docsgen import generate
 
 _LLM_FIELDS = {
     "title": "Demo", "one_liner": "x", "what_it_is": "x", "how_its_built": "x",
-    "how_to_apply": "x", "diagram_architecture": "flowchart LR; A-->B",
+    "how_to_apply": "x", "quickstart": "pip install x", "features": ["f1"],
+    "diagram_architecture": "flowchart LR; A-->B",
     "diagram_sequence": "sequenceDiagram; A->>B: hi", "capabilities": [],
     "components": [], "tech": ["python"], "depends_on": [], "integrates_with": [],
     "patterns": [], "reuse_tags": [],

@@ -23,6 +23,8 @@ REQUIRED_STRING_FIELDS = (
     "what_it_is",
     "how_its_built",
     "how_to_apply",
+    "quickstart",       # human-facing: how to get it running quickly (may be "")
+    "screenshot_url",   # human-facing: UI image derived from the README (may be "")
     "diagram_architecture",
     "diagram_sequence",
     "generated_at",
@@ -33,6 +35,7 @@ REQUIRED_STRING_FIELDS = (
 # List-of-string metadata fields (may be empty lists, but must be lists).
 REQUIRED_LIST_FIELDS = (
     "capabilities",
+    "features",         # human-facing: overview of what the project does
     "components",
     "tech",
     "depends_on",

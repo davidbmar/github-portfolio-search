@@ -28,6 +28,8 @@ _LLM_OWNED = (
     "what_it_is",
     "how_its_built",
     "how_to_apply",
+    "quickstart",
+    "features",
     "diagram_architecture",
     "diagram_sequence",
     "capabilities",
@@ -51,6 +53,7 @@ _GENERATOR_OWNED = (
     "status",
     "thin",
     "todos",
+    "screenshot_url",
     "generated_at",
     "source_commit",
     "model",
@@ -65,14 +68,18 @@ _SYSTEM = """You are a senior engineer writing a precise, reusable project brief
 Output ONE JSON object with EXACTLY these keys and no others:
   title (string), one_liner (string),
   what_it_is (string), how_its_built (string), how_to_apply (string),
+  quickstart (string), features (array of short strings),
   diagram_architecture (Mermaid flowchart source string),
   diagram_sequence (Mermaid sequenceDiagram source string),
   capabilities, components, tech, depends_on, integrates_with, patterns,
   reuse_tags (all arrays of short strings).
-The sequenceDiagram MUST reflect how the code actually runs (who calls whom) —
-do not hand-wave it from the README. Keep prose concrete and free of marketing.
-Mermaid must be valid: start diagram_architecture with 'flowchart' and
-diagram_sequence with 'sequenceDiagram'."""
+quickstart: the fastest path to running it for a new user — concrete install/run
+commands drawn from the README (use a short fenced code block if helpful); "" if
+genuinely unknown. features: a human-facing overview, 3-6 bullet-sized strings of
+what the project does. The sequenceDiagram MUST reflect how the code actually runs
+(who calls whom) — do not hand-wave it from the README. Keep prose concrete and
+free of marketing. Mermaid must be valid: start diagram_architecture with
+'flowchart' and diagram_sequence with 'sequenceDiagram'."""
 
 
 class RecordGenerationError(RuntimeError):
@@ -142,6 +149,7 @@ def _assemble(ctx: RepoContext, llm_part: dict, model: str) -> dict:
             "status": "shipped",
             "thin": ctx.thin,
             "todos": hygiene.derive_todos(ctx.branch_status, ctx.open_prs),
+            "screenshot_url": ctx.screenshot_url,
             "generated_at": datetime.now(timezone.utc)
             .isoformat()
             .replace("+00:00", "Z"),

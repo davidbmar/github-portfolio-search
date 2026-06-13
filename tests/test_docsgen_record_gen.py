@@ -36,6 +36,8 @@ _LLM_FIELDS = {
     "what_it_is": "A demonstration.",
     "how_its_built": "Built with Python.",
     "how_to_apply": "Copy it.",
+    "quickstart": "pip install demo && demo run",
+    "features": ["does the thing"],
     "diagram_architecture": "flowchart LR; A-->B",
     "diagram_sequence": "sequenceDiagram; A->>B: hi",
     "capabilities": ["demoing"],

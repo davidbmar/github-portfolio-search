@@ -80,6 +80,38 @@ def test_private_visibility_propagates():
     assert ctx.visibility == "private"
 
 
+def test_screenshot_resolves_relative_readme_image():
+    gh = _fake_gh(readme="# Demo\n\n![ui](docs/screenshot.png)\n\nText.")
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.screenshot_url == (
+        "https://raw.githubusercontent.com/davidbmar/demo/main/docs/screenshot.png"
+    )
+
+
+def test_screenshot_keeps_absolute_url():
+    gh = _fake_gh(readme="# Demo\n\n![ui](https://cdn.example.com/shot.png)")
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.screenshot_url == "https://cdn.example.com/shot.png"
+
+
+def test_screenshot_skips_badges_and_picks_real_image():
+    readme = (
+        "# Demo\n\n"
+        "![build](https://img.shields.io/badge/build-passing-green)\n"
+        "![screenshot](assets/app.png)\n"
+    )
+    gh = _fake_gh(readme=readme)
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.screenshot_url.endswith("/assets/app.png")
+    assert "shields.io" not in ctx.screenshot_url
+
+
+def test_no_image_yields_empty_screenshot():
+    gh = _fake_gh(readme="# Demo\n\nNo images here, just words.")
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.screenshot_url == ""
+
+
 def test_no_branches_leaves_head_sha_empty():
     gh = _fake_gh(branches=[])
     ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
