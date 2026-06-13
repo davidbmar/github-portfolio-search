@@ -229,6 +229,7 @@ class TestAuth:
 class TestFetchBranches:
     @patch.object(github_client, "_session")
     def test_lists_branches_with_sha(self, mock_session_fn):
+        """Branches are returned as name + commit_sha pairs."""
         session = MagicMock()
         mock_session_fn.return_value = session
         session.get.return_value = _mock_response([
@@ -244,6 +245,7 @@ class TestFetchBranches:
 
     @patch.object(github_client, "_session")
     def test_repo_not_found_returns_empty(self, mock_session_fn):
+        """A 404 (missing repo) yields an empty branch list."""
         session = MagicMock()
         mock_session_fn.return_value = session
         resp = MagicMock()
@@ -256,6 +258,7 @@ class TestFetchBranches:
 class TestCompareCommits:
     @patch.object(github_client, "_session")
     def test_returns_ahead_by(self, mock_session_fn):
+        """ahead_by from the compare API is returned as an int."""
         session = MagicMock()
         mock_session_fn.return_value = session
         session.get.return_value = _mock_response({"ahead_by": 4})
@@ -264,6 +267,7 @@ class TestCompareCommits:
 
     @patch.object(github_client, "_session")
     def test_missing_comparison_returns_zero(self, mock_session_fn):
+        """A non-200 comparison (e.g. 404) is treated as 0 ahead."""
         session = MagicMock()
         mock_session_fn.return_value = session
         resp = MagicMock()
@@ -276,6 +280,7 @@ class TestCompareCommits:
 class TestFetchOpenPRs:
     @patch.object(github_client, "_session")
     def test_returns_number_and_title(self, mock_session_fn):
+        """Open PRs are projected to number + title."""
         session = MagicMock()
         mock_session_fn.return_value = session
         session.get.return_value = _mock_response([
@@ -291,8 +296,22 @@ class TestFetchOpenPRs:
 
     @patch.object(github_client, "_session")
     def test_no_prs_returns_empty(self, mock_session_fn):
+        """No open PRs yields an empty list."""
         session = MagicMock()
         mock_session_fn.return_value = session
         session.get.return_value = _mock_response([])
 
         assert github_client.fetch_open_prs("owner", "repo") == []
+
+    @patch.object(github_client, "_session")
+    def test_pagination(self, mock_session_fn):
+        """Repos with >100 open PRs trigger multiple pages."""
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        page1 = [{"number": i, "title": f"PR {i}"} for i in range(100)]
+        page2 = [{"number": i, "title": f"PR {i}"} for i in range(100, 130)]
+        session.get.side_effect = [_mock_response(page1), _mock_response(page2)]
+
+        result = github_client.fetch_open_prs("owner", "repo")
+        assert len(result) == 130
+        assert session.get.call_count == 2

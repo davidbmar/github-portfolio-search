@@ -223,6 +223,11 @@ def compare_commits(owner: str, repo: str, base: str, head: str) -> int:
     session = _session()
     resp = session.get(f"{API_BASE}/repos/{owner}/{repo}/compare/{base}...{head}")
     if resp.status_code != 200:
+        if resp.status_code != 404:
+            logger.debug(
+                "compare %s/%s %s...%s returned %d; treating as 0 ahead",
+                owner, repo, base, head, resp.status_code,
+            )
         return 0
     return int(resp.json().get("ahead_by", 0))
 
@@ -231,14 +236,27 @@ def fetch_open_prs(owner: str, repo: str) -> list[dict[str, Any]]:
     """List open pull requests for *owner/repo*.
 
     Returns a list of ``{"number": int, "title": str}``. Empty list if none or
-    if the repo is missing.
+    if the repo is missing. Handles pagination.
     """
     session = _session()
-    resp = session.get(
-        f"{API_BASE}/repos/{owner}/{repo}/pulls",
-        params={"state": "open", "per_page": PER_PAGE},
-    )
-    if resp.status_code == 404:
-        return []
-    resp.raise_for_status()
-    return [{"number": pr["number"], "title": pr.get("title", "")} for pr in resp.json()]
+    prs: list[dict[str, Any]] = []
+    page = 1
+
+    while True:
+        resp = session.get(
+            f"{API_BASE}/repos/{owner}/{repo}/pulls",
+            params={"state": "open", "per_page": PER_PAGE, "page": page},
+        )
+        if resp.status_code == 404:
+            return []
+        resp.raise_for_status()
+        data = resp.json()
+
+        for pr in data:
+            prs.append({"number": pr["number"], "title": pr.get("title", "")})
+
+        if len(data) < PER_PAGE:
+            break
+        page += 1
+
+    return prs
