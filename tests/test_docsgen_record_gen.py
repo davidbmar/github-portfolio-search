@@ -57,7 +57,9 @@ class _FakeClient:
 
     def complete_json(self, system, user):
         self.calls += 1
-        return self._returns.pop(0)
+        # Repeat the last supplied return if called more often than seeded, so
+        # the test fails on the assertion under test rather than an IndexError.
+        return self._returns.pop(0) if len(self._returns) > 1 else self._returns[0]
 
 
 def test_generates_valid_record_and_fills_deterministic_fields():
@@ -74,6 +76,31 @@ def test_generates_valid_record_and_fills_deterministic_fields():
     # provenance timestamp present
     assert rec["generated_at"].endswith("Z")
     assert record_gen.schema.validate_record(rec) == []
+
+
+def test_llm_supplied_deterministic_fields_are_overridden():
+    """Untrusted LLM output can never populate generator-owned fields."""
+    poisoned = dict(_LLM_FIELDS)
+    poisoned["slug"] = "INJECTED"
+    poisoned["repo_url"] = "https://evil.example.com"
+    poisoned["visibility"] = "private"
+    poisoned["thin"] = True
+    poisoned["status"] = "idea"
+    poisoned["source_commit"] = "deadbee"
+    poisoned["model"] = "evil-model"
+    poisoned["todos"] = [{"kind": "injected", "detail": "bad"}]
+    client = _FakeClient(poisoned)
+    rec = record_gen.generate_record(_ctx(), client)
+    assert rec["slug"] == "demo"
+    assert rec["repo_url"] == "https://github.com/davidbmar/demo"
+    assert rec["visibility"] == "public"
+    assert rec["thin"] is False
+    assert rec["status"] == "shipped"
+    assert rec["source_commit"] == "abc1234"
+    assert rec["model"] == "fake-model"
+    # todos derived from hygiene (branch_status), not taken from LLM
+    assert all(t["kind"] != "injected" for t in rec["todos"])
+    assert rec["todos"][0]["kind"] == "unmerged_branch"
 
 
 def test_retries_once_on_invalid_then_succeeds():

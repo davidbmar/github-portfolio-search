@@ -17,7 +17,10 @@ _MAX_README_CHARS = 6000
 _MAX_FILE_CHARS = 1500
 _MAX_FILES = 6
 
-# Fields the model is asked to author.
+# How many times to attempt generation: 1 try + 1 retry.
+_MAX_ATTEMPTS = 2
+
+# Fields the model is asked to author (the ONLY keys pulled from LLM output).
 _LLM_OWNED = (
     "title",
     "one_liner",
@@ -33,6 +36,28 @@ _LLM_OWNED = (
     "integrates_with",
     "patterns",
     "reuse_tags",
+)
+
+# Fields the GENERATOR owns and always sets in _assemble from trusted sources
+# (ctx / derived state) — never from the untrusted LLM output. Kept strictly
+# disjoint from _LLM_OWNED so model output can never populate a deterministic
+# field; the assert below makes a future "let the model set status" diff fail
+# at import time rather than silently widening the trust boundary.
+_GENERATOR_OWNED = (
+    "slug",
+    "repo_url",
+    "visibility",
+    "status",
+    "thin",
+    "todos",
+    "generated_at",
+    "source_commit",
+    "model",
+)
+
+assert set(_LLM_OWNED).isdisjoint(_GENERATOR_OWNED), (
+    "trust boundary violated: a field is declared both LLM-owned and "
+    "generator-owned"
 )
 
 _SYSTEM = """You are a senior engineer writing a precise, reusable project brief.
@@ -88,7 +113,7 @@ def generate_record(ctx: RepoContext, client, *, model: str | None = None) -> di
     system, user = build_messages(ctx)
 
     last_errors: list[str] = []
-    for _attempt in range(2):
+    for _attempt in range(_MAX_ATTEMPTS):
         llm_part = client.complete_json(system, user)
         record = _assemble(ctx, llm_part, model or getattr(client, "model", "unknown"))
         last_errors = schema.validate_record(record)
