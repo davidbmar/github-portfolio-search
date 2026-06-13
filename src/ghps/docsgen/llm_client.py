@@ -31,14 +31,19 @@ class LLMClient(Protocol):
 
 
 def _extract_json(text: str) -> dict:
-    """Parse a JSON object from model text, tolerating ```json fences."""
+    """Parse a JSON object from model text, tolerating ``` fences.
+
+    Handles ```json / ``` (with or without a leading newline), an inline
+    one-line fence, and unfenced JSON. Strips the opening fence + optional
+    ``json`` language tag and the closing fence, then json.loads the remainder.
+    """
     s = text.strip()
     if s.startswith("```"):
-        s = s.split("\n", 1)[1] if "\n" in s else s
-        if s.endswith("```"):
-            s = s[: -3]
-        if s.startswith("json"):
+        s = s[3:]
+        if s[:4].lower() == "json":
             s = s[4:]
+        if s.endswith("```"):
+            s = s[:-3]
     return json.loads(s.strip())
 
 

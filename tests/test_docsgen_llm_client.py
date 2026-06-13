@@ -58,6 +58,31 @@ class TestAnthropicClient:
         )
         assert client.complete_json("sys", "user") == {"slug": "demo"}
 
+    def test_request_shape_headers_and_body(self):
+        session = MagicMock()
+        session.post.return_value = _resp({"content": [{"text": "{}"}]})
+        client = llm_client.AnthropicClient(
+            api_key="k", base_url="https://api.anthropic.com", model="claude-x",
+            session=session,
+        )
+        client.complete_json("sys", "user")
+        args, kwargs = session.post.call_args
+        assert args[0] == "https://api.anthropic.com/v1/messages"
+        assert kwargs["headers"]["x-api-key"] == "k"
+        assert kwargs["headers"]["anthropic-version"] == "2023-06-01"
+        assert kwargs["json"]["max_tokens"] > 0
+        assert kwargs["json"]["model"] == "claude-x"
+        # the JSON-only instruction is injected into the system prompt
+        assert "JSON" in kwargs["json"]["system"]
+
+
+def test_extract_json_bare_fence_without_language_tag():
+    assert llm_client._extract_json("```\n{\"a\": 1}\n```") == {"a": 1}
+
+
+def test_extract_json_no_fence():
+    assert llm_client._extract_json('{"a": 1}') == {"a": 1}
+
 
 class TestGetClient:
     def test_dashscope_from_env(self, monkeypatch):
@@ -74,3 +99,12 @@ class TestGetClient:
         monkeypatch.delenv("DASHSCOPE_API_KEY", raising=False)
         with pytest.raises(RuntimeError, match="DASHSCOPE_API_KEY"):
             llm_client.get_client()
+
+    def test_anthropic_provider_returns_anthropic_client(self, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+        client = llm_client.get_client("anthropic")
+        assert isinstance(client, llm_client.AnthropicClient)
+
+    def test_unknown_provider_raises(self, monkeypatch):
+        with pytest.raises(RuntimeError, match="unknown LLM provider"):
+            llm_client.get_client("nope")
