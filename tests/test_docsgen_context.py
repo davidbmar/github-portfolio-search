@@ -28,10 +28,10 @@ def _fake_gh(*, readme="# Demo", files=None, branches=None, prs=None, ahead=0):
     gh.fetch_top_files.return_value = (
         [("main.py", "print('hi')")] if files is None else files
     )
-    gh.fetch_branches.return_value = branches or [
-        {"name": "main", "commit_sha": "aaa111"}
-    ]
-    gh.fetch_open_prs.return_value = prs or []
+    gh.fetch_branches.return_value = (
+        [{"name": "main", "commit_sha": "aaa111"}] if branches is None else branches
+    )
+    gh.fetch_open_prs.return_value = [] if prs is None else prs
     gh.compare_commits.return_value = ahead
     return gh
 
@@ -78,3 +78,11 @@ def test_private_visibility_propagates():
     gh = _fake_gh()
     ctx = context.build_context(_repo_meta(private=True), owner="davidbmar", gh=gh)
     assert ctx.visibility == "private"
+
+
+def test_no_branches_leaves_head_sha_empty():
+    gh = _fake_gh(branches=[])
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.default_branch == "main"
+    assert ctx.head_sha == ""
+    assert ctx.branch_status == []

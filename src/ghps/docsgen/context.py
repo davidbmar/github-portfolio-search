@@ -51,11 +51,14 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
     # The default branch is the one whose name is "main" or "master"; fall back
     # to the first branch. (We avoid a separate repo call: branches + heuristic.)
     branch_names = [b["name"] for b in branches]
-    default_branch = "main"
-    if "main" not in branch_names:
-        default_branch = "master" if "master" in branch_names else (
-            branch_names[0] if branch_names else "main"
-        )
+    if "main" in branch_names:
+        default_branch = "main"
+    elif "master" in branch_names:
+        default_branch = "master"
+    elif branch_names:
+        default_branch = branch_names[0]
+    else:
+        default_branch = "main"
 
     head_sha = ""
     for b in branches:
