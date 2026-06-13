@@ -51,4 +51,14 @@ def test_skips_malformed_json(tmp_path):
 
     result = aggregate.aggregate_records(str(records_dir), str(out))
     assert result["count"] == 1
-    assert "broken" in result["skipped"][0]
+    assert result["skipped"] == ["broken.record.json"]
+
+
+def test_empty_directory_yields_zero_count(tmp_path):
+    records_dir = tmp_path / "projects"
+    records_dir.mkdir()
+    out = tmp_path / "projects.json"
+
+    result = aggregate.aggregate_records(str(records_dir), str(out))
+    assert result == {"count": 0, "skipped": []}
+    assert json.loads(out.read_text())["projects"] == []

@@ -37,7 +37,12 @@ def aggregate_records(records_dir: str, output_path: str) -> dict:
         "count": len(projects),
         "projects": projects,
     }
-    out.write_text(json.dumps(payload, indent=2))
+    # Match export.py's JSON convention: keep Unicode (ensure_ascii=False) so
+    # repo titles/one-liners stay readable in the live feed, explicit utf-8, and
+    # a trailing newline for clean diffs.
+    out.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     logger.info("aggregated %d records to %s", len(projects), output_path)
 
     return {"count": len(projects), "skipped": skipped}
