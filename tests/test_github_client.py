@@ -220,3 +220,79 @@ class TestAuth:
         """Without GITHUB_TOKEN, no Authorization header is set."""
         session = github_client._session()
         assert "Authorization" not in session.headers
+
+
+# ---------------------------------------------------------------------------
+# fetch_branches / compare_commits / fetch_open_prs  (L0 hygiene)
+# ---------------------------------------------------------------------------
+
+class TestFetchBranches:
+    @patch.object(github_client, "_session")
+    def test_lists_branches_with_sha(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response([
+            {"name": "main", "commit": {"sha": "aaa111"}},
+            {"name": "feat/x", "commit": {"sha": "bbb222"}},
+        ])
+
+        result = github_client.fetch_branches("owner", "repo")
+        assert result == [
+            {"name": "main", "commit_sha": "aaa111"},
+            {"name": "feat/x", "commit_sha": "bbb222"},
+        ]
+
+    @patch.object(github_client, "_session")
+    def test_repo_not_found_returns_empty(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        resp = MagicMock()
+        resp.status_code = 404
+        session.get.return_value = resp
+
+        assert github_client.fetch_branches("owner", "missing") == []
+
+
+class TestCompareCommits:
+    @patch.object(github_client, "_session")
+    def test_returns_ahead_by(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response({"ahead_by": 4})
+
+        assert github_client.compare_commits("owner", "repo", "main", "feat/x") == 4
+
+    @patch.object(github_client, "_session")
+    def test_missing_comparison_returns_zero(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        resp = MagicMock()
+        resp.status_code = 404
+        session.get.return_value = resp
+
+        assert github_client.compare_commits("owner", "repo", "main", "x") == 0
+
+
+class TestFetchOpenPRs:
+    @patch.object(github_client, "_session")
+    def test_returns_number_and_title(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response([
+            {"number": 7, "title": "Add feature", "draft": False},
+            {"number": 9, "title": "Fix bug", "draft": False},
+        ])
+
+        result = github_client.fetch_open_prs("owner", "repo")
+        assert result == [
+            {"number": 7, "title": "Add feature"},
+            {"number": 9, "title": "Fix bug"},
+        ]
+
+    @patch.object(github_client, "_session")
+    def test_no_prs_returns_empty(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response([])
+
+        assert github_client.fetch_open_prs("owner", "repo") == []

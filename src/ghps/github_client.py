@@ -184,3 +184,61 @@ def fetch_top_files(
         results.append((item["path"], content))
 
     return results
+
+
+def fetch_branches(owner: str, repo: str) -> list[dict[str, str]]:
+    """List branches for *owner/repo*.
+
+    Returns a list of ``{"name": str, "commit_sha": str}``. Empty list if the
+    repo is missing. Handles pagination.
+    """
+    session = _session()
+    branches: list[dict[str, str]] = []
+    page = 1
+
+    while True:
+        resp = session.get(
+            f"{API_BASE}/repos/{owner}/{repo}/branches",
+            params={"per_page": PER_PAGE, "page": page},
+        )
+        if resp.status_code == 404:
+            return []
+        resp.raise_for_status()
+        data = resp.json()
+
+        for b in data:
+            branches.append(
+                {"name": b["name"], "commit_sha": b.get("commit", {}).get("sha", "")}
+            )
+
+        if len(data) < PER_PAGE:
+            break
+        page += 1
+
+    return branches
+
+
+def compare_commits(owner: str, repo: str, base: str, head: str) -> int:
+    """Return how many commits *head* is ahead of *base* (0 if unknown)."""
+    session = _session()
+    resp = session.get(f"{API_BASE}/repos/{owner}/{repo}/compare/{base}...{head}")
+    if resp.status_code != 200:
+        return 0
+    return int(resp.json().get("ahead_by", 0))
+
+
+def fetch_open_prs(owner: str, repo: str) -> list[dict[str, Any]]:
+    """List open pull requests for *owner/repo*.
+
+    Returns a list of ``{"number": int, "title": str}``. Empty list if none or
+    if the repo is missing.
+    """
+    session = _session()
+    resp = session.get(
+        f"{API_BASE}/repos/{owner}/{repo}/pulls",
+        params={"state": "open", "per_page": PER_PAGE},
+    )
+    if resp.status_code == 404:
+        return []
+    resp.raise_for_status()
+    return [{"number": pr["number"], "title": pr.get("title", "")} for pr in resp.json()]
