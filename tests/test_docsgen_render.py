@@ -60,6 +60,14 @@ def test_includes_both_mermaid_blocks():
     assert "sequenceDiagram; A->>B: hi" in html
 
 
+def test_mermaid_imported_as_esm_module():
+    """The Mermaid import must be the ESM build (.mjs); the UMD .min.js has no
+    default export and would make `import mermaid` fail so diagrams never render."""
+    html = render.render_page(_record())
+    assert "mermaid.esm.min.mjs" in html
+    assert 'import mermaid from "https://cdn.jsdelivr.net' in html
+
+
 def test_includes_json_ld_software_source_code():
     html = render.render_page(_record())
     assert '"@type": "SoftwareSourceCode"' in html

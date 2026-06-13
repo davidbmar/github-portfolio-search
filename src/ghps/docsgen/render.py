@@ -22,7 +22,10 @@ from __future__ import annotations
 import html
 import json
 
-_MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"
+# Use the ESM module build (.mjs) — the .min.js is a UMD bundle with no default
+# export, so `import mermaid from ...` silently fails and diagrams never render.
+# Pinned for reproducibility.
+_MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs"
 
 
 def _mermaid(src: str) -> str:
