@@ -74,7 +74,8 @@ Output ONE JSON object with EXACTLY these keys and no others:
   capabilities, components, tech, depends_on, integrates_with, patterns,
   reuse_tags (all arrays of short strings).
 quickstart: the fastest path to running it for a new user — concrete install/run
-commands drawn from the README (use a short fenced code block if helpful); "" if
+commands drawn from the README, as PLAIN text with one command per line and NO
+markdown code fences (the page renders it in a code block already); "" if
 genuinely unknown. features: a human-facing overview, 3-6 bullet-sized strings of
 what the project does. The sequenceDiagram MUST reflect how the code actually runs
 (who calls whom) — do not hand-wave it from the README. Keep prose concrete and

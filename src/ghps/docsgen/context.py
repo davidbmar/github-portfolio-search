@@ -20,9 +20,13 @@ _MD_IMAGE = re.compile(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)")
 _HTML_IMAGE = re.compile(r"""<img[^>]+src\s*=\s*["']([^"']+)""", re.IGNORECASE)
 
 # Substrings that mark an image as a badge/CI shield rather than a UI screenshot.
+# Use slash-delimited "/badge/" (not bare "badge") so a real screenshot path like
+# docs/badge-system-screenshot.png is not mistaken for a shield.
 _BADGE_MARKERS = (
     "shields.io",
-    "badge",
+    "/badge/",
+    "badge.svg",
+    "badge.fury.io",
     "/workflows/",
     "travis-ci",
     "circleci",
@@ -71,14 +75,18 @@ def first_readme_image(readme: str, owner: str, repo: str, branch: str) -> str:
 
     for _pos, url in candidates:
         low = url.lower()
+        if low.startswith("data:"):  # inline base64 image — can't resolve to a URL
+            continue
         if any(marker in low for marker in _BADGE_MARKERS):
             continue
         if url.startswith(("http://", "https://")):
             return url
         if url.startswith("//"):
             return "https:" + url
-        # Relative path → resolve to the raw content host.
-        rel = url.lstrip("./")
+        # Relative path → resolve to the raw content host. Strip a single leading
+        # "./" then any leading "/", being careful not to eat a dotfile dir name.
+        rel = url[2:] if url.startswith("./") else url
+        rel = rel.lstrip("/")
         return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{rel}"
 
     return ""

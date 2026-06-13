@@ -112,6 +112,20 @@ def test_no_image_yields_empty_screenshot():
     assert ctx.screenshot_url == ""
 
 
+def test_screenshot_keeps_image_path_containing_badge_word():
+    gh = _fake_gh(readme="# D\n\n![ui](docs/badge-overview-screenshot.png)")
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.screenshot_url.endswith("/docs/badge-overview-screenshot.png")
+
+
+def test_screenshot_skips_data_uri_and_picks_real_image():
+    gh = _fake_gh(
+        readme='# D\n\n<img src="data:image/png;base64,AAAA">\n\n![real](shot.png)'
+    )
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.screenshot_url.endswith("/shot.png")
+
+
 def test_no_branches_leaves_head_sha_empty():
     gh = _fake_gh(branches=[])
     ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)

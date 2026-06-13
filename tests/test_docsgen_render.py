@@ -130,6 +130,17 @@ def test_omits_features_when_empty():
     assert "<h2>Features</h2>" not in html
 
 
+def test_escapes_quickstart_and_features():
+    html = render.render_page(
+        _record(quickstart="<script>alert(1)</script>", features=["<b>x</b>"])
+    )
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html  # quickstart escaped
+    assert "&lt;b&gt;x&lt;/b&gt;" in html  # feature item escaped
+    # neither raw tag survives in executable form
+    assert "<script>alert(1)</script>" not in html
+    assert "<b>x</b>" not in html
+
+
 def test_json_ld_cannot_break_out_of_script_tag():
     """An LLM-authored title with </script> must not terminate the ld+json block."""
     html = render.render_page(_record(title="Evil </script><script>alert(1)"))
