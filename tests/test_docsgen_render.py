@@ -82,3 +82,24 @@ def test_renders_all_clear_when_no_todos():
 def test_thin_badge_when_thin():
     html = render.render_page(_record(thin=True))
     assert "thin" in html.lower()
+
+
+def test_json_ld_cannot_break_out_of_script_tag():
+    """An LLM-authored title with </script> must not terminate the ld+json block."""
+    html = render.render_page(_record(title="Evil </script><script>alert(1)"))
+    # the literal closing tag must be neutralized to <\/script> inside the JSON
+    assert "</script><script>alert(1)" not in html
+    assert "<\\/script>" in html
+
+
+def test_mermaid_cannot_break_out_of_pre():
+    """A diagram payload with </pre><script> must be neutralized via &lt;."""
+    html = render.render_page(
+        _record(diagram_architecture="flowchart LR; A-->B</pre><script>alert(1)</script>")
+    )
+    # the raw breakout sequence must not survive; only < is escaped (to &lt;),
+    # which is sufficient — every breakout requires a <
+    assert "</pre><script>alert(1)" not in html
+    assert "&lt;/pre>&lt;script>alert(1)" in html
+    # legitimate arrow syntax still renders unescaped
+    assert "A-->B" in html

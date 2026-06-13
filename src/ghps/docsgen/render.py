@@ -1,9 +1,20 @@
 """Render a structured record into a self-contained HTML page.
 
-Pure Python (no Jinja). Prose is HTML-escaped; Mermaid diagram source is placed
-raw inside <pre class="mermaid"> (Mermaid requires unescaped text, and the source
-is generator-owned, not user input). Each page embeds a JSON data island and a
-JSON-LD SoftwareSourceCode block so machine-readability falls out for free.
+Pure Python (no Jinja). All record fields are LLM-authored and therefore treated
+as UNTRUSTED (a prompt-injected README could steer the model's output):
+
+  - Prose fields are html.escape'd.
+  - Mermaid diagram source must stay human-readable to render, so it is NOT fully
+    escaped — but `<` is escaped to `&lt;` (see `_mermaid`) to prevent a
+    `</pre><script>` breakout. Arrow syntax (`-->`, `->>`) has no `<`, so diagrams
+    still render; the browser decodes `&lt;` back to `<` in the element's
+    textContent, which is what Mermaid reads.
+  - Both `<script>` JSON blocks (the #project-data island and the JSON-LD block)
+    apply `.replace("</", "<\\/")` so a field containing `</script>` cannot
+    terminate the tag early. `<\\/` is valid JSON.
+
+Each page embeds a JSON data island and a JSON-LD SoftwareSourceCode block so
+machine-readability falls out for free.
 """
 
 from __future__ import annotations
@@ -12,6 +23,22 @@ import html
 import json
 
 _MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"
+
+
+def _mermaid(src: str) -> str:
+    """Make Mermaid source safe to embed raw in <pre> without breaking rendering.
+
+    Escapes only ``<`` (to ``&lt;``) so a payload like ``</pre><script>`` cannot
+    break out of the <pre> element. Mermaid arrow syntax contains no ``<``, and
+    the browser decodes ``&lt;`` back to ``<`` in textContent before Mermaid reads
+    it, so legitimate diagrams are unaffected.
+    """
+    return src.replace("<", "&lt;")
+
+
+def _json_script(data) -> str:
+    """Serialize *data* for embedding inside a <script> tag without breakout."""
+    return json.dumps(data).replace("</", "<\\/")
 
 
 def _tags(items: list[str]) -> str:
@@ -51,7 +78,9 @@ def _json_ld(record: dict) -> str:
         "codeRepository": record.get("repo_url", ""),
         "programmingLanguage": record.get("tech", []),
     }
-    return json.dumps(data, indent=2)
+    # Same <script> breakout protection as the data island: name/description are
+    # LLM-authored and could contain a literal </script>.
+    return json.dumps(data, indent=2).replace("</", "<\\/")
 
 
 def render_page(record: dict) -> str:
@@ -69,7 +98,7 @@ def render_page(record: dict) -> str:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · davidbmar.com</title>
-<script type="application/json" id="project-data">{json.dumps(record).replace("</", "<\\/")}</script>
+<script type="application/json" id="project-data">{_json_script(record)}</script>
 <script type="application/ld+json">{_json_ld(record)}</script>
 <style>
   :root {{ color-scheme: light dark; }}
@@ -103,13 +132,13 @@ def render_page(record: dict) -> str:
 <section><h2>What it is</h2><p>{html.escape(record.get("what_it_is", ""))}</p></section>
 
 <section><h2>Architecture</h2>
-  <pre class="mermaid">{record.get("diagram_architecture", "")}</pre>
+  <pre class="mermaid">{_mermaid(record.get("diagram_architecture", ""))}</pre>
 </section>
 
 <section><h2>How it's built</h2><p>{html.escape(record.get("how_its_built", ""))}</p></section>
 
 <section><h2>How it runs</h2>
-  <pre class="mermaid">{record.get("diagram_sequence", "")}</pre>
+  <pre class="mermaid">{_mermaid(record.get("diagram_sequence", ""))}</pre>
 </section>
 
 <section><h2>How to apply &amp; reuse</h2><p>{html.escape(record.get("how_to_apply", ""))}</p></section>
