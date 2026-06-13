@@ -47,6 +47,51 @@ class TestDashScopeClient:
         assert kwargs["headers"]["Authorization"] == "Bearer k"
 
 
+    def test_http_error_becomes_llm_error(self):
+        import requests
+
+        session = MagicMock()
+        resp = MagicMock()
+        resp.raise_for_status.side_effect = requests.HTTPError("500 Server Error")
+        session.post.return_value = resp
+        client = llm_client.DashScopeClient(
+            api_key="k", base_url="https://x/v1", model="qwen-plus", session=session
+        )
+        with pytest.raises(llm_client.LLMError):
+            client.complete_json("sys", "user")
+
+    def test_network_error_becomes_llm_error(self):
+        import requests
+
+        session = MagicMock()
+        session.post.side_effect = requests.ConnectionError("boom")
+        client = llm_client.DashScopeClient(
+            api_key="k", base_url="https://x/v1", model="qwen-plus", session=session
+        )
+        with pytest.raises(llm_client.LLMError):
+            client.complete_json("sys", "user")
+
+    def test_malformed_response_shape_becomes_llm_error(self):
+        session = MagicMock()
+        session.post.return_value = _resp({"unexpected": "shape"})  # no choices
+        client = llm_client.DashScopeClient(
+            api_key="k", base_url="https://x/v1", model="qwen-plus", session=session
+        )
+        with pytest.raises(llm_client.LLMError):
+            client.complete_json("sys", "user")
+
+    def test_unparseable_content_becomes_llm_error(self):
+        session = MagicMock()
+        session.post.return_value = _resp(
+            {"choices": [{"message": {"content": "not json at all"}}]}
+        )
+        client = llm_client.DashScopeClient(
+            api_key="k", base_url="https://x/v1", model="qwen-plus", session=session
+        )
+        with pytest.raises(llm_client.LLMError):
+            client.complete_json("sys", "user")
+
+
 class TestAnthropicClient:
     def test_strips_code_fence_and_parses(self):
         session = MagicMock()

@@ -21,6 +21,20 @@ import requests
 _TIMEOUT = 120
 _MAX_TOKENS = 4096
 
+# Failures the seam converts into LLMError (so callers don't import requests/json):
+#   requests.RequestException — network/timeout/HTTP-status errors
+#   ValueError                — json.JSONDecodeError (a ValueError subclass)
+#   KeyError / IndexError     — malformed response shape (missing choices/content)
+_CALL_FAILURES = (requests.RequestException, ValueError, KeyError, IndexError)
+
+
+class LLMError(RuntimeError):
+    """An LLM call failed: network/HTTP error, or unparseable/malformed output.
+
+    Adapters raise this for ANY call failure so generators can retry uniformly
+    and never abort a batch on a single bad repo.
+    """
+
 
 class LLMClient(Protocol):
     model: str
@@ -57,25 +71,28 @@ class DashScopeClient:
         self._session = session or requests.Session()
 
     def complete_json(self, system: str, user: str) -> dict:
-        resp = self._session.post(
-            f"{self.base_url}/chat/completions",
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": self.model,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-                "response_format": {"type": "json_object"},
-            },
-            timeout=_TIMEOUT,
-        )
-        resp.raise_for_status()
-        content = resp.json()["choices"][0]["message"]["content"]
-        return _extract_json(content)
+        try:
+            resp = self._session.post(
+                f"{self.base_url}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.model,
+                    "messages": [
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user},
+                    ],
+                    "response_format": {"type": "json_object"},
+                },
+                timeout=_TIMEOUT,
+            )
+            resp.raise_for_status()
+            content = resp.json()["choices"][0]["message"]["content"]
+            return _extract_json(content)
+        except _CALL_FAILURES as exc:
+            raise LLMError(f"DashScope call failed: {exc}") from exc
 
 
 class AnthropicClient:
@@ -88,24 +105,27 @@ class AnthropicClient:
         self._session = session or requests.Session()
 
     def complete_json(self, system: str, user: str) -> dict:
-        resp = self._session.post(
-            f"{self.base_url}/v1/messages",
-            headers={
-                "x-api-key": self.api_key,
-                "anthropic-version": "2023-06-01",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": self.model,
-                "max_tokens": _MAX_TOKENS,
-                "system": system + "\n\nRespond with a single JSON object only.",
-                "messages": [{"role": "user", "content": user}],
-            },
-            timeout=_TIMEOUT,
-        )
-        resp.raise_for_status()
-        text = resp.json()["content"][0]["text"]
-        return _extract_json(text)
+        try:
+            resp = self._session.post(
+                f"{self.base_url}/v1/messages",
+                headers={
+                    "x-api-key": self.api_key,
+                    "anthropic-version": "2023-06-01",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.model,
+                    "max_tokens": _MAX_TOKENS,
+                    "system": system + "\n\nRespond with a single JSON object only.",
+                    "messages": [{"role": "user", "content": user}],
+                },
+                timeout=_TIMEOUT,
+            )
+            resp.raise_for_status()
+            text = resp.json()["content"][0]["text"]
+            return _extract_json(text)
+        except _CALL_FAILURES as exc:
+            raise LLMError(f"Anthropic call failed: {exc}") from exc
 
 
 def get_client(provider: str | None = None) -> LLMClient:

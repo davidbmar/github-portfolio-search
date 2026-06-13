@@ -271,9 +271,9 @@ def gen_docs(owner, only, limit, force, provider, model):
     from ghps.docsgen import generate
     from ghps.docsgen.llm_client import get_client
 
+    # The model id (when given) propagates via the generate_all kwarg, which
+    # takes precedence inside generate_record — no need to mutate the client.
     client = get_client(provider)
-    if model:
-        client.model = model
 
     result = generate.generate_all(
         owner=owner,
@@ -292,6 +292,8 @@ def gen_docs(owner, only, limit, force, provider, model):
     click.echo(f"  skipped:   {result['skipped']}")
     if result["failed"]:
         click.echo(click.style(f"  failed:    {result['failed']}", fg="red"))
+        # Surface partial failure to make / CI chains so a bad run is visible.
+        sys.exit(1)
 
 
 @main.command()

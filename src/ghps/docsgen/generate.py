@@ -41,7 +41,7 @@ def generate_one(
     )
 
     html_path = Path(html_dir) / f"{record['slug']}.html"
-    html_path.write_text(render.render_page(record))
+    html_path.write_text(render.render_page(record), encoding="utf-8")
 
     logger.info("generated %s", record["slug"])
     return record

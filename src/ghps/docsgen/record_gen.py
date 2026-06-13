@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 
 from ghps.docsgen import hygiene, schema
 from ghps.docsgen.context import RepoContext
+from ghps.docsgen.llm_client import LLMError
 
 _MAX_README_CHARS = 6000
 _MAX_FILE_CHARS = 1500
@@ -112,17 +113,22 @@ def generate_record(ctx: RepoContext, client, *, model: str | None = None) -> di
     """
     system, user = build_messages(ctx)
 
-    last_errors: list[str] = []
+    last_error = ""
     for _attempt in range(_MAX_ATTEMPTS):
-        llm_part = client.complete_json(system, user)
+        # A failed LLM call (network/HTTP/unparseable) is retried just like an
+        # invalid record — so one bad repo never aborts a batch run.
+        try:
+            llm_part = client.complete_json(system, user)
+        except LLMError as exc:
+            last_error = f"LLM call failed: {exc}"
+            continue
         record = _assemble(ctx, llm_part, model or getattr(client, "model", "unknown"))
-        last_errors = schema.validate_record(record)
-        if not last_errors:
+        errors = schema.validate_record(record)
+        if not errors:
             return record
+        last_error = f"record invalid: {errors}"
 
-    raise RecordGenerationError(
-        f"{ctx.slug}: record invalid after retry: {last_errors}"
-    )
+    raise RecordGenerationError(f"{ctx.slug}: {last_error}")
 
 
 def _assemble(ctx: RepoContext, llm_part: dict, model: str) -> dict:
