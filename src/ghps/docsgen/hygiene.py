@@ -22,7 +22,7 @@ def derive_todos(branch_status: list[dict], open_prs: list[dict]) -> list[dict]:
 
     for branch in branch_status:
         ahead = branch.get("ahead_by", 0)
-        if ahead and ahead > 0:
+        if ahead > 0:
             noun = "commit" if ahead == 1 else "commits"
             todos.append(
                 {

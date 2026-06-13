@@ -40,6 +40,11 @@ def test_open_pr_becomes_todo():
     assert "Add feature" in todos[0]["detail"]
 
 
+def test_branch_missing_ahead_by_is_ignored():
+    todos = hygiene.derive_todos([{"name": "b"}], [])
+    assert todos == []
+
+
 def test_singular_vs_plural_commit_wording():
     one = hygiene.derive_todos([{"name": "b", "ahead_by": 1}], [])
     assert "1 commit ahead" in one[0]["detail"]
