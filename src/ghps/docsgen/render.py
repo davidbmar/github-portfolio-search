@@ -38,7 +38,7 @@ def _mermaid(src: str) -> str:
 
 def _json_script(data) -> str:
     """Serialize *data* for embedding inside a <script> tag without breakout."""
-    return json.dumps(data).replace("</", "<\\/")
+    return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
 
 def _tags(items: list[str]) -> str:
@@ -80,7 +80,7 @@ def _json_ld(record: dict) -> str:
     }
     # Same <script> breakout protection as the data island: name/description are
     # LLM-authored and could contain a literal </script>.
-    return json.dumps(data, indent=2).replace("</", "<\\/")
+    return json.dumps(data, indent=2, ensure_ascii=False).replace("</", "<\\/")
 
 
 def _screenshot(record: dict) -> str:

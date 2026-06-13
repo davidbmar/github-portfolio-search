@@ -122,6 +122,13 @@ def test_raises_after_retry_exhausted():
         record_gen.generate_record(_ctx(), client)
 
 
+def test_non_dict_llm_response_raises_record_error_not_attributeerror():
+    """Valid-but-non-dict JSON (e.g. a list) must not crash — it retries then raises."""
+    client = _FakeClient([1, 2, 3], [1, 2, 3])
+    with pytest.raises(record_gen.RecordGenerationError):
+        record_gen.generate_record(_ctx(), client)
+
+
 def test_thin_repo_still_produces_valid_record():
     client = _FakeClient(dict(_LLM_FIELDS))
     rec = record_gen.generate_record(_ctx(thin=True, readme="", source_files=[]), client)

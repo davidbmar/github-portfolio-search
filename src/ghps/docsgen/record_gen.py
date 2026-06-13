@@ -130,6 +130,10 @@ def generate_record(ctx: RepoContext, client, *, model: str | None = None) -> di
         except LLMError as exc:
             last_error = f"LLM call failed: {exc}"
             continue
+        if not isinstance(llm_part, dict):
+            # Valid JSON but not an object (e.g. [], null, 42) — retry, don't crash.
+            last_error = f"LLM returned non-dict JSON: {type(llm_part).__name__}"
+            continue
         record = _assemble(ctx, llm_part, model or getattr(client, "model", "unknown"))
         errors = schema.validate_record(record)
         if not errors:
