@@ -12,7 +12,9 @@ from typing import Any
 
 SCHEMA_VERSION = "v1"
 
-# Prose / scalar string fields that must be present and non-empty-typed.
+# Prose / scalar string fields that must be present and of type str. Empty
+# strings are intentionally tolerated: provenance fields like source_commit are
+# legitimately "" for thin repos with no resolvable HEAD (see record_gen).
 REQUIRED_STRING_FIELDS = (
     "slug",
     "title",

@@ -63,3 +63,16 @@ def test_thin_must_be_bool():
     rec["thin"] = "yes"
     errors = schema.validate_record(rec)
     assert any("thin" in e for e in errors)
+
+
+def test_non_dict_record_is_rejected():
+    errors = schema.validate_record("oops")
+    assert errors != []
+    assert any("dict" in e for e in errors)
+
+
+def test_list_field_with_non_string_element_is_reported():
+    rec = _valid_record()
+    rec["capabilities"] = ["ok", 123]
+    errors = schema.validate_record(rec)
+    assert any("capabilities" in e for e in errors)
