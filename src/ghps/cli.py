@@ -259,6 +259,41 @@ def export(db: str, output: str) -> None:
         click.echo(f"  {name} -> {path}")
 
 
+@main.command(name="gen-docs")
+@click.option("--owner", default="davidbmar", help="GitHub owner/org to document.")
+@click.option("--only", default=None, help="Generate just one repo by slug.")
+@click.option("--limit", default=None, type=int, help="Cap number of repos (cost control).")
+@click.option("--force", is_flag=True, help="Regenerate even if a record exists.")
+@click.option("--provider", default=None, help="LLM provider (dashscope|anthropic).")
+@click.option("--model", default=None, help="Override model id (provenance + dial).")
+def gen_docs(owner, only, limit, force, provider, model):
+    """Generate AI-written, machine-readable docs (L0) for each repo."""
+    from ghps.docsgen import generate
+    from ghps.docsgen.llm_client import get_client
+
+    client = get_client(provider)
+    if model:
+        client.model = model
+
+    result = generate.generate_all(
+        owner=owner,
+        records_dir="projects",
+        html_dir="web/projects",
+        feed_path="web/data/projects.json",
+        client=client,
+        only=only,
+        limit=limit,
+        force=force,
+        model=model,
+    )
+
+    click.echo(click.style("Doc generation complete!", fg="green", bold=True))
+    click.echo(f"  generated: {result['generated']}")
+    click.echo(f"  skipped:   {result['skipped']}")
+    if result["failed"]:
+        click.echo(click.style(f"  failed:    {result['failed']}", fg="red"))
+
+
 @main.command()
 @click.option("--port", default=8000, help="Port to listen on.")
 @click.option("--db", default=DEFAULT_DB, help="Path to the SQLite-vec database.")

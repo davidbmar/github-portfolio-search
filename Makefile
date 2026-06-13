@@ -1,4 +1,4 @@
-.PHONY: install test lint index serve export deploy clean reindex
+.PHONY: install test lint index serve export gen-docs deploy clean reindex
 
 install:
 	pip install -e ".[dev]"
@@ -19,6 +19,9 @@ serve:
 
 export:
 	ghps export
+
+gen-docs:
+	ghps gen-docs $(if $(ONLY),--only $(ONLY),) $(if $(LIMIT),--limit $(LIMIT),)
 
 deploy:
 	@test -d web/ || (echo "Error: web/ directory not found" && exit 1)
