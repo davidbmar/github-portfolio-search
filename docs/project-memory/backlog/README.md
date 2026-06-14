@@ -42,6 +42,7 @@ What should happen?
 | B-019 | Google OAuth gates entire site — public tier (browse/search) blocked for unauthenticated users | Fixed | High |
 | F-009 | Public tier should be accessible without sign-in, auth only for gated features | Fixed | High |
 | B-020 | `static-site-deployer` IAM user cannot deploy (missing s3:PutObject) — deploy needs admin profile | Open | Medium |
+| B-021 | gen-docs exhausts GitHub rate limit on full runs — needs backoff/respect reset | Open | Medium |
 
 ## Archived (Fixed, pre-Sprint 10)
 
