@@ -84,12 +84,19 @@ class DashScopeClient:
                         {"role": "system", "content": system},
                         {"role": "user", "content": user},
                     ],
+                    "temperature": 0.3,
                     "response_format": {"type": "json_object"},
+                    # Qwen3.x defaults to "thinking" mode, which pollutes the JSON
+                    # output; disable it for fast, clean JSON (matches the proven
+                    # generate_title_headline_hooks DashScope client).
+                    "enable_thinking": False,
                 },
                 timeout=_TIMEOUT,
             )
             resp.raise_for_status()
-            content = resp.json()["choices"][0]["message"]["content"]
+            msg = resp.json()["choices"][0]["message"]
+            # Qwen occasionally returns the payload under reasoning_content.
+            content = msg.get("content") or msg.get("reasoning_content") or ""
             return _extract_json(content)
         except _CALL_FAILURES as exc:
             raise LLMError(f"DashScope call failed: {exc}") from exc
