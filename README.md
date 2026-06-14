@@ -148,7 +148,27 @@ Then from Claude Code:
 - `portfolio_search("presigned URL")` — semantic search
 - `portfolio_clusters()` — browse capability clusters
 - `portfolio_repo_detail("voice-print")` — full repo info
+- `portfolio_find_docs("fail-closed LLM gate")` — search the AI-generated project docs
 - `portfolio_reindex()` — refresh the index
+
+## For LLMs / AI
+
+Every repo is auto-documented (what it is, how it's built with diagrams, how to
+reuse it) and the corpus is published so an **AI agent can find and use it without
+loading everything into context** — Anthropic's progressive-disclosure pattern:
+
+1. **Start tiny:** [`davidbmar.com/llms.txt`](https://davidbmar.com/llms.txt) — the
+   discovery manifest.
+2. **Scan the compact index:** [`/data/projects-index.json`](https://davidbmar.com/data/projects-index.json)
+   (slug · one-liner · tech · reuse_tags — ~8× smaller than the full feed).
+3. **Fetch only what you need:** `/projects/<slug>.record.json` (full record per repo).
+4. **Or search, don't download:** MCP tool `portfolio_find_docs(query)`.
+
+Full corpus (last resort): `/data/projects.json`. Human pages: `davidbmar.com/projects/`.
+Full design + field semantics: [`docs/AI_DISCOVERY.md`](docs/AI_DISCOVERY.md).
+
+Regenerate docs with `ghps gen-docs` (LLM); rebuild all web artifacts from records
+with `ghps publish-docs` (no LLM).
 
 ## Architecture
 

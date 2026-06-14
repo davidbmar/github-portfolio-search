@@ -201,6 +201,13 @@ def test_index_empty_state():
     assert "0 projects" in html
 
 
+def test_index_has_llms_pointer():
+    html = render.render_index_page(_index_projects())
+    assert "For LLMs / AI" in html
+    assert 'href="/llms.txt"' in html
+    assert 'href="/data/projects-index.json"' in html
+
+
 def test_index_omits_non_http_thumb():
     html = render.render_index_page(
         [{"slug": "x", "title": "X", "one_liner": "", "thin": False, "tech": [],

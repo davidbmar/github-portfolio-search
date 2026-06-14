@@ -335,6 +335,9 @@ def render_index_page(projects: list[dict]) -> str:
   .hyg.warn {{ color: #d33; }}
   .muted {{ opacity: .6; }}
   a.home {{ color: #2563eb; }}
+  .llms {{ margin-top: 2rem; padding: .9rem 1.1rem; border: 1px dashed #8886;
+           border-radius: 10px; font-size: .9rem; opacity: .9; }}
+  .llms a {{ color: #2563eb; }}
 </style>
 </head>
 <body>
@@ -344,6 +347,12 @@ def render_index_page(projects: list[dict]) -> str:
      <a class="home" href="/">← back to portfolio search</a></p>
 </header>
 {body}
+<aside class="llms">
+  🤖 <strong>For LLMs / AI agents:</strong> start at
+  <a href="/llms.txt">/llms.txt</a> — a tiny manifest that points to a compact
+  machine-readable index (<a href="/data/projects-index.json">/data/projects-index.json</a>)
+  and per-repo records, so you can find what you need without loading everything.
+</aside>
 </body>
 </html>
 """
