@@ -8,9 +8,8 @@ a RecordGenerationError (caller marks a failure; never renders a broken page).
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-
 from ghps.docsgen import hygiene, schema
+from ghps.docsgen._util import utc_z
 from ghps.docsgen.context import RepoContext
 from ghps.docsgen.llm_client import LLMError
 
@@ -155,9 +154,7 @@ def _assemble(ctx: RepoContext, llm_part: dict, model: str) -> dict:
             "thin": ctx.thin,
             "todos": hygiene.derive_todos(ctx.branch_status, ctx.open_prs),
             "screenshot_url": ctx.screenshot_url,
-            "generated_at": datetime.now(timezone.utc)
-            .isoformat()
-            .replace("+00:00", "Z"),
+            "generated_at": utc_z(),
             "source_commit": ctx.head_sha[:7] if ctx.head_sha else "",
             "model": model,
         }

@@ -15,7 +15,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 # Tool definitions (JSON Schema for MCP tool listing)
 # ---------------------------------------------------------------------------
 
-TOOLS: List[Dict[str, Any]] = [
+TOOLS: list[dict[str, Any]] = [
     {
         "name": "portfolio_search",
         "description": (
@@ -129,7 +129,7 @@ def _check_index(store: Any) -> None:
         raise ValueError(_NO_INDEX_MSG)
 
 
-def _handle_portfolio_search(store: Any, embedder: Any, args: dict) -> List[dict]:
+def _handle_portfolio_search(store: Any, embedder: Any, args: dict) -> list[dict]:
     """Execute portfolio_search tool."""
     query = args.get("query", "")
     limit = args.get("limit", args.get("top_k", 10))
@@ -143,7 +143,7 @@ def _handle_portfolio_search(store: Any, embedder: Any, args: dict) -> List[dict
     raw = store.search(query_vec, limit=limit * 3)
 
     db = store.connect()
-    repo_meta: Dict[str, dict] = {}
+    repo_meta: dict[str, dict] = {}
     for row in db.execute(
         "SELECT name, description, language, topics, url FROM repos"
     ).fetchall():
@@ -159,7 +159,7 @@ def _handle_portfolio_search(store: Any, embedder: Any, args: dict) -> List[dict
             "url": row[4] or "",
         }
 
-    best: Dict[str, dict] = {}
+    best: dict[str, dict] = {}
     for row in raw:
         repo_name = row["repo_name"]
         score = 1.0 - row["distance"]
@@ -180,7 +180,7 @@ def _handle_portfolio_search(store: Any, embedder: Any, args: dict) -> List[dict
     return results[:limit]
 
 
-def _handle_portfolio_clusters(store: Any, _args: dict) -> List[dict]:
+def _handle_portfolio_clusters(store: Any, _args: dict) -> list[dict]:
     """Execute portfolio_clusters tool."""
     _check_index(store)
 
@@ -258,7 +258,7 @@ def _handle_portfolio_repo_detail(store: Any, args: dict) -> dict:
     }
 
 
-def _handle_portfolio_find_docs(docs_feed: str, args: dict) -> List[dict]:
+def _handle_portfolio_find_docs(docs_feed: str, args: dict) -> list[dict]:
     """Execute portfolio_find_docs — search the L0 docs feed (projects.json)."""
     from ghps.docsgen.search_docs import load_feed, search_docs
 
@@ -329,7 +329,7 @@ def handle_message(
     store: Any,
     embedder: Any,
     docs_feed: str = "web/data/projects.json",
-) -> Optional[dict]:
+) -> dict | None:
     """Process a single JSON-RPC message and return a response (or None for notifications)."""
     method = msg.get("method", "")
     msg_id = msg.get("id")
@@ -387,7 +387,7 @@ def handle_message(
     return None
 
 
-def _read_message(stream) -> Optional[dict]:
+def _read_message(stream) -> dict | None:
     """Read a JSON-RPC message from a stream using MCP stdio framing (newline-delimited JSON)."""
     line = stream.readline()
     if not line:

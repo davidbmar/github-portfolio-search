@@ -214,6 +214,50 @@ class TestFetchTopFiles:
         assert len(result) == 1
         assert result[0][0] == "index.html"
 
+    @patch.object(github_client, "_session")
+    def test_default_branch_skips_repo_lookup(self, mock_session_fn):
+        """Passing default_branch avoids the extra GET /repos call."""
+        session = MagicMock()
+        mock_session_fn.return_value = session
+
+        tree_resp = _mock_response({
+            "tree": [{"path": "a.py", "type": "blob", "sha": "s1"}]
+        })
+        blob_resp = _mock_response(
+            {"content": base64.b64encode(b"x").decode(), "encoding": "base64"}
+        )
+        # Only tree + blob calls — NO repo lookup first.
+        session.get.side_effect = [tree_resp, blob_resp]
+
+        result = github_client.fetch_top_files("owner", "repo", default_branch="main")
+        assert result == [("a.py", "x")]
+        # first call is the tree endpoint, not /repos/owner/repo
+        assert "git/trees/main" in session.get.call_args_list[0].args[0]
+
+    @patch.object(github_client, "_session")
+    def test_max_files_caps_blob_downloads(self, mock_session_fn):
+        """max_files limits how many blobs are fetched (not all matching files)."""
+        session = MagicMock()
+        mock_session_fn.return_value = session
+
+        tree_resp = _mock_response({
+            "tree": [
+                {"path": f"f{i}.py", "type": "blob", "sha": f"s{i}"} for i in range(10)
+            ]
+        })
+        blob_resp = _mock_response(
+            {"content": base64.b64encode(b"x").decode(), "encoding": "base64"}
+        )
+        # tree + exactly 2 blob fetches (capped), nothing more.
+        session.get.side_effect = [tree_resp, blob_resp, blob_resp]
+
+        result = github_client.fetch_top_files(
+            "owner", "repo", default_branch="main", max_files=2
+        )
+        assert len(result) == 2
+        # 1 tree call + 2 blob calls = 3 total (no repo lookup, no 10 blobs)
+        assert session.get.call_count == 3
+
 
 # ---------------------------------------------------------------------------
 # Authentication

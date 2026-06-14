@@ -67,6 +67,7 @@ def fetch_repos(username: str) -> list[dict[str, Any]]:
                     "stars": r.get("stargazers_count", 0),
                     "updated_at": r.get("updated_at", ""),
                     "pushed_at": r.get("pushed_at", ""),
+                    "default_branch": r.get("default_branch", ""),
                     "html_url": r.get("html_url", ""),
                     "private": r.get("private", False),
                 }
@@ -135,23 +136,32 @@ def fetch_top_files(
     owner: str,
     repo: str,
     extensions: tuple[str, ...] | list[str] = DEFAULT_EXTENSIONS,
+    *,
+    default_branch: str | None = None,
+    max_files: int | None = None,
 ) -> list[tuple[str, str]]:
     """Fetch source files matching *extensions* from the repo's default branch.
 
-    Uses the Git Trees API with ``recursive=1`` to list all files, then
-    fetches the content of matching files via the Blobs API.
+    Uses the Git Trees API with ``recursive=1`` to list all files, then fetches
+    the content of matching files via the Blobs API.
+
+    Pass *default_branch* to skip the extra repo lookup when the caller already
+    knows it. Pass *max_files* to cap how many blobs are downloaded — callers
+    that only use the first few files (e.g. doc generation) avoid hundreds of
+    wasted Blob API calls on large repos.
 
     Returns a list of ``(path, content)`` tuples.
     """
     session = _session()
     extensions_set = set(extensions)
 
-    # Get the default branch SHA via the repo endpoint
-    repo_resp = session.get(f"{API_BASE}/repos/{owner}/{repo}")
-    if repo_resp.status_code == 404:
-        return []
-    repo_resp.raise_for_status()
-    default_branch = repo_resp.json().get("default_branch", "main")
+    # Resolve the default branch — only hit the repo endpoint if not supplied.
+    if not default_branch:
+        repo_resp = session.get(f"{API_BASE}/repos/{owner}/{repo}")
+        if repo_resp.status_code == 404:
+            return []
+        repo_resp.raise_for_status()
+        default_branch = repo_resp.json().get("default_branch", "main")
 
     # Fetch full tree
     tree_resp = session.get(
@@ -164,13 +174,15 @@ def fetch_top_files(
 
     tree = tree_resp.json().get("tree", [])
 
-    # Filter to matching blobs
+    # Filter to matching blobs, then cap BEFORE downloading their content.
     matching = [
         item
         for item in tree
         if item["type"] == "blob"
         and any(item["path"].endswith(ext) for ext in extensions_set)
     ]
+    if max_files is not None:
+        matching = matching[:max_files]
 
     results: list[tuple[str, str]] = []
     for item in matching:

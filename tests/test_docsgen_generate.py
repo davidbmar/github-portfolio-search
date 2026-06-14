@@ -39,7 +39,7 @@ def _fake_gh(*names, pushed_at=""):
     return types.SimpleNamespace(
         fetch_repos=lambda username: repos,
         fetch_readme=lambda o, r: "# Repo\n\nReal content here for the project.",
-        fetch_top_files=lambda o, r: [("main.py", "print('hi')")],
+        fetch_top_files=lambda o, r, **kw: [("main.py", "print('hi')")],
         fetch_branches=lambda o, r: [{"name": "main", "commit_sha": "abc1234"}],
         fetch_open_prs=lambda o, r: [],
         compare_commits=lambda o, r, b, h: 0,

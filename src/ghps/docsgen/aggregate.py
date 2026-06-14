@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
 from pathlib import Path
+
+from ghps.docsgen._util import utc_z
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ def aggregate_records(records_dir: str, output_path: str) -> dict:
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     payload = {
-        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "generated_at": utc_z(),
         "count": len(projects),
         "projects": projects,
     }

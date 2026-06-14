@@ -15,6 +15,19 @@ from ghps import github_client as _default_gh
 # Treat a repo as "thin" when there is essentially nothing to document.
 _THIN_README_CHARS = 80
 
+# How many source files to fetch for the prompt (record_gen uses the first 6;
+# fetch a small buffer). Bounds Blob API calls on large repos.
+_MAX_SOURCE_FILES = 8
+
+
+def _pick_default_branch(branch_names: list[str]) -> str:
+    """Heuristic default branch: main → master → first → 'main'."""
+    if "main" in branch_names:
+        return "main"
+    if "master" in branch_names:
+        return "master"
+    return branch_names[0] if branch_names else "main"
+
 # Markdown image:  ![alt](url)   and HTML <img src="url">
 _MD_IMAGE = re.compile(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)")
 _HTML_IMAGE = re.compile(r"""<img[^>]+src\s*=\s*["']([^"']+)""", re.IGNORECASE)
@@ -102,22 +115,20 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
         gh: the github_client module (injectable for tests).
     """
     name = repo_meta["name"]
-    readme = gh.fetch_readme(owner, name)
-    source_files = gh.fetch_top_files(owner, name)
     branches = gh.fetch_branches(owner, name)
-    open_prs = gh.fetch_open_prs(owner, name)
-
-    # The default branch is the one whose name is "main" or "master"; fall back
-    # to the first branch. (We avoid a separate repo call: branches + heuristic.)
     branch_names = [b["name"] for b in branches]
-    if "main" in branch_names:
-        default_branch = "main"
-    elif "master" in branch_names:
-        default_branch = "master"
-    elif branch_names:
-        default_branch = branch_names[0]
-    else:
-        default_branch = "main"
+
+    # Prefer the authoritative default branch from the repo metadata; fall back
+    # to a name heuristic (main → master → first) when it's absent.
+    default_branch = repo_meta.get("default_branch") or _pick_default_branch(branch_names)
+
+    readme = gh.fetch_readme(owner, name)
+    # Pass default_branch (skips a redundant repo API call) and cap the blob
+    # downloads — doc generation only consumes the first few files.
+    source_files = gh.fetch_top_files(
+        owner, name, default_branch=default_branch, max_files=_MAX_SOURCE_FILES
+    )
+    open_prs = gh.fetch_open_prs(owner, name)
 
     head_sha = ""
     for b in branches:

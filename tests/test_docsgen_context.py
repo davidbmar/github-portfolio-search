@@ -126,6 +126,28 @@ def test_screenshot_skips_data_uri_and_picks_real_image():
     assert ctx.screenshot_url.endswith("/shot.png")
 
 
+def test_uses_default_branch_from_repo_meta():
+    gh = _fake_gh(branches=[
+        {"name": "main", "commit_sha": "aaa"},
+        {"name": "develop", "commit_sha": "ddd"},
+    ])
+    ctx = context.build_context(
+        _repo_meta(default_branch="develop"), owner="davidbmar", gh=gh
+    )
+    assert ctx.default_branch == "develop"
+    assert ctx.head_sha == "ddd"
+    # main is now a non-default branch → appears in branch_status
+    assert "main" in [b["name"] for b in ctx.branch_status]
+
+
+def test_fetch_top_files_called_with_default_branch_and_cap():
+    gh = _fake_gh(branches=[{"name": "main", "commit_sha": "aaa"}])
+    context.build_context(_repo_meta(default_branch="main"), owner="davidbmar", gh=gh)
+    _, kwargs = gh.fetch_top_files.call_args
+    assert kwargs.get("default_branch") == "main"
+    assert kwargs.get("max_files") == context._MAX_SOURCE_FILES
+
+
 def test_no_branches_leaves_head_sha_empty():
     gh = _fake_gh(branches=[])
     ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)

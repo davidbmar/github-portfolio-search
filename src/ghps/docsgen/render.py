@@ -230,9 +230,7 @@ def _index_card(p: dict) -> str:
         hyg = f'<span class="hyg warn">⚠ {len(todos)} need attention</span>'
     else:
         hyg = '<span class="hyg ok">✓ all on main</span>'
-    tech = "".join(
-        f'<span class="tag">{html.escape(t)}</span>' for t in (p.get("tech") or [])[:4]
-    )
+    tech = _tags((p.get("tech") or [])[:4])
     shot = ""
     url = p.get("screenshot_url", "")
     if url.startswith(("http://", "https://")):
