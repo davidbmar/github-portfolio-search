@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nano-claw voice loop · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "nano-claw voice loop", "one_liner": "A local, voice-powered AI agent that runs in your browser with Metal-accelerated speech recognition and tool execution.", "what_it_is": "nano-claw is a personal AI assistant designed for local execution. It creates a continuous voice loop where users speak to their browser, audio is transcribed via Whisper (running natively on Mac for GPU speed), processed by Claude (via API), and spoken back using Kokoro TTS. It supports interactive tool approval, allowing the AI to request permission before executing shell commands or file operations on the host machine.", "how_its_built": "The system uses a hybrid architecture to bypass Docker GPU limitations on macOS. A native Python service runs `faster-whisper` on port 8200 using Apple Metal acceleration. The core logic, including the TypeScript API server and Python-based Voice Server (handling WebRTC and Kokoro TTS), runs inside a Docker container. The browser client communicates via WebSockets for real-time audio streaming and UI updates.", "how_to_apply": "Use this project as a foundation for building private, voice-first AI agents that require low-latency speech-to-text on Apple Silicon. It demonstrates how to bridge native high-performance ML services with containerized application logic and secure tool execution patterns.", "quickstart": "git clone https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt.git\ncd 2026-nano-claw-voice-loop-tts-stt\nexport ANTHROPIC_API_KEY=sk-ant-...\n./run.sh", "features": ["Real-time voice interaction via WebRTC in the browser", "Metal-accelerated Whisper STT running natively on macOS", "Kokoro TTS for natural-sounding voice responses", "Interactive tool approval for shell and file operations", "Persistent conversation memory stored in JSON files", "Modular skill system loaded from Markdown definitions"], "diagram_architecture": "flowchart TD\n    User[User Browser] <-->|WebRTC Audio / WebSocket| VS[Voice Server: Python/Docker]\n    VS <-->|HTTP POST /transcribe| STT[STT Service: faster-whisper/Native Mac]\n    VS <-->|HTTP API| API[nano-claw API: TypeScript/Docker]\n    API <-->|LLM Request| Claude[Anthropic Claude API]\n    API -->|Execute| Tools[Local Tools: Shell/File]\n    subgraph Docker Container\n        VS\n        API\n    end\n    subgraph Host Mac\n        STT\n        Tools\n    end", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser Client\n    participant V as Voice Server (Docker)\n    participant S as STT Service (Native)\n    participant A as Agent API (Docker)\n    participant L as Claude API\n    \n    U->>B: Hold button & Speak\n    B->>V: Stream Audio (WebRTC)\n    U->>B: Release button\n    V->>S: POST audio bytes\n    S-->>V: Transcribed Text\n    V->>A: POST text message\n    A->>L: Send prompt + context\n    L-->>A: Response + Tool Calls?\n    alt Tool Call Required\n        A-->>V: Pending tool request\n        V-->>B: Show approval card\n        B->>U: Display approval\n        U->>B: Approve/Reject\n        B->>V: Send decision\n        V->>A: Confirm execution\n        A->>A: Execute Tool\n        A->>L: Send tool result\n        L-->>A: Final response\n    end\n    A-->>V: Final text response\n    V->>V: Generate Speech (Kokoro TTS)\n    V->>B: Stream Audio Response\n    B->>U: Play audio", "capabilities": ["Voice-to-Voice Interaction", "Local Tool Execution", "Contextual Memory", "Skill Extension", "Real-time Transcription"], "components": ["Browser Client", "Voice Server", "Agent API", "STT Service", "Tool Registry", "Memory Store"], "tech": ["TypeScript", "Python", "Docker", "WebRTC", "Whisper", "Kokoro TTS", "Claude API"], "depends_on": ["Docker Desktop", "Python 3.10+", "Anthropic API Key", "macOS (for Metal STT)"], "integrates_with": ["Anthropic Claude", "Local File System", "Shell Environment"], "patterns": ["Voice Loop", "Human-in-the-Loop Approval", "Hybrid Native/Container Architecture", "Skill-based Prompting"], "reuse_tags": ["ai-agent", "voice-interface", "local-llm", "typescript", "python", "docker", "webrtc", "whisper", "tool-use"], "slug": "2026-nano-claw-voice-loop-tts-stt", "repo_url": "https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "copilot/optimize-typescript-files is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/npm_and_yarn-4825ac1e2e is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump vitest from 1.6.1 to 4.1.8 in the npm_and_yarn group across 1 directory"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/2026-nano-claw-voice-loop-tts-stt/main/docs/voice-full-flow.png", "generated_at": "2026-06-14T01:50:35.509108Z", "source_commit": "6e302a0", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "nano-claw voice loop",
+  "description": "A local, voice-powered AI agent that runs in your browser with Metal-accelerated speech recognition and tool execution.",
+  "codeRepository": "https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt",
+  "programmingLanguage": [
+    "TypeScript",
+    "Python",
+    "Docker",
+    "WebRTC",
+    "Whisper",
+    "Kokoro TTS",
+    "Claude API"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>nano-claw voice loop</h1>
+  <p class="one-liner">A local, voice-powered AI agent that runs in your browser with Metal-accelerated speech recognition and tool execution.</p>
+  <p><a href="https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt">https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/2026-nano-claw-voice-loop-tts-stt/main/docs/voice-full-flow.png" alt="nano-claw voice loop screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>nano-claw is a personal AI assistant designed for local execution. It creates a continuous voice loop where users speak to their browser, audio is transcribed via Whisper (running natively on Mac for GPU speed), processed by Claude (via API), and spoken back using Kokoro TTS. It supports interactive tool approval, allowing the AI to request permission before executing shell commands or file operations on the host machine.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time voice interaction via WebRTC in the browser</li><li>Metal-accelerated Whisper STT running natively on macOS</li><li>Kokoro TTS for natural-sounding voice responses</li><li>Interactive tool approval for shell and file operations</li><li>Persistent conversation memory stored in JSON files</li><li>Modular skill system loaded from Markdown definitions</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt.git
+cd 2026-nano-claw-voice-loop-tts-stt
+export ANTHROPIC_API_KEY=sk-ant-...
+./run.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] &lt;-->|WebRTC Audio / WebSocket| VS[Voice Server: Python/Docker]
+    VS &lt;-->|HTTP POST /transcribe| STT[STT Service: faster-whisper/Native Mac]
+    VS &lt;-->|HTTP API| API[nano-claw API: TypeScript/Docker]
+    API &lt;-->|LLM Request| Claude[Anthropic Claude API]
+    API -->|Execute| Tools[Local Tools: Shell/File]
+    subgraph Docker Container
+        VS
+        API
+    end
+    subgraph Host Mac
+        STT
+        Tools
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system uses a hybrid architecture to bypass Docker GPU limitations on macOS. A native Python service runs `faster-whisper` on port 8200 using Apple Metal acceleration. The core logic, including the TypeScript API server and Python-based Voice Server (handling WebRTC and Kokoro TTS), runs inside a Docker container. The browser client communicates via WebSockets for real-time audio streaming and UI updates.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant B as Browser Client
+    participant V as Voice Server (Docker)
+    participant S as STT Service (Native)
+    participant A as Agent API (Docker)
+    participant L as Claude API
+    
+    U->>B: Hold button & Speak
+    B->>V: Stream Audio (WebRTC)
+    U->>B: Release button
+    V->>S: POST audio bytes
+    S-->>V: Transcribed Text
+    V->>A: POST text message
+    A->>L: Send prompt + context
+    L-->>A: Response + Tool Calls?
+    alt Tool Call Required
+        A-->>V: Pending tool request
+        V-->>B: Show approval card
+        B->>U: Display approval
+        U->>B: Approve/Reject
+        B->>V: Send decision
+        V->>A: Confirm execution
+        A->>A: Execute Tool
+        A->>L: Send tool result
+        L-->>A: Final response
+    end
+    A-->>V: Final text response
+    V->>V: Generate Speech (Kokoro TTS)
+    V->>B: Stream Audio Response
+    B->>U: Play audio</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this project as a foundation for building private, voice-first AI agents that require low-latency speech-to-text on Apple Silicon. It demonstrates how to bridge native high-performance ML services with containerized application logic and secure tool execution patterns.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Voice-to-Voice Interaction</span><span class="tag">Local Tool Execution</span><span class="tag">Contextual Memory</span><span class="tag">Skill Extension</span><span class="tag">Real-time Transcription</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Browser Client</span><span class="tag">Voice Server</span><span class="tag">Agent API</span><span class="tag">STT Service</span><span class="tag">Tool Registry</span><span class="tag">Memory Store</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">Python</span><span class="tag">Docker</span><span class="tag">WebRTC</span><span class="tag">Whisper</span><span class="tag">Kokoro TTS</span><span class="tag">Claude API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Docker Desktop</span><span class="tag">Python 3.10+</span><span class="tag">Anthropic API Key</span><span class="tag">macOS (for Metal STT)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Anthropic Claude</span><span class="tag">Local File System</span><span class="tag">Shell Environment</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Voice Loop</span><span class="tag">Human-in-the-Loop Approval</span><span class="tag">Hybrid Native/Container Architecture</span><span class="tag">Skill-based Prompting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">ai-agent</span><span class="tag">voice-interface</span><span class="tag">local-llm</span><span class="tag">typescript</span><span class="tag">python</span><span class="tag">docker</span><span class="tag">webrtc</span><span class="tag">whisper</span><span class="tag">tool-use</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: copilot/optimize-typescript-files is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/npm_and_yarn-4825ac1e2e is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump vitest from 1.6.1 to 4.1.8 in the npm_and_yarn group across 1 directory</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T01:50:35.509108Z ·
+     commit 6e302a0 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

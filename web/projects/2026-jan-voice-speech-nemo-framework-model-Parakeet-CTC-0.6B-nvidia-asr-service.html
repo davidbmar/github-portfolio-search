@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real-Time ASR Service with NVIDIA NeMo Parakeet · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Real-Time ASR Service with NVIDIA NeMo Parakeet", "one_liner": "A production-ready streaming speech-to-text API using NVIDIA's Parakeet-CTC-0.6B model, featuring WebSocket audio ingestion, Silero VAD, and FastAPI.", "what_it_is": "This project implements a low-latency Automatic Speech Recognition (ASR) service designed for real-time transcription. It leverages the NVIDIA NeMo framework and the Parakeet-CTC-0.6B model to convert spoken audio into text. The system accepts audio streams via WebSockets from a browser client, processes them through an Audio Gateway for normalization, filters silence using Silero Voice Activity Detection (VAD), and performs streaming inference to deliver both partial and final transcripts. It is built with Python 3.12 and FastAPI, supporting GPU acceleration for high concurrency.", "how_its_built": "The backend is constructed using FastAPI for asynchronous HTTP and WebSocket handling. Core ASR logic relies on NVIDIA NeMo's `EncDecCTCModel` for transcription and PyTorch for Silero VAD. Audio processing includes resampling and normalization within a custom Audio Gateway. Session management handles concurrent WebSocket connections, ensuring resource limits are respected. The frontend is a lightweight HTML/JS demo that captures microphone input and streams it to the backend. Deployment is containerized via Docker with GPU support (`--gpus all`).", "how_to_apply": "Use this service as a backend for voice-enabled web applications, meeting transcription tools, or live captioning systems. It is suitable for developers needing a self-hosted, GPU-accelerated alternative to cloud ASR APIs. The modular architecture allows swapping the ASR model or VAD component. It integrates easily into existing Python microservices ecosystems via its REST/WebSocket interface.", "quickstart": "pip install -r requirements.txt\npython download_models.py\npython main.py\nopen http://localhost:8000", "features": ["Real-time streaming transcription via WebSockets with <500ms p95 latency", "Integrated Silero VAD for efficient silence filtering and audio segmentation", "Supports partial and final transcript stabilization for responsive UI updates", "GPU-accelerated inference using NVIDIA NeMo Parakeet-CTC-0.6B model", "Built-in browser demo UI for immediate testing and integration reference", "Session management with configurable concurrency limits and timeout handling"], "diagram_architecture": "flowchart TD\n    Client[Browser Client] -->|WebSocket Audio Stream| GW[Audio Gateway]\n    GW -->|Preprocessed Chunks| VAD[Silero VAD]\n    VAD -->|Active Speech Segments| ASR[Nemo Parakeet ASR]\n    ASR -->|Partial/Final Text| SM[Session Manager]\n    SM -->|Transcript JSON| Client\n    subgraph Backend\n        GW\n        VAD\n        ASR\n        SM\n    end", "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant WS as WebSocket Handler\n    participant GW as Audio Gateway\n    participant VAD as Silero VAD\n    participant ASR as NeMo Engine\n    \n    Browser->>WS: Connect & Start Session\n    WS->>WS: Register Session\n    loop Audio Stream\n        Browser->>WS: Send Audio Chunk\n        WS->>GW: Preprocess (Resample/Normalize)\n        GW->>VAD: Check Voice Activity\n        alt Speech Detected\n            VAD->>ASR: Forward Audio Segment\n            ASR->>ASR: Streaming Inference\n            ASR-->>WS: Return Partial/Final Transcript\n            WS-->>Browser: Send Transcript Update\n        else Silence\n            VAD-->>WS: Ignore Chunk\n        end\n    end", "capabilities": ["Streaming ASR", "Voice Activity Detection", "WebSocket Communication", "GPU Acceleration", "Session Management", "API Key Authentication"], "components": ["FastAPI Server", "NeMo ASR Engine", "Silero VAD Module", "Audio Gateway", "Session Manager", "Browser Demo UI"], "tech": ["Python 3.12", "FastAPI", "NVIDIA NeMo", "PyTorch", "WebSockets", "Docker"], "depends_on": ["nemo-toolkit", "torch", "fastapi", "uvicorn", "websockets", "numpy"], "integrates_with": ["Web Browsers", "GPU Hardware (CUDA)", "REST Clients"], "patterns": ["Producer-Consumer", "Singleton Model Loading", "Async WebSocket Handling", "Middleware Authentication"], "reuse_tags": ["asr", "speech-to-text", "nvidia-nemo", "real-time", "websocket", "fastapi", "vad"], "slug": "2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service", "repo_url": "https://github.com/davidbmar/2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T01:49:51.783736Z", "source_commit": "01e5f18", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Real-Time ASR Service with NVIDIA NeMo Parakeet",
+  "description": "A production-ready streaming speech-to-text API using NVIDIA's Parakeet-CTC-0.6B model, featuring WebSocket audio ingestion, Silero VAD, and FastAPI.",
+  "codeRepository": "https://github.com/davidbmar/2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service",
+  "programmingLanguage": [
+    "Python 3.12",
+    "FastAPI",
+    "NVIDIA NeMo",
+    "PyTorch",
+    "WebSockets",
+    "Docker"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Real-Time ASR Service with NVIDIA NeMo Parakeet</h1>
+  <p class="one-liner">A production-ready streaming speech-to-text API using NVIDIA&#x27;s Parakeet-CTC-0.6B model, featuring WebSocket audio ingestion, Silero VAD, and FastAPI.</p>
+  <p><a href="https://github.com/davidbmar/2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service">https://github.com/davidbmar/2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project implements a low-latency Automatic Speech Recognition (ASR) service designed for real-time transcription. It leverages the NVIDIA NeMo framework and the Parakeet-CTC-0.6B model to convert spoken audio into text. The system accepts audio streams via WebSockets from a browser client, processes them through an Audio Gateway for normalization, filters silence using Silero Voice Activity Detection (VAD), and performs streaming inference to deliver both partial and final transcripts. It is built with Python 3.12 and FastAPI, supporting GPU acceleration for high concurrency.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time streaming transcription via WebSockets with &lt;500ms p95 latency</li><li>Integrated Silero VAD for efficient silence filtering and audio segmentation</li><li>Supports partial and final transcript stabilization for responsive UI updates</li><li>GPU-accelerated inference using NVIDIA NeMo Parakeet-CTC-0.6B model</li><li>Built-in browser demo UI for immediate testing and integration reference</li><li>Session management with configurable concurrency limits and timeout handling</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install -r requirements.txt
+python download_models.py
+python main.py
+open http://localhost:8000</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Browser Client] -->|WebSocket Audio Stream| GW[Audio Gateway]
+    GW -->|Preprocessed Chunks| VAD[Silero VAD]
+    VAD -->|Active Speech Segments| ASR[Nemo Parakeet ASR]
+    ASR -->|Partial/Final Text| SM[Session Manager]
+    SM -->|Transcript JSON| Client
+    subgraph Backend
+        GW
+        VAD
+        ASR
+        SM
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is constructed using FastAPI for asynchronous HTTP and WebSocket handling. Core ASR logic relies on NVIDIA NeMo&#x27;s `EncDecCTCModel` for transcription and PyTorch for Silero VAD. Audio processing includes resampling and normalization within a custom Audio Gateway. Session management handles concurrent WebSocket connections, ensuring resource limits are respected. The frontend is a lightweight HTML/JS demo that captures microphone input and streams it to the backend. Deployment is containerized via Docker with GPU support (`--gpus all`).</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Browser
+    participant WS as WebSocket Handler
+    participant GW as Audio Gateway
+    participant VAD as Silero VAD
+    participant ASR as NeMo Engine
+    
+    Browser->>WS: Connect & Start Session
+    WS->>WS: Register Session
+    loop Audio Stream
+        Browser->>WS: Send Audio Chunk
+        WS->>GW: Preprocess (Resample/Normalize)
+        GW->>VAD: Check Voice Activity
+        alt Speech Detected
+            VAD->>ASR: Forward Audio Segment
+            ASR->>ASR: Streaming Inference
+            ASR-->>WS: Return Partial/Final Transcript
+            WS-->>Browser: Send Transcript Update
+        else Silence
+            VAD-->>WS: Ignore Chunk
+        end
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this service as a backend for voice-enabled web applications, meeting transcription tools, or live captioning systems. It is suitable for developers needing a self-hosted, GPU-accelerated alternative to cloud ASR APIs. The modular architecture allows swapping the ASR model or VAD component. It integrates easily into existing Python microservices ecosystems via its REST/WebSocket interface.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Streaming ASR</span><span class="tag">Voice Activity Detection</span><span class="tag">WebSocket Communication</span><span class="tag">GPU Acceleration</span><span class="tag">Session Management</span><span class="tag">API Key Authentication</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">FastAPI Server</span><span class="tag">NeMo ASR Engine</span><span class="tag">Silero VAD Module</span><span class="tag">Audio Gateway</span><span class="tag">Session Manager</span><span class="tag">Browser Demo UI</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.12</span><span class="tag">FastAPI</span><span class="tag">NVIDIA NeMo</span><span class="tag">PyTorch</span><span class="tag">WebSockets</span><span class="tag">Docker</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">nemo-toolkit</span><span class="tag">torch</span><span class="tag">fastapi</span><span class="tag">uvicorn</span><span class="tag">websockets</span><span class="tag">numpy</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Web Browsers</span><span class="tag">GPU Hardware (CUDA)</span><span class="tag">REST Clients</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Producer-Consumer</span><span class="tag">Singleton Model Loading</span><span class="tag">Async WebSocket Handling</span><span class="tag">Middleware Authentication</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">asr</span><span class="tag">speech-to-text</span><span class="tag">nvidia-nemo</span><span class="tag">real-time</span><span class="tag">websocket</span><span class="tag">fastapi</span><span class="tag">vad</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T01:49:51.783736Z ·
+     commit 01e5f18 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

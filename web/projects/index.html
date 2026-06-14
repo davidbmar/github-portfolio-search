@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Docs · davidbmar.com</title>
+<meta name="description" content="AI-generated documentation for 6 projects.">
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 1080px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  header.top { margin-bottom: 1.5rem; }
+  header.top h1 { margin-bottom: .15rem; }
+  .sub { opacity: .7; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .card { display: flex; flex-direction: column; border: 1px solid #8884; border-radius: 12px;
+           overflow: hidden; text-decoration: none; color: inherit; background: #fff1;
+           transition: box-shadow .15s, transform .15s; }
+  .card:hover { box-shadow: 0 6px 24px #0003; transform: translateY(-2px); }
+  .thumb { width: 100%; height: 150px; object-fit: cover; border-bottom: 1px solid #8883; }
+  .card-body { padding: .85rem 1rem 1rem; display: flex; flex-direction: column; gap: .4rem; flex: 1; }
+  .card h2 { font-size: 1.05rem; margin: 0; }
+  .ol { font-size: .9rem; opacity: .85; margin: 0; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: .2rem; }
+  .tag { background: #eef; color: #224; border-radius: 6px; padding: .05rem .4rem; font-size: .75rem; }
+  .badge.thin { font-size: .65rem; padding: .1rem .4rem; border-radius: 999px;
+                 background: #b88600; color: #fff; margin-left: .4rem; vertical-align: middle; }
+  .hyg { font-size: .78rem; }
+  .hyg.ok { color: #2a7; }
+  .hyg.warn { color: #d33; }
+  .muted { opacity: .6; }
+  a.home { color: #2563eb; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Project Docs</h1>
+  <p class="sub">AI-generated documentation — 6 projects.
+     <a class="home" href="/">← back to portfolio search</a></p>
+</header>
+<div class="grid"><a class="card" href="2026-FEB-21-K3-App-Builder-Claude-proto.html"><div class="card-body"><h2>k3s App Builder Platform</h2><p class="ol">A self-contained platform for deploying apps with plain language and Claude, running entirely within k3s on a single EC2 instance.</p><div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">k3s</span><span class="tag">Docker</span></div><span class="hyg warn">⚠ 2 need attention</span></div></a>
+<a class="card" href="2026-feb-File-Broswer-for-EC2-copy-and-deploy-files.html"><img class="thumb" src="https://raw.githubusercontent.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files/main/docs/screenshot-dual-pane.png" alt="Remote Dev UI screenshot" loading="lazy"><div class="card-body"><h2>Remote Dev UI</h2><p class="ol">A web-based dual-pane file browser with an integrated terminal for managing local and EC2 files via SSH/SFTP.</p><div class="tags"><span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">Express</span><span class="tag">ssh2</span></div><span class="hyg warn">⚠ 2 need attention</span></div></a>
+<a class="card" href="2026-jan-vibecodeportal-aws-cognito-alb-auth-portal.html"><div class="card-body"><h2>AWS Cognito + ALB Auth Portal</h2><p class="ol">A minimal employee access portal using AWS ALB for OAuth2 authentication and FastAPI for group-based authorization.</p><div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Terraform</span><span class="tag">AWS Cognito</span></div><span class="hyg ok">✓ all on main</span></div></a>
+<a class="card" href="2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service.html"><div class="card-body"><h2>Real-Time ASR Service with NVIDIA NeMo Parakeet</h2><p class="ol">A production-ready streaming speech-to-text API using NVIDIA&#x27;s Parakeet-CTC-0.6B model, featuring WebSocket audio ingestion, Silero VAD, and FastAPI.</p><div class="tags"><span class="tag">Python 3.12</span><span class="tag">FastAPI</span><span class="tag">NVIDIA NeMo</span><span class="tag">PyTorch</span></div><span class="hyg ok">✓ all on main</span></div></a>
+<a class="card" href="2026-nano-claw-voice-loop-tts-stt.html"><img class="thumb" src="https://raw.githubusercontent.com/davidbmar/2026-nano-claw-voice-loop-tts-stt/main/docs/voice-full-flow.png" alt="nano-claw voice loop screenshot" loading="lazy"><div class="card-body"><h2>nano-claw voice loop</h2><p class="ol">A local, voice-powered AI agent that runs in your browser with Metal-accelerated speech recognition and tool execution.</p><div class="tags"><span class="tag">TypeScript</span><span class="tag">Python</span><span class="tag">Docker</span><span class="tag">WebRTC</span></div><span class="hyg warn">⚠ 3 need attention</span></div></a>
+<a class="card" href="generate_title_headline_hooks.html"><div class="card-body"><h2>generate_title_headline_hooks</h2><p class="ol">An integrity-checked headline generation pipeline that separates proposal, judgment, and verification to prevent hallucinated quotes and unsupported claims.</p><div class="tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Pydantic</span><span class="tag">SQLite</span></div><span class="hyg ok">✓ all on main</span></div></a></div>
+</body>
+</html>

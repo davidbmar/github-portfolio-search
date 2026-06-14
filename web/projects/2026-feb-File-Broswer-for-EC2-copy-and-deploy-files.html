@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remote Dev UI · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Remote Dev UI", "one_liner": "A web-based dual-pane file browser with an integrated terminal for managing local and EC2 files via SSH/SFTP.", "what_it_is": "Remote Dev UI is a self-hosted web application that provides a graphical interface for file management and terminal access on remote servers, specifically optimized for AWS EC2 instances. It replaces traditional CLI-only workflows with a dual-pane explorer that supports drag-and-drop transfers between local and remote filesystems, syntax-highlighted file previews, and persistent SSH sessions.", "how_its_built": "The application uses a TypeScript monorepo structure. The frontend is built with React 18, TailwindCSS, and shadcn/ui components, using TanStack Query for state management and xterm.js for the terminal emulator. The backend is an Express 5 server that handles HTTP API requests for file operations and upgrades connections to WebSockets for real-time terminal streaming. It uses the ssh2 library to manage SFTP connections and shell sessions. The build process utilizes Vite for the client and esbuild for bundling the server into a single executable-like CJS file.", "how_to_apply": "Deploy this tool on a jump host or directly on development EC2 instances to provide developers with secure, browser-based access to server filesystems without exposing raw SSH ports to the public internet (if behind a VPN/WAF). It simplifies file uploads, log inspection, and quick code edits for teams managing infrastructure.", "quickstart": "npm install\nnpm run dev", "features": ["Dual-pane file browser for side-by-side local and remote directory navigation", "Integrated xterm.js terminal with multiple SSH session support", "Drag-and-drop file transfer between local machine and remote EC2 instances", "Syntax-highlighted code preview and markdown rendering", "Batch file operations including multi-select copy, move, and delete", "Secure SSH/SFTP connection management with .pem key authentication"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP/WebSocket| Client[React Frontend]\n    Client -->|API Requests| Server[Express Backend]\n    Client -->|Terminal Stream| Server\n    Server -->|SFTP/SSH| Remote[EC2 Instance]\n    Server -->|Local FS| Local[Local Machine]\n    subgraph Frontend\n        Client\n    end\n    subgraph Backend\n        Server\n    end", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as Frontend (React)\n    participant B as Backend (Express)\n    participant R as Remote EC2\n    \n    U->>F: Click Connect SSH\n    F->>B: POST /api/connect (Host, Key)\n    B->>R: Establish SSH/SFTP Connection\n    R-->>B: Connection Established\n    B-->>F: Session ID & Status\n    \n    U->>F: Drag File to Remote Panel\n    F->>B: POST /api/upload (File Data)\n    B->>R: SFTP Write Stream\n    R-->>B: Write Complete\n    B-->>F: Success Response\n    \n    U->>F: Open Terminal\n    F->>B: WebSocket Upgrade\n    B->>R: Open Shell Channel\n    loop Terminal Session\n        U->>F: Type Command\n        F->>B: WS Send Input\n        B->>R: Stdin Write\n        R->>B: Stdout Data\n        B->>F: WS Send Output\n        F->>U: Render Terminal Output\n    end", "capabilities": ["File Management", "Remote Access", "Terminal Emulation", "Secure Transfer"], "components": ["DualPaneBrowser", "TerminalEmulator", "SSHConfigDialog", "FilePreviewer", "DragDropHandler"], "tech": ["TypeScript", "React", "Express", "ssh2", "xterm.js", "TailwindCSS", "Vite", "esbuild"], "depends_on": ["Node.js 18+", "npm"], "integrates_with": ["AWS EC2", "SSH Servers", "SFTP Servers"], "patterns": ["Client-Server", "WebSocket Streaming", "SFTP Proxy", "Single Page Application"], "reuse_tags": ["dev-tools", "file-manager", "ssh-client", "web-terminal", "ec2-management"], "slug": "2026-feb-File-Broswer-for-EC2-copy-and-deploy-files", "repo_url": "https://github.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/npm_and_yarn-2d24ead0df is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 11 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files/main/docs/screenshot-dual-pane.png", "generated_at": "2026-06-14T01:46:46.433344Z", "source_commit": "dfc7448", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Remote Dev UI",
+  "description": "A web-based dual-pane file browser with an integrated terminal for managing local and EC2 files via SSH/SFTP.",
+  "codeRepository": "https://github.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files",
+  "programmingLanguage": [
+    "TypeScript",
+    "React",
+    "Express",
+    "ssh2",
+    "xterm.js",
+    "TailwindCSS",
+    "Vite",
+    "esbuild"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Remote Dev UI</h1>
+  <p class="one-liner">A web-based dual-pane file browser with an integrated terminal for managing local and EC2 files via SSH/SFTP.</p>
+  <p><a href="https://github.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files">https://github.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files/main/docs/screenshot-dual-pane.png" alt="Remote Dev UI screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>Remote Dev UI is a self-hosted web application that provides a graphical interface for file management and terminal access on remote servers, specifically optimized for AWS EC2 instances. It replaces traditional CLI-only workflows with a dual-pane explorer that supports drag-and-drop transfers between local and remote filesystems, syntax-highlighted file previews, and persistent SSH sessions.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Dual-pane file browser for side-by-side local and remote directory navigation</li><li>Integrated xterm.js terminal with multiple SSH session support</li><li>Drag-and-drop file transfer between local machine and remote EC2 instances</li><li>Syntax-highlighted code preview and markdown rendering</li><li>Batch file operations including multi-select copy, move, and delete</li><li>Secure SSH/SFTP connection management with .pem key authentication</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">npm install
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|HTTP/WebSocket| Client[React Frontend]
+    Client -->|API Requests| Server[Express Backend]
+    Client -->|Terminal Stream| Server
+    Server -->|SFTP/SSH| Remote[EC2 Instance]
+    Server -->|Local FS| Local[Local Machine]
+    subgraph Frontend
+        Client
+    end
+    subgraph Backend
+        Server
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The application uses a TypeScript monorepo structure. The frontend is built with React 18, TailwindCSS, and shadcn/ui components, using TanStack Query for state management and xterm.js for the terminal emulator. The backend is an Express 5 server that handles HTTP API requests for file operations and upgrades connections to WebSockets for real-time terminal streaming. It uses the ssh2 library to manage SFTP connections and shell sessions. The build process utilizes Vite for the client and esbuild for bundling the server into a single executable-like CJS file.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant F as Frontend (React)
+    participant B as Backend (Express)
+    participant R as Remote EC2
+    
+    U->>F: Click Connect SSH
+    F->>B: POST /api/connect (Host, Key)
+    B->>R: Establish SSH/SFTP Connection
+    R-->>B: Connection Established
+    B-->>F: Session ID & Status
+    
+    U->>F: Drag File to Remote Panel
+    F->>B: POST /api/upload (File Data)
+    B->>R: SFTP Write Stream
+    R-->>B: Write Complete
+    B-->>F: Success Response
+    
+    U->>F: Open Terminal
+    F->>B: WebSocket Upgrade
+    B->>R: Open Shell Channel
+    loop Terminal Session
+        U->>F: Type Command
+        F->>B: WS Send Input
+        B->>R: Stdin Write
+        R->>B: Stdout Data
+        B->>F: WS Send Output
+        F->>U: Render Terminal Output
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy this tool on a jump host or directly on development EC2 instances to provide developers with secure, browser-based access to server filesystems without exposing raw SSH ports to the public internet (if behind a VPN/WAF). It simplifies file uploads, log inspection, and quick code edits for teams managing infrastructure.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">File Management</span><span class="tag">Remote Access</span><span class="tag">Terminal Emulation</span><span class="tag">Secure Transfer</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">DualPaneBrowser</span><span class="tag">TerminalEmulator</span><span class="tag">SSHConfigDialog</span><span class="tag">FilePreviewer</span><span class="tag">DragDropHandler</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">Express</span><span class="tag">ssh2</span><span class="tag">xterm.js</span><span class="tag">TailwindCSS</span><span class="tag">Vite</span><span class="tag">esbuild</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js 18+</span><span class="tag">npm</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS EC2</span><span class="tag">SSH Servers</span><span class="tag">SFTP Servers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server</span><span class="tag">WebSocket Streaming</span><span class="tag">SFTP Proxy</span><span class="tag">Single Page Application</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">dev-tools</span><span class="tag">file-manager</span><span class="tag">ssh-client</span><span class="tag">web-terminal</span><span class="tag">ec2-management</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/npm_and_yarn-2d24ead0df is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 11 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T01:46:46.433344Z ·
+     commit dfc7448 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

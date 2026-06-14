@@ -1,7 +1,428 @@
 {
-  "generated_at": "2026-06-14T00:18:05.004742Z",
-  "count": 1,
+  "generated_at": "2026-06-14T01:50:35.515022Z",
+  "count": 6,
   "projects": [
+    {
+      "title": "k3s App Builder Platform",
+      "one_liner": "A self-contained platform for deploying apps with plain language and Claude, running entirely within k3s on a single EC2 instance.",
+      "what_it_is": "A local-first application development and deployment platform that allows users to describe an app in natural language, have Claude generate the code, build it into a container, and deploy it to a preview or production environment on a single-node Kubernetes cluster. It isolates apps using Kubernetes namespaces and manages traffic via Traefik.",
+      "how_its_built": "The platform is built with Python (FastAPI) for the backend logic, utilizing the Anthropic SDK for code generation. It uses k3s for container orchestration, Docker for image building, a local Docker registry for storage, and Traefik for ingress routing. Jinja2 templates are used to generate Kubernetes manifests dynamically.",
+      "how_to_apply": "Clone the repository to an Ubuntu 24.04 EC2 instance, install dependencies via provided shell scripts, set the ANTHROPIC_API_KEY, and access the web UI via a nip.io domain pointing to the instance's public IP.",
+      "quickstart": "git clone https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto\ncd 2026-FEB-21-K3-App-Builder-Claude-proto\nchmod +x scripts/*.sh\n./scripts/install-k3s.sh\n./scripts/setup-registry.sh\nexport ANTHROPIC_API_KEY=sk-ant-...\n./scripts/bootstrap-cluster.sh",
+      "features": [
+        "Natural language app generation using Claude Opus",
+        "Live code streaming and preview before deployment",
+        "Automated Docker build and push to local registry",
+        "Isolated preview and production environments per app",
+        "One-click rollback to previous versions",
+        "Resource quotas and network policies for isolation"
+      ],
+      "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| Traefik[Traefik Ingress Controller]\n    Traefik -->|Route: builder.*| BuilderUI[Builder UI Service]\n    Traefik -->|Route: app.*| AppNS[App Namespace Services]\n    \n    subgraph Builder System\n        BuilderUI --> BuildOps[Build Operations]\n        BuildOps -->|Generate Code| Claude[Claude API]\n        BuildOps -->|Build Image| DockerHost[Docker Daemon]\n        DockerHost -->|Push| LocalReg[Local Registry :5050]\n        BuildOps -->|Apply Manifests| K8sAPI[k3s API Server]\n    end\n    \n    subgraph App Namespace\n        K8sAPI --> Deploy[Deployment]\n        Deploy --> Pod[App Pod]\n        AppNS --> Pod\n    end\n    \n    LocalReg -->|Pull Image| Pod",
+      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant UI as Builder UI\n    participant Claude as Claude API\n    participant Docker as Docker Daemon\n    participant Reg as Local Registry\n    participant K8s as k3s Cluster\n\n    User->>UI: Describe App & Click Generate\n    UI->>Claude: Stream Prompt with Context\n    Claude-->>UI: Stream Generated Code Files\n    UI->>User: Display Code Preview\n    \n    User->>UI: Click Build & Deploy Preview\n    UI->>Docker: docker build .\n    Docker->>Reg: Push Image (app:timestamp)\n    UI->>K8s: Apply Preview Deployment Manifest\n    K8s->>Reg: Pull Image\n    K8s->>K8s: Start Preview Pod\n    K8s-->>UI: Deployment Ready\n    UI-->>User: Show Preview URL",
+      "capabilities": [
+        "Code Generation",
+        "Container Building",
+        "Kubernetes Deployment",
+        "Traffic Routing",
+        "Version Management",
+        "Environment Isolation"
+      ],
+      "components": [
+        "Builder UI (FastAPI)",
+        "Build Ops Module",
+        "Claude Ops Module",
+        "K8s Ops Module",
+        "Traefik Ingress",
+        "Local Docker Registry",
+        "k3s Control Plane"
+      ],
+      "tech": [
+        "Python",
+        "FastAPI",
+        "k3s",
+        "Docker",
+        "Traefik",
+        "Jinja2",
+        "Anthropic SDK"
+      ],
+      "depends_on": [
+        "Ubuntu 24.04",
+        "Docker Engine",
+        "Anthropic API Key",
+        "Public IP Address",
+        "Port 80 Access"
+      ],
+      "integrates_with": [
+        "Anthropic Claude API",
+        "nip.io DNS Service",
+        "Local Docker Registry"
+      ],
+      "patterns": [
+        "GitOps-like Manifest Generation",
+        "Preview/Production Parity",
+        "Namespace Isolation",
+        "Streaming AI Response",
+        "Self-hosted CI/CD"
+      ],
+      "reuse_tags": [
+        "k3s",
+        "ai-code-gen",
+        "self-hosted",
+        "python",
+        "devops-tool",
+        "single-node"
+      ],
+      "slug": "2026-FEB-21-K3-App-Builder-Claude-proto",
+      "repo_url": "https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto",
+      "visibility": "public",
+      "status": "shipped",
+      "thin": false,
+      "todos": [
+        {
+          "kind": "unmerged_branch",
+          "detail": "dependabot/pip/builder/pip-04ebf05b2f is 1 commit ahead of the default branch"
+        },
+        {
+          "kind": "open_pr",
+          "detail": "PR #1: build(deps): Bump the pip group across 1 directory with 2 updates"
+        }
+      ],
+      "screenshot_url": "",
+      "generated_at": "2026-06-14T01:46:20.210106Z",
+      "source_commit": "2d2a29e",
+      "model": "qwen3.7-plus"
+    },
+    {
+      "title": "Remote Dev UI",
+      "one_liner": "A web-based dual-pane file browser with an integrated terminal for managing local and EC2 files via SSH/SFTP.",
+      "what_it_is": "Remote Dev UI is a self-hosted web application that provides a graphical interface for file management and terminal access on remote servers, specifically optimized for AWS EC2 instances. It replaces traditional CLI-only workflows with a dual-pane explorer that supports drag-and-drop transfers between local and remote filesystems, syntax-highlighted file previews, and persistent SSH sessions.",
+      "how_its_built": "The application uses a TypeScript monorepo structure. The frontend is built with React 18, TailwindCSS, and shadcn/ui components, using TanStack Query for state management and xterm.js for the terminal emulator. The backend is an Express 5 server that handles HTTP API requests for file operations and upgrades connections to WebSockets for real-time terminal streaming. It uses the ssh2 library to manage SFTP connections and shell sessions. The build process utilizes Vite for the client and esbuild for bundling the server into a single executable-like CJS file.",
+      "how_to_apply": "Deploy this tool on a jump host or directly on development EC2 instances to provide developers with secure, browser-based access to server filesystems without exposing raw SSH ports to the public internet (if behind a VPN/WAF). It simplifies file uploads, log inspection, and quick code edits for teams managing infrastructure.",
+      "quickstart": "npm install\nnpm run dev",
+      "features": [
+        "Dual-pane file browser for side-by-side local and remote directory navigation",
+        "Integrated xterm.js terminal with multiple SSH session support",
+        "Drag-and-drop file transfer between local machine and remote EC2 instances",
+        "Syntax-highlighted code preview and markdown rendering",
+        "Batch file operations including multi-select copy, move, and delete",
+        "Secure SSH/SFTP connection management with .pem key authentication"
+      ],
+      "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP/WebSocket| Client[React Frontend]\n    Client -->|API Requests| Server[Express Backend]\n    Client -->|Terminal Stream| Server\n    Server -->|SFTP/SSH| Remote[EC2 Instance]\n    Server -->|Local FS| Local[Local Machine]\n    subgraph Frontend\n        Client\n    end\n    subgraph Backend\n        Server\n    end",
+      "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as Frontend (React)\n    participant B as Backend (Express)\n    participant R as Remote EC2\n    \n    U->>F: Click Connect SSH\n    F->>B: POST /api/connect (Host, Key)\n    B->>R: Establish SSH/SFTP Connection\n    R-->>B: Connection Established\n    B-->>F: Session ID & Status\n    \n    U->>F: Drag File to Remote Panel\n    F->>B: POST /api/upload (File Data)\n    B->>R: SFTP Write Stream\n    R-->>B: Write Complete\n    B-->>F: Success Response\n    \n    U->>F: Open Terminal\n    F->>B: WebSocket Upgrade\n    B->>R: Open Shell Channel\n    loop Terminal Session\n        U->>F: Type Command\n        F->>B: WS Send Input\n        B->>R: Stdin Write\n        R->>B: Stdout Data\n        B->>F: WS Send Output\n        F->>U: Render Terminal Output\n    end",
+      "capabilities": [
+        "File Management",
+        "Remote Access",
+        "Terminal Emulation",
+        "Secure Transfer"
+      ],
+      "components": [
+        "DualPaneBrowser",
+        "TerminalEmulator",
+        "SSHConfigDialog",
+        "FilePreviewer",
+        "DragDropHandler"
+      ],
+      "tech": [
+        "TypeScript",
+        "React",
+        "Express",
+        "ssh2",
+        "xterm.js",
+        "TailwindCSS",
+        "Vite",
+        "esbuild"
+      ],
+      "depends_on": [
+        "Node.js 18+",
+        "npm"
+      ],
+      "integrates_with": [
+        "AWS EC2",
+        "SSH Servers",
+        "SFTP Servers"
+      ],
+      "patterns": [
+        "Client-Server",
+        "WebSocket Streaming",
+        "SFTP Proxy",
+        "Single Page Application"
+      ],
+      "reuse_tags": [
+        "dev-tools",
+        "file-manager",
+        "ssh-client",
+        "web-terminal",
+        "ec2-management"
+      ],
+      "slug": "2026-feb-File-Broswer-for-EC2-copy-and-deploy-files",
+      "repo_url": "https://github.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files",
+      "visibility": "public",
+      "status": "shipped",
+      "thin": false,
+      "todos": [
+        {
+          "kind": "unmerged_branch",
+          "detail": "dependabot/npm_and_yarn/npm_and_yarn-2d24ead0df is 1 commit ahead of the default branch"
+        },
+        {
+          "kind": "open_pr",
+          "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 11 updates"
+        }
+      ],
+      "screenshot_url": "https://raw.githubusercontent.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files/main/docs/screenshot-dual-pane.png",
+      "generated_at": "2026-06-14T01:46:46.433344Z",
+      "source_commit": "dfc7448",
+      "model": "qwen3.7-plus"
+    },
+    {
+      "title": "AWS Cognito + ALB Auth Portal",
+      "one_liner": "A minimal employee access portal using AWS ALB for OAuth2 authentication and FastAPI for group-based authorization.",
+      "what_it_is": "This project is a reference implementation of an 'Employee Access Portal' deployed on AWS. It leverages the Application Load Balancer (ALB) to handle the heavy lifting of OpenID Connect (OIDC) authentication with AWS Cognito, passing user identity via HTTP headers to a backend FastAPI application running on EC2. The application enforces fine-grained, group-based access control (e.g., Engineering, HR) and provides a simple UI for viewing user details and protected areas. It includes infrastructure-as-code (Terraform) for one-command deployment and seeded test users.",
+      "how_its_built": "The infrastructure is defined in Terraform, provisioning a VPC, public subnets, an Internet Gateway, an ALB, an EC2 instance (t3.micro), and a Cognito User Pool with custom auth triggers (Lambda functions for email-based MFA). The ALB listener rules route unauthenticated traffic to Cognito and bypass authentication for health checks. The EC2 instance runs a systemd-managed FastAPI service, initialized via user_data scripts. The app reads `x-amzn-oidc-data` or similar ALB-injected headers to identify users and queries Cognito (via IAM role) to resolve group memberships, caching results in memory.",
+      "how_to_apply": "Use this as a starter template for internal tools requiring secure, group-based access without building a custom auth backend. It demonstrates how to offload authentication to the load balancer layer, reducing application complexity. The Terraform modules can be adapted for other AWS regions or integrated into existing VPCs. The custom MFA Lambda triggers provide a pattern for implementing step-up authentication or custom verification flows beyond standard SMS/TOTP.",
+      "quickstart": "./scripts/deploy.sh\nUSER_POOL_ID=$(cd terraform/envs/tier5 && terraform output -raw cognito_user_pool_id)\naws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID --username dmar@capsule.com --password \"YourSecurepw23!\" --permanent --region us-east-1\ncd terraform/envs/tier5 && terraform output -raw alb_dns_name",
+      "features": [
+        "ALB-managed OIDC authentication with AWS Cognito (no app-level auth logic)",
+        "Group-based authorization enforced by FastAPI backend (Engineering, HR, etc.)",
+        "Custom email-based MFA flow using Cognito Lambda triggers and DynamoDB",
+        "One-command Terraform deployment including VPC, EC2, ALB, and Cognito",
+        "In-memory caching of user group memberships with 60s TTL",
+        "Pre-seeded test users and groups for immediate validation"
+      ],
+      "diagram_architecture": "flowchart TD\n    User([User Browser]) -->|HTTPS| ALB[Application Load Balancer]\n    ALB -->|Auth Required| Cognito[AWS Cognito User Pool]\n    Cognito -->|OIDC Callback| ALB\n    ALB -->|x-amzn-oidc-* Headers| EC2[EC2 Instance]\n    subgraph EC2_Instance [EC2 Instance]\n        FastAPI[FastAPI App]\n        Cache[(In-Memory Cache)]\n    end\n    EC2 --> FastAPI\n    FastAPI --> Cache\n    FastAPI -->|IAM Role| CognitoAPI[Cognito API]\n    CognitoAPI -->|Group Membership| FastAPI\n    ALB -->|Health Check Bypass| FastAPI",
+      "diagram_sequence": "sequenceDiagram\n    participant User as User Browser\n    participant ALB as Application Load Balancer\n    participant Cognito as AWS Cognito\n    participant App as FastAPI App\n    participant DB as DynamoDB/MFA\n\n    User->>ALB: GET /areas/engineering\n    ALB->>Cognito: Authenticate-Cognito Action\n    Cognito->>User: Redirect to Hosted UI\n    User->>Cognito: Submit Credentials\n    Cognito->>DB: Trigger CreateAuthChallenge (MFA)\n    DB->>User: Send Email Code\n    User->>Cognito: Submit MFA Code\n    Cognito->>DB: VerifyAuthChallenge\n    Cognito->>ALB: Return OIDC Tokens\n    ALB->>App: Forward Request + User Headers\n    App->>App: Extract Email from Headers\n    App->>App: Check Group Cache\n    alt Cache Miss\n        App->>Cognito: ListGroupsForUser (IAM)\n        Cognito-->>App: Return Groups\n        App->>App: Update Cache\n    end\n    alt Authorized\n        App-->>User: Render Engineering Page\n    else Denied\n        App-->>User: Redirect to /denied\n    end",
+      "capabilities": [
+        "OIDC Authentication Offloading",
+        "Group-Based Access Control",
+        "Custom MFA Flows",
+        "Infrastructure as Code",
+        "Header-Based Identity Propagation"
+      ],
+      "components": [
+        "FastAPI Backend",
+        "Terraform Modules",
+        "Cognito Lambda Triggers",
+        "ALB Listener Rules",
+        "Jinja2 Templates"
+      ],
+      "tech": [
+        "Python",
+        "FastAPI",
+        "Terraform",
+        "AWS Cognito",
+        "AWS ALB",
+        "AWS EC2",
+        "AWS Lambda",
+        "AWS DynamoDB"
+      ],
+      "depends_on": [
+        "AWS CLI",
+        "Terraform >= 1.0",
+        "jq",
+        "Python 3.9+"
+      ],
+      "integrates_with": [
+        "AWS SES (for MFA emails)",
+        "AWS IAM (for EC2 role)",
+        "AWS Route53 (optional DNS)"
+      ],
+      "patterns": [
+        "Load Balancer Auth Pattern",
+        "Sidecar-less Identity",
+        "Cache-Aside Group Lookup",
+        "Custom Challenge MFA"
+      ],
+      "reuse_tags": [
+        "aws-auth",
+        "cognito-mfa",
+        "alb-oidc",
+        "terraform-ec2",
+        "fastapi-rbac"
+      ],
+      "slug": "2026-jan-vibecodeportal-aws-cognito-alb-auth-portal",
+      "repo_url": "https://github.com/davidbmar/2026-jan-vibecodeportal-aws-cognito-alb-auth-portal",
+      "visibility": "public",
+      "status": "shipped",
+      "thin": false,
+      "todos": [],
+      "screenshot_url": "",
+      "generated_at": "2026-06-14T01:49:19.741918Z",
+      "source_commit": "d124ca8",
+      "model": "qwen3.7-plus"
+    },
+    {
+      "title": "Real-Time ASR Service with NVIDIA NeMo Parakeet",
+      "one_liner": "A production-ready streaming speech-to-text API using NVIDIA's Parakeet-CTC-0.6B model, featuring WebSocket audio ingestion, Silero VAD, and FastAPI.",
+      "what_it_is": "This project implements a low-latency Automatic Speech Recognition (ASR) service designed for real-time transcription. It leverages the NVIDIA NeMo framework and the Parakeet-CTC-0.6B model to convert spoken audio into text. The system accepts audio streams via WebSockets from a browser client, processes them through an Audio Gateway for normalization, filters silence using Silero Voice Activity Detection (VAD), and performs streaming inference to deliver both partial and final transcripts. It is built with Python 3.12 and FastAPI, supporting GPU acceleration for high concurrency.",
+      "how_its_built": "The backend is constructed using FastAPI for asynchronous HTTP and WebSocket handling. Core ASR logic relies on NVIDIA NeMo's `EncDecCTCModel` for transcription and PyTorch for Silero VAD. Audio processing includes resampling and normalization within a custom Audio Gateway. Session management handles concurrent WebSocket connections, ensuring resource limits are respected. The frontend is a lightweight HTML/JS demo that captures microphone input and streams it to the backend. Deployment is containerized via Docker with GPU support (`--gpus all`).",
+      "how_to_apply": "Use this service as a backend for voice-enabled web applications, meeting transcription tools, or live captioning systems. It is suitable for developers needing a self-hosted, GPU-accelerated alternative to cloud ASR APIs. The modular architecture allows swapping the ASR model or VAD component. It integrates easily into existing Python microservices ecosystems via its REST/WebSocket interface.",
+      "quickstart": "pip install -r requirements.txt\npython download_models.py\npython main.py\nopen http://localhost:8000",
+      "features": [
+        "Real-time streaming transcription via WebSockets with <500ms p95 latency",
+        "Integrated Silero VAD for efficient silence filtering and audio segmentation",
+        "Supports partial and final transcript stabilization for responsive UI updates",
+        "GPU-accelerated inference using NVIDIA NeMo Parakeet-CTC-0.6B model",
+        "Built-in browser demo UI for immediate testing and integration reference",
+        "Session management with configurable concurrency limits and timeout handling"
+      ],
+      "diagram_architecture": "flowchart TD\n    Client[Browser Client] -->|WebSocket Audio Stream| GW[Audio Gateway]\n    GW -->|Preprocessed Chunks| VAD[Silero VAD]\n    VAD -->|Active Speech Segments| ASR[Nemo Parakeet ASR]\n    ASR -->|Partial/Final Text| SM[Session Manager]\n    SM -->|Transcript JSON| Client\n    subgraph Backend\n        GW\n        VAD\n        ASR\n        SM\n    end",
+      "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant WS as WebSocket Handler\n    participant GW as Audio Gateway\n    participant VAD as Silero VAD\n    participant ASR as NeMo Engine\n    \n    Browser->>WS: Connect & Start Session\n    WS->>WS: Register Session\n    loop Audio Stream\n        Browser->>WS: Send Audio Chunk\n        WS->>GW: Preprocess (Resample/Normalize)\n        GW->>VAD: Check Voice Activity\n        alt Speech Detected\n            VAD->>ASR: Forward Audio Segment\n            ASR->>ASR: Streaming Inference\n            ASR-->>WS: Return Partial/Final Transcript\n            WS-->>Browser: Send Transcript Update\n        else Silence\n            VAD-->>WS: Ignore Chunk\n        end\n    end",
+      "capabilities": [
+        "Streaming ASR",
+        "Voice Activity Detection",
+        "WebSocket Communication",
+        "GPU Acceleration",
+        "Session Management",
+        "API Key Authentication"
+      ],
+      "components": [
+        "FastAPI Server",
+        "NeMo ASR Engine",
+        "Silero VAD Module",
+        "Audio Gateway",
+        "Session Manager",
+        "Browser Demo UI"
+      ],
+      "tech": [
+        "Python 3.12",
+        "FastAPI",
+        "NVIDIA NeMo",
+        "PyTorch",
+        "WebSockets",
+        "Docker"
+      ],
+      "depends_on": [
+        "nemo-toolkit",
+        "torch",
+        "fastapi",
+        "uvicorn",
+        "websockets",
+        "numpy"
+      ],
+      "integrates_with": [
+        "Web Browsers",
+        "GPU Hardware (CUDA)",
+        "REST Clients"
+      ],
+      "patterns": [
+        "Producer-Consumer",
+        "Singleton Model Loading",
+        "Async WebSocket Handling",
+        "Middleware Authentication"
+      ],
+      "reuse_tags": [
+        "asr",
+        "speech-to-text",
+        "nvidia-nemo",
+        "real-time",
+        "websocket",
+        "fastapi",
+        "vad"
+      ],
+      "slug": "2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service",
+      "repo_url": "https://github.com/davidbmar/2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service",
+      "visibility": "public",
+      "status": "shipped",
+      "thin": false,
+      "todos": [],
+      "screenshot_url": "",
+      "generated_at": "2026-06-14T01:49:51.783736Z",
+      "source_commit": "01e5f18",
+      "model": "qwen3.7-plus"
+    },
+    {
+      "title": "nano-claw voice loop",
+      "one_liner": "A local, voice-powered AI agent that runs in your browser with Metal-accelerated speech recognition and tool execution.",
+      "what_it_is": "nano-claw is a personal AI assistant designed for local execution. It creates a continuous voice loop where users speak to their browser, audio is transcribed via Whisper (running natively on Mac for GPU speed), processed by Claude (via API), and spoken back using Kokoro TTS. It supports interactive tool approval, allowing the AI to request permission before executing shell commands or file operations on the host machine.",
+      "how_its_built": "The system uses a hybrid architecture to bypass Docker GPU limitations on macOS. A native Python service runs `faster-whisper` on port 8200 using Apple Metal acceleration. The core logic, including the TypeScript API server and Python-based Voice Server (handling WebRTC and Kokoro TTS), runs inside a Docker container. The browser client communicates via WebSockets for real-time audio streaming and UI updates.",
+      "how_to_apply": "Use this project as a foundation for building private, voice-first AI agents that require low-latency speech-to-text on Apple Silicon. It demonstrates how to bridge native high-performance ML services with containerized application logic and secure tool execution patterns.",
+      "quickstart": "git clone https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt.git\ncd 2026-nano-claw-voice-loop-tts-stt\nexport ANTHROPIC_API_KEY=sk-ant-...\n./run.sh",
+      "features": [
+        "Real-time voice interaction via WebRTC in the browser",
+        "Metal-accelerated Whisper STT running natively on macOS",
+        "Kokoro TTS for natural-sounding voice responses",
+        "Interactive tool approval for shell and file operations",
+        "Persistent conversation memory stored in JSON files",
+        "Modular skill system loaded from Markdown definitions"
+      ],
+      "diagram_architecture": "flowchart TD\n    User[User Browser] <-->|WebRTC Audio / WebSocket| VS[Voice Server: Python/Docker]\n    VS <-->|HTTP POST /transcribe| STT[STT Service: faster-whisper/Native Mac]\n    VS <-->|HTTP API| API[nano-claw API: TypeScript/Docker]\n    API <-->|LLM Request| Claude[Anthropic Claude API]\n    API -->|Execute| Tools[Local Tools: Shell/File]\n    subgraph Docker Container\n        VS\n        API\n    end\n    subgraph Host Mac\n        STT\n        Tools\n    end",
+      "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser Client\n    participant V as Voice Server (Docker)\n    participant S as STT Service (Native)\n    participant A as Agent API (Docker)\n    participant L as Claude API\n    \n    U->>B: Hold button & Speak\n    B->>V: Stream Audio (WebRTC)\n    U->>B: Release button\n    V->>S: POST audio bytes\n    S-->>V: Transcribed Text\n    V->>A: POST text message\n    A->>L: Send prompt + context\n    L-->>A: Response + Tool Calls?\n    alt Tool Call Required\n        A-->>V: Pending tool request\n        V-->>B: Show approval card\n        B->>U: Display approval\n        U->>B: Approve/Reject\n        B->>V: Send decision\n        V->>A: Confirm execution\n        A->>A: Execute Tool\n        A->>L: Send tool result\n        L-->>A: Final response\n    end\n    A-->>V: Final text response\n    V->>V: Generate Speech (Kokoro TTS)\n    V->>B: Stream Audio Response\n    B->>U: Play audio",
+      "capabilities": [
+        "Voice-to-Voice Interaction",
+        "Local Tool Execution",
+        "Contextual Memory",
+        "Skill Extension",
+        "Real-time Transcription"
+      ],
+      "components": [
+        "Browser Client",
+        "Voice Server",
+        "Agent API",
+        "STT Service",
+        "Tool Registry",
+        "Memory Store"
+      ],
+      "tech": [
+        "TypeScript",
+        "Python",
+        "Docker",
+        "WebRTC",
+        "Whisper",
+        "Kokoro TTS",
+        "Claude API"
+      ],
+      "depends_on": [
+        "Docker Desktop",
+        "Python 3.10+",
+        "Anthropic API Key",
+        "macOS (for Metal STT)"
+      ],
+      "integrates_with": [
+        "Anthropic Claude",
+        "Local File System",
+        "Shell Environment"
+      ],
+      "patterns": [
+        "Voice Loop",
+        "Human-in-the-Loop Approval",
+        "Hybrid Native/Container Architecture",
+        "Skill-based Prompting"
+      ],
+      "reuse_tags": [
+        "ai-agent",
+        "voice-interface",
+        "local-llm",
+        "typescript",
+        "python",
+        "docker",
+        "webrtc",
+        "whisper",
+        "tool-use"
+      ],
+      "slug": "2026-nano-claw-voice-loop-tts-stt",
+      "repo_url": "https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt",
+      "visibility": "public",
+      "status": "shipped",
+      "thin": false,
+      "todos": [
+        {
+          "kind": "unmerged_branch",
+          "detail": "copilot/optimize-typescript-files is 1 commit ahead of the default branch"
+        },
+        {
+          "kind": "unmerged_branch",
+          "detail": "dependabot/npm_and_yarn/npm_and_yarn-4825ac1e2e is 1 commit ahead of the default branch"
+        },
+        {
+          "kind": "open_pr",
+          "detail": "PR #1: Bump vitest from 1.6.1 to 4.1.8 in the npm_and_yarn group across 1 directory"
+        }
+      ],
+      "screenshot_url": "https://raw.githubusercontent.com/davidbmar/2026-nano-claw-voice-loop-tts-stt/main/docs/voice-full-flow.png",
+      "generated_at": "2026-06-14T01:50:35.509108Z",
+      "source_commit": "6e302a0",
+      "model": "qwen3.7-plus"
+    },
     {
       "title": "generate_title_headline_hooks",
       "one_liner": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification to prevent hallucinated quotes and unsupported claims.",

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS Cognito + ALB Auth Portal · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "AWS Cognito + ALB Auth Portal", "one_liner": "A minimal employee access portal using AWS ALB for OAuth2 authentication and FastAPI for group-based authorization.", "what_it_is": "This project is a reference implementation of an 'Employee Access Portal' deployed on AWS. It leverages the Application Load Balancer (ALB) to handle the heavy lifting of OpenID Connect (OIDC) authentication with AWS Cognito, passing user identity via HTTP headers to a backend FastAPI application running on EC2. The application enforces fine-grained, group-based access control (e.g., Engineering, HR) and provides a simple UI for viewing user details and protected areas. It includes infrastructure-as-code (Terraform) for one-command deployment and seeded test users.", "how_its_built": "The infrastructure is defined in Terraform, provisioning a VPC, public subnets, an Internet Gateway, an ALB, an EC2 instance (t3.micro), and a Cognito User Pool with custom auth triggers (Lambda functions for email-based MFA). The ALB listener rules route unauthenticated traffic to Cognito and bypass authentication for health checks. The EC2 instance runs a systemd-managed FastAPI service, initialized via user_data scripts. The app reads `x-amzn-oidc-data` or similar ALB-injected headers to identify users and queries Cognito (via IAM role) to resolve group memberships, caching results in memory.", "how_to_apply": "Use this as a starter template for internal tools requiring secure, group-based access without building a custom auth backend. It demonstrates how to offload authentication to the load balancer layer, reducing application complexity. The Terraform modules can be adapted for other AWS regions or integrated into existing VPCs. The custom MFA Lambda triggers provide a pattern for implementing step-up authentication or custom verification flows beyond standard SMS/TOTP.", "quickstart": "./scripts/deploy.sh\nUSER_POOL_ID=$(cd terraform/envs/tier5 && terraform output -raw cognito_user_pool_id)\naws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID --username dmar@capsule.com --password \"YourSecurepw23!\" --permanent --region us-east-1\ncd terraform/envs/tier5 && terraform output -raw alb_dns_name", "features": ["ALB-managed OIDC authentication with AWS Cognito (no app-level auth logic)", "Group-based authorization enforced by FastAPI backend (Engineering, HR, etc.)", "Custom email-based MFA flow using Cognito Lambda triggers and DynamoDB", "One-command Terraform deployment including VPC, EC2, ALB, and Cognito", "In-memory caching of user group memberships with 60s TTL", "Pre-seeded test users and groups for immediate validation"], "diagram_architecture": "flowchart TD\n    User([User Browser]) -->|HTTPS| ALB[Application Load Balancer]\n    ALB -->|Auth Required| Cognito[AWS Cognito User Pool]\n    Cognito -->|OIDC Callback| ALB\n    ALB -->|x-amzn-oidc-* Headers| EC2[EC2 Instance]\n    subgraph EC2_Instance [EC2 Instance]\n        FastAPI[FastAPI App]\n        Cache[(In-Memory Cache)]\n    end\n    EC2 --> FastAPI\n    FastAPI --> Cache\n    FastAPI -->|IAM Role| CognitoAPI[Cognito API]\n    CognitoAPI -->|Group Membership| FastAPI\n    ALB -->|Health Check Bypass| FastAPI", "diagram_sequence": "sequenceDiagram\n    participant User as User Browser\n    participant ALB as Application Load Balancer\n    participant Cognito as AWS Cognito\n    participant App as FastAPI App\n    participant DB as DynamoDB/MFA\n\n    User->>ALB: GET /areas/engineering\n    ALB->>Cognito: Authenticate-Cognito Action\n    Cognito->>User: Redirect to Hosted UI\n    User->>Cognito: Submit Credentials\n    Cognito->>DB: Trigger CreateAuthChallenge (MFA)\n    DB->>User: Send Email Code\n    User->>Cognito: Submit MFA Code\n    Cognito->>DB: VerifyAuthChallenge\n    Cognito->>ALB: Return OIDC Tokens\n    ALB->>App: Forward Request + User Headers\n    App->>App: Extract Email from Headers\n    App->>App: Check Group Cache\n    alt Cache Miss\n        App->>Cognito: ListGroupsForUser (IAM)\n        Cognito-->>App: Return Groups\n        App->>App: Update Cache\n    end\n    alt Authorized\n        App-->>User: Render Engineering Page\n    else Denied\n        App-->>User: Redirect to /denied\n    end", "capabilities": ["OIDC Authentication Offloading", "Group-Based Access Control", "Custom MFA Flows", "Infrastructure as Code", "Header-Based Identity Propagation"], "components": ["FastAPI Backend", "Terraform Modules", "Cognito Lambda Triggers", "ALB Listener Rules", "Jinja2 Templates"], "tech": ["Python", "FastAPI", "Terraform", "AWS Cognito", "AWS ALB", "AWS EC2", "AWS Lambda", "AWS DynamoDB"], "depends_on": ["AWS CLI", "Terraform >= 1.0", "jq", "Python 3.9+"], "integrates_with": ["AWS SES (for MFA emails)", "AWS IAM (for EC2 role)", "AWS Route53 (optional DNS)"], "patterns": ["Load Balancer Auth Pattern", "Sidecar-less Identity", "Cache-Aside Group Lookup", "Custom Challenge MFA"], "reuse_tags": ["aws-auth", "cognito-mfa", "alb-oidc", "terraform-ec2", "fastapi-rbac"], "slug": "2026-jan-vibecodeportal-aws-cognito-alb-auth-portal", "repo_url": "https://github.com/davidbmar/2026-jan-vibecodeportal-aws-cognito-alb-auth-portal", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T01:49:19.741918Z", "source_commit": "d124ca8", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "AWS Cognito + ALB Auth Portal",
+  "description": "A minimal employee access portal using AWS ALB for OAuth2 authentication and FastAPI for group-based authorization.",
+  "codeRepository": "https://github.com/davidbmar/2026-jan-vibecodeportal-aws-cognito-alb-auth-portal",
+  "programmingLanguage": [
+    "Python",
+    "FastAPI",
+    "Terraform",
+    "AWS Cognito",
+    "AWS ALB",
+    "AWS EC2",
+    "AWS Lambda",
+    "AWS DynamoDB"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AWS Cognito + ALB Auth Portal</h1>
+  <p class="one-liner">A minimal employee access portal using AWS ALB for OAuth2 authentication and FastAPI for group-based authorization.</p>
+  <p><a href="https://github.com/davidbmar/2026-jan-vibecodeportal-aws-cognito-alb-auth-portal">https://github.com/davidbmar/2026-jan-vibecodeportal-aws-cognito-alb-auth-portal</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project is a reference implementation of an &#x27;Employee Access Portal&#x27; deployed on AWS. It leverages the Application Load Balancer (ALB) to handle the heavy lifting of OpenID Connect (OIDC) authentication with AWS Cognito, passing user identity via HTTP headers to a backend FastAPI application running on EC2. The application enforces fine-grained, group-based access control (e.g., Engineering, HR) and provides a simple UI for viewing user details and protected areas. It includes infrastructure-as-code (Terraform) for one-command deployment and seeded test users.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>ALB-managed OIDC authentication with AWS Cognito (no app-level auth logic)</li><li>Group-based authorization enforced by FastAPI backend (Engineering, HR, etc.)</li><li>Custom email-based MFA flow using Cognito Lambda triggers and DynamoDB</li><li>One-command Terraform deployment including VPC, EC2, ALB, and Cognito</li><li>In-memory caching of user group memberships with 60s TTL</li><li>Pre-seeded test users and groups for immediate validation</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">./scripts/deploy.sh
+USER_POOL_ID=$(cd terraform/envs/tier5 &amp;&amp; terraform output -raw cognito_user_pool_id)
+aws cognito-idp admin-set-user-password --user-pool-id $USER_POOL_ID --username dmar@capsule.com --password &quot;YourSecurepw23!&quot; --permanent --region us-east-1
+cd terraform/envs/tier5 &amp;&amp; terraform output -raw alb_dns_name</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User([User Browser]) -->|HTTPS| ALB[Application Load Balancer]
+    ALB -->|Auth Required| Cognito[AWS Cognito User Pool]
+    Cognito -->|OIDC Callback| ALB
+    ALB -->|x-amzn-oidc-* Headers| EC2[EC2 Instance]
+    subgraph EC2_Instance [EC2 Instance]
+        FastAPI[FastAPI App]
+        Cache[(In-Memory Cache)]
+    end
+    EC2 --> FastAPI
+    FastAPI --> Cache
+    FastAPI -->|IAM Role| CognitoAPI[Cognito API]
+    CognitoAPI -->|Group Membership| FastAPI
+    ALB -->|Health Check Bypass| FastAPI</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The infrastructure is defined in Terraform, provisioning a VPC, public subnets, an Internet Gateway, an ALB, an EC2 instance (t3.micro), and a Cognito User Pool with custom auth triggers (Lambda functions for email-based MFA). The ALB listener rules route unauthenticated traffic to Cognito and bypass authentication for health checks. The EC2 instance runs a systemd-managed FastAPI service, initialized via user_data scripts. The app reads `x-amzn-oidc-data` or similar ALB-injected headers to identify users and queries Cognito (via IAM role) to resolve group memberships, caching results in memory.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as User Browser
+    participant ALB as Application Load Balancer
+    participant Cognito as AWS Cognito
+    participant App as FastAPI App
+    participant DB as DynamoDB/MFA
+
+    User->>ALB: GET /areas/engineering
+    ALB->>Cognito: Authenticate-Cognito Action
+    Cognito->>User: Redirect to Hosted UI
+    User->>Cognito: Submit Credentials
+    Cognito->>DB: Trigger CreateAuthChallenge (MFA)
+    DB->>User: Send Email Code
+    User->>Cognito: Submit MFA Code
+    Cognito->>DB: VerifyAuthChallenge
+    Cognito->>ALB: Return OIDC Tokens
+    ALB->>App: Forward Request + User Headers
+    App->>App: Extract Email from Headers
+    App->>App: Check Group Cache
+    alt Cache Miss
+        App->>Cognito: ListGroupsForUser (IAM)
+        Cognito-->>App: Return Groups
+        App->>App: Update Cache
+    end
+    alt Authorized
+        App-->>User: Render Engineering Page
+    else Denied
+        App-->>User: Redirect to /denied
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this as a starter template for internal tools requiring secure, group-based access without building a custom auth backend. It demonstrates how to offload authentication to the load balancer layer, reducing application complexity. The Terraform modules can be adapted for other AWS regions or integrated into existing VPCs. The custom MFA Lambda triggers provide a pattern for implementing step-up authentication or custom verification flows beyond standard SMS/TOTP.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">OIDC Authentication Offloading</span><span class="tag">Group-Based Access Control</span><span class="tag">Custom MFA Flows</span><span class="tag">Infrastructure as Code</span><span class="tag">Header-Based Identity Propagation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">FastAPI Backend</span><span class="tag">Terraform Modules</span><span class="tag">Cognito Lambda Triggers</span><span class="tag">ALB Listener Rules</span><span class="tag">Jinja2 Templates</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Terraform</span><span class="tag">AWS Cognito</span><span class="tag">AWS ALB</span><span class="tag">AWS EC2</span><span class="tag">AWS Lambda</span><span class="tag">AWS DynamoDB</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS CLI</span><span class="tag">Terraform &gt;= 1.0</span><span class="tag">jq</span><span class="tag">Python 3.9+</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS SES (for MFA emails)</span><span class="tag">AWS IAM (for EC2 role)</span><span class="tag">AWS Route53 (optional DNS)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Load Balancer Auth Pattern</span><span class="tag">Sidecar-less Identity</span><span class="tag">Cache-Aside Group Lookup</span><span class="tag">Custom Challenge MFA</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">aws-auth</span><span class="tag">cognito-mfa</span><span class="tag">alb-oidc</span><span class="tag">terraform-ec2</span><span class="tag">fastapi-rbac</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T01:49:19.741918Z ·
+     commit d124ca8 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

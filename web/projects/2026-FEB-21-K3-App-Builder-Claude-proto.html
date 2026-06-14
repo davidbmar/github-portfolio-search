@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>k3s App Builder Platform · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "k3s App Builder Platform", "one_liner": "A self-contained platform for deploying apps with plain language and Claude, running entirely within k3s on a single EC2 instance.", "what_it_is": "A local-first application development and deployment platform that allows users to describe an app in natural language, have Claude generate the code, build it into a container, and deploy it to a preview or production environment on a single-node Kubernetes cluster. It isolates apps using Kubernetes namespaces and manages traffic via Traefik.", "how_its_built": "The platform is built with Python (FastAPI) for the backend logic, utilizing the Anthropic SDK for code generation. It uses k3s for container orchestration, Docker for image building, a local Docker registry for storage, and Traefik for ingress routing. Jinja2 templates are used to generate Kubernetes manifests dynamically.", "how_to_apply": "Clone the repository to an Ubuntu 24.04 EC2 instance, install dependencies via provided shell scripts, set the ANTHROPIC_API_KEY, and access the web UI via a nip.io domain pointing to the instance's public IP.", "quickstart": "git clone https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto\ncd 2026-FEB-21-K3-App-Builder-Claude-proto\nchmod +x scripts/*.sh\n./scripts/install-k3s.sh\n./scripts/setup-registry.sh\nexport ANTHROPIC_API_KEY=sk-ant-...\n./scripts/bootstrap-cluster.sh", "features": ["Natural language app generation using Claude Opus", "Live code streaming and preview before deployment", "Automated Docker build and push to local registry", "Isolated preview and production environments per app", "One-click rollback to previous versions", "Resource quotas and network policies for isolation"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| Traefik[Traefik Ingress Controller]\n    Traefik -->|Route: builder.*| BuilderUI[Builder UI Service]\n    Traefik -->|Route: app.*| AppNS[App Namespace Services]\n    \n    subgraph Builder System\n        BuilderUI --> BuildOps[Build Operations]\n        BuildOps -->|Generate Code| Claude[Claude API]\n        BuildOps -->|Build Image| DockerHost[Docker Daemon]\n        DockerHost -->|Push| LocalReg[Local Registry :5050]\n        BuildOps -->|Apply Manifests| K8sAPI[k3s API Server]\n    end\n    \n    subgraph App Namespace\n        K8sAPI --> Deploy[Deployment]\n        Deploy --> Pod[App Pod]\n        AppNS --> Pod\n    end\n    \n    LocalReg -->|Pull Image| Pod", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant UI as Builder UI\n    participant Claude as Claude API\n    participant Docker as Docker Daemon\n    participant Reg as Local Registry\n    participant K8s as k3s Cluster\n\n    User->>UI: Describe App & Click Generate\n    UI->>Claude: Stream Prompt with Context\n    Claude-->>UI: Stream Generated Code Files\n    UI->>User: Display Code Preview\n    \n    User->>UI: Click Build & Deploy Preview\n    UI->>Docker: docker build .\n    Docker->>Reg: Push Image (app:timestamp)\n    UI->>K8s: Apply Preview Deployment Manifest\n    K8s->>Reg: Pull Image\n    K8s->>K8s: Start Preview Pod\n    K8s-->>UI: Deployment Ready\n    UI-->>User: Show Preview URL", "capabilities": ["Code Generation", "Container Building", "Kubernetes Deployment", "Traffic Routing", "Version Management", "Environment Isolation"], "components": ["Builder UI (FastAPI)", "Build Ops Module", "Claude Ops Module", "K8s Ops Module", "Traefik Ingress", "Local Docker Registry", "k3s Control Plane"], "tech": ["Python", "FastAPI", "k3s", "Docker", "Traefik", "Jinja2", "Anthropic SDK"], "depends_on": ["Ubuntu 24.04", "Docker Engine", "Anthropic API Key", "Public IP Address", "Port 80 Access"], "integrates_with": ["Anthropic Claude API", "nip.io DNS Service", "Local Docker Registry"], "patterns": ["GitOps-like Manifest Generation", "Preview/Production Parity", "Namespace Isolation", "Streaming AI Response", "Self-hosted CI/CD"], "reuse_tags": ["k3s", "ai-code-gen", "self-hosted", "python", "devops-tool", "single-node"], "slug": "2026-FEB-21-K3-App-Builder-Claude-proto", "repo_url": "https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/pip/builder/pip-04ebf05b2f is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: build(deps): Bump the pip group across 1 directory with 2 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T01:46:20.210106Z", "source_commit": "2d2a29e", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "k3s App Builder Platform",
+  "description": "A self-contained platform for deploying apps with plain language and Claude, running entirely within k3s on a single EC2 instance.",
+  "codeRepository": "https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto",
+  "programmingLanguage": [
+    "Python",
+    "FastAPI",
+    "k3s",
+    "Docker",
+    "Traefik",
+    "Jinja2",
+    "Anthropic SDK"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>k3s App Builder Platform</h1>
+  <p class="one-liner">A self-contained platform for deploying apps with plain language and Claude, running entirely within k3s on a single EC2 instance.</p>
+  <p><a href="https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto">https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A local-first application development and deployment platform that allows users to describe an app in natural language, have Claude generate the code, build it into a container, and deploy it to a preview or production environment on a single-node Kubernetes cluster. It isolates apps using Kubernetes namespaces and manages traffic via Traefik.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Natural language app generation using Claude Opus</li><li>Live code streaming and preview before deployment</li><li>Automated Docker build and push to local registry</li><li>Isolated preview and production environments per app</li><li>One-click rollback to previous versions</li><li>Resource quotas and network policies for isolation</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto
+cd 2026-FEB-21-K3-App-Builder-Claude-proto
+chmod +x scripts/*.sh
+./scripts/install-k3s.sh
+./scripts/setup-registry.sh
+export ANTHROPIC_API_KEY=sk-ant-...
+./scripts/bootstrap-cluster.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|HTTP Request| Traefik[Traefik Ingress Controller]
+    Traefik -->|Route: builder.*| BuilderUI[Builder UI Service]
+    Traefik -->|Route: app.*| AppNS[App Namespace Services]
+    
+    subgraph Builder System
+        BuilderUI --> BuildOps[Build Operations]
+        BuildOps -->|Generate Code| Claude[Claude API]
+        BuildOps -->|Build Image| DockerHost[Docker Daemon]
+        DockerHost -->|Push| LocalReg[Local Registry :5050]
+        BuildOps -->|Apply Manifests| K8sAPI[k3s API Server]
+    end
+    
+    subgraph App Namespace
+        K8sAPI --> Deploy[Deployment]
+        Deploy --> Pod[App Pod]
+        AppNS --> Pod
+    end
+    
+    LocalReg -->|Pull Image| Pod</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The platform is built with Python (FastAPI) for the backend logic, utilizing the Anthropic SDK for code generation. It uses k3s for container orchestration, Docker for image building, a local Docker registry for storage, and Traefik for ingress routing. Jinja2 templates are used to generate Kubernetes manifests dynamically.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant UI as Builder UI
+    participant Claude as Claude API
+    participant Docker as Docker Daemon
+    participant Reg as Local Registry
+    participant K8s as k3s Cluster
+
+    User->>UI: Describe App & Click Generate
+    UI->>Claude: Stream Prompt with Context
+    Claude-->>UI: Stream Generated Code Files
+    UI->>User: Display Code Preview
+    
+    User->>UI: Click Build & Deploy Preview
+    UI->>Docker: docker build .
+    Docker->>Reg: Push Image (app:timestamp)
+    UI->>K8s: Apply Preview Deployment Manifest
+    K8s->>Reg: Pull Image
+    K8s->>K8s: Start Preview Pod
+    K8s-->>UI: Deployment Ready
+    UI-->>User: Show Preview URL</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Clone the repository to an Ubuntu 24.04 EC2 instance, install dependencies via provided shell scripts, set the ANTHROPIC_API_KEY, and access the web UI via a nip.io domain pointing to the instance&#x27;s public IP.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Code Generation</span><span class="tag">Container Building</span><span class="tag">Kubernetes Deployment</span><span class="tag">Traffic Routing</span><span class="tag">Version Management</span><span class="tag">Environment Isolation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Builder UI (FastAPI)</span><span class="tag">Build Ops Module</span><span class="tag">Claude Ops Module</span><span class="tag">K8s Ops Module</span><span class="tag">Traefik Ingress</span><span class="tag">Local Docker Registry</span><span class="tag">k3s Control Plane</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">k3s</span><span class="tag">Docker</span><span class="tag">Traefik</span><span class="tag">Jinja2</span><span class="tag">Anthropic SDK</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Ubuntu 24.04</span><span class="tag">Docker Engine</span><span class="tag">Anthropic API Key</span><span class="tag">Public IP Address</span><span class="tag">Port 80 Access</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Anthropic Claude API</span><span class="tag">nip.io DNS Service</span><span class="tag">Local Docker Registry</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">GitOps-like Manifest Generation</span><span class="tag">Preview/Production Parity</span><span class="tag">Namespace Isolation</span><span class="tag">Streaming AI Response</span><span class="tag">Self-hosted CI/CD</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">k3s</span><span class="tag">ai-code-gen</span><span class="tag">self-hosted</span><span class="tag">python</span><span class="tag">devops-tool</span><span class="tag">single-node</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/pip/builder/pip-04ebf05b2f is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: build(deps): Bump the pip group across 1 directory with 2 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T01:46:20.210106Z ·
+     commit 2d2a29e ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>
