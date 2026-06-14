@@ -1,0 +1,87 @@
+{
+  "title": "Speaker Workflow System",
+  "one_liner": "A visual editor and runtime engine for declarative, multi-turn conversational workflows defined in JSONL.",
+  "what_it_is": "A vanilla TypeScript application that allows developers to define stateful conversation flows (like transcription or data collection) using a simple JSONL format. It provides a split-pane UI: an interactive graph editor on the left and a linked, color-coded pseudocode view on the right. The system includes a runtime engine that processes user input, manages state transitions, handles intent classification via keywords, and supports features like speech accumulation and template variable resolution.",
+  "how_its_built": "Built with Vite and TypeScript using pure DOM manipulation (no frontend framework). The architecture separates concerns into a workflow engine (state machine), intent classifier (keyword-based), visual map renderer (SVG connectors), code view generator (pseudocode), and editor modules (node/arrow editing). State is managed via a central app context with a callback bag pattern to avoid circular dependencies between UI components and the engine.",
+  "how_to_apply": "Use this system to prototype and debug complex multi-turn dialogues without writing imperative code. Define your flow in `data/workflows.jsonl`, visualize it in the browser, test interactions in real-time, and export the JSONL definition for integration into larger voice or chat applications. It serves as a reference implementation for declarative state machines and bidirectional UI-code linking.",
+  "quickstart": "npm install\nnpm run dev",
+  "features": [
+    "Visual graph editor with interactive node/arrow editing and auto-wiring",
+    "Bidirectional highlighting between graph nodes and pseudocode lines",
+    "Declarative JSONL format for defining states, transitions, and handlers",
+    "Runtime engine with keyword-based intent classification and template variables",
+    "Graph-aware rendering with shared state links and SVG tree connectors",
+    "Interactive testing panel for simulating multi-turn conversations"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Input Text/Voice| UI[demo.ts UI Layer]\n    UI -->|Classify Intent| IC[intentClassifier.ts]\n    UI -->|Trigger Action| WM[workflow.ts Engine]\n    WM -->|Load Def| JSONL[data/workflows.jsonl]\n    WM -->|Execute Handler| WH[workflowHandlers.ts]\n    WM -->|Update State| UI\n    UI -->|Render Graph| WMap[workflowMap.ts]\n    UI -->|Render Code| CView[codeView.ts]\n    WMap -->|Click Node| NE[nodeEditor.ts]\n    CView -->|Click Line| NE\n    NE -->|Update Def| WM",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant UI as demo.ts\n    participant IC as intentClassifier.ts\n    participant WF as workflow.ts\n    participant WH as workflowHandlers.ts\n    \n    U->>UI: Types/Speaks Input\n    UI->>IC: classifyIntent(input)\n    IC-->>UI: { intent, score }\n    UI->>WF: processAction(intent)\n    WF->>WF: Resolve Current State\n    WF->>WF: Check Transitions\n    alt Has Handler\n        WF->>WH: executeHandler(state.handler, input)\n        WH-->>WF: Updated Context\n    end\n    WF->>WF: Determine Next State\n    WF-->>UI: { message, nextState, context }\n    UI->>U: Display Message & Update Graph Highlight",
+  "capabilities": [
+    "Declarative workflow definition",
+    "Visual state machine editing",
+    "Real-time conversation simulation",
+    "Keyword-based intent recognition",
+    "Bidirectional code-graph linking",
+    "Template variable resolution",
+    "Speech text accumulation",
+    "Exit phrase handling"
+  ],
+  "components": [
+    "workflow.ts (Engine)",
+    "demo.ts (Orchestrator/UI)",
+    "workflowMap.ts (Graph Renderer)",
+    "codeView.ts (Pseudocode Generator)",
+    "intentClassifier.ts (Intent Logic)",
+    "nodeEditor.ts (State Editor)",
+    "arrowEditor.ts (Transition Editor)",
+    "addStateEditor.ts (New State Wizard)"
+  ],
+  "tech": [
+    "TypeScript",
+    "Vite",
+    "Vitest",
+    "Vanilla DOM API",
+    "SVG",
+    "JSONL"
+  ],
+  "depends_on": [],
+  "integrates_with": [
+    "Web Speech API (via speechRecognition.ts)",
+    "Browser DOM"
+  ],
+  "patterns": [
+    "State Machine",
+    "Callback Bag",
+    "Declarative Configuration",
+    "Observer Pattern (implicit via DOM events)",
+    "Module Pattern"
+  ],
+  "reuse_tags": [
+    "conversational-ui",
+    "state-machine",
+    "visual-editor",
+    "typescript",
+    "vanilla-js",
+    "workflow-engine",
+    "jsonl",
+    "intent-classification"
+  ],
+  "slug": "speaker-workflow-system",
+  "repo_url": "https://github.com/davidbmar/speaker-workflow-system",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-9c2c3d55e5 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 4 updates"
+    }
+  ],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/speaker-workflow-system/main/docs/screenshots/code-view-default.png",
+  "generated_at": "2026-06-14T03:55:44.403812Z",
+  "source_commit": "688964c",
+  "model": "qwen3.7-plus"
+}

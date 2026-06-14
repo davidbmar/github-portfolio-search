@@ -1,0 +1,56 @@
+{
+  "title": "Palindrome-Index",
+  "one_liner": "A Python utility that identifies the index of a character whose removal converts a string into a palindrome.",
+  "what_it_is": "A command-line script that solves the 'Palindrome Index' algorithmic problem. It accepts a series of lowercase strings and determines if they are already palindromes or if removing a single specific character makes them one. It returns the zero-based index of the removable character, or -1 if the string is already a palindrome.",
+  "how_its_built": "The solution is implemented in a single Python file (`palindromeIndex.py`). It uses a two-pointer approach implicitly by comparing the string with its reverse. When a mismatch is found at index `i`, it tests two hypotheses: removing the character at `i` from the original string, or removing the corresponding character from the end (index `len(s)-1-i`). It validates these hypotheses by checking if the resulting substrings are palindromes.",
+  "how_to_apply": "This code serves as a reference implementation for string manipulation algorithms, specifically for interview preparation involving palindromes and greedy approaches. It demonstrates basic string slicing, reversal, and iterative comparison logic in Python 2/3 compatible syntax.",
+  "quickstart": "python palindromeIndex.py",
+  "features": [
+    "Detects if a string is already a palindrome",
+    "Identifies the specific index of a character to remove to form a palindrome",
+    "Handles multiple test cases via standard input",
+    "Returns -1 for strings that are already palindromes",
+    "Uses efficient string slicing for substring generation"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Start] --> B[Read Input Integer T]\n    B --> C{Loop T times}\n    C -->|Next String S| D[Check isPalindrome(S)]\n    D -->|True| E[Print -1]\n    D -->|False| F[Find Mismatch Index i]\n    F --> G[Test Remove S[i]]\n    G -->|Is Palindrome| H[Print i]\n    G -->|Not Palindrome| I[Test Remove S[len-1-i]]\n    I -->|Is Palindrome| J[Print len-1-i]\n    E --> K{More Cases?}\n    H --> K\n    J --> K\n    K -->|Yes| C\n    K -->|No| L[End]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Main as palindromeIndex.py\n    participant Logic as palindromeIndex()\n    participant Helper as isPalindrome()\n    \n    User->>Main: Provide Input (T, Strings)\n    loop For each string S\n        Main->>Logic: palindromeIndex(S)\n        Logic->>Helper: isPalindrome(S)\n        alt S is Palindrome\n            Helper-->>Logic: True (1)\n            Logic-->>Main: Return -1\n        else S is Not Palindrome\n            Helper-->>Logic: False (0)\n            Logic->>Logic: Find first mismatch i\n            Logic->>Helper: isPalindrome(S without i)\n            alt Substring is Palindrome\n                Helper-->>Logic: True\n                Logic-->>Main: Return i\n            else Substring is Not Palindrome\n                Helper-->>Logic: False\n                Logic->>Helper: isPalindrome(S without mirror i)\n                Helper-->>Logic: True\n                Logic-->>Main: Return mirror index\n            end\n        end\n        Main->>User: Print Result\n    end",
+  "capabilities": [
+    "String reversal",
+    "Palindrome validation",
+    "Character removal simulation",
+    "Standard input parsing"
+  ],
+  "components": [
+    "reverseString",
+    "isPalindrome",
+    "stringWithoutIndex",
+    "palindromeIndex"
+  ],
+  "tech": [
+    "Python",
+    "Standard Library"
+  ],
+  "depends_on": [],
+  "integrates_with": [],
+  "patterns": [
+    "Two Pointer Technique",
+    "Greedy Algorithm",
+    "Brute Force Validation"
+  ],
+  "reuse_tags": [
+    "algorithm",
+    "string-manipulation",
+    "coding-challenge",
+    "interview-prep"
+  ],
+  "slug": "Palindrome-Index",
+  "repo_url": "https://github.com/davidbmar/Palindrome-Index",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:46:20.474715Z",
+  "source_commit": "21d081a",
+  "model": "qwen3.7-plus"
+}

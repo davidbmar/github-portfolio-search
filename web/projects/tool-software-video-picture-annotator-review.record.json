@@ -1,0 +1,81 @@
+{
+  "title": "Video Picture Annotator Review",
+  "one_liner": "A Playwright-style tool for analyzing screen recordings, annotating UI elements with AI, and generating visual diff reports.",
+  "what_it_is": "A Python-based automation and review tool that processes video recordings and images. It uses scene detection to break down videos, applies AI-driven annotations (via Claude) or manual specs to highlight UI elements, and generates HTML/PDF reports. It also provides a web interface for capturing screenshots and performing pixel-level image comparisons with SSIM scoring.",
+  "how_its_built": "Built in Python using Click for CLI structure, Rich for terminal UIs, and OpenCV/SceneDetect for video processing. It integrates the Anthropic API for intelligent frame annotation and Pillow for image manipulation. The web component is a lightweight server exposing JSON APIs for screenshot capture and image diffing, while the core logic is modularized into agents, annotators, and report renderers.",
+  "how_to_apply": "Use it to automate QA reviews of UI changes by comparing before/after screenshots, generate annotated walkthroughs of user sessions from screen recordings, or integrate into CI pipelines to visually verify application states using natural language queries.",
+  "quickstart": "pip install -e \".[dev]\"\nvideo-annotator --help\nvideo-annotator serve",
+  "features": [
+    "Automated video analysis with scene detection and keyframe extraction",
+    "AI-powered UI annotation using Claude to identify and label elements",
+    "Visual diffing of images with SSIM scores and overlay views",
+    "Web UI for live screenshot capture and interactive report viewing",
+    "CLI pipeline for end-to-end review: extract, annotate, and report generation",
+    "Support for both spec-driven and fully autonomous annotation modes"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User/Developer] --> CLI[CLI Interface]\n    User --> WebUI[Web UI :7070]\n    CLI --> Core[Core Pipeline]\n    WebUI --> API[JSON API Server]\n    Core --> VideoAgent[Video Agent]\n    Core --> Annotator[Annotator Engine]\n    Core --> Reporter[Report Renderer]\n    API --> ScreenshotSvc[Screenshot Service]\n    API --> DiffSvc[Diff Service]\n    VideoAgent --> OpenCV[OpenCV/SceneDetect]\n    Annotator --> Claude[Anthropic Claude API]\n    Annotator --> Pillow[Pillow Imaging]\n    Reporter --> HTML[HTML/PDF Output]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant C as CLI/Web\n    participant VA as VideoAgent\n    participant A as Annotator\n    participant LLM as Claude API\n    participant R as ReportRenderer\n    U->>C: video-annotator review rec.mp4\n    C->>VA: Extract scenes & frames\n    VA->>VA: Detect scenes (OpenCV)\n    VA-->>C: List of frames/timestamps\n    C->>A: Annotate frames with spec\n    A->>LLM: Send frame + context\n    LLM-->>A: Return callouts/labels\n    A->>A: Draw highlights (Pillow)\n    A-->>C: Annotated frames\n    C->>R: Generate report\n    R-->>U: report.html",
+  "capabilities": [
+    "Video scene detection",
+    "AI-based UI annotation",
+    "Image diffing (SSIM)",
+    "Screenshot capture",
+    "HTML/PDF report generation",
+    "Web server hosting"
+  ],
+  "components": [
+    "VideoAgent",
+    "Annotator",
+    "ReportRenderer",
+    "WebServer",
+    "CLI Entry Point"
+  ],
+  "tech": [
+    "Python",
+    "Click",
+    "Rich",
+    "OpenCV",
+    "SceneDetect",
+    "Pillow",
+    "Anthropic API",
+    "Playwright"
+  ],
+  "depends_on": [
+    "ffmpeg",
+    "anthropic",
+    "opencv-python",
+    "scenedetect",
+    "click",
+    "rich",
+    "Pillow",
+    "weasyprint"
+  ],
+  "integrates_with": [
+    "Claude AI",
+    "Web Browsers",
+    "CI/CD Pipelines"
+  ],
+  "patterns": [
+    "Pipeline Processing",
+    "Agent-Based Automation",
+    "REST-like API",
+    "Spec-Driven Execution"
+  ],
+  "reuse_tags": [
+    "video-processing",
+    "ui-testing",
+    "ai-annotation",
+    "visual-regression",
+    "reporting-tool"
+  ],
+  "slug": "tool-software-video-picture-annotator-review",
+  "repo_url": "https://github.com/davidbmar/tool-software-video-picture-annotator-review",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:01:33.822158Z",
+  "source_commit": "9e4a517",
+  "model": "qwen3.7-plus"
+}

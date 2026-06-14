@@ -1,0 +1,75 @@
+{
+  "title": "Picture QR Code",
+  "one_liner": "A serverless, password-gated shared photo album accessed via QR code, using AWS Lambda and S3.",
+  "what_it_is": "A lightweight web application that creates a temporary, shared photo album. Users scan a QR code to access a landing page, enter a guest password, and can then upload photos directly to an S3 bucket or browse existing ones. It requires no app installation and runs entirely on AWS serverless infrastructure (Lambda + S3).",
+  "how_its_built": "The backend is a single AWS Lambda function exposed via a Function URL, which serves the HTML/JS frontend and handles API requests for authentication and presigned URLs. Photo uploads bypass the Lambda, going directly from the browser to S3 using short-lived presigned URLs. Thumbnails are generated client-side using HTML5 Canvas. Authentication uses stateless HMAC tokens signed by a secret stored in Lambda environment variables.",
+  "how_to_apply": "Ideal for events like weddings, parties, or conferences where you want attendees to contribute photos to a central gallery without creating accounts or installing apps. It provides a low-friction way to collect media while maintaining basic access control via passwords.",
+  "quickstart": "export ACCESS_PASSWORD=\"your-guest-password\"\nexport OWNER_PASSCODE=\"your-private-passcode\"\nexport TOKEN_SECRET=\"$(openssl rand -hex 32)\"\n./scripts/deploy.sh\npython scripts/make_qr.py \"<the-printed-url>\" album-qr.png",
+  "features": [
+    "Scan-to-access workflow using QR codes",
+    "Password-gated viewing and uploading",
+    "Direct-to-S3 uploads via presigned URLs",
+    "Client-side thumbnail generation",
+    "Owner-only delete protection via separate passcode",
+    "No database required; state managed via S3 and tokens"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Device] -->|Scan QR| Browser[Web Browser]\n    Browser -->|HTTP Request| Lambda[AWS Lambda Function URL]\n    Lambda -->|Serve HTML/JS| Browser\n    Browser -->|Enter Password| Lambda\n    Lambda -->|Verify HMAC| Lambda\n    Lambda -->|Return Presigned URL| Browser\n    Browser -->|Upload Image| S3[(AWS S3 Bucket)]\n    Browser -->|List/Get Images| Lambda\n    Lambda -->|List Objects| S3\n    Lambda -->|Generate Presigned Get| S3\n    S3 -->|Image Data| Browser",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser\n    participant L as Lambda\n    participant S as S3\n\n    U->>B: Scan QR Code\n    B->>L: GET / (Load Page)\n    L-->>B: Return HTML/JS\n    U->>B: Enter Guest Password\n    B->>L: POST /auth (Password)\n    L->>L: Verify HMAC Token\n    L-->>B: Return Session Token\n    U->>B: Select Photo\n    B->>L: POST /sign-upload (Request Upload URL)\n    L->>L: Generate Presigned PUT URL\n    L-->>B: Return Presigned URL\n    B->>S: PUT Image Data (Direct Upload)\n    S-->>B: 200 OK\n    B->>B: Generate Thumbnail (Canvas)\n    U->>B: View Gallery\n    B->>L: GET /images (List)\n    L->>S: ListObjectsV2\n    S-->>L: Object Keys\n    L->>S: CreatePresignedGet (For each)\n    L-->>B: Return Image URLs\n    B->>S: GET Images\n    S-->>B: Image Data",
+  "capabilities": [
+    "Photo Upload",
+    "Photo Browsing",
+    "Access Control",
+    "QR Code Generation",
+    "Serverless Hosting"
+  ],
+  "components": [
+    "Lambda Function",
+    "S3 Bucket",
+    "HTML/JS Frontend",
+    "Deploy Script",
+    "QR Generator Script"
+  ],
+  "tech": [
+    "AWS Lambda",
+    "Amazon S3",
+    "Python",
+    "HTML5",
+    "JavaScript",
+    "HMAC"
+  ],
+  "depends_on": [
+    "AWS CLI",
+    "Python 3",
+    "boto3",
+    "qrcode",
+    "pillow",
+    "pillow-heif"
+  ],
+  "integrates_with": [
+    "AWS IAM",
+    "Web Browsers"
+  ],
+  "patterns": [
+    "Serverless",
+    "Presigned URLs",
+    "Stateless Authentication",
+    "Client-side Processing"
+  ],
+  "reuse_tags": [
+    "event-photo-sharing",
+    "aws-serverless",
+    "lambda-s3",
+    "no-db",
+    "qr-code-access"
+  ],
+  "slug": "picture_qr_code",
+  "repo_url": "https://github.com/davidbmar/picture_qr_code",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:49:18.961539Z",
+  "source_commit": "ff5eed7",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,83 @@
+{
+  "title": "YouTube Phrase Scanner",
+  "one_liner": "A serverless, GPU-accelerated pipeline that downloads YouTube videos, transcribes them with WhisperX, and scans for specific phrases.",
+  "what_it_is": "A distributed system for processing YouTube video content at scale. It uses an SQS queue to manage jobs, AWS S3 for stateful job tracking and result storage, and GPU-enabled workers to perform high-accuracy transcription using WhisperX. The system is designed for resilience, featuring automatic job recovery, segment-level progress tracking, and fallback download mechanisms.",
+  "how_its_built": "The core logic is implemented in Python. It relies on `yt-dlp` (with `PyTubeFix` fallback) for downloading, `ffmpeg` for audio conversion, and `WhisperX` for transcription. State management is handled via a custom `JobTracker` class interacting with AWS S3. The architecture includes a main `worker.py` loop, auxiliary scripts for queue management, and optional AWS Lambda functions for managing RunPod GPU instances.",
+  "how_to_apply": "Deploy the worker script on a GPU-enabled instance (local or cloud). Configure AWS credentials with S3 and SQS permissions. Set environment variables for the target S3 bucket and SQS queue URL. Run the worker to start polling for jobs, and use the helper script to enqueue YouTube URLs for processing.",
+  "quickstart": "git clone https://github.com/davidbmar/youtube_transcriber_2\ncd youtube_transcriber_2\npip install -r requirements.txt\npython worker.py --queue_url YOUR_SQS_QUEUE_URL --s3_bucket YOUR_S3_BUCKET",
+  "features": [
+    "Queue-based processing using AWS SQS for scalable job management",
+    "GPU-accelerated transcription using WhisperX with word-level timestamps",
+    "Resilient download strategy with yt-dlp and PyTubeFix fallbacks",
+    "Self-healing job recovery with segment-level progress tracking in S3",
+    "Automated phrase scanning and statistical analysis of transcripts",
+    "Support for CPU-only mode and containerized deployment via Docker"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Enqueue URL| SQS[AWS SQS Queue]\n    SQS -->|Poll| Worker[Worker Instance]\n    Worker -->|Read/Write State| S3[(AWS S3 Bucket)]\n    Worker -->|Download Audio| YT[YouTube]\n    Worker -->|Transcribe| WhisperX[WhisperX Model]\n    Worker -->|Manage GPU| Lambda[AWS Lambda]\n    Lambda -->|API Call| RunPod[RunPod Service]\n    subgraph Storage\n        S3\n    end\n    subgraph Compute\n        Worker\n        WhisperX\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant Q as SQS Queue\n    participant W as Worker\n    participant S3 as S3 Storage\n    participant DL as Downloader\n    participant TX as Transcriber\n    participant SC as Scanner\n\n    U->>Q: Send YouTube URL\n    loop Polling Interval\n        W->>Q: Receive Message\n        W->>S3: Create Job (queued -> processing)\n        W->>DL: Download Audio (yt-dlp/PyTube)\n        DL-->>W: Return Audio File\n        W->>S3: Update Progress (segment level)\n        W->>TX: Transcribe Segments (WhisperX)\n        TX-->>W: Return Transcript Data\n        W->>SC: Scan for Phrases\n        SC-->>W: Return Results\n        W->>S3: Save Results & Mark Completed\n    end",
+  "capabilities": [
+    "Batch video processing",
+    "Phrase occurrence statistics",
+    "Segment-level resumability",
+    "Spot instance tolerance",
+    "Multi-method video downloading",
+    "JSON result export"
+  ],
+  "components": [
+    "worker.py",
+    "job_tracker.py",
+    "downloader.py",
+    "transcriber.py",
+    "scanner.py",
+    "send_to_queue.py",
+    "runpod_manager.py"
+  ],
+  "tech": [
+    "Python 3.7+",
+    "WhisperX",
+    "yt-dlp",
+    "ffmpeg",
+    "AWS SQS",
+    "AWS S3",
+    "Boto3",
+    "Docker"
+  ],
+  "depends_on": [
+    "AWS Account",
+    "GPU (optional but recommended)",
+    "FFmpeg binary",
+    "RunPod API Key (optional)"
+  ],
+  "integrates_with": [
+    "AWS S3",
+    "AWS SQS",
+    "AWS Lambda",
+    "RunPod",
+    "YouTube"
+  ],
+  "patterns": [
+    "Worker Queue",
+    "State Machine",
+    "Fallback Strategy",
+    "Serverless Compute",
+    "Event-Driven Architecture"
+  ],
+  "reuse_tags": [
+    "video-processing",
+    "transcription",
+    "aws-serverless",
+    "gpu-computing",
+    "data-pipeline",
+    "content-analysis"
+  ],
+  "slug": "youtube_transcriber_2",
+  "repo_url": "https://github.com/davidbmar/youtube_transcriber_2",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:12:17.218128Z",
+  "source_commit": "90f9471",
+  "model": "qwen3.7-plus"
+}

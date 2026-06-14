@@ -1,0 +1,89 @@
+{
+  "title": "Headshot AI Starter",
+  "one_liner": "Open-source SaaS starter for generating professional AI headshots using Astria, Next.js, and Supabase.",
+  "what_it_is": "A full-stack application template that allows users to upload sample photos, train a custom AI model via Astria, and generate professional headshots. It includes authentication, database management, webhook handling for async AI tasks, and optional email notifications and billing integration.",
+  "how_its_built": "Built with Next.js (App Router) for the frontend and API routes, Supabase for PostgreSQL database and Authentication, Astria for AI model training/inference, Vercel Blob for image storage, and Tailwind/Shadcn for UI. It uses webhooks to handle long-running AI training jobs asynchronously.",
+  "how_to_apply": "Fork the repository, deploy to Vercel using the provided button to set up Supabase integrations automatically, configure environment variables (Astria API Key, Webhook Secret), and customize the UI/branding for your specific SaaS offering.",
+  "quickstart": "git clone https://github.com/davidbmar/headshots-starter-clone.git\ncd headshots-starter-clone\nnpm install\nnpm run dev",
+  "features": [
+    "User authentication and session management via Supabase Auth",
+    "Secure image upload to Vercel Blob with user-scoped access",
+    "Async AI model training triggered via Astria API",
+    "Webhook handlers for training completion and prompt generation",
+    "Database schema for tracking credits, models, and generated images",
+    "Optional email notifications via Resend when headshots are ready"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|Upload Images| NextJS[Next.js App]\n    NextJS -->|Auth Check| SupabaseAuth[Supabase Auth]\n    NextJS -->|Store Images| VercelBlob[Vercel Blob Storage]\n    NextJS -->|Trigger Training| Astria[Astria AI API]\n    Astria -->|Webhook: Train Complete| WebhookTrain[Train Webhook Route]\n    WebhookTrain -->|Update Status| SupabaseDB[Supabase Database]\n    WebhookTrain -->|Send Email| Resend[Resend Email Service]\n    User -->|View Results| NextJS\n    NextJS -->|Fetch Data| SupabaseDB",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant N as Next.js API\n    participant S as Supabase\n    participant V as Vercel Blob\n    participant A as Astria AI\n    \n    U->>N: POST /train-model (images)\n    N->>S: Verify User Session\n    S-->>N: User Valid\n    N->>V: Upload Images\n    V-->>N: Image URLs\n    N->>A: POST /tunes (Train Model)\n    A-->>N: Tune ID & Status\n    N->>S: Save Model Record (pending)\n    N-->>U: Training Started\n    \n    Note over A, N: Async Processing...\n    \n    A->>N: POST /astria/train-webhook\n    N->>S: Update Model Status (completed)\n    N->>S: Generate Prompts/Images\n    N-->>A: 200 OK",
+  "capabilities": [
+    "AI Model Training",
+    "Image Generation",
+    "User Authentication",
+    "Webhook Processing",
+    "File Storage",
+    "Email Notifications"
+  ],
+  "components": [
+    "Next.js App Router",
+    "Supabase Client",
+    "Astria API Client",
+    "Vercel Blob Client",
+    "Resend Email Client",
+    "Stripe Billing (Optional)"
+  ],
+  "tech": [
+    "TypeScript",
+    "React",
+    "Tailwind CSS",
+    "Shadcn UI",
+    "PostgreSQL",
+    "Serverless Functions"
+  ],
+  "depends_on": [
+    "Node.js",
+    "npm/yarn",
+    "Vercel Account",
+    "Supabase Account",
+    "Astria Account"
+  ],
+  "integrates_with": [
+    "Astria.ai",
+    "Supabase",
+    "Vercel",
+    "Resend",
+    "Stripe"
+  ],
+  "patterns": [
+    "Webhook-driven Async Processing",
+    "Serverless API Routes",
+    "Row Level Security (RLS)",
+    "Magic Link Authentication",
+    "Presigned URL Uploads"
+  ],
+  "reuse_tags": [
+    "ai-saas-starter",
+    "nextjs-template",
+    "supabase-auth",
+    "astria-integration",
+    "vercel-deployment"
+  ],
+  "slug": "headshots-starter-clone",
+  "repo_url": "https://github.com/davidbmar/headshots-starter-clone",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-4447804625 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 16 updates"
+    }
+  ],
+  "screenshot_url": "https://vercel.com/button",
+  "generated_at": "2026-06-14T02:56:40.242488Z",
+  "source_commit": "186a587",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,57 @@
+{
+  "title": "knightsMovesRecursive",
+  "one_liner": "A Python script that calculates valid knight moves on a chessboard using recursive logic and coordinate translation.",
+  "what_it_is": "A lightweight Python utility that models knight movement on an 8x8 chessboard. It translates linear position indices to row/column coordinates, generates all eight potential L-shaped moves, filters for board boundaries, and prepares data structures for recursive traversal or pathfinding analysis.",
+  "how_its_built": "The project is built as a single-file Python module (`knight.py`). It uses basic arithmetic for coordinate mapping (index to row/col), list manipulation for generating move offsets, and conditional checks for boundary validation. The core logic relies on standard Python lists and integer math without external dependencies.",
+  "how_to_apply": "Import the functions into another Python script to validate moves, generate next-step possibilities for a knight at a given position, or integrate into a larger chess engine or puzzle solver that requires legal move generation.",
+  "quickstart": "python knight.py",
+  "features": [
+    "Translates linear board positions (0-63) to row/column coordinates",
+    "Generates all 8 theoretical L-shaped knight moves from a given square",
+    "Filters moves to ensure they remain within the 8x8 board boundaries",
+    "Returns structured lists of valid row and column pairs for further processing",
+    "Provides foundational logic for recursive pathfinding algorithms"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Input: Position Index] --> B[translateFromNumberToRowCol]\n    B --> C[Row, Col Coordinates]\n    C --> D[possibleMoves]\n    D --> E[Raw Move Lists: 8 Options]\n    E --> F[validMoves]\n    F --> G[Boundary Check: 0 < x,y < 9]\n    G --> H[Output: Valid Row/Col Lists]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Main as knight.py\n    participant Translator as translateFromNumberToRowCol\n    participant Generator as possibleMoves\n    participant Validator as validMoves\n\n    User->>Main: Execute Script / Call Function\n    Main->>Translator: Pass Position Index\n    Translator-->>Main: Return Row, Col\n    Main->>Generator: Pass Row, Col\n    Generator-->>Main: Return Raw RowList, ColList\n    Main->>Validator: Pass Raw Lists\n    Validator-->>Main: Return Valid RowList, ColList\n    Main-->>User: Output Valid Moves",
+  "capabilities": [
+    "Coordinate translation",
+    "Move generation",
+    "Boundary validation",
+    "Recursive readiness"
+  ],
+  "components": [
+    "translateFromNumberToRowCol",
+    "possibleMoves",
+    "validMoves",
+    "allValidMoves"
+  ],
+  "tech": [
+    "Python",
+    "Standard Library"
+  ],
+  "depends_on": [],
+  "integrates_with": [],
+  "patterns": [
+    "Functional decomposition",
+    "Coordinate mapping",
+    "Filter pattern"
+  ],
+  "reuse_tags": [
+    "chess-logic",
+    "board-games",
+    "pathfinding-primitive",
+    "educational",
+    "recursive-algorithm"
+  ],
+  "slug": "knightsMovesRecursive",
+  "repo_url": "https://github.com/davidbmar/knightsMovesRecursive",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:03:45.971421Z",
+  "source_commit": "66f2820",
+  "model": "qwen3.7-plus"
+}

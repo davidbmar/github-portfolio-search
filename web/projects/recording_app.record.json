@@ -1,0 +1,102 @@
+{
+  "title": "recording_app",
+  "one_liner": "Browser-based voice memo recorder with chunked S3 streaming and local faster-whisper transcription.",
+  "what_it_is": "A privacy-focused voice recording system that captures audio in the browser, streams it in chunks to private AWS S3 storage, and uses a local worker (running on your Mac) to transcribe the audio using faster-whisper. It includes a web interface for live status tracking and supports advanced features like intent recognition ('hey riff') and transcript hydration.",
+  "how_its_built": "The system consists of a Python-based AWS Lambda web application (served via Function URL) for handling uploads and auth, and a separate Python worker process that polls S3 for new recordings. The worker uses `faster-whisper` for transcription and `boto3` for S3 interaction. Frontend logic handles media streaming and intent resolution via vanilla JavaScript.",
+  "how_to_apply": "Deploy the web backend to AWS using the provided shell scripts and IAM policies. Run the transcription worker locally on a machine with GPU/CPU capacity, configured with least-privilege AWS credentials. Use the web app to record memos, which are automatically transcribed by the local worker.",
+  "quickstart": "cp env.sample .env\nexport TOKEN_SECRET=\"$(openssl rand -hex 32)\"\n./scripts/deploy.sh\ncd /path/to/recording_app\npython3 -m venv .wenv\n.wenv/bin/pip install boto3\n.wenv/bin/python -m worker.worker --bucket <bucket> --region us-east-2 --stub",
+  "features": [
+    "Chunked audio streaming from browser to private S3 bucket",
+    "Local transcription worker using faster-whisper for privacy and speed",
+    "Live status updates for recordings in the web interface",
+    "HMAC-based stateless authentication and scoped tokens",
+    "Deterministic intent recognition layer for voice commands",
+    "Transcript hydration and idea generation via LLM integration"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|MediaStream API| Client[Web App Client]\n    Client -->|Chunked Audio POST| Lambda[AWS Lambda Web App]\n    Lambda -->|Auth Check| Auth[src/auth.py]\n    Lambda -->|PutObject| S3[(AWS S3 Bucket)]\n    S3 -->|Poll/ListObjects| Worker[Local Transcription Worker]\n    Worker -->|Download Audio| S3\n    Worker -->|Transcribe| Whisper[faster-whisper]\n    Worker -->|Upload Transcript| S3\n    Worker -->|Hydrate| LLM[DashScope/Qwen API]\n    Lambda -->|Get Status| S3\n    Client -->|Poll Status| Lambda",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser\n    participant L as Lambda API\n    participant S as S3 Bucket\n    participant W as Local Worker\n    participant M as Whisper Model\n\n    U->>B: Start Recording\n    B->>B: Capture MediaStream\n    loop Every Chunk\n        B->>L: POST audio chunk\n        L->>L: Verify HMAC Token\n        L->>S: Upload Chunk\n    end\n    B->>L: Finalize Recording\n    W->>S: List New Objects\n    S-->>W: Return Recording Key\n    W->>S: Download Full Audio\n    W->>M: Transcribe Audio\n    M-->>W: Return Text\n    W->>S: Upload Transcript.txt\n    W->>S: Upload Hydrated.json\n    U->>B: Refresh Page\n    B->>L: Get Recording Status\n    L->>S: Check Metadata\n    S-->>L: Return Status\n    L-->>B: JSON Status\n    B-->>U: Display Transcript",
+  "capabilities": [
+    "Voice Recording",
+    "Audio Streaming",
+    "Speech-to-Text",
+    "Cloud Storage Integration",
+    "Local Processing",
+    "Intent Recognition"
+  ],
+  "components": [
+    "Web Client (JS/HTML)",
+    "AWS Lambda Backend",
+    "S3 Storage",
+    "Local Python Worker",
+    "Auth Module",
+    "Intent Resolver"
+  ],
+  "tech": [
+    "Python",
+    "JavaScript",
+    "AWS Lambda",
+    "AWS S3",
+    "faster-whisper",
+    "boto3",
+    "Pygments",
+    "Mermaid"
+  ],
+  "depends_on": [
+    "boto3",
+    "faster-whisper",
+    "openai",
+    "markdown",
+    "pytest"
+  ],
+  "integrates_with": [
+    "AWS S3",
+    "AWS Lambda",
+    "DashScope (Qwen)",
+    "Alibaba Cloud Model Studio"
+  ],
+  "patterns": [
+    "Chunked Upload",
+    "Worker Pool",
+    "Stateless Auth",
+    "Polling",
+    "Least Privilege Access"
+  ],
+  "reuse_tags": [
+    "voice-memos",
+    "transcription",
+    "aws-serverless",
+    "local-ai",
+    "privacy-first"
+  ],
+  "slug": "recording_app",
+  "repo_url": "https://github.com/davidbmar/recording_app",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/intent-hydrate-from-server is 8 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/l1-intent-routing is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/l2-intent-catalog is 2 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "fix/deploy-pin-recording-deployer is 2 commits ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #15: fix(deploy): pin recording-deployer profile + fail-fast identity guard"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:51:24.814020Z",
+  "source_commit": "ce2786e",
+  "model": "qwen3.7-plus"
+}

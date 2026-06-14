@@ -1,0 +1,78 @@
+{
+  "title": "Phone Agent Training Pipeline",
+  "one_liner": "A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists.",
+  "what_it_is": "This project provides a complete workflow to train small, efficient language models (3.8B-7B parameters) to handle inbound phone calls for a plumbing business. It uses knowledge distillation where a large teacher model generates realistic conversations, which are then processed into structured training data with slot injection (context, state, tasks). The resulting models are fine-tuned using MLX LoRA adapters to run locally on Mac hardware, offering low-latency, zero-cost inference while maintaining high-quality receptionist behavior across 11 conversation phases.",
+  "how_its_built": "The pipeline is built in Python, leveraging the `mlx-lm` library for efficient fine-tuning on Apple Silicon. It processes raw JSON conversation logs through normalization scripts that map diverse user inputs to standardized FSM states. Data is enriched with structured context blocks ([CONTEXT], [SLOTS], [STATE], [TASK]) to teach the model slot-filling and workflow adherence. The final training data is converted into chat templates compatible with MLX, and LoRA adapters are trained against base models like Phi-4-mini-instruct.",
+  "how_to_apply": "Use this pipeline when you need a specialized, domain-specific voice agent that runs entirely on-device without API costs. It is ideal for businesses requiring consistent handling of scheduling, triage, and customer service queries where data privacy and low latency are critical. The modular script structure allows adaptation to other service industries by updating the scenario matrix and slot definitions.",
+  "quickstart": "python3 scripts/normalize_and_split.py\npython3 scripts/convert_to_chat_templates.py -i data/splits/train.json -f mlx -o data/splits/train_mlx.jsonl\npython3 scripts/convert_to_chat_templates.py -i data/splits/val.json -f mlx -o data/splits/val_mlx.jsonl\npip install mlx-lm\npython -m mlx_lm.lora --model microsoft/phi-4-mini-instruct --data data/splits/ --train --batch-size 2 --lora-rank 8 --iters 600 --adapter-path adapters/phi4-mini",
+  "features": [
+    "Generates synthetic training data using knowledge distillation from large teacher models",
+    "Implements slot injection training with structured context, state, and task prompts",
+    "Fine-tunes local LLMs using LoRA on Apple Silicon via MLX for efficient inference",
+    "Normalizes conversation phases into 11 standardized FSM states for consistent behavior",
+    "Includes stratified splitting and edge-case oversampling for robust model performance",
+    "Provides interactive HTML documentation and data explorers for pipeline transparency"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Scenario Matrix] -->|Defines| B(Raw Conversations)\n    C[Teacher Model/Claude] -->|Generates| B\n    B --> D[normalize_and_split.py]\n    D -->|Stratified Splits| E[train/val/test JSON]\n    E --> F[convert_to_chat_templates.py]\n    F -->|MLX Format| G[MLX JSONL Data]\n    G --> H[MLX LoRA Trainer]\n    I[Base Model Phi-4] --> H\n    H -->|Produces| J[LoRA Adapters]\n    J --> K[Local Phone Agent]",
+  "diagram_sequence": "sequenceDiagram\n    participant Dev as Developer\n    participant Script as Normalization Script\n    participant Data as Processed Data\n    participant Trainer as MLX LoRA Trainer\n    participant Model as Base LLM\n    \n    Dev->>Script: Run normalize_and_split.py\n    Script->>Data: Create stratified train/val/test splits\n    Dev->>Script: Run convert_to_chat_templates.py\n    Script->>Data: Convert to MLX chat format\n    Dev->>Trainer: Execute mlx_lm.lora command\n    Trainer->>Model: Load base model & adapters\n    Trainer->>Data: Load training batches\n    loop Training Iterations\n        Trainer->>Model: Compute loss & update weights\n    end\n    Trainer->>Dev: Save LoRA adapters",
+  "capabilities": [
+    "Synthetic data generation",
+    "LoRA fine-tuning",
+    "Slot filling",
+    "FSM state tracking",
+    "Local inference",
+    "Conversation normalization"
+  ],
+  "components": [
+    "normalize_and_split.py",
+    "convert_to_chat_templates.py",
+    "build_final_training.py",
+    "rewrite_with_slots.py",
+    "retrain_from_fsm.py",
+    "add_json_responses.py"
+  ],
+  "tech": [
+    "Python",
+    "MLX",
+    "LoRA",
+    "JSONL",
+    "Apple Silicon",
+    "Phi-4-mini"
+  ],
+  "depends_on": [
+    "mlx-lm",
+    "python3",
+    "numpy",
+    "json"
+  ],
+  "integrates_with": [
+    "phone-agent-scheduler",
+    "Claude API",
+    "GGUF quantization tools"
+  ],
+  "patterns": [
+    "Knowledge Distillation",
+    "Slot Injection",
+    "Finite State Machine",
+    "Chat Template Conversion",
+    "Stratified Sampling"
+  ],
+  "reuse_tags": [
+    "llm-training",
+    "voice-agent",
+    "apple-silicon",
+    "mlx",
+    "lora",
+    "synthetic-data"
+  ],
+  "slug": "training",
+  "repo_url": "https://github.com/davidbmar/training",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:02:57.893943Z",
+  "source_commit": "703a29e",
+  "model": "qwen3.7-plus"
+}

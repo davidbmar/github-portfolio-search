@@ -1,0 +1,81 @@
+{
+  "title": "website-cloner",
+  "one_liner": "A six-phase static site cloning tool that enumerates URLs, downloads assets, rewrites links, detects dynamic content, and deploys to AWS S3.",
+  "what_it_is": "website-cloner is a Node.js utility designed to create static replicas of dynamic websites. It operates in distinct phases: URL enumeration via BFS, asset extraction (HTML/CSS/JS/Images), link rewriting for relative paths, dynamic content detection (marking API calls/forms for LLM review), and optional deployment to AWS S3 with static hosting configuration. It includes both a CLI for automation and a Web UI for interactive use.",
+  "how_its_built": "Built with Node.js using ES modules. Key libraries include `axios` for HTTP requests, `cheerio` for HTML parsing and manipulation, `commander` for CLI argument parsing, `p-queue` for concurrency control, and `@aws-sdk/client-s3` for cloud deployment. The architecture separates concerns into modular classes: Enumerator, Downloader, LinkRewriter, DynamicDetector, and S3Uploader, orchestrated by a main CLI entry point.",
+  "how_to_apply": "Use this tool to archive legacy sites, create static backups of dynamic content, or migrate simple websites to serverless hosting on S3. It is particularly useful for developers needing to inspect how a site's assets are structured or to prepare a site for LLM-based refactoring by marking dynamic elements.",
+  "quickstart": "bash setup.sh\ncp config.example.json mysite-config.json\nnode clone-website.js --config=mysite-config.json --full",
+  "features": [
+    "Breadth-First Search URL enumeration without downloading content",
+    "Asset extraction for HTML, CSS, JS, images, and fonts",
+    "Automatic link rewriting from absolute to relative paths",
+    "Dynamic content detection marking APIs, forms, and WebSockets",
+    "One-click deployment to AWS S3 with static website hosting",
+    "Web UI and CLI interfaces with real-time progress tracking"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Config| CLI[clone-website.js]\n    CLI --> Enum[Enumerator]\n    CLI --> Down[Downloader]\n    CLI --> Rewriter[LinkRewriter]\n    CLI --> Dyn[DynamicDetector]\n    CLI --> S3[S3Uploader]\n    \n    Enum -->|manifest.json| Down\n    Down -->|Local Files| Rewriter\n    Rewriter -->|Modified Files| Dyn\n    Dyn -->|Marked Files| S3\n    S3 -->|Upload| AWS[AWS S3 Bucket]\n    \n    subgraph Libs\n    Axios[axios]\n    Cheerio[cheerio]\n    PQueue[p-queue]\n    end\n    \n    Down --> Axios\n    Rewriter --> Cheerio\n    Down --> PQueue",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant C as CLI\n    participant E as Enumerator\n    participant D as Downloader\n    participant R as LinkRewriter\n    participant DD as DynamicDetector\n    participant S as S3Uploader\n    \n    U->>C: Run with --full flag\n    C->>E: Execute Phase 2 (Enumerate)\n    E->>E: BFS Crawl Target URL\n    E-->>C: Generate manifest.json\n    \n    C->>D: Execute Phase 3 (Download)\n    D->>D: Load manifest.json\n    D->>D: Download HTML & Assets\n    D-->>C: Save to output directory\n    \n    C->>R: Execute Phase 4 (Rewrite)\n    R->>R: Parse HTML with Cheerio\n    R->>R: Convert Absolute to Relative Links\n    R-->>C: Save modified files\n    \n    C->>DD: Execute Phase 5 (Detect)\n    DD->>DD: Scan for API/Form/WebSocket usage\n    DD->>DD: Add data-marker attributes\n    DD-->>C: Save marked files\n    \n    C->>S: Execute Phase 6 (Deploy)\n    S->>S: Configure S3 Bucket\n    S->>S: Upload Static Assets\n    S-->>U: Return S3 Website URL",
+  "capabilities": [
+    "Static Site Generation",
+    "Web Scraping",
+    "AWS S3 Deployment",
+    "Link Rewriting",
+    "Dynamic Content Analysis"
+  ],
+  "components": [
+    "CLI Interface",
+    "Web UI Server",
+    "URL Enumerator",
+    "Asset Downloader",
+    "Link Rewriter",
+    "Dynamic Detector",
+    "S3 Uploader",
+    "404 Page Generator"
+  ],
+  "tech": [
+    "Node.js",
+    "JavaScript",
+    "ES Modules",
+    "Cheerio",
+    "Axios",
+    "AWS SDK v3",
+    "Commander.js",
+    "P-Queue"
+  ],
+  "depends_on": [
+    "Node.js runtime",
+    "npm package manager",
+    "AWS Account (for S3 deployment)",
+    "EC2 IAM Role or AWS Credentials"
+  ],
+  "integrates_with": [
+    "AWS S3",
+    "Nginx (via bootstrap script)",
+    "Systemd (via bootstrap script)"
+  ],
+  "patterns": [
+    "Command Line Interface",
+    "Phase-based Processing",
+    "Breadth-First Search",
+    "Static Site Hosting",
+    "Dependency Injection (Logger/Config)"
+  ],
+  "reuse_tags": [
+    "web-scraping",
+    "static-site-generator",
+    "aws-s3",
+    "nodejs-tool",
+    "site-migration",
+    "archiving"
+  ],
+  "slug": "website-cloner",
+  "repo_url": "https://github.com/davidbmar/website-cloner",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:09:33.689924Z",
+  "source_commit": "294994c",
+  "model": "qwen3.7-plus"
+}

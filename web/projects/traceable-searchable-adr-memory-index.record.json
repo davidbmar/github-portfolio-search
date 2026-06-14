@@ -1,0 +1,87 @@
+{
+  "title": "Traceable Searchable ADR Memory Index",
+  "one_liner": "A framework for traceable, searchable project memory with multi-agent sprint automation and architecture decision tracking.",
+  "what_it_is": "A CLI framework installed into existing projects to provide structured session tracking, Architecture Decision Records (ADRs), and parallel AI agent sprints using git worktrees. It separates framework logic from project data, ensuring all sprint briefs, sessions, and decisions are committed to the project repo for full git history traceability.",
+  "how_its_built": "The framework consists of Bash scripts for sprint orchestration (init, run, merge, validate) and a Python/HTML dashboard for visualization. It includes an optional TypeScript-based 'Afterburner' agent engine that manages context, skills, and tool execution for autonomous coding agents. Setup is handled via a shell script that scaffolds the target project with necessary directories and configuration files.",
+  "how_to_apply": "Run the setup script against your target project directory to install sprint scripts and templates. Configure test commands and ephemeral files in the generated config. Use the provided scripts to manage sprint lifecycles, or integrate the TypeScript agent engine for automated task execution within isolated git worktrees.",
+  "quickstart": "./toolkit/setup.sh /path/to/your/project\nvim .sprint/config.sh\nvim SPRINT_BRIEF.md\n./.sprint/scripts/sprint-run.sh\npython3 dashboard/server.py",
+  "features": [
+    "Automates parallel AI agent sprints using isolated git worktrees",
+    "Enforces structured Architecture Decision Records (ADRs) and session logs",
+    "Provides a web dashboard for tracking sprint lifecycle and pipeline status",
+    "Ensures full traceability by committing all memory artifacts to project git history",
+    "Includes validation and auto-fix scripts for sprint brief formatting",
+    "Supports multi-agent coordination via tmux sessions and shared context"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Runs| Setup[toolkit/setup.sh]\n    Setup -->|Scaffolds| Project[Target Project Repo]\n    Project -->|Contains| Scripts[.sprint/scripts/]\n    Project -->|Contains| Memory[docs/project-memory/]\n    Project -->|Contains| Brief[SPRINT_BRIEF.md]\n    Scripts -->|Executes| Agents[Claude Code Agents]\n    Agents -->|Work in| Worktrees[Git Worktrees]\n    Worktrees -->|Merge Results| MainBranch[Main Branch]\n    Dashboard[Dashboard Server] -->|Reads| Memory\n    Dashboard -->|Reads| Brief\n    Dashboard -->|Visualizes| User",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as Sprint Scripts\n    participant G as Git Worktrees\n    participant A as AI Agents\n    participant M as Project Memory\n    \n    U->>S: Execute sprint-run.sh\n    S->>M: Archive current SPRINT_BRIEF.md\n    S->>G: Create isolated worktrees\n    S->>A: Launch agents in tmux\n    A->>G: Read code & context\n    A->>A: Execute tasks & generate code\n    A->>G: Commit changes in worktree\n    S->>G: Validate & Merge worktrees\n    S->>M: Save session docs & ADRs\n    S->>U: Report completion",
+  "capabilities": [
+    "Sprint Automation",
+    "Project Memory Tracking",
+    "ADR Management",
+    "Multi-Agent Coordination",
+    "Git Worktree Isolation",
+    "Dashboard Visualization"
+  ],
+  "components": [
+    "toolkit/setup.sh",
+    ".sprint/scripts/",
+    "dashboard/server.py",
+    "agent/src/agent/loop.ts",
+    "docs/project-memory/",
+    "SPRINT_BRIEF.md"
+  ],
+  "tech": [
+    "Bash",
+    "JavaScript",
+    "TypeScript",
+    "Python",
+    "HTML/CSS",
+    "Git"
+  ],
+  "depends_on": [
+    "Git",
+    "Node.js",
+    "Python 3",
+    "tmux",
+    "Claude Code API"
+  ],
+  "integrates_with": [
+    "GitHub",
+    "Claude Code",
+    "Existing Git Repositories"
+  ],
+  "patterns": [
+    "Framework Injection",
+    "Git Worktree Isolation",
+    "Convention over Configuration",
+    "Agent Loop",
+    "Memory Persistence"
+  ],
+  "reuse_tags": [
+    "dev-tools",
+    "ai-agents",
+    "project-management",
+    "documentation",
+    "automation"
+  ],
+  "slug": "traceable-searchable-adr-memory-index",
+  "repo_url": "https://github.com/davidbmar/traceable-searchable-adr-memory-index",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/agent/npm_and_yarn-048fd5ea03 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: chore(deps): bump the npm_and_yarn group across 1 directory with 2 updates"
+    }
+  ],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/traceable-searchable-adr-memory-index/main/docs/screenshots/overview.png",
+  "generated_at": "2026-06-14T04:02:30.787189Z",
+  "source_commit": "817138e",
+  "model": "qwen3.7-plus"
+}

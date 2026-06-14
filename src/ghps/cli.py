@@ -298,6 +298,25 @@ def gen_docs(owner, only, limit, force, stale, provider, model):
         sys.exit(1)
 
 
+@main.command(name="publish-docs")
+def publish_docs():
+    """Rebuild all web doc artifacts from existing records (no LLM calls).
+
+    Re-renders HTML pages, the listing page, per-repo record JSON, the full feed,
+    the compact index, and /llms.txt from projects/*.record.json. Use after a
+    template change or to publish records without regenerating them.
+    """
+    from ghps.docsgen import generate
+
+    result = generate.publish_all(
+        records_dir="projects",
+        html_dir="web/projects",
+        feed_path="web/data/projects.json",
+    )
+    click.echo(click.style("Publish complete!", fg="green", bold=True))
+    click.echo(f"  published: {result['published']} project docs")
+
+
 @main.command(name="find-docs")
 @click.argument("query")
 @click.option("--feed", default="web/data/projects.json", help="Path to the L0 docs feed.")

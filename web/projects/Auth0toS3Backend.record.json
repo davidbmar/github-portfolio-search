@@ -1,0 +1,77 @@
+{
+  "title": "Auth0 to S3 Backend",
+  "one_liner": "A reference architecture for mapping Auth0 authenticated users to individual AWS S3 buckets with secure, pre-signed URL access.",
+  "what_it_is": "This project demonstrates a backend pattern where user identity is managed by Auth0 and storage is isolated per user in AWS S3. It handles the lifecycle of creating user-specific buckets upon first login and generating temporary credentials or pre-signed URLs for secure file operations, ensuring data separation without managing user passwords directly.",
+  "how_its_built": "The solution uses a React frontend for authentication flows via @auth0/auth0-react and a Python Flask backend for token verification and AWS logic. The backend verifies JWTs using the `python-jose` library, checks a database for existing bucket mappings, creates new S3 buckets if necessary, and returns access credentials to the client.",
+  "how_to_apply": "Use this pattern when building multi-tenant applications requiring strict data isolation per user. It is suitable for document management systems, personal media stores, or any application where users need direct, secure access to their own cloud storage namespace without exposing long-term AWS keys.",
+  "quickstart": "",
+  "features": [
+    "Auth0 integration for seamless user registration and login",
+    "Automatic provisioning of dedicated S3 buckets for new users",
+    "JWT verification on the backend to secure API endpoints",
+    "Generation of pre-signed URLs for secure, time-limited S3 access",
+    "Database mapping of user emails to specific S3 bucket names"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|Login/Register| Auth0[Auth0 Service]\n    Auth0 -->|JWT| User\n    User -->|Request with JWT| Backend[Flask Backend]\n    Backend -->|Verify JWT| Auth0\n    Backend -->|Check/Create Bucket| DB[(User DB)]\n    Backend -->|Create Bucket/Get Creds| S3[AWS S3]\n    Backend -->|Pre-signed URLs/Creds| User\n    User -->|Direct File Access| S3",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant A as Auth0\n    participant B as Backend (Flask)\n    participant D as Database\n    participant S as AWS S3\n\n    U->>A: Login/Register\n    A-->>U: Return JWT\n    U->>B: Request Resource (send JWT)\n    B->>A: Verify JWT Signature\n    A-->>B: Valid Payload\n    B->>D: Check for User Bucket Mapping\n    alt No Bucket Exists\n        B->>S: Create New S3 Bucket\n        S-->>B: Bucket Created\n        B->>D: Update User Mapping\n    end\n    B->>S: Generate Pre-signed URLs/Credentials\n    S-->>B: Return Access Credentials\n    B-->>U: Return Credentials/URLs\n    U->>S: Upload/Download Files",
+  "capabilities": [
+    "User Authentication",
+    "Identity Management",
+    "Cloud Storage Provisioning",
+    "Secure Access Control",
+    "Token Verification"
+  ],
+  "components": [
+    "React Frontend",
+    "Flask Backend API",
+    "Auth0 Identity Provider",
+    "AWS S3 Storage",
+    "User Database"
+  ],
+  "tech": [
+    "JavaScript",
+    "Python",
+    "React",
+    "Flask",
+    "Auth0",
+    "AWS S3",
+    "JWT"
+  ],
+  "depends_on": [
+    "@auth0/auth0-react",
+    "flask",
+    "python-jose",
+    "boto3",
+    "react-router-dom"
+  ],
+  "integrates_with": [
+    "Auth0",
+    "AWS S3",
+    "SQL/NoSQL Database"
+  ],
+  "patterns": [
+    "Backend for Frontend",
+    "Token-Based Authentication",
+    "Resource Provisioning on Demand",
+    "Pre-signed URL Access"
+  ],
+  "reuse_tags": [
+    "authentication",
+    "aws",
+    "s3",
+    "auth0",
+    "flask",
+    "react",
+    "multi-tenancy"
+  ],
+  "slug": "Auth0toS3Backend",
+  "repo_url": "https://github.com/davidbmar/Auth0toS3Backend",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:26:29.691395Z",
+  "source_commit": "1e461bd",
+  "model": "qwen3.7-plus"
+}

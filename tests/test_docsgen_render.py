@@ -184,6 +184,17 @@ def test_index_escapes_titles_and_has_no_script():
     assert "&lt;script&gt;" in html
 
 
+def test_llms_txt_points_at_index_and_query_tool():
+    txt = render.render_llms_txt(
+        [{"slug": "a"}, {"slug": "b"}], base_url="https://x.com/", generated_at="2026-06-14T00:00:00Z"
+    )
+    assert "https://x.com/data/projects-index.json" in txt   # tier 1
+    assert "https://x.com/projects/<slug>.record.json" in txt  # tier 2
+    assert "https://x.com/data/projects.json" in txt           # full corpus
+    assert "portfolio_find_docs" in txt                        # query interface
+    assert "2 projects" in txt
+
+
 def test_index_empty_state():
     html = render.render_index_page([])
     assert "No project docs generated yet" in html

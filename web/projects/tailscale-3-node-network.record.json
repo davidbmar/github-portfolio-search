@@ -1,0 +1,97 @@
+{
+  "title": "FriendNet",
+  "one_liner": "A private network dashboard that aggregates mDNS service discovery from multiple Tailscale-connected homes into a single view.",
+  "what_it_is": "FriendNet is a distributed system for monitoring home networks across multiple physical locations connected via Tailscale. It consists of lightweight Python agents deployed on local machines (e.g., Raspberry Pis) that perform mDNS/Bonjour scanning and port fingerprinting, and a central React/FastAPI dashboard that aggregates this data to provide a unified view of all devices and services across the network.",
+  "how_its_built": "The system uses a hub-and-spoke architecture. The 'Agent' (Python) runs on each node, using `zeroconf` for mDNS discovery and `httpx` for HTTP fingerprinting of services like Plex, Home Assistant, and SSH. It reports findings to the 'Dashboard' (FastAPI + SQLite) via HTTP POST. The Dashboard serves a React frontend (Vite) that visualizes the network topology and service status. Authentication is handled via a client-side SHA-256 hash gate for simplicity.",
+  "how_to_apply": "Deploy the Agent on any machine within a Tailscale network that has visibility to the local subnet (using Tailscale Subnet Routing or exit nodes). Configure the Agent with the Dashboard's URL and a unique House ID. Use the Dashboard to monitor service availability, discover new devices automatically, and verify connectivity between remote homes without exposing ports to the public internet.",
+  "quickstart": "git clone https://github.com/davidbmar/tailscale-3-node-network.git\ncd tailscale-3-node-network\ncd backend\npython3 -m venv .venv && source .venv/bin/activate\npip install -e .\nPYTHONPATH=. python app/main.py\ncd ../frontend\nnpm install\nnpm run dev",
+  "features": [
+    "Automatic mDNS/Bonjour service discovery across local subnets",
+    "Service fingerprinting for Plex, Home Assistant, SSH, SMB, and more",
+    "Centralized dashboard aggregating multiple remote homes via Tailscale",
+    "Lightweight Python agent with configurable scan intervals",
+    "Client-side password protection for dashboard access",
+    "SQLite-backed storage for persistent device history"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph House_A[\"House A (Remote)\"]\n        Agent_A[\"FriendNet Agent\\n(Python/Zeroconf)\"]\n        Local_Net_A[\"Local LAN Devices\\n(mDNS Services)\"]\n    end\n\n    subgraph House_B[\"House B (Remote)\"]\n        Agent_B[\"FriendNet Agent\\n(Python/Zeroconf)\"]\n        Local_Net_B[\"Local LAN Devices\\n(mDNS Services)\"]\n    end\n\n    subgraph Central[\"Central Dashboard Host\"]\n        Dashboard_API[\"FastAPI Backend\\n(SQLite)\"]\n        Dashboard_UI[\"React Frontend\\n(Vite)\"]\n    end\n\n    Tailscale[\"Tailscale VPN Tunnel\"]\n\n    Local_Net_A -- \"mDNS Scan\" --> Agent_A\n    Local_Net_B -- \"mDNS Scan\" --> Agent_B\n    Agent_A -- \"HTTP POST /report\" --> Tailscale\n    Agent_B -- \"HTTP POST /report\" --> Tailscale\n    Tailscale --> Dashboard_API\n    Dashboard_UI -- \"Fetch Status\" --> Dashboard_API",
+  "diagram_sequence": "sequenceDiagram\n    participant Agent as FriendNet Agent\n    participant Zeroconf as zeroconf Library\n    participant Network as Local LAN\n    participant API as Dashboard API (FastAPI)\n    participant DB as SQLite Database\n\n    loop Every N seconds\n        Agent->>Zeroconf: Start Service Browser\n        Zeroconf->>Network: Send mDNS Queries\n        Network-->>Zeroconf: Return Service Records\n        Zeroconf-->>Agent: Discovered Services List\n        \n        Agent->>Agent: Fingerprint Services (HTTP/Port checks)\n        \n        Agent->>API: POST /api/report (House ID, Services)\n        API->>DB: Upsert Nodes & Services\n        DB-->>API: Confirm Save\n        API-->>Agent: 200 OK\n    end",
+  "capabilities": [
+    "mDNS Discovery",
+    "Service Fingerprinting",
+    "Multi-site Aggregation",
+    "Network Health Monitoring",
+    "Private Dashboarding"
+  ],
+  "components": [
+    "Agent (Python)",
+    "Dashboard API (FastAPI)",
+    "Dashboard UI (React)",
+    "SQLite Database",
+    "Auth Gate (JS)"
+  ],
+  "tech": [
+    "Python 3.9+",
+    "FastAPI",
+    "React",
+    "Vite",
+    "SQLite",
+    "zeroconf",
+    "httpx",
+    "Tailscale"
+  ],
+  "depends_on": [
+    "Node.js 18+",
+    "Python 3.9+",
+    "Tailscale Client"
+  ],
+  "integrates_with": [
+    "Plex Media Server",
+    "Home Assistant",
+    "SSH Servers",
+    "SMB/NFS Shares",
+    "Printers (IPP)",
+    "AirPlay/Raop"
+  ],
+  "patterns": [
+    "Hub-and-Spoke",
+    "Periodic Polling",
+    "Client-side Auth",
+    "RESTful Reporting"
+  ],
+  "reuse_tags": [
+    "home-lab",
+    "network-monitoring",
+    "tailscale",
+    "mdns",
+    "dashboard",
+    "python-agent",
+    "react-ui"
+  ],
+  "slug": "tailscale-3-node-network",
+  "repo_url": "https://github.com/davidbmar/tailscale-3-node-network",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/frontend/npm_and_yarn-4db41a3a8f is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/uv/backend/uv-7a932ce3d2 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: chore(deps): bump the uv group across 2 directories with 2 updates"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: chore(deps): bump the npm_and_yarn group across 1 directory with 2 updates"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:58:34.663344Z",
+  "source_commit": "9e58b0a",
+  "model": "qwen3.7-plus"
+}

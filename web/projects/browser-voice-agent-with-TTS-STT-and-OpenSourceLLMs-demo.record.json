@@ -1,0 +1,84 @@
+{
+  "title": "Browser Voice Agent",
+  "one_liner": "A fully browser-native voice agent using local WebGPU LLMs, TTS, and STT with no server requirements.",
+  "what_it_is": "A real-time voice conversation agent that runs entirely in the browser. It uses the Web Speech API for transcription, a local LLM via WebGPU for intent classification and response generation, and Text-to-Speech for audio output. It features an 8-stage Finite State Machine (FSM) architecture to manage the conversation loop, including adaptive bias systems and streaming responses.",
+  "how_its_built": "Built with React 19 and TypeScript, bundled with Vite 7. It uses WebLLM for local LLM inference on WebGPU, vits-web for neural TTS on desktop (falling back to native SpeechSynthesis on mobile), and the Web Speech API for STT. The UI is styled with Tailwind CSS v4 and shadcn/ui components.",
+  "how_to_apply": "Clone the repository, install dependencies, and run the development server. Open the application in Chrome or Edge (WebGPU required). The app automatically loads a small Qwen model on startup. For deployment, use the provided shell script to sync to AWS S3 and CloudFront with necessary COOP/COEP headers.",
+  "quickstart": "git clone https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo.git\ncd browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo\nnpm install\nnpm run dev",
+  "features": [
+    "Local LLM inference via WebGPU with support for 15+ models",
+    "Real-time Speech-to-Text using Web Speech API with silence detection",
+    "Streaming Text-to-Speech with VITS neural voices on desktop",
+    "8-stage FSM architecture for robust conversation management",
+    "Adaptive bias system that adjusts verbosity and confidence based on user feedback",
+    "Mobile optimizations for iOS Chrome with native API fallbacks"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Speaks| Mic[Microphone]\n    Mic -->|Audio Stream| STT[Web Speech API]\n    STT -->|Transcribed Text| FSM[FSM Loop Controller]\n    FSM -->|Intent/Context| LLM[WebLLM Local Model]\n    LLM -->|Streamed Tokens| TTS[TTS Engine]\n    TTS -->|Audio Output| Speaker[Speaker]\n    Speaker -->|Heard by| User\n    FSM -->|State Updates| Dashboard[React Dashboard]\n    subgraph Browser\n        STT\n        FSM\n        LLM\n        TTS\n        Dashboard\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant M as Microphone\n    participant STT as Web Speech API\n    participant FSM as Loop Controller\n    participant LLM as WebLLM\n    participant TTS as TTS Engine\n    \n    U->>M: Speak\n    M->>STT: Audio Stream\n    STT->>FSM: Transcribed Text\n    FSM->>FSM: Detect Signal & Classify Intent\n    FSM->>LLM: Generate Response (Stream)\n    LLM-->>FSM: Token Stream\n    FSM->>TTS: Synthesize Sentence\n    TTS-->>U: Audio Output\n    FSM->>FSM: Observe Feedback & Update Bias",
+  "capabilities": [
+    "Local LLM Inference",
+    "Speech Recognition",
+    "Text-to-Speech",
+    "Intent Classification",
+    "Adaptive Conversation",
+    "Offline Operation"
+  ],
+  "components": [
+    "Loop Controller (FSM)",
+    "WebLLM Runtime",
+    "VITS TTS Engine",
+    "Web Speech API Interface",
+    "React Dashboard",
+    "Bias System"
+  ],
+  "tech": [
+    "React 19",
+    "TypeScript",
+    "Vite 7",
+    "Tailwind CSS v4",
+    "WebLLM",
+    "vits-web",
+    "Web Speech API",
+    "WebGPU"
+  ],
+  "depends_on": [
+    "Chrome 113+",
+    "Edge 113+",
+    "WebGPU Support",
+    "Microphone Access",
+    "1GB+ VRAM"
+  ],
+  "integrates_with": [
+    "AWS S3",
+    "CloudFront",
+    "iOS Native SpeechSynthesis",
+    "Desktop VITS Voices"
+  ],
+  "patterns": [
+    "Finite State Machine",
+    "Streaming Response",
+    "Local-First Architecture",
+    "Adapter Pattern (TTS)",
+    "Observer Pattern (Feedback)"
+  ],
+  "reuse_tags": [
+    "voice-agent",
+    "webgpu",
+    "local-llm",
+    "typescript",
+    "react",
+    "offline-first",
+    "speech-recognition",
+    "text-to-speech"
+  ],
+  "slug": "browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo",
+  "repo_url": "https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo/main/docs/screenshots/desktop-dashboard.png",
+  "generated_at": "2026-06-14T02:31:26.349077Z",
+  "source_commit": "e1715fb",
+  "model": "qwen3.7-plus"
+}

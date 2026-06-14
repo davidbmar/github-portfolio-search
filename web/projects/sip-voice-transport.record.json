@@ -1,0 +1,76 @@
+{
+  "title": "sip-voice-transport",
+  "one_liner": "PSTN phone call transport for Mac-local voice AI supporting Telnyx and Twilio.",
+  "what_it_is": "A Python library that bridges PSTN telephony providers (Telnyx, Twilio) with local AI pipelines. It handles webhook ingestion, WebSocket media streaming, and automatic audio codec conversion to provide a consistent 16kHz PCM interface for STT/LLM/TTS applications.",
+  "how_its_built": "Built on FastAPI for handling HTTP webhooks and WebSocket connections. It uses an abstract base class pattern to support multiple telephony providers, with specific implementations for Telnyx (L16/16kHz) and Twilio (mulaw/8kHz). Audio conversion is handled via NumPy and custom μ-law decoding tables to avoid deprecated dependencies.",
+  "how_to_apply": "Integrate by instantiating `SipTransport` and iterating over `receive_audio()` in an async loop. Process each 16kHz PCM chunk through your STT model, generate text responses via an LLM, synthesize speech with TTS, and send the resulting PCM bytes back via `send_audio()`.",
+  "quickstart": "python3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[cli,dev]\"\nsip-voice-server --port 8765\npython test_call.py --port 8765",
+  "features": [
+    "Bidirectional audio streaming over WebSocket from Telnyx or Twilio",
+    "Automatic codec conversion (mulaw/8kHz to 16kHz PCM) for consistent input",
+    "DID-based routing to specific LLM models and system prompts",
+    "Mac sleep prevention during active calls using caffeinate",
+    "Async iterator interface for seamless integration with AI pipelines"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[Caller] -->|PSTN| Provider[Telnyx/Twilio]\n    Provider -->|Webhook POST| Handler[SipWebhookHandler]\n    Handler -->|TeXML/TwiML| Provider\n    Provider -->|WebSocket Media| Handler\n    Handler -->|Raw Audio| Transport[SipTransport]\n    Transport -->|Codec Convert| Codec[AudioCodec]\n    Codec -->|16kHz PCM| App[Your AI Pipeline]\n    App -->|16kHz PCM| Transport\n    Transport -->|Provider Format| Handler\n    Handler -->|WebSocket Media| Provider",
+  "diagram_sequence": "sequenceDiagram\n    participant Caller\n    participant Provider as Telnyx/Twilio\n    participant Server as SipWebhookHandler\n    participant Transport as SipTransport\n    participant App as AI Pipeline\n    Caller->>Provider: Initiate Call\n    Provider->>Server: POST /sip/{provider}/answer\n    Server-->>Provider: Return TeXML/TwiML with Stream URL\n    Provider->>Server: WebSocket Connect /sip/media-stream\n    Server->>Transport: Initialize Session\n    loop Active Call\n        Provider->>Server: Audio Frame (Provider Format)\n        Server->>Transport: Raw Bytes\n        Transport->>App: Canonical 16kHz PCM\n        App->>Transport: Response 16kHz PCM\n        Transport->>Server: Encoded Bytes\n        Server->>Provider: Audio Frame (Provider Format)\n    end",
+  "capabilities": [
+    "Inbound call handling",
+    "Real-time audio streaming",
+    "Codec transcoding",
+    "DID routing",
+    "System sleep inhibition"
+  ],
+  "components": [
+    "SipTransport",
+    "SipWebhookHandler",
+    "BaseSipProvider",
+    "AudioCodec",
+    "DIDRouter",
+    "SleepInhibitor"
+  ],
+  "tech": [
+    "Python 3.11+",
+    "FastAPI",
+    "NumPy",
+    "Uvicorn",
+    "WebSockets"
+  ],
+  "depends_on": [
+    "fastapi",
+    "uvicorn",
+    "numpy",
+    "pyyaml",
+    "httpx"
+  ],
+  "integrates_with": [
+    "Telnyx",
+    "Twilio",
+    "Whisper (STT)",
+    "Ollama (LLM)",
+    "Piper (TTS)"
+  ],
+  "patterns": [
+    "Abstract Base Class",
+    "Async Iterator",
+    "Strategy Pattern (Providers)",
+    "Adapter Pattern (Codecs)"
+  ],
+  "reuse_tags": [
+    "telephony",
+    "voip",
+    "voice-ai",
+    "real-time-audio",
+    "macos"
+  ],
+  "slug": "sip-voice-transport",
+  "repo_url": "https://github.com/davidbmar/sip-voice-transport",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:53:34.967973Z",
+  "source_commit": "d576b26",
+  "model": "qwen3.7-plus"
+}

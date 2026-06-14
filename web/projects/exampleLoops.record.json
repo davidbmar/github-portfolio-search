@@ -1,0 +1,56 @@
+{
+  "title": "exampleLoops",
+  "one_liner": "Educational code samples demonstrating basic loop structures in Java and Python.",
+  "what_it_is": "A minimal educational repository containing implementations of a simple multiplication table generator. It solves a specific algorithmic task: given an integer n, print the first 10 multiples of n using iterative loops. The project serves as a reference for syntax comparison between Java and Python.",
+  "how_its_built": "The Java implementation uses the java.util.Scanner class for standard input parsing and a standard for-loop for iteration. The logic calculates products sequentially and prints formatted strings to stdout. The Python implementation (implied by description) follows similar logic using Python's range-based looping constructs.",
+  "how_to_apply": "Use this repository as a baseline for teaching introductory programming concepts, specifically iteration and standard I/O. It is suitable for beginners learning syntax differences between statically typed (Java) and dynamically typed (Python) languages.",
+  "quickstart": "javac Solution.java\njava Solution\npython3 loops.py",
+  "features": [
+    "Reads an integer from standard input",
+    "Iterates exactly 10 times using a counter",
+    "Calculates multiplication results dynamically",
+    "Formats output as 'n x i = result'",
+    "Demonstrates basic loop syntax in Java"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[User Input] -->|Integer n| B(Main Execution)\n    B --> C{Loop Counter 1-10}\n    C -->|Yes| D[Calculate n * counter]\n    D --> E[Print Formatted String]\n    E --> C\n    C -->|No| F[Exit]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Main as Solution.main()\n    participant Scanner as java.util.Scanner\n    participant Console as System.out\n    \n    User->>Main: Provide integer n\n    Main->>Scanner: nextInt()\n    Scanner-->>Main: Return n\n    \n    loop counter = 1 to 10\n        Main->>Main: Calculate answer = n * counter\n        Main->>Console: println(n + \" x \" + counter + \" = \" + answer)\n    end",
+  "capabilities": [
+    "Standard input parsing",
+    "Iterative calculation",
+    "Formatted console output"
+  ],
+  "components": [
+    "Solution.java",
+    "loops.py"
+  ],
+  "tech": [
+    "Java",
+    "Python"
+  ],
+  "depends_on": [
+    "JDK 8+",
+    "Python 3.x"
+  ],
+  "integrates_with": [],
+  "patterns": [
+    "For Loop",
+    "Standard I/O",
+    "Linear Iteration"
+  ],
+  "reuse_tags": [
+    "education",
+    "beginner",
+    "loops",
+    "syntax-comparison"
+  ],
+  "slug": "exampleLoops",
+  "repo_url": "https://github.com/davidbmar/exampleLoops",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:51:33.137482Z",
+  "source_commit": "c4b7c39",
+  "model": "qwen3.7-plus"
+}

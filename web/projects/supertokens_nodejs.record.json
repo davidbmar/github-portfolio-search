@@ -1,0 +1,75 @@
+{
+  "title": "SuperTokens Passwordless Node.js Demo",
+  "one_liner": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.",
+  "what_it_is": "This project is a reference implementation of passwordless authentication. It replaces traditional passwords with time-limited, single-use magic links sent to the user's email. The system consists of a static HTML frontend for inputting emails and verifying tokens, an Express.js backend handling session management and SuperTokens integration, and a SuperTokens Core instance running in Docker with PostgreSQL for persistent storage.",
+  "how_its_built": "The backend uses the `supertokens-node` SDK with Express middleware to handle auth routes. The SuperTokens Core (v9.3.0) runs in a Docker container alongside PostgreSQL. The frontend is a static site served via `npx serve`, interacting with the backend API. Magic links are logged to the server console instead of being sent via SMTP for demonstration purposes.",
+  "how_to_apply": "Use this as a starting point for integrating passwordless login into Node.js applications. Replace the console-based email delivery with a real SMTP provider (e.g., SendGrid, AWS SES) by modifying the `emailDelivery` override in `server.js`. Customize `appInfo.js` with your production domains.",
+  "quickstart": "docker-compose up -d\nnpm start\nnpx serve -s .",
+  "features": [
+    "Passwordless login via email magic links",
+    "Single-use, time-limited authentication tokens (15 min expiry)",
+    "Session management with HTTP-only cookies",
+    "Dockerized SuperTokens Core and PostgreSQL setup",
+    "Express.js backend with CORS configuration",
+    "Static frontend with login and dashboard views"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| Frontend[Static Frontend :3000]\n    Frontend -->|API Call| Backend[Node.js/Express Server :3001]\n    Backend -->|Auth Logic| ST_SDK[supertokens-node SDK]\n    ST_SDK -->|HTTP API| Core[SuperTokens Core :3567]\n    Core -->|Read/Write| DB[(PostgreSQL :5432)]\n    Backend -->|Log Link| Console[Server Console]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as Frontend (:3000)\n    participant B as Backend (:3001)\n    participant S as SuperTokens Core\n    participant D as PostgreSQL\n\n    U->>F: Enter Email & Click Send\n    F->>B: POST /auth/signinup/code\n    B->>S: Create Code (Email)\n    S->>D: Store Code & Hash\n    S-->>B: Return PreAuthSessionID\n    B-->>F: Success Response\n    B->>B: Log Magic Link to Console\n\n    U->>U: Copy Link from Console\n    U->>F: Open Magic Link\n    F->>B: GET /auth/signinup/code/consume\n    B->>S: Consume Code\n    S->>D: Validate & Delete Code\n    S-->>B: Return Session Tokens\n    B-->>F: Set Session Cookie & Redirect\n    F->>U: Show Dashboard",
+  "capabilities": [
+    "Passwordless Authentication",
+    "Session Management",
+    "Magic Link Generation",
+    "Token Verification",
+    "CORS Handling"
+  ],
+  "components": [
+    "Express.js Server",
+    "SuperTokens Node SDK",
+    "SuperTokens Core (Docker)",
+    "PostgreSQL Database",
+    "Static HTML Frontend"
+  ],
+  "tech": [
+    "Node.js",
+    "Express",
+    "SuperTokens",
+    "Docker",
+    "PostgreSQL",
+    "HTML/CSS/JS"
+  ],
+  "depends_on": [
+    "Node.js 14+",
+    "Docker",
+    "Docker Compose",
+    "npx"
+  ],
+  "integrates_with": [
+    "SMTP Providers (via override)",
+    "Any Static Host",
+    "PostgreSQL Compatible DBs"
+  ],
+  "patterns": [
+    "Middleware Pattern",
+    "Dependency Injection (SDK Init)",
+    "Override Pattern (Email Delivery)",
+    "Single-Use Token"
+  ],
+  "reuse_tags": [
+    "authentication",
+    "passwordless",
+    "nodejs",
+    "supertokens",
+    "docker",
+    "prototype"
+  ],
+  "slug": "supertokens_nodejs",
+  "repo_url": "https://github.com/davidbmar/supertokens_nodejs",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:57:35.162023Z",
+  "source_commit": "a19b8d6",
+  "model": "qwen3.7-plus"
+}

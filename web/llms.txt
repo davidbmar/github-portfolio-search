@@ -1,0 +1,36 @@
+# davidbmar.com — Project Portfolio
+
+> AI-generated, machine-readable documentation for 132 of David Mar's GitHub
+> projects. Each project covers what it is, how it's built (with architecture +
+> sequence diagrams), and how to apply/reuse it, plus typed metadata
+> (capabilities, tech, patterns, reuse_tags) for "have we built X?" queries.
+
+## How to use this efficiently (progressive disclosure — do NOT load everything)
+
+1. Scan the COMPACT index first (small — slug, title, one_liner, tech, reuse_tags):
+   https://davidbmar.com/data/projects-index.json
+   Use it to pick the few projects relevant to your question.
+2. Fetch the FULL record for ONLY those slugs:
+   https://davidbmar.com/projects/<slug>.record.json
+   (full prose, Mermaid diagrams, components, depends_on, integrates_with, hygiene)
+3. Human-readable page for a project:
+   https://davidbmar.com/projects/<slug>.html
+4. Browse all projects (humans): https://davidbmar.com/projects/
+
+## Query interface for agents (search, don't download)
+
+MCP server `ghps-mcp` exposes `portfolio_find_docs(query)` — returns ranked matches
+(slug, title, one_liner, the fields that matched). Prefer this over downloading the
+full corpus when you only need a few results.
+
+## Full corpus (last resort — only if you genuinely need every record at once)
+
+https://davidbmar.com/data/projects.json
+
+## Field semantics
+
+- reuse_tags, capabilities, patterns: best signals for "have we built X / can I reuse Y?"
+- tech, depends_on, integrates_with: stack and dependencies
+- thin=true: fork / stub / empty repo — low signal, may be skipped
+
+Generated 2026-06-14T04:39:48.364516Z · 132 projects.

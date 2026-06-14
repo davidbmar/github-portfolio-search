@@ -1,0 +1,67 @@
+{
+  "title": "AWS_tools_for_pricing",
+  "one_liner": "Python scripts to export EC2 instance details and OpenSearch domain configurations for cost analysis.",
+  "what_it_is": "A collection of standalone Python utilities that query AWS services (EC2 and OpenSearch) and output structured data (CSV or JSON) to facilitate infrastructure pricing and auditing. It bridges the gap between raw AWS API responses and human-readable reports.",
+  "how_its_built": "The project consists of independent Python scripts. `ec2_csv_list.py` uses the `boto3` SDK to interact with the EC2 API directly. The OpenSearch scripts (`opensearch2.py`) rely on `subprocess` calls to the AWS CLI, parsing the resulting JSON output. Data is serialized into CSV files for easy import into spreadsheet software.",
+  "how_to_apply": "Use these tools to generate an inventory of running resources. Export EC2 instance types and states to estimate compute costs, or dump OpenSearch cluster configurations to analyze search infrastructure spending. The resulting CSVs can be fed into pricing calculators or internal billing dashboards.",
+  "quickstart": "pip install boto3\npython ec2_csv_list.py\npython opensearch2.py",
+  "features": [
+    "Exports running EC2 instance details (ID, Type, State, Security Groups) to CSV",
+    "Lists OpenSearch domain names using AWS CLI",
+    "Extracts detailed OpenSearch cluster configuration (e.g., dedicated master nodes)",
+    "Generates structured reports for cost estimation and auditing"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Executes| Script[Python Script]\n    Script -->|boto3 SDK| EC2_API[EC2 API]\n    Script -->|subprocess| AWS_CLI[AWS CLI]\n    AWS_CLI -->|API Call| OS_API[OpenSearch API]\n    EC2_API -->|Instance Data| Script\n    OS_API -->|Domain Config| AWS_CLI\n    AWS_CLI -->|JSON Output| Script\n    Script -->|Writes| CSV[CSV File]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as Python Script\n    participant B as Boto3/CLI\n    participant A as AWS API\n    \n    U->>S: Run script\n    alt EC2 Mode\n        S->>B: Initialize boto3 client\n        B->>A: describe_instances()\n        A-->>B: Instance Metadata\n        B-->>S: Parsed Objects\n        S->>S: Format to CSV\n        S-->>U: Save running_ec2_instances.csv\n    else OpenSearch Mode\n        S->>B: subprocess.run(aws opensearch...)\n        B->>A: list-domain-names / describe-domain\n        A-->>B: JSON Response\n        B-->>S: Stdout String\n        S->>S: Parse JSON & Extract Details\n        S-->>U: Print/Save Domain Data\n    end",
+  "capabilities": [
+    "EC2 Inventory",
+    "OpenSearch Auditing",
+    "CSV Export",
+    "Cost Analysis Prep"
+  ],
+  "components": [
+    "ec2_csv_list.py",
+    "opensearch2.py",
+    "boto3 Client",
+    "AWS CLI Wrapper"
+  ],
+  "tech": [
+    "Python 3",
+    "boto3",
+    "AWS CLI",
+    "CSV",
+    "JSON"
+  ],
+  "depends_on": [
+    "boto3",
+    "awscli",
+    "python3"
+  ],
+  "integrates_with": [
+    "Amazon EC2",
+    "Amazon OpenSearch Service"
+  ],
+  "patterns": [
+    "Scripting",
+    "CLI Automation",
+    "Data Extraction"
+  ],
+  "reuse_tags": [
+    "aws",
+    "pricing",
+    "inventory",
+    "ec2",
+    "opensearch",
+    "python"
+  ],
+  "slug": "AWS_tools_for_pricing",
+  "repo_url": "https://github.com/davidbmar/AWS_tools_for_pricing",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:26:51.093252Z",
+  "source_commit": "f0529c0",
+  "model": "qwen3.7-plus"
+}

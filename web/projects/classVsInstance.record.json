@@ -1,0 +1,56 @@
+{
+  "title": "classVsInstance",
+  "one_liner": "Educational Python implementation demonstrating class vs instance variables and basic OOP logic.",
+  "what_it_is": "A Python coding challenge solution that defines a Person class to manage age validation, state progression over time, and categorical status reporting (young, teenager, old). It serves as a practical example of object-oriented principles, specifically distinguishing between class-level and instance-level data and behavior.",
+  "how_its_built": "The project consists of a single Python module defining a `Person` class. The class includes an `__init__` constructor for validation, a `yearPasses` method to mutate state, and an `amIOld` method for conditional output. It relies on standard Python control flow and print statements, designed to interface with a provided stub/main driver for testing.",
+  "how_to_apply": "Integrate the `Person` class into Python learning modules, OOP tutorials, or automated grading systems for introductory programming courses. Use it as a reference for implementing validation logic within constructors and managing object state transitions.",
+  "quickstart": "python person.py",
+  "features": [
+    "Validates age input in constructor, defaulting to 0 if negative",
+    "Prints warning message when invalid age is provided",
+    "Increments instance age by 1 via yearPasses method",
+    "Categorizes age as young, teenager, or old via amIOld method",
+    "Demonstrates separation of class structure and instance data"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Main Driver] -->|Input Age| B(Person Constructor)\n    B -->|Validate Age| C{Age < 0?}\n    C -->|Yes| D[Set Age = 0]\n    C -->|No| E[Set Age = Input]\n    D --> F[Print Warning]\n    E --> G[Store Instance Variable]\n    F --> H[Person Instance]\n    G --> H\n    H -->|Call| I[amIOld]\n    H -->|Call| J[yearPasses]\n    I --> K[Print Status]\n    J --> L[Increment Age]",
+  "diagram_sequence": "sequenceDiagram\n    participant Main as Main Driver\n    participant P as Person Instance\n    Main->>P: __init__(initialAge)\n    alt initialAge < 0\n        P->>P: self.age = 0\n        P->>Main: Print 'Age is not valid...'\n    else initialAge >= 0\n        P->>P: self.age = initialAge\n    end\n    Main->>P: amIOld()\n    P->>Main: Print Status (Young/Teen/Old)\n    Main->>P: yearPasses()\n    P->>P: self.age += 1\n    Main->>P: amIOld()\n    P->>Main: Print Updated Status",
+  "capabilities": [
+    "Age validation",
+    "State mutation",
+    "Conditional logging",
+    "Object instantiation"
+  ],
+  "components": [
+    "Person Class",
+    "Constructor",
+    "Instance Methods",
+    "Main Stub"
+  ],
+  "tech": [
+    "Python 3",
+    "OOP"
+  ],
+  "depends_on": [],
+  "integrates_with": [],
+  "patterns": [
+    "Constructor Validation",
+    "State Pattern",
+    "Encapsulation"
+  ],
+  "reuse_tags": [
+    "education",
+    "oop-basics",
+    "python-example",
+    "coding-challenge"
+  ],
+  "slug": "classVsInstance",
+  "repo_url": "https://github.com/davidbmar/classVsInstance",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:41:08.187725Z",
+  "source_commit": "6a7f3ca",
+  "model": "qwen3.7-plus"
+}

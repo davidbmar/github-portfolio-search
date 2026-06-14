@@ -1,0 +1,80 @@
+{
+  "title": "tool-browserAutomationScripts",
+  "one_liner": "macOS CLI and library for listing Chrome profiles, decrypting cookies, and launching browser instances.",
+  "what_it_is": "A TypeScript-based utility for macOS that interacts directly with Google Chrome's internal storage. It lists user profiles, extracts and decrypts HTTP cookies by accessing the macOS Keychain and SQLite databases, and launches Chrome instances with specific profiles via the command line or as a Node.js library.",
+  "how_its_built": "Built with TypeScript and compiled to JavaScript. It uses `commander` for the CLI interface, `better-sqlite3` for reading Chrome's cookie database, and Node.js `crypto` and `child_process` modules to handle AES-128-CBC decryption and Keychain access. The build process is managed via npm scripts.",
+  "how_to_apply": "Use the `bas` CLI to quickly inspect active sessions (cookies) for web scraping or debugging, list available profiles for multi-account management, or launch specific Chrome profiles from automation scripts. Integrate the library into larger Node.js automation workflows to programmatically manage browser state.",
+  "quickstart": "npm install\nnpm run build\nnpm link\nbas profiles",
+  "features": [
+    "Lists all local Google Chrome user profiles on macOS",
+    "Decrypts Chrome cookies using macOS Keychain and AES-128-CBC",
+    "Launches Chrome with specific profiles and optional URLs",
+    "Provides both CLI interface and TypeScript library API",
+    "Outputs cookie data in table or JSON format"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User/Script] -->|CLI or Import| BAS[browser-automation-scripts]\n    subgraph Core_Library\n        Profiles[listProfiles]\n        Cookies[getCookies]\n        Launcher[launchProfile]\n    end\n    BAS --> Profiles\n    BAS --> Cookies\n    BAS --> Launcher\n    \n    Profiles --> FS[File System]\n    FS -->|Read Dir| ChromeData[~/Library/Application Support/Google/Chrome]\n    \n    Cookies --> Keychain[macOS Keychain]\n    Keychain -->|Safe Storage Password| Decrypt[AES-128-CBC Decryptor]\n    Cookies --> DB[(SQLite Cookies DB)]\n    DB -->|Encrypted Values| Decrypt\n    Decrypt -->|Plain Text Cookies| BAS\n    \n    Launcher --> Exec[Child Process]\n    Exec -->|Spawn| ChromeBin[Google Chrome Binary]",
+  "diagram_sequence": "sequenceDiagram\n    participant Client as Client (CLI/Library)\n    participant BAS as BAS Core\n    participant FS as File System\n    participant Keychain as macOS Keychain\n    participant DB as SQLite DB\n\n    Note over Client, DB: Cookie Decryption Flow\n    Client->>BAS: getCookies(domain, profile)\n    BAS->>FS: Resolve Profile Path\n    FS-->>BAS: Profile Directory\n    BAS->>DB: Copy Cookies DB to Temp\n    DB-->>BAS: Temp DB Path\n    BAS->>Keychain: security find-generic-password\n    Keychain-->>BAS: Safe Storage Password\n    BAS->>BAS: Derive AES Key (PBKDF2)\n    BAS->>DB: Query Encrypted Cookies\n    DB-->>BAS: Encrypted Rows\n    BAS->>BAS: Decrypt Values (AES-128-CBC)\n    BAS-->>Client: Decrypted Cookie Array",
+  "capabilities": [
+    "Profile Discovery",
+    "Cookie Decryption",
+    "Browser Launching",
+    "Keychain Access",
+    "SQLite Parsing"
+  ],
+  "components": [
+    "CLI Entry Point (bas.ts)",
+    "Profile Manager",
+    "Cookie Decryptor",
+    "Database Reader",
+    "Process Launcher"
+  ],
+  "tech": [
+    "TypeScript",
+    "Node.js",
+    "Commander.js",
+    "better-sqlite3",
+    "Crypto API"
+  ],
+  "depends_on": [
+    "macOS",
+    "Google Chrome",
+    "Node.js >= 18"
+  ],
+  "integrates_with": [
+    "macOS Keychain",
+    "Chrome User Data Directory",
+    "SQLite Database Files"
+  ],
+  "patterns": [
+    "CLI Tool",
+    "Library Module",
+    "System Integration",
+    "Cryptographic Decryption"
+  ],
+  "reuse_tags": [
+    "browser-automation",
+    "chrome-tools",
+    "cookie-decryption",
+    "macos-utilities",
+    "typescript-cli"
+  ],
+  "slug": "tool-browserAutomationScripts",
+  "repo_url": "https://github.com/davidbmar/tool-browserAutomationScripts",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-2cf28e01b8 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 2 updates"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:58:59.889552Z",
+  "source_commit": "fd86224",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,66 @@
+{
+  "title": "youtube_commercial_detector",
+  "one_liner": "A utility that estimates YouTube ad frequency by downloading videos and analyzing their text transcriptions for commercial keywords.",
+  "what_it_is": "A Python-based script that automates the process of downloading YouTube video content and its associated subtitles or auto-generated captions. It then parses the resulting text files to identify patterns, keywords, or phrases typically associated with commercials, providing a count of likely ad occurrences within the video duration.",
+  "how_its_built": "The project relies on external command-line tools for media acquisition (likely youtube-dl or yt-dlp) and standard Python string processing libraries for text analysis. It operates as a linear pipeline: download media/captions -> extract text -> scan for ad indicators -> report count.",
+  "how_to_apply": "Use this tool for media analysis, academic research into advertising density on specific channels, or personal curiosity about ad load in long-form content. It is not a real-time blocker but a post-hoc analyzer.",
+  "quickstart": "git clone https://github.com/davidbmar/youtube_commercial_detector.git\ncd youtube_commercial_detector\npip install -r requirements.txt\npython main.py <youtube_url>",
+  "features": [
+    "Automated downloading of YouTube video metadata and captions",
+    "Text-based analysis of transcription data",
+    "Keyword matching to identify potential commercial segments",
+    "Simple count output of detected ad instances",
+    "Lightweight dependency footprint"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[User Input URL] --> B[Downloader Module]\n    B --> C{Caption Available?}\n    C -->|Yes| D[Extract Text]\n    C -->|No| E[Auto-Generate/Transcribe]\n    D --> F[Text Parser]\n    E --> F\n    F --> G[Keyword Matcher]\n    G --> H[Ad Counter]\n    H --> I[Report Output]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant MainScript\n    participant Downloader\n    participant Parser\n    participant Output\n    \n    User->>MainScript: Provide YouTube URL\n    MainScript->>Downloader: Download video & captions\n    Downloader-->>MainScript: Return text file path\n    MainScript->>Parser: Load and read text\n    Parser->>Parser: Scan for ad keywords\n    Parser-->>MainScript: Return match count\n    MainScript->>Output: Print ad frequency",
+  "capabilities": [
+    "YouTube content retrieval",
+    "Subtitle extraction",
+    "Text pattern matching",
+    "Ad frequency estimation"
+  ],
+  "components": [
+    "Download handler",
+    "Text extractor",
+    "Keyword scanner",
+    "Result formatter"
+  ],
+  "tech": [
+    "Python",
+    "youtube-dl/yt-dlp",
+    "Regular Expressions",
+    "File I/O"
+  ],
+  "depends_on": [
+    "Python 3.x",
+    "youtube-dl or yt-dlp",
+    "requests"
+  ],
+  "integrates_with": [
+    "YouTube Data API (indirectly via downloader)",
+    "Local file system"
+  ],
+  "patterns": [
+    "Pipeline processing",
+    "Keyword filtering",
+    "Script automation"
+  ],
+  "reuse_tags": [
+    "media-analysis",
+    "youtube-tools",
+    "text-mining",
+    "ad-detection",
+    "python-script"
+  ],
+  "slug": "youtube_commercial_detector",
+  "repo_url": "https://github.com/davidbmar/youtube_commercial_detector",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:11:50.319322Z",
+  "source_commit": "2a515b8",
+  "model": "qwen3.7-plus"
+}

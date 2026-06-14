@@ -1,0 +1,99 @@
+{
+  "title": "Open Source Sound Generator LLMs",
+  "one_liner": "A local browser-based benchmarking suite for comparing nine open-source audio generation models with real-time progress streaming and Apple Silicon optimization.",
+  "what_it_is": "A full-stack application consisting of a React frontend and FastAPI backend that allows users to generate, compare, and benchmark sound effects, music, and speech models. It features real-time Server-Sent Events (SSE) for monitoring generation steps, an LRU cache for instant repeat results, and automated hardware detection to optimize for MPS (Apple Silicon), CUDA, or CPU.",
+  "how_its_built": "The backend uses FastAPI with PyTorch, Diffusers, and Transformers libraries to manage model loading and inference. It employs an asyncio lock to ensure only one model resides in memory at a time, using gc.collect() for cleanup. The frontend is built with React and Vite, consuming SSE streams for progress updates and fetching binary WAV data separately to avoid proxy limitations. Audio processing relies on NumPy and SoundFile for format conversion.",
+  "how_to_apply": "Use this project to evaluate the quality, speed, and resource consumption of different open-source audio models before integrating them into production pipelines. It serves as a reference implementation for handling large model swaps, streaming inference progress, and managing GPU/MPS memory constraints in local AI applications.",
+  "quickstart": "git clone https://github.com/davidbmar/opensource_sound_generator_llms.git\ncd opensource_sound_generator_llms\nmake install\nmake start",
+  "features": [
+    "Supports 9 models across sound effects, music, and speech categories",
+    "Real-time SSE streaming for generation steps and model loading progress",
+    "Automated benchmarking script with Real-Time Factor (RTF) metrics",
+    "LRU generation cache for instant retrieval of identical prompts",
+    "Apple Silicon MPS optimization with float32 precision and pre-warming",
+    "Interactive waveform visualization and side-by-side comparison table"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph Client[\"Browser (React/Vite :5173)\"]\n        UI[\"UI Components\\n(Model Selector, Prompt Input)\"]\n        Player[\"Audio Player & Waveform\"]\n        Table[\"Compare Table\"]\n    end\n\n    subgraph Server[\"Python Backend (FastAPI :8000)\"]\n        API[\"API Routes\\n(/api/generate-stream, /api/models)\"]\n        MM[\"ModelManager\\n(Asyncio Lock, One-at-a-time)\"]\n        Cache[\"GenerationCache\\n(LRU Store)\"]\n        Gen[\"Generators\\n(AudioLDM, MusicGen, Bark, etc.)\"]\n        Utils[\"Audio Utils\\n(Numpy to WAV)\"]\n    end\n\n    UI -->|HTTP/SSE| API\n    API -->|Manage Lifecycle| MM\n    API -->|Check/Store| Cache\n    MM -->|Load/Unload| Gen\n    Gen -->|Raw Audio| Utils\n    Utils -->|WAV Bytes| Cache\n    Cache -->|WAV Bytes| API\n    API -->|SSE Progress| UI\n    API -->|WAV Binary| Player\n    Player -->|Display Data| Table",
+  "diagram_sequence": "sequenceDiagram\n    participant User as Browser UI\n    participant API as FastAPI Endpoint\n    participant Manager as ModelManager\n    participant Model as Loaded Model\n    participant Cache as GenerationCache\n\n    User->>API: POST /api/generate-stream\n    API->>Cache: Check cache key\n    alt Cache Hit\n        Cache-->>API: Return cached WAV bytes\n        API-->>User: SSE: complete (instant)\n    else Cache Miss\n        API->>Manager: Acquire lock & get model\n        Manager->>Model: Ensure loaded (warm-up if needed)\n        loop Inference Steps\n            Model-->>API: Yield progress (step N/total)\n            API-->>User: SSE: progress event\n        end\n        Model-->>API: Return raw audio array\n        API->>Cache: Store WAV bytes\n        API-->>User: SSE: complete (audio_id)\n        User->>API: GET /api/audio/{id}\n        API-->>User: Binary WAV data\n    end",
+  "capabilities": [
+    "Text-to-Audio Generation",
+    "Text-to-Music Generation",
+    "Text-to-Speech Synthesis",
+    "Real-time Progress Streaming",
+    "Automated Performance Benchmarking",
+    "Local Model Management"
+  ],
+  "components": [
+    "FastAPI Backend",
+    "React Frontend",
+    "ModelManager Service",
+    "GenerationCache Store",
+    "Benchmark Script",
+    "Audio Utilities Module"
+  ],
+  "tech": [
+    "Python 3.13+",
+    "FastAPI",
+    "React",
+    "Vite",
+    "PyTorch",
+    "Diffusers",
+    "Transformers",
+    "NumPy",
+    "SoundFile"
+  ],
+  "depends_on": [
+    "Node.js 20+",
+    "PyTorch",
+    "Hugging Face Hub",
+    "FFmpeg (implicit via soundfile)",
+    "Make"
+  ],
+  "integrates_with": [
+    "Hugging Face Model Hub",
+    "Apple Metal Performance Shaders (MPS)",
+    "NVIDIA CUDA"
+  ],
+  "patterns": [
+    "Server-Sent Events (SSE)",
+    "LRU Caching",
+    "Singleton Model Loading",
+    "Lazy Initialization",
+    "Resource Locking"
+  ],
+  "reuse_tags": [
+    "audio-generation",
+    "llm-benchmarking",
+    "fastapi-react",
+    "mps-optimization",
+    "sse-streaming",
+    "local-ai"
+  ],
+  "slug": "opensource_sound_generator_llms",
+  "repo_url": "https://github.com/davidbmar/opensource_sound_generator_llms",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/frontend/npm_and_yarn-790455a2e9 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/frontend/rollup-4.61.1 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: Bump rollup from 4.57.1 to 4.61.1 in /frontend"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 4 updates"
+    }
+  ],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/opensource_sound_generator_llms/main/docs/screenshots/app-overview.png",
+  "generated_at": "2026-06-14T03:45:59.891505Z",
+  "source_commit": "b993452",
+  "model": "qwen3.7-plus"
+}

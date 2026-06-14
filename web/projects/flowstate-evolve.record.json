@@ -1,0 +1,70 @@
+{
+  "title": "flowstate-evolve",
+  "one_liner": "Analyzes Flowstate workflow traces to recommend graph improvements and generate auditable before/after reports.",
+  "what_it_is": "A Python analysis tool that ingests scored execution traces from Flowstate-based agents, identifies state-level failures and regressions, and recommends specific graph modifications (such as splitting states or adding guards) without auto-promoting changes.",
+  "how_its_built": "Built in Python using a src-layout. It uses `yaml` to parse workflow definitions and `json` for trace data. The core logic resides in `analyzer.py` for evidence grouping and action recommendation, `compare.py` for metric diffing, and `evidence.py` for normalizing external pass files into a standard JSONL contract. CLI entry points are managed via `argparse` in `cli.py`.",
+  "how_to_apply": "Use this package after running a Flowstate agent (like phone-agent-scheduler) to generate evaluation passes. Run the import command to normalize raw pass JSONs into evidence JSONL, then run the analyze command against your workflow YAML to get a report of recommended changes and a candidate YAML file.",
+  "quickstart": "cd ~/src/flowstate-evolve\npython3 -m venv .venv\n.venv/bin/python -m pip install -e \".[dev]\"\n.venv/bin/flowstate-evolve --help",
+  "features": [
+    "Converts scored workflow traces into state-level evidence groups",
+    "Detects repeated failures, regressions, and response smells",
+    "Recommends actions: refine_state, add_guard, split_state, merge_states",
+    "Generates auditable old-vs-new scorecard comparisons",
+    "Produces candidate YAML files with evolution metadata"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Flowstate Core Runtime] -->|Executes YAML Flows| B(Reference App e.g. phone-agent-scheduler)\n    B -->|Exports Scored Pass JSON| C{flowstate-evolve CLI}\n    C -->|import-phone-pass| D[Evidence Normalizer]\n    D -->|Writes JSONL| E[(Evidence Store)]\n    C -->|analyze| F[Analyzer Engine]\n    F -->|Reads| A\n    F -->|Reads| E\n    F -->|Generates| G[State Evolution Report]\n    F -->|Generates| H[Candidate YAML]\n    C -->|compare| I[Compare Engine]\n    I -->|Reads| J[Old Pass JSON]\n    I -->|Reads| K[New Pass JSON]\n    I -->|Outputs| L[Scorecard Diff]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant CLI as flowstate-evolve CLI\n    participant Analyzer as analyzer.py\n    participant Evidence as evidence.py\n    participant FS as Flowstate YAML\n\n    User->>CLI: run analyze --flow flow.yaml --passes ./data\n    CLI->>Evidence: phone_pass_to_evidence(pass_files)\n    Evidence-->>CLI: normalized JSONL records\n    CLI->>Analyzer: analyze(flow_yaml, evidence_records)\n    Analyzer->>FS: parse workflow structure\n    Analyzer->>Analyzer: group evidence by state/transition\n    Analyzer->>Analyzer: detect smells & fact tags\n    Analyzer->>Analyzer: recommend actions (split/merge/guard)\n    Analyzer-->>CLI: state_evolution_report.json\n    Analyzer-->>CLI: flow.candidate.yaml\n    CLI-->>User: output files written",
+  "capabilities": [
+    "Trace normalization",
+    "State-level evidence grouping",
+    "Failure pattern detection",
+    "Graph change recommendation",
+    "Metric comparison",
+    "Candidate generation"
+  ],
+  "components": [
+    "analyzer.py",
+    "compare.py",
+    "evidence.py",
+    "cli.py",
+    "dashboard/state_evolution.html"
+  ],
+  "tech": [
+    "Python",
+    "PyYAML",
+    "JSONL",
+    "Argparse",
+    "Pytest"
+  ],
+  "depends_on": [
+    "flowstate",
+    "phone-agent-scheduler (reference data)"
+  ],
+  "integrates_with": [
+    "Flowstate runtime",
+    "Phone Agent Scheduler",
+    "Static HTML Dashboard"
+  ],
+  "patterns": [
+    "Human-in-the-loop promotion",
+    "Evidence-based refactoring",
+    "Immutable candidate generation",
+    "Normalization layer"
+  ],
+  "reuse_tags": [
+    "workflow-analysis",
+    "llm-ops",
+    "graph-evolution",
+    "evaluation-tooling"
+  ],
+  "slug": "flowstate-evolve",
+  "repo_url": "https://github.com/davidbmar/flowstate-evolve",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:52:24.682709Z",
+  "source_commit": "6f0a088",
+  "model": "qwen3.7-plus"
+}

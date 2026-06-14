@@ -1,0 +1,90 @@
+{
+  "title": "transcription-sqs-spot-s3",
+  "one_liner": "Scalable AWS-based audio transcription system using SQS queues, EC2 Spot instances, and WhisperX/Voxtral models.",
+  "what_it_is": "A production-ready infrastructure-as-code solution for transcribing audio files stored in S3. It uses an SQS queue to manage job distribution to EC2 Spot instances (GPU or CPU) running containerized or native workers. The system supports automatic scaling, cost optimization via Spot instances, and dead-letter queue handling for failed jobs.",
+  "how_its_built": "The system is orchestrated via Bash scripts that configure AWS resources (IAM, SQS, ECR) and deploy workers. Workers are Python applications using FastAPI, PyTorch, and Hugging Face Transformers (Whisper or Voxtral). Deployment supports two paths: traditional EC2 user-data installation or Docker containers pushed to Amazon ECR.",
+  "how_to_apply": "Use this project to build a cost-effective, scalable transcription backend for applications requiring high-volume audio processing. It is suitable for podcast transcription, meeting notes, or media archival where latency is secondary to cost and reliability.",
+  "quickstart": "git clone https://github.com/davidbmar/transcription-sqs-spot-s3.git\ncd transcription-sqs-spot-s3\n./scripts/step-000-setup-configuration.sh\n./scripts/step-010-setup-iam-permissions.sh\n./scripts/step-020-create-sqs-resources.sh\n./scripts/step-060-choose-deployment-path.sh",
+  "features": [
+    "Automated provisioning of SQS queues and IAM roles via shell scripts",
+    "Support for EC2 Spot instances with GPU (NVIDIA T4) acceleration",
+    "Dual deployment modes: Traditional EC2 setup and Docker/ECR containerization",
+    "Integration with WhisperX and Voxtral models for high-accuracy transcription",
+    "Automatic idle shutdown and dead-letter queue handling for cost control",
+    "Health monitoring endpoints and comprehensive benchmarking scripts"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User/Application] -->|Upload Audio| S3In[(S3 Input Bucket)]\n    User -->|Send Job Metadata| SQS[SQS Queue]\n    SQS -->|Poll Jobs| Worker[EC2 Spot Worker]\n    Worker -->|Download Audio| S3In\n    Worker -->|Process| Model[WhisperX/Voxtral Model]\n    Worker -->|Upload Transcript| S3Out[(S3 Output Bucket)]\n    SQS -->|Failed Messages| DLQ[SQS Dead Letter Queue]\n    subgraph AWS Cloud\n        S3In\n        SQS\n        Worker\n        S3Out\n        DLQ\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant Client as Client App\n    participant S3 as S3 Bucket\n    participant SQS as SQS Queue\n    participant Worker as EC2 Worker\n    participant Model as AI Model\n\n    Client->>S3: Upload Audio File\n    Client->>SQS: Send Message (S3 Path)\n    loop Polling\n        Worker->>SQS: Receive Message\n    end\n    Worker->>S3: Download Audio File\n    Worker->>Model: Transcribe Audio\n    Model-->>Worker: Return Text\n    Worker->>S3: Upload Transcript JSON\n    Worker->>SQS: Delete Message",
+  "capabilities": [
+    "Audio-to-text transcription",
+    "Batch job processing",
+    "Cloud infrastructure automation",
+    "GPU-accelerated inference",
+    "Cost-optimized computing"
+  ],
+  "components": [
+    "Bash Setup Scripts",
+    "Python FastAPI Workers",
+    "Dockerfiles",
+    "SQS Queue Configuration",
+    "IAM Policy Definitions"
+  ],
+  "tech": [
+    "Python",
+    "Bash",
+    "AWS EC2",
+    "AWS SQS",
+    "AWS S3",
+    "Docker",
+    "PyTorch",
+    "FastAPI",
+    "WhisperX",
+    "Voxtral"
+  ],
+  "depends_on": [
+    "AWS CLI",
+    "Docker Engine",
+    "Git",
+    "Python 3.8+",
+    "NVIDIA Drivers (for GPU path)"
+  ],
+  "integrates_with": [
+    "Amazon ECR",
+    "Amazon CloudWatch",
+    "Hugging Face Hub"
+  ],
+  "patterns": [
+    "Worker Queue Pattern",
+    "Spot Instance Optimization",
+    "Containerized Deployment",
+    "Infrastructure as Code (Scripted)"
+  ],
+  "reuse_tags": [
+    "aws",
+    "transcription",
+    "sqS",
+    "spot-instances",
+    "whisper",
+    "docker",
+    "gpu"
+  ],
+  "slug": "transcription-sqs-spot-s3",
+  "repo_url": "https://github.com/davidbmar/transcription-sqs-spot-s3",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/pip/pip-bb6eef0b69 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump pip from 24.0 to 26.1 in the pip group across 1 directory"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:05:15.011106Z",
+  "source_commit": "4c5851d",
+  "model": "qwen3.7-plus"
+}

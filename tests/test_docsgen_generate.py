@@ -74,6 +74,36 @@ def test_generate_all_writes_record_html_and_aggregate(tmp_path):
     # listing page is written and links to the generated page
     index_html = (tmp_path / "web" / "projects" / "index.html").read_text()
     assert 'href="alpha.html"' in index_html
+    # progressive-disclosure artifacts: per-repo record, compact index, llms.txt
+    assert (tmp_path / "web" / "projects" / "alpha.record.json").exists()
+    compact = json.loads((tmp_path / "web" / "data" / "projects-index.json").read_text())
+    assert compact["count"] == 1
+    assert "one_liner" in compact["projects"][0]
+    assert "diagram_architecture" not in compact["projects"][0]  # compact = no prose
+    llms = (tmp_path / "web" / "llms.txt").read_text()
+    assert "projects-index.json" in llms and "portfolio_find_docs" in llms
+
+
+def test_publish_all_rebuilds_web_from_records_without_llm(tmp_path):
+    # First generate one record (LLM), then publish from records alone.
+    from ghps.docsgen import generate as gen
+    args = _gen_args(tmp_path)
+    gen.generate_all(client=_FakeClient(), gh=_fake_gh("alpha"), **args)
+
+    # Remove the rendered HTML, then republish purely from the record on disk.
+    (tmp_path / "web" / "projects" / "alpha.html").unlink()
+    result = gen.publish_all(
+        records_dir=str(tmp_path / "projects"),
+        html_dir=str(tmp_path / "web" / "projects"),
+        feed_path=str(tmp_path / "web" / "data" / "projects.json"),
+        base_url="https://example.com",
+    )
+    assert result["published"] == 1
+    assert (tmp_path / "web" / "projects" / "alpha.html").exists()  # re-rendered
+    assert (tmp_path / "web" / "projects" / "alpha.record.json").exists()
+    assert "https://example.com/data/projects-index.json" in (
+        tmp_path / "web" / "llms.txt"
+    ).read_text()
 
 
 def test_idempotent_skips_existing_unless_force(tmp_path):

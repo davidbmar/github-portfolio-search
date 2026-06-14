@@ -1,0 +1,68 @@
+{
+  "title": "llm_gpt3.5-vs-gpt4-comparison",
+  "one_liner": "A cost-optimized document summarization pipeline using GPT-3.5 that achieves comparable or better results than GPT-4 by leveraging logical paragraph segmentation and hierarchical summarization.",
+  "what_it_is": "This project demonstrates a method to summarize long documents (such as an hour-long conversation or State of the Union address) at approximately 1/22nd the cost of GPT-4. It replaces fixed-character chunking with logic-based segmentation, breaking text into sentences, grouping them into coherent paragraphs based on topic changes, summarizing each paragraph individually, and then generating a final summary of those sub-summaries using GPT-3.5-16k.",
+  "how_its_built": "The system is built in Python using LangChain for LLM orchestration and OpenAI embeddings. It processes raw text by splitting on punctuation to create sentence fragments, groups these into logical paragraphs, and uses cosine similarity on embeddings to detect topic shifts. Each paragraph is summarized and titled using GPT-3.5-turbo. Finally, the collection of paragraph summaries is fed into GPT-3.5-16k for a global summary. Visualization tools generate heatmaps of topic clusters.",
+  "how_to_apply": "Use this approach when cost is a primary constraint and latency is secondary. It is ideal for batch processing large transcripts, articles, or logs where parallelization is not required. Replace the default 'stateoftheunion.txt' with your target document and ensure your OpenAI API key is configured.",
+  "quickstart": "bash llm_setup.sh\nexport OPENAI_API_KEY=yourkeyhere\npython3 llm_summary.py",
+  "features": [
+    "Logical text segmentation based on sentence boundaries rather than fixed character counts",
+    "Hierarchical summarization: paragraph-level summaries aggregated into a final document summary",
+    "Topic change detection using cosine similarity of OpenAI embeddings",
+    "Cost optimization targeting ~22.5x savings compared to GPT-4",
+    "Visual heatmap generation for topic clustering and chunk analysis"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Raw Text Input] --> B[Sentence Splitter]\n    B --> C[Paragraph Grouping]\n    C --> D[Embedding Generation]\n    D --> E[Cosine Similarity Check]\n    E -->|Topic Change| F[New Paragraph]\n    E -->|Same Topic| C\n    F --> G[GPT-3.5 Summarize Paragraph]\n    G --> H[Collection of Sub-Summaries]\n    H --> I[GPT-3.5-16k Final Summary]\n    I --> J[Final Output]\n    D --> K[Heatmap Visualization]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script as llm_summary.py\n    participant OpenAI as OpenAI API\n    \n    User->>Script: Execute script with txt file\n    Script->>Script: Split text into sentences\n    Script->>Script: Group sentences into paragraphs\n    loop For each paragraph\n        Script->>OpenAI: Generate Embeddings\n        OpenAI-->>Script: Vector embeddings\n        Script->>Script: Calculate Cosine Similarity\n        Script->>OpenAI: Summarize Paragraph (GPT-3.5)\n        OpenAI-->>Script: Paragraph Summary & Title\n    end\n    Script->>OpenAI: Summarize All Sub-Summaries (GPT-3.5-16k)\n    OpenAI-->>Script: Final Document Summary\n    Script->>User: Display Summary & Save Heatmaps",
+  "capabilities": [
+    "Text Summarization",
+    "Topic Modeling",
+    "Cost Optimization",
+    "Data Visualization"
+  ],
+  "components": [
+    "llm_summary.py",
+    "llm_setup.sh",
+    "stateoftheunion.txt"
+  ],
+  "tech": [
+    "Python",
+    "LangChain",
+    "OpenAI API",
+    "NumPy",
+    "Pandas",
+    "Matplotlib",
+    "SciPy",
+    "NetworkX"
+  ],
+  "depends_on": [
+    "OpenAI API Key",
+    "Python 3.x"
+  ],
+  "integrates_with": [
+    "OpenAI Embeddings",
+    "OpenAI Chat Completions"
+  ],
+  "patterns": [
+    "Map-Reduce Summarization",
+    "Semantic Chunking",
+    "Hierarchical Processing"
+  ],
+  "reuse_tags": [
+    "summarization",
+    "llm",
+    "cost-optimization",
+    "nlp",
+    "langchain"
+  ],
+  "slug": "llm_gpt3.5-vs-gpt4-comparison",
+  "repo_url": "https://github.com/davidbmar/llm_gpt3.5-vs-gpt4-comparison",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:05:11.072602Z",
+  "source_commit": "7851f7c",
+  "model": "qwen3.7-plus"
+}

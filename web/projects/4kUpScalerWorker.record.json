@@ -1,0 +1,69 @@
+{
+  "title": "4kUpScalerWorker",
+  "one_liner": "Serverless-style image upscaling worker using AWS S3, SQS, and InvokeAI.",
+  "what_it_is": "A Python-based background worker that listens to an AWS SQS queue for S3 upload events. Upon receiving a notification, it downloads the specified image from S3, prepares it for processing (intended for 4K upscaling via InvokeAI), and manages the file lifecycle between storage and local processing directories.",
+  "how_its_built": "Built with Python 3 and boto3 for AWS interactions. It relies on the InvokeAI environment for the actual upscaling logic. The architecture uses S3 for storage, S3 Event Notifications to trigger SQS messages, and a long-polling or periodic polling script (UpscalerWorker.py) to process jobs.",
+  "how_to_apply": "Deploy this worker on a GPU-enabled instance (e.g., RunPod) with the InvokeAI image. Configure AWS credentials to allow reading from the source S3 bucket and writing to the destination. Use UploadToS3_forProcessing.py to batch-upload images to trigger the workflow.",
+  "quickstart": "git clone https://github.com/davidbmar/4kUpScalerWorker.git\ncd 4kUpScalerWorker\nmkdir -p /root/.aws\n# Copy your AWS config and credentials into /root/.aws/\npython3 UpscalerWorker.py",
+  "features": [
+    "Automated ingestion of images from AWS S3 buckets",
+    "Event-driven processing via AWS SQS queues",
+    "Local file staging for GPU-accelerated upscaling",
+    "Batch upload utility for triggering multiple jobs",
+    "Error handling for S3 upload failures"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Uploads Image| S3[S3 Bucket]\n    S3 -->|Put Event| SNS[S3 Event Notification]\n    SNS -->|Send Message| SQS[SQS Queue]\n    Worker[UpscalerWorker.py] -->|Poll/Receive| SQS\n    Worker -->|Download Object| S3\n    Worker -->|Process/Upscale| LocalFS[Local File System]\n    LocalFS -->|Upload Result| S3Processed[S3 Processed Bucket/Folder]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S3 as S3 Bucket\n    participant SQS as SQS Queue\n    participant W as UpscalerWorker\n    \n    U->>S3: PUT object (image.jpg)\n    S3->>SQS: Send event notification\n    loop Polling\n        W->>SQS: ReceiveMessage\n        SQS-->>W: Return message (if available)\n    end\n    W->>S3: GetObject (bucket, key)\n    S3-->>W: Return file content\n    W->>W: Save to local disk\n    W->>W: Execute Upscaling (InvokeAI)\n    W->>S3: Upload processed file (via s3_utils)",
+  "capabilities": [
+    "S3 Object Retrieval",
+    "SQS Message Consumption",
+    "Local File Management",
+    "Image Processing Integration",
+    "AWS Credential Management"
+  ],
+  "components": [
+    "UpscalerWorker.py",
+    "UploadToS3_forProcessing.py",
+    "s3_utils.py"
+  ],
+  "tech": [
+    "Python",
+    "boto3",
+    "AWS S3",
+    "AWS SQS",
+    "InvokeAI"
+  ],
+  "depends_on": [
+    "AWS Account",
+    "S3 Bucket",
+    "SQS Queue",
+    "InvokeAI Environment",
+    "GPU Hardware"
+  ],
+  "integrates_with": [
+    "RunPod",
+    "GitHub"
+  ],
+  "patterns": [
+    "Event-Driven Architecture",
+    "Producer-Consumer",
+    "Polling Consumer"
+  ],
+  "reuse_tags": [
+    "image-upscaling",
+    "aws-worker",
+    "s3-sqs-integration",
+    "invokeai",
+    "python-script"
+  ],
+  "slug": "4kUpScalerWorker",
+  "repo_url": "https://github.com/davidbmar/4kUpScalerWorker",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:21:07.844023Z",
+  "source_commit": "89c5550",
+  "model": "qwen3.7-plus"
+}

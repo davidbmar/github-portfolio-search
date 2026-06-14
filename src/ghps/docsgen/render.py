@@ -44,6 +44,53 @@ def _json_script(data) -> str:
     return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
 
+def render_llms_txt(projects: list[dict], *, base_url: str, generated_at: str) -> str:
+    """Render the /llms.txt discovery manifest (progressive disclosure entry point).
+
+    Tiny on purpose: it tells an agent where the structured data is and how to pull
+    only what it needs, instead of loading all records into context.
+    """
+    base = base_url.rstrip("/")
+    n = len(projects)
+    return f"""# davidbmar.com — Project Portfolio
+
+> AI-generated, machine-readable documentation for {n} of David Mar's GitHub
+> projects. Each project covers what it is, how it's built (with architecture +
+> sequence diagrams), and how to apply/reuse it, plus typed metadata
+> (capabilities, tech, patterns, reuse_tags) for "have we built X?" queries.
+
+## How to use this efficiently (progressive disclosure — do NOT load everything)
+
+1. Scan the COMPACT index first (small — slug, title, one_liner, tech, reuse_tags):
+   {base}/data/projects-index.json
+   Use it to pick the few projects relevant to your question.
+2. Fetch the FULL record for ONLY those slugs:
+   {base}/projects/<slug>.record.json
+   (full prose, Mermaid diagrams, components, depends_on, integrates_with, hygiene)
+3. Human-readable page for a project:
+   {base}/projects/<slug>.html
+4. Browse all projects (humans): {base}/projects/
+
+## Query interface for agents (search, don't download)
+
+MCP server `ghps-mcp` exposes `portfolio_find_docs(query)` — returns ranked matches
+(slug, title, one_liner, the fields that matched). Prefer this over downloading the
+full corpus when you only need a few results.
+
+## Full corpus (last resort — only if you genuinely need every record at once)
+
+{base}/data/projects.json
+
+## Field semantics
+
+- reuse_tags, capabilities, patterns: best signals for "have we built X / can I reuse Y?"
+- tech, depends_on, integrates_with: stack and dependencies
+- thin=true: fork / stub / empty repo — low signal, may be skipped
+
+Generated {generated_at} · {n} projects.
+"""
+
+
 def _tags(items: list[str]) -> str:
     if not items:
         return '<span class="muted">—</span>'

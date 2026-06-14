@@ -1,0 +1,38 @@
+{
+  "title": "spot-setup",
+  "one_liner": "A thin repository intended for setting up GPU spot instances optimized for running Whisper.",
+  "what_it_is": "An empty or stub GitHub repository with no implemented source code, documentation, or configuration files.",
+  "how_its_built": "Not applicable; the repository contains no build scripts, source code, or infrastructure definitions.",
+  "how_to_apply": "Not applicable; there is no functional software to deploy or configure.",
+  "quickstart": "",
+  "features": [
+    "Repository exists as a placeholder or fork stub",
+    "No executable scripts or configuration files present",
+    "No documentation or usage instructions provided"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Empty Repository] --> B[No Source Code]\n    A --> C[No Documentation]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Repo\n    User->>Repo: Clone Repository\n    Repo-->>User: Return Empty Directory",
+  "capabilities": [],
+  "components": [],
+  "tech": [
+    "Shell"
+  ],
+  "depends_on": [],
+  "integrates_with": [],
+  "patterns": [],
+  "reuse_tags": [
+    "placeholder",
+    "empty-repo",
+    "stub"
+  ],
+  "slug": "spot-setup",
+  "repo_url": "https://github.com/davidbmar/spot-setup",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": true,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:55:52.276075Z",
+  "source_commit": "beb370e",
+  "model": "qwen3.7-plus"
+}

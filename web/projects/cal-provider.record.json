@@ -1,0 +1,85 @@
+{
+  "title": "cal-provider",
+  "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server.",
+  "what_it_is": "cal-provider is a Python library that abstracts away the differences between Google Calendar and CalDAV-compatible services (like iCloud, Nextcloud, and Fastmail). It provides a single asynchronous API for listing calendars, checking availability, retrieving events, and creating or canceling meetings. It includes built-in error handling, timezone support, and an optional Model Context Protocol (MCP) server to allow AI agents to interact with calendars, along with a web-based admin UI for easy configuration.",
+  "how_its_built": "The library is built in Python using an async-first design. It implements a provider pattern where specific backend implementations (Google, CalDAV) adhere to a common interface. It uses standard Python libraries for datetime handling and likely HTTP clients for API communication. The project includes an optional admin UI built with a web framework (likely serving on port 8100) and an MCP server component for AI integration. Configuration is managed via environment variables or generated .env files.",
+  "how_to_apply": "Use cal-provider when building Python applications that need to interact with multiple calendar backends without maintaining separate code paths for each. It is ideal for scheduling bots, AI agents requiring calendar access via MCP, or internal tools that need to check availability and book meetings across different organizational calendar systems. Install it via pip with the appropriate extras for your target backend.",
+  "quickstart": "pip install -e \".[google]\"\npython -c \"\nimport asyncio\nfrom datetime import datetime, timezone\nfrom cal_provider import get_provider\n\nasync def main():\n    provider = get_provider('google', service_account_path='/path/to/sa.json')\n    slots = await provider.get_available_slots(\n        'primary',\n        start=datetime(2026, 3, 15, 9, 0, tzinfo=timezone.utc),\n        end=datetime(2026, 3, 15, 18, 0, tzinfo=timezone.utc),\n        duration_minutes=30,\n    )\n    for slot in slots:\n        print(f'{slot.start:%I:%M %p} - {slot.end:%I:%M %p}')\n\nasyncio.run(main())\n\"",
+  "features": [
+    "Unified async API for Google Calendar and CalDAV (iCloud, Nextcloud, Fastmail)",
+    "Automatic timezone conversion for event retrieval and availability checks",
+    "Optional MCP server for seamless integration with AI agents",
+    "Web-based admin UI for credential setup and connection testing",
+    "Structured exception hierarchy for granular error handling",
+    "Support for listing calendars, checking slots, and creating/canceling events"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Application] -->|Async Calls| Provider[Calendar Provider Interface]\n    Provider -->|Implements| Google[Google Calendar Backend]\n    Provider -->|Implements| CalDAV[CalDAV Backend]\n    Google -->|OAuth/Service Account| GAPI[Google Calendar API]\n    CalDAV -->|HTTP Basic/Digest| CServer[CalDAV Server]\n    AdminUI[Admin UI] -->|Generates Config| Env[.env File]\n    MCPServer[MCP Server] -->|Uses| Provider\n    User -->|Optional| MCPServer",
+  "diagram_sequence": "sequenceDiagram\n    participant App as User Application\n    participant Lib as cal-provider\n    participant Backend as Calendar Backend\n    App->>Lib: get_provider(\"google\", creds)\n    Lib-->>App: Provider Instance\n    App->>Lib: get_available_slots(cal_id, start, end)\n    Lib->>Backend: Fetch Events\n    Backend-->>Lib: Raw Event Data\n    Lib->>Lib: Calculate Free Slots\n    Lib-->>App: List[TimeSlot]\n    App->>Lib: create_event(cal_id, event)\n    Lib->>Backend: Create Event\n    Backend-->>Lib: Event ID/Status\n    Lib-->>App: Result Dict",
+  "capabilities": [
+    "List available calendars",
+    "Check time slot availability",
+    "Retrieve events with timezone support",
+    "Create new calendar events",
+    "Cancel existing events",
+    "Update event details",
+    "Serve as MCP server for AI agents",
+    "Provide web admin UI for setup"
+  ],
+  "components": [
+    "Core Async Provider Interface",
+    "Google Calendar Backend",
+    "CalDAV Backend",
+    "Admin Web UI",
+    "MCP Server",
+    "Exception Hierarchy",
+    "Data Models (Event, TimeSlot, CalendarInfo)"
+  ],
+  "tech": [
+    "Python",
+    "Asyncio",
+    "Google Calendar API",
+    "CalDAV Protocol",
+    "Model Context Protocol (MCP)",
+    "Web Framework (for Admin UI)"
+  ],
+  "depends_on": [
+    "Python 3.12+",
+    "Google API Client Libraries (optional)",
+    "CalDAV Client Library (optional)",
+    "MCP SDK (optional)"
+  ],
+  "integrates_with": [
+    "Google Calendar",
+    "iCloud Calendar",
+    "Nextcloud Calendar",
+    "Fastmail Calendar",
+    "Claude Code",
+    "Cursor IDE"
+  ],
+  "patterns": [
+    "Provider Pattern",
+    "Async/Await",
+    "Factory Method (get_provider)",
+    "Adapter Pattern (Backend abstraction)",
+    "Dependency Injection (via config)"
+  ],
+  "reuse_tags": [
+    "calendar-integration",
+    "async-python",
+    "mcp-server",
+    "google-calendar",
+    "caldav",
+    "scheduling",
+    "ai-agent-tool"
+  ],
+  "slug": "cal-provider",
+  "repo_url": "https://github.com/davidbmar/cal-provider",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:40:13.710733Z",
+  "source_commit": "259eb60",
+  "model": "qwen3.7-plus"
+}

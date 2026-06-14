@@ -1,0 +1,76 @@
+{
+  "title": "Easy Cognito Nginx Gateway Auth",
+  "one_liner": "A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.",
+  "what_it_is": "This project provides a shell-based installation framework to configure an nginx reverse proxy and oauth2-proxy instance. It acts as a centralized authentication layer for web applications, handling OAuth2/OIDC flows with AWS Cognito. Applications behind the gateway receive authenticated user details via HTTP headers (e.g., X-User-Email), enabling zero-code integration of Single Sign-On (SSO).",
+  "how_its_built": "The solution is built using Bash scripts for automation and configuration management. It installs and configures three core components: nginx (as the entry point and reverse proxy), oauth2-proxy (as the OIDC client handler), and AWS Cognito (as the identity provider). Configuration is managed via template files populated by command-line arguments or environment variables, and services are managed via systemd.",
+  "how_to_apply": "Deploy this on an Ubuntu/Debian server where your web applications are hosted. Use the provided install.sh script to configure the gateway with your AWS Cognito credentials and application ports. For infrastructure-as-code workflows, use the bootstrap.sh script within EC2 user_data templates to automate setup during instance initialization.",
+  "quickstart": "git clone https://github.com/davidbmar/easy-cognito-nginx-gateway-auth.git\ncd easy-cognito-nginx-gateway-auth\nsudo ./scripts/install.sh --domain=your-domain.com --cognito-region=us-east-1 --cognito-pool-id=us-east-1_XXXXXXXXX --cognito-client-id=YOUR_CLIENT_ID --cognito-client-secret=YOUR_CLIENT_SECRET --app-port=3000",
+  "features": [
+    "Zero-code authentication integration for existing web apps",
+    "Centralized Single Sign-On (SSO) via AWS Cognito",
+    "Secure OAuth2 Authorization Code Flow with PKCE",
+    "Passes user identity to apps via standard HTTP headers",
+    "Modular nginx configuration for multi-app support",
+    "Automated installation and systemd service management"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS Request| Nginx[Nginx Reverse Proxy]\n    Nginx -->|Auth Check| OAuth2[oauth2-proxy]\n    OAuth2 -->|OIDC Flow| Cognito[AWS Cognito]\n    Cognito -->|Token Validation| OAuth2\n    OAuth2 -->|Set Cookie/Headers| Nginx\n    Nginx -->|Proxy Request + Headers| App[Web Application]\n    App -->|Response| Nginx\n    Nginx -->|Response| User",
+  "diagram_sequence": "sequenceDiagram\n    participant User as User Browser\n    participant Nginx as Nginx Gateway\n    participant Proxy as oauth2-proxy\n    participant Cognito as AWS Cognito\n    participant App as Web App\n\n    User->>Nginx: GET /protected-resource\n    Nginx->>Proxy: auth_request /oauth2/auth\n    alt Not Authenticated\n        Proxy->>User: 302 Redirect to Cognito Login\n        User->>Cognito: Authenticate\n        Cognito->>User: Redirect with Code\n        User->>Proxy: Callback with Code\n        Proxy->>Cognito: Exchange Code for Token\n        Cognito->>Proxy: ID/Access Tokens\n        Proxy->>User: Set Secure Cookie & Redirect\n    else Authenticated\n        Proxy->>Nginx: 200 OK + User Headers\n    end\n    Nginx->>App: Proxy Request + X-User-Email Header\n    App->>Nginx: Application Response\n    Nginx->>User: Final Content",
+  "capabilities": [
+    "Reverse Proxy Authentication",
+    "OIDC Client Management",
+    "Header Injection",
+    "SSL/TLS Termination",
+    "Session Management"
+  ],
+  "components": [
+    "nginx",
+    "oauth2-proxy",
+    "install.sh",
+    "bootstrap.sh",
+    "systemd services"
+  ],
+  "tech": [
+    "Bash",
+    "Nginx",
+    "oauth2-proxy",
+    "AWS Cognito",
+    "Systemd",
+    "OpenSSL"
+  ],
+  "depends_on": [
+    "Ubuntu/Debian Linux",
+    "AWS Account",
+    "Cognito User Pool",
+    "Domain Name"
+  ],
+  "integrates_with": [
+    "AWS Cognito",
+    "Express.js",
+    "Any HTTP Web Server",
+    "Terraform"
+  ],
+  "patterns": [
+    "Reverse Proxy",
+    "Sidecar Authentication",
+    "Infrastructure as Code",
+    "Zero-Trust Network"
+  ],
+  "reuse_tags": [
+    "authentication",
+    "aws-cognito",
+    "nginx",
+    "oauth2",
+    "devops",
+    "security-gateway"
+  ],
+  "slug": "easy-cognito-nginx-gateway-auth-",
+  "repo_url": "https://github.com/davidbmar/easy-cognito-nginx-gateway-auth-",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:44:48.964213Z",
+  "source_commit": "e9ac681",
+  "model": "qwen3.7-plus"
+}

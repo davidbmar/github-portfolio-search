@@ -1,0 +1,92 @@
+{
+  "title": "search-tool-provider",
+  "one_liner": "Unified async web search interface supporting 6+ backends with MCP server, CLI, and admin UI.",
+  "what_it_is": "A Python library that abstracts multiple web search engines (DuckDuckGo, Tavily, Brave, Serper, Bing, etc.) behind a single asynchronous API. It provides a registry pattern for swapping providers, built-in fallback chains, caching, and structured response models. It includes three interfaces: a programmatic Python API, an interactive Rich-based CLI, and a FastAPI-based Admin UI with a configuration wizard.",
+  "how_its_built": "Built on Python's asyncio for non-blocking I/O. Uses a Registry pattern to manage provider implementations of the SearchProvider ABC. Configuration is handled via environment variables or a safe .env merge utility. The Admin UI uses FastAPI and Jinja2 templates, while the CLI uses Rich for terminal rendering. It supports dependency injection for API keys and includes custom exception hierarchies for error handling.",
+  "how_to_apply": "Install the package with desired backend extras (e.g., duckduckgo, tavily). Use get_provider() to instantiate a search engine by name. Call await provider.search() for standard results, search_news() for news, or get_answer() for direct answers. Use the FallbackProvider to automatically chain multiple providers based on available API keys. Integrate into LLM agents via the included MCP server or use the CLI for manual testing.",
+  "quickstart": "pip install search-tool-provider[duckduckgo,cli]\nsearch-provider-cli",
+  "features": [
+    "Unified async API for 6+ search backends (DuckDuckGo, Tavily, Brave, Serper, Bing, etc.)",
+    "Automatic fallback chains to retry failed queries across configured providers",
+    "Interactive CLI with Rich formatting for quick testing and comparison",
+    "Admin UI with step-by-step wizard for API key setup and live search testing",
+    "Built-in caching and rate limit handling with specific exception types",
+    "MCP server support for integration with AI agent frameworks"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User/Agent] -->|Python API| App[Application]\n    User -->|CLI| CLI_App[CLI Interface]\n    User -->|Browser| Admin_UI[Admin UI FastAPI]\n    \n    subgraph Core_Library[search-tool-provider]\n        Registry[Provider Registry]\n        ABC[SearchProvider ABC]\n        Models[Data Models]\n        Env[Env Manager]\n    end\n    \n    App --> Registry\n    CLI_App --> Registry\n    Admin_UI --> Registry\n    \n    Registry -->|Instantiates| Provider_Instance[Concrete Provider]\n    \n    subgraph Backends[External APIs]\n        DDG[DuckDuckGo]\n        Tav[Tavily]\n        Brv[Brave Search]\n        Oth[Other Providers]\n    end\n    \n    Provider_Instance -->|HTTP Request| DDG\n    Provider_Instance -->|HTTP Request| Tav\n    Provider_Instance -->|HTTP Request| Brv\n    Provider_Instance -->|HTTP Request| Oth",
+  "diagram_sequence": "sequenceDiagram\n    participant Client as Application/CLI\n    participant Registry as get_provider()\n    participant Provider as Concrete Provider\n    participant Backend as Search Engine API\n    \n    Client->>Registry: get_provider(\"tavily\", api_key=\"...\")\n    Registry->>Registry: Lookup registered class\n    Registry-->>Client: Return Provider Instance\n    \n    Client->>Provider: await search(query, max_results=5)\n    Provider->>Provider: Validate SearchQuery\n    Provider->>Backend: HTTP POST /search\n    Backend-->>Provider: JSON Response\n    Provider->>Provider: Parse & Normalize Results\n    Provider->>Provider: Map to SearchResult models\n    Provider-->>Client: Return SearchResponse",
+  "capabilities": [
+    "Web Search",
+    "News Search",
+    "Direct Answers",
+    "Provider Fallback",
+    "Result Caching",
+    "Rate Limit Handling",
+    "MCP Server",
+    "Admin Configuration"
+  ],
+  "components": [
+    "SearchProvider ABC",
+    "Provider Registry",
+    "FallbackProvider",
+    "CLI Interface",
+    "Admin UI (FastAPI)",
+    "Env Writer",
+    "Data Models",
+    "Exception Hierarchy"
+  ],
+  "tech": [
+    "Python",
+    "Asyncio",
+    "FastAPI",
+    "Rich",
+    "Pydantic",
+    "Jinja2",
+    "python-dotenv",
+    "HTTPX"
+  ],
+  "depends_on": [
+    "asyncio",
+    "pydantic",
+    "httpx",
+    "rich",
+    "fastapi",
+    "jinja2",
+    "python-dotenv",
+    "uvicorn"
+  ],
+  "integrates_with": [
+    "DuckDuckGo",
+    "Tavily",
+    "Brave Search",
+    "Serper",
+    "Bing",
+    "Google Custom Search",
+    "MCP Clients"
+  ],
+  "patterns": [
+    "Strategy Pattern",
+    "Registry Pattern",
+    "Adapter Pattern",
+    "Factory Method",
+    "Chain of Responsibility"
+  ],
+  "reuse_tags": [
+    "search-abstraction",
+    "async-python",
+    "multi-backend",
+    "cli-tool",
+    "admin-dashboard",
+    "llm-tooling"
+  ],
+  "slug": "search-tool-provider",
+  "repo_url": "https://github.com/davidbmar/search-tool-provider",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/search-tool-provider/main/docs/screenshots/01-choose-provider.png",
+  "generated_at": "2026-06-14T03:53:11.516911Z",
+  "source_commit": "a4d404b",
+  "model": "qwen3.7-plus"
+}

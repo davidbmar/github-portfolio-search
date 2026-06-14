@@ -1,0 +1,3013 @@
+{
+  "generated_at": "2026-06-14T04:39:48.363480Z",
+  "count": 132,
+  "projects": [
+    {
+      "slug": "2026-FEB-21-K3-App-Builder-Claude-proto",
+      "title": "k3s App Builder Platform",
+      "one_liner": "A self-contained platform for deploying apps with plain language and Claude, running entirely within k3s on a single EC2 instance.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "k3s",
+        "Docker",
+        "Traefik",
+        "Jinja2",
+        "Anthropic SDK"
+      ],
+      "reuse_tags": [
+        "k3s",
+        "ai-code-gen",
+        "self-hosted",
+        "python",
+        "devops-tool",
+        "single-node"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto"
+    },
+    {
+      "slug": "2026-feb-File-Broswer-for-EC2-copy-and-deploy-files",
+      "title": "Remote Dev UI",
+      "one_liner": "A web-based dual-pane file browser with an integrated terminal for managing local and EC2 files via SSH/SFTP.",
+      "tech": [
+        "TypeScript",
+        "React",
+        "Express",
+        "ssh2",
+        "xterm.js",
+        "TailwindCSS",
+        "Vite",
+        "esbuild"
+      ],
+      "reuse_tags": [
+        "dev-tools",
+        "file-manager",
+        "ssh-client",
+        "web-terminal",
+        "ec2-management"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/2026-feb-File-Broswer-for-EC2-copy-and-deploy-files"
+    },
+    {
+      "slug": "2026-jan-vibecodeportal-aws-cognito-alb-auth-portal",
+      "title": "AWS Cognito + ALB Auth Portal",
+      "one_liner": "A minimal employee access portal using AWS ALB for OAuth2 authentication and FastAPI for group-based authorization.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "Terraform",
+        "AWS Cognito",
+        "AWS ALB",
+        "AWS EC2",
+        "AWS Lambda",
+        "AWS DynamoDB"
+      ],
+      "reuse_tags": [
+        "aws-auth",
+        "cognito-mfa",
+        "alb-oidc",
+        "terraform-ec2",
+        "fastapi-rbac"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/2026-jan-vibecodeportal-aws-cognito-alb-auth-portal"
+    },
+    {
+      "slug": "2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service",
+      "title": "Real-Time ASR Service with NVIDIA NeMo Parakeet",
+      "one_liner": "A production-ready streaming speech-to-text API using NVIDIA's Parakeet-CTC-0.6B model, featuring WebSocket audio ingestion, Silero VAD, and FastAPI.",
+      "tech": [
+        "Python 3.12",
+        "FastAPI",
+        "NVIDIA NeMo",
+        "PyTorch",
+        "WebSockets",
+        "Docker"
+      ],
+      "reuse_tags": [
+        "asr",
+        "speech-to-text",
+        "nvidia-nemo",
+        "real-time",
+        "websocket",
+        "fastapi",
+        "vad"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/2026-jan-voice-speech-nemo-framework-model-Parakeet-CTC-0.6B-nvidia-asr-service"
+    },
+    {
+      "slug": "2026-nano-claw-voice-loop-tts-stt",
+      "title": "nano-claw voice loop",
+      "one_liner": "A local, voice-powered AI agent that runs in your browser with Metal-accelerated speech recognition and tool execution.",
+      "tech": [
+        "TypeScript",
+        "Python",
+        "Docker",
+        "WebRTC",
+        "Whisper",
+        "Kokoro TTS",
+        "Claude API"
+      ],
+      "reuse_tags": [
+        "ai-agent",
+        "voice-interface",
+        "local-llm",
+        "typescript",
+        "python",
+        "docker",
+        "webrtc",
+        "whisper",
+        "tool-use"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt"
+    },
+    {
+      "slug": "4kUpScalerWorker",
+      "title": "4kUpScalerWorker",
+      "one_liner": "Serverless-style image upscaling worker using AWS S3, SQS, and InvokeAI.",
+      "tech": [
+        "Python",
+        "boto3",
+        "AWS S3",
+        "AWS SQS",
+        "InvokeAI"
+      ],
+      "reuse_tags": [
+        "image-upscaling",
+        "aws-worker",
+        "s3-sqs-integration",
+        "invokeai",
+        "python-script"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/4kUpScalerWorker"
+    },
+    {
+      "slug": "AWS_tools_for_pricing",
+      "title": "AWS_tools_for_pricing",
+      "one_liner": "Python scripts to export EC2 instance details and OpenSearch domain configurations for cost analysis.",
+      "tech": [
+        "Python 3",
+        "boto3",
+        "AWS CLI",
+        "CSV",
+        "JSON"
+      ],
+      "reuse_tags": [
+        "aws",
+        "pricing",
+        "inventory",
+        "ec2",
+        "opensearch",
+        "python"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/AWS_tools_for_pricing"
+    },
+    {
+      "slug": "Audio2ScriptViewer",
+      "title": "Audio2ScriptViewer",
+      "one_liner": "A Python micro-service that processes transcribed audio messages from AWS SQS and compiles them into a sorted CSV script.",
+      "tech": [
+        "Python",
+        "boto3",
+        "AWS SQS",
+        "Terraform",
+        "CSV",
+        "Regex"
+      ],
+      "reuse_tags": [
+        "aws-integration",
+        "transcription-pipeline",
+        "csv-export",
+        "microservice",
+        "python-script"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/Audio2ScriptViewer"
+    },
+    {
+      "slug": "Auth0toS3Backend",
+      "title": "Auth0 to S3 Backend",
+      "one_liner": "A reference architecture for mapping Auth0 authenticated users to individual AWS S3 buckets with secure, pre-signed URL access.",
+      "tech": [
+        "JavaScript",
+        "Python",
+        "React",
+        "Flask",
+        "Auth0",
+        "AWS S3",
+        "JWT"
+      ],
+      "reuse_tags": [
+        "authentication",
+        "aws",
+        "s3",
+        "auth0",
+        "flask",
+        "react",
+        "multi-tenancy"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/Auth0toS3Backend"
+    },
+    {
+      "slug": "Browser-Text-to-Speech-TTS-Realtime",
+      "title": "Browser-Text-to-Speech-TTS-Realtime",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "tech": [
+        "TypeScript",
+        "React 18",
+        "Vite",
+        "ONNX Runtime Web",
+        "WebAssembly",
+        "Tailwind CSS",
+        "shadcn/ui"
+      ],
+      "reuse_tags": [
+        "tts",
+        "webassembly",
+        "onnx",
+        "react-hook",
+        "offline-first",
+        "privacy-focused"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime"
+    },
+    {
+      "slug": "COE-overview",
+      "title": "COE-overview",
+      "one_liner": "Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.",
+      "tech": [
+        "Python",
+        "SQLAlchemy",
+        "Alembic",
+        "Pydantic",
+        "AsyncIO",
+        "Structlog",
+        "PostgreSQL"
+      ],
+      "reuse_tags": [
+        "security-ops",
+        "data-aggregation",
+        "weekly-reporting",
+        "python-etl",
+        "k8s-cronjob"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/COE-overview"
+    },
+    {
+      "slug": "FSM-generic",
+      "title": "FSM-generic (Voice OS)",
+      "one_liner": "A generic voice-first operating system framework that defines conversational apps as workflow state machines.",
+      "tech": [
+        "Python 3.11+",
+        "FastAPI",
+        "React",
+        "TypeScript",
+        "Vite",
+        "Tailwind CSS",
+        "Node.js 18+",
+        "Pydantic"
+      ],
+      "reuse_tags": [
+        "voice-assistant",
+        "state-machine",
+        "llm-orchestration",
+        "conversational-ai",
+        "workflow-engine",
+        "fastapi",
+        "react-dashboard"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/FSM-generic"
+    },
+    {
+      "slug": "Huberman-Lab-Podcast-Transcripts",
+      "title": "Huberman Lab Podcast Transcripts",
+      "one_liner": "A curated collection of MS Word and Markdown transcripts for episodes 1–30 of the Huberman Lab Podcast.",
+      "tech": [
+        "Markdown",
+        "Microsoft Word"
+      ],
+      "reuse_tags": [
+        "dataset",
+        "transcripts",
+        "podcast",
+        "health",
+        "neuroscience",
+        "static-content"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/Huberman-Lab-Podcast-Transcripts"
+    },
+    {
+      "slug": "Palindrome-Index",
+      "title": "Palindrome-Index",
+      "one_liner": "A Python utility that identifies the index of a character whose removal converts a string into a palindrome.",
+      "tech": [
+        "Python",
+        "Standard Library"
+      ],
+      "reuse_tags": [
+        "algorithm",
+        "string-manipulation",
+        "coding-challenge",
+        "interview-prep"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/Palindrome-Index"
+    },
+    {
+      "slug": "S3-presignedURL-Lambda-APIGateway-setup",
+      "title": "S3 Presigned URL Lambda API Gateway Setup",
+      "one_liner": "A Serverless Framework template for generating secure, rate-limited S3 presigned upload URLs via API Gateway and Lambda.",
+      "tech": [
+        "AWS Lambda",
+        "Amazon S3",
+        "Amazon API Gateway",
+        "Serverless Framework",
+        "Node.js",
+        "Python",
+        "AWS SDK v3",
+        "boto3"
+      ],
+      "reuse_tags": [
+        "aws",
+        "serverless",
+        "s3",
+        "lambda",
+        "api-gateway",
+        "presigned-url",
+        "template"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup"
+    },
+    {
+      "slug": "TranscriptionAPI-S3-backend",
+      "title": "TranscriptionAPI-S3-backend",
+      "one_liner": "A lightweight Flask microservice that generates AWS S3 presigned URLs for secure audio file uploads.",
+      "tech": [
+        "Python",
+        "Flask",
+        "Boto3",
+        "AWS S3"
+      ],
+      "reuse_tags": [
+        "audio-upload",
+        "s3-backend",
+        "flask-api",
+        "presigned-urls"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/TranscriptionAPI-S3-backend"
+    },
+    {
+      "slug": "UFOBriefing",
+      "title": "UFOBriefing",
+      "one_liner": "Static intelligence portal for UAP/UFO disclosure research, powered by the Intelligence Briefing Toolkit.",
+      "tech": [
+        "TypeScript",
+        "Next.js",
+        "tsx",
+        "Node.js",
+        "AWS S3",
+        "CloudFront",
+        "JSON"
+      ],
+      "reuse_tags": [
+        "static-site",
+        "intelligence-analysis",
+        "data-visualization",
+        "nextjs",
+        "typescript",
+        "aws-deployment",
+        "provenance-tracking"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/UFOBriefing"
+    },
+    {
+      "slug": "WhisperLive",
+      "title": "WhisperLive",
+      "one_liner": "A real-time speech-to-text server and client ecosystem using OpenAI's Whisper with WebSocket streaming.",
+      "tech": [
+        "Python",
+        "JavaScript",
+        "WebSockets",
+        "PyAudio",
+        "NumPy",
+        "Faster-Whisper",
+        "TensorRT",
+        "OpenVINO"
+      ],
+      "reuse_tags": [
+        "real-time",
+        "asr",
+        "websocket",
+        "transcription",
+        "audio-processing"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/WhisperLive"
+    },
+    {
+      "slug": "address-validator",
+      "title": "address-validator",
+      "one_liner": "FastAPI service that resolves messy/voice-transcribed US addresses to USPS standards via phonetic fuzzy matching and calculates driving routes using OpenStreetMap.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "httpx",
+        "Jellyfish",
+        "Uvicorn",
+        "Pydantic"
+      ],
+      "reuse_tags": [
+        "address-validation",
+        "geocoding",
+        "routing",
+        "fastapi",
+        "usps",
+        "fuzzy-matching"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/address-validator"
+    },
+    {
+      "slug": "agent-router",
+      "title": "Agent Router",
+      "one_liner": "A federated, multi-agent cockpit that spawns Gemini, Claude, and Codex in real PTYs and bridges them to a browser workspace.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "uvicorn",
+        "websockets",
+        "ptyprocess",
+        "HTML/JS",
+        "xterm.js",
+        "SortableJS"
+      ],
+      "reuse_tags": [
+        "ai-agents",
+        "terminal-emulator",
+        "federated-learning",
+        "developer-tools",
+        "pty-management"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/agent-router"
+    },
+    {
+      "slug": "art-starry-night-flowfield",
+      "title": "art-starry-night-flowfield",
+      "one_liner": "WebGPU-accelerated particle flow field visualization inspired by Van Gogh's Starry Night.",
+      "tech": [
+        "JavaScript",
+        "WebGPU",
+        "WGSL",
+        "p5.js",
+        "HTML5 Canvas"
+      ],
+      "reuse_tags": [
+        "generative-art",
+        "webgpu",
+        "particle-system",
+        "flow-field",
+        "visualization",
+        "van-gogh"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/art-starry-night-flowfield"
+    },
+    {
+      "slug": "audio-orchestrator",
+      "title": "Audio Orchestrator",
+      "one_liner": "A Python-based service that manages audio file processing workflows by coordinating S3 uploads, database task tracking, and SQS worker queues.",
+      "tech": [
+        "Python",
+        "Flask",
+        "PostgreSQL",
+        "AWS SQS",
+        "AWS S3",
+        "AWS Secrets Manager",
+        "boto3",
+        "psycopg2"
+      ],
+      "reuse_tags": [
+        "audio-processing",
+        "task-orchestration",
+        "aws-integration",
+        "flask-api",
+        "sqs-worker-pattern"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/audio-orchestrator"
+    },
+    {
+      "slug": "audio-ui",
+      "title": "audio-ui",
+      "one_liner": "Browser-based audio recorder with chunking functionality.",
+      "tech": [
+        "HTML",
+        "JavaScript",
+        "Web Audio API"
+      ],
+      "reuse_tags": [
+        "audio-recording",
+        "browser-based",
+        "chunking"
+      ],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/audio-ui"
+    },
+    {
+      "slug": "audio-ui-cf-s3-lambda-cognito",
+      "title": "audio-ui-cf-s3-lambda-cognito",
+      "one_liner": "A deprecated serverless personal cloud platform featuring secure audio recording and file management via AWS Cognito, Lambda, S3, and CloudFront.",
+      "tech": [
+        "Node.js",
+        "AWS Lambda",
+        "Amazon S3",
+        "Amazon CloudFront",
+        "Amazon Cognito",
+        "API Gateway",
+        "HTML5 MediaRecorder API",
+        "React"
+      ],
+      "reuse_tags": [
+        "aws-serverless",
+        "audio-recording",
+        "cognito-auth",
+        "s3-storage",
+        "cloudfront-cdn",
+        "deprecated"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/audio-ui-cf-s3-lambda-cognito"
+    },
+    {
+      "slug": "audio-ui-realtime-transcribe",
+      "title": "audio-ui-realtime-transcribe",
+      "one_liner": "Serverless platform for browser-based chunked audio recording, S3 storage, and file management with planned real-time transcription.",
+      "tech": [
+        "HTML/CSS/JS",
+        "Node.js",
+        "AWS Lambda",
+        "Amazon S3",
+        "Amazon Cognito",
+        "API Gateway",
+        "CloudFront"
+      ],
+      "reuse_tags": [
+        "audio-recording",
+        "serverless",
+        "aws",
+        "transcription-ready",
+        "meeting-intelligence"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/audio-ui-realtime-transcribe"
+    },
+    {
+      "slug": "audio-workernode",
+      "title": "audio-workernode",
+      "one_liner": "A Python-based distributed worker node for audio transcription tasks, designed to run on RunPod infrastructure and communicate with a central orchestrator.",
+      "tech": [
+        "Python",
+        "Requests",
+        "YAML",
+        "RunPod SDK"
+      ],
+      "reuse_tags": [
+        "distributed-systems",
+        "audio-processing",
+        "worker-node",
+        "runpod",
+        "python-service"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/audio-workernode"
+    },
+    {
+      "slug": "audio_client_server",
+      "title": "audio_client_server",
+      "one_liner": "A web-based audio recording client that streams sound to a Python Flask server for real-time transcription and processing.",
+      "tech": [
+        "Python",
+        "Flask",
+        "JavaScript",
+        "PyJWT",
+        "HTML5 MediaRecorder"
+      ],
+      "reuse_tags": [
+        "audio-processing",
+        "flask-api",
+        "auth0-integration",
+        "real-time-transcription",
+        "web-audio"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/audio_client_server"
+    },
+    {
+      "slug": "bot-customerObsessed-No-Prob-Bob-afterburner",
+      "title": "No Prob Bob — Customer Discovery Agent",
+      "one_liner": "A conversational AI agent that guides customer discovery interviews, extracts insights, and saves structured seed documents to Afterburner projects.",
+      "tech": [
+        "Python 3.11+",
+        "Ollama",
+        "Faster-Whisper",
+        "Piper TTS",
+        "SQLite",
+        "Google OAuth",
+        "WebSockets/SSE"
+      ],
+      "reuse_tags": [
+        "customer-discovery",
+        "conversational-ai",
+        "voice-interface",
+        "local-llm",
+        "afterburner-integration"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/bot-customerObsessed-No-Prob-Bob-afterburner"
+    },
+    {
+      "slug": "browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters",
+      "title": "browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters",
+      "one_liner": "A fully offline, in-browser vector database for real-time RAG retrieval using SQLite WASM and client-side embeddings.",
+      "tech": [
+        "TypeScript",
+        "SQLite WASM",
+        "Transformers.js",
+        "Vite",
+        "IndexedDB",
+        "Node.js"
+      ],
+      "reuse_tags": [
+        "vector-database",
+        "browser-ai",
+        "sqlite-wasm",
+        "rag",
+        "offline-search"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters"
+    },
+    {
+      "slug": "browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript",
+      "title": "Browser-Native RAG Retrieval Layer",
+      "one_liner": "A fully local, WebGPU-accelerated RAG retrieval system that runs embedding and vector search entirely in the browser with zero network calls at query time.",
+      "tech": [
+        "TypeScript",
+        "Vite",
+        "Transformers.js",
+        "hnswlib-node",
+        "WebGPU",
+        "ONNX Runtime",
+        "IndexedDB"
+      ],
+      "reuse_tags": [
+        "browser-native",
+        "rag-retrieval",
+        "webgpu",
+        "transformers-js",
+        "hnsw",
+        "offline-search",
+        "typescript",
+        "vite"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript"
+    },
+    {
+      "slug": "browser-Speech-to-Text-realtime-ASR",
+      "title": "VoiceStream ASR",
+      "one_liner": "A production-ready real-time Automatic Speech Recognition service using browser APIs and WebSocket streaming.",
+      "tech": [
+        "TypeScript",
+        "React",
+        "Express.js",
+        "WebSocket (ws)",
+        "Vite",
+        "Tailwind CSS",
+        "Drizzle ORM",
+        "Web Speech API"
+      ],
+      "reuse_tags": [
+        "speech-recognition",
+        "real-time",
+        "websocket",
+        "typescript",
+        "react",
+        "express",
+        "voice-agent",
+        "asr"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/browser-Speech-to-Text-realtime-ASR"
+    },
+    {
+      "slug": "browser-llm-local-ai-chat",
+      "title": "browser-llm-local-ai-chat",
+      "one_liner": "A zero-build, vanilla JS browser chat interface supporting Ollama, OpenAI, Anthropic, and in-browser WebGPU/WASM inference.",
+      "tech": [
+        "JavaScript",
+        "ES Modules",
+        "WebGPU",
+        "WebAssembly",
+        "Electron",
+        "HTML5",
+        "CSS3"
+      ],
+      "reuse_tags": [
+        "ai-chat",
+        "local-llm",
+        "webgpu",
+        "vanilla-js",
+        "electron-app",
+        "privacy-focused"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/browser-llm-local-ai-chat"
+    },
+    {
+      "slug": "browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo",
+      "title": "Browser Voice Agent",
+      "one_liner": "A fully browser-native voice agent using local WebGPU LLMs, TTS, and STT with no server requirements.",
+      "tech": [
+        "React 19",
+        "TypeScript",
+        "Vite 7",
+        "Tailwind CSS v4",
+        "WebLLM",
+        "vits-web",
+        "Web Speech API",
+        "WebGPU"
+      ],
+      "reuse_tags": [
+        "voice-agent",
+        "webgpu",
+        "local-llm",
+        "typescript",
+        "react",
+        "offline-first",
+        "speech-recognition",
+        "text-to-speech"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo"
+    },
+    {
+      "slug": "browser-whisper-models-local-showcase",
+      "title": "Browser Whisper Models Local Showcase",
+      "one_liner": "A client-side web application for private, offline speech-to-text transcription using OpenAI's Whisper models via WebGPU or WebAssembly.",
+      "tech": [
+        "HTML5",
+        "JavaScript",
+        "WebGPU",
+        "WebAssembly",
+        "Web Audio API",
+        "IndexedDB",
+        "Service Workers"
+      ],
+      "reuse_tags": [
+        "privacy-first",
+        "offline-ai",
+        "webgpu",
+        "wasm",
+        "speech-recognition",
+        "static-site"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/browser-whisper-models-local-showcase"
+    },
+    {
+      "slug": "browser_mobile_debug_panel",
+      "title": "browser_mobile_debug_panel",
+      "one_liner": "One-tap debug report button for mobile web apps that captures console logs, browser info, and app state to S3.",
+      "tech": [
+        "TypeScript",
+        "React",
+        "AWS Lambda",
+        "Amazon S3",
+        "API Gateway",
+        "Shell Scripting"
+      ],
+      "reuse_tags": [
+        "debugging",
+        "mobile-web",
+        "react-component",
+        "aws-serverless",
+        "telemetry",
+        "error-reporting"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/browser_mobile_debug_panel"
+    },
+    {
+      "slug": "cal-provider",
+      "title": "cal-provider",
+      "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server.",
+      "tech": [
+        "Python",
+        "Asyncio",
+        "Google Calendar API",
+        "CalDAV Protocol",
+        "Model Context Protocol (MCP)",
+        "Web Framework (for Admin UI)"
+      ],
+      "reuse_tags": [
+        "calendar-integration",
+        "async-python",
+        "mcp-server",
+        "google-calendar",
+        "caldav",
+        "scheduling",
+        "ai-agent-tool"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/cal-provider"
+    },
+    {
+      "slug": "character-iris-kade-noir-cyberpunk-ai-browser-native-rag-llm-tts-stt",
+      "title": "Browser-Native RAG Retrieval Layer",
+      "one_liner": "A fully local, WebGPU-accelerated RAG retrieval system that runs entirely in the browser with zero network calls at query time.",
+      "tech": [
+        "TypeScript",
+        "Vite",
+        "Transformers.js",
+        "WebGPU",
+        "HNSW",
+        "IndexedDB",
+        "ONNX"
+      ],
+      "reuse_tags": [
+        "local-ai",
+        "browser-rag",
+        "webgpu",
+        "privacy-first",
+        "vector-search",
+        "typescript"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/character-iris-kade-noir-cyberpunk-ai-browser-native-rag-llm-tts-stt"
+    },
+    {
+      "slug": "classVsInstance",
+      "title": "classVsInstance",
+      "one_liner": "Educational Python implementation demonstrating class vs instance variables and basic OOP logic.",
+      "tech": [
+        "Python 3",
+        "OOP"
+      ],
+      "reuse_tags": [
+        "education",
+        "oop-basics",
+        "python-example",
+        "coding-challenge"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/classVsInstance"
+    },
+    {
+      "slug": "claude-chat-workspace",
+      "title": "claude-chat-workspace",
+      "one_liner": "Lightweight self-hosted chat interface for Claude using Node.js, Express, and SSE.",
+      "tech": [
+        "Node.js",
+        "Express",
+        "Docker",
+        "Server-Sent Events",
+        "Shell"
+      ],
+      "reuse_tags": [
+        "chat-ui",
+        "claude-wrapper",
+        "self-hosted",
+        "nodejs-template",
+        "sse-streaming"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/claude-chat-workspace"
+    },
+    {
+      "slug": "claude-memory-bridge",
+      "title": "Claude Memory Bridge",
+      "one_liner": "A Chrome extension that detects specific memory markers in Claude AI chats and bridges them to external storage via webhooks or serverless functions.",
+      "tech": [
+        "JavaScript",
+        "Chrome Extensions API (Manifest V3)",
+        "AWS SDK",
+        "HTML/CSS"
+      ],
+      "reuse_tags": [
+        "chrome-extension",
+        "ai-memory",
+        "webhook-bridge",
+        "claude-ai",
+        "aws-lambda"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/claude-memory-bridge"
+    },
+    {
+      "slug": "cloudflare-zero-trust-setup",
+      "title": "Cloudflare Zero Trust Setup Wizard",
+      "one_liner": "Interactive portal and CLI for provisioning secure, identity-gated localhost tunnels via Cloudflare.",
+      "tech": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "Express",
+        "Bash",
+        "Cloudflare Tunnels"
+      ],
+      "reuse_tags": [
+        "dev-tools",
+        "security",
+        "tunneling",
+        "cloudflare",
+        "localhost-exposure",
+        "react-wizard"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/cloudflare-zero-trust-setup"
+    },
+    {
+      "slug": "codefresh",
+      "title": "codefresh-release-stats",
+      "one_liner": "A Python script to count Codefresh Kubernetes releases per cluster over the last week.",
+      "tech": [
+        "Python",
+        "Requests",
+        "JSON",
+        "Datetime"
+      ],
+      "reuse_tags": [
+        "devops",
+        "monitoring",
+        "codefresh",
+        "kubernetes",
+        "python-script"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/codefresh"
+    },
+    {
+      "slug": "cognito-lambda-s3-webserver-cloudfront",
+      "title": "CloudDrive: Serverless Personal Cloud with Audio Recording",
+      "one_liner": "A secure, mobile-first personal cloud platform featuring chunked audio recording, file management, and event-driven architecture on AWS.",
+      "tech": [
+        "AWS Lambda",
+        "Amazon S3",
+        "Amazon CloudFront",
+        "Amazon Cognito",
+        "Amazon API Gateway",
+        "Amazon EventBridge",
+        "JavaScript/Node.js",
+        "HTML/CSS",
+        "MediaRecorder API"
+      ],
+      "reuse_tags": [
+        "serverless",
+        "aws",
+        "audio-recording",
+        "file-storage",
+        "cognito",
+        "eventbridge",
+        "mobile-first"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/cognito-lambda-s3-webserver-cloudfront"
+    },
+    {
+      "slug": "deploy-portal",
+      "title": "Deploy Portal (Capsule Cloud)",
+      "one_liner": "A self-service web portal for provisioning SSH access and deploying applications to an EC2 gateway instance protected by AWS Cognito authentication.",
+      "tech": [
+        "Python 3.8+",
+        "Flask",
+        "Boto3",
+        "Shell Scripting",
+        "Nginx",
+        "oauth2-proxy",
+        "AWS Cognito",
+        "Jinja2",
+        "Firecracker (Optional)"
+      ],
+      "reuse_tags": [
+        "aws-deployment",
+        "ssh-management",
+        "flask-admin",
+        "self-hosted-paas",
+        "ec2-automation",
+        "nginx-config-gen"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/deploy-portal"
+    },
+    {
+      "slug": "easy-cognito-nginx-gateway-auth-",
+      "title": "Easy Cognito Nginx Gateway Auth",
+      "one_liner": "A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.",
+      "tech": [
+        "Bash",
+        "Nginx",
+        "oauth2-proxy",
+        "AWS Cognito",
+        "Systemd",
+        "OpenSSL"
+      ],
+      "reuse_tags": [
+        "authentication",
+        "aws-cognito",
+        "nginx",
+        "oauth2",
+        "devops",
+        "security-gateway"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/easy-cognito-nginx-gateway-auth-"
+    },
+    {
+      "slug": "eventbridge-orchestrator",
+      "title": "EventBridge Orchestrator",
+      "one_liner": "Infrastructure-as-code repository defining AWS EventBridge schemas, rules, and utility lambdas for a decoupled microservices architecture.",
+      "tech": [
+        "AWS EventBridge",
+        "Terraform",
+        "Node.js",
+        "AWS Lambda",
+        "JSON Schema",
+        "AWS SDK"
+      ],
+      "reuse_tags": [
+        "aws",
+        "eventbridge",
+        "terraform",
+        "microservices",
+        "schema-validation"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/eventbridge-orchestrator"
+    },
+    {
+      "slug": "everyone-ai",
+      "title": "everyone-ai",
+      "one_liner": "A self-service internal developer platform that launches isolated Claude Code workspaces on Kubernetes via a web portal.",
+      "tech": [
+        "Node.js",
+        "Express",
+        "Kubernetes (k3s)",
+        "Helm",
+        "Traefik",
+        "code-server",
+        "Claude Code",
+        "Bash",
+        "Playwright"
+      ],
+      "reuse_tags": [
+        "kubernetes-operator",
+        "dev-portal",
+        "ai-workspace",
+        "self-hosted",
+        "claude-code",
+        "vscode-web"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/everyone-ai"
+    },
+    {
+      "slug": "exampleLoops",
+      "title": "exampleLoops",
+      "one_liner": "Educational code samples demonstrating basic loop structures in Java and Python.",
+      "tech": [
+        "Java",
+        "Python"
+      ],
+      "reuse_tags": [
+        "education",
+        "beginner",
+        "loops",
+        "syntax-comparison"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/exampleLoops"
+    },
+    {
+      "slug": "flowstate",
+      "title": "flowstate",
+      "one_liner": "A declarative Finite State Machine engine for multi-turn conversational AI that uses YAML to define states, typed slots, and per-state model selection.",
+      "tech": [
+        "Python",
+        "YAML",
+        "JSON",
+        "Anthropic SDK",
+        "Google Generative AI SDK",
+        "MLX"
+      ],
+      "reuse_tags": [
+        "conversational-ai",
+        "fsm",
+        "llm-orchestration",
+        "structured-output",
+        "yaml-config"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/flowstate"
+    },
+    {
+      "slug": "flowstate-evolve",
+      "title": "flowstate-evolve",
+      "one_liner": "Analyzes Flowstate workflow traces to recommend graph improvements and generate auditable before/after reports.",
+      "tech": [
+        "Python",
+        "PyYAML",
+        "JSONL",
+        "Argparse",
+        "Pytest"
+      ],
+      "reuse_tags": [
+        "workflow-analysis",
+        "llm-ops",
+        "graph-evolution",
+        "evaluation-tooling"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/flowstate-evolve"
+    },
+    {
+      "slug": "generate_title_headline_hooks",
+      "title": "generate_title_headline_hooks",
+      "one_liner": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification to prevent hallucinated quotes and unsupported claims.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "Pydantic",
+        "SQLite",
+        "Uvicorn",
+        "HTTPX"
+      ],
+      "reuse_tags": [
+        "content-generation",
+        "nlp-pipeline",
+        "hallucination-prevention",
+        "llm-orchestration",
+        "fastapi-service"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/generate_title_headline_hooks"
+    },
+    {
+      "slug": "github-portfolio-search",
+      "title": "GitHub Portfolio Search",
+      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
+      "tech": [
+        "Python",
+        "SQLite-vec",
+        "sentence-transformers",
+        "FastAPI",
+        "Click",
+        "AWS Lambda",
+        "S3/CloudFront"
+      ],
+      "reuse_tags": [
+        "portfolio",
+        "search-engine",
+        "knowledge-base",
+        "developer-tools",
+        "ai-assistant"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/github-portfolio-search"
+    },
+    {
+      "slug": "gpt4-pdf-chatbot-langchain",
+      "title": "GPT-4 & LangChain PDF Chatbot",
+      "one_liner": "A Next.js application that enables natural language querying of multiple large PDF documents using GPT-4, LangChain, and Pinecone vector storage.",
+      "tech": [
+        "TypeScript",
+        "Next.js",
+        "LangChain",
+        "Pinecone",
+        "OpenAI API",
+        "pdf-parse"
+      ],
+      "reuse_tags": [
+        "chatbot",
+        "pdf-reader",
+        "langchain",
+        "pinecone",
+        "nextjs",
+        "rag",
+        "gpt-4"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/gpt4-pdf-chatbot-langchain"
+    },
+    {
+      "slug": "grassy-knoll",
+      "title": "grassy-knoll",
+      "one_liner": "A generic voice-first operating system framework that defines conversational apps as workflow state machines.",
+      "tech": [
+        "Python 3.11+",
+        "Anthropic API",
+        "JSONL",
+        "AsyncIO",
+        "Pytest"
+      ],
+      "reuse_tags": [
+        "voice-assistant",
+        "conversational-ai",
+        "state-machine",
+        "llm-framework",
+        "python-library"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/grassy-knoll"
+    },
+    {
+      "slug": "headshots-starter-clone",
+      "title": "Headshot AI Starter",
+      "one_liner": "Open-source SaaS starter for generating professional AI headshots using Astria, Next.js, and Supabase.",
+      "tech": [
+        "TypeScript",
+        "React",
+        "Tailwind CSS",
+        "Shadcn UI",
+        "PostgreSQL",
+        "Serverless Functions"
+      ],
+      "reuse_tags": [
+        "ai-saas-starter",
+        "nextjs-template",
+        "supabase-auth",
+        "astria-integration",
+        "vercel-deployment"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/headshots-starter-clone"
+    },
+    {
+      "slug": "hello-world",
+      "title": "hello-world",
+      "one_liner": "A minimal tutorial repository for Hello World by David Mar.",
+      "tech": [],
+      "reuse_tags": [
+        "tutorial",
+        "hello-world",
+        "onboarding",
+        "documentation"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/hello-world"
+    },
+    {
+      "slug": "hello-world-test",
+      "title": "hello-world-test",
+      "one_liner": "A minimal GitHub repository used for testing branch edits and README updates.",
+      "tech": [
+        "Git",
+        "Markdown"
+      ],
+      "reuse_tags": [
+        "test-repo",
+        "documentation-only",
+        "git-workflow-example"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/hello-world-test"
+    },
+    {
+      "slug": "html-framework-record-ver2.0",
+      "title": "html-framework-record-ver2.0",
+      "one_liner": "A lightweight, web-only audio recorder that captures PCM data and stores it in IndexedDB for persistent local playback.",
+      "tech": [
+        "JavaScript",
+        "Web Audio API",
+        "IndexedDB",
+        "ScriptProcessorNode",
+        "ES Modules"
+      ],
+      "reuse_tags": [
+        "audio-recording",
+        "indexeddb",
+        "web-audio",
+        "pcm",
+        "no-dependencies"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/html-framework-record-ver2.0"
+    },
+    {
+      "slug": "ibt-ufo",
+      "title": "ibt-ufo",
+      "one_liner": "Stub repository for a UAP knowledge graph and MetaPath2Vec correlation engine.",
+      "tech": [],
+      "reuse_tags": [
+        "stub",
+        "placeholder",
+        "uap-research",
+        "knowledge-graph-concept"
+      ],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/ibt-ufo"
+    },
+    {
+      "slug": "intelligence-briefing-toolkit",
+      "title": "Intelligence Briefing Toolkit",
+      "one_liner": "A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "Anthropic SDK",
+        "Pydantic",
+        "Model Context Protocol (MCP)",
+        "JSON",
+        "AsyncIO"
+      ],
+      "reuse_tags": [
+        "osint",
+        "research-automation",
+        "llm-orchestration",
+        "cli-tool",
+        "rest-api",
+        "mcp-server",
+        "evidence-tracking"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/intelligence-briefing-toolkit"
+    },
+    {
+      "slug": "interviewnotes",
+      "title": "interviewnotes",
+      "one_liner": "A structured framework and checklist for conducting five-part technical and behavioral engineering interviews.",
+      "tech": [
+        "Markdown",
+        "Git"
+      ],
+      "reuse_tags": [
+        "hiring",
+        "interview-guide",
+        "engineering-management",
+        "technical-assessment",
+        "onboarding"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/interviewnotes"
+    },
+    {
+      "slug": "iphone-and-desktop-companion-TTS-SST-talking-app",
+      "title": "iPhone & Desktop Companion TTS/SST Talking App",
+      "one_liner": "Mac-hosted Python voice assistant streaming WebRTC audio to iPhone with a hybrid FSM workflow engine for complex research.",
+      "tech": [
+        "Python",
+        "aiohttp",
+        "WebRTC",
+        "Whisper",
+        "Piper TTS",
+        "Mermaid"
+      ],
+      "reuse_tags": [
+        "voice-assistant",
+        "webrtc-audio",
+        "fsm-engine",
+        "local-llm",
+        "python-backend",
+        "mobile-companion"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/iphone-and-desktop-companion-TTS-SST-talking-app"
+    },
+    {
+      "slug": "iphone-streaming-plus-Finite-State-Machine",
+      "title": "iPhone Streaming Plus Finite State Machine",
+      "one_liner": "Mac-hosted Python voice assistant streaming TTS to iPhone Safari via WebRTC with a hybrid FSM workflow engine for complex queries.",
+      "tech": [
+        "Python",
+        "WebRTC",
+        "aiohttp",
+        "Whisper",
+        "Piper TTS",
+        "Ollama",
+        "Mermaid"
+      ],
+      "reuse_tags": [
+        "voice-agent",
+        "webrtc-audio",
+        "finite-state-machine",
+        "local-llm",
+        "python-backend",
+        "ios-web-app"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/iphone-streaming-plus-Finite-State-Machine"
+    },
+    {
+      "slug": "iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser",
+      "title": "iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser",
+      "one_liner": "Stream generated audio from a Mac host to an iPhone browser via WebRTC and TURN, featuring a voice agent loop with STT, LLM, and TTS.",
+      "tech": [
+        "Python",
+        "TypeScript",
+        "WebRTC",
+        "WebSocket",
+        "aiohttp",
+        "faster-whisper",
+        "Piper"
+      ],
+      "reuse_tags": [
+        "voice-assistant",
+        "webrtc-audio",
+        "local-llm",
+        "mobile-browser",
+        "turn-server"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser"
+    },
+    {
+      "slug": "iran-intel",
+      "title": "iran-intel",
+      "one_liner": "Static intelligence portal for Iran war investigation signals, powered by the Intelligence Briefing Toolkit.",
+      "tech": [
+        "TypeScript",
+        "Next.js",
+        "tsx",
+        "JSON",
+        "Markdown"
+      ],
+      "reuse_tags": [
+        "intelligence-portal",
+        "static-site",
+        "data-journalism",
+        "nextjs",
+        "typescript"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/iran-intel"
+    },
+    {
+      "slug": "knightsMovesRecursive",
+      "title": "knightsMovesRecursive",
+      "one_liner": "A Python script that calculates valid knight moves on a chessboard using recursive logic and coordinate translation.",
+      "tech": [
+        "Python",
+        "Standard Library"
+      ],
+      "reuse_tags": [
+        "chess-logic",
+        "board-games",
+        "pathfinding-primitive",
+        "educational",
+        "recursive-algorithm"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/knightsMovesRecursive"
+    },
+    {
+      "slug": "liveblocks-starter-kit",
+      "title": "Liveblocks Next.js Starter Kit",
+      "one_liner": "A production-ready template for building collaborative applications with real-time features using Next.js and Liveblocks.",
+      "tech": [
+        "TypeScript",
+        "Next.js",
+        "React",
+        "Liveblocks",
+        "Tailwind CSS"
+      ],
+      "reuse_tags": [
+        "collaboration",
+        "real-time",
+        "nextjs-template",
+        "whiteboard",
+        "auth-integrated"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/liveblocks-starter-kit"
+    },
+    {
+      "slug": "llm_gpt3.5-vs-gpt4-comparison",
+      "title": "llm_gpt3.5-vs-gpt4-comparison",
+      "one_liner": "A cost-optimized document summarization pipeline using GPT-3.5 that achieves comparable or better results than GPT-4 by leveraging logical paragraph segmentation and hierarchical summarization.",
+      "tech": [
+        "Python",
+        "LangChain",
+        "OpenAI API",
+        "NumPy",
+        "Pandas",
+        "Matplotlib",
+        "SciPy",
+        "NetworkX"
+      ],
+      "reuse_tags": [
+        "summarization",
+        "llm",
+        "cost-optimization",
+        "nlp",
+        "langchain"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/llm_gpt3.5-vs-gpt4-comparison"
+    },
+    {
+      "slug": "login-system",
+      "title": "login-system",
+      "one_liner": "Serverless authentication backend using AWS Lambda, DynamoDB, and JWT.",
+      "tech": [
+        "JavaScript",
+        "AWS Lambda",
+        "DynamoDB",
+        "JWT",
+        "bcryptjs"
+      ],
+      "reuse_tags": [
+        "authentication",
+        "aws-lambda",
+        "dynamodb",
+        "jwt",
+        "backend-template"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/login-system"
+    },
+    {
+      "slug": "mcp-highlighter",
+      "title": "mcp-highlighter",
+      "one_liner": "A Chrome extension and MCP bridge system that captures LLM-formatted memory blocks from web pages and persists them for AI context.",
+      "tech": [
+        "TypeScript",
+        "Node.js",
+        "Express.js",
+        "Model Context Protocol SDK",
+        "Chrome Extensions API",
+        "AWS SDK"
+      ],
+      "reuse_tags": [
+        "ai-memory",
+        "chrome-extension",
+        "mcp-server",
+        "typescript",
+        "persistent-context"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/mcp-highlighter"
+    },
+    {
+      "slug": "my-blog",
+      "title": "my-blog",
+      "one_liner": "Placeholder repository for personal blog writing.",
+      "tech": [],
+      "reuse_tags": [
+        "placeholder",
+        "empty-repo",
+        "blog-stub"
+      ],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/my-blog"
+    },
+    {
+      "slug": "nvidia-RNN-T-Parakeet",
+      "title": "nvidia-RNN-T-Parakeet",
+      "one_liner": "A low-latency, GPU-accelerated speech-to-text API server using NVIDIA Parakeet RNN-T and Riva.",
+      "tech": [
+        "Python",
+        "Shell Script",
+        "FastAPI",
+        "NVIDIA Riva",
+        "Docker",
+        "gRPC",
+        "CUDA",
+        "TensorRT"
+      ],
+      "reuse_tags": [
+        "speech-recognition",
+        "nvidia-riva",
+        "parakeet-model",
+        "fastapi",
+        "gpu-acceleration",
+        "real-time-transcription"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/nvidia-RNN-T-Parakeet"
+    },
+    {
+      "slug": "nvidia-parakeet",
+      "title": "nvidia-parakeet",
+      "one_liner": "Production-ready deployment system for NVIDIA Parakeet RNNT ASR via Riva with WebSocket streaming.",
+      "tech": [
+        "Shell",
+        "Python",
+        "NVIDIA Riva",
+        "FastAPI",
+        "WebSockets",
+        "Docker",
+        "Pydantic",
+        "gRPC"
+      ],
+      "reuse_tags": [
+        "asr",
+        "speech-to-text",
+        "nvidia-riva",
+        "websocket-server",
+        "gpu-inference",
+        "aws-deployment"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/nvidia-parakeet"
+    },
+    {
+      "slug": "nvidia-parakeet-ver-5",
+      "title": "NVIDIA Parakeet Riva ASR Deployment System",
+      "one_liner": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT speech recognition via Riva ASR with WebSocket streaming.",
+      "tech": [
+        "Python 3.10+",
+        "FastAPI",
+        "WebSockets",
+        "gRPC",
+        "NVIDIA Riva ASR",
+        "Docker",
+        "NVIDIA Container Toolkit",
+        "Pydantic",
+        "SpeechBrain",
+        "Boto3"
+      ],
+      "reuse_tags": [
+        "ASR",
+        "Speech-to-Text",
+        "NVIDIA",
+        "Riva",
+        "Parakeet",
+        "Real-time",
+        "WebSocket",
+        "GPU-Accelerated",
+        "AWS",
+        "Deployment-Pipeline"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/nvidia-parakeet-ver-5"
+    },
+    {
+      "slug": "nvidia-riva-conformer-streaming",
+      "title": "NVIDIA Riva Conformer-CTC Streaming ASR",
+      "one_liner": "Production-ready real-time speech transcription using NVIDIA Riva 2.19 with Conformer-CTC streaming model via WebSocket bridge.",
+      "tech": [
+        "Python",
+        "Shell",
+        "NVIDIA Riva",
+        "gRPC",
+        "WebSockets",
+        "AWS EC2",
+        "Docker",
+        "Conformer-CTC"
+      ],
+      "reuse_tags": [
+        "speech-recognition",
+        "nvidia-riva",
+        "aws-deployment",
+        "streaming-asr",
+        "websocket-bridge"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/nvidia-riva-conformer-streaming"
+    },
+    {
+      "slug": "nvidia-riva-rnnt-transcription",
+      "title": "NVIDIA Riva RNN-T Real-Time Transcription System",
+      "one_liner": "Ultra-low latency real-time audio transcription system leveraging NVIDIA Riva RNN-T on AWS GPU instances.",
+      "tech": [
+        "Python",
+        "Bash",
+        "FastAPI",
+        "NVIDIA Riva",
+        "gRPC",
+        "Docker",
+        "AWS EC2",
+        "AWS S3",
+        "WebSocket"
+      ],
+      "reuse_tags": [
+        "speech-recognition",
+        "nvidia-riva",
+        "aws-deployment",
+        "real-time-transcription",
+        "gpu-acceleration",
+        "fastapi",
+        "websocket-streaming"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/nvidia-riva-rnnt-transcription"
+    },
+    {
+      "slug": "nvidia-rnn-t-riva-nonmock-really-transcribe-",
+      "title": "NVIDIA RNN-T Production Transcription System",
+      "one_liner": "Automated deployment of a GPU-accelerated SpeechBrain Conformer RNN-T speech recognition server with WebSocket streaming and S3 integration.",
+      "tech": [
+        "Python",
+        "Bash",
+        "FastAPI",
+        "PyTorch",
+        "SpeechBrain",
+        "WebSockets",
+        "AWS EC2",
+        "AWS S3"
+      ],
+      "reuse_tags": [
+        "speech-recognition",
+        "gpu-deployment",
+        "aws-automation",
+        "real-time-transcription",
+        "rnnt",
+        "fastapi"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/nvidia-rnn-t-riva-nonmock-really-transcribe-"
+    },
+    {
+      "slug": "openai_transcribe",
+      "title": "openai_transcribe",
+      "one_liner": "A lightweight Node.js HTTP server that proxies audio files to the OpenAI Whisper API for transcription.",
+      "tech": [
+        "Node.js",
+        "JavaScript",
+        "HTTP",
+        "OpenAI API"
+      ],
+      "reuse_tags": [
+        "speech-to-text",
+        "openai-wrapper",
+        "nodejs-server",
+        "audio-processing"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/openai_transcribe"
+    },
+    {
+      "slug": "opensource_sound_generator_llms",
+      "title": "Open Source Sound Generator LLMs",
+      "one_liner": "A local browser-based benchmarking suite for comparing nine open-source audio generation models with real-time progress streaming and Apple Silicon optimization.",
+      "tech": [
+        "Python 3.13+",
+        "FastAPI",
+        "React",
+        "Vite",
+        "PyTorch",
+        "Diffusers",
+        "Transformers",
+        "NumPy",
+        "SoundFile"
+      ],
+      "reuse_tags": [
+        "audio-generation",
+        "llm-benchmarking",
+        "fastapi-react",
+        "mps-optimization",
+        "sse-streaming",
+        "local-ai"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/opensource_sound_generator_llms"
+    },
+    {
+      "slug": "phone-agent-keiko-tv",
+      "title": "phone-agent-keiko-tv",
+      "one_liner": "A Python-based AI phone agent for keiko.tv that handles customer service calls, manages contacts via SQLite, and integrates with FSM-generic for state-driven scheduling.",
+      "tech": [
+        "Python",
+        "SQLite",
+        "HTTPX",
+        "JavaScript",
+        "Shell"
+      ],
+      "reuse_tags": [
+        "customer-service",
+        "ai-agent",
+        "telephony",
+        "lead-capture",
+        "scheduling"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/phone-agent-keiko-tv"
+    },
+    {
+      "slug": "phone-agent-scheduler",
+      "title": "phone-agent-scheduler",
+      "one_liner": "A real-time voice AI agent for trades businesses that handles phone calls, checks Google Calendar availability, and books appointments using a deterministic FSM and LLM safety nets.",
+      "tech": [
+        "Python",
+        "Flask",
+        "Telnyx API",
+        "Google Calendar API",
+        "Anthropic Sonnet",
+        "Gemini",
+        "WebSockets",
+        "JSONL"
+      ],
+      "reuse_tags": [
+        "voice-ai",
+        "scheduling-agent",
+        "calendar-integration",
+        "fsm-workflow",
+        "llm-safety",
+        "trades-business",
+        "real-time-communication"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/phone-agent-scheduler"
+    },
+    {
+      "slug": "picture_qr_code",
+      "title": "Picture QR Code",
+      "one_liner": "A serverless, password-gated shared photo album accessed via QR code, using AWS Lambda and S3.",
+      "tech": [
+        "AWS Lambda",
+        "Amazon S3",
+        "Python",
+        "HTML5",
+        "JavaScript",
+        "HMAC"
+      ],
+      "reuse_tags": [
+        "event-photo-sharing",
+        "aws-serverless",
+        "lambda-s3",
+        "no-db",
+        "qr-code-access"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/picture_qr_code"
+    },
+    {
+      "slug": "picture_qr_code_2_login",
+      "title": "Picture QR Code Login",
+      "one_liner": "Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution.",
+      "tech": [
+        "AWS Lambda",
+        "Amazon S3",
+        "Amazon CloudFront",
+        "HTML5/JavaScript",
+        "Python",
+        "Google Identity Services"
+      ],
+      "reuse_tags": [
+        "aws-serverless",
+        "photo-album",
+        "oauth-login",
+        "s3-direct-upload",
+        "qr-code-access"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/picture_qr_code_2_login"
+    },
+    {
+      "slug": "pictures-valentina",
+      "title": "pictures-valentina",
+      "one_liner": "Automated pipeline for generating a 16-year school portrait poster from an Apple Photos library.",
+      "tech": [
+        "Python",
+        "Pillow",
+        "OpenCV",
+        "rembg",
+        "osxphotos",
+        "NumPy"
+      ],
+      "reuse_tags": [
+        "photo-automation",
+        "face-cropping",
+        "background-replacement",
+        "apple-photos",
+        "poster-generation"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/pictures-valentina"
+    },
+    {
+      "slug": "pythonArrays2",
+      "title": "pythonArrays2",
+      "one_liner": "A Python script that reads an array of integers from standard input and prints them in reverse order.",
+      "tech": [
+        "Python 2",
+        "sys module"
+      ],
+      "reuse_tags": [
+        "algorithm",
+        "array-reversal",
+        "educational",
+        "cli-tool"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/pythonArrays2"
+    },
+    {
+      "slug": "rag-document-chat",
+      "title": "rag-document-chat",
+      "one_liner": "A Python-based Retrieval-Augmented Generation (RAG) system for document Q&A using FastAPI, Streamlit, ChromaDB, and OpenAI.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "Streamlit",
+        "ChromaDB",
+        "OpenAI API",
+        "PyPDF2",
+        "NLTK",
+        "Boto3",
+        "LangChain"
+      ],
+      "reuse_tags": [
+        "rag",
+        "llm",
+        "document-chat",
+        "fastapi",
+        "streamlit",
+        "chromadb",
+        "pdf-processing"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/rag-document-chat"
+    },
+    {
+      "slug": "rag-document-chat-ver2",
+      "title": "RAG Document Chat System v2",
+      "one_liner": "A modular, production-ready Retrieval-Augmented Generation system with hierarchical document processing and paragraph-aware search.",
+      "tech": [
+        "Python 3.9+",
+        "FastAPI",
+        "Streamlit",
+        "Next.js",
+        "ChromaDB",
+        "OpenAI API",
+        "Pydantic",
+        "Docker"
+      ],
+      "reuse_tags": [
+        "rag",
+        "document-chat",
+        "vector-search",
+        "llm-application",
+        "enterprise-search",
+        "python-backend"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/rag-document-chat-ver2"
+    },
+    {
+      "slug": "recording_app",
+      "title": "recording_app",
+      "one_liner": "Browser-based voice memo recorder with chunked S3 streaming and local faster-whisper transcription.",
+      "tech": [
+        "Python",
+        "JavaScript",
+        "AWS Lambda",
+        "AWS S3",
+        "faster-whisper",
+        "boto3",
+        "Pygments",
+        "Mermaid"
+      ],
+      "reuse_tags": [
+        "voice-memos",
+        "transcription",
+        "aws-serverless",
+        "local-ai",
+        "privacy-first"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/recording_app"
+    },
+    {
+      "slug": "riff",
+      "title": "riff",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice flows from plain English business descriptions.",
+      "tech": [
+        "Python",
+        "YAML",
+        "Mermaid",
+        "Pytest",
+        "FastAPI/Stdlib HTTP",
+        "Git"
+      ],
+      "reuse_tags": [
+        "voice-agent",
+        "fsm-orchestration",
+        "llm-guardrails",
+        "python-framework",
+        "deterministic-ai",
+        "business-automation"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/riff"
+    },
+    {
+      "slug": "riot",
+      "title": "riot",
+      "one_liner": "A lightweight Python socket server and curses-based client for tracking taxi driver performance ratings.",
+      "tech": [
+        "Python 2",
+        "SQLite3",
+        "TCP Sockets",
+        "Curses",
+        "JSON"
+      ],
+      "reuse_tags": [
+        "iot-feedback",
+        "socket-server",
+        "curses-ui",
+        "sqlite-storage",
+        "python-2"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/riot"
+    },
+    {
+      "slug": "search-tool-provider",
+      "title": "search-tool-provider",
+      "one_liner": "Unified async web search interface supporting 6+ backends with MCP server, CLI, and admin UI.",
+      "tech": [
+        "Python",
+        "Asyncio",
+        "FastAPI",
+        "Rich",
+        "Pydantic",
+        "Jinja2",
+        "python-dotenv",
+        "HTTPX"
+      ],
+      "reuse_tags": [
+        "search-abstraction",
+        "async-python",
+        "multi-backend",
+        "cli-tool",
+        "admin-dashboard",
+        "llm-tooling"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/search-tool-provider"
+    },
+    {
+      "slug": "sip-voice-transport",
+      "title": "sip-voice-transport",
+      "one_liner": "PSTN phone call transport for Mac-local voice AI supporting Telnyx and Twilio.",
+      "tech": [
+        "Python 3.11+",
+        "FastAPI",
+        "NumPy",
+        "Uvicorn",
+        "WebSockets"
+      ],
+      "reuse_tags": [
+        "telephony",
+        "voip",
+        "voice-ai",
+        "real-time-audio",
+        "macos"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/sip-voice-transport"
+    },
+    {
+      "slug": "smart-transcription-router",
+      "title": "Smart Transcription Router",
+      "one_liner": "Hybrid AWS architecture routing audio transcription between real-time GPU FastAPI and batch SQS processing based on server health.",
+      "tech": [
+        "Python",
+        "Shell",
+        "FastAPI",
+        "AWS Lambda",
+        "Docker",
+        "WhisperX",
+        "Voxtral"
+      ],
+      "reuse_tags": [
+        "aws-serverless",
+        "hybrid-cloud",
+        "audio-processing",
+        "gpu-optimization",
+        "event-driven"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/smart-transcription-router"
+    },
+    {
+      "slug": "spa_react_javascript_auth0",
+      "title": "spa_react_javascript_auth0",
+      "one_liner": "Auth0 React SPA authentication sample with auxiliary S3 audio upload utilities.",
+      "tech": [
+        "React",
+        "JavaScript",
+        "React Router 6",
+        "Auth0 SDK",
+        "Web MediaRecorder API",
+        "AWS S3"
+      ],
+      "reuse_tags": [
+        "authentication",
+        "react",
+        "auth0",
+        "s3-upload",
+        "audio-recording",
+        "spa"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/spa_react_javascript_auth0"
+    },
+    {
+      "slug": "speaker-generation-version-1",
+      "title": "Iris Kade: Local Browser-Native Conversational AI",
+      "one_liner": "A zero-network, WebGPU-accelerated conversational AI with dual-LLM architecture, multi-lane RAG, and streaming TTS/STT running entirely in the browser.",
+      "tech": [
+        "TypeScript",
+        "Vite",
+        "WebGPU",
+        "Web-LLM",
+        "Transformers.js",
+        "vits-web",
+        "Web Speech API",
+        "Playwright"
+      ],
+      "reuse_tags": [
+        "local-llm",
+        "webgpu",
+        "rag",
+        "voice-ai",
+        "privacy-focused",
+        "browser-native"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/speaker-generation-version-1"
+    },
+    {
+      "slug": "speaker-generation-version-2-intents",
+      "title": "Iris Kade v2: Local Browser AI with Intent Workflow",
+      "one_liner": "A zero-network, WebGPU-powered conversational AI featuring an embedder-based intent classifier and a visual workflow editor for stateful dialogue.",
+      "tech": [
+        "TypeScript",
+        "WebGPU",
+        "ONNX Runtime",
+        "Vite",
+        "Mermaid",
+        "JSONL"
+      ],
+      "reuse_tags": [
+        "privacy-first",
+        "offline-ai",
+        "webgpu",
+        "local-llm",
+        "voice-interface",
+        "workflow-engine"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/speaker-generation-version-2-intents"
+    },
+    {
+      "slug": "speaker-workflow-system",
+      "title": "Speaker Workflow System",
+      "one_liner": "A visual editor and runtime engine for declarative, multi-turn conversational workflows defined in JSONL.",
+      "tech": [
+        "TypeScript",
+        "Vite",
+        "Vitest",
+        "Vanilla DOM API",
+        "SVG",
+        "JSONL"
+      ],
+      "reuse_tags": [
+        "conversational-ui",
+        "state-machine",
+        "visual-editor",
+        "typescript",
+        "vanilla-js",
+        "workflow-engine",
+        "jsonl",
+        "intent-classification"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/speaker-workflow-system"
+    },
+    {
+      "slug": "spot-setup",
+      "title": "spot-setup",
+      "one_liner": "A thin repository intended for setting up GPU spot instances optimized for running Whisper.",
+      "tech": [
+        "Shell"
+      ],
+      "reuse_tags": [
+        "placeholder",
+        "empty-repo",
+        "stub"
+      ],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/spot-setup"
+    },
+    {
+      "slug": "ssh-helper",
+      "title": "SSH Helper",
+      "one_liner": "A lightweight, web-based SSH terminal emulator with IP whitelisting and external authentication support.",
+      "tech": [
+        "Node.js",
+        "JavaScript",
+        "Express",
+        "ws",
+        "node-pty",
+        "xterm.js",
+        "Nginx",
+        "Systemd"
+      ],
+      "reuse_tags": [
+        "web-terminal",
+        "ssh-gateway",
+        "nodejs-pty",
+        "nginx-auth",
+        "devops-tool"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/ssh-helper"
+    },
+    {
+      "slug": "stringsAndLoops",
+      "title": "stringsAndLoops",
+      "one_liner": "A Python script that separates even and odd indexed characters from input strings.",
+      "tech": [
+        "Python 2",
+        "sys module",
+        "raw_input",
+        "stdout.write"
+      ],
+      "reuse_tags": [
+        "string-manipulation",
+        "coding-challenge",
+        "basic-algorithm",
+        "stdin-processing"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/stringsAndLoops"
+    },
+    {
+      "slug": "stripe-single-subscription-ec2",
+      "title": "stripe-single-subscription-ec2",
+      "one_liner": "A Python Flask backend and vanilla JS frontend implementing Stripe Checkout for single subscriptions, configured for EC2 deployment.",
+      "tech": [
+        "Python 3.8+",
+        "Flask",
+        "Stripe API",
+        "JavaScript",
+        "HTML/CSS"
+      ],
+      "reuse_tags": [
+        "stripe-integration",
+        "python-flask",
+        "subscription-boilerplate",
+        "ec2-deployment"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/stripe-single-subscription-ec2"
+    },
+    {
+      "slug": "supertokens-s3-example",
+      "title": "SuperTokens S3 Example",
+      "one_liner": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2.",
+      "tech": [
+        "Go",
+        "SuperTokens",
+        "Docker",
+        "PostgreSQL",
+        "AWS EC2",
+        "Shell"
+      ],
+      "reuse_tags": [
+        "authentication",
+        "go",
+        "docker",
+        "aws",
+        "supertokens"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/supertokens-s3-example"
+    },
+    {
+      "slug": "supertokens_nodejs",
+      "title": "SuperTokens Passwordless Node.js Demo",
+      "one_liner": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.",
+      "tech": [
+        "Node.js",
+        "Express",
+        "SuperTokens",
+        "Docker",
+        "PostgreSQL",
+        "HTML/CSS/JS"
+      ],
+      "reuse_tags": [
+        "authentication",
+        "passwordless",
+        "nodejs",
+        "supertokens",
+        "docker",
+        "prototype"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/supertokens_nodejs"
+    },
+    {
+      "slug": "switchboard-ai",
+      "title": "switchboard-ai",
+      "one_liner": "Append-only coordination channel for AI agents and humans via HTTP and JSONL.",
+      "tech": [
+        "Python",
+        "aiohttp",
+        "JSONL",
+        "HTTP REST",
+        "Threading",
+        "Markdown"
+      ],
+      "reuse_tags": [
+        "multi-agent",
+        "coordination",
+        "chat-server",
+        "jsonl-storage",
+        "cli-tool",
+        "developer-tools"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/switchboard-ai"
+    },
+    {
+      "slug": "tailscale-3-node-network",
+      "title": "FriendNet",
+      "one_liner": "A private network dashboard that aggregates mDNS service discovery from multiple Tailscale-connected homes into a single view.",
+      "tech": [
+        "Python 3.9+",
+        "FastAPI",
+        "React",
+        "Vite",
+        "SQLite",
+        "zeroconf",
+        "httpx",
+        "Tailscale"
+      ],
+      "reuse_tags": [
+        "home-lab",
+        "network-monitoring",
+        "tailscale",
+        "mdns",
+        "dashboard",
+        "python-agent",
+        "react-ui"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/tailscale-3-node-network"
+    },
+    {
+      "slug": "tool-RAG-for-split-personalities",
+      "title": "Persona RAG Engine",
+      "one_liner": "A multi-domain intelligence platform that isolates analytical personas and evidence corpora to prevent data bleed while enabling specialized, voice-consistent Q&A.",
+      "tech": [
+        "Python 3.12+",
+        "FastAPI",
+        "ChromaDB",
+        "Anthropic Claude API",
+        "WebSockets",
+        "JavaScript (SHA-256)"
+      ],
+      "reuse_tags": [
+        "RAG",
+        "Multi-Agent",
+        "Vector Search",
+        "Domain Isolation",
+        "Political Analysis",
+        "Historical Research"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/tool-RAG-for-split-personalities"
+    },
+    {
+      "slug": "tool-browserAutomationScripts",
+      "title": "tool-browserAutomationScripts",
+      "one_liner": "macOS CLI and library for listing Chrome profiles, decrypting cookies, and launching browser instances.",
+      "tech": [
+        "TypeScript",
+        "Node.js",
+        "Commander.js",
+        "better-sqlite3",
+        "Crypto API"
+      ],
+      "reuse_tags": [
+        "browser-automation",
+        "chrome-tools",
+        "cookie-decryption",
+        "macos-utilities",
+        "typescript-cli"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/tool-browserAutomationScripts"
+    },
+    {
+      "slug": "tool-messaging-project",
+      "title": "tool-messaging-project",
+      "one_liner": "Empty or stub repository for a messaging tool project.",
+      "tech": [
+        "Git"
+      ],
+      "reuse_tags": [
+        "stub",
+        "empty",
+        "placeholder"
+      ],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/tool-messaging-project"
+    },
+    {
+      "slug": "tool-s3-cloudfront-push",
+      "title": "tool-s3-cloudfront-push",
+      "one_liner": "A shell-based static site deployer that crawls a running local website and pushes it to AWS S3 and CloudFront for low-cost, HTTPS-enabled global hosting.",
+      "tech": [
+        "Bash",
+        "AWS CLI",
+        "Wget/Curl",
+        "JSON"
+      ],
+      "reuse_tags": [
+        "deployment",
+        "aws",
+        "static-site",
+        "shell-script",
+        "cdn",
+        "s3",
+        "cloudfront"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/tool-s3-cloudfront-push"
+    },
+    {
+      "slug": "tool-software-video-picture-annotator-review",
+      "title": "Video Picture Annotator Review",
+      "one_liner": "A Playwright-style tool for analyzing screen recordings, annotating UI elements with AI, and generating visual diff reports.",
+      "tech": [
+        "Python",
+        "Click",
+        "Rich",
+        "OpenCV",
+        "SceneDetect",
+        "Pillow",
+        "Anthropic API",
+        "Playwright"
+      ],
+      "reuse_tags": [
+        "video-processing",
+        "ui-testing",
+        "ai-annotation",
+        "visual-regression",
+        "reporting-tool"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/tool-software-video-picture-annotator-review"
+    },
+    {
+      "slug": "tool-telegram-whatsapp",
+      "title": "whatsup",
+      "one_liner": "Multi-transport project messaging for Afterburner sprints via Telegram, WhatsApp (planned), and console.",
+      "tech": [
+        "Python 3.11+",
+        "argparse",
+        "requests",
+        "JSON",
+        "HTTP Server"
+      ],
+      "reuse_tags": [
+        "notification-service",
+        "multi-transport",
+        "cli-tool",
+        "rest-api",
+        "mcp-server",
+        "telegram-bot",
+        "devops-tooling"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/tool-telegram-whatsapp"
+    },
+    {
+      "slug": "traceable-searchable-adr-memory-index",
+      "title": "Traceable Searchable ADR Memory Index",
+      "one_liner": "A framework for traceable, searchable project memory with multi-agent sprint automation and architecture decision tracking.",
+      "tech": [
+        "Bash",
+        "JavaScript",
+        "TypeScript",
+        "Python",
+        "HTML/CSS",
+        "Git"
+      ],
+      "reuse_tags": [
+        "dev-tools",
+        "ai-agents",
+        "project-management",
+        "documentation",
+        "automation"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/traceable-searchable-adr-memory-index"
+    },
+    {
+      "slug": "training",
+      "title": "Phone Agent Training Pipeline",
+      "one_liner": "A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists.",
+      "tech": [
+        "Python",
+        "MLX",
+        "LoRA",
+        "JSONL",
+        "Apple Silicon",
+        "Phi-4-mini"
+      ],
+      "reuse_tags": [
+        "llm-training",
+        "voice-agent",
+        "apple-silicon",
+        "mlx",
+        "lora",
+        "synthetic-data"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/training"
+    },
+    {
+      "slug": "transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14",
+      "title": "transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14",
+      "one_liner": "Hybrid architecture combining NVIDIA Riva Conformer-CTC for real-time streaming ASR with an AWS serverless backend for secure, chunked audio storage and session management.",
+      "tech": [
+        "Python",
+        "TypeScript",
+        "Shell",
+        "gRPC",
+        "WebSockets",
+        "AWS CDK/CLI",
+        "Docker",
+        "Systemd"
+      ],
+      "reuse_tags": [
+        "speech-recognition",
+        "aws-serverless",
+        "nvidia-riva",
+        "real-time-audio",
+        "gpu-computing"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14"
+    },
+    {
+      "slug": "transcription-end-to-end-docs",
+      "title": "transcription-end-to-end-docs",
+      "one_liner": "Documentation and integration guide for a serverless transcription pipeline using AWS EventBridge, Cognito, and Lambda.",
+      "tech": [
+        "AWS EventBridge",
+        "AWS Lambda",
+        "Amazon S3",
+        "Amazon CloudFront",
+        "Amazon Cognito",
+        "Amazon SQS",
+        "Terraform",
+        "JSON Schema"
+      ],
+      "reuse_tags": [
+        "serverless",
+        "aws",
+        "eventbridge",
+        "terraform",
+        "transcription",
+        "orchestration"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/transcription-end-to-end-docs"
+    },
+    {
+      "slug": "transcription-realtime-whisper",
+      "title": "transcription-realtime-whisper",
+      "one_liner": "Production-ready real-time speech transcription system supporting WhisperLive edge proxy and NVIDIA Riva enterprise architectures.",
+      "tech": [
+        "Bash",
+        "Python",
+        "Node.js",
+        "TypeScript",
+        "Docker",
+        "WebSockets",
+        "gRPC",
+        "AWS EC2"
+      ],
+      "reuse_tags": [
+        "speech-to-text",
+        "real-time",
+        "aws-deployment",
+        "whisper",
+        "nvidia-riva",
+        "websocket-streaming"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/transcription-realtime-whisper"
+    },
+    {
+      "slug": "transcription-realtime-whisper-cognito-s3-lambda",
+      "title": "CloudDrive: Real-Time Transcription Platform",
+      "one_liner": "A production-ready SaaS for real-time speech-to-text using WhisperLive, AWS Cognito, and serverless backend.",
+      "tech": [
+        "HTML5",
+        "JavaScript",
+        "Node.js 18.x",
+        "AWS Lambda",
+        "Amazon S3",
+        "Amazon CloudFront",
+        "Amazon Cognito",
+        "WhisperLive",
+        "Faster-Whisper",
+        "Caddy",
+        "Serverless Framework",
+        "Playwright"
+      ],
+      "reuse_tags": [
+        "real-time-transcription",
+        "aws-serverless",
+        "whisper-live",
+        "cognito-auth",
+        "gpu-inference",
+        "vanilla-js",
+        "saas-template"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/transcription-realtime-whisper-cognito-s3-lambda"
+    },
+    {
+      "slug": "transcription-sqs-spot-s3",
+      "title": "transcription-sqs-spot-s3",
+      "one_liner": "Scalable AWS-based audio transcription system using SQS queues, EC2 Spot instances, and WhisperX/Voxtral models.",
+      "tech": [
+        "Python",
+        "Bash",
+        "AWS EC2",
+        "AWS SQS",
+        "AWS S3",
+        "Docker",
+        "PyTorch",
+        "FastAPI",
+        "WhisperX",
+        "Voxtral"
+      ],
+      "reuse_tags": [
+        "aws",
+        "transcription",
+        "sqS",
+        "spot-instances",
+        "whisper",
+        "docker",
+        "gpu"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/transcription-sqs-spot-s3"
+    },
+    {
+      "slug": "ui-audiorecorder-html-sample",
+      "title": "ui-audiorecorder-html-sample",
+      "one_liner": "Reference implementation for recording independent, playable audio chunks in the browser to avoid WebM container header issues.",
+      "tech": [
+        "HTML5",
+        "JavaScript (ES5)",
+        "MediaRecorder API",
+        "IndexedDB",
+        "Canvas API",
+        "Fetch API"
+      ],
+      "reuse_tags": [
+        "audio-recording",
+        "media-recorder",
+        "webm-fix",
+        "indexeddb",
+        "vanilla-js",
+        "browser-audio"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/ui-audiorecorder-html-sample"
+    },
+    {
+      "slug": "voice-calendar-scheduler-FSM",
+      "title": "Voice Calendar Scheduler FSM",
+      "one_liner": "A 24/7 voice-driven apartment viewing scheduling assistant using Twilio/WebRTC, an 8-step FSM, and Google Calendar integration.",
+      "tech": [
+        "Python 3.11+",
+        "FastAPI",
+        "Twilio",
+        "WebRTC",
+        "Faster-Whisper",
+        "Piper TTS",
+        "LanceDB",
+        "Google Calendar API",
+        "Docker"
+      ],
+      "reuse_tags": [
+        "voice-agent",
+        "scheduling-bot",
+        "fsm-conversation",
+        "twilio-integration",
+        "webrtc-audio",
+        "calendar-automation"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/voice-calendar-scheduler-FSM"
+    },
+    {
+      "slug": "voice-frontend-modules-auth.transport.engine",
+      "title": "voice-frontend-modules",
+      "one_liner": "Composable Python infrastructure for voice AI apps: WebRTC transport, edge authentication, and pluggable STT/TTS/LLM engines.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "WebRTC",
+        "WebSocket",
+        "Whisper",
+        "Piper",
+        "Ollama",
+        "JavaScript"
+      ],
+      "reuse_tags": [
+        "voice-ai",
+        "webrtc",
+        "auth-middleware",
+        "stt-tts",
+        "fastapi",
+        "real-time"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/voice-frontend-modules-auth.transport.engine"
+    },
+    {
+      "slug": "voice-only-UI-STT-TTS-base",
+      "title": "Voice Base — Browser-to-Server Voice UI",
+      "one_liner": "A minimal, self-contained voice conversation system connecting browser microphone to Claude via WebRTC, using local Whisper for STT and Piper for TTS.",
+      "tech": [
+        "Python 3.11+",
+        "FastAPI",
+        "aiortc",
+        "faster-whisper",
+        "Piper TTS",
+        "WebRTC",
+        "ONNX Runtime",
+        "Scipy",
+        "Numpy"
+      ],
+      "reuse_tags": [
+        "voice-ui",
+        "webrtc",
+        "stt",
+        "tts",
+        "llm-integration",
+        "real-time-audio",
+        "python-backend"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/voice-only-UI-STT-TTS-base"
+    },
+    {
+      "slug": "voice-optimal-RAG",
+      "title": "voice-optimal-RAG",
+      "one_liner": "Self-contained Dockerized RAG service for semantic document search using LanceDB and Nomic embeddings.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "LanceDB",
+        "SentenceTransformers",
+        "PyMuPDF",
+        "Tiktoken",
+        "Docker"
+      ],
+      "reuse_tags": [
+        "rag",
+        "vector-search",
+        "lancedb",
+        "fastapi",
+        "docker",
+        "nomic-embed",
+        "self-hosted"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/voice-optimal-RAG"
+    },
+    {
+      "slug": "voice-print",
+      "title": "Voice Print",
+      "one_liner": "Real-time speaker diarization and voice fingerprinting system using multiple embedding models.",
+      "tech": [
+        "Python 3.11+",
+        "FastAPI",
+        "WebSockets",
+        "ONNX Runtime",
+        "PyTorch",
+        "WebGPU",
+        "WebAssembly",
+        "NumPy",
+        "SciPy"
+      ],
+      "reuse_tags": [
+        "audio-processing",
+        "speaker-diarization",
+        "real-time-streaming",
+        "machine-learning",
+        "websockets",
+        "fastapi",
+        "onnx",
+        "voice-id"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/voice-print"
+    },
+    {
+      "slug": "website-cloner",
+      "title": "website-cloner",
+      "one_liner": "A six-phase static site cloning tool that enumerates URLs, downloads assets, rewrites links, detects dynamic content, and deploys to AWS S3.",
+      "tech": [
+        "Node.js",
+        "JavaScript",
+        "ES Modules",
+        "Cheerio",
+        "Axios",
+        "AWS SDK v3",
+        "Commander.js",
+        "P-Queue"
+      ],
+      "reuse_tags": [
+        "web-scraping",
+        "static-site-generator",
+        "aws-s3",
+        "nodejs-tool",
+        "site-migration",
+        "archiving"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/website-cloner"
+    },
+    {
+      "slug": "whisper-runpod",
+      "title": "whisper-runpod",
+      "one_liner": "Containerized Faster Whisper transcription service optimized for RunPod with S3 integration.",
+      "tech": [
+        "Docker",
+        "Shell Scripting",
+        "Faster Whisper",
+        "Python",
+        "AWS CLI"
+      ],
+      "reuse_tags": [
+        "speech-to-text",
+        "whisper",
+        "runpod",
+        "docker",
+        "s3",
+        "transcription"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/whisper-runpod"
+    },
+    {
+      "slug": "whisperX-runpod",
+      "title": "whisperX-runpod",
+      "one_liner": "Scripts and handlers for deploying WhisperX with speaker diarization on RunPod or AWS EC2 GPU instances.",
+      "tech": [
+        "Python",
+        "Shell",
+        "Docker",
+        "FastAPI",
+        "WhisperX",
+        "Pyannote.audio",
+        "Faster-Whisper",
+        "AWS CLI",
+        "RunPod API"
+      ],
+      "reuse_tags": [
+        "speech-to-text",
+        "gpu-deployment",
+        "runpod",
+        "aws-ec2",
+        "diarization",
+        "whisperx",
+        "fastapi"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/whisperX-runpod"
+    },
+    {
+      "slug": "whisperlive-runpod",
+      "title": "whisperlive-runpod",
+      "one_liner": "Deployable real-time speech-to-text service using OpenAI Whisper on RunPod GPU infrastructure.",
+      "tech": [
+        "Python",
+        "Docker",
+        "WebSockets",
+        "RunPod API",
+        "Whisper",
+        "Faster-Whisper"
+      ],
+      "reuse_tags": [
+        "speech-to-text",
+        "gpu-deployment",
+        "runpod",
+        "whisper",
+        "real-time"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/whisperlive-runpod"
+    },
+    {
+      "slug": "whisperlive-salad",
+      "title": "whisperlive-salad",
+      "one_liner": "Real-time speech-to-text server using OpenAI Whisper, optimized for Salad Cloud GPU deployment.",
+      "tech": [
+        "Python",
+        "WebSockets",
+        "Faster-Whisper",
+        "TensorRT",
+        "OpenVINO",
+        "JavaScript",
+        "AudioWorklet"
+      ],
+      "reuse_tags": [
+        "speech-to-text",
+        "real-time",
+        "gpu-accelerated",
+        "websocket",
+        "whisper"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/whisperlive-salad"
+    },
+    {
+      "slug": "youtube_commercial_detector",
+      "title": "youtube_commercial_detector",
+      "one_liner": "A utility that estimates YouTube ad frequency by downloading videos and analyzing their text transcriptions for commercial keywords.",
+      "tech": [
+        "Python",
+        "youtube-dl/yt-dlp",
+        "Regular Expressions",
+        "File I/O"
+      ],
+      "reuse_tags": [
+        "media-analysis",
+        "youtube-tools",
+        "text-mining",
+        "ad-detection",
+        "python-script"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/youtube_commercial_detector"
+    },
+    {
+      "slug": "youtube_transcriber_2",
+      "title": "YouTube Phrase Scanner",
+      "one_liner": "A serverless, GPU-accelerated pipeline that downloads YouTube videos, transcribes them with WhisperX, and scans for specific phrases.",
+      "tech": [
+        "Python 3.7+",
+        "WhisperX",
+        "yt-dlp",
+        "ffmpeg",
+        "AWS SQS",
+        "AWS S3",
+        "Boto3",
+        "Docker"
+      ],
+      "reuse_tags": [
+        "video-processing",
+        "transcription",
+        "aws-serverless",
+        "gpu-computing",
+        "data-pipeline",
+        "content-analysis"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/youtube_transcriber_2"
+    },
+    {
+      "slug": "youtube_transcriber_3",
+      "title": "YouTube Phrase Scanner",
+      "one_liner": "Serverless pipeline for downloading, transcribing, and scanning YouTube videos for specific phrases using WhisperX and AWS infrastructure.",
+      "tech": [
+        "Python",
+        "WhisperX",
+        "Docker",
+        "AWS Lambda",
+        "RunPod",
+        "yt-dlp"
+      ],
+      "reuse_tags": [
+        "media-processing",
+        "ai-transcription",
+        "aws-serverless",
+        "gpu-orchestration",
+        "content-analysis"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/youtube_transcriber_3"
+    }
+  ]
+}

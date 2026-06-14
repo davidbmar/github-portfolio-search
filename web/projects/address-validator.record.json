@@ -1,0 +1,73 @@
+{
+  "title": "address-validator",
+  "one_liner": "FastAPI service that resolves messy/voice-transcribed US addresses to USPS standards via phonetic fuzzy matching and calculates driving routes using OpenStreetMap.",
+  "what_it_is": "A lightweight Python API service designed to handle imperfect address inputs, such as those from voice-to-text systems. It parses raw strings, generates phonetic variants (e.g., swapping vowels, joining/splitting words), and concurrently queries the Photon geocoder to find valid USPS-standardized matches. It also integrates with OSRM to calculate driving distances, times, and route geometries between validated points without requiring API keys.",
+  "how_its_built": "Built with FastAPI for the HTTP interface and httpx for asynchronous external requests. Address validation relies on custom phonetic variant generation logic and the Jellyfish library for string similarity, querying the public Photon (Komoot) geocoder. Routing is handled by sending resolved coordinates to the public OSRM (Open Source Routing Machine) API. The application is stateless and configured via environment variables for service endpoints.",
+  "how_to_apply": "Deploy as a microservice in dispatch or logistics applications where user input is unstructured. Use the /validate-address endpoint to clean customer data before storage, and the /route endpoint to estimate driver ETAs and distances for multi-stop deliveries. Ideal for voice-enabled interfaces where exact spelling cannot be guaranteed.",
+  "quickstart": "pip install -r requirements.txt\npython server.py",
+  "features": [
+    "Resolves messy/voice-transcribed addresses to USPS-standardized format",
+    "Generates ~40 phonetic variants for fuzzy matching against geocoders",
+    "Calculates driving routes, distances, and times via OpenStreetMap/OSRM",
+    "Supports multi-stop routing with mixed address and coordinate inputs",
+    "No API keys required; uses public Photon and OSRM instances by default"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client App] -->|POST /validate-address| API[FastAPI Server]\n    Client -->|POST /route| API\n    API -->|Generate Variants| Logic[Phonetic Variant Logic]\n    Logic -->|Concurrent Requests| Photon[Photon Geocoder API]\n    Photon -->|Coordinates & Address Data| API\n    API -->|Send Coordinates| OSRM[OSRM Routing API]\n    OSRM -->|Route Geometry & Duration| API\n    API -->|JSON Response| Client",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant S as FastAPI Server\n    participant P as Photon Geocoder\n    participant O as OSRM Router\n\n    Note over C, S: Address Validation Flow\n    C->>S: POST /validate-address {raw_address}\n    S->>S: Parse address parts\n    S->>S: Generate phonetic variants\n    loop For each variant\n        S->>P: GET /api?q={variant}\n        P-->>S: Geocoding Result\n    end\n    S->>S: Select best match\n    S-->>C: JSON {formatted_address, lat, lng}\n\n    Note over C, S: Route Calculation Flow\n    C->>S: POST /route {origin, destination}\n    alt Input is Address\n        S->>S: Validate/Resolve Address (as above)\n    else Input is Lat/Lng\n        S->>S: Use coordinates directly\n    end\n    S->>O: GET /route/v1/driving/{coords}\n    O-->>S: GeoJSON Route & Duration\n    S-->>C: JSON {distance, duration, geometry}",
+  "capabilities": [
+    "Phonetic fuzzy matching",
+    "USPS address standardization",
+    "Driving route calculation",
+    "Multi-stop waypoint support",
+    "Voice-to-text error correction",
+    "Geocoding without API keys"
+  ],
+  "components": [
+    "FastAPI Application",
+    "Phonetic Variant Generator",
+    "Photon Geocoder Client",
+    "OSRM Routing Client",
+    "Pydantic Data Models"
+  ],
+  "tech": [
+    "Python",
+    "FastAPI",
+    "httpx",
+    "Jellyfish",
+    "Uvicorn",
+    "Pydantic"
+  ],
+  "depends_on": [
+    "photon.komoot.io",
+    "router.project-osrm.org"
+  ],
+  "integrates_with": [
+    "Photon Geocoder",
+    "OSRM",
+    "MapLibre/Leaflet (via GeoJSON output)"
+  ],
+  "patterns": [
+    "Async HTTP Requests",
+    "Fuzzy String Matching",
+    "API Gateway/Microservice",
+    "Retry/Fallback Strategy"
+  ],
+  "reuse_tags": [
+    "address-validation",
+    "geocoding",
+    "routing",
+    "fastapi",
+    "usps",
+    "fuzzy-matching"
+  ],
+  "slug": "address-validator",
+  "repo_url": "https://github.com/davidbmar/address-validator",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:21:31.191681Z",
+  "source_commit": "99d23f8",
+  "model": "qwen3.7-plus"
+}

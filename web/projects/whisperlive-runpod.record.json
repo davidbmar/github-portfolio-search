@@ -1,0 +1,74 @@
+{
+  "title": "whisperlive-runpod",
+  "one_liner": "Deployable real-time speech-to-text service using OpenAI Whisper on RunPod GPU infrastructure.",
+  "what_it_is": "A deployment wrapper and configuration toolkit for running Collabora's WhisperLive on RunPod. It provides scripts to build optimized Docker images (slim or full with diarization), push them to a registry, and deploy them to RunPod GPU instances. The system exposes a WebSocket API for real-time audio transcription and HTTP endpoints for health monitoring.",
+  "how_its_built": "Python-based server wrapping the WhisperLive library, containerized with Docker. It uses shell scripts for infrastructure-as-code style deployment (building, pushing, deploying via RunPod API). The server supports multiple backends (faster_whisper, tensorrt) and includes a separate health-check microservice running on port 9999.",
+  "how_to_apply": "Use this project to spin up a scalable, cost-effective transcription endpoint on cloud GPUs without managing complex Kubernetes clusters. Ideal for applications requiring low-latency speech-to-text where you want to pay only for active GPU usage via RunPod's serverless or pod model.",
+  "quickstart": "./scripts/000-questions.sh\n./scripts/200-build-image-local.sh --slim\nexport DOCKER_PASSWORD='your-docker-hub-token'\n./scripts/205-push-to-registry.sh --slim\n./scripts/210-deploy-to-runpod.sh\n./scripts/215-test-runpod-health.sh",
+  "features": [
+    "Real-time WebSocket-based speech-to-text transcription",
+    "Automated deployment scripts for RunPod GPU instances",
+    "Optimized Docker images (slim for transcription, full for diarization)",
+    "Built-in health check and readiness endpoints for orchestration",
+    "Support for multiple Whisper backends (Faster-Whisper, TensorRT)",
+    "Configurable model sizes and compute precision for cost/performance tuning"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client App] -->|WSS:443| Proxy[RunPod Proxy]\n    Proxy -->|WS:9090| Server[WhisperLive Server]\n    Server -->|Load Model| Whisper[OpenAI Whisper]\n    Server -->|GPU Compute| GPU[NVIDIA GPU]\n    Monitor[Monitoring System] -->|HTTP:9999| Health[Health Check Service]\n    Health -->|Query Status| Server\n    Health -->|nvidia-smi| GPU",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant P as RunPod Proxy\n    participant S as WhisperLive Server\n    participant H as Health Service\n    participant W as Whisper Model\n\n    Note over C, H: Deployment Phase\n    H->>S: Check readiness\n    S->>W: Load Model (small.en)\n    W-->>S: Model Loaded\n    S-->>H: Ready\n\n    Note over C, W: Transcription Phase\n    C->>P: Connect WebSocket (wss://...)\n    P->>S: Forward Connection\n    S-->>C: Connection Accepted\n    loop Audio Stream\n        C->>S: Send Audio Chunk (100ms)\n        S->>W: Transcribe Chunk\n        W-->>S: Text Result\n        S-->>C: Send Transcription\n    end",
+  "capabilities": [
+    "Real-time transcription",
+    "Speaker diarization (full image)",
+    "Multi-language support",
+    "Health monitoring",
+    "GPU acceleration"
+  ],
+  "components": [
+    "run_server.py",
+    "run_client.py",
+    "healthcheck.py",
+    "deployment scripts",
+    "Dockerfile"
+  ],
+  "tech": [
+    "Python",
+    "Docker",
+    "WebSockets",
+    "RunPod API",
+    "Whisper",
+    "Faster-Whisper"
+  ],
+  "depends_on": [
+    "RunPod Account",
+    "Docker Hub Account",
+    "NVIDIA GPU",
+    "Collabora WhisperLive"
+  ],
+  "integrates_with": [
+    "RunPod Platform",
+    "Docker Registry",
+    "WebSocket Clients"
+  ],
+  "patterns": [
+    "Microservices",
+    "Containerization",
+    "Infrastructure as Code",
+    "Health Check Pattern"
+  ],
+  "reuse_tags": [
+    "speech-to-text",
+    "gpu-deployment",
+    "runpod",
+    "whisper",
+    "real-time"
+  ],
+  "slug": "whisperlive-runpod",
+  "repo_url": "https://github.com/davidbmar/whisperlive-runpod",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:10:41.983453Z",
+  "source_commit": "4679424",
+  "model": "qwen3.7-plus"
+}

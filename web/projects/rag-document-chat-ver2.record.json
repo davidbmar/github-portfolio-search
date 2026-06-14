@@ -1,0 +1,103 @@
+{
+  "title": "RAG Document Chat System v2",
+  "one_liner": "A modular, production-ready Retrieval-Augmented Generation system with hierarchical document processing and paragraph-aware search.",
+  "what_it_is": "A Python-based RAG application that ingests PDF/TXT documents, processes them into multiple layers of granularity (basic chunks, smart summaries, paragraph contexts), and stores them in ChromaDB. It provides a FastAPI backend, Streamlit web interface, and Next.js modern UI for querying documents using OpenAI LLMs, featuring SOC2-compliant citation trails and relevancy scoring.",
+  "how_its_built": "Built with Python 3.9+ using a modular architecture split into core, processing, search, and API modules. It uses Pydantic for data validation, ChromaDB for vector storage, and supports S3 for document persistence. The system employs hierarchical indexing strategies to balance conceptual search with detailed retrieval.",
+  "how_to_apply": "Deploy on Linux/Ubuntu servers or EC2 instances. Configure via .env file with OpenAI API keys and optional AWS credentials. Use Docker Compose for ChromaDB dependency management. Suitable for enterprise document Q&A where audit trails and source transparency are required.",
+  "quickstart": "git clone https://github.com/davidbmar/rag-document-chat-ver2.git\ncd rag-document-chat-ver2\nchmod +x setup.sh start.sh\n./setup.sh\nnano .env\n./start.sh",
+  "features": [
+    "Multi-layer document processing with basic chunks, smart summaries, and paragraph contexts",
+    "SOC2-compliant raw source citations with percentage relevancy scoring",
+    "Intelligent search hierarchy automatically selecting the best strategy per query",
+    "Modular architecture with 9 focused modules replacing monolithic design",
+    "Multiple interfaces: Streamlit web app, FastAPI REST API, and Next.js modern UI",
+    "CLI tool for direct search, asking questions, and system management"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Query| UI[Web Interface / CLI]\n    UI -->|HTTP Request| API[FastAPI Server]\n    API -->|Orchestrate| RAG[RAGSystem Core]\n    RAG -->|Search| VectorDB[(ChromaDB)]\n    RAG -->|Retrieve Docs| Storage[S3 / Local FS]\n    RAG -->|Generate Answer| LLM[OpenAI API]\n    RAG -->|Return Response| API\n    API -->|JSON Response| UI\n    subgraph Processing\n        DocProc[DocumentProcessor] -->|Extract Text| Parser[PDF/TXT Parser]\n        DocProc -->|Chunk & Summarize| Indexer[Indexing Engine]\n        Indexer -->|Store Vectors| VectorDB\n    end\n    API -->|Upload| DocProc",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as FastAPI\n    participant R as RAGSystem\n    participant C as ChromaDB\n    participant O as OpenAI\n    \n    U->>F: POST /ask {question}\n    F->>R: search_and_answer(question)\n    R->>C: similarity_search(query, top_k)\n    C-->>R: List[DocumentChunks]\n    R->>R: Filter & Score Relevancy\n    R->>O: ChatCompletion(context + question)\n    O-->>R: Generated Answer\n    R-->>F: ChatResponse(answer, sources)\n    F-->>U: JSON Response",
+  "capabilities": [
+    "Hierarchical document indexing",
+    "Paragraph-aware semantic search",
+    "Automated source citation",
+    "Relevancy scoring",
+    "Multi-format document ingestion",
+    "RESTful API exposure",
+    "Interactive web chat",
+    "Command-line interface"
+  ],
+  "components": [
+    "src/core/config.py",
+    "src/core/models.py",
+    "src/search/rag_system.py",
+    "src/processing/document_processor.py",
+    "app_refactored.py",
+    "streamlit_app.py",
+    "src/ui/modern"
+  ],
+  "tech": [
+    "Python 3.9+",
+    "FastAPI",
+    "Streamlit",
+    "Next.js",
+    "ChromaDB",
+    "OpenAI API",
+    "Pydantic",
+    "Docker"
+  ],
+  "depends_on": [
+    "OpenAI API Key",
+    "Docker & Docker Compose",
+    "Python 3.9+",
+    "Node.js (for Modern UI)",
+    "AWS Credentials (optional)"
+  ],
+  "integrates_with": [
+    "OpenAI GPT Models",
+    "ChromaDB Vector Store",
+    "AWS S3",
+    "Streamlit",
+    "Next.js Frontend"
+  ],
+  "patterns": [
+    "Retrieval-Augmented Generation",
+    "Modular Monolith",
+    "Dependency Injection",
+    "Strategy Pattern (Search)",
+    "Repository Pattern (Storage)"
+  ],
+  "reuse_tags": [
+    "rag",
+    "document-chat",
+    "vector-search",
+    "llm-application",
+    "enterprise-search",
+    "python-backend"
+  ],
+  "slug": "rag-document-chat-ver2",
+  "repo_url": "https://github.com/davidbmar/rag-document-chat-ver2",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/src/ui/modern/npm_and_yarn-c6636f2d36 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/pip/pip-f7c9f9c38b is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: Bump the npm_and_yarn group across 1 directory with 7 updates"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the pip group across 1 directory with 6 updates"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:50:55.834851Z",
+  "source_commit": "a7c1c3d",
+  "model": "qwen3.7-plus"
+}

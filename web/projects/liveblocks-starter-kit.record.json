@@ -1,0 +1,91 @@
+{
+  "title": "Liveblocks Next.js Starter Kit",
+  "one_liner": "A production-ready template for building collaborative applications with real-time features using Next.js and Liveblocks.",
+  "what_it_is": "This starter kit provides a fully functional foundation for multi-user collaborative apps. It includes a document management dashboard with CRUD operations, permissions, and grouping, alongside a collaborative whiteboard implementation. It handles complex state synchronization, presence tracking (cursors), and authentication integration out of the box.",
+  "how_its_built": "Built on Next.js (App Router or Pages depending on version, typically App Router in modern kits) using TypeScript. It leverages Liveblocks client and server APIs for real-time state synchronization, presence, and storage. UI components are built with React, likely using Tailwind CSS for styling given the standard Liveblocks stack, and integrates with NextAuth or similar for auth.",
+  "how_to_apply": "Use this as a base for any application requiring real-time collaboration: shared editors, design tools, project management boards, or multiplayer games. Clone the repo, configure your Liveblocks API keys, and extend the existing document/whiteboard patterns to your specific domain objects.",
+  "quickstart": "git clone https://github.com/davidbmar/liveblocks-starter-kit.git\ncd liveblocks-starter-kit\nnpm install\ncp .env.example .env.local\n# Add LIVEBLOCKS_SECRET_KEY and NEXTAUTH_SECRET to .env.local\nnpm run dev",
+  "features": [
+    "Real-time collaborative whiteboard with cursor presence",
+    "Document dashboard with pagination, drafts, and groups",
+    "Granular permission system (user, group, public scopes)",
+    "Auto-revalidation of data and optimistic updates",
+    "Authentication ready for GitHub, Google, Auth0, etc.",
+    "Fully featured share menu for document access control"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Next.js Client]\n    LB_Client[Liveblocks Client SDK]\n    Server[Next.js API Routes / Server Actions]\n    LB_Server[Liveblocks Backend]\n    DB[(Database)]\n    Auth[Auth Provider]\n\n    Client -->|Reads/Writes UI| LB_Client\n    LB_Client -->|WebSocket: Presence & Storage| LB_Server\n    Client -->|HTTP: Auth & Metadata| Server\n    Server -->|Verify Session| Auth\n    Server -->|CRUD Documents| DB\n    Server -->|Authorize Access| LB_Server",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Browser as Next.js App\n    participant API as Next.js API\n    participant LB as Liveblocks Service\n    \n    User->>Browser: Open Document\n    Browser->>API: GET /api/documents/:id\n    API->>LB: authorizeRoomAccess()\n    LB-->>API: Permission Token\n    API-->>Browser: Document Data + Token\n    Browser->>LB: enterRoom(token)\n    LB-->>Browser: Room State & Presence\n    User->>Browser: Move Cursor / Edit\n    Browser->>LB: Update Presence / Storage\n    LB-->>Browser: Broadcast Updates\n    Browser->>User: Render Remote Changes",
+  "capabilities": [
+    "Real-time synchronization",
+    "Presence tracking",
+    "Conflict-free replicated data types (CRDTs)",
+    "Role-based access control",
+    "Server-side authorization"
+  ],
+  "components": [
+    "DashboardSidebar",
+    "DashboardHeader",
+    "DocumentHeader",
+    "DocumentRow",
+    "DocumentIcon",
+    "DocumentCreatePopover",
+    "DocumentDeleteDialog",
+    "Cursors",
+    "Badge"
+  ],
+  "tech": [
+    "TypeScript",
+    "Next.js",
+    "React",
+    "Liveblocks",
+    "Tailwind CSS"
+  ],
+  "depends_on": [
+    "@liveblocks/client",
+    "@liveblocks/react",
+    "@liveblocks/node",
+    "next",
+    "react",
+    "react-dom"
+  ],
+  "integrates_with": [
+    "GitHub Auth",
+    "Google Auth",
+    "Auth0",
+    "Vercel Postgres/SQL",
+    "Prisma"
+  ],
+  "patterns": [
+    "Optimistic UI",
+    "Server-Side Authorization",
+    "Real-time Presence",
+    "Shared State Storage",
+    "Infinite Pagination"
+  ],
+  "reuse_tags": [
+    "collaboration",
+    "real-time",
+    "nextjs-template",
+    "whiteboard",
+    "auth-integrated"
+  ],
+  "slug": "liveblocks-starter-kit",
+  "repo_url": "https://github.com/davidbmar/liveblocks-starter-kit",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-cf0237d75a is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 20 updates"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:04:48.546809Z",
+  "source_commit": "bdf085d",
+  "model": "qwen3.7-plus"
+}

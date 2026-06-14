@@ -12,6 +12,30 @@ logger = logging.getLogger(__name__)
 
 _SUFFIX = ".record.json"
 
+# Fields kept in the compact index (Tier 1) — enough to scan all repos cheaply
+# and decide which full records to fetch, without loading prose/diagrams.
+_INDEX_FIELDS = ("slug", "title", "one_liner", "tech", "reuse_tags", "thin", "repo_url")
+
+
+def compact_entries(projects: list[dict]) -> list[dict]:
+    """Project the full records down to the compact index shape (Tier 1)."""
+    return [{f: p.get(f) for f in _INDEX_FIELDS} for p in projects]
+
+
+def write_compact_index(projects: list[dict], output_path: str) -> str:
+    """Write the compact index (projects-index.json) and return its path."""
+    out = Path(output_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "generated_at": utc_z(),
+        "count": len(projects),
+        "projects": compact_entries(projects),
+    }
+    out.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    return str(out)
+
 
 def aggregate_records(records_dir: str, output_path: str) -> dict:
     """Aggregate every ``*.record.json`` in *records_dir* into *output_path*.

@@ -13,9 +13,22 @@ from pathlib import Path
 
 from ghps import github_client as _default_gh
 from ghps.docsgen import aggregate, context, record_gen, render
+from ghps.docsgen._util import utc_z
 from ghps.docsgen.record_gen import RecordGenerationError
 
 logger = logging.getLogger(__name__)
+
+# Where the published docs live (used to build absolute URLs in llms.txt).
+BASE_URL = "https://davidbmar.com"
+
+
+def _write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def _write_json(path: Path, data) -> None:
+    _write_text(path, json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 
 
 def _is_stale(record_path: Path, pushed_at: str) -> bool:
@@ -38,28 +51,62 @@ def generate_one(
     *,
     owner: str,
     records_dir: str,
-    html_dir: str,
     client,
     gh=_default_gh,
     model: str | None = None,
 ) -> dict:
-    """Generate record + HTML for a single repo. Returns the record dict."""
+    """Generate + persist the record for a single repo (no rendering).
+
+    Rendering to HTML/feeds is decoupled into :func:`publish_all`, so the web
+    artifacts can be rebuilt from records without re-calling the LLM.
+    """
     ctx = context.build_context(repo_meta, owner=owner, gh=gh)
     record = record_gen.generate_record(ctx, client, model=model)
 
-    Path(records_dir).mkdir(parents=True, exist_ok=True)
-    Path(html_dir).mkdir(parents=True, exist_ok=True)
-
     record_path = Path(records_dir) / f"{record['slug']}.record.json"
-    record_path.write_text(
-        json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
-
-    html_path = Path(html_dir) / f"{record['slug']}.html"
-    html_path.write_text(render.render_page(record), encoding="utf-8")
-
+    _write_json(record_path, record)
     logger.info("generated %s", record["slug"])
     return record
+
+
+def publish_all(
+    *,
+    records_dir: str,
+    html_dir: str,
+    feed_path: str,
+    base_url: str = BASE_URL,
+) -> dict:
+    """Render ALL web artifacts from the records on disk — no LLM calls.
+
+    Produces, for AI + human consumption (progressive disclosure):
+      - per-repo:  <html_dir>/<slug>.html  and  <html_dir>/<slug>.record.json (Tier 2)
+      - <feed_dir>/projects.json        — full corpus (last resort)
+      - <feed_dir>/projects-index.json  — compact index (Tier 1)
+      - <html_dir>/index.html           — human listing page
+      - <web_root>/llms.txt             — discovery manifest (Tier 0)
+    """
+    summary = aggregate.aggregate_records(records_dir, feed_path)
+    projects = summary["projects"]
+    hd = Path(html_dir)
+    hd.mkdir(parents=True, exist_ok=True)
+
+    for p in projects:
+        slug = p.get("slug")
+        if not slug:
+            continue
+        _write_text(hd / f"{slug}.html", render.render_page(p))
+        _write_json(hd / f"{slug}.record.json", p)
+
+    aggregate.write_compact_index(
+        projects, str(Path(feed_path).parent / "projects-index.json")
+    )
+    _write_text(hd / "index.html", render.render_index_page(projects))
+    _write_text(
+        hd.parent / "llms.txt",
+        render.render_llms_txt(projects, base_url=base_url, generated_at=utc_z()),
+    )
+    logger.info("published %d project docs to %s", len(projects), html_dir)
+    return {"published": len(projects)}
 
 
 def generate_all(
@@ -108,7 +155,6 @@ def generate_all(
                 repo_meta,
                 owner=owner,
                 records_dir=records_dir,
-                html_dir=html_dir,
                 client=client,
                 gh=gh,
                 model=model,
@@ -118,14 +164,7 @@ def generate_all(
             logger.warning("FAILED %s: %s", slug, exc)
             failed.append(slug)
 
-    summary = aggregate.aggregate_records(records_dir, feed_path)
-
-    # Render the human listing page over ALL records on disk (not just this run).
-    # Ensure html_dir exists even when no repo was generated this run.
-    Path(html_dir).mkdir(parents=True, exist_ok=True)
-    index_path = Path(html_dir) / "index.html"
-    index_path.write_text(
-        render.render_index_page(summary["projects"]), encoding="utf-8"
-    )
+    # Render every web artifact from the records on disk (not just this run).
+    publish_all(records_dir=records_dir, html_dir=html_dir, feed_path=feed_path)
 
     return {"generated": generated, "skipped": skipped, "failed": failed}

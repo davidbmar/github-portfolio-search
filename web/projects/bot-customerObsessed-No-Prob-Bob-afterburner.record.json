@@ -1,0 +1,86 @@
+{
+  "title": "No Prob Bob — Customer Discovery Agent",
+  "one_liner": "A conversational AI agent that guides customer discovery interviews, extracts insights, and saves structured seed documents to Afterburner projects.",
+  "what_it_is": "No Prob Bob is a Python-based conversational AI bot designed to facilitate customer discovery. It uses personality frameworks to ask probing questions rather than jumping to solutions, supporting text chat, push-to-talk voice interaction (STT/TTS), and Google Sign-In. It integrates with the Afterburner ecosystem to save structured insights.",
+  "how_its_built": "Built with Python 3.11+, it uses Ollama (default qwen3:4b) or cloud LLMs (Claude/OpenAI) for inference. Voice features rely on Faster-Whisper for STT and Piper-TTS for audio synthesis. Authentication is handled via Google OAuth JWT verification. The server runs on a custom HTTP gateway with SQLite for session management.",
+  "how_to_apply": "Use this bot during the early stages of product development to validate problem statements. Engage it in simulated or real customer interviews to extract structured insights, which are then saved as seed documents for your project's memory index.",
+  "quickstart": "ollama pull qwen3:4b\ngit clone https://github.com/davidbmar/bot-customerObsessed-No-Prob-Bob-afterburner.git\ncd bot-customerObsessed-No-Prob-Bob-afterburner\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\npip install \"piper-tts>=1.4\" \"faster-whisper>=1.0\" \"numpy>=1.24\" \"scipy>=1.11\" \"google-auth[requests]>=2.20\"\ncp .env.example .env\npython3 -m bot.server",
+  "features": [
+    "Guides customer discovery interviews with a specific personality framework",
+    "Supports push-to-talk voice input and text-to-speech audio responses",
+    "Integrates with Google Sign-In for secure user authentication",
+    "Saves structured seed documents to Afterburner projects",
+    "Runs locally with Ollama for privacy or connects to Claude/OpenAI",
+    "Includes a production launcher with watchdog and auto-restart capabilities"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS/WebSocket| Server[Bot Server]\n    Server -->|JWT Verify| Auth[Google Auth Module]\n    Server -->|LLM Request| LLM[Ollama/Claude/OpenAI]\n    Server -->|STT Request| Whisper[Faster-Whisper]\n    Server -->|TTS Request| Piper[Piper TTS]\n    Server -->|Read/Write| DB[(SQLite Bot DB)]\n    Server -->|Save Insights| Afterburner[Afterburner Memory Index]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser\n    participant S as Bot Server\n    participant W as Faster-Whisper\n    participant L as LLM Provider\n    participant D as SQLite DB\n    U->>B: Hold Mic & Speak\n    B->>S: POST /api/voice/transcribe (PCM)\n    S->>W: Transcribe Audio\n    W-->>S: Text Result\n    S->>L: Send Prompt + Context\n    L-->>S: AI Response Stream\n    S->>B: Stream SSE Response\n    B->>U: Display Text\n    opt Voice Output\n        B->>S: POST /api/voice/synthesize\n        S->>Piper: Generate Audio\n        Piper-->>S: WAV Blob\n        S-->>B: Audio Data\n        B->>U: Play Audio\n    end\n    S->>D: Save Session/Insights",
+  "capabilities": [
+    "Conversational Interviewing",
+    "Voice Interaction (STT/TTS)",
+    "User Authentication",
+    "Insight Extraction",
+    "Local LLM Support",
+    "Cloud LLM Support"
+  ],
+  "components": [
+    "bot.server",
+    "bot.gateway",
+    "bot.auth",
+    "bot.config",
+    "bot.db",
+    "scripts/run.sh"
+  ],
+  "tech": [
+    "Python 3.11+",
+    "Ollama",
+    "Faster-Whisper",
+    "Piper TTS",
+    "SQLite",
+    "Google OAuth",
+    "WebSockets/SSE"
+  ],
+  "depends_on": [
+    "Ollama",
+    "Python 3.11+",
+    "piper-tts",
+    "faster-whisper",
+    "google-auth"
+  ],
+  "integrates_with": [
+    "Afterburner Ecosystem",
+    "Telegram",
+    "Google Sign-In",
+    "Anthropic Claude",
+    "OpenAI ChatGPT"
+  ],
+  "patterns": [
+    "Customer Discovery",
+    "Conversational AI",
+    "Local-First AI",
+    "Voice UI",
+    "Structured Insight Saving"
+  ],
+  "reuse_tags": [
+    "customer-discovery",
+    "conversational-ai",
+    "voice-interface",
+    "local-llm",
+    "afterburner-integration"
+  ],
+  "slug": "bot-customerObsessed-No-Prob-Bob-afterburner",
+  "repo_url": "https://github.com/davidbmar/bot-customerObsessed-No-Prob-Bob-afterburner",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-sprint-history-v2 is 1 commit ahead of the default branch"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:27:57.553364Z",
+  "source_commit": "f59ed35",
+  "model": "qwen3.7-plus"
+}

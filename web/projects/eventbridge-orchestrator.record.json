@@ -1,0 +1,83 @@
+{
+  "title": "EventBridge Orchestrator",
+  "one_liner": "Infrastructure-as-code repository defining AWS EventBridge schemas, rules, and utility lambdas for a decoupled microservices architecture.",
+  "what_it_is": "A centralized configuration and schema registry for an AWS event-driven system. It enforces contract consistency via JSON Schema definitions, manages EventBridge routing rules via Terraform, and provides operational utility Lambdas for logging and dead-letter queue processing. It does not contain business logic but defines how independent services (Frontend, Transcription, Search) communicate asynchronously.",
+  "how_its_built": "The project uses Terraform to provision AWS EventBridge resources (Event Buses, Rules, Targets) and IAM permissions. Event contracts are defined as versioned JSON Schema files. Operational resilience is handled by Node.js Lambda functions for event auditing and DLQ recovery. Integration tests verify event publishing using the AWS SDK.",
+  "how_to_apply": "Clone the repository to manage the central event bus infrastructure. Add new event schemas to the `schemas/` directory following semantic versioning. Update `terraform/` modules to route new event types to specific service targets. Deploy using Terraform to synchronize the event routing layer across environments.",
+  "quickstart": "git clone https://github.com/davidbmar/eventbridge-orchestrator.git\ncd eventbridge-orchestrator\nterraform init\nterraform plan\nterraform apply",
+  "features": [
+    "Centralized JSON Schema registry for event contract validation and versioning",
+    "Terraform-managed EventBridge rules for decoupled service-to-service routing",
+    "Utility Lambda for structured event logging and CloudWatch metric emission",
+    "Dead Letter Queue (DLQ) processor for failed event recovery and SNS alerting",
+    "Integration test suite for verifying event publishing and schema compliance"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph Services\n        FE[Frontend Service]\n        TS[Transcription Service]\n        SE[Search Service]\n    end\n\n    subgraph EventBridge_Orchestrator\n        EB[AWS EventBridge Bus]\n        Schemas[JSON Schemas]\n        Rules[Terraform Rules]\n    end\n\n    subgraph Utilities\n        Logger[Event Logger Lambda]\n        DLQ[DLQ Processor Lambda]\n        CW[CloudWatch Logs/Metrics]\n        SNS[SNS Alerts]\n    end\n\n    FE -->|Publish AudioUploaded| EB\n    TS -->|Publish TranscriptionCompleted| EB\n    \n    EB -->|Route| TS\n    EB -->|Route| SE\n    EB -->|Log All| Logger\n    Logger --> CW\n    \n    EB -.->|Failed Events| DLQ\n    DLQ -->|Retry| EB\n    DLQ -->|Alert| SNS",
+  "diagram_sequence": "sequenceDiagram\n    participant Pub as Publisher Service\n    participant EB as EventBridge Bus\n    participant Sub as Subscriber Service\n    participant Log as Event Logger Lambda\n    participant DLQ as DLQ Processor\n\n    Pub->>EB: putEvents(Detail, Source, DetailType)\n    EB->>EB: Validate against Schema\n    alt Valid Event\n        EB->>Sub: Invoke Target (Lambda/SQS)\n        EB->>Log: Invoke Logger Lambda\n        Log->>Log: Write to CloudWatch\n    else Invalid/Failed Delivery\n        EB->>DLQ: Send to Dead Letter Queue\n        DLQ->>DLQ: Process Failed Record\n        alt Retryable\n            DLQ->>EB: Republish Event\n        else Fatal Error\n            DLQ->>SNS: Send Alert Notification\n        end\n    end",
+  "capabilities": [
+    "Event Schema Management",
+    "Infrastructure as Code",
+    "Event Routing",
+    "Observability & Logging",
+    "Error Handling & Recovery"
+  ],
+  "components": [
+    "schemas/",
+    "lambdas/event-logger/",
+    "lambdas/dead-letter-processor/",
+    "terraform/"
+  ],
+  "tech": [
+    "AWS EventBridge",
+    "Terraform",
+    "Node.js",
+    "AWS Lambda",
+    "JSON Schema",
+    "AWS SDK"
+  ],
+  "depends_on": [
+    "AWS Account",
+    "Terraform CLI",
+    "Node.js Runtime"
+  ],
+  "integrates_with": [
+    "audio-ui-cf-s3-lambda-cognito",
+    "transcription-sqs-spot-s3",
+    "search-index-service",
+    "Amazon CloudWatch",
+    "Amazon SNS"
+  ],
+  "patterns": [
+    "Event-Driven Architecture",
+    "Publisher-Subscriber",
+    "Dead Letter Queue",
+    "Schema Registry",
+    "Sidecar Logging"
+  ],
+  "reuse_tags": [
+    "aws",
+    "eventbridge",
+    "terraform",
+    "microservices",
+    "schema-validation"
+  ],
+  "slug": "eventbridge-orchestrator",
+  "repo_url": "https://github.com/davidbmar/eventbridge-orchestrator",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/tests/npm_and_yarn-e9ce4f7be9 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump uuid from 9.0.1 to 14.0.0 in /tests in the npm_and_yarn group across 1 directory"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:45:13.392832Z",
+  "source_commit": "9946418",
+  "model": "qwen3.7-plus"
+}

@@ -54,6 +54,24 @@ def test_skips_malformed_json(tmp_path):
     assert result["skipped"] == ["broken.record.json"]
 
 
+def test_compact_entries_keeps_only_index_fields():
+    full = {
+        "slug": "x", "title": "X", "one_liner": "o", "tech": ["py"],
+        "reuse_tags": ["t"], "thin": False, "repo_url": "u",
+        "what_it_is": "long prose", "diagram_architecture": "flowchart",
+    }
+    entry = aggregate.compact_entries([full])[0]
+    assert set(entry) == {"slug", "title", "one_liner", "tech", "reuse_tags", "thin", "repo_url"}
+    assert "what_it_is" not in entry and "diagram_architecture" not in entry
+
+
+def test_write_compact_index(tmp_path):
+    out = tmp_path / "data" / "projects-index.json"
+    aggregate.write_compact_index([{"slug": "a", "one_liner": "hi"}], str(out))
+    data = json.loads(out.read_text())
+    assert data["count"] == 1 and data["projects"][0]["slug"] == "a"
+
+
 def test_empty_directory_yields_zero_count(tmp_path):
     records_dir = tmp_path / "projects"
     records_dir.mkdir()

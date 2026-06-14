@@ -1,0 +1,148 @@
+{
+  "title": "Persona RAG Engine",
+  "one_liner": "A multi-domain intelligence platform that isolates analytical personas and evidence corpora to prevent data bleed while enabling specialized, voice-consistent Q&A.",
+  "what_it_is": "The Persona RAG Engine is a factory-style architecture for building independent analytical environments. Each 'domain' (e.g., political campaign, historical investigation) operates with its own set of persona cards, evidence collections in ChromaDB, and retrieval logic. It ensures zero data bleed between domains by strictly partitioning vector stores and session contexts. The system supports dynamic domain creation via UI or directory structure and integrates with external intelligence pipelines for live evidence syncing.",
+  "how_its_built": "Built on Python 3.12+, the engine uses FastAPI for the backend server and WebSocket connections for streaming chat responses. It relies on ChromaDB for per-domain vector storage, organizing collections by domain and persona. Retrieval is enhanced by persona-weighted ranking, where specific signal affinities boost relevant evidence. Generation occurs in two passes: first constructing a reasoning frame, then styling the output to match the persona's voice. The frontend is a lightweight web interface with a domain switcher and optional password protection via client-side SHA-256 hashing.",
+  "how_to_apply": "Use this engine when you need multiple distinct analytical lenses on different topics without cross-contamination. Ideal for political war rooms, historical research teams, or literary criticism platforms where specific voices (personas) must adhere to strict evidentiary boundaries. It scales by adding new domain directories with JSON configurations and evidence files, allowing rapid deployment of new analytical workspaces.",
+  "quickstart": "git clone https://github.com/davidbmar/tool-RAG-for-split-personalities.git\ncd tool-RAG-for-split-personalities\npython -m venv .venv && source .venv/bin/activate\npip install -r requirements.txt\nexport ANTHROPIC_API_KEY=sk-ant-...\npython scripts/serve.py",
+  "features": [
+    "Zero data bleed between domains via isolated ChromaDB collections",
+    "Persona-weighted retrieval boosting evidence based on signal affinity",
+    "Two-pass generation separating logical reasoning from stylistic voice",
+    "Dynamic domain creation via UI factory or directory-based configuration",
+    "Integration with external intelligence briefings for daily evidence syncs",
+    "WebSocket-supported streaming chat with real-time domain switching"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP/WebSocket| API[FastAPI Server]\n    API --> DomainMgr[Domain Manager]\n    DomainMgr -->|Select Context| Chroma[ChromaDB]\n    Chroma -->|Per-Domain Collections| Evidence[Evidence Corpus]\n    Chroma -->|Per-Persona Collections| Personas[Persona Cards]\n    API -->|Retrieve & Rank| Retriever[Retrieval Engine]\n    Retriever -->|Weighted Results| Generator[LLM Generator]\n    Generator -->|Pass 1: Reasoning| ReasonFrame[Reasoning Frame]\n    ReasonFrame -->|Pass 2: Styling| FinalResponse[Styled Response]\n    FinalResponse -->|Stream| API\n    IBT[Intelligence Briefing Toolkit] -->|Daily Sync Script| Evidence",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as FastAPI Server\n    participant D as Domain Manager\n    participant C as ChromaDB\n    participant L as LLM Generator\n    U->>F: Select Domain & Persona\n    F->>D: Load Domain Context\n    D->>C: Fetch Persona Card & Evidence Collection\n    C-->>D: Return Config & Vector Store Ref\n    U->>F: Send Question\n    F->>D: Initiate Query\n    D->>C: Retrieve Evidence (Persona-Weighted)\n    C-->>D: Ranked Evidence Chunks\n    D->>L: Pass 1: Generate Reasoning Frame\n    L-->>D: Raw Logical Analysis\n    D->>L: Pass 2: Apply Persona Style\n    L-->>D: Styled Response\n    D-->>F: Stream Response\n    F-->>U: Display Answer",
+  "capabilities": [
+    "Multi-domain isolation",
+    "Persona-based retrieval weighting",
+    "Two-pass LLM generation",
+    "Dynamic domain ingestion",
+    "External evidence syncing",
+    "Streaming WebSocket chat"
+  ],
+  "components": [
+    "FastAPI Backend",
+    "ChromaDB Vector Store",
+    "Domain Factory UI",
+    "Persona Card Schema",
+    "Evidence Sync Scripts",
+    "Client-side Auth Gate"
+  ],
+  "tech": [
+    "Python 3.12+",
+    "FastAPI",
+    "ChromaDB",
+    "Anthropic Claude API",
+    "WebSockets",
+    "JavaScript (SHA-256)"
+  ],
+  "depends_on": [
+    "anthropic",
+    "chromadb",
+    "fastapi",
+    "uvicorn",
+    "websockets"
+  ],
+  "integrates_with": [
+    "Intelligence Briefing Toolkit",
+    "Cron (for scheduled syncs)",
+    "Custom Evidence Pipelines"
+  ],
+  "patterns": [
+    "Factory Pattern",
+    "Strategy Pattern (Personas)",
+    "Repository Pattern (Evidence)",
+    "Two-Step Generation",
+    "Domain-Driven Design"
+  ],
+  "reuse_tags": [
+    "RAG",
+    "Multi-Agent",
+    "Vector Search",
+    "Domain Isolation",
+    "Political Analysis",
+    "Historical Research"
+  ],
+  "slug": "tool-RAG-for-split-personalities",
+  "repo_url": "https://github.com/davidbmar/tool-RAG-for-split-personalities",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-analytics-export is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-batch-roundtable is 2 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-cli-installer is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-collaboration is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-deploy-command is 2 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-openapi-docs is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-production-hardening is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-whitelabel is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-zero-config is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-analytics-readme is 2 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-bug-sweep is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-domain-versioning is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-embed-widget is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-factory-validation is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-persona-editor is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-typing-indicators is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentC-ux-fixes is 1 commit ahead of the default branch"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:00:48.150034Z",
+  "source_commit": "98e4e89",
+  "model": "qwen3.7-plus"
+}

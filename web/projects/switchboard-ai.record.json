@@ -1,0 +1,77 @@
+{
+  "title": "switchboard-ai",
+  "one_liner": "Append-only coordination channel for AI agents and humans via HTTP and JSONL.",
+  "what_it_is": "A lightweight HTTP server and CLI tool that provides an append-only, token-gated chat interface for multi-agent coordination. It stores messages as JSONL files per topic, allowing AI agents (like Codex or Claude) and humans to share a scrolling working memory without manual copy-pasting. The system includes a web portal for visualization, terminal watchers for alerts, and a REST API for incremental message polling.",
+  "how_its_built": "Built in Python using aiohttp for the asynchronous web server and standard library tools for filesystem operations. Data persistence is handled via append-only JSONL files on disk, serialized with threading locks. The CLI interacts with the server via HTTP requests, while the web portal serves static HTML/JS that polls the API for updates.",
+  "how_to_apply": "Use Switchboard to coordinate multiple AI coding agents working on the same codebase or task across different machines. Replace manual context switching by having agents post status updates, questions, and findings to a shared topic. Humans can monitor the web portal, while agents use the CLI or direct HTTP calls to read new messages incrementally using sequence cursors.",
+  "quickstart": "pip install -e '.[dev]'\nexport SWITCHBOARD_TOKEN=\"$(openssl rand -hex 16)\"\nsw serve --port 9101 --token \"$SWITCHBOARD_TOKEN\"\nsw post --topic debug-marker --author claude --kind review \"**found it.** F-184 sync overwrites the marker\"\nopen \"http://127.0.0.1:9101/portal?topic=debug-marker&token=$SWITCHBOARD_TOKEN\"",
+  "features": [
+    "Append-only JSONL storage per topic for reliable audit trails",
+    "REST API with token-based authentication and incremental polling",
+    "Live web portal rendering Markdown with machine-readable JSON toggle",
+    "CLI tools for posting, tailing, and identifying terminal sessions",
+    "Terminal watcher with visual alerts (badge, dock attention) for specific agents",
+    "Support for LAN mode to coordinate agents across multiple machines"
+  ],
+  "diagram_architecture": "flowchart TD\n    Agent[AI Agent / Human]\n    CLI[Switchboard CLI]\n    Server[aiohttp Server]\n    Store[TopicStore JSONL]\n    Portal[Web Browser Portal]\n    \n    Agent -->|HTTP POST/GET| Server\n    CLI -->|HTTP POST/GET| Server\n    Portal -->|HTTP GET /notes| Server\n    \n    Server -->|Read/Write| Store\n    Store -->|Persist| Disk[(Filesystem JSONL)]\n    \n    subgraph Coordination\n        Agent\n        CLI\n        Portal\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant Agent as AI Agent\n    participant CLI as Switchboard CLI\n    participant Server as aiohttp Server\n    participant Store as TopicStore\n    \n    Note over Agent, Server: Posting a Message\n    Agent->>CLI: sw post --topic T --author A --body B\n    CLI->>Server: POST /notes {from, topic, kind, body}\n    Server->>Store: append(msg)\n    Store->>Store: Validate & Write JSONL\n    Store-->>Server: {seq, ts}\n    Server-->>CLI: 200 OK {seq, ts}\n    CLI-->>Agent: Print seq/ts\n    \n    Note over Agent, Server: Reading Incrementally\n    Agent->>Server: GET /notes?topic=T&since=LastSeq\n    Server->>Store: read_lines(since=LastSeq)\n    Store-->>Server: List of new messages\n    Server-->>Agent: JSON Array + next_since cursor",
+  "capabilities": [
+    "Multi-agent chat coordination",
+    "Append-only message logging",
+    "Incremental message polling",
+    "Terminal session identification",
+    "Visual alerting for agents",
+    "Markdown rendering in web UI"
+  ],
+  "components": [
+    "aiohttp Web Server",
+    "TopicStore (JSONL backend)",
+    "CLI Client",
+    "Web Portal (HTML/JS)",
+    "Terminal Watcher"
+  ],
+  "tech": [
+    "Python",
+    "aiohttp",
+    "JSONL",
+    "HTTP REST",
+    "Threading",
+    "Markdown"
+  ],
+  "depends_on": [
+    "aiohttp",
+    "pytest",
+    "openssl (for token gen)"
+  ],
+  "integrates_with": [
+    "Codex",
+    "Claude Code",
+    "iTerm2",
+    "Terminal Emulators"
+  ],
+  "patterns": [
+    "Append-only Log",
+    "Polling Consumer",
+    "Token-based Auth",
+    "Filesystem Persistence",
+    "Pub/Sub via Polling"
+  ],
+  "reuse_tags": [
+    "multi-agent",
+    "coordination",
+    "chat-server",
+    "jsonl-storage",
+    "cli-tool",
+    "developer-tools"
+  ],
+  "slug": "switchboard-ai",
+  "repo_url": "https://github.com/davidbmar/switchboard-ai",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:58:01.710336Z",
+  "source_commit": "2a3254e",
+  "model": "qwen3.7-plus"
+}

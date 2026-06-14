@@ -1,0 +1,84 @@
+{
+  "title": "Voice Base — Browser-to-Server Voice UI",
+  "one_liner": "A minimal, self-contained voice conversation system connecting browser microphone to Claude via WebRTC, using local Whisper for STT and Piper for TTS.",
+  "what_it_is": "A real-time voice interface that runs entirely in the browser and a local Python server. It captures audio via WebRTC, performs Voice Activity Detection (VAD), transcribes speech locally using faster-whisper, sends text to Anthropic's Claude API, synthesizes response audio locally using Piper TTS, and streams it back to the browser. It supports barge-in (interrupting the assistant) and runtime configuration via an admin panel.",
+  "how_its_built": "Built with Python 3.11+ using FastAPI for the web server and aiortc for WebRTC handling. Speech-to-Text uses faster-whisper (CPU-based), Text-to-Speech uses Piper ONNX models, and the LLM integration targets Anthropic's Claude. The frontend is a simple HTML/JS client handling getUserMedia and WebRTC peer connection.",
+  "how_to_apply": "Use as a foundational template for building voice-enabled AI assistants without complex state machines. Ideal for developers needing a low-latency, privacy-conscious (local STT/TTS) voice interface prototype that can be extended with custom logic or different LLM providers.",
+  "quickstart": "git clone https://github.com/davidbmar/voice-only-UI-STT-TTS-base.git\ncd voice-only-UI-STT-TTS-base\npython -m venv .venv\nsource .venv/bin/activate\npip install -r requirements.txt\ncp .env.example .env\n# Edit .env to set ANTHROPIC_API_KEY\npython server.py",
+  "features": [
+    "Real-time WebRTC audio streaming with low latency via aiortc",
+    "Local Speech-to-Text using faster-whisper (tiny/base/small/medium models)",
+    "Local Text-to-Speech using Piper ONNX voices with auto-download",
+    "Barge-in support allowing users to interrupt assistant speech mid-sentence",
+    "Runtime Admin Panel for tuning VAD, switching models, and previewing voices",
+    "Sentence-level streaming: plays first sentence while synthesizing subsequent ones"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph Client [Browser]\n        Mic[Microphone]\n        WebRTC_Client[WebRTC Peer]\n        Speaker[Speaker]\n    end\n\n    subgraph Server [Python Server]\n        Signaling[FastAPI / WebSocket]\n        Peer[aiortc PeerConnection]\n        VAD[Voice Activity Detector]\n        STT[faster-whisper]\n        LLM[Claude API]\n        TTS[Piper TTS]\n        AudioQueue[Audio Queue]\n    end\n\n    Mic -->|Audio Frames| WebRTC_Client\n    WebRTC_Client -->|Opus Audio| Peer\n    Peer -->|PCM Audio| VAD\n    VAD -->|Speech Detected| STT\n    STT -->|Transcript| LLM\n    LLM -->|Response Text| TTS\n    TTS -->|PCM Audio| AudioQueue\n    AudioQueue -->|Opus Audio| Peer\n    Peer -->|Audio Stream| WebRTC_Client\n    WebRTC_Client --> Speaker\n    \n    Signaling <-->|SDP Offer/Answer| WebRTC_Client\n    Signaling -->|Controls| VAD\n    Signaling -->|Controls| STT\n    Signaling -->|Controls| TTS",
+  "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant Server\n    participant Whisper as faster-whisper\n    participant Claude as Claude API\n    participant Piper as Piper TTS\n\n    Browser->>Server: HTTP GET /\n    Server-->>Browser: Serve HTML/JS UI\n    Browser->>Server: WebSocket Connect /ws\n    Browser->>Server: WebRTC Offer (SDP)\n    Server-->>Browser: WebRTC Answer (SDP)\n    Browser->>Server: Audio Frames (Opus)\n    Server->>Server: VAD Detection\n    alt Speech Detected\n        Server->>Whisper: Transcribe Audio\n        Whisper-->>Server: Text Transcript\n        Server->>Claude: Send Prompt\n        Claude-->>Server: Response Text\n        Server->>Piper: Synthesize Speech\n        Piper-->>Server: Audio Chunks\n        loop Streaming\n            Server->>Browser: Audio Frames (Opus)\n            Browser->>Server: Barge-in Audio (if interrupting)\n        end\n    end",
+  "capabilities": [
+    "Real-time voice conversation",
+    "Local speech recognition",
+    "Local speech synthesis",
+    "Voice activity detection",
+    "Speech interruption (barge-in)",
+    "Runtime model switching",
+    "Admin configuration interface"
+  ],
+  "components": [
+    "server.py",
+    "config.py",
+    "engine/stt.py",
+    "engine/tts.py",
+    "engine/adapter.py",
+    "engine/types.py",
+    "static/index.html"
+  ],
+  "tech": [
+    "Python 3.11+",
+    "FastAPI",
+    "aiortc",
+    "faster-whisper",
+    "Piper TTS",
+    "WebRTC",
+    "ONNX Runtime",
+    "Scipy",
+    "Numpy"
+  ],
+  "depends_on": [
+    "Anthropic API Key",
+    "Internet connection for initial model downloads",
+    "Modern Web Browser with WebRTC support"
+  ],
+  "integrates_with": [
+    "Anthropic Claude API",
+    "HuggingFace (for Piper voices)",
+    "Google STUN servers (default)",
+    "Twilio TURN servers (optional)"
+  ],
+  "patterns": [
+    "Client-Server Architecture",
+    "WebRTC Media Streaming",
+    "Lazy Loading Models",
+    "Producer-Consumer (Audio Queue)",
+    "Event-Driven VAD"
+  ],
+  "reuse_tags": [
+    "voice-ui",
+    "webrtc",
+    "stt",
+    "tts",
+    "llm-integration",
+    "real-time-audio",
+    "python-backend"
+  ],
+  "slug": "voice-only-UI-STT-TTS-base",
+  "repo_url": "https://github.com/davidbmar/voice-only-UI-STT-TTS-base",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/voice-only-UI-STT-TTS-base/main/docs/screenshots/voice-ui.png",
+  "generated_at": "2026-06-14T04:08:05.205107Z",
+  "source_commit": "3b70be9",
+  "model": "qwen3.7-plus"
+}

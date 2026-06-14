@@ -1,0 +1,88 @@
+{
+  "title": "S3 Presigned URL Lambda API Gateway Setup",
+  "one_liner": "A Serverless Framework template for generating secure, rate-limited S3 presigned upload URLs via API Gateway and Lambda.",
+  "what_it_is": "This project provides a ready-to-deploy AWS infrastructure template using the Serverless Framework. It creates an HTTP API endpoint secured by API Keys and Usage Plans that triggers a Lambda function to generate presigned PUT URLs for direct S3 uploads. It is designed for secure, serverless file ingestion without exposing S3 credentials to clients.",
+  "how_its_built": "The infrastructure is defined in `serverless.yml`, provisioning an S3 bucket with public access blocked, a Node.js Lambda function (`urlSigner`) using AWS SDK v3, and an HTTP API Gateway with API Key enforcement. A Python utility script (`generate_key.py`) manages API key creation and association with Usage Plans via boto3.",
+  "how_to_apply": "Clone the repository, install Node.js dependencies, configure AWS CLI credentials, and run `sls deploy`. Use the provided Python script to generate API keys for users, then integrate the returned presigned URLs into your client-side upload logic.",
+  "quickstart": "git clone https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup.git\ncd S3-presignedURL-Lambda-APIGateway-setup\nnpm install\nsls deploy --stage=dev",
+  "features": [
+    "Generates presigned S3 PUT URLs for direct client uploads",
+    "Secures API endpoints with API Gateway API Keys and Usage Plans",
+    "Enforces rate limiting and quotas via configurable Usage Plans",
+    "Validates file extensions and MIME types in Lambda before signing",
+    "Automates resource provisioning via Serverless Framework"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client Application] -->|POST /generate-upload-url + API Key| APIGW[API Gateway HTTP API]\n    APIGW -->|Validate API Key & Throttle| UsagePlan[Usage Plan]\n    APIGW -->|Invoke| Lambda[Lambda: urlSigner]\n    Lambda -->|Generate Presigned URL| S3[S3 Bucket]\n    Client -->|PUT File Data| S3\n    Admin[Admin/Script] -->|create_api_key| APIGW_Mgmt[API Gateway Management]\n    APIGW_Mgmt -->|Associate| UsagePlan",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant G as API Gateway\n    participant L as Lambda (urlSigner)\n    participant S as S3\n    \n    C->>G: POST /generate-upload-url (x-api-key: KEY)\n    G->>G: Validate API Key & Check Quota\n    G->>L: Invoke Function\n    L->>L: Parse body (fileExt, contentType)\n    L->>L: Validate extension whitelist\n    L->>S: Create PutObjectCommand (dry-run/signing)\n    S-->>L: Return Presigned URL\n    L-->>G: 200 OK { uploadUrl, key }\n    G-->>C: 200 OK { uploadUrl, key }\n    \n    C->>S: PUT file data to Presigned URL\n    S-->>C: 200 OK",
+  "capabilities": [
+    "Presigned URL Generation",
+    "API Key Management",
+    "Rate Limiting",
+    "Input Validation",
+    "Serverless Deployment"
+  ],
+  "components": [
+    "Lambda Function (Node.js)",
+    "API Gateway (HTTP API)",
+    "S3 Bucket",
+    "Usage Plan",
+    "API Key",
+    "Python Key Generator Script"
+  ],
+  "tech": [
+    "AWS Lambda",
+    "Amazon S3",
+    "Amazon API Gateway",
+    "Serverless Framework",
+    "Node.js",
+    "Python",
+    "AWS SDK v3",
+    "boto3"
+  ],
+  "depends_on": [
+    "AWS Account",
+    "Node.js >=16",
+    "Python 3",
+    "Serverless CLI",
+    "AWS CLI"
+  ],
+  "integrates_with": [
+    "AWS CloudFormation",
+    "AWS IAM",
+    "Client-side Uploaders"
+  ],
+  "patterns": [
+    "Presigned URL Pattern",
+    "API Key Authentication",
+    "Serverless Microservice",
+    "Direct-to-S3 Upload"
+  ],
+  "reuse_tags": [
+    "aws",
+    "serverless",
+    "s3",
+    "lambda",
+    "api-gateway",
+    "presigned-url",
+    "template"
+  ],
+  "slug": "S3-presignedURL-Lambda-APIGateway-setup",
+  "repo_url": "https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-72ef35c8ef is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump @smithy/config-resolver from 4.1.2 to 4.4.17 in the npm_and_yarn group across 1 directory"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:52:44.278336Z",
+  "source_commit": "5f7c5cb",
+  "model": "qwen3.7-plus"
+}

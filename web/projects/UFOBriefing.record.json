@@ -1,0 +1,85 @@
+{
+  "title": "UFOBriefing",
+  "one_liner": "Static intelligence portal for UAP/UFO disclosure research, powered by the Intelligence Briefing Toolkit.",
+  "what_it_is": "A read-only, static website that visualizes UAP-related signals, panel debates, and disclosure leads. It ingests structured data from the Intelligence Briefing Toolkit (IBT) and Tool-RAG repositories to generate JSON APIs consumed by a Next.js frontend. The site emphasizes provenance, showing exactly how raw signals are filtered into daily briefs and wire logs.",
+  "how_its_built": "TypeScript/Next.js static site. Build scripts (tsx) read IBT graph data and Tool-RAG artifacts to generate static JSON files in public/api/. The site is deployed to AWS S3 behind CloudFront. It uses a three-repo architecture: IBT for data collection, Tool-RAG for debate analysis, and UFOBriefing for presentation.",
+  "how_to_apply": "Clone the repo, ensure IBT and Tool-RAG repos are available locally, set environment variables for their paths, run build scripts to generate API data, then build and deploy the Next.js static export.",
+  "quickstart": "git clone https://github.com/davidbmar/UFOBriefing.git\ncd UFOBriefing\nnpm install\nexport IBT_ROOT=~/src/intelligence-briefing-toolkit\nexport TOOLRAG_ROOT=~/src/tool-RAG\nnpx tsx scripts/build-daily.ts\nnpx tsx scripts/build-cases.ts\nnpx tsx scripts/build-disclosure.ts\nnpx tsx scripts/build-wire.ts\nnpm run dev",
+  "features": [
+    "Daily UAP signal briefings with recency-weighted confidence scoring",
+    "Chronological wire ledger of dated, on-topic signals with source deduplication",
+    "Structured panel debate transcripts with persona-specific stance blocks",
+    "Disclosure lead generation connecting entities, events, and sources via graph edges",
+    "Analytical transparency page showing pipeline filtering statistics and source tiers"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph DataSources[\"External Data Sources\"]\n        IBT[\"Intelligence Briefing Toolkit\\n(graph.json, signals.json)\"]\n        RAG[\"Tool-RAG\\n(PANEL_DEBATE artifacts)\"]\n    end\n\n    subgraph BuildProcess[\"Build Scripts (tsx)\"]\n        BuildDaily[\"build-daily.ts\"]\n        BuildWire[\"build-wire.ts\"]\n        BuildCases[\"build-cases.ts\"]\n        BuildDisclosure[\"build-disclosure.ts\"]\n        BuildLeads[\"build-disclosure-leads.ts\"]\n        BuildStats[\"build-signals.ts\"]\n    end\n\n    subgraph StaticAssets[\"Public API (JSON)\"]\n        DailyAPI[\"/api/daily-brief.json\"]\n        WireAPI[\"/api/wire.json\"]\n        CasesAPI[\"/api/cases/*.json\"]\n        DisclosureAPI[\"/api/disclosure.json\"]\n        LeadsAPI[\"/api/disclosure-leads.json\"]\n        StatsAPI[\"/api/signals-stats.json\"]\n    end\n\n    subgraph Frontend[\"Next.js Static Site\"]\n        Pages[\"React Pages\"]\n    end\n\n    subgraph Deploy[\"AWS Infrastructure\"]\n        S3[\"S3 Bucket\"]\n        CF[\"CloudFront Distribution\"]\n    end\n\n    IBT --> BuildDaily\n    IBT --> BuildWire\n    IBT --> BuildDisclosure\n    IBT --> BuildStats\n    RAG --> BuildCases\n    \n    BuildDaily --> DailyAPI\n    BuildWire --> WireAPI\n    BuildCases --> CasesAPI\n    BuildDisclosure --> DisclosureAPI\n    DisclosureAPI --> BuildLeads\n    BuildLeads --> LeadsAPI\n    BuildStats --> StatsAPI\n\n    DailyAPI --> Pages\n    WireAPI --> Pages\n    CasesAPI --> Pages\n    DisclosureAPI --> Pages\n    LeadsAPI --> Pages\n    StatsAPI --> Pages\n\n    Pages --> S3\n    S3 --> CF",
+  "diagram_sequence": "sequenceDiagram\n    participant Dev as Developer\n    participant Build as Build Scripts (tsx)\n    participant IBT as IBT Data Store\n    participant RAG as Tool-RAG Artifacts\n    participant FS as Public API (JSON)\n    participant Next as Next.js Builder\n    participant S3 as AWS S3\n\n    Dev->>IBT: Read signals.json & graph.json\n    Dev->>RAG: Read PANEL_DEBATE files\n    \n    Build->>IBT: Fetch latest signals\n    Build->>Build: Filter by recency & topic\n    Build->>FS: Write daily-brief.json\n    \n    Build->>IBT: Fetch graph edges\n    Build->>FS: Write disclosure.json\n    Build->>FS: Write disclosure-leads.json\n    \n    Build->>RAG: Parse debate transcripts\n    Build->>FS: Write cases/*.json\n    \n    Build->>IBT: Calculate funnel stats\n    Build->>FS: Write signals-stats.json\n    \n    Dev->>Next: Run npm run static\n    Next->>FS: Read generated JSON APIs\n    Next->>Next: Pre-render React pages\n    Next->>S3: Sync ./out/ directory",
+  "capabilities": [
+    "Static site generation",
+    "Data ingestion from external repos",
+    "JSON API generation",
+    "Provenance tracking",
+    "Signal filtering and ranking",
+    "Graph data visualization preparation"
+  ],
+  "components": [
+    "build-daily.ts",
+    "build-wire.ts",
+    "build-cases.ts",
+    "build-disclosure.ts",
+    "build-disclosure-leads.ts",
+    "build-signals.ts",
+    "Next.js Pages",
+    "React Components"
+  ],
+  "tech": [
+    "TypeScript",
+    "Next.js",
+    "tsx",
+    "Node.js",
+    "AWS S3",
+    "CloudFront",
+    "JSON"
+  ],
+  "depends_on": [
+    "intelligence-briefing-toolkit",
+    "tool-RAG"
+  ],
+  "integrates_with": [
+    "Intelligence Briefing Toolkit",
+    "Tool-RAG",
+    "AWS S3",
+    "CloudFront"
+  ],
+  "patterns": [
+    "Static Site Generation",
+    "Build-time Data Aggregation",
+    "Three-Repo Architecture",
+    "Provenance-preserving Data Flow",
+    "JSON API Contract"
+  ],
+  "reuse_tags": [
+    "static-site",
+    "intelligence-analysis",
+    "data-visualization",
+    "nextjs",
+    "typescript",
+    "aws-deployment",
+    "provenance-tracking"
+  ],
+  "slug": "UFOBriefing",
+  "repo_url": "https://github.com/davidbmar/UFOBriefing",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "ufo-storyline-engine is 6 commits ahead of the default branch"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:06:07.134898Z",
+  "source_commit": "5672f7b",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,91 @@
+{
+  "title": "Deploy Portal (Capsule Cloud)",
+  "one_liner": "A self-service web portal for provisioning SSH access and deploying applications to an EC2 gateway instance protected by AWS Cognito authentication.",
+  "what_it_is": "Deploy Portal is a Flask-based web application that acts as a control plane for managing deployments on an AWS EC2 instance. It integrates with AWS Cognito via oauth2-proxy for authentication, automatically manages EC2 Security Group rules to whitelist user IPs for SSH access, and generates deployment kits containing SSH keys and configuration scripts. It supports automated infrastructure setup including nginx reverse proxy configuration, port allocation, and framework-specific Dockerfile generation for applications like Next.js.",
+  "how_its_built": "The core application is built with Python 3.8+ and Flask. It uses boto3 to interact with AWS EC2 APIs for security group management. The frontend is served via Jinja2 templates within Flask. Authentication is handled externally by nginx and oauth2-proxy, which injects the user's email into the `X-User-Email` header. Infrastructure automation is handled via Shell scripts for bootstrapping, SSL setup, and installing helper tools like `capsule-nginx-manager`. The system also includes a Firecracker VM manager module for microVM lifecycle management, though the primary deployment path focuses on containerized or direct application deployment on the host.",
+  "how_to_apply": "This project is suitable for teams needing a lightweight, self-hosted deployment dashboard on AWS. It replaces manual SSH key distribution and security group editing with a web interface. It is ideal for internal tools, staging environments, or small-scale production setups where a full Kubernetes cluster is overkill. Developers can use it to quickly spin up new services with automatic HTTPS and port management.",
+  "quickstart": "git clone https://github.com/davidbmar/deploy-portal.git\ncd deploy-portal\nbash scripts/github-deploy.sh",
+  "features": [
+    "Automatic IP whitelisting in EC2 Security Groups upon login",
+    "One-click generation of SSH deployment kits with keys and instructions",
+    "Integrated application catalog with real-time status monitoring",
+    "Automated nginx configuration and port allocation for deployed apps",
+    "Framework-aware Dockerfile generation (e.g., Next.js, Vite)",
+    "Self-signed SSL support with optional Let's Encrypt migration path"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS| Nginx[nginx :443]\n    Nginx -->|Auth Check| OAuth[oauth2-proxy :4180]\n    OAuth -->|Cognito Auth| Cognito[AWS Cognito]\n    OAuth -->|X-User-Email Header| Flask[Deploy Portal Flask App :5000]\n    Flask -->|boto3 API| EC2[EC2 Security Group Manager]\n    Flask -->|File I/O| Registry[App/Port Registry JSON]\n    Flask -->|Generate| Keys[SSH Key Generator]\n    Flask -->|Detect| Framework[Framework Detector]\n    subgraph Infrastructure\n        EC2\n        Registry\n        Keys\n        Framework\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Nginx\n    participant OAuth\n    participant Flask\n    participant AWS\n    participant FS\n    \n    User->>Nginx: GET /deploy/\n    Nginx->>OAuth: Forward request\n    OAuth->>AWS: Validate Cognito Token\n    AWS-->>OAuth: Valid User Email\n    OAuth->>Nginx: Add X-User-Email Header\n    Nginx->>Flask: Proxy Request\n    Flask->>AWS: Get Instance Metadata\n    Flask->>AWS: Resolve Security Group\n    Flask->>AWS: Authorize User IP Ingress\n    Flask->>FS: Generate SSH Key Pair\n    Flask->>FS: Create Deployment Kit Zip\n    Flask-->>Nginx: Return Deployment Kit\n    Nginx-->>User: Download Zip",
+  "capabilities": [
+    "EC2 Security Group Management",
+    "SSH Key Generation and Distribution",
+    "Application Deployment Automation",
+    "Nginx Reverse Proxy Configuration",
+    "Port Allocation and Registry",
+    "Framework Detection (Next.js, Vite, etc.)",
+    "SSL/TLS Certificate Management",
+    "Activity Logging and Monitoring"
+  ],
+  "components": [
+    "app.py (Flask Application)",
+    "config.py (Configuration Loader)",
+    "ec2_utils.py (AWS EC2 Manager)",
+    "services/framework_detector.py",
+    "services/dockerfile_generator.py",
+    "firecracker/vm-manager.py",
+    "scripts/bootstrap.sh",
+    "scripts/github-deploy.sh",
+    "infrastructure/install-infrastructure.sh"
+  ],
+  "tech": [
+    "Python 3.8+",
+    "Flask",
+    "Boto3",
+    "Shell Scripting",
+    "Nginx",
+    "oauth2-proxy",
+    "AWS Cognito",
+    "Jinja2",
+    "Firecracker (Optional)"
+  ],
+  "depends_on": [
+    "AWS EC2 Instance with IAM Role",
+    "AWS Cognito User Pool",
+    "Python 3.8+",
+    "pip",
+    "nginx",
+    "oauth2-proxy",
+    "git"
+  ],
+  "integrates_with": [
+    "AWS EC2 API",
+    "AWS Cognito",
+    "Claude Code (via prompts)",
+    "Let's Encrypt (Certbot)",
+    "Systemd"
+  ],
+  "patterns": [
+    "Reverse Proxy Authentication",
+    "Infrastructure as Code (Lightweight)",
+    "Self-Service Portal",
+    "Convention over Configuration",
+    "MicroVM Management (Experimental)"
+  ],
+  "reuse_tags": [
+    "aws-deployment",
+    "ssh-management",
+    "flask-admin",
+    "self-hosted-paas",
+    "ec2-automation",
+    "nginx-config-gen"
+  ],
+  "slug": "deploy-portal",
+  "repo_url": "https://github.com/davidbmar/deploy-portal",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:44:24.490878Z",
+  "source_commit": "79f9dbd",
+  "model": "qwen3.7-plus"
+}

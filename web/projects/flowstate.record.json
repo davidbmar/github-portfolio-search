@@ -1,0 +1,79 @@
+{
+  "title": "flowstate",
+  "one_liner": "A declarative Finite State Machine engine for multi-turn conversational AI that uses YAML to define states, typed slots, and per-state model selection.",
+  "what_it_is": "flowstate is a Python library that structures complex conversations as deterministic state machines. Instead of relying on long chat histories and fragile system prompts, it breaks conversations into discrete states with specific goals and typed data contracts (slots). Each state can use a different LLM optimized for its specific task, ensuring context isolation, debuggability, and reliable data extraction.",
+  "how_its_built": "The core is a Python engine that loads YAML flow definitions. It uses a `ModelRouter` to dispatch requests to specific `ModelAdapter` implementations (Anthropic, Gemini, MLX, or Fake). The engine maintains a `FlowContext` tracking the current state and filled slots, executing a `step()` function that calls the adapter, parses structured JSON responses, updates slots, and evaluates transition conditions to move to the next state.",
+  "how_to_apply": "Define your conversation logic in a YAML file specifying states, goals, required slots, and transitions. Instantiate a `FlowContext` and load the flow using `load_flow()`. Use the `step()` function in your application loop, passing user input and the current context. Integrate specific LLM adapters via the `ModelRouter` to handle actual generation.",
+  "quickstart": "pip install flowstate\npython scripts/demo_real_pizza.py",
+  "features": [
+    "Declarative YAML configuration for conversation flows",
+    "Per-state LLM model selection for cost and performance optimization",
+    "Typed slot contracts ensuring structured data extraction",
+    "Deterministic state transitions based on slot completion",
+    "Tool side-effect boundaries for safe external integrations",
+    "Empty-turn safety net to prevent conversation stalls"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Input] --> Engine[flowstate Engine]\n    Engine --> Context[FlowContext]\n    Context --> Router[ModelRouter]\n    Router --> Adapter[Model Adapter]\n    Adapter --> LLM[External LLM]\n    LLM --> Adapter\n    Adapter --> Engine\n    Engine --> Tools[Tool Registry]\n    Tools --> External[External Systems]\n    External --> Tools\n    Engine --> NextState[Next State Decision]",
+  "diagram_sequence": "sequenceDiagram\n    participant App as Application\n    participant Eng as flowstate Engine\n    participant Ctx as FlowContext\n    participant Rtr as ModelRouter\n    participant Adp as ModelAdapter\n    participant LLM as LLM Provider\n\n    App->>Eng: step(input, ctx)\n    Eng->>Ctx: get_current_state()\n    Ctx-->>Eng: state_config\n    Eng->>Rtr: get_adapter(state.model)\n    Rtr-->>Eng: adapter_instance\n    Eng->>Adp: complete(prompt, slots)\n    Adp->>LLM: generate_response()\n    LLM-->>Adp: raw_text/json\n    Adp-->>Eng: AdapterResponse(slots, tool_calls)\n    Eng->>Eng: update_slots(ctx)\n    Eng->>Eng: evaluate_transitions()\n    Eng-->>App: StepResult(next_state, updated_ctx)",
+  "capabilities": [
+    "Multi-turn conversation management",
+    "Structured data extraction",
+    "Dynamic model routing",
+    "State-based goal enforcement",
+    "Tool integration",
+    "Conversation debugging"
+  ],
+  "components": [
+    "YAML Loader",
+    "Flow Validator",
+    "State Engine",
+    "Model Router",
+    "Model Adapters",
+    "Tool Registry",
+    "Flow Context"
+  ],
+  "tech": [
+    "Python",
+    "YAML",
+    "JSON",
+    "Anthropic SDK",
+    "Google Generative AI SDK",
+    "MLX"
+  ],
+  "depends_on": [
+    "pyyaml",
+    "anthropic",
+    "google-generativeai",
+    "mlx-lm"
+  ],
+  "integrates_with": [
+    "Anthropic Claude",
+    "Google Gemini",
+    "Local MLX Models",
+    "Custom Tool APIs"
+  ],
+  "patterns": [
+    "Finite State Machine",
+    "Adapter Pattern",
+    "Strategy Pattern",
+    "Dependency Injection",
+    "Declarative Configuration"
+  ],
+  "reuse_tags": [
+    "conversational-ai",
+    "fsm",
+    "llm-orchestration",
+    "structured-output",
+    "yaml-config"
+  ],
+  "slug": "flowstate",
+  "repo_url": "https://github.com/davidbmar/flowstate",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:52:00.561825Z",
+  "source_commit": "0ec715e",
+  "model": "qwen3.7-plus"
+}
