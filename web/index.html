@@ -57,6 +57,7 @@
       <a href="#/" class="nav-link">Home</a>
       <a href="#/search" class="nav-link">Search</a>
       <a href="#/clusters" class="nav-link">Clusters</a>
+      <a href="/projects/" class="nav-link">Project Docs</a>
       <a href="#/access" class="nav-link">Request Access</a>
       <a href="#/collections" class="nav-link">Collections</a>
     </nav>
@@ -66,6 +67,20 @@
       <div class="autocomplete-dropdown" id="autocomplete-dropdown" role="listbox" aria-label="Search suggestions"></div>
     </div>
   </header>
+
+  <!-- Static banner (outside #content, so the SPA never overwrites it). -->
+  <aside class="docs-banner" style="max-width:1080px;margin:1rem auto 0;padding:1rem 1.25rem;border:1px solid #2563eb33;border-left:4px solid #2563eb;border-radius:10px;background:#2563eb0d;font:15px/1.6 system-ui,sans-serif;">
+    <strong style="font-size:1.05rem;">📄 AI-Generated Project Docs</strong>
+    <p style="margin:.4rem 0 .6rem;opacity:.9;">
+      Every repository in this portfolio documents itself. An AI reads each repo and
+      writes a readable page — what it is, a feature overview, a quickstart, architecture
+      &amp; sequence diagrams, and a repo-hygiene check — published automatically and kept
+      up to date.
+    </p>
+    <a href="/projects/" style="display:inline-block;font-weight:600;color:#2563eb;text-decoration:none;">
+      Browse all project docs →
+    </a>
+  </aside>
 
   <main class="main-content" id="content">
     <div class="loading">Loading portfolio data</div>
