@@ -31,9 +31,18 @@ _FIELD_WEIGHTS = {
 
 _TOKEN = re.compile(r"[a-z0-9]+")
 
+# Common words that match everywhere and would otherwise dominate scoring
+# (e.g. "speech to text" must not rank an auth portal first because of "to").
+_STOPWORDS = {
+    "a", "an", "the", "to", "of", "and", "or", "for", "in", "on", "with",
+    "is", "are", "be", "by", "as", "at", "from", "that", "this", "it",
+    "how", "do", "i", "we", "you", "using", "use", "via", "into", "can",
+}
+
 
 def _terms(text: str) -> list[str]:
-    return _TOKEN.findall(text.lower())
+    """Tokenize to lowercase terms, dropping stopwords and 1-char noise."""
+    return [t for t in _TOKEN.findall(text.lower()) if len(t) > 1 and t not in _STOPWORDS]
 
 
 def _field_text(value) -> str:

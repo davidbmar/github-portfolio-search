@@ -56,6 +56,28 @@ def test_no_match_returns_empty():
     assert search_docs.search_docs(_projects(), "kubernetes blockchain") == []
 
 
+def test_stopwords_do_not_skew_ranking():
+    # "to" is a stopword; the speech repo must win on "speech"/"text", not lose
+    # to a prose-heavy repo that merely contains "to" many times.
+    projects = [
+        {"slug": "speechy", "title": "Speechy", "one_liner": "Speech to text engine.",
+         "capabilities": ["speech to text"], "tech": [], "patterns": [],
+         "reuse_tags": [], "components": [], "integrates_with": [], "features": [],
+         "what_it_is": "", "how_its_built": "", "how_to_apply": ""},
+        {"slug": "prosey", "title": "Prosey", "one_liner": "",
+         "capabilities": [], "tech": [], "patterns": [], "reuse_tags": [],
+         "components": [], "integrates_with": [], "features": [],
+         "what_it_is": "you need to add this to that to do the thing to win",
+         "how_its_built": "", "how_to_apply": ""},
+    ]
+    hits = search_docs.search_docs(projects, "speech to text")
+    assert hits[0]["slug"] == "speechy"
+
+
+def test_query_of_only_stopwords_returns_nothing():
+    assert search_docs.search_docs(_projects(), "how do i use the") == []
+
+
 def test_limit_caps_results():
     hits = search_docs.search_docs(_projects(), "generation speech", limit=1)
     assert len(hits) == 1
