@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iris Kade v2: Local Browser AI with Intent Workflow · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Iris Kade v2: Local Browser AI with Intent Workflow", "one_liner": "A zero-network, WebGPU-powered conversational AI featuring an embedder-based intent classifier and a visual workflow editor for stateful dialogue.", "what_it_is": "Iris Kade is a privacy-first, browser-native AI assistant that runs entirely on client-side hardware using WebGPU. It combines local LLM inference (via web-llm) with a multi-lane RAG pipeline and a custom declarative workflow engine. The system uses vector embeddings to classify user intents and route conversations through defined state machines, enabling complex, context-aware interactions without sending data to external servers.", "how_its_built": "The application is built with TypeScript and runs in the browser. It leverages web-llm for local LLM inference, vits-web for streaming text-to-speech, and the Web Speech API for speech-to-text. A custom workflow engine parses JSONL definitions into interactive state graphs. Vector search is handled via Web Workers using ONNX embeddings, while the UI manages a 4-state conversation FSM (IDLE, PROCESSING, SPEAKING, INTERRUPTED).", "how_to_apply": "Use this project as a foundation for building private, offline-capable AI assistants or interactive narrative engines. The modular workflow system allows developers to define complex conversation logic declaratively, while the RAG pipeline can be repurposed for domain-specific knowledge retrieval. It serves as a reference implementation for high-performance WebGPU AI applications.", "quickstart": "git clone https://github.com/davidbmar/speaker-generation-version-2-intents\ncd speaker-generation-version-2-intents/web-app\nnpm install\nnpm run dev", "features": ["100% local execution using WebGPU with no network calls or API keys", "Visual workflow editor for defining stateful, multi-turn conversation graphs", "Embedder-based intent classification with vector and lexical reranking", "Streaming TTS and STT for hands-free, real-time voice interaction", "Multi-lane RAG pipeline retrieving from persona, playbook, and lore contexts", "Built-in diagnostic harness for one-click conversation testing and analysis"], "diagram_architecture": "flowchart TD\n    User[User Input] -->|Voice/Text| STT[Web Speech API]\n    STT --> FSM[Conversation FSM]\n    FSM -->|IDLE to PROCESSING| Pipeline[RAG Pipeline]\n    Pipeline -->|Retrieve & Rerank| Context[Context Composer]\n    Context --> LLM[Local LLM via web-llm]\n    LLM -->|Stream Tokens| Buffer[Sentence Buffer]\n    Buffer --> TTS[vits-web TTS]\n    TTS --> Audio[Audio Output]\n    FSM -->|Interrupt| Pipeline\n    FSM -->|Reset| IDLE((IDLE State))\n    subgraph Local Browser\n        STT\n        FSM\n        Pipeline\n        LLM\n        TTS\n    end", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant UI as UI/FSM\n    participant W as Workflow/Intent\n    participant RAG as RAG Pipeline\n    participant LLM as WebLLM\n    participant TTS as VITS Web\n    \n    U->>UI: Speak/Type Input\n    UI->>W: Classify Intent\n    W->>W: Match State/Transition\n    W->>RAG: Retrieve Context\n    RAG->>RAG: Vector + Lexical Rerank\n    RAG->>LLM: Compose Prompt\n    LLM->>LLM: Generate Tokens\n    LLM->>TTS: Stream Sentences\n    TTS->>U: Play Audio\n    U->>UI: Interrupt (Optional)\n    UI->>LLM: Abort Generation\n    UI->>TTS: Stop Audio\n    UI->>W: Reset to IDLE", "capabilities": ["Local LLM Inference", "Intent Classification", "Visual Workflow Editing", "Vector Search RAG", "Speech Synthesis", "Speech Recognition", "State Machine Management"], "components": ["web-llm", "vits-web", "Web Speech API", "Workflow Manager", "Intent Classifier", "Search Worker", "Code View Renderer"], "tech": ["TypeScript", "WebGPU", "ONNX Runtime", "Vite", "Mermaid", "JSONL"], "depends_on": ["Chrome 113+", "Edge 113+", "WebGPU Support", "Node.js (for dev)"], "integrates_with": ["Web Audio API", "Web Workers", "File System Access (for packs)"], "patterns": ["Finite State Machine", "Retrieval-Augmented Generation", "Model-View-Controller", "Worker-based Offloading", "Declarative Configuration"], "reuse_tags": ["privacy-first", "offline-ai", "webgpu", "local-llm", "voice-interface", "workflow-engine"], "slug": "speaker-generation-version-2-intents", "repo_url": "https://github.com/davidbmar/speaker-generation-version-2-intents", "visibility": "private", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web-app/npm_and_yarn-6a3a1fcd0f is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 2 directories with 6 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/speaker-generation-version-2-intents/main/docs/screenshots/live-demo.png", "generated_at": "2026-06-14T03:55:18.701933Z", "source_commit": "9979902", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Iris Kade v2: Local Browser AI with Intent Workflow",
+  "description": "A zero-network, WebGPU-powered conversational AI featuring an embedder-based intent classifier and a visual workflow editor for stateful dialogue.",
+  "codeRepository": "https://github.com/davidbmar/speaker-generation-version-2-intents",
+  "programmingLanguage": [
+    "TypeScript",
+    "WebGPU",
+    "ONNX Runtime",
+    "Vite",
+    "Mermaid",
+    "JSONL"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Iris Kade v2: Local Browser AI with Intent Workflow</h1>
+  <p class="one-liner">A zero-network, WebGPU-powered conversational AI featuring an embedder-based intent classifier and a visual workflow editor for stateful dialogue.</p>
+  <p><a href="https://github.com/davidbmar/speaker-generation-version-2-intents">https://github.com/davidbmar/speaker-generation-version-2-intents</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/speaker-generation-version-2-intents/main/docs/screenshots/live-demo.png" alt="Iris Kade v2: Local Browser AI with Intent Workflow screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>Iris Kade is a privacy-first, browser-native AI assistant that runs entirely on client-side hardware using WebGPU. It combines local LLM inference (via web-llm) with a multi-lane RAG pipeline and a custom declarative workflow engine. The system uses vector embeddings to classify user intents and route conversations through defined state machines, enabling complex, context-aware interactions without sending data to external servers.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>100% local execution using WebGPU with no network calls or API keys</li><li>Visual workflow editor for defining stateful, multi-turn conversation graphs</li><li>Embedder-based intent classification with vector and lexical reranking</li><li>Streaming TTS and STT for hands-free, real-time voice interaction</li><li>Multi-lane RAG pipeline retrieving from persona, playbook, and lore contexts</li><li>Built-in diagnostic harness for one-click conversation testing and analysis</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/speaker-generation-version-2-intents
+cd speaker-generation-version-2-intents/web-app
+npm install
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Input] -->|Voice/Text| STT[Web Speech API]
+    STT --> FSM[Conversation FSM]
+    FSM -->|IDLE to PROCESSING| Pipeline[RAG Pipeline]
+    Pipeline -->|Retrieve & Rerank| Context[Context Composer]
+    Context --> LLM[Local LLM via web-llm]
+    LLM -->|Stream Tokens| Buffer[Sentence Buffer]
+    Buffer --> TTS[vits-web TTS]
+    TTS --> Audio[Audio Output]
+    FSM -->|Interrupt| Pipeline
+    FSM -->|Reset| IDLE((IDLE State))
+    subgraph Local Browser
+        STT
+        FSM
+        Pipeline
+        LLM
+        TTS
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The application is built with TypeScript and runs in the browser. It leverages web-llm for local LLM inference, vits-web for streaming text-to-speech, and the Web Speech API for speech-to-text. A custom workflow engine parses JSONL definitions into interactive state graphs. Vector search is handled via Web Workers using ONNX embeddings, while the UI manages a 4-state conversation FSM (IDLE, PROCESSING, SPEAKING, INTERRUPTED).</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant UI as UI/FSM
+    participant W as Workflow/Intent
+    participant RAG as RAG Pipeline
+    participant LLM as WebLLM
+    participant TTS as VITS Web
+    
+    U->>UI: Speak/Type Input
+    UI->>W: Classify Intent
+    W->>W: Match State/Transition
+    W->>RAG: Retrieve Context
+    RAG->>RAG: Vector + Lexical Rerank
+    RAG->>LLM: Compose Prompt
+    LLM->>LLM: Generate Tokens
+    LLM->>TTS: Stream Sentences
+    TTS->>U: Play Audio
+    U->>UI: Interrupt (Optional)
+    UI->>LLM: Abort Generation
+    UI->>TTS: Stop Audio
+    UI->>W: Reset to IDLE</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this project as a foundation for building private, offline-capable AI assistants or interactive narrative engines. The modular workflow system allows developers to define complex conversation logic declaratively, while the RAG pipeline can be repurposed for domain-specific knowledge retrieval. It serves as a reference implementation for high-performance WebGPU AI applications.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Local LLM Inference</span><span class="tag">Intent Classification</span><span class="tag">Visual Workflow Editing</span><span class="tag">Vector Search RAG</span><span class="tag">Speech Synthesis</span><span class="tag">Speech Recognition</span><span class="tag">State Machine Management</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">web-llm</span><span class="tag">vits-web</span><span class="tag">Web Speech API</span><span class="tag">Workflow Manager</span><span class="tag">Intent Classifier</span><span class="tag">Search Worker</span><span class="tag">Code View Renderer</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">WebGPU</span><span class="tag">ONNX Runtime</span><span class="tag">Vite</span><span class="tag">Mermaid</span><span class="tag">JSONL</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Chrome 113+</span><span class="tag">Edge 113+</span><span class="tag">WebGPU Support</span><span class="tag">Node.js (for dev)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Web Audio API</span><span class="tag">Web Workers</span><span class="tag">File System Access (for packs)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Finite State Machine</span><span class="tag">Retrieval-Augmented Generation</span><span class="tag">Model-View-Controller</span><span class="tag">Worker-based Offloading</span><span class="tag">Declarative Configuration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">privacy-first</span><span class="tag">offline-ai</span><span class="tag">webgpu</span><span class="tag">local-llm</span><span class="tag">voice-interface</span><span class="tag">workflow-engine</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web-app/npm_and_yarn-6a3a1fcd0f is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 2 directories with 6 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:55:18.701933Z ·
+     commit 9979902 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

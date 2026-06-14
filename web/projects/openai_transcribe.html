@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>openai_transcribe · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "openai_transcribe", "one_liner": "A lightweight Node.js HTTP server that proxies audio files to the OpenAI Whisper API for transcription.", "what_it_is": "This project provides two distinct Node.js server implementations for transcribing audio using OpenAI's Whisper model. It acts as a backend proxy, accepting audio data via HTTP POST requests and forwarding it to the OpenAI API. The 'turn_based' version handles discrete audio file uploads, while the 'streaming_based' version attempts to handle continuous audio streams by buffering chunks before sending them for transcription.", "how_its_built": "The application is built using native Node.js modules (http, fs, path) and minimal dependencies like axios and form-data for the turn-based variant. It relies on environment variables for configuration, specifically requiring an OPENAI_API_KEY. The servers implement basic CORS headers to allow cross-origin requests from web clients.", "how_to_apply": "Use this project as a simple backend service to add speech-to-text capabilities to web applications without exposing your OpenAI API key to the client-side code. It is suitable for prototypes or internal tools where a full-featured media processing pipeline is not required.", "quickstart": "npm install\nexport OPENAI_API_KEY=your_api_key\nnode turn_based_transcribe/server.js", "features": ["Proxies audio data to OpenAI Whisper API", "Supports turn-based file upload transcription", "Experimental support for streaming audio buffering", "Configurable via OPENAI_API_KEY environment variable", "Includes CORS headers for browser compatibility"], "diagram_architecture": "flowchart TD\n    Client[Web Client] -->|POST /audio| Server[Node.js HTTP Server]\n    Server -->|Check Env| Env[OPENAI_API_KEY]\n    Server -->|POST FormData| OpenAI[OpenAI Whisper API]\n    OpenAI -->|JSON Transcript| Server\n    Server -->|JSON Response| Client", "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant S as Node.js Server\n    participant O as OpenAI API\n    C->>S: POST /audio (Audio Data)\n    S->>S: Validate OPENAI_API_KEY\n    S->>S: Construct FormData\n    S->>O: POST /v1/audio/transcriptions\n    O-->>S: JSON { text: \"...\" }\n    S-->>C: 200 OK (Transcription Text)", "capabilities": ["Audio Transcription", "HTTP Proxying", "API Key Management"], "components": ["turn_based_transcribe/server.js", "streaming_based_transcribe/server.js"], "tech": ["Node.js", "JavaScript", "HTTP", "OpenAI API"], "depends_on": ["axios", "form-data"], "integrates_with": ["OpenAI Whisper"], "patterns": ["Proxy Pattern", "Server-Side API Key Storage"], "reuse_tags": ["speech-to-text", "openai-wrapper", "nodejs-server", "audio-processing"], "slug": "openai_transcribe", "repo_url": "https://github.com/davidbmar/openai_transcribe", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:45:29.887324Z", "source_commit": "7cb468a", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "openai_transcribe",
+  "description": "A lightweight Node.js HTTP server that proxies audio files to the OpenAI Whisper API for transcription.",
+  "codeRepository": "https://github.com/davidbmar/openai_transcribe",
+  "programmingLanguage": [
+    "Node.js",
+    "JavaScript",
+    "HTTP",
+    "OpenAI API"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>openai_transcribe</h1>
+  <p class="one-liner">A lightweight Node.js HTTP server that proxies audio files to the OpenAI Whisper API for transcription.</p>
+  <p><a href="https://github.com/davidbmar/openai_transcribe">https://github.com/davidbmar/openai_transcribe</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project provides two distinct Node.js server implementations for transcribing audio using OpenAI&#x27;s Whisper model. It acts as a backend proxy, accepting audio data via HTTP POST requests and forwarding it to the OpenAI API. The &#x27;turn_based&#x27; version handles discrete audio file uploads, while the &#x27;streaming_based&#x27; version attempts to handle continuous audio streams by buffering chunks before sending them for transcription.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Proxies audio data to OpenAI Whisper API</li><li>Supports turn-based file upload transcription</li><li>Experimental support for streaming audio buffering</li><li>Configurable via OPENAI_API_KEY environment variable</li><li>Includes CORS headers for browser compatibility</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">npm install
+export OPENAI_API_KEY=your_api_key
+node turn_based_transcribe/server.js</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Web Client] -->|POST /audio| Server[Node.js HTTP Server]
+    Server -->|Check Env| Env[OPENAI_API_KEY]
+    Server -->|POST FormData| OpenAI[OpenAI Whisper API]
+    OpenAI -->|JSON Transcript| Server
+    Server -->|JSON Response| Client</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The application is built using native Node.js modules (http, fs, path) and minimal dependencies like axios and form-data for the turn-based variant. It relies on environment variables for configuration, specifically requiring an OPENAI_API_KEY. The servers implement basic CORS headers to allow cross-origin requests from web clients.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client
+    participant S as Node.js Server
+    participant O as OpenAI API
+    C->>S: POST /audio (Audio Data)
+    S->>S: Validate OPENAI_API_KEY
+    S->>S: Construct FormData
+    S->>O: POST /v1/audio/transcriptions
+    O-->>S: JSON { text: "..." }
+    S-->>C: 200 OK (Transcription Text)</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this project as a simple backend service to add speech-to-text capabilities to web applications without exposing your OpenAI API key to the client-side code. It is suitable for prototypes or internal tools where a full-featured media processing pipeline is not required.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Audio Transcription</span><span class="tag">HTTP Proxying</span><span class="tag">API Key Management</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">turn_based_transcribe/server.js</span><span class="tag">streaming_based_transcribe/server.js</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Node.js</span><span class="tag">JavaScript</span><span class="tag">HTTP</span><span class="tag">OpenAI API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">axios</span><span class="tag">form-data</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">OpenAI Whisper</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Proxy Pattern</span><span class="tag">Server-Side API Key Storage</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-to-text</span><span class="tag">openai-wrapper</span><span class="tag">nodejs-server</span><span class="tag">audio-processing</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:45:29.887324Z ·
+     commit 7cb468a ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

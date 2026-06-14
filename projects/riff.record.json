@@ -1,0 +1,115 @@
+{
+  "title": "riff",
+  "one_liner": "Voice agent platform that generates deterministic FSM-based voice flows from plain English business descriptions.",
+  "what_it_is": "riff is a Python-based voice agent framework that combines Large Language Models (LLMs) for natural language understanding with declared Finite State Machines (FSMs) for strict workflow enforcement. It allows developers to describe a business process in plain English, automatically generating a YAML-defined state graph that handles phone conversations (ordering, scheduling, intake). The system ensures reliability by keeping all state transitions, slot validation, and guardrails as deterministic pure functions, while the LLM only handles language generation and intent recognition within those bounds.",
+  "how_its_built": "The core engine uses a `StateManager` to enforce transitions defined in YAML flow files. Input speech is converted to text (STT), processed by `run_turn()` which consults the LLM (via adapters for Gemini, Gemma, or Claude) and deterministic guardrails, then converts response text to speech (TTS). Key components include `slot_extractor` for deterministic data capture, `state_manager` for graph traversal, and an event bus for internal signaling. The architecture isolates non-deterministic LLM calls behind pure-function interfaces for slots and transitions.",
+  "how_to_apply": "Use riff to build robust customer service voice agents where hallucination prevention is critical. Ideal for scheduling services (plumbing, dental), retail orders (pizza, coffee), or complex intakes (apartment viewings). Developers define business logic via YAML or generate it via the `/api/flows/generate` endpoint, then integrate the web server or MCP server into their telephony infrastructure.",
+  "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server",
+  "features": [
+    "Generates voice agent flows from plain English business descriptions",
+    "Enforces deterministic state transitions using YAML-defined FSMs",
+    "Prevents LLM hallucinations via pure-function guardrails and slot validators",
+    "Includes 11 pre-built flows for retail, service, and complex intake scenarios",
+    "Provides A/B testing harness with observable-metric scoring",
+    "Exposes reusable RIFF blocks to MCP clients for extended integration"
+  ],
+  "diagram_architecture": "flowchart TD\n    Caller[Caller] -->|Speaks| STT[STT]\n    STT -->|Text| RunTurn[run_turn]\n    subgraph CorePipeline [Core Pipeline]\n        RunTurn -->|Context| Guardrails[Guardrails<br/>8 layers pure fns]\n        RunTurn -->|Prompt| LLM[LLM Call<br/>Gemini/Gemma/Claude]\n        RunTurn -->|State| StateMgr[State Manager<br/>Declared Graph]\n    end\n    Guardrails -->|Validated| RunTurn\n    LLM -->|Response| RunTurn\n    StateMgr -->|Next State| RunTurn\n    RunTurn -->|Result| SlotExt[slot_extractor]\n    RunTurn -->|Result| Eval[eval framework]\n    RunTurn -->|Result| Logger[turn_logger JSONL]\n    RunTurn -->|Audio| TTS[TTS]\n    TTS -->|Hears| Caller",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Caller\n    participant S as STT\n    participant RT as run_turn()\n    participant SM as StateManager\n    participant L as LLM Adapter\n    participant T as TTS\n    \n    C->>S: Speaks audio\n    S->>RT: Transcribed text\n    RT->>SM: Get current state & valid transitions\n    SM-->>RT: State definition & guards\n    RT->>L: Generate response based on state/context\n    L-->>RT: Raw text response\n    RT->>SM: Validate transition & extract slots\n    SM-->>RT: Updated state & validated slots\n    RT->>T: Synthesize audio response\n    T->>C: Plays audio\n    RT->>RT: Log turn result (JSONL)",
+  "capabilities": [
+    "Plain-text to voice-flow generation",
+    "Deterministic state machine enforcement",
+    "Multi-provider LLM adaptation (Gemini, Gemma, Claude)",
+    "Real-time session inspection and debugging",
+    "A/B testing with synthetic scoring",
+    "MCP server exposure for AI clients"
+  ],
+  "components": [
+    "StateManager",
+    "Flow Loader",
+    "Session Context",
+    "Turn Runner",
+    "Guardrail Engine",
+    "Slot Extractor",
+    "Web Server",
+    "MCP Server",
+    "Event Bus"
+  ],
+  "tech": [
+    "Python",
+    "YAML",
+    "Mermaid",
+    "Pytest",
+    "FastAPI/Stdlib HTTP",
+    "Git"
+  ],
+  "depends_on": [
+    "Google Gemini API (optional)",
+    "Local Gemma model (optional)",
+    "Anthropic Claude API (optional)",
+    "MCP CLI (optional)"
+  ],
+  "integrates_with": [
+    "Telephony systems via STT/TTS adapters",
+    "Model Context Protocol (MCP) clients",
+    "Browser-based voice UI (voice.html)"
+  ],
+  "patterns": [
+    "LLM riffs, FSM keeps beat",
+    "Pure function guardrails",
+    "Deterministic slot extraction",
+    "Weakref-finalize cache cleanup",
+    "Grep-audit invariant tests",
+    "Pre-registered canary tests"
+  ],
+  "reuse_tags": [
+    "voice-agent",
+    "fsm-orchestration",
+    "llm-guardrails",
+    "python-framework",
+    "deterministic-ai",
+    "business-automation"
+  ],
+  "slug": "riff",
+  "repo_url": "https://github.com/davidbmar/riff",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "architect/flow-metrics-schema-2026-05-27 is 17 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "codex-m3/ladder-semantic-ack-judge-20260528 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/web/flow-editor/npm_and_yarn-da0aa30ced is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/gemini-off-record-audio is 37 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "release-mgr/property-ticket-readiness-2026-05-27 is 2 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "review/metrics-audit-2026-05-27 is 24 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "wip/property-ticket-l2-real-routing-20260526-174019 is 87 commits ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #3: chore(deps): bump brace-expansion from 5.0.5 to 5.0.6 in /web/flow-editor in the npm_and_yarn group across 1 directory"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:52:01.986839Z",
+  "source_commit": "17e8b85",
+  "model": "qwen3.7-plus"
+}

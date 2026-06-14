@@ -1,0 +1,78 @@
+{
+  "title": "whisperlive-salad",
+  "one_liner": "Real-time speech-to-text server using OpenAI Whisper, optimized for Salad Cloud GPU deployment.",
+  "what_it_is": "A Python-based WebSocket server that streams audio chunks from clients (browser extensions or scripts) to a backend running OpenAI's Whisper model. It supports multiple inference backends including Faster-Whisper, TensorRT, and OpenVINO, enabling low-latency transcription on GPU infrastructure like Salad Cloud.",
+  "how_its_built": "Built with Python using the `websockets` library for communication. It integrates `faster-whisper` for efficient CPU/GPU inference, `tensorrt` for NVIDIA GPU acceleration, and `openvino` for Intel hardware. The client-side logic is implemented as Chrome/Firefox extensions using AudioWorklets to capture and preprocess microphone/tab audio before sending it via WebSocket.",
+  "how_to_apply": "Deploy the server on a Salad Cloud container with GPU support. Connect browser extensions or custom clients to the server's WebSocket endpoint to transcribe live meetings, lectures, or voice notes in real-time.",
+  "quickstart": "bash scripts/setup.sh\npip install whisper-live\npython3 run_server.py --port 9090 --backend faster_whisper",
+  "features": [
+    "Real-time transcription via WebSocket streaming",
+    "Supports Faster-Whisper, TensorRT, and OpenVINO backends",
+    "Browser extensions for Chrome and Firefox for easy capture",
+    "Voice Activity Detection (VAD) to reduce processing load",
+    "Configurable client limits and connection timeouts",
+    "Single-model mode for reduced memory usage and latency"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Browser Extension/Client] -->|WebSocket Audio Chunks| Server[WhisperLive Server]\n    Server -->|Load Balance| Backend[Inference Backend]\n    Backend -->|Faster-Whisper| FW[Faster-Whisper Engine]\n    Backend -->|TensorRT| TRT[TensorRT Engine]\n    Backend -->|OpenVINO| OV[OpenVINO Engine]\n    FW -->|Text Segments| Server\n    TRT -->|Text Segments| Server\n    OV -->|Text Segments| Server\n    Server -->|Transcribed Text| Client",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client (Extension)\n    participant S as WhisperLive Server\n    participant B as Inference Backend\n    C->>S: Connect WebSocket\n    S->>C: Connection Accepted\n    loop Audio Stream\n        C->>S: Send Audio Chunk (16kHz Mono)\n        S->>B: Forward Audio Data\n        B->>B: Run Whisper Inference\n        B-->>S: Return Transcribed Segment\n        S-->>C: Send JSON Result\n    end\n    C->>S: Close Connection",
+  "capabilities": [
+    "Live audio transcription",
+    "File-based transcription",
+    "Multi-client support",
+    "GPU acceleration",
+    "Voice Activity Detection"
+  ],
+  "components": [
+    "run_server.py",
+    "AudioPreProcessor (JS)",
+    "Chrome Extension",
+    "Firefox Extension",
+    "WebSocket Handler"
+  ],
+  "tech": [
+    "Python",
+    "WebSockets",
+    "Faster-Whisper",
+    "TensorRT",
+    "OpenVINO",
+    "JavaScript",
+    "AudioWorklet"
+  ],
+  "depends_on": [
+    "PyAudio",
+    "NumPy",
+    "OpenAI Whisper",
+    "CUDA (for TensorRT)",
+    "Intel OpenVINO Runtime"
+  ],
+  "integrates_with": [
+    "Salad Cloud",
+    "Google Chrome",
+    "Mozilla Firefox",
+    "NVIDIA GPUs",
+    "Intel CPUs/GPUs"
+  ],
+  "patterns": [
+    "Client-Server",
+    "Streaming",
+    "Producer-Consumer",
+    "Plugin Architecture"
+  ],
+  "reuse_tags": [
+    "speech-to-text",
+    "real-time",
+    "gpu-accelerated",
+    "websocket",
+    "whisper"
+  ],
+  "slug": "whisperlive-salad",
+  "repo_url": "https://github.com/davidbmar/whisperlive-salad",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://img.youtube.com/vi/0PHWCApIcCI/0.jpg",
+  "generated_at": "2026-06-14T04:11:04.922673Z",
+  "source_commit": "d936448",
+  "model": "qwen3.7-plus"
+}

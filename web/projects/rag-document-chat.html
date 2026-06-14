@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rag-document-chat · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "rag-document-chat", "one_liner": "A Python-based Retrieval-Augmented Generation (RAG) system for document Q&A using FastAPI, Streamlit, ChromaDB, and OpenAI.", "what_it_is": "This project implements a complete RAG pipeline that ingests PDF documents, processes them using hierarchical semantic grouping and compression, stores embeddings in ChromaDB, and provides a chat interface via Streamlit backed by a FastAPI server. It supports optional S3 storage for documents and uses OpenAI for both embedding generation and LLM responses.", "how_its_built": "The backend is built with FastAPI to handle document uploads and query processing. It uses PyPDF2 for text extraction, NLTK for tokenization, and a custom HierarchicalProcessor to group sentences into logical units and generate compressed summaries (10:1 ratio). Embeddings are stored in ChromaDB (local or HTTP mode). The frontend is a Streamlit application that interacts with the FastAPI backend. AWS Boto3 is used for optional S3 integration.", "how_to_apply": "Use this template to build internal knowledge base chatbots, legal document reviewers, or academic paper assistants. It is suitable for developers needing a structured RAG implementation with advanced chunking strategies beyond simple character splitting.", "quickstart": "pip install -r requirements.txt\npython -m nltk.downloader punkt_tab punkt stopwords\nuvicorn app:app --reload\nstreamlit run streamlit_app.py", "features": ["Hierarchical document processing with logical sentence grouping and 10:1 compression summaries", "PDF text extraction with page number and section title metadata tracking", "Vector storage and retrieval using ChromaDB with enhanced chunk metadata", "FastAPI backend for document upload and query handling with CORS support", "Streamlit frontend for interactive document chatting", "Optional AWS S3 integration for persistent document storage"], "diagram_architecture": "flowchart TD\n    User[User] -->|Uploads PDF| Streamlit[Streamlit Frontend]\n    Streamlit -->|POST /upload| FastAPI[FastAPI Backend]\n    FastAPI -->|Extract Text| PyPDF2[PyPDF2]\n    PyPDF2 -->|Raw Text| HierarchicalProc[HierarchicalProcessor]\n    HierarchicalProc -->|Logical Groups & Summaries| Embedder[OpenAI Embeddings]\n    Embedder -->|Vectors| ChromaDB[(ChromaDB)]\n    User -->|Asks Question| Streamlit\n    Streamlit -->|POST /query| FastAPI\n    FastAPI -->|Search| ChromaDB\n    ChromaDB -->|Context Chunks| FastAPI\n    FastAPI -->|Prompt + Context| OpenAI[OpenAI LLM]\n    OpenAI -->|Answer| FastAPI\n    FastAPI -->|Response| Streamlit", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as Streamlit UI\n    participant F as FastAPI Server\n    participant P as HierarchicalProcessor\n    participant C as ChromaDB\n    participant O as OpenAI API\n\n    Note over U, O: Document Ingestion Phase\n    U->>S: Upload PDF File\n    S->>F: POST /upload file\n    F->>F: Parse PDF with PyPDF2\n    F->>P: Process Text Hierarchically\n    P->>P: Group Sentences & Generate Summaries\n    P->>O: Generate Embeddings for Chunks\n    O-->>P: Return Vectors\n    P->>C: Store Chunks with Metadata\n    C-->>F: Confirm Storage\n    F-->>S: Upload Success\n    S-->>U: Display Success Message\n\n    Note over U, O: Query Phase\n    U->>S: Ask Question\n    S->>F: POST /query {question}\n    F->>O: Generate Query Embedding\n    O-->>F: Return Query Vector\n    F->>C: Similarity Search\n    C-->>F: Return Relevant Chunks\n    F->>O: Send Prompt with Context\n    O-->>F: Return Generated Answer\n    F-->>S: Return Answer\n    S-->>U: Display Answer", "capabilities": ["Document Ingestion", "Semantic Chunking", "Vector Search", "LLM Generation", "Metadata Tracking", "Cloud Storage Integration"], "components": ["FastAPI Application", "Streamlit Interface", "Hierarchical Processor", "Enhanced Document Processor", "ChromaDB Client", "S3 Uploader"], "tech": ["Python", "FastAPI", "Streamlit", "ChromaDB", "OpenAI API", "PyPDF2", "NLTK", "Boto3", "LangChain"], "depends_on": ["openai", "chromadb", "fastapi", "streamlit", "pypdf2", "boto3", "nltk", "langchain", "pydantic", "uvicorn"], "integrates_with": ["AWS S3", "OpenAI GPT Models", "Local File System"], "patterns": ["Retrieval-Augmented Generation (RAG)", "Microservices (API + UI)", "Hierarchical Data Processing", "Vector Database Indexing"], "reuse_tags": ["rag", "llm", "document-chat", "fastapi", "streamlit", "chromadb", "pdf-processing"], "slug": "rag-document-chat", "repo_url": "https://github.com/davidbmar/rag-document-chat", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/pip/pip-f7c9f9c38b is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the pip group across 1 directory with 6 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T03:50:28.287927Z", "source_commit": "dbedbbc", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "rag-document-chat",
+  "description": "A Python-based Retrieval-Augmented Generation (RAG) system for document Q&A using FastAPI, Streamlit, ChromaDB, and OpenAI.",
+  "codeRepository": "https://github.com/davidbmar/rag-document-chat",
+  "programmingLanguage": [
+    "Python",
+    "FastAPI",
+    "Streamlit",
+    "ChromaDB",
+    "OpenAI API",
+    "PyPDF2",
+    "NLTK",
+    "Boto3",
+    "LangChain"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>rag-document-chat</h1>
+  <p class="one-liner">A Python-based Retrieval-Augmented Generation (RAG) system for document Q&amp;A using FastAPI, Streamlit, ChromaDB, and OpenAI.</p>
+  <p><a href="https://github.com/davidbmar/rag-document-chat">https://github.com/davidbmar/rag-document-chat</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project implements a complete RAG pipeline that ingests PDF documents, processes them using hierarchical semantic grouping and compression, stores embeddings in ChromaDB, and provides a chat interface via Streamlit backed by a FastAPI server. It supports optional S3 storage for documents and uses OpenAI for both embedding generation and LLM responses.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Hierarchical document processing with logical sentence grouping and 10:1 compression summaries</li><li>PDF text extraction with page number and section title metadata tracking</li><li>Vector storage and retrieval using ChromaDB with enhanced chunk metadata</li><li>FastAPI backend for document upload and query handling with CORS support</li><li>Streamlit frontend for interactive document chatting</li><li>Optional AWS S3 integration for persistent document storage</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install -r requirements.txt
+python -m nltk.downloader punkt_tab punkt stopwords
+uvicorn app:app --reload
+streamlit run streamlit_app.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Uploads PDF| Streamlit[Streamlit Frontend]
+    Streamlit -->|POST /upload| FastAPI[FastAPI Backend]
+    FastAPI -->|Extract Text| PyPDF2[PyPDF2]
+    PyPDF2 -->|Raw Text| HierarchicalProc[HierarchicalProcessor]
+    HierarchicalProc -->|Logical Groups & Summaries| Embedder[OpenAI Embeddings]
+    Embedder -->|Vectors| ChromaDB[(ChromaDB)]
+    User -->|Asks Question| Streamlit
+    Streamlit -->|POST /query| FastAPI
+    FastAPI -->|Search| ChromaDB
+    ChromaDB -->|Context Chunks| FastAPI
+    FastAPI -->|Prompt + Context| OpenAI[OpenAI LLM]
+    OpenAI -->|Answer| FastAPI
+    FastAPI -->|Response| Streamlit</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is built with FastAPI to handle document uploads and query processing. It uses PyPDF2 for text extraction, NLTK for tokenization, and a custom HierarchicalProcessor to group sentences into logical units and generate compressed summaries (10:1 ratio). Embeddings are stored in ChromaDB (local or HTTP mode). The frontend is a Streamlit application that interacts with the FastAPI backend. AWS Boto3 is used for optional S3 integration.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant S as Streamlit UI
+    participant F as FastAPI Server
+    participant P as HierarchicalProcessor
+    participant C as ChromaDB
+    participant O as OpenAI API
+
+    Note over U, O: Document Ingestion Phase
+    U->>S: Upload PDF File
+    S->>F: POST /upload file
+    F->>F: Parse PDF with PyPDF2
+    F->>P: Process Text Hierarchically
+    P->>P: Group Sentences & Generate Summaries
+    P->>O: Generate Embeddings for Chunks
+    O-->>P: Return Vectors
+    P->>C: Store Chunks with Metadata
+    C-->>F: Confirm Storage
+    F-->>S: Upload Success
+    S-->>U: Display Success Message
+
+    Note over U, O: Query Phase
+    U->>S: Ask Question
+    S->>F: POST /query {question}
+    F->>O: Generate Query Embedding
+    O-->>F: Return Query Vector
+    F->>C: Similarity Search
+    C-->>F: Return Relevant Chunks
+    F->>O: Send Prompt with Context
+    O-->>F: Return Generated Answer
+    F-->>S: Return Answer
+    S-->>U: Display Answer</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this template to build internal knowledge base chatbots, legal document reviewers, or academic paper assistants. It is suitable for developers needing a structured RAG implementation with advanced chunking strategies beyond simple character splitting.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Document Ingestion</span><span class="tag">Semantic Chunking</span><span class="tag">Vector Search</span><span class="tag">LLM Generation</span><span class="tag">Metadata Tracking</span><span class="tag">Cloud Storage Integration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">FastAPI Application</span><span class="tag">Streamlit Interface</span><span class="tag">Hierarchical Processor</span><span class="tag">Enhanced Document Processor</span><span class="tag">ChromaDB Client</span><span class="tag">S3 Uploader</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Streamlit</span><span class="tag">ChromaDB</span><span class="tag">OpenAI API</span><span class="tag">PyPDF2</span><span class="tag">NLTK</span><span class="tag">Boto3</span><span class="tag">LangChain</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">openai</span><span class="tag">chromadb</span><span class="tag">fastapi</span><span class="tag">streamlit</span><span class="tag">pypdf2</span><span class="tag">boto3</span><span class="tag">nltk</span><span class="tag">langchain</span><span class="tag">pydantic</span><span class="tag">uvicorn</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3</span><span class="tag">OpenAI GPT Models</span><span class="tag">Local File System</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Retrieval-Augmented Generation (RAG)</span><span class="tag">Microservices (API + UI)</span><span class="tag">Hierarchical Data Processing</span><span class="tag">Vector Database Indexing</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">rag</span><span class="tag">llm</span><span class="tag">document-chat</span><span class="tag">fastapi</span><span class="tag">streamlit</span><span class="tag">chromadb</span><span class="tag">pdf-processing</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/pip/pip-f7c9f9c38b is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the pip group across 1 directory with 6 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:50:28.287927Z ·
+     commit dbedbbc ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

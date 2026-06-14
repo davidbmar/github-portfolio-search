@@ -1,0 +1,71 @@
+{
+  "title": "ui-audiorecorder-html-sample",
+  "one_liner": "Reference implementation for recording independent, playable audio chunks in the browser to avoid WebM container header issues.",
+  "what_it_is": "A set of progressive HTML/JS examples demonstrating how to record microphone audio into continuous, independently playable segments. It solves the common Chrome/WebM issue where intermediate fragments from a single MediaRecorder session lack necessary container headers, rendering them unplayable until the stream stops. The solution involves creating a new MediaRecorder instance for each time slice while reusing the same getUserMedia stream.",
+  "how_its_built": "The project is built using vanilla JavaScript (ES5-safe) and HTML. It leverages the MediaRecorder API with a 'stop-and-restart' pattern per chunk rather than using timeslice data events. Advanced steps integrate IndexedDB for local persistence and include logic for generating pre-signed URLs for cloud storage uploads. Visualization is handled via Canvas API for waveform rendering.",
+  "how_to_apply": "Use this code as a reference pattern when building web-based voice recorders that require immediate playback of segments or reliable upload of partial recordings. It is particularly useful for applications needing to bypass browser-specific demuxer errors associated with fragmented WebM/Ogg streams.",
+  "quickstart": "git clone https://github.com/davidbmar/ui-audiorecorder-html-sample.git\ncd ui-audiorecorder-html-sample\npython3 -m http.server 8000",
+  "features": [
+    "Records audio in continuous, independently playable chunks",
+    "Solves Chrome WebM fragment header issues by restarting MediaRecorder per segment",
+    "Reuses a single getUserMedia stream to avoid repeated permission prompts",
+    "Persists audio chunks locally using IndexedDB",
+    "Includes optional S3 pre-signed URL upload logic",
+    "Real-time waveform visualization using Canvas API"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Clicks Start| UI[HTML UI]\n    UI -->|Request Permission| Browser[Browser API]\n    Browser -->|MediaStream| RecorderMgr[Recorder Manager]\n    RecorderMgr -->|Loop| ChunkRec[New MediaRecorder Instance]\n    ChunkRec -->|Audio Data| Blob[Blob Object]\n    Blob -->|Store| Storage[(IndexedDB / Local)]\n    Blob -->|Optional Upload| S3[S3 Cloud Storage]\n    Storage -->|Retrieve| Player[HTML Audio Element]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant UI as HTML Interface\n    participant MR as Recorder Manager\n    participant Stream as MediaStream\n    participant Rec as MediaRecorder (Chunk N)\n    participant DB as IndexedDB\n\n    U->>UI: Click Start Recording\n    UI->>Stream: getUserMedia({audio: true})\n    Stream-->>UI: Return MediaStream\n    UI->>MR: startLoop()\n    loop For each chunk\n        MR->>Rec: new MediaRecorder(stream)\n        Rec->>Rec: start()\n        Note over Rec: Wait for duration (e.g., 5s)\n        Rec->>Rec: stop()\n        Rec->>MR: ondataavailable (Blob)\n        MR->>DB: saveChunk(blob, index)\n        MR->>UI: renderChunk(blob)\n        UI->>U: Display <audio> controls\n    end",
+  "capabilities": [
+    "Chunked Audio Recording",
+    "Local Persistence",
+    "Waveform Visualization",
+    "Cloud Upload Preparation"
+  ],
+  "components": [
+    "index-step1-example.html",
+    "step4-indexdb/app.js",
+    "step4-indexdb/storage.js",
+    "audio-lite.js"
+  ],
+  "tech": [
+    "HTML5",
+    "JavaScript (ES5)",
+    "MediaRecorder API",
+    "IndexedDB",
+    "Canvas API",
+    "Fetch API"
+  ],
+  "depends_on": [
+    "Modern Web Browser",
+    "Microphone Access",
+    "HTTP Server (for local testing)"
+  ],
+  "integrates_with": [
+    "AWS S3 (via pre-signed URLs)",
+    "CloudFront (for playback)"
+  ],
+  "patterns": [
+    "Per-Chunk Recorder Pattern",
+    "Stream Reuse",
+    "Client-Side Storage",
+    "Progressive Enhancement"
+  ],
+  "reuse_tags": [
+    "audio-recording",
+    "media-recorder",
+    "webm-fix",
+    "indexeddb",
+    "vanilla-js",
+    "browser-audio"
+  ],
+  "slug": "ui-audiorecorder-html-sample",
+  "repo_url": "https://github.com/davidbmar/ui-audiorecorder-html-sample",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/ui-audiorecorder-html-sample/main/images/ui-waveform-chunked-indexdb.png",
+  "generated_at": "2026-06-14T04:06:33.246751Z",
+  "source_commit": "d71b9ae",
+  "model": "qwen3.7-plus"
+}

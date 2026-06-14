@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picture QR Code · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Picture QR Code", "one_liner": "A serverless, password-gated shared photo album accessed via QR code, using AWS Lambda and S3.", "what_it_is": "A lightweight web application that creates a temporary, shared photo album. Users scan a QR code to access a landing page, enter a guest password, and can then upload photos directly to an S3 bucket or browse existing ones. It requires no app installation and runs entirely on AWS serverless infrastructure (Lambda + S3).", "how_its_built": "The backend is a single AWS Lambda function exposed via a Function URL, which serves the HTML/JS frontend and handles API requests for authentication and presigned URLs. Photo uploads bypass the Lambda, going directly from the browser to S3 using short-lived presigned URLs. Thumbnails are generated client-side using HTML5 Canvas. Authentication uses stateless HMAC tokens signed by a secret stored in Lambda environment variables.", "how_to_apply": "Ideal for events like weddings, parties, or conferences where you want attendees to contribute photos to a central gallery without creating accounts or installing apps. It provides a low-friction way to collect media while maintaining basic access control via passwords.", "quickstart": "export ACCESS_PASSWORD=\"your-guest-password\"\nexport OWNER_PASSCODE=\"your-private-passcode\"\nexport TOKEN_SECRET=\"$(openssl rand -hex 32)\"\n./scripts/deploy.sh\npython scripts/make_qr.py \"<the-printed-url>\" album-qr.png", "features": ["Scan-to-access workflow using QR codes", "Password-gated viewing and uploading", "Direct-to-S3 uploads via presigned URLs", "Client-side thumbnail generation", "Owner-only delete protection via separate passcode", "No database required; state managed via S3 and tokens"], "diagram_architecture": "flowchart TD\n    User[User Device] -->|Scan QR| Browser[Web Browser]\n    Browser -->|HTTP Request| Lambda[AWS Lambda Function URL]\n    Lambda -->|Serve HTML/JS| Browser\n    Browser -->|Enter Password| Lambda\n    Lambda -->|Verify HMAC| Lambda\n    Lambda -->|Return Presigned URL| Browser\n    Browser -->|Upload Image| S3[(AWS S3 Bucket)]\n    Browser -->|List/Get Images| Lambda\n    Lambda -->|List Objects| S3\n    Lambda -->|Generate Presigned Get| S3\n    S3 -->|Image Data| Browser", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser\n    participant L as Lambda\n    participant S as S3\n\n    U->>B: Scan QR Code\n    B->>L: GET / (Load Page)\n    L-->>B: Return HTML/JS\n    U->>B: Enter Guest Password\n    B->>L: POST /auth (Password)\n    L->>L: Verify HMAC Token\n    L-->>B: Return Session Token\n    U->>B: Select Photo\n    B->>L: POST /sign-upload (Request Upload URL)\n    L->>L: Generate Presigned PUT URL\n    L-->>B: Return Presigned URL\n    B->>S: PUT Image Data (Direct Upload)\n    S-->>B: 200 OK\n    B->>B: Generate Thumbnail (Canvas)\n    U->>B: View Gallery\n    B->>L: GET /images (List)\n    L->>S: ListObjectsV2\n    S-->>L: Object Keys\n    L->>S: CreatePresignedGet (For each)\n    L-->>B: Return Image URLs\n    B->>S: GET Images\n    S-->>B: Image Data", "capabilities": ["Photo Upload", "Photo Browsing", "Access Control", "QR Code Generation", "Serverless Hosting"], "components": ["Lambda Function", "S3 Bucket", "HTML/JS Frontend", "Deploy Script", "QR Generator Script"], "tech": ["AWS Lambda", "Amazon S3", "Python", "HTML5", "JavaScript", "HMAC"], "depends_on": ["AWS CLI", "Python 3", "boto3", "qrcode", "pillow", "pillow-heif"], "integrates_with": ["AWS IAM", "Web Browsers"], "patterns": ["Serverless", "Presigned URLs", "Stateless Authentication", "Client-side Processing"], "reuse_tags": ["event-photo-sharing", "aws-serverless", "lambda-s3", "no-db", "qr-code-access"], "slug": "picture_qr_code", "repo_url": "https://github.com/davidbmar/picture_qr_code", "visibility": "private", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:49:18.961539Z", "source_commit": "ff5eed7", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Picture QR Code",
+  "description": "A serverless, password-gated shared photo album accessed via QR code, using AWS Lambda and S3.",
+  "codeRepository": "https://github.com/davidbmar/picture_qr_code",
+  "programmingLanguage": [
+    "AWS Lambda",
+    "Amazon S3",
+    "Python",
+    "HTML5",
+    "JavaScript",
+    "HMAC"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Picture QR Code</h1>
+  <p class="one-liner">A serverless, password-gated shared photo album accessed via QR code, using AWS Lambda and S3.</p>
+  <p><a href="https://github.com/davidbmar/picture_qr_code">https://github.com/davidbmar/picture_qr_code</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A lightweight web application that creates a temporary, shared photo album. Users scan a QR code to access a landing page, enter a guest password, and can then upload photos directly to an S3 bucket or browse existing ones. It requires no app installation and runs entirely on AWS serverless infrastructure (Lambda + S3).</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Scan-to-access workflow using QR codes</li><li>Password-gated viewing and uploading</li><li>Direct-to-S3 uploads via presigned URLs</li><li>Client-side thumbnail generation</li><li>Owner-only delete protection via separate passcode</li><li>No database required; state managed via S3 and tokens</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">export ACCESS_PASSWORD=&quot;your-guest-password&quot;
+export OWNER_PASSCODE=&quot;your-private-passcode&quot;
+export TOKEN_SECRET=&quot;$(openssl rand -hex 32)&quot;
+./scripts/deploy.sh
+python scripts/make_qr.py &quot;&lt;the-printed-url&gt;&quot; album-qr.png</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Device] -->|Scan QR| Browser[Web Browser]
+    Browser -->|HTTP Request| Lambda[AWS Lambda Function URL]
+    Lambda -->|Serve HTML/JS| Browser
+    Browser -->|Enter Password| Lambda
+    Lambda -->|Verify HMAC| Lambda
+    Lambda -->|Return Presigned URL| Browser
+    Browser -->|Upload Image| S3[(AWS S3 Bucket)]
+    Browser -->|List/Get Images| Lambda
+    Lambda -->|List Objects| S3
+    Lambda -->|Generate Presigned Get| S3
+    S3 -->|Image Data| Browser</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is a single AWS Lambda function exposed via a Function URL, which serves the HTML/JS frontend and handles API requests for authentication and presigned URLs. Photo uploads bypass the Lambda, going directly from the browser to S3 using short-lived presigned URLs. Thumbnails are generated client-side using HTML5 Canvas. Authentication uses stateless HMAC tokens signed by a secret stored in Lambda environment variables.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant L as Lambda
+    participant S as S3
+
+    U->>B: Scan QR Code
+    B->>L: GET / (Load Page)
+    L-->>B: Return HTML/JS
+    U->>B: Enter Guest Password
+    B->>L: POST /auth (Password)
+    L->>L: Verify HMAC Token
+    L-->>B: Return Session Token
+    U->>B: Select Photo
+    B->>L: POST /sign-upload (Request Upload URL)
+    L->>L: Generate Presigned PUT URL
+    L-->>B: Return Presigned URL
+    B->>S: PUT Image Data (Direct Upload)
+    S-->>B: 200 OK
+    B->>B: Generate Thumbnail (Canvas)
+    U->>B: View Gallery
+    B->>L: GET /images (List)
+    L->>S: ListObjectsV2
+    S-->>L: Object Keys
+    L->>S: CreatePresignedGet (For each)
+    L-->>B: Return Image URLs
+    B->>S: GET Images
+    S-->>B: Image Data</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Ideal for events like weddings, parties, or conferences where you want attendees to contribute photos to a central gallery without creating accounts or installing apps. It provides a low-friction way to collect media while maintaining basic access control via passwords.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Photo Upload</span><span class="tag">Photo Browsing</span><span class="tag">Access Control</span><span class="tag">QR Code Generation</span><span class="tag">Serverless Hosting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Lambda Function</span><span class="tag">S3 Bucket</span><span class="tag">HTML/JS Frontend</span><span class="tag">Deploy Script</span><span class="tag">QR Generator Script</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">AWS Lambda</span><span class="tag">Amazon S3</span><span class="tag">Python</span><span class="tag">HTML5</span><span class="tag">JavaScript</span><span class="tag">HMAC</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS CLI</span><span class="tag">Python 3</span><span class="tag">boto3</span><span class="tag">qrcode</span><span class="tag">pillow</span><span class="tag">pillow-heif</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS IAM</span><span class="tag">Web Browsers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Serverless</span><span class="tag">Presigned URLs</span><span class="tag">Stateless Authentication</span><span class="tag">Client-side Processing</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">event-photo-sharing</span><span class="tag">aws-serverless</span><span class="tag">lambda-s3</span><span class="tag">no-db</span><span class="tag">qr-code-access</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:49:18.961539Z ·
+     commit ff5eed7 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

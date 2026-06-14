@@ -1,0 +1,75 @@
+{
+  "title": "tool-s3-cloudfront-push",
+  "one_liner": "A shell-based static site deployer that crawls a running local website and pushes it to AWS S3 and CloudFront for low-cost, HTTPS-enabled global hosting.",
+  "what_it_is": "A collection of Bash scripts that automate the deployment of dynamic or locally-hosted websites to AWS infrastructure. It converts a running site (e.g., localhost:3000) into static files via crawling, then uploads them to a private S3 bucket served through a CloudFront CDN with Origin Access Control (OAC) for security and HTTPS.",
+  "how_its_built": "The project is built entirely in Shell (Bash). It relies on standard Unix utilities for file handling and the AWS CLI for interacting with Amazon Web Services (S3, CloudFront, IAM). It uses `wget` or similar tools implicitly for the crawling step to generate static copies of dynamic pages.",
+  "how_to_apply": "Use this tool when you have a website running locally (or on a staging server) that you want to publish as a static site with minimal ongoing cost. It is ideal for portfolios, blogs, or documentation sites where server-side processing is not required at runtime, but you want the performance and security of a CDN.",
+  "quickstart": "./step0-setup-aws-account.sh\n./step1-crawl-site.sh\n./step2-create-infrastructure.sh\n./step3-deploy.sh",
+  "features": [
+    "Crawls running websites to generate static HTML/CSS/JS copies",
+    "Deploys to AWS S3 with private bucket configuration",
+    "Configures CloudFront CDN for global distribution and HTTPS",
+    "Implements Origin Access Control (OAC) for secure S3 access",
+    "Automates IAM user setup for least-privilege AWS access",
+    "Low-cost hosting leveraging AWS Free Tier"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User/Laptop] -->|Runs Scripts| Scripts[Bash Scripts]\n    Scripts -->|Crawls| LocalSite[Running Website localhost]\n    LocalSite -->|Static Files| CrawlOutput[crawl-output/]\n    Scripts -->|Uploads| CrawlOutput\n    CrawlOutput -->|AWS CLI PutObject| S3[(S3 Bucket Private)]\n    S3 -->|Origin Access Control| CF[CloudFront Distribution]\n    CF -->|HTTPS| Visitor[Global Visitors]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as Shell Scripts\n    participant L as Local Site\n    participant AWS as AWS CLI\n    participant S3 as S3 Bucket\n    participant CF as CloudFront\n\n    U->>S: Execute step1-crawl-site.sh\n    S->>L: Request pages/assets\n    L-->>S: Return HTML/CSS/JS\n    S->>S: Save to crawl-output/\n    \n    U->>S: Execute step3-deploy.sh\n    S->>AWS: Upload files\n    AWS->>S3: PutObject (Private)\n    S->>AWS: Create Invalidation\n    AWS->>CF: Invalidate Cache\n    CF-->>U: Serve updated content via HTTPS",
+  "capabilities": [
+    "Static site generation via crawling",
+    "AWS infrastructure provisioning",
+    "Secure cloud storage deployment",
+    "CDN cache management",
+    "IAM credential management"
+  ],
+  "components": [
+    "step0-setup-aws-account.sh",
+    "step1-crawl-site.sh",
+    "step2-create-infrastructure.sh",
+    "step3-deploy.sh",
+    "crawl-output directory"
+  ],
+  "tech": [
+    "Bash",
+    "AWS CLI",
+    "Wget/Curl",
+    "JSON"
+  ],
+  "depends_on": [
+    "AWS Account",
+    "AWS CLI installed and configured",
+    "Unix-like operating system",
+    "Internet connection"
+  ],
+  "integrates_with": [
+    "Amazon S3",
+    "Amazon CloudFront",
+    "AWS IAM",
+    "Local Web Servers"
+  ],
+  "patterns": [
+    "Static Site Generation",
+    "Infrastructure as Code (Scripted)",
+    "CI/CD Pipeline (Manual)",
+    "Least Privilege Access"
+  ],
+  "reuse_tags": [
+    "deployment",
+    "aws",
+    "static-site",
+    "shell-script",
+    "cdn",
+    "s3",
+    "cloudfront"
+  ],
+  "slug": "tool-s3-cloudfront-push",
+  "repo_url": "https://github.com/davidbmar/tool-s3-cloudfront-push",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:01:09.467148Z",
+  "source_commit": "649668f",
+  "model": "qwen3.7-plus"
+}

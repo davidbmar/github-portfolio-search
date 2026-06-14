@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhisperLive · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "WhisperLive", "one_liner": "A real-time speech-to-text server and client ecosystem using OpenAI's Whisper with WebSocket streaming.", "what_it_is": "WhisperLive is a Python-based server application that exposes a WebSocket API for real-time audio transcription. It supports multiple inference backends (Faster-Whisper, TensorRT, OpenVINO) to optimize performance on different hardware. The project includes browser extensions (Chrome/Firefox) and Python clients that capture microphone or tab audio, preprocess it into 16kHz mono chunks, and stream it to the server for near-instant text output.", "how_its_built": "The core server is built in Python using `websockets` for communication and `pyaudio`/`numpy` for audio handling. It integrates with ASR engines like `faster-whisper`, `tensorrt_llm`, or `openvino`. Clients are implemented as JavaScript Browser Extensions using the Web Audio API and AudioWorklets for efficient client-side resampling and buffering before sending binary data over WebSockets.", "how_to_apply": "Deploy the server on a machine with GPU acceleration (NVIDIA for TensorRT, Intel for OpenVINO) or CPU (Faster-Whisper). Connect browser extensions to transcribe meetings, lectures, or media playback directly in the browser. Integrate the Python client into desktop applications requiring live captioning.", "quickstart": "bash scripts/setup.sh\npip install whisper-live\npython3 run_server.py --port 9090 --backend faster_whisper", "features": ["Real-time transcription via WebSocket streaming", "Supports Faster-Whisper, TensorRT, and OpenVINO backends", "Browser extensions for Chrome and Firefox with tab/mic capture", "Voice Activity Detection (VAD) to reduce processing load", "Multi-client support with configurable connection limits", "SRT caption export functionality"], "diagram_architecture": "flowchart TD\n    Client[Browser/Python Client] -->|WebSocket Binary Audio| Server[WhisperLive Server]\n    Server --> Backend{Inference Backend}\n    Backend -->|CPU| FW[Faster-Whisper]\n    Backend -->|GPU NVIDIA| TRT[TensorRT-LLM]\n    Backend -->|Intel HW| OV[OpenVINO]\n    FW --> Text[Transcribed Text]\n    TRT --> Text\n    OV --> Text\n    Text -->|WebSocket JSON| Client", "diagram_sequence": "sequenceDiagram\n    participant C as Client (JS/Python)\n    participant S as WhisperLive Server\n    participant B as ASR Backend\n    C->>S: Connect WebSocket\n    S-->>C: Connection Established\n    loop Audio Stream\n        C->>C: Capture & Resample to 16kHz Mono\n        C->>S: Send Audio Chunk (Binary)\n        S->>B: Process Chunk\n        B-->>S: Return Transcript Segment\n        S-->>C: Send Transcript (JSON)\n    end\n    C->>S: Close Connection", "capabilities": ["Live Speech-to-Text", "Audio File Transcription", "Multi-language Support", "Translation to English", "Voice Activity Detection"], "components": ["run_server.py", "whisper_live/server.py", "Audio-Transcription-Chrome", "Audio-Transcription-Firefox", "whisper_live/client.py"], "tech": ["Python", "JavaScript", "WebSockets", "PyAudio", "NumPy", "Faster-Whisper", "TensorRT", "OpenVINO"], "depends_on": ["torch", "faster-whisper", "websockets", "pyaudio", "onnxruntime"], "integrates_with": ["Chrome Browser", "Firefox Browser", "NVIDIA GPUs", "Intel CPUs/GPUs"], "patterns": ["Client-Server", "Streaming", "Producer-Consumer", "Plugin Architecture"], "reuse_tags": ["real-time", "asr", "websocket", "transcription", "audio-processing"], "slug": "WhisperLive", "repo_url": "https://github.com/davidbmar/WhisperLive", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "https://img.youtube.com/vi/0PHWCApIcCI/0.jpg", "generated_at": "2026-06-14T04:10:17.509175Z", "source_commit": "3b17bda", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "WhisperLive",
+  "description": "A real-time speech-to-text server and client ecosystem using OpenAI's Whisper with WebSocket streaming.",
+  "codeRepository": "https://github.com/davidbmar/WhisperLive",
+  "programmingLanguage": [
+    "Python",
+    "JavaScript",
+    "WebSockets",
+    "PyAudio",
+    "NumPy",
+    "Faster-Whisper",
+    "TensorRT",
+    "OpenVINO"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>WhisperLive</h1>
+  <p class="one-liner">A real-time speech-to-text server and client ecosystem using OpenAI&#x27;s Whisper with WebSocket streaming.</p>
+  <p><a href="https://github.com/davidbmar/WhisperLive">https://github.com/davidbmar/WhisperLive</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://img.youtube.com/vi/0PHWCApIcCI/0.jpg" alt="WhisperLive screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>WhisperLive is a Python-based server application that exposes a WebSocket API for real-time audio transcription. It supports multiple inference backends (Faster-Whisper, TensorRT, OpenVINO) to optimize performance on different hardware. The project includes browser extensions (Chrome/Firefox) and Python clients that capture microphone or tab audio, preprocess it into 16kHz mono chunks, and stream it to the server for near-instant text output.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time transcription via WebSocket streaming</li><li>Supports Faster-Whisper, TensorRT, and OpenVINO backends</li><li>Browser extensions for Chrome and Firefox with tab/mic capture</li><li>Voice Activity Detection (VAD) to reduce processing load</li><li>Multi-client support with configurable connection limits</li><li>SRT caption export functionality</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">bash scripts/setup.sh
+pip install whisper-live
+python3 run_server.py --port 9090 --backend faster_whisper</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Browser/Python Client] -->|WebSocket Binary Audio| Server[WhisperLive Server]
+    Server --> Backend{Inference Backend}
+    Backend -->|CPU| FW[Faster-Whisper]
+    Backend -->|GPU NVIDIA| TRT[TensorRT-LLM]
+    Backend -->|Intel HW| OV[OpenVINO]
+    FW --> Text[Transcribed Text]
+    TRT --> Text
+    OV --> Text
+    Text -->|WebSocket JSON| Client</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The core server is built in Python using `websockets` for communication and `pyaudio`/`numpy` for audio handling. It integrates with ASR engines like `faster-whisper`, `tensorrt_llm`, or `openvino`. Clients are implemented as JavaScript Browser Extensions using the Web Audio API and AudioWorklets for efficient client-side resampling and buffering before sending binary data over WebSockets.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client (JS/Python)
+    participant S as WhisperLive Server
+    participant B as ASR Backend
+    C->>S: Connect WebSocket
+    S-->>C: Connection Established
+    loop Audio Stream
+        C->>C: Capture & Resample to 16kHz Mono
+        C->>S: Send Audio Chunk (Binary)
+        S->>B: Process Chunk
+        B-->>S: Return Transcript Segment
+        S-->>C: Send Transcript (JSON)
+    end
+    C->>S: Close Connection</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the server on a machine with GPU acceleration (NVIDIA for TensorRT, Intel for OpenVINO) or CPU (Faster-Whisper). Connect browser extensions to transcribe meetings, lectures, or media playback directly in the browser. Integrate the Python client into desktop applications requiring live captioning.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Live Speech-to-Text</span><span class="tag">Audio File Transcription</span><span class="tag">Multi-language Support</span><span class="tag">Translation to English</span><span class="tag">Voice Activity Detection</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">run_server.py</span><span class="tag">whisper_live/server.py</span><span class="tag">Audio-Transcription-Chrome</span><span class="tag">Audio-Transcription-Firefox</span><span class="tag">whisper_live/client.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">JavaScript</span><span class="tag">WebSockets</span><span class="tag">PyAudio</span><span class="tag">NumPy</span><span class="tag">Faster-Whisper</span><span class="tag">TensorRT</span><span class="tag">OpenVINO</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">torch</span><span class="tag">faster-whisper</span><span class="tag">websockets</span><span class="tag">pyaudio</span><span class="tag">onnxruntime</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Chrome Browser</span><span class="tag">Firefox Browser</span><span class="tag">NVIDIA GPUs</span><span class="tag">Intel CPUs/GPUs</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server</span><span class="tag">Streaming</span><span class="tag">Producer-Consumer</span><span class="tag">Plugin Architecture</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">real-time</span><span class="tag">asr</span><span class="tag">websocket</span><span class="tag">transcription</span><span class="tag">audio-processing</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:10:17.509175Z ·
+     commit 3b17bda ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

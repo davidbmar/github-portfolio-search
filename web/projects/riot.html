@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>riot · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "riot", "one_liner": "A lightweight Python socket server and curses-based client for tracking taxi driver performance ratings.", "what_it_is": "riot is a distributed system for collecting real-time feedback on taxi drivers. It consists of a central server that stores ride data in SQLite, interactive terminal clients for drivers to log rides and toggle 'thumbs up' ratings (promptness, cleanliness, friendliness), and a reporting agent that generates top-10 lists over rolling 48-hour windows.", "how_its_built": "The system is built with Python 2 standard libraries. The server uses raw TCP sockets to accept JSON payloads and writes directly to a local SQLite database. The client uses the `curses` library for a text-based user interface (TUI) to manage ride states and rating toggles before sending JSON data over TCP. Reporting is handled by direct SQL queries against the SQLite file.", "how_to_apply": "Deploy the server on a central machine accessible by all taxis. Run `server.py` to start listening on port 9998. On each taxi's onboard computer or driver device, run `taxi_client.py` with a unique UUID. Drivers use the TUI to start/end rides and toggle ratings. Periodically run `report2.py` on the server machine to generate performance reports.", "quickstart": "python server.py &\npython taxi_client.py\nreset", "features": ["TCP socket server accepting JSON ride data on port 9998", "Curses-based TUI client for drivers to manage rides and ratings", "SQLite backend for persistent storage of ride transactions", "Rolling 48-hour reporting agent for top-10 driver rankings", "Automated test harness for generating CSV-based load data"], "diagram_architecture": "flowchart TD\n    Client[taxi_client.py] -->|JSON over TCP| Server[server.py]\n    Server -->|Write| DB[(taxi.sqlite)]\n    Reporter[report2.py] -->|Read SQL| DB\n    Test[test_taxi_client.py] -->|CSV Input| Client", "diagram_sequence": "sequenceDiagram\n    participant Driver as Driver\n    participant Client as taxi_client.py\n    participant Server as server.py\n    participant DB as taxi.sqlite\n    \n    Driver->>Client: Start Ride (Press 1)\n    Driver->>Client: Toggle Ratings (p/c/f)\n    Driver->>Client: End Ride (Press 2)\n    Client->>Server: Send JSON (UUID, ratings)\n    Server->>Server: Parse JSON & Timestamp\n    Server->>DB: INSERT INTO rides\n    DB-->>Server: Acknowledge\n    Server-->>Client: Close Connection", "capabilities": ["Real-time ride logging", "Category-based rating toggling", "Historical data analysis", "Automated testing via CSV"], "components": ["server.py", "taxi_client.py", "report2.py", "test_taxi_client.py", "taxi.sqlite"], "tech": ["Python 2", "SQLite3", "TCP Sockets", "Curses", "JSON"], "depends_on": ["python-curses", "sqlite3"], "integrates_with": [], "patterns": ["Client-Server", "Publish-Subscribe (via DB)", "Command Line Interface"], "reuse_tags": ["iot-feedback", "socket-server", "curses-ui", "sqlite-storage", "python-2"], "slug": "riot", "repo_url": "https://github.com/davidbmar/riot", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:52:21.237941Z", "source_commit": "fabea06", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "riot",
+  "description": "A lightweight Python socket server and curses-based client for tracking taxi driver performance ratings.",
+  "codeRepository": "https://github.com/davidbmar/riot",
+  "programmingLanguage": [
+    "Python 2",
+    "SQLite3",
+    "TCP Sockets",
+    "Curses",
+    "JSON"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>riot</h1>
+  <p class="one-liner">A lightweight Python socket server and curses-based client for tracking taxi driver performance ratings.</p>
+  <p><a href="https://github.com/davidbmar/riot">https://github.com/davidbmar/riot</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>riot is a distributed system for collecting real-time feedback on taxi drivers. It consists of a central server that stores ride data in SQLite, interactive terminal clients for drivers to log rides and toggle &#x27;thumbs up&#x27; ratings (promptness, cleanliness, friendliness), and a reporting agent that generates top-10 lists over rolling 48-hour windows.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>TCP socket server accepting JSON ride data on port 9998</li><li>Curses-based TUI client for drivers to manage rides and ratings</li><li>SQLite backend for persistent storage of ride transactions</li><li>Rolling 48-hour reporting agent for top-10 driver rankings</li><li>Automated test harness for generating CSV-based load data</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python server.py &amp;
+python taxi_client.py
+reset</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[taxi_client.py] -->|JSON over TCP| Server[server.py]
+    Server -->|Write| DB[(taxi.sqlite)]
+    Reporter[report2.py] -->|Read SQL| DB
+    Test[test_taxi_client.py] -->|CSV Input| Client</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system is built with Python 2 standard libraries. The server uses raw TCP sockets to accept JSON payloads and writes directly to a local SQLite database. The client uses the `curses` library for a text-based user interface (TUI) to manage ride states and rating toggles before sending JSON data over TCP. Reporting is handled by direct SQL queries against the SQLite file.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Driver as Driver
+    participant Client as taxi_client.py
+    participant Server as server.py
+    participant DB as taxi.sqlite
+    
+    Driver->>Client: Start Ride (Press 1)
+    Driver->>Client: Toggle Ratings (p/c/f)
+    Driver->>Client: End Ride (Press 2)
+    Client->>Server: Send JSON (UUID, ratings)
+    Server->>Server: Parse JSON & Timestamp
+    Server->>DB: INSERT INTO rides
+    DB-->>Server: Acknowledge
+    Server-->>Client: Close Connection</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the server on a central machine accessible by all taxis. Run `server.py` to start listening on port 9998. On each taxi&#x27;s onboard computer or driver device, run `taxi_client.py` with a unique UUID. Drivers use the TUI to start/end rides and toggle ratings. Periodically run `report2.py` on the server machine to generate performance reports.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Real-time ride logging</span><span class="tag">Category-based rating toggling</span><span class="tag">Historical data analysis</span><span class="tag">Automated testing via CSV</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">server.py</span><span class="tag">taxi_client.py</span><span class="tag">report2.py</span><span class="tag">test_taxi_client.py</span><span class="tag">taxi.sqlite</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 2</span><span class="tag">SQLite3</span><span class="tag">TCP Sockets</span><span class="tag">Curses</span><span class="tag">JSON</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">python-curses</span><span class="tag">sqlite3</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="muted">—</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server</span><span class="tag">Publish-Subscribe (via DB)</span><span class="tag">Command Line Interface</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">iot-feedback</span><span class="tag">socket-server</span><span class="tag">curses-ui</span><span class="tag">sqlite-storage</span><span class="tag">python-2</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:52:21.237941Z ·
+     commit fabea06 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

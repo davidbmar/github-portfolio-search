@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14 · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14", "one_liner": "Hybrid architecture combining NVIDIA Riva Conformer-CTC for real-time streaming ASR with an AWS serverless backend for secure, chunked audio storage and session management.", "what_it_is": "A production-grade speech recognition system that splits processing into two paths: a low-latency WebSocket bridge to an NVIDIA Riva GPU instance for immediate transcription, and a robust AWS serverless API (Lambda + S3 + Cognito) for storing raw audio chunks, managing sessions, and finalizing recordings. It bridges the gap between real-time user experience and reliable cloud storage.", "how_its_built": "The system uses Shell scripts for infrastructure provisioning (EC2 g4dn instances, NVIDIA drivers, Docker). The real-time path uses a Python WebSocket-to-gRPC bridge connecting browsers to Riva. The storage path uses TypeScript AWS Lambda functions behind API Gateway, authenticated via Amazon Cognito JWTs, storing audio chunks in S3 with presigned URLs and maintaining session manifests.", "how_to_apply": "Use this when you need both instant transcription feedback for users and a permanent, searchable archive of the original audio. Ideal for meeting assistants, call center analytics, or medical dictation where latency matters but data integrity and security are paramount.", "quickstart": "git clone https://github.com/davidbmar/transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14\ncd transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14\ncp .env.example .env\nnano .env\n./scripts/010-setup-build-box.sh\naws configure\n./scripts/020-deploy-gpu-instance.sh\n./scripts/100-deploy-conformer-streaming.sh\n./scripts/110-setup-websocket-bridge.sh\n./scripts/120-setup-https-demo.sh\necho \"Open: https://$(curl -s ifconfig.me):8444\"", "features": ["Real-time browser streaming transcription via NVIDIA Riva Conformer-CTC-XL", "Secure WebSocket (WSS) bridge from browser to GPU gRPC endpoint", "Serverless audio chunk storage using S3 presigned URLs and Lambda", "Amazon Cognito JWT authentication for all API endpoints", "Automated GPU instance lifecycle management (start/stop/shutdown)", "Session manifest tracking for multi-chunk audio assembly"], "diagram_architecture": "flowchart TD\n    Browser[Browser Microphone] -->|WSS Audio Chunks| WS_Bridge[WebSocket Bridge :8443]\n    Browser -->|HTTPS API| API_GW[AWS API Gateway]\n    \n    subgraph Build_Box [Build Box / EC2]\n        WS_Bridge -->|gRPC Streaming| Riva[RIVA 2.19 Conformer CTC]\n        Demo[HTTPS Demo UI :8444] --> Browser\n    end\n\n    subgraph AWS_Cloud [AWS Serverless Backend]\n        API_GW --> Auth[Cognito Authorizer]\n        Auth --> Lambda[Lambda Functions]\n        Lambda -->|Presign/Store| S3[(S3 Bucket)]\n        Lambda -->|Manifest| S3\n    end\n\n    Riva -.->|Transcription Text| Browser", "diagram_sequence": "sequenceDiagram\n    participant User as Browser\n    participant API as API Gateway/Lambda\n    participant S3 as S3 Storage\n    participant WS as WebSocket Bridge\n    participant Riva as NVIDIA Riva GPU\n\n    Note over User, Riva: Session Setup & Upload\n    User->>API: POST /sessions (Create Session)\n    API->>User: Return sessionId & basePrefix\n    \n    loop For each audio chunk\n        User->>API: POST /chunks/presign\n        API->>User: Return Presigned PUT URL\n        User->>S3: PUT Audio Chunk (Direct)\n        User->>API: POST /chunks/complete\n        API->>S3: Verify Object Exists\n        API->>S3: Update Manifest\n    end\n\n    Note over User, Riva: Real-time Transcription\n    User->>WS: Connect WSS\n    WS->>Riva: Init gRPC Streaming\n    loop Streaming Audio\n        User->>WS: Send Audio Chunk\n        WS->>Riva: Stream Audio Data\n        Riva->>WS: Return Partial Transcript\n        WS->>User: Push Transcript\n    end\n\n    User->>API: POST /sessions/{id}/finalize\n    API->>S3: Seal Manifest\n    API->>User: Session Finalized", "capabilities": ["Streaming ASR", "Audio Archival", "Identity Management", "Infrastructure Automation", "Secure File Upload"], "components": ["NVIDIA Riva Server", "WebSocket-gRPC Bridge", "AWS Lambda API", "Amazon S3", "Amazon Cognito", "EC2 GPU Instance", "Browser Client"], "tech": ["Python", "TypeScript", "Shell", "gRPC", "WebSockets", "AWS CDK/CLI", "Docker", "Systemd"], "depends_on": ["NVIDIA NGC Account", "AWS Account", "Ubuntu 20.04/22.04", "Node.js", "Python 3.8+"], "integrates_with": ["Amazon Cognito", "Amazon S3", "AWS Lambda", "API Gateway", "NVIDIA Riva Service"], "patterns": ["Presigned URL Upload", "WebSocket Proxy", "Serverless API", "Infrastructure as Code (Shell)", "JWT Authentication"], "reuse_tags": ["speech-recognition", "aws-serverless", "nvidia-riva", "real-time-audio", "gpu-computing"], "slug": "transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14", "repo_url": "https://github.com/davidbmar/transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/audio-api/npm_and_yarn-30ad79c937 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 2 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T04:03:29.536248Z", "source_commit": "44c1d01", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14",
+  "description": "Hybrid architecture combining NVIDIA Riva Conformer-CTC for real-time streaming ASR with an AWS serverless backend for secure, chunked audio storage and session management.",
+  "codeRepository": "https://github.com/davidbmar/transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14",
+  "programmingLanguage": [
+    "Python",
+    "TypeScript",
+    "Shell",
+    "gRPC",
+    "WebSockets",
+    "AWS CDK/CLI",
+    "Docker",
+    "Systemd"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14</h1>
+  <p class="one-liner">Hybrid architecture combining NVIDIA Riva Conformer-CTC for real-time streaming ASR with an AWS serverless backend for secure, chunked audio storage and session management.</p>
+  <p><a href="https://github.com/davidbmar/transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14">https://github.com/davidbmar/transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A production-grade speech recognition system that splits processing into two paths: a low-latency WebSocket bridge to an NVIDIA Riva GPU instance for immediate transcription, and a robust AWS serverless API (Lambda + S3 + Cognito) for storing raw audio chunks, managing sessions, and finalizing recordings. It bridges the gap between real-time user experience and reliable cloud storage.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time browser streaming transcription via NVIDIA Riva Conformer-CTC-XL</li><li>Secure WebSocket (WSS) bridge from browser to GPU gRPC endpoint</li><li>Serverless audio chunk storage using S3 presigned URLs and Lambda</li><li>Amazon Cognito JWT authentication for all API endpoints</li><li>Automated GPU instance lifecycle management (start/stop/shutdown)</li><li>Session manifest tracking for multi-chunk audio assembly</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14
+cd transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14
+cp .env.example .env
+nano .env
+./scripts/010-setup-build-box.sh
+aws configure
+./scripts/020-deploy-gpu-instance.sh
+./scripts/100-deploy-conformer-streaming.sh
+./scripts/110-setup-websocket-bridge.sh
+./scripts/120-setup-https-demo.sh
+echo &quot;Open: https://$(curl -s ifconfig.me):8444&quot;</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Browser[Browser Microphone] -->|WSS Audio Chunks| WS_Bridge[WebSocket Bridge :8443]
+    Browser -->|HTTPS API| API_GW[AWS API Gateway]
+    
+    subgraph Build_Box [Build Box / EC2]
+        WS_Bridge -->|gRPC Streaming| Riva[RIVA 2.19 Conformer CTC]
+        Demo[HTTPS Demo UI :8444] --> Browser
+    end
+
+    subgraph AWS_Cloud [AWS Serverless Backend]
+        API_GW --> Auth[Cognito Authorizer]
+        Auth --> Lambda[Lambda Functions]
+        Lambda -->|Presign/Store| S3[(S3 Bucket)]
+        Lambda -->|Manifest| S3
+    end
+
+    Riva -.->|Transcription Text| Browser</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system uses Shell scripts for infrastructure provisioning (EC2 g4dn instances, NVIDIA drivers, Docker). The real-time path uses a Python WebSocket-to-gRPC bridge connecting browsers to Riva. The storage path uses TypeScript AWS Lambda functions behind API Gateway, authenticated via Amazon Cognito JWTs, storing audio chunks in S3 with presigned URLs and maintaining session manifests.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as Browser
+    participant API as API Gateway/Lambda
+    participant S3 as S3 Storage
+    participant WS as WebSocket Bridge
+    participant Riva as NVIDIA Riva GPU
+
+    Note over User, Riva: Session Setup & Upload
+    User->>API: POST /sessions (Create Session)
+    API->>User: Return sessionId & basePrefix
+    
+    loop For each audio chunk
+        User->>API: POST /chunks/presign
+        API->>User: Return Presigned PUT URL
+        User->>S3: PUT Audio Chunk (Direct)
+        User->>API: POST /chunks/complete
+        API->>S3: Verify Object Exists
+        API->>S3: Update Manifest
+    end
+
+    Note over User, Riva: Real-time Transcription
+    User->>WS: Connect WSS
+    WS->>Riva: Init gRPC Streaming
+    loop Streaming Audio
+        User->>WS: Send Audio Chunk
+        WS->>Riva: Stream Audio Data
+        Riva->>WS: Return Partial Transcript
+        WS->>User: Push Transcript
+    end
+
+    User->>API: POST /sessions/{id}/finalize
+    API->>S3: Seal Manifest
+    API->>User: Session Finalized</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this when you need both instant transcription feedback for users and a permanent, searchable archive of the original audio. Ideal for meeting assistants, call center analytics, or medical dictation where latency matters but data integrity and security are paramount.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Streaming ASR</span><span class="tag">Audio Archival</span><span class="tag">Identity Management</span><span class="tag">Infrastructure Automation</span><span class="tag">Secure File Upload</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">NVIDIA Riva Server</span><span class="tag">WebSocket-gRPC Bridge</span><span class="tag">AWS Lambda API</span><span class="tag">Amazon S3</span><span class="tag">Amazon Cognito</span><span class="tag">EC2 GPU Instance</span><span class="tag">Browser Client</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">TypeScript</span><span class="tag">Shell</span><span class="tag">gRPC</span><span class="tag">WebSockets</span><span class="tag">AWS CDK/CLI</span><span class="tag">Docker</span><span class="tag">Systemd</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">NVIDIA NGC Account</span><span class="tag">AWS Account</span><span class="tag">Ubuntu 20.04/22.04</span><span class="tag">Node.js</span><span class="tag">Python 3.8+</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Amazon Cognito</span><span class="tag">Amazon S3</span><span class="tag">AWS Lambda</span><span class="tag">API Gateway</span><span class="tag">NVIDIA Riva Service</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Presigned URL Upload</span><span class="tag">WebSocket Proxy</span><span class="tag">Serverless API</span><span class="tag">Infrastructure as Code (Shell)</span><span class="tag">JWT Authentication</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-recognition</span><span class="tag">aws-serverless</span><span class="tag">nvidia-riva</span><span class="tag">real-time-audio</span><span class="tag">gpu-computing</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/audio-api/npm_and_yarn-30ad79c937 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 2 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:03:29.536248Z ·
+     commit 44c1d01 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

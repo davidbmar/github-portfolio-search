@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>riff · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "riff", "one_liner": "Voice agent platform that generates deterministic FSM-based voice flows from plain English business descriptions.", "what_it_is": "riff is a Python-based voice agent framework that combines Large Language Models (LLMs) for natural language understanding with declared Finite State Machines (FSMs) for strict workflow enforcement. It allows developers to describe a business process in plain English, automatically generating a YAML-defined state graph that handles phone conversations (ordering, scheduling, intake). The system ensures reliability by keeping all state transitions, slot validation, and guardrails as deterministic pure functions, while the LLM only handles language generation and intent recognition within those bounds.", "how_its_built": "The core engine uses a `StateManager` to enforce transitions defined in YAML flow files. Input speech is converted to text (STT), processed by `run_turn()` which consults the LLM (via adapters for Gemini, Gemma, or Claude) and deterministic guardrails, then converts response text to speech (TTS). Key components include `slot_extractor` for deterministic data capture, `state_manager` for graph traversal, and an event bus for internal signaling. The architecture isolates non-deterministic LLM calls behind pure-function interfaces for slots and transitions.", "how_to_apply": "Use riff to build robust customer service voice agents where hallucination prevention is critical. Ideal for scheduling services (plumbing, dental), retail orders (pizza, coffee), or complex intakes (apartment viewings). Developers define business logic via YAML or generate it via the `/api/flows/generate` endpoint, then integrate the web server or MCP server into their telephony infrastructure.", "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server", "features": ["Generates voice agent flows from plain English business descriptions", "Enforces deterministic state transitions using YAML-defined FSMs", "Prevents LLM hallucinations via pure-function guardrails and slot validators", "Includes 11 pre-built flows for retail, service, and complex intake scenarios", "Provides A/B testing harness with observable-metric scoring", "Exposes reusable RIFF blocks to MCP clients for extended integration"], "diagram_architecture": "flowchart TD\n    Caller[Caller] -->|Speaks| STT[STT]\n    STT -->|Text| RunTurn[run_turn]\n    subgraph CorePipeline [Core Pipeline]\n        RunTurn -->|Context| Guardrails[Guardrails<br/>8 layers pure fns]\n        RunTurn -->|Prompt| LLM[LLM Call<br/>Gemini/Gemma/Claude]\n        RunTurn -->|State| StateMgr[State Manager<br/>Declared Graph]\n    end\n    Guardrails -->|Validated| RunTurn\n    LLM -->|Response| RunTurn\n    StateMgr -->|Next State| RunTurn\n    RunTurn -->|Result| SlotExt[slot_extractor]\n    RunTurn -->|Result| Eval[eval framework]\n    RunTurn -->|Result| Logger[turn_logger JSONL]\n    RunTurn -->|Audio| TTS[TTS]\n    TTS -->|Hears| Caller", "diagram_sequence": "sequenceDiagram\n    participant C as Caller\n    participant S as STT\n    participant RT as run_turn()\n    participant SM as StateManager\n    participant L as LLM Adapter\n    participant T as TTS\n    \n    C->>S: Speaks audio\n    S->>RT: Transcribed text\n    RT->>SM: Get current state & valid transitions\n    SM-->>RT: State definition & guards\n    RT->>L: Generate response based on state/context\n    L-->>RT: Raw text response\n    RT->>SM: Validate transition & extract slots\n    SM-->>RT: Updated state & validated slots\n    RT->>T: Synthesize audio response\n    T->>C: Plays audio\n    RT->>RT: Log turn result (JSONL)", "capabilities": ["Plain-text to voice-flow generation", "Deterministic state machine enforcement", "Multi-provider LLM adaptation (Gemini, Gemma, Claude)", "Real-time session inspection and debugging", "A/B testing with synthetic scoring", "MCP server exposure for AI clients"], "components": ["StateManager", "Flow Loader", "Session Context", "Turn Runner", "Guardrail Engine", "Slot Extractor", "Web Server", "MCP Server", "Event Bus"], "tech": ["Python", "YAML", "Mermaid", "Pytest", "FastAPI/Stdlib HTTP", "Git"], "depends_on": ["Google Gemini API (optional)", "Local Gemma model (optional)", "Anthropic Claude API (optional)", "MCP CLI (optional)"], "integrates_with": ["Telephony systems via STT/TTS adapters", "Model Context Protocol (MCP) clients", "Browser-based voice UI (voice.html)"], "patterns": ["LLM riffs, FSM keeps beat", "Pure function guardrails", "Deterministic slot extraction", "Weakref-finalize cache cleanup", "Grep-audit invariant tests", "Pre-registered canary tests"], "reuse_tags": ["voice-agent", "fsm-orchestration", "llm-guardrails", "python-framework", "deterministic-ai", "business-automation"], "slug": "riff", "repo_url": "https://github.com/davidbmar/riff", "visibility": "private", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "architect/flow-metrics-schema-2026-05-27 is 17 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "codex-m3/ladder-semantic-ack-judge-20260528 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web/flow-editor/npm_and_yarn-da0aa30ced is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/gemini-off-record-audio is 37 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "release-mgr/property-ticket-readiness-2026-05-27 is 2 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "review/metrics-audit-2026-05-27 is 24 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "wip/property-ticket-l2-real-routing-20260526-174019 is 87 commits ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #3: chore(deps): bump brace-expansion from 5.0.5 to 5.0.6 in /web/flow-editor in the npm_and_yarn group across 1 directory"}], "screenshot_url": "", "generated_at": "2026-06-14T03:52:01.986839Z", "source_commit": "17e8b85", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "riff",
+  "description": "Voice agent platform that generates deterministic FSM-based voice flows from plain English business descriptions.",
+  "codeRepository": "https://github.com/davidbmar/riff",
+  "programmingLanguage": [
+    "Python",
+    "YAML",
+    "Mermaid",
+    "Pytest",
+    "FastAPI/Stdlib HTTP",
+    "Git"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>riff</h1>
+  <p class="one-liner">Voice agent platform that generates deterministic FSM-based voice flows from plain English business descriptions.</p>
+  <p><a href="https://github.com/davidbmar/riff">https://github.com/davidbmar/riff</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>riff is a Python-based voice agent framework that combines Large Language Models (LLMs) for natural language understanding with declared Finite State Machines (FSMs) for strict workflow enforcement. It allows developers to describe a business process in plain English, automatically generating a YAML-defined state graph that handles phone conversations (ordering, scheduling, intake). The system ensures reliability by keeping all state transitions, slot validation, and guardrails as deterministic pure functions, while the LLM only handles language generation and intent recognition within those bounds.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Generates voice agent flows from plain English business descriptions</li><li>Enforces deterministic state transitions using YAML-defined FSMs</li><li>Prevents LLM hallucinations via pure-function guardrails and slot validators</li><li>Includes 11 pre-built flows for retail, service, and complex intake scenarios</li><li>Provides A/B testing harness with observable-metric scoring</li><li>Exposes reusable RIFF blocks to MCP clients for extended integration</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">cd ~/src/riff
+.venv/bin/python3 -m pytest tests/ -q
+.venv/bin/python3 -m riff.web_server</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Caller[Caller] -->|Speaks| STT[STT]
+    STT -->|Text| RunTurn[run_turn]
+    subgraph CorePipeline [Core Pipeline]
+        RunTurn -->|Context| Guardrails[Guardrails&lt;br/>8 layers pure fns]
+        RunTurn -->|Prompt| LLM[LLM Call&lt;br/>Gemini/Gemma/Claude]
+        RunTurn -->|State| StateMgr[State Manager&lt;br/>Declared Graph]
+    end
+    Guardrails -->|Validated| RunTurn
+    LLM -->|Response| RunTurn
+    StateMgr -->|Next State| RunTurn
+    RunTurn -->|Result| SlotExt[slot_extractor]
+    RunTurn -->|Result| Eval[eval framework]
+    RunTurn -->|Result| Logger[turn_logger JSONL]
+    RunTurn -->|Audio| TTS[TTS]
+    TTS -->|Hears| Caller</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The core engine uses a `StateManager` to enforce transitions defined in YAML flow files. Input speech is converted to text (STT), processed by `run_turn()` which consults the LLM (via adapters for Gemini, Gemma, or Claude) and deterministic guardrails, then converts response text to speech (TTS). Key components include `slot_extractor` for deterministic data capture, `state_manager` for graph traversal, and an event bus for internal signaling. The architecture isolates non-deterministic LLM calls behind pure-function interfaces for slots and transitions.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Caller
+    participant S as STT
+    participant RT as run_turn()
+    participant SM as StateManager
+    participant L as LLM Adapter
+    participant T as TTS
+    
+    C->>S: Speaks audio
+    S->>RT: Transcribed text
+    RT->>SM: Get current state & valid transitions
+    SM-->>RT: State definition & guards
+    RT->>L: Generate response based on state/context
+    L-->>RT: Raw text response
+    RT->>SM: Validate transition & extract slots
+    SM-->>RT: Updated state & validated slots
+    RT->>T: Synthesize audio response
+    T->>C: Plays audio
+    RT->>RT: Log turn result (JSONL)</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use riff to build robust customer service voice agents where hallucination prevention is critical. Ideal for scheduling services (plumbing, dental), retail orders (pizza, coffee), or complex intakes (apartment viewings). Developers define business logic via YAML or generate it via the `/api/flows/generate` endpoint, then integrate the web server or MCP server into their telephony infrastructure.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Plain-text to voice-flow generation</span><span class="tag">Deterministic state machine enforcement</span><span class="tag">Multi-provider LLM adaptation (Gemini, Gemma, Claude)</span><span class="tag">Real-time session inspection and debugging</span><span class="tag">A/B testing with synthetic scoring</span><span class="tag">MCP server exposure for AI clients</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">StateManager</span><span class="tag">Flow Loader</span><span class="tag">Session Context</span><span class="tag">Turn Runner</span><span class="tag">Guardrail Engine</span><span class="tag">Slot Extractor</span><span class="tag">Web Server</span><span class="tag">MCP Server</span><span class="tag">Event Bus</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">YAML</span><span class="tag">Mermaid</span><span class="tag">Pytest</span><span class="tag">FastAPI/Stdlib HTTP</span><span class="tag">Git</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Google Gemini API (optional)</span><span class="tag">Local Gemma model (optional)</span><span class="tag">Anthropic Claude API (optional)</span><span class="tag">MCP CLI (optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Telephony systems via STT/TTS adapters</span><span class="tag">Model Context Protocol (MCP) clients</span><span class="tag">Browser-based voice UI (voice.html)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">LLM riffs, FSM keeps beat</span><span class="tag">Pure function guardrails</span><span class="tag">Deterministic slot extraction</span><span class="tag">Weakref-finalize cache cleanup</span><span class="tag">Grep-audit invariant tests</span><span class="tag">Pre-registered canary tests</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-agent</span><span class="tag">fsm-orchestration</span><span class="tag">llm-guardrails</span><span class="tag">python-framework</span><span class="tag">deterministic-ai</span><span class="tag">business-automation</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: architect/flow-metrics-schema-2026-05-27 is 17 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: codex-m3/ladder-semantic-ack-judge-20260528 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web/flow-editor/npm_and_yarn-da0aa30ced is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/gemini-off-record-audio is 37 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: release-mgr/property-ticket-readiness-2026-05-27 is 2 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: review/metrics-audit-2026-05-27 is 24 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: wip/property-ticket-l2-real-routing-20260526-174019 is 87 commits ahead of the default branch</li><li><strong>open_pr</strong>: PR #3: chore(deps): bump brace-expansion from 5.0.5 to 5.0.6 in /web/flow-editor in the npm_and_yarn group across 1 directory</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:52:01.986839Z ·
+     commit 17e8b85 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

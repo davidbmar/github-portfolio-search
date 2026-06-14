@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Picture Annotator Review · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Video Picture Annotator Review", "one_liner": "A Playwright-style tool for analyzing screen recordings, annotating UI elements with AI, and generating visual diff reports.", "what_it_is": "A Python-based automation and review tool that processes video recordings and images. It uses scene detection to break down videos, applies AI-driven annotations (via Claude) or manual specs to highlight UI elements, and generates HTML/PDF reports. It also provides a web interface for capturing screenshots and performing pixel-level image comparisons with SSIM scoring.", "how_its_built": "Built in Python using Click for CLI structure, Rich for terminal UIs, and OpenCV/SceneDetect for video processing. It integrates the Anthropic API for intelligent frame annotation and Pillow for image manipulation. The web component is a lightweight server exposing JSON APIs for screenshot capture and image diffing, while the core logic is modularized into agents, annotators, and report renderers.", "how_to_apply": "Use it to automate QA reviews of UI changes by comparing before/after screenshots, generate annotated walkthroughs of user sessions from screen recordings, or integrate into CI pipelines to visually verify application states using natural language queries.", "quickstart": "pip install -e \".[dev]\"\nvideo-annotator --help\nvideo-annotator serve", "features": ["Automated video analysis with scene detection and keyframe extraction", "AI-powered UI annotation using Claude to identify and label elements", "Visual diffing of images with SSIM scores and overlay views", "Web UI for live screenshot capture and interactive report viewing", "CLI pipeline for end-to-end review: extract, annotate, and report generation", "Support for both spec-driven and fully autonomous annotation modes"], "diagram_architecture": "flowchart TD\n    User[User/Developer] --> CLI[CLI Interface]\n    User --> WebUI[Web UI :7070]\n    CLI --> Core[Core Pipeline]\n    WebUI --> API[JSON API Server]\n    Core --> VideoAgent[Video Agent]\n    Core --> Annotator[Annotator Engine]\n    Core --> Reporter[Report Renderer]\n    API --> ScreenshotSvc[Screenshot Service]\n    API --> DiffSvc[Diff Service]\n    VideoAgent --> OpenCV[OpenCV/SceneDetect]\n    Annotator --> Claude[Anthropic Claude API]\n    Annotator --> Pillow[Pillow Imaging]\n    Reporter --> HTML[HTML/PDF Output]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant C as CLI/Web\n    participant VA as VideoAgent\n    participant A as Annotator\n    participant LLM as Claude API\n    participant R as ReportRenderer\n    U->>C: video-annotator review rec.mp4\n    C->>VA: Extract scenes & frames\n    VA->>VA: Detect scenes (OpenCV)\n    VA-->>C: List of frames/timestamps\n    C->>A: Annotate frames with spec\n    A->>LLM: Send frame + context\n    LLM-->>A: Return callouts/labels\n    A->>A: Draw highlights (Pillow)\n    A-->>C: Annotated frames\n    C->>R: Generate report\n    R-->>U: report.html", "capabilities": ["Video scene detection", "AI-based UI annotation", "Image diffing (SSIM)", "Screenshot capture", "HTML/PDF report generation", "Web server hosting"], "components": ["VideoAgent", "Annotator", "ReportRenderer", "WebServer", "CLI Entry Point"], "tech": ["Python", "Click", "Rich", "OpenCV", "SceneDetect", "Pillow", "Anthropic API", "Playwright"], "depends_on": ["ffmpeg", "anthropic", "opencv-python", "scenedetect", "click", "rich", "Pillow", "weasyprint"], "integrates_with": ["Claude AI", "Web Browsers", "CI/CD Pipelines"], "patterns": ["Pipeline Processing", "Agent-Based Automation", "REST-like API", "Spec-Driven Execution"], "reuse_tags": ["video-processing", "ui-testing", "ai-annotation", "visual-regression", "reporting-tool"], "slug": "tool-software-video-picture-annotator-review", "repo_url": "https://github.com/davidbmar/tool-software-video-picture-annotator-review", "visibility": "private", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:01:33.822158Z", "source_commit": "9e4a517", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Video Picture Annotator Review",
+  "description": "A Playwright-style tool for analyzing screen recordings, annotating UI elements with AI, and generating visual diff reports.",
+  "codeRepository": "https://github.com/davidbmar/tool-software-video-picture-annotator-review",
+  "programmingLanguage": [
+    "Python",
+    "Click",
+    "Rich",
+    "OpenCV",
+    "SceneDetect",
+    "Pillow",
+    "Anthropic API",
+    "Playwright"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Video Picture Annotator Review</h1>
+  <p class="one-liner">A Playwright-style tool for analyzing screen recordings, annotating UI elements with AI, and generating visual diff reports.</p>
+  <p><a href="https://github.com/davidbmar/tool-software-video-picture-annotator-review">https://github.com/davidbmar/tool-software-video-picture-annotator-review</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A Python-based automation and review tool that processes video recordings and images. It uses scene detection to break down videos, applies AI-driven annotations (via Claude) or manual specs to highlight UI elements, and generates HTML/PDF reports. It also provides a web interface for capturing screenshots and performing pixel-level image comparisons with SSIM scoring.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Automated video analysis with scene detection and keyframe extraction</li><li>AI-powered UI annotation using Claude to identify and label elements</li><li>Visual diffing of images with SSIM scores and overlay views</li><li>Web UI for live screenshot capture and interactive report viewing</li><li>CLI pipeline for end-to-end review: extract, annotate, and report generation</li><li>Support for both spec-driven and fully autonomous annotation modes</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install -e &quot;.[dev]&quot;
+video-annotator --help
+video-annotator serve</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User/Developer] --> CLI[CLI Interface]
+    User --> WebUI[Web UI :7070]
+    CLI --> Core[Core Pipeline]
+    WebUI --> API[JSON API Server]
+    Core --> VideoAgent[Video Agent]
+    Core --> Annotator[Annotator Engine]
+    Core --> Reporter[Report Renderer]
+    API --> ScreenshotSvc[Screenshot Service]
+    API --> DiffSvc[Diff Service]
+    VideoAgent --> OpenCV[OpenCV/SceneDetect]
+    Annotator --> Claude[Anthropic Claude API]
+    Annotator --> Pillow[Pillow Imaging]
+    Reporter --> HTML[HTML/PDF Output]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built in Python using Click for CLI structure, Rich for terminal UIs, and OpenCV/SceneDetect for video processing. It integrates the Anthropic API for intelligent frame annotation and Pillow for image manipulation. The web component is a lightweight server exposing JSON APIs for screenshot capture and image diffing, while the core logic is modularized into agents, annotators, and report renderers.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant C as CLI/Web
+    participant VA as VideoAgent
+    participant A as Annotator
+    participant LLM as Claude API
+    participant R as ReportRenderer
+    U->>C: video-annotator review rec.mp4
+    C->>VA: Extract scenes & frames
+    VA->>VA: Detect scenes (OpenCV)
+    VA-->>C: List of frames/timestamps
+    C->>A: Annotate frames with spec
+    A->>LLM: Send frame + context
+    LLM-->>A: Return callouts/labels
+    A->>A: Draw highlights (Pillow)
+    A-->>C: Annotated frames
+    C->>R: Generate report
+    R-->>U: report.html</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use it to automate QA reviews of UI changes by comparing before/after screenshots, generate annotated walkthroughs of user sessions from screen recordings, or integrate into CI pipelines to visually verify application states using natural language queries.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Video scene detection</span><span class="tag">AI-based UI annotation</span><span class="tag">Image diffing (SSIM)</span><span class="tag">Screenshot capture</span><span class="tag">HTML/PDF report generation</span><span class="tag">Web server hosting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">VideoAgent</span><span class="tag">Annotator</span><span class="tag">ReportRenderer</span><span class="tag">WebServer</span><span class="tag">CLI Entry Point</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Click</span><span class="tag">Rich</span><span class="tag">OpenCV</span><span class="tag">SceneDetect</span><span class="tag">Pillow</span><span class="tag">Anthropic API</span><span class="tag">Playwright</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">ffmpeg</span><span class="tag">anthropic</span><span class="tag">opencv-python</span><span class="tag">scenedetect</span><span class="tag">click</span><span class="tag">rich</span><span class="tag">Pillow</span><span class="tag">weasyprint</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Claude AI</span><span class="tag">Web Browsers</span><span class="tag">CI/CD Pipelines</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Pipeline Processing</span><span class="tag">Agent-Based Automation</span><span class="tag">REST-like API</span><span class="tag">Spec-Driven Execution</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">video-processing</span><span class="tag">ui-testing</span><span class="tag">ai-annotation</span><span class="tag">visual-regression</span><span class="tag">reporting-tool</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:01:33.822158Z ·
+     commit 9e4a517 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

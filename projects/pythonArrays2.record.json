@@ -1,0 +1,52 @@
+{
+  "title": "pythonArrays2",
+  "one_liner": "A Python script that reads an array of integers from standard input and prints them in reverse order.",
+  "what_it_is": "A simple command-line utility designed for educational purposes to demonstrate basic array manipulation and standard I/O handling in Python. It solves the specific algorithmic task of reversing an integer array provided via stdin.",
+  "how_its_built": "The project consists of a single Python script (`pythonArrays.py`) that utilizes `sys` for output control and built-in functions for input parsing. It manually iterates through the array indices in reverse order to construct the output string.",
+  "how_to_apply": "Use this script as a reference for basic Python input/output operations, specifically handling space-separated integer inputs and controlling output formatting without trailing newlines using `sys.stdout.write`. It serves as a baseline solution for HackerRank-style array reversal challenges.",
+  "quickstart": "echo '4\\n1 4 3 2' | python pythonArrays.py",
+  "features": [
+    "Reads integer array size and elements from standard input",
+    "Parses space-separated integers into a list",
+    "Iterates through the array in reverse index order",
+    "Outputs reversed elements as a space-separated line"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[User Input] -->|stdin| B(pythonArrays.py)\n    B --> C{Parse Input}\n    C -->|Split & Map| D[Integer Array]\n    D --> E[Reverse Iteration Loop]\n    E -->|sys.stdout.write| F[Console Output]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script as pythonArrays.py\n    participant Sys as sys module\n    \n    User->>Script: Provide n (size) and array elements\n    Script->>Script: Parse n via raw_input()\n    Script->>Script: Parse array via map(int, split())\n    loop For i in range(n)\n        Script->>Script: Calculate reverse index x = n - i - 1\n        Script->>Sys: Write str(arr[x]) + \" \"\n    end\n    Sys-->>User: Display reversed array",
+  "capabilities": [
+    "Standard input parsing",
+    "Array indexing",
+    "Formatted output"
+  ],
+  "components": [
+    "pythonArrays.py"
+  ],
+  "tech": [
+    "Python 2",
+    "sys module"
+  ],
+  "depends_on": [
+    "Python 2 interpreter"
+  ],
+  "integrates_with": [],
+  "patterns": [
+    "Standard I/O",
+    "Index-based iteration"
+  ],
+  "reuse_tags": [
+    "algorithm",
+    "array-reversal",
+    "educational",
+    "cli-tool"
+  ],
+  "slug": "pythonArrays2",
+  "repo_url": "https://github.com/davidbmar/pythonArrays2",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:49:59.820086Z",
+  "source_commit": "b6b7aa6",
+  "model": "qwen3.7-plus"
+}

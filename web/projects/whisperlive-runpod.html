@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whisperlive-runpod · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "whisperlive-runpod", "one_liner": "Deployable real-time speech-to-text service using OpenAI Whisper on RunPod GPU infrastructure.", "what_it_is": "A deployment wrapper and configuration toolkit for running Collabora's WhisperLive on RunPod. It provides scripts to build optimized Docker images (slim or full with diarization), push them to a registry, and deploy them to RunPod GPU instances. The system exposes a WebSocket API for real-time audio transcription and HTTP endpoints for health monitoring.", "how_its_built": "Python-based server wrapping the WhisperLive library, containerized with Docker. It uses shell scripts for infrastructure-as-code style deployment (building, pushing, deploying via RunPod API). The server supports multiple backends (faster_whisper, tensorrt) and includes a separate health-check microservice running on port 9999.", "how_to_apply": "Use this project to spin up a scalable, cost-effective transcription endpoint on cloud GPUs without managing complex Kubernetes clusters. Ideal for applications requiring low-latency speech-to-text where you want to pay only for active GPU usage via RunPod's serverless or pod model.", "quickstart": "./scripts/000-questions.sh\n./scripts/200-build-image-local.sh --slim\nexport DOCKER_PASSWORD='your-docker-hub-token'\n./scripts/205-push-to-registry.sh --slim\n./scripts/210-deploy-to-runpod.sh\n./scripts/215-test-runpod-health.sh", "features": ["Real-time WebSocket-based speech-to-text transcription", "Automated deployment scripts for RunPod GPU instances", "Optimized Docker images (slim for transcription, full for diarization)", "Built-in health check and readiness endpoints for orchestration", "Support for multiple Whisper backends (Faster-Whisper, TensorRT)", "Configurable model sizes and compute precision for cost/performance tuning"], "diagram_architecture": "flowchart TD\n    Client[Client App] -->|WSS:443| Proxy[RunPod Proxy]\n    Proxy -->|WS:9090| Server[WhisperLive Server]\n    Server -->|Load Model| Whisper[OpenAI Whisper]\n    Server -->|GPU Compute| GPU[NVIDIA GPU]\n    Monitor[Monitoring System] -->|HTTP:9999| Health[Health Check Service]\n    Health -->|Query Status| Server\n    Health -->|nvidia-smi| GPU", "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant P as RunPod Proxy\n    participant S as WhisperLive Server\n    participant H as Health Service\n    participant W as Whisper Model\n\n    Note over C, H: Deployment Phase\n    H->>S: Check readiness\n    S->>W: Load Model (small.en)\n    W-->>S: Model Loaded\n    S-->>H: Ready\n\n    Note over C, W: Transcription Phase\n    C->>P: Connect WebSocket (wss://...)\n    P->>S: Forward Connection\n    S-->>C: Connection Accepted\n    loop Audio Stream\n        C->>S: Send Audio Chunk (100ms)\n        S->>W: Transcribe Chunk\n        W-->>S: Text Result\n        S-->>C: Send Transcription\n    end", "capabilities": ["Real-time transcription", "Speaker diarization (full image)", "Multi-language support", "Health monitoring", "GPU acceleration"], "components": ["run_server.py", "run_client.py", "healthcheck.py", "deployment scripts", "Dockerfile"], "tech": ["Python", "Docker", "WebSockets", "RunPod API", "Whisper", "Faster-Whisper"], "depends_on": ["RunPod Account", "Docker Hub Account", "NVIDIA GPU", "Collabora WhisperLive"], "integrates_with": ["RunPod Platform", "Docker Registry", "WebSocket Clients"], "patterns": ["Microservices", "Containerization", "Infrastructure as Code", "Health Check Pattern"], "reuse_tags": ["speech-to-text", "gpu-deployment", "runpod", "whisper", "real-time"], "slug": "whisperlive-runpod", "repo_url": "https://github.com/davidbmar/whisperlive-runpod", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:10:41.983453Z", "source_commit": "4679424", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "whisperlive-runpod",
+  "description": "Deployable real-time speech-to-text service using OpenAI Whisper on RunPod GPU infrastructure.",
+  "codeRepository": "https://github.com/davidbmar/whisperlive-runpod",
+  "programmingLanguage": [
+    "Python",
+    "Docker",
+    "WebSockets",
+    "RunPod API",
+    "Whisper",
+    "Faster-Whisper"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>whisperlive-runpod</h1>
+  <p class="one-liner">Deployable real-time speech-to-text service using OpenAI Whisper on RunPod GPU infrastructure.</p>
+  <p><a href="https://github.com/davidbmar/whisperlive-runpod">https://github.com/davidbmar/whisperlive-runpod</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A deployment wrapper and configuration toolkit for running Collabora&#x27;s WhisperLive on RunPod. It provides scripts to build optimized Docker images (slim or full with diarization), push them to a registry, and deploy them to RunPod GPU instances. The system exposes a WebSocket API for real-time audio transcription and HTTP endpoints for health monitoring.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time WebSocket-based speech-to-text transcription</li><li>Automated deployment scripts for RunPod GPU instances</li><li>Optimized Docker images (slim for transcription, full for diarization)</li><li>Built-in health check and readiness endpoints for orchestration</li><li>Support for multiple Whisper backends (Faster-Whisper, TensorRT)</li><li>Configurable model sizes and compute precision for cost/performance tuning</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">./scripts/000-questions.sh
+./scripts/200-build-image-local.sh --slim
+export DOCKER_PASSWORD=&#x27;your-docker-hub-token&#x27;
+./scripts/205-push-to-registry.sh --slim
+./scripts/210-deploy-to-runpod.sh
+./scripts/215-test-runpod-health.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Client App] -->|WSS:443| Proxy[RunPod Proxy]
+    Proxy -->|WS:9090| Server[WhisperLive Server]
+    Server -->|Load Model| Whisper[OpenAI Whisper]
+    Server -->|GPU Compute| GPU[NVIDIA GPU]
+    Monitor[Monitoring System] -->|HTTP:9999| Health[Health Check Service]
+    Health -->|Query Status| Server
+    Health -->|nvidia-smi| GPU</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Python-based server wrapping the WhisperLive library, containerized with Docker. It uses shell scripts for infrastructure-as-code style deployment (building, pushing, deploying via RunPod API). The server supports multiple backends (faster_whisper, tensorrt) and includes a separate health-check microservice running on port 9999.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client
+    participant P as RunPod Proxy
+    participant S as WhisperLive Server
+    participant H as Health Service
+    participant W as Whisper Model
+
+    Note over C, H: Deployment Phase
+    H->>S: Check readiness
+    S->>W: Load Model (small.en)
+    W-->>S: Model Loaded
+    S-->>H: Ready
+
+    Note over C, W: Transcription Phase
+    C->>P: Connect WebSocket (wss://...)
+    P->>S: Forward Connection
+    S-->>C: Connection Accepted
+    loop Audio Stream
+        C->>S: Send Audio Chunk (100ms)
+        S->>W: Transcribe Chunk
+        W-->>S: Text Result
+        S-->>C: Send Transcription
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this project to spin up a scalable, cost-effective transcription endpoint on cloud GPUs without managing complex Kubernetes clusters. Ideal for applications requiring low-latency speech-to-text where you want to pay only for active GPU usage via RunPod&#x27;s serverless or pod model.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Real-time transcription</span><span class="tag">Speaker diarization (full image)</span><span class="tag">Multi-language support</span><span class="tag">Health monitoring</span><span class="tag">GPU acceleration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">run_server.py</span><span class="tag">run_client.py</span><span class="tag">healthcheck.py</span><span class="tag">deployment scripts</span><span class="tag">Dockerfile</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Docker</span><span class="tag">WebSockets</span><span class="tag">RunPod API</span><span class="tag">Whisper</span><span class="tag">Faster-Whisper</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">RunPod Account</span><span class="tag">Docker Hub Account</span><span class="tag">NVIDIA GPU</span><span class="tag">Collabora WhisperLive</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">RunPod Platform</span><span class="tag">Docker Registry</span><span class="tag">WebSocket Clients</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Microservices</span><span class="tag">Containerization</span><span class="tag">Infrastructure as Code</span><span class="tag">Health Check Pattern</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-to-text</span><span class="tag">gpu-deployment</span><span class="tag">runpod</span><span class="tag">whisper</span><span class="tag">real-time</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:10:41.983453Z ·
+     commit 4679424 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

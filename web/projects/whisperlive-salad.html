@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whisperlive-salad · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "whisperlive-salad", "one_liner": "Real-time speech-to-text server using OpenAI Whisper, optimized for Salad Cloud GPU deployment.", "what_it_is": "A Python-based WebSocket server that streams audio chunks from clients (browser extensions or scripts) to a backend running OpenAI's Whisper model. It supports multiple inference backends including Faster-Whisper, TensorRT, and OpenVINO, enabling low-latency transcription on GPU infrastructure like Salad Cloud.", "how_its_built": "Built with Python using the `websockets` library for communication. It integrates `faster-whisper` for efficient CPU/GPU inference, `tensorrt` for NVIDIA GPU acceleration, and `openvino` for Intel hardware. The client-side logic is implemented as Chrome/Firefox extensions using AudioWorklets to capture and preprocess microphone/tab audio before sending it via WebSocket.", "how_to_apply": "Deploy the server on a Salad Cloud container with GPU support. Connect browser extensions or custom clients to the server's WebSocket endpoint to transcribe live meetings, lectures, or voice notes in real-time.", "quickstart": "bash scripts/setup.sh\npip install whisper-live\npython3 run_server.py --port 9090 --backend faster_whisper", "features": ["Real-time transcription via WebSocket streaming", "Supports Faster-Whisper, TensorRT, and OpenVINO backends", "Browser extensions for Chrome and Firefox for easy capture", "Voice Activity Detection (VAD) to reduce processing load", "Configurable client limits and connection timeouts", "Single-model mode for reduced memory usage and latency"], "diagram_architecture": "flowchart TD\n    Client[Browser Extension/Client] -->|WebSocket Audio Chunks| Server[WhisperLive Server]\n    Server -->|Load Balance| Backend[Inference Backend]\n    Backend -->|Faster-Whisper| FW[Faster-Whisper Engine]\n    Backend -->|TensorRT| TRT[TensorRT Engine]\n    Backend -->|OpenVINO| OV[OpenVINO Engine]\n    FW -->|Text Segments| Server\n    TRT -->|Text Segments| Server\n    OV -->|Text Segments| Server\n    Server -->|Transcribed Text| Client", "diagram_sequence": "sequenceDiagram\n    participant C as Client (Extension)\n    participant S as WhisperLive Server\n    participant B as Inference Backend\n    C->>S: Connect WebSocket\n    S->>C: Connection Accepted\n    loop Audio Stream\n        C->>S: Send Audio Chunk (16kHz Mono)\n        S->>B: Forward Audio Data\n        B->>B: Run Whisper Inference\n        B-->>S: Return Transcribed Segment\n        S-->>C: Send JSON Result\n    end\n    C->>S: Close Connection", "capabilities": ["Live audio transcription", "File-based transcription", "Multi-client support", "GPU acceleration", "Voice Activity Detection"], "components": ["run_server.py", "AudioPreProcessor (JS)", "Chrome Extension", "Firefox Extension", "WebSocket Handler"], "tech": ["Python", "WebSockets", "Faster-Whisper", "TensorRT", "OpenVINO", "JavaScript", "AudioWorklet"], "depends_on": ["PyAudio", "NumPy", "OpenAI Whisper", "CUDA (for TensorRT)", "Intel OpenVINO Runtime"], "integrates_with": ["Salad Cloud", "Google Chrome", "Mozilla Firefox", "NVIDIA GPUs", "Intel CPUs/GPUs"], "patterns": ["Client-Server", "Streaming", "Producer-Consumer", "Plugin Architecture"], "reuse_tags": ["speech-to-text", "real-time", "gpu-accelerated", "websocket", "whisper"], "slug": "whisperlive-salad", "repo_url": "https://github.com/davidbmar/whisperlive-salad", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "https://img.youtube.com/vi/0PHWCApIcCI/0.jpg", "generated_at": "2026-06-14T04:11:04.922673Z", "source_commit": "d936448", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "whisperlive-salad",
+  "description": "Real-time speech-to-text server using OpenAI Whisper, optimized for Salad Cloud GPU deployment.",
+  "codeRepository": "https://github.com/davidbmar/whisperlive-salad",
+  "programmingLanguage": [
+    "Python",
+    "WebSockets",
+    "Faster-Whisper",
+    "TensorRT",
+    "OpenVINO",
+    "JavaScript",
+    "AudioWorklet"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>whisperlive-salad</h1>
+  <p class="one-liner">Real-time speech-to-text server using OpenAI Whisper, optimized for Salad Cloud GPU deployment.</p>
+  <p><a href="https://github.com/davidbmar/whisperlive-salad">https://github.com/davidbmar/whisperlive-salad</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://img.youtube.com/vi/0PHWCApIcCI/0.jpg" alt="whisperlive-salad screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A Python-based WebSocket server that streams audio chunks from clients (browser extensions or scripts) to a backend running OpenAI&#x27;s Whisper model. It supports multiple inference backends including Faster-Whisper, TensorRT, and OpenVINO, enabling low-latency transcription on GPU infrastructure like Salad Cloud.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time transcription via WebSocket streaming</li><li>Supports Faster-Whisper, TensorRT, and OpenVINO backends</li><li>Browser extensions for Chrome and Firefox for easy capture</li><li>Voice Activity Detection (VAD) to reduce processing load</li><li>Configurable client limits and connection timeouts</li><li>Single-model mode for reduced memory usage and latency</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">bash scripts/setup.sh
+pip install whisper-live
+python3 run_server.py --port 9090 --backend faster_whisper</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Browser Extension/Client] -->|WebSocket Audio Chunks| Server[WhisperLive Server]
+    Server -->|Load Balance| Backend[Inference Backend]
+    Backend -->|Faster-Whisper| FW[Faster-Whisper Engine]
+    Backend -->|TensorRT| TRT[TensorRT Engine]
+    Backend -->|OpenVINO| OV[OpenVINO Engine]
+    FW -->|Text Segments| Server
+    TRT -->|Text Segments| Server
+    OV -->|Text Segments| Server
+    Server -->|Transcribed Text| Client</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with Python using the `websockets` library for communication. It integrates `faster-whisper` for efficient CPU/GPU inference, `tensorrt` for NVIDIA GPU acceleration, and `openvino` for Intel hardware. The client-side logic is implemented as Chrome/Firefox extensions using AudioWorklets to capture and preprocess microphone/tab audio before sending it via WebSocket.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client (Extension)
+    participant S as WhisperLive Server
+    participant B as Inference Backend
+    C->>S: Connect WebSocket
+    S->>C: Connection Accepted
+    loop Audio Stream
+        C->>S: Send Audio Chunk (16kHz Mono)
+        S->>B: Forward Audio Data
+        B->>B: Run Whisper Inference
+        B-->>S: Return Transcribed Segment
+        S-->>C: Send JSON Result
+    end
+    C->>S: Close Connection</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the server on a Salad Cloud container with GPU support. Connect browser extensions or custom clients to the server&#x27;s WebSocket endpoint to transcribe live meetings, lectures, or voice notes in real-time.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Live audio transcription</span><span class="tag">File-based transcription</span><span class="tag">Multi-client support</span><span class="tag">GPU acceleration</span><span class="tag">Voice Activity Detection</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">run_server.py</span><span class="tag">AudioPreProcessor (JS)</span><span class="tag">Chrome Extension</span><span class="tag">Firefox Extension</span><span class="tag">WebSocket Handler</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">WebSockets</span><span class="tag">Faster-Whisper</span><span class="tag">TensorRT</span><span class="tag">OpenVINO</span><span class="tag">JavaScript</span><span class="tag">AudioWorklet</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">PyAudio</span><span class="tag">NumPy</span><span class="tag">OpenAI Whisper</span><span class="tag">CUDA (for TensorRT)</span><span class="tag">Intel OpenVINO Runtime</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Salad Cloud</span><span class="tag">Google Chrome</span><span class="tag">Mozilla Firefox</span><span class="tag">NVIDIA GPUs</span><span class="tag">Intel CPUs/GPUs</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server</span><span class="tag">Streaming</span><span class="tag">Producer-Consumer</span><span class="tag">Plugin Architecture</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-to-text</span><span class="tag">real-time</span><span class="tag">gpu-accelerated</span><span class="tag">websocket</span><span class="tag">whisper</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:11:04.922673Z ·
+     commit d936448 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

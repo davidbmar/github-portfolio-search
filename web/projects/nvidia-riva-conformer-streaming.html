@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NVIDIA Riva Conformer-CTC Streaming ASR · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "NVIDIA Riva Conformer-CTC Streaming ASR", "one_liner": "Production-ready real-time speech transcription using NVIDIA Riva 2.19 with Conformer-CTC streaming model via WebSocket bridge.", "what_it_is": "A deployment automation suite and WebSocket bridge that enables real-time, browser-based speech-to-text using NVIDIA Riva's Conformer-CTC-XL model. It handles the complexity of deploying GPU-accelerated ASR on AWS, managing gRPC connections, and serving a secure HTTPS demo interface for immediate testing.", "how_its_built": "The system uses Shell scripts for infrastructure provisioning (AWS EC2 g4dn instances, NVIDIA drivers, Docker) and Python for the application layer. The core logic consists of a WebSocket-to-gRPC bridge (`riva_websocket_bridge.py`) that translates browser audio chunks into Riva API calls, and a `TranscriptAccumulator` that manages partial/final hypothesis reconciliation to prevent word loss during streaming.", "how_to_apply": "Clone the repository, configure AWS and NGC credentials in `.env`, and run the sequential setup scripts to provision the GPU instance, deploy the Riva model, and start the WebSocket bridge and HTTPS demo server.", "quickstart": "git clone https://github.com/davidbmar/nvidia-riva-conformer-streaming.git\ncd nvidia-riva-conformer-streaming\ncp .env.example .env\nnano .env\n./scripts/010-setup-build-box.sh\naws configure\n./scripts/020-deploy-gpu-instance.sh\n./scripts/100-deploy-conformer-streaming.sh\n./scripts/110-setup-websocket-bridge.sh\n./scripts/120-setup-https-demo.sh\necho \"Open: https://$(curl -s ifconfig.me):8444\"", "features": ["Real-time browser streaming transcription via microphone input", "Conformer-CTC-XL model with 40ms timestep for high accuracy", "Secure WebSocket (WSS) bridge connecting browser to Riva gRPC", "Automated AWS GPU instance provisioning and lifecycle management", "Production-ready systemd services with health checks and auto-restart", "Cost-optimized startup/shutdown scripts for overnight GPU savings"], "diagram_architecture": "flowchart TD\n    Browser[Browser Microphone] -->|WSS Audio Chunks| Bridge[WebSocket Bridge :8443]\n    Bridge -->|gRPC Streaming| Riva[NVIDIA Riva Server :50051]\n    Riva -->|Conformer-CTC-XL| GPU[GPU Worker Tesla T4]\n    Demo[HTTPS Demo UI :8444] -->|Serves HTML/JS| Browser\n    subgraph BuildBox [Build Box / Controller]\n        Bridge\n        Demo\n    end\n    subgraph AWS [AWS EC2 Instance]\n        Riva\n        GPU\n    end", "diagram_sequence": "sequenceDiagram\n    participant User as Browser User\n    participant WS as WebSocket Bridge\n    participant Riva as Riva gRPC Server\n    participant GPU as GPU Model\n    \n    User->>WS: Connect WSS & Start Stream\n    WS->>Riva: Init Streaming Recognize Request\n    loop Audio Streaming\n        User->>WS: Send Audio Chunk\n        WS->>Riva: Stream Audio Data\n        Riva->>GPU: Process Conformer-CTC\n        GPU-->>Riva: Return Partial/Final Hypothesis\n        Riva-->>WS: Stream Response\n        WS-->>User: Send JSON Transcript\n    end\n    User->>WS: Stop Stream\n    WS->>Riva: Close Stream", "capabilities": ["Streaming ASR", "WebSocket Proxy", "Cloud Deployment", "GPU Acceleration", "Real-time Transcription"], "components": ["riva_websocket_bridge.py", "riva_client.py", "transcript_accumulator.py", "simple_https_server.py", "deployment scripts"], "tech": ["Python", "Shell", "NVIDIA Riva", "gRPC", "WebSockets", "AWS EC2", "Docker", "Conformer-CTC"], "depends_on": ["Ubuntu 20.04/22.04", "AWS CLI", "NGC API Key", "NVIDIA Drivers", "Docker + NVIDIA Container Toolkit"], "integrates_with": ["AWS EC2", "NVIDIA NGC", "Web Browsers", "Systemd"], "patterns": ["WebSocket-to-gRPC Bridge", "Infrastructure as Code (Shell)", "Producer-Consumer (Audio Stream)", "Service Wrapper"], "reuse_tags": ["speech-recognition", "nvidia-riva", "aws-deployment", "streaming-asr", "websocket-bridge"], "slug": "nvidia-riva-conformer-streaming", "repo_url": "https://github.com/davidbmar/nvidia-riva-conformer-streaming", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:43:56.702331Z", "source_commit": "441c8fd", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "NVIDIA Riva Conformer-CTC Streaming ASR",
+  "description": "Production-ready real-time speech transcription using NVIDIA Riva 2.19 with Conformer-CTC streaming model via WebSocket bridge.",
+  "codeRepository": "https://github.com/davidbmar/nvidia-riva-conformer-streaming",
+  "programmingLanguage": [
+    "Python",
+    "Shell",
+    "NVIDIA Riva",
+    "gRPC",
+    "WebSockets",
+    "AWS EC2",
+    "Docker",
+    "Conformer-CTC"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NVIDIA Riva Conformer-CTC Streaming ASR</h1>
+  <p class="one-liner">Production-ready real-time speech transcription using NVIDIA Riva 2.19 with Conformer-CTC streaming model via WebSocket bridge.</p>
+  <p><a href="https://github.com/davidbmar/nvidia-riva-conformer-streaming">https://github.com/davidbmar/nvidia-riva-conformer-streaming</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A deployment automation suite and WebSocket bridge that enables real-time, browser-based speech-to-text using NVIDIA Riva&#x27;s Conformer-CTC-XL model. It handles the complexity of deploying GPU-accelerated ASR on AWS, managing gRPC connections, and serving a secure HTTPS demo interface for immediate testing.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time browser streaming transcription via microphone input</li><li>Conformer-CTC-XL model with 40ms timestep for high accuracy</li><li>Secure WebSocket (WSS) bridge connecting browser to Riva gRPC</li><li>Automated AWS GPU instance provisioning and lifecycle management</li><li>Production-ready systemd services with health checks and auto-restart</li><li>Cost-optimized startup/shutdown scripts for overnight GPU savings</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/nvidia-riva-conformer-streaming.git
+cd nvidia-riva-conformer-streaming
+cp .env.example .env
+nano .env
+./scripts/010-setup-build-box.sh
+aws configure
+./scripts/020-deploy-gpu-instance.sh
+./scripts/100-deploy-conformer-streaming.sh
+./scripts/110-setup-websocket-bridge.sh
+./scripts/120-setup-https-demo.sh
+echo &quot;Open: https://$(curl -s ifconfig.me):8444&quot;</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Browser[Browser Microphone] -->|WSS Audio Chunks| Bridge[WebSocket Bridge :8443]
+    Bridge -->|gRPC Streaming| Riva[NVIDIA Riva Server :50051]
+    Riva -->|Conformer-CTC-XL| GPU[GPU Worker Tesla T4]
+    Demo[HTTPS Demo UI :8444] -->|Serves HTML/JS| Browser
+    subgraph BuildBox [Build Box / Controller]
+        Bridge
+        Demo
+    end
+    subgraph AWS [AWS EC2 Instance]
+        Riva
+        GPU
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system uses Shell scripts for infrastructure provisioning (AWS EC2 g4dn instances, NVIDIA drivers, Docker) and Python for the application layer. The core logic consists of a WebSocket-to-gRPC bridge (`riva_websocket_bridge.py`) that translates browser audio chunks into Riva API calls, and a `TranscriptAccumulator` that manages partial/final hypothesis reconciliation to prevent word loss during streaming.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as Browser User
+    participant WS as WebSocket Bridge
+    participant Riva as Riva gRPC Server
+    participant GPU as GPU Model
+    
+    User->>WS: Connect WSS & Start Stream
+    WS->>Riva: Init Streaming Recognize Request
+    loop Audio Streaming
+        User->>WS: Send Audio Chunk
+        WS->>Riva: Stream Audio Data
+        Riva->>GPU: Process Conformer-CTC
+        GPU-->>Riva: Return Partial/Final Hypothesis
+        Riva-->>WS: Stream Response
+        WS-->>User: Send JSON Transcript
+    end
+    User->>WS: Stop Stream
+    WS->>Riva: Close Stream</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Clone the repository, configure AWS and NGC credentials in `.env`, and run the sequential setup scripts to provision the GPU instance, deploy the Riva model, and start the WebSocket bridge and HTTPS demo server.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Streaming ASR</span><span class="tag">WebSocket Proxy</span><span class="tag">Cloud Deployment</span><span class="tag">GPU Acceleration</span><span class="tag">Real-time Transcription</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">riva_websocket_bridge.py</span><span class="tag">riva_client.py</span><span class="tag">transcript_accumulator.py</span><span class="tag">simple_https_server.py</span><span class="tag">deployment scripts</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Shell</span><span class="tag">NVIDIA Riva</span><span class="tag">gRPC</span><span class="tag">WebSockets</span><span class="tag">AWS EC2</span><span class="tag">Docker</span><span class="tag">Conformer-CTC</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Ubuntu 20.04/22.04</span><span class="tag">AWS CLI</span><span class="tag">NGC API Key</span><span class="tag">NVIDIA Drivers</span><span class="tag">Docker + NVIDIA Container Toolkit</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS EC2</span><span class="tag">NVIDIA NGC</span><span class="tag">Web Browsers</span><span class="tag">Systemd</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">WebSocket-to-gRPC Bridge</span><span class="tag">Infrastructure as Code (Shell)</span><span class="tag">Producer-Consumer (Audio Stream)</span><span class="tag">Service Wrapper</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-recognition</span><span class="tag">nvidia-riva</span><span class="tag">aws-deployment</span><span class="tag">streaming-asr</span><span class="tag">websocket-bridge</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:43:56.702331Z ·
+     commit 441c8fd ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

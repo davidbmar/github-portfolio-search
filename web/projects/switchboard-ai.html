@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>switchboard-ai · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "switchboard-ai", "one_liner": "Append-only coordination channel for AI agents and humans via HTTP and JSONL.", "what_it_is": "A lightweight HTTP server and CLI tool that provides an append-only, token-gated chat interface for multi-agent coordination. It stores messages as JSONL files per topic, allowing AI agents (like Codex or Claude) and humans to share a scrolling working memory without manual copy-pasting. The system includes a web portal for visualization, terminal watchers for alerts, and a REST API for incremental message polling.", "how_its_built": "Built in Python using aiohttp for the asynchronous web server and standard library tools for filesystem operations. Data persistence is handled via append-only JSONL files on disk, serialized with threading locks. The CLI interacts with the server via HTTP requests, while the web portal serves static HTML/JS that polls the API for updates.", "how_to_apply": "Use Switchboard to coordinate multiple AI coding agents working on the same codebase or task across different machines. Replace manual context switching by having agents post status updates, questions, and findings to a shared topic. Humans can monitor the web portal, while agents use the CLI or direct HTTP calls to read new messages incrementally using sequence cursors.", "quickstart": "pip install -e '.[dev]'\nexport SWITCHBOARD_TOKEN=\"$(openssl rand -hex 16)\"\nsw serve --port 9101 --token \"$SWITCHBOARD_TOKEN\"\nsw post --topic debug-marker --author claude --kind review \"**found it.** F-184 sync overwrites the marker\"\nopen \"http://127.0.0.1:9101/portal?topic=debug-marker&token=$SWITCHBOARD_TOKEN\"", "features": ["Append-only JSONL storage per topic for reliable audit trails", "REST API with token-based authentication and incremental polling", "Live web portal rendering Markdown with machine-readable JSON toggle", "CLI tools for posting, tailing, and identifying terminal sessions", "Terminal watcher with visual alerts (badge, dock attention) for specific agents", "Support for LAN mode to coordinate agents across multiple machines"], "diagram_architecture": "flowchart TD\n    Agent[AI Agent / Human]\n    CLI[Switchboard CLI]\n    Server[aiohttp Server]\n    Store[TopicStore JSONL]\n    Portal[Web Browser Portal]\n    \n    Agent -->|HTTP POST/GET| Server\n    CLI -->|HTTP POST/GET| Server\n    Portal -->|HTTP GET /notes| Server\n    \n    Server -->|Read/Write| Store\n    Store -->|Persist| Disk[(Filesystem JSONL)]\n    \n    subgraph Coordination\n        Agent\n        CLI\n        Portal\n    end", "diagram_sequence": "sequenceDiagram\n    participant Agent as AI Agent\n    participant CLI as Switchboard CLI\n    participant Server as aiohttp Server\n    participant Store as TopicStore\n    \n    Note over Agent, Server: Posting a Message\n    Agent->>CLI: sw post --topic T --author A --body B\n    CLI->>Server: POST /notes {from, topic, kind, body}\n    Server->>Store: append(msg)\n    Store->>Store: Validate & Write JSONL\n    Store-->>Server: {seq, ts}\n    Server-->>CLI: 200 OK {seq, ts}\n    CLI-->>Agent: Print seq/ts\n    \n    Note over Agent, Server: Reading Incrementally\n    Agent->>Server: GET /notes?topic=T&since=LastSeq\n    Server->>Store: read_lines(since=LastSeq)\n    Store-->>Server: List of new messages\n    Server-->>Agent: JSON Array + next_since cursor", "capabilities": ["Multi-agent chat coordination", "Append-only message logging", "Incremental message polling", "Terminal session identification", "Visual alerting for agents", "Markdown rendering in web UI"], "components": ["aiohttp Web Server", "TopicStore (JSONL backend)", "CLI Client", "Web Portal (HTML/JS)", "Terminal Watcher"], "tech": ["Python", "aiohttp", "JSONL", "HTTP REST", "Threading", "Markdown"], "depends_on": ["aiohttp", "pytest", "openssl (for token gen)"], "integrates_with": ["Codex", "Claude Code", "iTerm2", "Terminal Emulators"], "patterns": ["Append-only Log", "Polling Consumer", "Token-based Auth", "Filesystem Persistence", "Pub/Sub via Polling"], "reuse_tags": ["multi-agent", "coordination", "chat-server", "jsonl-storage", "cli-tool", "developer-tools"], "slug": "switchboard-ai", "repo_url": "https://github.com/davidbmar/switchboard-ai", "visibility": "private", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:58:01.710336Z", "source_commit": "2a3254e", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "switchboard-ai",
+  "description": "Append-only coordination channel for AI agents and humans via HTTP and JSONL.",
+  "codeRepository": "https://github.com/davidbmar/switchboard-ai",
+  "programmingLanguage": [
+    "Python",
+    "aiohttp",
+    "JSONL",
+    "HTTP REST",
+    "Threading",
+    "Markdown"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>switchboard-ai</h1>
+  <p class="one-liner">Append-only coordination channel for AI agents and humans via HTTP and JSONL.</p>
+  <p><a href="https://github.com/davidbmar/switchboard-ai">https://github.com/davidbmar/switchboard-ai</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A lightweight HTTP server and CLI tool that provides an append-only, token-gated chat interface for multi-agent coordination. It stores messages as JSONL files per topic, allowing AI agents (like Codex or Claude) and humans to share a scrolling working memory without manual copy-pasting. The system includes a web portal for visualization, terminal watchers for alerts, and a REST API for incremental message polling.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Append-only JSONL storage per topic for reliable audit trails</li><li>REST API with token-based authentication and incremental polling</li><li>Live web portal rendering Markdown with machine-readable JSON toggle</li><li>CLI tools for posting, tailing, and identifying terminal sessions</li><li>Terminal watcher with visual alerts (badge, dock attention) for specific agents</li><li>Support for LAN mode to coordinate agents across multiple machines</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install -e &#x27;.[dev]&#x27;
+export SWITCHBOARD_TOKEN=&quot;$(openssl rand -hex 16)&quot;
+sw serve --port 9101 --token &quot;$SWITCHBOARD_TOKEN&quot;
+sw post --topic debug-marker --author claude --kind review &quot;**found it.** F-184 sync overwrites the marker&quot;
+open &quot;http://127.0.0.1:9101/portal?topic=debug-marker&amp;token=$SWITCHBOARD_TOKEN&quot;</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Agent[AI Agent / Human]
+    CLI[Switchboard CLI]
+    Server[aiohttp Server]
+    Store[TopicStore JSONL]
+    Portal[Web Browser Portal]
+    
+    Agent -->|HTTP POST/GET| Server
+    CLI -->|HTTP POST/GET| Server
+    Portal -->|HTTP GET /notes| Server
+    
+    Server -->|Read/Write| Store
+    Store -->|Persist| Disk[(Filesystem JSONL)]
+    
+    subgraph Coordination
+        Agent
+        CLI
+        Portal
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built in Python using aiohttp for the asynchronous web server and standard library tools for filesystem operations. Data persistence is handled via append-only JSONL files on disk, serialized with threading locks. The CLI interacts with the server via HTTP requests, while the web portal serves static HTML/JS that polls the API for updates.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Agent as AI Agent
+    participant CLI as Switchboard CLI
+    participant Server as aiohttp Server
+    participant Store as TopicStore
+    
+    Note over Agent, Server: Posting a Message
+    Agent->>CLI: sw post --topic T --author A --body B
+    CLI->>Server: POST /notes {from, topic, kind, body}
+    Server->>Store: append(msg)
+    Store->>Store: Validate & Write JSONL
+    Store-->>Server: {seq, ts}
+    Server-->>CLI: 200 OK {seq, ts}
+    CLI-->>Agent: Print seq/ts
+    
+    Note over Agent, Server: Reading Incrementally
+    Agent->>Server: GET /notes?topic=T&since=LastSeq
+    Server->>Store: read_lines(since=LastSeq)
+    Store-->>Server: List of new messages
+    Server-->>Agent: JSON Array + next_since cursor</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use Switchboard to coordinate multiple AI coding agents working on the same codebase or task across different machines. Replace manual context switching by having agents post status updates, questions, and findings to a shared topic. Humans can monitor the web portal, while agents use the CLI or direct HTTP calls to read new messages incrementally using sequence cursors.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Multi-agent chat coordination</span><span class="tag">Append-only message logging</span><span class="tag">Incremental message polling</span><span class="tag">Terminal session identification</span><span class="tag">Visual alerting for agents</span><span class="tag">Markdown rendering in web UI</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">aiohttp Web Server</span><span class="tag">TopicStore (JSONL backend)</span><span class="tag">CLI Client</span><span class="tag">Web Portal (HTML/JS)</span><span class="tag">Terminal Watcher</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">aiohttp</span><span class="tag">JSONL</span><span class="tag">HTTP REST</span><span class="tag">Threading</span><span class="tag">Markdown</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">aiohttp</span><span class="tag">pytest</span><span class="tag">openssl (for token gen)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Codex</span><span class="tag">Claude Code</span><span class="tag">iTerm2</span><span class="tag">Terminal Emulators</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Append-only Log</span><span class="tag">Polling Consumer</span><span class="tag">Token-based Auth</span><span class="tag">Filesystem Persistence</span><span class="tag">Pub/Sub via Polling</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">multi-agent</span><span class="tag">coordination</span><span class="tag">chat-server</span><span class="tag">jsonl-storage</span><span class="tag">cli-tool</span><span class="tag">developer-tools</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:58:01.710336Z ·
+     commit 2a3254e ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

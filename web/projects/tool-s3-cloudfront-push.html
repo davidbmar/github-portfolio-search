@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tool-s3-cloudfront-push · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "tool-s3-cloudfront-push", "one_liner": "A shell-based static site deployer that crawls a running local website and pushes it to AWS S3 and CloudFront for low-cost, HTTPS-enabled global hosting.", "what_it_is": "A collection of Bash scripts that automate the deployment of dynamic or locally-hosted websites to AWS infrastructure. It converts a running site (e.g., localhost:3000) into static files via crawling, then uploads them to a private S3 bucket served through a CloudFront CDN with Origin Access Control (OAC) for security and HTTPS.", "how_its_built": "The project is built entirely in Shell (Bash). It relies on standard Unix utilities for file handling and the AWS CLI for interacting with Amazon Web Services (S3, CloudFront, IAM). It uses `wget` or similar tools implicitly for the crawling step to generate static copies of dynamic pages.", "how_to_apply": "Use this tool when you have a website running locally (or on a staging server) that you want to publish as a static site with minimal ongoing cost. It is ideal for portfolios, blogs, or documentation sites where server-side processing is not required at runtime, but you want the performance and security of a CDN.", "quickstart": "./step0-setup-aws-account.sh\n./step1-crawl-site.sh\n./step2-create-infrastructure.sh\n./step3-deploy.sh", "features": ["Crawls running websites to generate static HTML/CSS/JS copies", "Deploys to AWS S3 with private bucket configuration", "Configures CloudFront CDN for global distribution and HTTPS", "Implements Origin Access Control (OAC) for secure S3 access", "Automates IAM user setup for least-privilege AWS access", "Low-cost hosting leveraging AWS Free Tier"], "diagram_architecture": "flowchart TD\n    User[User/Laptop] -->|Runs Scripts| Scripts[Bash Scripts]\n    Scripts -->|Crawls| LocalSite[Running Website localhost]\n    LocalSite -->|Static Files| CrawlOutput[crawl-output/]\n    Scripts -->|Uploads| CrawlOutput\n    CrawlOutput -->|AWS CLI PutObject| S3[(S3 Bucket Private)]\n    S3 -->|Origin Access Control| CF[CloudFront Distribution]\n    CF -->|HTTPS| Visitor[Global Visitors]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as Shell Scripts\n    participant L as Local Site\n    participant AWS as AWS CLI\n    participant S3 as S3 Bucket\n    participant CF as CloudFront\n\n    U->>S: Execute step1-crawl-site.sh\n    S->>L: Request pages/assets\n    L-->>S: Return HTML/CSS/JS\n    S->>S: Save to crawl-output/\n    \n    U->>S: Execute step3-deploy.sh\n    S->>AWS: Upload files\n    AWS->>S3: PutObject (Private)\n    S->>AWS: Create Invalidation\n    AWS->>CF: Invalidate Cache\n    CF-->>U: Serve updated content via HTTPS", "capabilities": ["Static site generation via crawling", "AWS infrastructure provisioning", "Secure cloud storage deployment", "CDN cache management", "IAM credential management"], "components": ["step0-setup-aws-account.sh", "step1-crawl-site.sh", "step2-create-infrastructure.sh", "step3-deploy.sh", "crawl-output directory"], "tech": ["Bash", "AWS CLI", "Wget/Curl", "JSON"], "depends_on": ["AWS Account", "AWS CLI installed and configured", "Unix-like operating system", "Internet connection"], "integrates_with": ["Amazon S3", "Amazon CloudFront", "AWS IAM", "Local Web Servers"], "patterns": ["Static Site Generation", "Infrastructure as Code (Scripted)", "CI/CD Pipeline (Manual)", "Least Privilege Access"], "reuse_tags": ["deployment", "aws", "static-site", "shell-script", "cdn", "s3", "cloudfront"], "slug": "tool-s3-cloudfront-push", "repo_url": "https://github.com/davidbmar/tool-s3-cloudfront-push", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:01:09.467148Z", "source_commit": "649668f", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "tool-s3-cloudfront-push",
+  "description": "A shell-based static site deployer that crawls a running local website and pushes it to AWS S3 and CloudFront for low-cost, HTTPS-enabled global hosting.",
+  "codeRepository": "https://github.com/davidbmar/tool-s3-cloudfront-push",
+  "programmingLanguage": [
+    "Bash",
+    "AWS CLI",
+    "Wget/Curl",
+    "JSON"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>tool-s3-cloudfront-push</h1>
+  <p class="one-liner">A shell-based static site deployer that crawls a running local website and pushes it to AWS S3 and CloudFront for low-cost, HTTPS-enabled global hosting.</p>
+  <p><a href="https://github.com/davidbmar/tool-s3-cloudfront-push">https://github.com/davidbmar/tool-s3-cloudfront-push</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A collection of Bash scripts that automate the deployment of dynamic or locally-hosted websites to AWS infrastructure. It converts a running site (e.g., localhost:3000) into static files via crawling, then uploads them to a private S3 bucket served through a CloudFront CDN with Origin Access Control (OAC) for security and HTTPS.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Crawls running websites to generate static HTML/CSS/JS copies</li><li>Deploys to AWS S3 with private bucket configuration</li><li>Configures CloudFront CDN for global distribution and HTTPS</li><li>Implements Origin Access Control (OAC) for secure S3 access</li><li>Automates IAM user setup for least-privilege AWS access</li><li>Low-cost hosting leveraging AWS Free Tier</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">./step0-setup-aws-account.sh
+./step1-crawl-site.sh
+./step2-create-infrastructure.sh
+./step3-deploy.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User/Laptop] -->|Runs Scripts| Scripts[Bash Scripts]
+    Scripts -->|Crawls| LocalSite[Running Website localhost]
+    LocalSite -->|Static Files| CrawlOutput[crawl-output/]
+    Scripts -->|Uploads| CrawlOutput
+    CrawlOutput -->|AWS CLI PutObject| S3[(S3 Bucket Private)]
+    S3 -->|Origin Access Control| CF[CloudFront Distribution]
+    CF -->|HTTPS| Visitor[Global Visitors]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project is built entirely in Shell (Bash). It relies on standard Unix utilities for file handling and the AWS CLI for interacting with Amazon Web Services (S3, CloudFront, IAM). It uses `wget` or similar tools implicitly for the crawling step to generate static copies of dynamic pages.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant S as Shell Scripts
+    participant L as Local Site
+    participant AWS as AWS CLI
+    participant S3 as S3 Bucket
+    participant CF as CloudFront
+
+    U->>S: Execute step1-crawl-site.sh
+    S->>L: Request pages/assets
+    L-->>S: Return HTML/CSS/JS
+    S->>S: Save to crawl-output/
+    
+    U->>S: Execute step3-deploy.sh
+    S->>AWS: Upload files
+    AWS->>S3: PutObject (Private)
+    S->>AWS: Create Invalidation
+    AWS->>CF: Invalidate Cache
+    CF-->>U: Serve updated content via HTTPS</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this tool when you have a website running locally (or on a staging server) that you want to publish as a static site with minimal ongoing cost. It is ideal for portfolios, blogs, or documentation sites where server-side processing is not required at runtime, but you want the performance and security of a CDN.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Static site generation via crawling</span><span class="tag">AWS infrastructure provisioning</span><span class="tag">Secure cloud storage deployment</span><span class="tag">CDN cache management</span><span class="tag">IAM credential management</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">step0-setup-aws-account.sh</span><span class="tag">step1-crawl-site.sh</span><span class="tag">step2-create-infrastructure.sh</span><span class="tag">step3-deploy.sh</span><span class="tag">crawl-output directory</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Bash</span><span class="tag">AWS CLI</span><span class="tag">Wget/Curl</span><span class="tag">JSON</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS Account</span><span class="tag">AWS CLI installed and configured</span><span class="tag">Unix-like operating system</span><span class="tag">Internet connection</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Amazon S3</span><span class="tag">Amazon CloudFront</span><span class="tag">AWS IAM</span><span class="tag">Local Web Servers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Static Site Generation</span><span class="tag">Infrastructure as Code (Scripted)</span><span class="tag">CI/CD Pipeline (Manual)</span><span class="tag">Least Privilege Access</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">deployment</span><span class="tag">aws</span><span class="tag">static-site</span><span class="tag">shell-script</span><span class="tag">cdn</span><span class="tag">s3</span><span class="tag">cloudfront</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:01:09.467148Z ·
+     commit 649668f ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

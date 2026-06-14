@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>youtube_commercial_detector · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "youtube_commercial_detector", "one_liner": "A utility that estimates YouTube ad frequency by downloading videos and analyzing their text transcriptions for commercial keywords.", "what_it_is": "A Python-based script that automates the process of downloading YouTube video content and its associated subtitles or auto-generated captions. It then parses the resulting text files to identify patterns, keywords, or phrases typically associated with commercials, providing a count of likely ad occurrences within the video duration.", "how_its_built": "The project relies on external command-line tools for media acquisition (likely youtube-dl or yt-dlp) and standard Python string processing libraries for text analysis. It operates as a linear pipeline: download media/captions -> extract text -> scan for ad indicators -> report count.", "how_to_apply": "Use this tool for media analysis, academic research into advertising density on specific channels, or personal curiosity about ad load in long-form content. It is not a real-time blocker but a post-hoc analyzer.", "quickstart": "git clone https://github.com/davidbmar/youtube_commercial_detector.git\ncd youtube_commercial_detector\npip install -r requirements.txt\npython main.py <youtube_url>", "features": ["Automated downloading of YouTube video metadata and captions", "Text-based analysis of transcription data", "Keyword matching to identify potential commercial segments", "Simple count output of detected ad instances", "Lightweight dependency footprint"], "diagram_architecture": "flowchart TD\n    A[User Input URL] --> B[Downloader Module]\n    B --> C{Caption Available?}\n    C -->|Yes| D[Extract Text]\n    C -->|No| E[Auto-Generate/Transcribe]\n    D --> F[Text Parser]\n    E --> F\n    F --> G[Keyword Matcher]\n    G --> H[Ad Counter]\n    H --> I[Report Output]", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant MainScript\n    participant Downloader\n    participant Parser\n    participant Output\n    \n    User->>MainScript: Provide YouTube URL\n    MainScript->>Downloader: Download video & captions\n    Downloader-->>MainScript: Return text file path\n    MainScript->>Parser: Load and read text\n    Parser->>Parser: Scan for ad keywords\n    Parser-->>MainScript: Return match count\n    MainScript->>Output: Print ad frequency", "capabilities": ["YouTube content retrieval", "Subtitle extraction", "Text pattern matching", "Ad frequency estimation"], "components": ["Download handler", "Text extractor", "Keyword scanner", "Result formatter"], "tech": ["Python", "youtube-dl/yt-dlp", "Regular Expressions", "File I/O"], "depends_on": ["Python 3.x", "youtube-dl or yt-dlp", "requests"], "integrates_with": ["YouTube Data API (indirectly via downloader)", "Local file system"], "patterns": ["Pipeline processing", "Keyword filtering", "Script automation"], "reuse_tags": ["media-analysis", "youtube-tools", "text-mining", "ad-detection", "python-script"], "slug": "youtube_commercial_detector", "repo_url": "https://github.com/davidbmar/youtube_commercial_detector", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:11:50.319322Z", "source_commit": "2a515b8", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "youtube_commercial_detector",
+  "description": "A utility that estimates YouTube ad frequency by downloading videos and analyzing their text transcriptions for commercial keywords.",
+  "codeRepository": "https://github.com/davidbmar/youtube_commercial_detector",
+  "programmingLanguage": [
+    "Python",
+    "youtube-dl/yt-dlp",
+    "Regular Expressions",
+    "File I/O"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>youtube_commercial_detector</h1>
+  <p class="one-liner">A utility that estimates YouTube ad frequency by downloading videos and analyzing their text transcriptions for commercial keywords.</p>
+  <p><a href="https://github.com/davidbmar/youtube_commercial_detector">https://github.com/davidbmar/youtube_commercial_detector</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A Python-based script that automates the process of downloading YouTube video content and its associated subtitles or auto-generated captions. It then parses the resulting text files to identify patterns, keywords, or phrases typically associated with commercials, providing a count of likely ad occurrences within the video duration.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Automated downloading of YouTube video metadata and captions</li><li>Text-based analysis of transcription data</li><li>Keyword matching to identify potential commercial segments</li><li>Simple count output of detected ad instances</li><li>Lightweight dependency footprint</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/youtube_commercial_detector.git
+cd youtube_commercial_detector
+pip install -r requirements.txt
+python main.py &lt;youtube_url&gt;</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[User Input URL] --> B[Downloader Module]
+    B --> C{Caption Available?}
+    C -->|Yes| D[Extract Text]
+    C -->|No| E[Auto-Generate/Transcribe]
+    D --> F[Text Parser]
+    E --> F
+    F --> G[Keyword Matcher]
+    G --> H[Ad Counter]
+    H --> I[Report Output]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project relies on external command-line tools for media acquisition (likely youtube-dl or yt-dlp) and standard Python string processing libraries for text analysis. It operates as a linear pipeline: download media/captions -&gt; extract text -&gt; scan for ad indicators -&gt; report count.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant MainScript
+    participant Downloader
+    participant Parser
+    participant Output
+    
+    User->>MainScript: Provide YouTube URL
+    MainScript->>Downloader: Download video & captions
+    Downloader-->>MainScript: Return text file path
+    MainScript->>Parser: Load and read text
+    Parser->>Parser: Scan for ad keywords
+    Parser-->>MainScript: Return match count
+    MainScript->>Output: Print ad frequency</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this tool for media analysis, academic research into advertising density on specific channels, or personal curiosity about ad load in long-form content. It is not a real-time blocker but a post-hoc analyzer.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">YouTube content retrieval</span><span class="tag">Subtitle extraction</span><span class="tag">Text pattern matching</span><span class="tag">Ad frequency estimation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Download handler</span><span class="tag">Text extractor</span><span class="tag">Keyword scanner</span><span class="tag">Result formatter</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">youtube-dl/yt-dlp</span><span class="tag">Regular Expressions</span><span class="tag">File I/O</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Python 3.x</span><span class="tag">youtube-dl or yt-dlp</span><span class="tag">requests</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">YouTube Data API (indirectly via downloader)</span><span class="tag">Local file system</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Pipeline processing</span><span class="tag">Keyword filtering</span><span class="tag">Script automation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">media-analysis</span><span class="tag">youtube-tools</span><span class="tag">text-mining</span><span class="tag">ad-detection</span><span class="tag">python-script</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:11:50.319322Z ·
+     commit 2a515b8 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

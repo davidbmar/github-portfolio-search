@@ -1,0 +1,77 @@
+{
+  "title": "SSH Helper",
+  "one_liner": "A lightweight, web-based SSH terminal emulator with IP whitelisting and external authentication support.",
+  "what_it_is": "SSH Helper is a Node.js application that exposes a browser-based terminal interface using xterm.js. It bridges the gap between web browsers and server shells by spawning PTY (pseudo-terminal) sessions via WebSockets. Designed for secure deployment, it offloads authentication to an Nginx/OAuth2 proxy layer (e.g., AWS Cognito) and supports optional IP whitelisting for additional network-level security.",
+  "how_its_built": "The backend is built with Express.js and the 'ws' library for WebSocket handling, using 'node-pty' to spawn real shell processes (bash/sh). The frontend uses xterm.js for terminal emulation, connecting to the backend via WebSocket. Configuration is managed via a JSON file, and deployment is streamlined using a bash bootstrap script that configures systemd services and modular Nginx includes.",
+  "how_to_apply": "Deploy this tool when you need secure, browser-accessible shell access to development or production servers without exposing raw SSH ports. It is ideal for environments already using Nginx as a reverse proxy with OAuth2/OIDC authentication (like Cognito or Auth0), allowing you to grant terminal access based on user identity rather than just SSH keys.",
+  "quickstart": "git clone https://github.com/davidbmar/ssh-helper\ncd ssh-helper\nnpm install\ncp config.json config.local.json\nnpm run dev",
+  "features": [
+    "Full xterm.js terminal emulation with color and responsive design",
+    "WebSocket-based real-time I/O for low-latency shell interaction",
+    "Optional IP whitelisting for network-level access control",
+    "Seamless integration with Nginx and OAuth2 proxies for authentication",
+    "Automated deployment via bootstrap script for systemd and Nginx"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS| Nginx[Nginx Reverse Proxy]\n    Nginx -->|Auth Request| OAuth2[OAuth2 Proxy / Cognito]\n    OAuth2 -->|Authenticated Headers| Nginx\n    Nginx -->|Proxy Pass| App[SSH Helper Node.js]\n    App -->|Spawn PTY| Shell[Bash/Sh Shell]\n    App -->|WebSocket| User",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant N as Nginx\n    participant O as OAuth2 Proxy\n    participant S as SSH Helper\n    participant P as PTY Process\n\n    U->>N: GET /ssh\n    N->>O: /oauth2/auth\n    O-->>N: 200 OK + User Headers\n    N->>S: Proxy Request + X-User-Email\n    S-->>N: HTTP 101 Switching Protocols\n    N-->>U: WebSocket Connection Established\n    U->>S: Terminal Input (WS)\n    S->>P: Write to PTY\n    P-->>S: Shell Output\n    S-->>U: Terminal Output (WS)",
+  "capabilities": [
+    "Web-based terminal access",
+    "IP whitelisting",
+    "External auth integration",
+    "PTY session management",
+    "Systemd service management"
+  ],
+  "components": [
+    "Express.js Server",
+    "WebSocket Server",
+    "xterm.js Client",
+    "node-pty Spawner",
+    "Nginx Configs",
+    "Bootstrap Script"
+  ],
+  "tech": [
+    "Node.js",
+    "JavaScript",
+    "Express",
+    "ws",
+    "node-pty",
+    "xterm.js",
+    "Nginx",
+    "Systemd"
+  ],
+  "depends_on": [
+    "Node.js 16+",
+    "Linux OS",
+    "Nginx",
+    "OAuth2 Proxy (optional)"
+  ],
+  "integrates_with": [
+    "AWS Cognito",
+    "oauth2-proxy",
+    "Nginx",
+    "Systemd"
+  ],
+  "patterns": [
+    "Reverse Proxy Authentication",
+    "WebSocket Tunneling",
+    "PTY Bridging",
+    "Modular Nginx Config"
+  ],
+  "reuse_tags": [
+    "web-terminal",
+    "ssh-gateway",
+    "nodejs-pty",
+    "nginx-auth",
+    "devops-tool"
+  ],
+  "slug": "ssh-helper",
+  "repo_url": "https://github.com/davidbmar/ssh-helper",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:56:14.139485Z",
+  "source_commit": "158059c",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,91 @@
+{
+  "title": "Iris Kade: Local Browser-Native Conversational AI",
+  "one_liner": "A zero-network, WebGPU-accelerated conversational AI with dual-LLM architecture, multi-lane RAG, and streaming TTS/STT running entirely in the browser.",
+  "what_it_is": "Iris Kade is a privacy-first, noir-cyberpunk themed conversational agent that operates 100% client-side. It eliminates cloud dependencies by leveraging WebGPU for local LLM inference, Web Speech API for voice interaction, and ONNX/WASM for text-to-speech. The system features a 4-state conversation FSM, adaptive response biasing, and a multi-lane Retrieval-Augmented Generation (RAG) pipeline that retrieves context from persona, playbook, knowledge, and lore vectors.",
+  "how_its_built": "Built with vanilla TypeScript and Vite, the application uses @mlc-ai/web-llm for GPU-accelerated model inference and @huggingface/transformers.js for embedding generation. Voice capabilities are handled by the Web Speech API (STT) and vits-web (TTS). State management relies on a finite state machine (IDLE/PROCESSING/SPEAKING/INTERRUPTED), while persistent storage for RAG artifacts utilizes IndexedDB. The build process includes custom scripts for indexing session data into JSONL packs for offline retrieval.",
+  "how_to_apply": "Deploy as a static web application requiring no backend infrastructure. Ideal for secure environments where data sovereignty is critical, educational tools for teaching opsec/privacy, or offline-capable interactive characters. The modular architecture allows swapping LLMs (80MB–5GB) and TTS engines without altering core logic.",
+  "quickstart": "git clone https://github.com/davidbmar/speaker-generation-version-1.git\ncd speaker-generation-version-1/web-app\nnpm install\nnpm run dev",
+  "features": [
+    "Local LLM inference via WebGPU supporting 17+ models (80MB to 5GB)",
+    "Multi-lane RAG pipeline with vector + lexical reranking for persona and lore",
+    "Streaming concurrent TTS (vits-web) and STT (Web Speech API)",
+    "4-state conversation FSM with clean interrupt handling",
+    "Adaptive conversation bias adjusting verbosity and warmth",
+    "Pack-only mode for instant responses without LLM loading"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Input] -->|Voice/Text| STT[Web Speech API STT]\n    STT --> FSM[Conversation FSM]\n    FSM -->|IDLE to PROCESSING| Pipeline[RAG Pipeline]\n    Pipeline -->|Retrieve| VectorStore[(IndexedDB Artifacts)]\n    Pipeline -->|Rerank| Context[Context Composer]\n    Context --> LLM[Web-LLM Inference]\n    LLM -->|Stream Tokens| Buffer[Sentence Buffer]\n    Buffer --> TTS[vits-web TTS]\n    TTS --> Audio[Audio Output]\n    FSM -->|Interrupt| Buffer\n    FSM -->|Reset| Pipeline",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant FSM as Conversation FSM\n    participant RAG as RAG Pipeline\n    participant LLM as Web-LLM\n    participant TTS as vits-web Speaker\n    \n    U->>FSM: Speak/Type Input\n    FSM->>FSM: Transition IDLE -> PROCESSING\n    FSM->>RAG: Request Context (Persona/Lore)\n    RAG->>RAG: Retrieve & Rerank Vectors\n    RAG-->>FSM: Composed Prompt\n    FSM->>LLM: Stream Generation Request\n    loop Token Streaming\n        LLM-->>FSM: Return Token\n        FSM->>TTS: Enqueue Sentence\n    end\n    TTS->>U: Play Audio Stream\n    alt User Interrupts\n        U->>FSM: Interrupt Signal\n        FSM->>LLM: Abort Generation\n        FSM->>TTS: Clear Buffer\n        FSM->>FSM: Transition to INTERRUPTED\n    end",
+  "capabilities": [
+    "Offline-first operation",
+    "WebGPU acceleration",
+    "Voice interaction",
+    "Contextual memory",
+    "Adaptive personality",
+    "Diagnostic testing"
+  ],
+  "components": [
+    "Conversation FSM",
+    "Multi-lane RAG Engine",
+    "Web-LLM Interface",
+    "vits-web TTS Module",
+    "Artifact Store (IndexedDB)",
+    "Session Indexer"
+  ],
+  "tech": [
+    "TypeScript",
+    "Vite",
+    "WebGPU",
+    "Web-LLM",
+    "Transformers.js",
+    "vits-web",
+    "Web Speech API",
+    "Playwright"
+  ],
+  "depends_on": [
+    "@mlc-ai/web-llm",
+    "@huggingface/transformers",
+    "@diffusionstudio/vits-web",
+    "hnswlib-node (via WASM)",
+    "IndexedDB"
+  ],
+  "integrates_with": [
+    "Chrome 113+",
+    "Edge 113+",
+    "WebGPU-compatible browsers",
+    "Mobile WebSocket clients (planned)"
+  ],
+  "patterns": [
+    "Finite State Machine",
+    "Retrieval-Augmented Generation",
+    "Worker-based Embedding",
+    "Streaming UI Updates",
+    "Offline-First Caching"
+  ],
+  "reuse_tags": [
+    "local-llm",
+    "webgpu",
+    "rag",
+    "voice-ai",
+    "privacy-focused",
+    "browser-native"
+  ],
+  "slug": "speaker-generation-version-1",
+  "repo_url": "https://github.com/davidbmar/speaker-generation-version-1",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/web-app/npm_and_yarn-d1f9cb5775 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 5 updates"
+    }
+  ],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/speaker-generation-version-1/main/docs/screenshots/live-demo.png",
+  "generated_at": "2026-06-14T03:54:51.666881Z",
+  "source_commit": "02e44af",
+  "model": "qwen3.7-plus"
+}

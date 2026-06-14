@@ -1,0 +1,80 @@
+{
+  "title": "nvidia-RNN-T-Parakeet",
+  "one_liner": "A low-latency, GPU-accelerated speech-to-text API server using NVIDIA Parakeet RNN-T and Riva.",
+  "what_it_is": "This project provides a production-ready FastAPI wrapper around NVIDIA's Parakeet RNN-T model, served via the NVIDIA Riva ASR framework. It enables ultra-low latency (~100ms) real-time transcription with streaming WebSocket support, word-level timestamps, and optional AWS integrations for audio ingestion and event handling.",
+  "how_its_built": "The system is built as a Dockerized Python application. It uses a series of numbered Shell scripts to handle environment setup, dependency installation, model downloading from NGC, and GPU configuration. The core service is a FastAPI server that interfaces with the Riva client SDK to perform inference on the Parakeet 1.1B English model.",
+  "how_to_apply": "Deploy this system where low-latency transcription is critical, such as live captioning, voice assistants, or real-time meeting notes. It requires an NVIDIA GPU with CUDA support and an NGC API key. It can be integrated into larger pipelines via its REST API or WebSocket endpoints, with optional hooks for AWS S3 and EventBridge.",
+  "quickstart": "./scripts/step-005-setup-parakeet-environment.sh\n./scripts/step-010-install-parakeet-dependencies.sh\n./scripts/step-015-download-parakeet-model.sh\n./scripts/step-020-test-parakeet-inference.sh\n./scripts/step-025-setup-gpu-environment.sh",
+  "features": [
+    "Ultra-low latency transcription (~100ms) using Parakeet RNN-T",
+    "Real-time streaming support via WebSockets",
+    "GPU-optimized inference using NVIDIA Riva and TensorRT",
+    "Word-level timestamp generation for precise alignment",
+    "Dockerized deployment with health checks and CORS support",
+    "Optional AWS integration for S3 audio processing and EventBridge events"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client App] -->|WebSocket/HTTP| API[FastAPI Server]\n    API -->|gRPC| Riva[NVIDIA Riva Service]\n    Riva -->|TensorRT| GPU[NVIDIA GPU]\n    GPU -->|Inference Result| Riva\n    Riva -->|Transcription| API\n    API -->|Store/Event| AWS[AWS S3 / EventBridge]\n    subgraph Docker Container\n        API\n        Riva\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant F as FastAPI Server\n    participant R as Riva Service\n    participant G as GPU\n    C->>F: POST /transcribe or WS Connect\n    F->>R: StreamingRecognize Request (audio chunks)\n    R->>G: Execute Parakeet Model Inference\n    G-->>R: Return Logits/Text\n    R-->>F: Partial/Final Transcription Results\n    F-->>C: JSON Response with Text & Timestamps",
+  "capabilities": [
+    "Speech-to-Text Transcription",
+    "Real-time Streaming Audio Processing",
+    "Word-level Timing Analysis",
+    "REST API Serving",
+    "WebSocket Communication",
+    "Cloud Storage Integration"
+  ],
+  "components": [
+    "FastAPI Application",
+    "NVIDIA Riva ASR Client",
+    "Parakeet RNN-T Model",
+    "Docker Runtime",
+    "Setup Scripts (Shell)",
+    "AWS Boto3 Client"
+  ],
+  "tech": [
+    "Python",
+    "Shell Script",
+    "FastAPI",
+    "NVIDIA Riva",
+    "Docker",
+    "gRPC",
+    "CUDA",
+    "TensorRT"
+  ],
+  "depends_on": [
+    "NVIDIA GPU with CUDA",
+    "NGC API Key",
+    "Docker with nvidia-container-toolkit",
+    "AWS CLI (optional)"
+  ],
+  "integrates_with": [
+    "AWS S3",
+    "AWS EventBridge",
+    "AWS SQS",
+    "Web Browsers (via WebSocket)"
+  ],
+  "patterns": [
+    "Microservices",
+    "Producer-Consumer (Audio Stream)",
+    "Wrapper Pattern (Riva Client)",
+    "Infrastructure as Code (Scripts)"
+  ],
+  "reuse_tags": [
+    "speech-recognition",
+    "nvidia-riva",
+    "parakeet-model",
+    "fastapi",
+    "gpu-acceleration",
+    "real-time-transcription"
+  ],
+  "slug": "nvidia-RNN-T-Parakeet",
+  "repo_url": "https://github.com/davidbmar/nvidia-RNN-T-Parakeet",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:44:47.903312Z",
+  "source_commit": "5b2e1ad",
+  "model": "qwen3.7-plus"
+}

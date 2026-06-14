@@ -1,0 +1,62 @@
+{
+  "title": "stringsAndLoops",
+  "one_liner": "A Python script that separates even and odd indexed characters from input strings.",
+  "what_it_is": "A command-line utility designed for coding challenges that processes a series of strings, splitting each into two parts: characters at even indices and characters at odd indices, then prints them space-separated.",
+  "how_its_built": "Built with pure Python using standard I/O. It reads the number of test cases from stdin, iterates through each string, classifies characters by index parity into separate lists, and writes the concatenated results to stdout.",
+  "how_to_apply": "Use this as a reference for basic string manipulation, list accumulation patterns, and handling standard input/output in Python 2 environments. It demonstrates O(N) character processing per string.",
+  "quickstart": "python stringsAndLoops.py",
+  "features": [
+    "Reads integer count of test cases from stdin",
+    "Processes each subsequent line as a target string",
+    "Separates characters into even-indexed and odd-indexed groups",
+    "Outputs formatted result lines to stdout"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Start] --> B[Read Test Case Count]\n    B --> C{More Cases?}\n    C -->|Yes| D[Read Input String]\n    D --> E[Initialize Even/Odd Lists]\n    E --> F[Iterate Characters]\n    F --> G{Index Even?}\n    G -->|Yes| H[Append to Even List]\n    G -->|No| I[Append to Odd List]\n    H --> J{Next Char?}\n    I --> J\n    J -->|Yes| F\n    J -->|No| K[Join Even List]\n    K --> L[Join Odd List]\n    L --> M[Print Result]\n    M --> C\n    C -->|No| N[End]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script\n    participant SysStdout\n    User->>Script: Provide Test Case Count (N)\n    loop For each test case\n        User->>Script: Provide Input String (S)\n        Script->>Script: Initialize evenString, oddString\n        loop For each char in S\n            Script->>Script: Check index parity\n            alt Even Index\n                Script->>Script: Append to evenString\n            else Odd Index\n                Script->>Script: Append to oddString\n            end\n        end\n        Script->>SysStdout: Write evenString chars\n        Script->>SysStdout: Write space\n        Script->>SysStdout: Write oddString chars\n        Script->>SysStdout: Write newline\n    end",
+  "capabilities": [
+    "String indexing",
+    "Standard input parsing",
+    "Conditional logic application",
+    "List accumulation"
+  ],
+  "components": [
+    "Main execution block",
+    "Input reader",
+    "Character classifier",
+    "Output writer"
+  ],
+  "tech": [
+    "Python 2",
+    "sys module",
+    "raw_input",
+    "stdout.write"
+  ],
+  "depends_on": [
+    "Python 2 runtime"
+  ],
+  "integrates_with": [
+    "Standard Input (stdin)",
+    "Standard Output (stdout)"
+  ],
+  "patterns": [
+    "Accumulator pattern",
+    "Iteration over sequence",
+    "Parity check"
+  ],
+  "reuse_tags": [
+    "string-manipulation",
+    "coding-challenge",
+    "basic-algorithm",
+    "stdin-processing"
+  ],
+  "slug": "stringsAndLoops",
+  "repo_url": "https://github.com/davidbmar/stringsAndLoops",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:56:31.611672Z",
+  "source_commit": "2e70648",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nvidia-RNN-T-Parakeet · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "nvidia-RNN-T-Parakeet", "one_liner": "A low-latency, GPU-accelerated speech-to-text API server using NVIDIA Parakeet RNN-T and Riva.", "what_it_is": "This project provides a production-ready FastAPI wrapper around NVIDIA's Parakeet RNN-T model, served via the NVIDIA Riva ASR framework. It enables ultra-low latency (~100ms) real-time transcription with streaming WebSocket support, word-level timestamps, and optional AWS integrations for audio ingestion and event handling.", "how_its_built": "The system is built as a Dockerized Python application. It uses a series of numbered Shell scripts to handle environment setup, dependency installation, model downloading from NGC, and GPU configuration. The core service is a FastAPI server that interfaces with the Riva client SDK to perform inference on the Parakeet 1.1B English model.", "how_to_apply": "Deploy this system where low-latency transcription is critical, such as live captioning, voice assistants, or real-time meeting notes. It requires an NVIDIA GPU with CUDA support and an NGC API key. It can be integrated into larger pipelines via its REST API or WebSocket endpoints, with optional hooks for AWS S3 and EventBridge.", "quickstart": "./scripts/step-005-setup-parakeet-environment.sh\n./scripts/step-010-install-parakeet-dependencies.sh\n./scripts/step-015-download-parakeet-model.sh\n./scripts/step-020-test-parakeet-inference.sh\n./scripts/step-025-setup-gpu-environment.sh", "features": ["Ultra-low latency transcription (~100ms) using Parakeet RNN-T", "Real-time streaming support via WebSockets", "GPU-optimized inference using NVIDIA Riva and TensorRT", "Word-level timestamp generation for precise alignment", "Dockerized deployment with health checks and CORS support", "Optional AWS integration for S3 audio processing and EventBridge events"], "diagram_architecture": "flowchart TD\n    Client[Client App] -->|WebSocket/HTTP| API[FastAPI Server]\n    API -->|gRPC| Riva[NVIDIA Riva Service]\n    Riva -->|TensorRT| GPU[NVIDIA GPU]\n    GPU -->|Inference Result| Riva\n    Riva -->|Transcription| API\n    API -->|Store/Event| AWS[AWS S3 / EventBridge]\n    subgraph Docker Container\n        API\n        Riva\n    end", "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant F as FastAPI Server\n    participant R as Riva Service\n    participant G as GPU\n    C->>F: POST /transcribe or WS Connect\n    F->>R: StreamingRecognize Request (audio chunks)\n    R->>G: Execute Parakeet Model Inference\n    G-->>R: Return Logits/Text\n    R-->>F: Partial/Final Transcription Results\n    F-->>C: JSON Response with Text & Timestamps", "capabilities": ["Speech-to-Text Transcription", "Real-time Streaming Audio Processing", "Word-level Timing Analysis", "REST API Serving", "WebSocket Communication", "Cloud Storage Integration"], "components": ["FastAPI Application", "NVIDIA Riva ASR Client", "Parakeet RNN-T Model", "Docker Runtime", "Setup Scripts (Shell)", "AWS Boto3 Client"], "tech": ["Python", "Shell Script", "FastAPI", "NVIDIA Riva", "Docker", "gRPC", "CUDA", "TensorRT"], "depends_on": ["NVIDIA GPU with CUDA", "NGC API Key", "Docker with nvidia-container-toolkit", "AWS CLI (optional)"], "integrates_with": ["AWS S3", "AWS EventBridge", "AWS SQS", "Web Browsers (via WebSocket)"], "patterns": ["Microservices", "Producer-Consumer (Audio Stream)", "Wrapper Pattern (Riva Client)", "Infrastructure as Code (Scripts)"], "reuse_tags": ["speech-recognition", "nvidia-riva", "parakeet-model", "fastapi", "gpu-acceleration", "real-time-transcription"], "slug": "nvidia-RNN-T-Parakeet", "repo_url": "https://github.com/davidbmar/nvidia-RNN-T-Parakeet", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:44:47.903312Z", "source_commit": "5b2e1ad", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "nvidia-RNN-T-Parakeet",
+  "description": "A low-latency, GPU-accelerated speech-to-text API server using NVIDIA Parakeet RNN-T and Riva.",
+  "codeRepository": "https://github.com/davidbmar/nvidia-RNN-T-Parakeet",
+  "programmingLanguage": [
+    "Python",
+    "Shell Script",
+    "FastAPI",
+    "NVIDIA Riva",
+    "Docker",
+    "gRPC",
+    "CUDA",
+    "TensorRT"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>nvidia-RNN-T-Parakeet</h1>
+  <p class="one-liner">A low-latency, GPU-accelerated speech-to-text API server using NVIDIA Parakeet RNN-T and Riva.</p>
+  <p><a href="https://github.com/davidbmar/nvidia-RNN-T-Parakeet">https://github.com/davidbmar/nvidia-RNN-T-Parakeet</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project provides a production-ready FastAPI wrapper around NVIDIA&#x27;s Parakeet RNN-T model, served via the NVIDIA Riva ASR framework. It enables ultra-low latency (~100ms) real-time transcription with streaming WebSocket support, word-level timestamps, and optional AWS integrations for audio ingestion and event handling.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Ultra-low latency transcription (~100ms) using Parakeet RNN-T</li><li>Real-time streaming support via WebSockets</li><li>GPU-optimized inference using NVIDIA Riva and TensorRT</li><li>Word-level timestamp generation for precise alignment</li><li>Dockerized deployment with health checks and CORS support</li><li>Optional AWS integration for S3 audio processing and EventBridge events</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">./scripts/step-005-setup-parakeet-environment.sh
+./scripts/step-010-install-parakeet-dependencies.sh
+./scripts/step-015-download-parakeet-model.sh
+./scripts/step-020-test-parakeet-inference.sh
+./scripts/step-025-setup-gpu-environment.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Client App] -->|WebSocket/HTTP| API[FastAPI Server]
+    API -->|gRPC| Riva[NVIDIA Riva Service]
+    Riva -->|TensorRT| GPU[NVIDIA GPU]
+    GPU -->|Inference Result| Riva
+    Riva -->|Transcription| API
+    API -->|Store/Event| AWS[AWS S3 / EventBridge]
+    subgraph Docker Container
+        API
+        Riva
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system is built as a Dockerized Python application. It uses a series of numbered Shell scripts to handle environment setup, dependency installation, model downloading from NGC, and GPU configuration. The core service is a FastAPI server that interfaces with the Riva client SDK to perform inference on the Parakeet 1.1B English model.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client
+    participant F as FastAPI Server
+    participant R as Riva Service
+    participant G as GPU
+    C->>F: POST /transcribe or WS Connect
+    F->>R: StreamingRecognize Request (audio chunks)
+    R->>G: Execute Parakeet Model Inference
+    G-->>R: Return Logits/Text
+    R-->>F: Partial/Final Transcription Results
+    F-->>C: JSON Response with Text & Timestamps</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy this system where low-latency transcription is critical, such as live captioning, voice assistants, or real-time meeting notes. It requires an NVIDIA GPU with CUDA support and an NGC API key. It can be integrated into larger pipelines via its REST API or WebSocket endpoints, with optional hooks for AWS S3 and EventBridge.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Speech-to-Text Transcription</span><span class="tag">Real-time Streaming Audio Processing</span><span class="tag">Word-level Timing Analysis</span><span class="tag">REST API Serving</span><span class="tag">WebSocket Communication</span><span class="tag">Cloud Storage Integration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">FastAPI Application</span><span class="tag">NVIDIA Riva ASR Client</span><span class="tag">Parakeet RNN-T Model</span><span class="tag">Docker Runtime</span><span class="tag">Setup Scripts (Shell)</span><span class="tag">AWS Boto3 Client</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Shell Script</span><span class="tag">FastAPI</span><span class="tag">NVIDIA Riva</span><span class="tag">Docker</span><span class="tag">gRPC</span><span class="tag">CUDA</span><span class="tag">TensorRT</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">NVIDIA GPU with CUDA</span><span class="tag">NGC API Key</span><span class="tag">Docker with nvidia-container-toolkit</span><span class="tag">AWS CLI (optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3</span><span class="tag">AWS EventBridge</span><span class="tag">AWS SQS</span><span class="tag">Web Browsers (via WebSocket)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Microservices</span><span class="tag">Producer-Consumer (Audio Stream)</span><span class="tag">Wrapper Pattern (Riva Client)</span><span class="tag">Infrastructure as Code (Scripts)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-recognition</span><span class="tag">nvidia-riva</span><span class="tag">parakeet-model</span><span class="tag">fastapi</span><span class="tag">gpu-acceleration</span><span class="tag">real-time-transcription</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:44:47.903312Z ·
+     commit 5b2e1ad ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

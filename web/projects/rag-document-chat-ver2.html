@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAG Document Chat System v2 · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "RAG Document Chat System v2", "one_liner": "A modular, production-ready Retrieval-Augmented Generation system with hierarchical document processing and paragraph-aware search.", "what_it_is": "A Python-based RAG application that ingests PDF/TXT documents, processes them into multiple layers of granularity (basic chunks, smart summaries, paragraph contexts), and stores them in ChromaDB. It provides a FastAPI backend, Streamlit web interface, and Next.js modern UI for querying documents using OpenAI LLMs, featuring SOC2-compliant citation trails and relevancy scoring.", "how_its_built": "Built with Python 3.9+ using a modular architecture split into core, processing, search, and API modules. It uses Pydantic for data validation, ChromaDB for vector storage, and supports S3 for document persistence. The system employs hierarchical indexing strategies to balance conceptual search with detailed retrieval.", "how_to_apply": "Deploy on Linux/Ubuntu servers or EC2 instances. Configure via .env file with OpenAI API keys and optional AWS credentials. Use Docker Compose for ChromaDB dependency management. Suitable for enterprise document Q&A where audit trails and source transparency are required.", "quickstart": "git clone https://github.com/davidbmar/rag-document-chat-ver2.git\ncd rag-document-chat-ver2\nchmod +x setup.sh start.sh\n./setup.sh\nnano .env\n./start.sh", "features": ["Multi-layer document processing with basic chunks, smart summaries, and paragraph contexts", "SOC2-compliant raw source citations with percentage relevancy scoring", "Intelligent search hierarchy automatically selecting the best strategy per query", "Modular architecture with 9 focused modules replacing monolithic design", "Multiple interfaces: Streamlit web app, FastAPI REST API, and Next.js modern UI", "CLI tool for direct search, asking questions, and system management"], "diagram_architecture": "flowchart TD\n    User[User] -->|Query| UI[Web Interface / CLI]\n    UI -->|HTTP Request| API[FastAPI Server]\n    API -->|Orchestrate| RAG[RAGSystem Core]\n    RAG -->|Search| VectorDB[(ChromaDB)]\n    RAG -->|Retrieve Docs| Storage[S3 / Local FS]\n    RAG -->|Generate Answer| LLM[OpenAI API]\n    RAG -->|Return Response| API\n    API -->|JSON Response| UI\n    subgraph Processing\n        DocProc[DocumentProcessor] -->|Extract Text| Parser[PDF/TXT Parser]\n        DocProc -->|Chunk & Summarize| Indexer[Indexing Engine]\n        Indexer -->|Store Vectors| VectorDB\n    end\n    API -->|Upload| DocProc", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as FastAPI\n    participant R as RAGSystem\n    participant C as ChromaDB\n    participant O as OpenAI\n    \n    U->>F: POST /ask {question}\n    F->>R: search_and_answer(question)\n    R->>C: similarity_search(query, top_k)\n    C-->>R: List[DocumentChunks]\n    R->>R: Filter & Score Relevancy\n    R->>O: ChatCompletion(context + question)\n    O-->>R: Generated Answer\n    R-->>F: ChatResponse(answer, sources)\n    F-->>U: JSON Response", "capabilities": ["Hierarchical document indexing", "Paragraph-aware semantic search", "Automated source citation", "Relevancy scoring", "Multi-format document ingestion", "RESTful API exposure", "Interactive web chat", "Command-line interface"], "components": ["src/core/config.py", "src/core/models.py", "src/search/rag_system.py", "src/processing/document_processor.py", "app_refactored.py", "streamlit_app.py", "src/ui/modern"], "tech": ["Python 3.9+", "FastAPI", "Streamlit", "Next.js", "ChromaDB", "OpenAI API", "Pydantic", "Docker"], "depends_on": ["OpenAI API Key", "Docker & Docker Compose", "Python 3.9+", "Node.js (for Modern UI)", "AWS Credentials (optional)"], "integrates_with": ["OpenAI GPT Models", "ChromaDB Vector Store", "AWS S3", "Streamlit", "Next.js Frontend"], "patterns": ["Retrieval-Augmented Generation", "Modular Monolith", "Dependency Injection", "Strategy Pattern (Search)", "Repository Pattern (Storage)"], "reuse_tags": ["rag", "document-chat", "vector-search", "llm-application", "enterprise-search", "python-backend"], "slug": "rag-document-chat-ver2", "repo_url": "https://github.com/davidbmar/rag-document-chat-ver2", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/src/ui/modern/npm_and_yarn-c6636f2d36 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/pip/pip-f7c9f9c38b is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #2: Bump the npm_and_yarn group across 1 directory with 7 updates"}, {"kind": "open_pr", "detail": "PR #1: Bump the pip group across 1 directory with 6 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T03:50:55.834851Z", "source_commit": "a7c1c3d", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "RAG Document Chat System v2",
+  "description": "A modular, production-ready Retrieval-Augmented Generation system with hierarchical document processing and paragraph-aware search.",
+  "codeRepository": "https://github.com/davidbmar/rag-document-chat-ver2",
+  "programmingLanguage": [
+    "Python 3.9+",
+    "FastAPI",
+    "Streamlit",
+    "Next.js",
+    "ChromaDB",
+    "OpenAI API",
+    "Pydantic",
+    "Docker"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>RAG Document Chat System v2</h1>
+  <p class="one-liner">A modular, production-ready Retrieval-Augmented Generation system with hierarchical document processing and paragraph-aware search.</p>
+  <p><a href="https://github.com/davidbmar/rag-document-chat-ver2">https://github.com/davidbmar/rag-document-chat-ver2</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A Python-based RAG application that ingests PDF/TXT documents, processes them into multiple layers of granularity (basic chunks, smart summaries, paragraph contexts), and stores them in ChromaDB. It provides a FastAPI backend, Streamlit web interface, and Next.js modern UI for querying documents using OpenAI LLMs, featuring SOC2-compliant citation trails and relevancy scoring.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Multi-layer document processing with basic chunks, smart summaries, and paragraph contexts</li><li>SOC2-compliant raw source citations with percentage relevancy scoring</li><li>Intelligent search hierarchy automatically selecting the best strategy per query</li><li>Modular architecture with 9 focused modules replacing monolithic design</li><li>Multiple interfaces: Streamlit web app, FastAPI REST API, and Next.js modern UI</li><li>CLI tool for direct search, asking questions, and system management</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/rag-document-chat-ver2.git
+cd rag-document-chat-ver2
+chmod +x setup.sh start.sh
+./setup.sh
+nano .env
+./start.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Query| UI[Web Interface / CLI]
+    UI -->|HTTP Request| API[FastAPI Server]
+    API -->|Orchestrate| RAG[RAGSystem Core]
+    RAG -->|Search| VectorDB[(ChromaDB)]
+    RAG -->|Retrieve Docs| Storage[S3 / Local FS]
+    RAG -->|Generate Answer| LLM[OpenAI API]
+    RAG -->|Return Response| API
+    API -->|JSON Response| UI
+    subgraph Processing
+        DocProc[DocumentProcessor] -->|Extract Text| Parser[PDF/TXT Parser]
+        DocProc -->|Chunk & Summarize| Indexer[Indexing Engine]
+        Indexer -->|Store Vectors| VectorDB
+    end
+    API -->|Upload| DocProc</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with Python 3.9+ using a modular architecture split into core, processing, search, and API modules. It uses Pydantic for data validation, ChromaDB for vector storage, and supports S3 for document persistence. The system employs hierarchical indexing strategies to balance conceptual search with detailed retrieval.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant F as FastAPI
+    participant R as RAGSystem
+    participant C as ChromaDB
+    participant O as OpenAI
+    
+    U->>F: POST /ask {question}
+    F->>R: search_and_answer(question)
+    R->>C: similarity_search(query, top_k)
+    C-->>R: List[DocumentChunks]
+    R->>R: Filter & Score Relevancy
+    R->>O: ChatCompletion(context + question)
+    O-->>R: Generated Answer
+    R-->>F: ChatResponse(answer, sources)
+    F-->>U: JSON Response</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy on Linux/Ubuntu servers or EC2 instances. Configure via .env file with OpenAI API keys and optional AWS credentials. Use Docker Compose for ChromaDB dependency management. Suitable for enterprise document Q&amp;A where audit trails and source transparency are required.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Hierarchical document indexing</span><span class="tag">Paragraph-aware semantic search</span><span class="tag">Automated source citation</span><span class="tag">Relevancy scoring</span><span class="tag">Multi-format document ingestion</span><span class="tag">RESTful API exposure</span><span class="tag">Interactive web chat</span><span class="tag">Command-line interface</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">src/core/config.py</span><span class="tag">src/core/models.py</span><span class="tag">src/search/rag_system.py</span><span class="tag">src/processing/document_processor.py</span><span class="tag">app_refactored.py</span><span class="tag">streamlit_app.py</span><span class="tag">src/ui/modern</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.9+</span><span class="tag">FastAPI</span><span class="tag">Streamlit</span><span class="tag">Next.js</span><span class="tag">ChromaDB</span><span class="tag">OpenAI API</span><span class="tag">Pydantic</span><span class="tag">Docker</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">OpenAI API Key</span><span class="tag">Docker &amp; Docker Compose</span><span class="tag">Python 3.9+</span><span class="tag">Node.js (for Modern UI)</span><span class="tag">AWS Credentials (optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">OpenAI GPT Models</span><span class="tag">ChromaDB Vector Store</span><span class="tag">AWS S3</span><span class="tag">Streamlit</span><span class="tag">Next.js Frontend</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Retrieval-Augmented Generation</span><span class="tag">Modular Monolith</span><span class="tag">Dependency Injection</span><span class="tag">Strategy Pattern (Search)</span><span class="tag">Repository Pattern (Storage)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">rag</span><span class="tag">document-chat</span><span class="tag">vector-search</span><span class="tag">llm-application</span><span class="tag">enterprise-search</span><span class="tag">python-backend</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/src/ui/modern/npm_and_yarn-c6636f2d36 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/pip/pip-f7c9f9c38b is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #2: Bump the npm_and_yarn group across 1 directory with 7 updates</li><li><strong>open_pr</strong>: PR #1: Bump the pip group across 1 directory with 6 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:50:55.834851Z ·
+     commit a7c1c3d ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

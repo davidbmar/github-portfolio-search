@@ -1,0 +1,79 @@
+{
+  "title": "transcription-end-to-end-docs",
+  "one_liner": "Documentation and integration guide for a serverless transcription pipeline using AWS EventBridge, Cognito, and Lambda.",
+  "what_it_is": "A meta-repository containing documentation and setup instructions to integrate three distinct AWS serverless components: a smart transcription router, a Cognito-authenticated S3/CloudFront web server, and an EventBridge-based orchestration layer. It serves as the central nervous system for decoupling frontend, transcription, and search microservices via validated, versioned events.",
+  "how_its_built": "The system is built using Terraform for infrastructure provisioning, AWS EventBridge for event routing and schema validation, AWS Lambda for compute (including logging and DLQ processing), Amazon S3 for storage, Amazon CloudFront for distribution, and Amazon Cognito for authentication. JSON schemas are registered in the EventBridge Schema Registry to ensure type safety.",
+  "how_to_apply": "Clone the three dependent repositories into a root directory. Execute the step-by-step setup scripts provided in the eventbridge-orchestrator repository, starting with environment configuration (.env) and proceeding through infrastructure deployment. Ensure an S3 bucket for audio storage is available and configured across the projects.",
+  "quickstart": "git clone https://github.com/davidbmar/smart-transcription-router.git\ngit clone https://github.com/davidbmar/cognito-lambda-s3-webserver-cloudfront.git\ngit clone https://github.com/davidbmar/eventbridge-orchestrator.git\ncd eventbridge-orchestrator\n# Run step-000 to setup .env file\n./step-000.sh\n# Run subsequent step-xxx scripts as documented in that repo",
+  "features": [
+    "Serverless orchestration using AWS EventBridge as a central event bus",
+    "Versioned JSON schema validation via EventBridge Schema Registry",
+    "Decoupled microservices architecture for frontend, transcription, and search",
+    "Automated infrastructure provisioning using Terraform",
+    "Built-in observability with event logging Lambda and SQS Dead-Letter Queue processor",
+    "Secure web hosting with Cognito authentication, S3, and CloudFront"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Upload Audio| CF[CloudFront]\n    CF -->|Auth & Serve| Cognito[Cognito]\n    CF -->|Store| S3[S3 Bucket]\n    S3 -->|Trigger| Router[Smart Transcription Router Lambda]\n    Router -->|Publish Event| EB[EventBridge Bus]\n    EB -->|Validate Schema| SR[Schema Registry]\n    EB -->|Route| Transcriber[Transcription Service]\n    EB -->|Route| Search[Search Service]\n    EB -->|Log| Logger[Event Logger Lambda]\n    EB -->|Fail| DLQ[SQS Dead-Letter Queue]\n    DLQ -->|Process| DLQProcessor[DLQ Processor Lambda]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S3 as S3 Bucket\n    participant R as Transcription Router\n    participant EB as EventBridge Bus\n    participant T as Transcription Service\n    participant L as Event Logger\n    U->>S3: Upload Audio File\n    S3->>R: Trigger Notification\n    R->>EB: Publish AudioUploaded Event\n    EB->>L: Forward Event for Logging\n    L-->>EB: Acknowledge\n    EB->>T: Route Event based on Rule\n    T->>T: Process Transcription\n    T->>EB: Publish TranscriptionCompleted Event\n    EB->>L: Forward Completion Event",
+  "capabilities": [
+    "Event-driven architecture",
+    "Schema validation",
+    "Infrastructure as Code",
+    "Serverless compute",
+    "Secure content delivery",
+    "Error handling via DLQ"
+  ],
+  "components": [
+    "Smart Transcription Router",
+    "Cognito/Lambda/S3/CloudFront Webserver",
+    "EventBridge Orchestrator",
+    "Event Logger Lambda",
+    "DLQ Processor Lambda",
+    "Terraform Modules"
+  ],
+  "tech": [
+    "AWS EventBridge",
+    "AWS Lambda",
+    "Amazon S3",
+    "Amazon CloudFront",
+    "Amazon Cognito",
+    "Amazon SQS",
+    "Terraform",
+    "JSON Schema"
+  ],
+  "depends_on": [
+    "smart-transcription-router",
+    "cognito-lambda-s3-webserver-cloudfront",
+    "eventbridge-orchestrator"
+  ],
+  "integrates_with": [
+    "AWS Schema Registry",
+    "External Transcription APIs",
+    "Search Indexing Services"
+  ],
+  "patterns": [
+    "Event-Driven Architecture",
+    "Pub/Sub",
+    "Dead-Letter Queue",
+    "Infrastructure as Code",
+    "Microservices"
+  ],
+  "reuse_tags": [
+    "serverless",
+    "aws",
+    "eventbridge",
+    "terraform",
+    "transcription",
+    "orchestration"
+  ],
+  "slug": "transcription-end-to-end-docs",
+  "repo_url": "https://github.com/davidbmar/transcription-end-to-end-docs",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:03:52.576745Z",
+  "source_commit": "ffeaea7",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>transcription-realtime-whisper · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "transcription-realtime-whisper", "one_liner": "Production-ready real-time speech transcription system supporting WhisperLive edge proxy and NVIDIA Riva enterprise architectures.", "what_it_is": "A deployment automation framework for real-time speech-to-text services. It offers two distinct backends: an open-source WhisperLive setup using faster-whisper on GPU instances behind a Caddy reverse proxy, and an enterprise-grade NVIDIA Riva implementation using Conformer-CTC models. The system handles audio streaming from browser clients via WebSocket, manages SSL termination at the edge, and provides systemd-managed services for high availability.", "how_its_built": "The project is primarily built using Bash scripts for infrastructure provisioning and service configuration on AWS EC2. The WhisperLive architecture uses Python (faster-whisper) for inference, Caddy for reverse proxying/SSL, and standard WebSockets for client communication. The NVIDIA Riva architecture utilizes Docker containers for the Riva server and a Python-based WebSocket-to-gRPC bridge. Authentication and session management components (found in the audio-api subdirectory) are implemented as Node.js/TypeScript AWS Lambda functions interacting with S3 and Cognito.", "how_to_apply": "Use this repository to deploy a scalable, low-latency transcription service on AWS. It is suitable for applications requiring live captioning, meeting transcription, or voice command interfaces where data privacy (self-hosted) or enterprise accuracy (Riva) is critical. The modular script structure allows for selective deployment of either the lightweight WhisperLive edge or the heavy-duty Riva backend.", "quickstart": "git clone https://github.com/davidbmar/transcription-realtime-whisper.git\ncd transcription-realtime-whisper\n./scripts/010-setup-build-box.sh\n./scripts/020-deploy-gpu-instance.sh\n./scripts/030-configure-gpu-security.sh\n./scripts/305-setup-whisperlive-edge.sh\n./scripts/310-configure-whisperlive-gpu.sh\n./scripts/040-configure-edge-security.sh\n./scripts/320-update-edge-clients.sh\n./scripts/315-test-whisperlive-connection.sh", "features": ["Dual architecture support: WhisperLive (open-source) and NVIDIA Riva (enterprise)", "Edge proxy deployment with Caddy for automatic SSL termination and security", "Real-time browser-based transcription via WebSocket streaming", "GPU-accelerated inference on AWS g4dn instances", "Automated deployment scripts for full infrastructure setup", "Systemd service management with auto-restart and health checks"], "diagram_architecture": "flowchart TD\n    Client[Browser Client] -->|HTTPS/WSS Audio Stream| Edge[Edge EC2: Caddy Proxy]\n    Edge -->|Internal WebSocket| GPU[GPU EC2: WhisperLive/Riva]\n    GPU -->|Transcription Text| Edge\n    Edge -->|Transcription Text| Client\n    subgraph Infrastructure\n        Edge\n        GPU\n    end\n    subgraph Models\n        Whisper[faster-whisper]\n        Riva[NVIDIA Riva Conformer-CTC]\n    end\n    GPU --> Whisper\n    GPU --> Riva", "diagram_sequence": "sequenceDiagram\n    participant Browser as Browser Client\n    participant Caddy as Edge EC2 (Caddy)\n    participant Service as GPU EC2 (WhisperLive/Riva)\n    \n    Browser->>Caddy: Connect WSS (Audio Stream)\n    Caddy->>Service: Forward WebSocket Connection\n    Service-->>Caddy: Acknowledge Connection\n    Caddy-->>Browser: Connection Established\n    \n    loop Real-time Transcription\n        Browser->>Caddy: Send Audio Chunk (PCM)\n        Caddy->>Service: Forward Audio Chunk\n        Service->>Service: Process ASR Inference\n        Service-->>Caddy: Return Partial/Final Transcript\n        Caddy-->>Browser: Return Transcript JSON\n    end", "capabilities": ["Real-time Speech Recognition", "WebSocket Streaming", "SSL/TLS Termination", "GPU Acceleration", "Automated Deployment", "Service Health Monitoring"], "components": ["Caddy Reverse Proxy", "WhisperLive Server", "NVIDIA Riva Server", "WebSocket Bridge (Python)", "Deployment Scripts (Bash)", "Browser Client UI"], "tech": ["Bash", "Python", "Node.js", "TypeScript", "Docker", "WebSockets", "gRPC", "AWS EC2"], "depends_on": ["AWS CLI", "SSH Key Pair", "NVIDIA Drivers (for Riva)", "Docker Engine", "Node.js (for API components)"], "integrates_with": ["AWS Cognito", "AWS S3", "NVIDIA NGC", "Chrome/Firefox/Edge Browsers"], "patterns": ["Edge Computing", "Reverse Proxy", "Microservices", "Event-Driven Architecture", "Infrastructure as Code (Scripted)"], "reuse_tags": ["speech-to-text", "real-time", "aws-deployment", "whisper", "nvidia-riva", "websocket-streaming"], "slug": "transcription-realtime-whisper", "repo_url": "https://github.com/davidbmar/transcription-realtime-whisper", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "claude/code-review-011CUMdGcttmW74ETDnkuwcs is 54 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/audio-api/npm_and_yarn-30ad79c937 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 2 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T04:04:21.323408Z", "source_commit": "89ef394", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "transcription-realtime-whisper",
+  "description": "Production-ready real-time speech transcription system supporting WhisperLive edge proxy and NVIDIA Riva enterprise architectures.",
+  "codeRepository": "https://github.com/davidbmar/transcription-realtime-whisper",
+  "programmingLanguage": [
+    "Bash",
+    "Python",
+    "Node.js",
+    "TypeScript",
+    "Docker",
+    "WebSockets",
+    "gRPC",
+    "AWS EC2"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>transcription-realtime-whisper</h1>
+  <p class="one-liner">Production-ready real-time speech transcription system supporting WhisperLive edge proxy and NVIDIA Riva enterprise architectures.</p>
+  <p><a href="https://github.com/davidbmar/transcription-realtime-whisper">https://github.com/davidbmar/transcription-realtime-whisper</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A deployment automation framework for real-time speech-to-text services. It offers two distinct backends: an open-source WhisperLive setup using faster-whisper on GPU instances behind a Caddy reverse proxy, and an enterprise-grade NVIDIA Riva implementation using Conformer-CTC models. The system handles audio streaming from browser clients via WebSocket, manages SSL termination at the edge, and provides systemd-managed services for high availability.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Dual architecture support: WhisperLive (open-source) and NVIDIA Riva (enterprise)</li><li>Edge proxy deployment with Caddy for automatic SSL termination and security</li><li>Real-time browser-based transcription via WebSocket streaming</li><li>GPU-accelerated inference on AWS g4dn instances</li><li>Automated deployment scripts for full infrastructure setup</li><li>Systemd service management with auto-restart and health checks</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/transcription-realtime-whisper.git
+cd transcription-realtime-whisper
+./scripts/010-setup-build-box.sh
+./scripts/020-deploy-gpu-instance.sh
+./scripts/030-configure-gpu-security.sh
+./scripts/305-setup-whisperlive-edge.sh
+./scripts/310-configure-whisperlive-gpu.sh
+./scripts/040-configure-edge-security.sh
+./scripts/320-update-edge-clients.sh
+./scripts/315-test-whisperlive-connection.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Browser Client] -->|HTTPS/WSS Audio Stream| Edge[Edge EC2: Caddy Proxy]
+    Edge -->|Internal WebSocket| GPU[GPU EC2: WhisperLive/Riva]
+    GPU -->|Transcription Text| Edge
+    Edge -->|Transcription Text| Client
+    subgraph Infrastructure
+        Edge
+        GPU
+    end
+    subgraph Models
+        Whisper[faster-whisper]
+        Riva[NVIDIA Riva Conformer-CTC]
+    end
+    GPU --> Whisper
+    GPU --> Riva</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project is primarily built using Bash scripts for infrastructure provisioning and service configuration on AWS EC2. The WhisperLive architecture uses Python (faster-whisper) for inference, Caddy for reverse proxying/SSL, and standard WebSockets for client communication. The NVIDIA Riva architecture utilizes Docker containers for the Riva server and a Python-based WebSocket-to-gRPC bridge. Authentication and session management components (found in the audio-api subdirectory) are implemented as Node.js/TypeScript AWS Lambda functions interacting with S3 and Cognito.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Browser as Browser Client
+    participant Caddy as Edge EC2 (Caddy)
+    participant Service as GPU EC2 (WhisperLive/Riva)
+    
+    Browser->>Caddy: Connect WSS (Audio Stream)
+    Caddy->>Service: Forward WebSocket Connection
+    Service-->>Caddy: Acknowledge Connection
+    Caddy-->>Browser: Connection Established
+    
+    loop Real-time Transcription
+        Browser->>Caddy: Send Audio Chunk (PCM)
+        Caddy->>Service: Forward Audio Chunk
+        Service->>Service: Process ASR Inference
+        Service-->>Caddy: Return Partial/Final Transcript
+        Caddy-->>Browser: Return Transcript JSON
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this repository to deploy a scalable, low-latency transcription service on AWS. It is suitable for applications requiring live captioning, meeting transcription, or voice command interfaces where data privacy (self-hosted) or enterprise accuracy (Riva) is critical. The modular script structure allows for selective deployment of either the lightweight WhisperLive edge or the heavy-duty Riva backend.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Real-time Speech Recognition</span><span class="tag">WebSocket Streaming</span><span class="tag">SSL/TLS Termination</span><span class="tag">GPU Acceleration</span><span class="tag">Automated Deployment</span><span class="tag">Service Health Monitoring</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Caddy Reverse Proxy</span><span class="tag">WhisperLive Server</span><span class="tag">NVIDIA Riva Server</span><span class="tag">WebSocket Bridge (Python)</span><span class="tag">Deployment Scripts (Bash)</span><span class="tag">Browser Client UI</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Bash</span><span class="tag">Python</span><span class="tag">Node.js</span><span class="tag">TypeScript</span><span class="tag">Docker</span><span class="tag">WebSockets</span><span class="tag">gRPC</span><span class="tag">AWS EC2</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS CLI</span><span class="tag">SSH Key Pair</span><span class="tag">NVIDIA Drivers (for Riva)</span><span class="tag">Docker Engine</span><span class="tag">Node.js (for API components)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS Cognito</span><span class="tag">AWS S3</span><span class="tag">NVIDIA NGC</span><span class="tag">Chrome/Firefox/Edge Browsers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Edge Computing</span><span class="tag">Reverse Proxy</span><span class="tag">Microservices</span><span class="tag">Event-Driven Architecture</span><span class="tag">Infrastructure as Code (Scripted)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-to-text</span><span class="tag">real-time</span><span class="tag">aws-deployment</span><span class="tag">whisper</span><span class="tag">nvidia-riva</span><span class="tag">websocket-streaming</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: claude/code-review-011CUMdGcttmW74ETDnkuwcs is 54 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/audio-api/npm_and_yarn-30ad79c937 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 2 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:04:21.323408Z ·
+     commit 89ef394 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

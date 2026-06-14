@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>voice-optimal-RAG · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "voice-optimal-RAG", "one_liner": "Self-contained Dockerized RAG service for semantic document search using LanceDB and Nomic embeddings.", "what_it_is": "A lightweight, single-container Retrieval-Augmented Generation (RAG) backend designed to feed context into voice assistants. It ingests PDF, Markdown, TXT, DOCX, and HTML files, splits them into token-aware chunks, generates 768-dimensional vectors using Nomic Embed Text v1.5, and stores them in an embedded LanceDB instance. It exposes a REST API and a simple web UI for uploading documents and performing semantic similarity searches.", "how_its_built": "Built with Python FastAPI for the web server, sentence-transformers for embedding generation, and LanceDB for vector storage. Text processing uses PyMuPDF for PDFs and tiktoken for recursive character splitting. The entire stack is containerized in a single Docker image with the embedding model pre-downloaded to ensure fast startup and zero external dependencies.", "how_to_apply": "Deploy as a sidecar or standalone service for applications requiring local, private semantic search over documentation. Ideal for voice assistant backends where low-latency context retrieval is needed without relying on external cloud vector databases. Use the provided GitHub indexing scripts to automatically keep technical documentation up-to-date.", "quickstart": "docker build -t rag-service .\ndocker run -d --name rag-service -p 8100:8100 -v rag-data:/data rag-service\nopen http://localhost:8100", "features": ["Single-container deployment with pre-loaded embedding models", "Supports PDF, Markdown, TXT, DOCX, and HTML file ingestion", "Semantic search using Nomic Embed Text v1.5 (768-dim vectors)", "Embedded LanceDB vector store with no external database server", "Recursive text splitting with tiktoken-aware chunking", "Built-in Web UI for drag-and-drop upload and query testing"], "diagram_architecture": "flowchart TD\n    Client[Client / Voice Assistant] -->|HTTP POST /upload| API[FastAPI App]\n    Client -->|HTTP POST /query| API\n    API -->|Orchestrate| Pipeline[Document Pipeline]\n    Pipeline -->|Parse| Parsers[Parsers: PyMuPDF/Text]\n    Parsers -->|Raw Text| Chunker[Chunker: tiktoken]\n    Chunker -->|Text Chunks| Embedder[Embedder: SentenceTransformers]\n    Embedder -->|Vectors| Store[LanceDB Vector Store]\n    Store -->|Similarity Results| API\n    API -->|JSON Response| Client\n    subgraph Data Persistence\n    Store -->|/data/lancedb| Volume[Docker Volume]\n    end", "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant A as FastAPI App\n    participant P as Document Pipeline\n    participant E as Embedder\n    participant V as LanceDB\n\n    Note over C, V: Ingestion Flow\n    C->>A: POST /upload (files)\n    A->>P: ingest_file(filepath)\n    P->>P: Parse file (parsers.py)\n    P->>P: Chunk text (chunker.py)\n    P->>E: embed_batch(chunks)\n    E->>E: Model.encode()\n    E-->>P: Vectors\n    P->>V: insert_chunks(vectors)\n    V-->>P: Confirm Storage\n    P-->>A: Document Info\n    A-->>C: JSON Response\n\n    Note over C, V: Query Flow\n    C->>A: POST /query {query, top_k}\n    A->>E: embed_text(query)\n    E->>E: Model.encode()\n    E-->>A: Query Vector\n    A->>V: search(vector, top_k)\n    V-->>A: Ranked Results\n    A-->>C: JSON Results with Scores", "capabilities": ["File Ingestion", "Semantic Search", "Vector Embedding", "Document Management", "Health Monitoring"], "components": ["app.py", "document_pipeline.py", "parsers.py", "chunker.py", "embedder.py", "vector_store.py", "static/index.html"], "tech": ["Python", "FastAPI", "LanceDB", "SentenceTransformers", "PyMuPDF", "Tiktoken", "Docker"], "depends_on": ["sentence-transformers", "lancedb", "fastapi", "uvicorn", "pymupdf", "tiktoken", "python-multipart"], "integrates_with": ["Voice Assistants", "GitHub Repositories", "LLM Context Windows"], "patterns": ["Retrieval-Augmented Generation", "Embedded Database", "Single Container Service", "Asymmetric Semantic Search"], "reuse_tags": ["rag", "vector-search", "lancedb", "fastapi", "docker", "nomic-embed", "self-hosted"], "slug": "voice-optimal-RAG", "repo_url": "https://github.com/davidbmar/voice-optimal-RAG", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/pip/pip-14c377a4fb is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump python-multipart from 0.0.20 to 0.0.27 in the pip group across 1 directory"}], "screenshot_url": "", "generated_at": "2026-06-14T04:08:34.539129Z", "source_commit": "b33065d", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "voice-optimal-RAG",
+  "description": "Self-contained Dockerized RAG service for semantic document search using LanceDB and Nomic embeddings.",
+  "codeRepository": "https://github.com/davidbmar/voice-optimal-RAG",
+  "programmingLanguage": [
+    "Python",
+    "FastAPI",
+    "LanceDB",
+    "SentenceTransformers",
+    "PyMuPDF",
+    "Tiktoken",
+    "Docker"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>voice-optimal-RAG</h1>
+  <p class="one-liner">Self-contained Dockerized RAG service for semantic document search using LanceDB and Nomic embeddings.</p>
+  <p><a href="https://github.com/davidbmar/voice-optimal-RAG">https://github.com/davidbmar/voice-optimal-RAG</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A lightweight, single-container Retrieval-Augmented Generation (RAG) backend designed to feed context into voice assistants. It ingests PDF, Markdown, TXT, DOCX, and HTML files, splits them into token-aware chunks, generates 768-dimensional vectors using Nomic Embed Text v1.5, and stores them in an embedded LanceDB instance. It exposes a REST API and a simple web UI for uploading documents and performing semantic similarity searches.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Single-container deployment with pre-loaded embedding models</li><li>Supports PDF, Markdown, TXT, DOCX, and HTML file ingestion</li><li>Semantic search using Nomic Embed Text v1.5 (768-dim vectors)</li><li>Embedded LanceDB vector store with no external database server</li><li>Recursive text splitting with tiktoken-aware chunking</li><li>Built-in Web UI for drag-and-drop upload and query testing</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">docker build -t rag-service .
+docker run -d --name rag-service -p 8100:8100 -v rag-data:/data rag-service
+open http://localhost:8100</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Client / Voice Assistant] -->|HTTP POST /upload| API[FastAPI App]
+    Client -->|HTTP POST /query| API
+    API -->|Orchestrate| Pipeline[Document Pipeline]
+    Pipeline -->|Parse| Parsers[Parsers: PyMuPDF/Text]
+    Parsers -->|Raw Text| Chunker[Chunker: tiktoken]
+    Chunker -->|Text Chunks| Embedder[Embedder: SentenceTransformers]
+    Embedder -->|Vectors| Store[LanceDB Vector Store]
+    Store -->|Similarity Results| API
+    API -->|JSON Response| Client
+    subgraph Data Persistence
+    Store -->|/data/lancedb| Volume[Docker Volume]
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with Python FastAPI for the web server, sentence-transformers for embedding generation, and LanceDB for vector storage. Text processing uses PyMuPDF for PDFs and tiktoken for recursive character splitting. The entire stack is containerized in a single Docker image with the embedding model pre-downloaded to ensure fast startup and zero external dependencies.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client
+    participant A as FastAPI App
+    participant P as Document Pipeline
+    participant E as Embedder
+    participant V as LanceDB
+
+    Note over C, V: Ingestion Flow
+    C->>A: POST /upload (files)
+    A->>P: ingest_file(filepath)
+    P->>P: Parse file (parsers.py)
+    P->>P: Chunk text (chunker.py)
+    P->>E: embed_batch(chunks)
+    E->>E: Model.encode()
+    E-->>P: Vectors
+    P->>V: insert_chunks(vectors)
+    V-->>P: Confirm Storage
+    P-->>A: Document Info
+    A-->>C: JSON Response
+
+    Note over C, V: Query Flow
+    C->>A: POST /query {query, top_k}
+    A->>E: embed_text(query)
+    E->>E: Model.encode()
+    E-->>A: Query Vector
+    A->>V: search(vector, top_k)
+    V-->>A: Ranked Results
+    A-->>C: JSON Results with Scores</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy as a sidecar or standalone service for applications requiring local, private semantic search over documentation. Ideal for voice assistant backends where low-latency context retrieval is needed without relying on external cloud vector databases. Use the provided GitHub indexing scripts to automatically keep technical documentation up-to-date.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">File Ingestion</span><span class="tag">Semantic Search</span><span class="tag">Vector Embedding</span><span class="tag">Document Management</span><span class="tag">Health Monitoring</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">app.py</span><span class="tag">document_pipeline.py</span><span class="tag">parsers.py</span><span class="tag">chunker.py</span><span class="tag">embedder.py</span><span class="tag">vector_store.py</span><span class="tag">static/index.html</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">LanceDB</span><span class="tag">SentenceTransformers</span><span class="tag">PyMuPDF</span><span class="tag">Tiktoken</span><span class="tag">Docker</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">sentence-transformers</span><span class="tag">lancedb</span><span class="tag">fastapi</span><span class="tag">uvicorn</span><span class="tag">pymupdf</span><span class="tag">tiktoken</span><span class="tag">python-multipart</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Voice Assistants</span><span class="tag">GitHub Repositories</span><span class="tag">LLM Context Windows</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Retrieval-Augmented Generation</span><span class="tag">Embedded Database</span><span class="tag">Single Container Service</span><span class="tag">Asymmetric Semantic Search</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">rag</span><span class="tag">vector-search</span><span class="tag">lancedb</span><span class="tag">fastapi</span><span class="tag">docker</span><span class="tag">nomic-embed</span><span class="tag">self-hosted</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/pip/pip-14c377a4fb is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump python-multipart from 0.0.20 to 0.0.27 in the pip group across 1 directory</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:08:34.539129Z ·
+     commit b33065d ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

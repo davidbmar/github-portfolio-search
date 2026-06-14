@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone Agent Training Pipeline · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Phone Agent Training Pipeline", "one_liner": "A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists.", "what_it_is": "This project provides a complete workflow to train small, efficient language models (3.8B-7B parameters) to handle inbound phone calls for a plumbing business. It uses knowledge distillation where a large teacher model generates realistic conversations, which are then processed into structured training data with slot injection (context, state, tasks). The resulting models are fine-tuned using MLX LoRA adapters to run locally on Mac hardware, offering low-latency, zero-cost inference while maintaining high-quality receptionist behavior across 11 conversation phases.", "how_its_built": "The pipeline is built in Python, leveraging the `mlx-lm` library for efficient fine-tuning on Apple Silicon. It processes raw JSON conversation logs through normalization scripts that map diverse user inputs to standardized FSM states. Data is enriched with structured context blocks ([CONTEXT], [SLOTS], [STATE], [TASK]) to teach the model slot-filling and workflow adherence. The final training data is converted into chat templates compatible with MLX, and LoRA adapters are trained against base models like Phi-4-mini-instruct.", "how_to_apply": "Use this pipeline when you need a specialized, domain-specific voice agent that runs entirely on-device without API costs. It is ideal for businesses requiring consistent handling of scheduling, triage, and customer service queries where data privacy and low latency are critical. The modular script structure allows adaptation to other service industries by updating the scenario matrix and slot definitions.", "quickstart": "python3 scripts/normalize_and_split.py\npython3 scripts/convert_to_chat_templates.py -i data/splits/train.json -f mlx -o data/splits/train_mlx.jsonl\npython3 scripts/convert_to_chat_templates.py -i data/splits/val.json -f mlx -o data/splits/val_mlx.jsonl\npip install mlx-lm\npython -m mlx_lm.lora --model microsoft/phi-4-mini-instruct --data data/splits/ --train --batch-size 2 --lora-rank 8 --iters 600 --adapter-path adapters/phi4-mini", "features": ["Generates synthetic training data using knowledge distillation from large teacher models", "Implements slot injection training with structured context, state, and task prompts", "Fine-tunes local LLMs using LoRA on Apple Silicon via MLX for efficient inference", "Normalizes conversation phases into 11 standardized FSM states for consistent behavior", "Includes stratified splitting and edge-case oversampling for robust model performance", "Provides interactive HTML documentation and data explorers for pipeline transparency"], "diagram_architecture": "flowchart TD\n    A[Scenario Matrix] -->|Defines| B(Raw Conversations)\n    C[Teacher Model/Claude] -->|Generates| B\n    B --> D[normalize_and_split.py]\n    D -->|Stratified Splits| E[train/val/test JSON]\n    E --> F[convert_to_chat_templates.py]\n    F -->|MLX Format| G[MLX JSONL Data]\n    G --> H[MLX LoRA Trainer]\n    I[Base Model Phi-4] --> H\n    H -->|Produces| J[LoRA Adapters]\n    J --> K[Local Phone Agent]", "diagram_sequence": "sequenceDiagram\n    participant Dev as Developer\n    participant Script as Normalization Script\n    participant Data as Processed Data\n    participant Trainer as MLX LoRA Trainer\n    participant Model as Base LLM\n    \n    Dev->>Script: Run normalize_and_split.py\n    Script->>Data: Create stratified train/val/test splits\n    Dev->>Script: Run convert_to_chat_templates.py\n    Script->>Data: Convert to MLX chat format\n    Dev->>Trainer: Execute mlx_lm.lora command\n    Trainer->>Model: Load base model & adapters\n    Trainer->>Data: Load training batches\n    loop Training Iterations\n        Trainer->>Model: Compute loss & update weights\n    end\n    Trainer->>Dev: Save LoRA adapters", "capabilities": ["Synthetic data generation", "LoRA fine-tuning", "Slot filling", "FSM state tracking", "Local inference", "Conversation normalization"], "components": ["normalize_and_split.py", "convert_to_chat_templates.py", "build_final_training.py", "rewrite_with_slots.py", "retrain_from_fsm.py", "add_json_responses.py"], "tech": ["Python", "MLX", "LoRA", "JSONL", "Apple Silicon", "Phi-4-mini"], "depends_on": ["mlx-lm", "python3", "numpy", "json"], "integrates_with": ["phone-agent-scheduler", "Claude API", "GGUF quantization tools"], "patterns": ["Knowledge Distillation", "Slot Injection", "Finite State Machine", "Chat Template Conversion", "Stratified Sampling"], "reuse_tags": ["llm-training", "voice-agent", "apple-silicon", "mlx", "lora", "synthetic-data"], "slug": "training", "repo_url": "https://github.com/davidbmar/training", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:02:57.893943Z", "source_commit": "703a29e", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Phone Agent Training Pipeline",
+  "description": "A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists.",
+  "codeRepository": "https://github.com/davidbmar/training",
+  "programmingLanguage": [
+    "Python",
+    "MLX",
+    "LoRA",
+    "JSONL",
+    "Apple Silicon",
+    "Phi-4-mini"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Phone Agent Training Pipeline</h1>
+  <p class="one-liner">A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists.</p>
+  <p><a href="https://github.com/davidbmar/training">https://github.com/davidbmar/training</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project provides a complete workflow to train small, efficient language models (3.8B-7B parameters) to handle inbound phone calls for a plumbing business. It uses knowledge distillation where a large teacher model generates realistic conversations, which are then processed into structured training data with slot injection (context, state, tasks). The resulting models are fine-tuned using MLX LoRA adapters to run locally on Mac hardware, offering low-latency, zero-cost inference while maintaining high-quality receptionist behavior across 11 conversation phases.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Generates synthetic training data using knowledge distillation from large teacher models</li><li>Implements slot injection training with structured context, state, and task prompts</li><li>Fine-tunes local LLMs using LoRA on Apple Silicon via MLX for efficient inference</li><li>Normalizes conversation phases into 11 standardized FSM states for consistent behavior</li><li>Includes stratified splitting and edge-case oversampling for robust model performance</li><li>Provides interactive HTML documentation and data explorers for pipeline transparency</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python3 scripts/normalize_and_split.py
+python3 scripts/convert_to_chat_templates.py -i data/splits/train.json -f mlx -o data/splits/train_mlx.jsonl
+python3 scripts/convert_to_chat_templates.py -i data/splits/val.json -f mlx -o data/splits/val_mlx.jsonl
+pip install mlx-lm
+python -m mlx_lm.lora --model microsoft/phi-4-mini-instruct --data data/splits/ --train --batch-size 2 --lora-rank 8 --iters 600 --adapter-path adapters/phi4-mini</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Scenario Matrix] -->|Defines| B(Raw Conversations)
+    C[Teacher Model/Claude] -->|Generates| B
+    B --> D[normalize_and_split.py]
+    D -->|Stratified Splits| E[train/val/test JSON]
+    E --> F[convert_to_chat_templates.py]
+    F -->|MLX Format| G[MLX JSONL Data]
+    G --> H[MLX LoRA Trainer]
+    I[Base Model Phi-4] --> H
+    H -->|Produces| J[LoRA Adapters]
+    J --> K[Local Phone Agent]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The pipeline is built in Python, leveraging the `mlx-lm` library for efficient fine-tuning on Apple Silicon. It processes raw JSON conversation logs through normalization scripts that map diverse user inputs to standardized FSM states. Data is enriched with structured context blocks ([CONTEXT], [SLOTS], [STATE], [TASK]) to teach the model slot-filling and workflow adherence. The final training data is converted into chat templates compatible with MLX, and LoRA adapters are trained against base models like Phi-4-mini-instruct.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Dev as Developer
+    participant Script as Normalization Script
+    participant Data as Processed Data
+    participant Trainer as MLX LoRA Trainer
+    participant Model as Base LLM
+    
+    Dev->>Script: Run normalize_and_split.py
+    Script->>Data: Create stratified train/val/test splits
+    Dev->>Script: Run convert_to_chat_templates.py
+    Script->>Data: Convert to MLX chat format
+    Dev->>Trainer: Execute mlx_lm.lora command
+    Trainer->>Model: Load base model & adapters
+    Trainer->>Data: Load training batches
+    loop Training Iterations
+        Trainer->>Model: Compute loss & update weights
+    end
+    Trainer->>Dev: Save LoRA adapters</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this pipeline when you need a specialized, domain-specific voice agent that runs entirely on-device without API costs. It is ideal for businesses requiring consistent handling of scheduling, triage, and customer service queries where data privacy and low latency are critical. The modular script structure allows adaptation to other service industries by updating the scenario matrix and slot definitions.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Synthetic data generation</span><span class="tag">LoRA fine-tuning</span><span class="tag">Slot filling</span><span class="tag">FSM state tracking</span><span class="tag">Local inference</span><span class="tag">Conversation normalization</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">normalize_and_split.py</span><span class="tag">convert_to_chat_templates.py</span><span class="tag">build_final_training.py</span><span class="tag">rewrite_with_slots.py</span><span class="tag">retrain_from_fsm.py</span><span class="tag">add_json_responses.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">MLX</span><span class="tag">LoRA</span><span class="tag">JSONL</span><span class="tag">Apple Silicon</span><span class="tag">Phi-4-mini</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">mlx-lm</span><span class="tag">python3</span><span class="tag">numpy</span><span class="tag">json</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">phone-agent-scheduler</span><span class="tag">Claude API</span><span class="tag">GGUF quantization tools</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Knowledge Distillation</span><span class="tag">Slot Injection</span><span class="tag">Finite State Machine</span><span class="tag">Chat Template Conversion</span><span class="tag">Stratified Sampling</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">llm-training</span><span class="tag">voice-agent</span><span class="tag">apple-silicon</span><span class="tag">mlx</span><span class="tag">lora</span><span class="tag">synthetic-data</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:02:57.893943Z ·
+     commit 703a29e ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

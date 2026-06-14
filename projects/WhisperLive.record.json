@@ -1,0 +1,78 @@
+{
+  "title": "WhisperLive",
+  "one_liner": "A real-time speech-to-text server and client ecosystem using OpenAI's Whisper with WebSocket streaming.",
+  "what_it_is": "WhisperLive is a Python-based server application that exposes a WebSocket API for real-time audio transcription. It supports multiple inference backends (Faster-Whisper, TensorRT, OpenVINO) to optimize performance on different hardware. The project includes browser extensions (Chrome/Firefox) and Python clients that capture microphone or tab audio, preprocess it into 16kHz mono chunks, and stream it to the server for near-instant text output.",
+  "how_its_built": "The core server is built in Python using `websockets` for communication and `pyaudio`/`numpy` for audio handling. It integrates with ASR engines like `faster-whisper`, `tensorrt_llm`, or `openvino`. Clients are implemented as JavaScript Browser Extensions using the Web Audio API and AudioWorklets for efficient client-side resampling and buffering before sending binary data over WebSockets.",
+  "how_to_apply": "Deploy the server on a machine with GPU acceleration (NVIDIA for TensorRT, Intel for OpenVINO) or CPU (Faster-Whisper). Connect browser extensions to transcribe meetings, lectures, or media playback directly in the browser. Integrate the Python client into desktop applications requiring live captioning.",
+  "quickstart": "bash scripts/setup.sh\npip install whisper-live\npython3 run_server.py --port 9090 --backend faster_whisper",
+  "features": [
+    "Real-time transcription via WebSocket streaming",
+    "Supports Faster-Whisper, TensorRT, and OpenVINO backends",
+    "Browser extensions for Chrome and Firefox with tab/mic capture",
+    "Voice Activity Detection (VAD) to reduce processing load",
+    "Multi-client support with configurable connection limits",
+    "SRT caption export functionality"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Browser/Python Client] -->|WebSocket Binary Audio| Server[WhisperLive Server]\n    Server --> Backend{Inference Backend}\n    Backend -->|CPU| FW[Faster-Whisper]\n    Backend -->|GPU NVIDIA| TRT[TensorRT-LLM]\n    Backend -->|Intel HW| OV[OpenVINO]\n    FW --> Text[Transcribed Text]\n    TRT --> Text\n    OV --> Text\n    Text -->|WebSocket JSON| Client",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client (JS/Python)\n    participant S as WhisperLive Server\n    participant B as ASR Backend\n    C->>S: Connect WebSocket\n    S-->>C: Connection Established\n    loop Audio Stream\n        C->>C: Capture & Resample to 16kHz Mono\n        C->>S: Send Audio Chunk (Binary)\n        S->>B: Process Chunk\n        B-->>S: Return Transcript Segment\n        S-->>C: Send Transcript (JSON)\n    end\n    C->>S: Close Connection",
+  "capabilities": [
+    "Live Speech-to-Text",
+    "Audio File Transcription",
+    "Multi-language Support",
+    "Translation to English",
+    "Voice Activity Detection"
+  ],
+  "components": [
+    "run_server.py",
+    "whisper_live/server.py",
+    "Audio-Transcription-Chrome",
+    "Audio-Transcription-Firefox",
+    "whisper_live/client.py"
+  ],
+  "tech": [
+    "Python",
+    "JavaScript",
+    "WebSockets",
+    "PyAudio",
+    "NumPy",
+    "Faster-Whisper",
+    "TensorRT",
+    "OpenVINO"
+  ],
+  "depends_on": [
+    "torch",
+    "faster-whisper",
+    "websockets",
+    "pyaudio",
+    "onnxruntime"
+  ],
+  "integrates_with": [
+    "Chrome Browser",
+    "Firefox Browser",
+    "NVIDIA GPUs",
+    "Intel CPUs/GPUs"
+  ],
+  "patterns": [
+    "Client-Server",
+    "Streaming",
+    "Producer-Consumer",
+    "Plugin Architecture"
+  ],
+  "reuse_tags": [
+    "real-time",
+    "asr",
+    "websocket",
+    "transcription",
+    "audio-processing"
+  ],
+  "slug": "WhisperLive",
+  "repo_url": "https://github.com/davidbmar/WhisperLive",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://img.youtube.com/vi/0PHWCApIcCI/0.jpg",
+  "generated_at": "2026-06-14T04:10:17.509175Z",
+  "source_commit": "3b17bda",
+  "model": "qwen3.7-plus"
+}

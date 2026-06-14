@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Picture QR Code Login · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Picture QR Code Login", "one_liner": "Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution.", "what_it_is": "A password-gated, serverless photo album hosted on AWS. Users scan a QR code to access a web interface where they can authenticate via Google OAuth or username/password. Photos are uploaded directly from the browser to S3 using presigned URLs, ensuring the server never handles image bytes. Each upload is attributed to the logged-in user or 'Guest' if using the shared password.", "how_its_built": "Built as a single AWS Lambda function serving HTML/JSON via Function URL, backed by an S3 bucket for storage. Authentication uses stateless HMAC tokens for guest access and Google Identity Services for OAuth. Image processing (thumbnails) happens client-side via Canvas; HEIC conversion is handled by a secondary Lambda trigger. Infrastructure is managed via shell scripts and AWS CLI, isolated from other variants by specific naming conventions.", "how_to_apply": "Deploy to AWS using the provided shell scripts after configuring environment variables for passwords and secrets. Generate a QR code pointing to the CloudFront distribution URL. Print the QR code for physical display at events. Users scan the code, log in, and upload photos directly from their mobile browsers without installing an app.", "quickstart": "export ACCESS_PASSWORD=\"your-guest-password\"\nexport OWNER_PASSCODE=\"your-private-passcode\"\nexport TOKEN_SECRET=\"$(openssl rand -hex 32)\"\n./scripts/deploy.sh\npython scripts/make_qr.py \"<the-printed-url>\" album-qr.png", "features": ["Identity-aware login via Google OAuth or username/password", "Direct-to-S3 uploads using short-lived presigned URLs", "Client-side thumbnail generation and HEIC support", "Per-photo attribution tracking for logged-in users", "Password-gated access with separate owner delete controls", "Zero-maintenance serverless architecture on AWS"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|Scan QR| CF[CloudFront Distribution]\n    CF -->|Proxy Request| LF[Lambda Function URL]\n    LF -->|Verify Token/Auth| Auth[Auth Logic]\n    LF -->|Generate Presigned URL| S3[(S3 Bucket)]\n    User -->|Upload Photo Directly| S3\n    User -->|GET Photos| LF\n    LF -->|List Objects| S3\n    S3 -->|HEIC Upload Trigger| ConvLambda[Converter Lambda]\n    ConvLambda -->|Convert to JPG| S3", "diagram_sequence": "sequenceDiagram\n    participant U as User Browser\n    participant CF as CloudFront\n    participant L as Lambda Function\n    participant S3 as S3 Bucket\n    participant G as Google Auth\n\n    U->>CF: GET / (Scan QR)\n    CF->>L: Forward Request\n    L->>U: Return Login Page\n    U->>G: Sign in with Google\n    G->>U: Return ID Token\n    U->>L: POST /auth/google (ID Token)\n    L->>L: Verify Token & Create Session\n    L->>U: Return Authenticated State\n    U->>L: Request Upload Permission\n    L->>S3: Generate Presigned PUT URL\n    S3-->>L: Return Signed URL\n    L-->>U: Return Signed URL\n    U->>S3: PUT Photo Data (Direct)\n    S3-->>U: 200 OK\n    U->>L: Notify Upload Complete\n    L->>S3: Update Metadata/Attribution", "capabilities": ["OAuth2 Integration", "Presigned URL Generation", "Serverless Hosting", "Client-side Image Processing", "Static Site Delivery"], "components": ["Lambda Function (Main API)", "Lambda Function (HEIC Converter)", "S3 Bucket (Storage)", "CloudFront Distribution", "Dev Server Script", "Deployment Scripts"], "tech": ["AWS Lambda", "Amazon S3", "Amazon CloudFront", "HTML5/JavaScript", "Python", "Google Identity Services"], "depends_on": ["AWS CLI", "OpenSSL", "Python 3", "qrcode library", "boto3"], "integrates_with": ["Google OAuth", "AWS IAM", "Browser File API", "Canvas API"], "patterns": ["Serverless Backend", "Presigned URL Upload", "Stateless Authentication", "Edge Caching Passthrough", "Event-Driven Conversion"], "reuse_tags": ["aws-serverless", "photo-album", "oauth-login", "s3-direct-upload", "qr-code-access"], "slug": "picture_qr_code_2_login", "repo_url": "https://github.com/davidbmar/picture_qr_code_2_login", "visibility": "private", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:49:44.357400Z", "source_commit": "fe3bc32", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Picture QR Code Login",
+  "description": "Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution.",
+  "codeRepository": "https://github.com/davidbmar/picture_qr_code_2_login",
+  "programmingLanguage": [
+    "AWS Lambda",
+    "Amazon S3",
+    "Amazon CloudFront",
+    "HTML5/JavaScript",
+    "Python",
+    "Google Identity Services"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Picture QR Code Login</h1>
+  <p class="one-liner">Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution.</p>
+  <p><a href="https://github.com/davidbmar/picture_qr_code_2_login">https://github.com/davidbmar/picture_qr_code_2_login</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A password-gated, serverless photo album hosted on AWS. Users scan a QR code to access a web interface where they can authenticate via Google OAuth or username/password. Photos are uploaded directly from the browser to S3 using presigned URLs, ensuring the server never handles image bytes. Each upload is attributed to the logged-in user or &#x27;Guest&#x27; if using the shared password.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Identity-aware login via Google OAuth or username/password</li><li>Direct-to-S3 uploads using short-lived presigned URLs</li><li>Client-side thumbnail generation and HEIC support</li><li>Per-photo attribution tracking for logged-in users</li><li>Password-gated access with separate owner delete controls</li><li>Zero-maintenance serverless architecture on AWS</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">export ACCESS_PASSWORD=&quot;your-guest-password&quot;
+export OWNER_PASSCODE=&quot;your-private-passcode&quot;
+export TOKEN_SECRET=&quot;$(openssl rand -hex 32)&quot;
+./scripts/deploy.sh
+python scripts/make_qr.py &quot;&lt;the-printed-url&gt;&quot; album-qr.png</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|Scan QR| CF[CloudFront Distribution]
+    CF -->|Proxy Request| LF[Lambda Function URL]
+    LF -->|Verify Token/Auth| Auth[Auth Logic]
+    LF -->|Generate Presigned URL| S3[(S3 Bucket)]
+    User -->|Upload Photo Directly| S3
+    User -->|GET Photos| LF
+    LF -->|List Objects| S3
+    S3 -->|HEIC Upload Trigger| ConvLambda[Converter Lambda]
+    ConvLambda -->|Convert to JPG| S3</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built as a single AWS Lambda function serving HTML/JSON via Function URL, backed by an S3 bucket for storage. Authentication uses stateless HMAC tokens for guest access and Google Identity Services for OAuth. Image processing (thumbnails) happens client-side via Canvas; HEIC conversion is handled by a secondary Lambda trigger. Infrastructure is managed via shell scripts and AWS CLI, isolated from other variants by specific naming conventions.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User Browser
+    participant CF as CloudFront
+    participant L as Lambda Function
+    participant S3 as S3 Bucket
+    participant G as Google Auth
+
+    U->>CF: GET / (Scan QR)
+    CF->>L: Forward Request
+    L->>U: Return Login Page
+    U->>G: Sign in with Google
+    G->>U: Return ID Token
+    U->>L: POST /auth/google (ID Token)
+    L->>L: Verify Token & Create Session
+    L->>U: Return Authenticated State
+    U->>L: Request Upload Permission
+    L->>S3: Generate Presigned PUT URL
+    S3-->>L: Return Signed URL
+    L-->>U: Return Signed URL
+    U->>S3: PUT Photo Data (Direct)
+    S3-->>U: 200 OK
+    U->>L: Notify Upload Complete
+    L->>S3: Update Metadata/Attribution</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy to AWS using the provided shell scripts after configuring environment variables for passwords and secrets. Generate a QR code pointing to the CloudFront distribution URL. Print the QR code for physical display at events. Users scan the code, log in, and upload photos directly from their mobile browsers without installing an app.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">OAuth2 Integration</span><span class="tag">Presigned URL Generation</span><span class="tag">Serverless Hosting</span><span class="tag">Client-side Image Processing</span><span class="tag">Static Site Delivery</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Lambda Function (Main API)</span><span class="tag">Lambda Function (HEIC Converter)</span><span class="tag">S3 Bucket (Storage)</span><span class="tag">CloudFront Distribution</span><span class="tag">Dev Server Script</span><span class="tag">Deployment Scripts</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">AWS Lambda</span><span class="tag">Amazon S3</span><span class="tag">Amazon CloudFront</span><span class="tag">HTML5/JavaScript</span><span class="tag">Python</span><span class="tag">Google Identity Services</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS CLI</span><span class="tag">OpenSSL</span><span class="tag">Python 3</span><span class="tag">qrcode library</span><span class="tag">boto3</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Google OAuth</span><span class="tag">AWS IAM</span><span class="tag">Browser File API</span><span class="tag">Canvas API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Serverless Backend</span><span class="tag">Presigned URL Upload</span><span class="tag">Stateless Authentication</span><span class="tag">Edge Caching Passthrough</span><span class="tag">Event-Driven Conversion</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">aws-serverless</span><span class="tag">photo-album</span><span class="tag">oauth-login</span><span class="tag">s3-direct-upload</span><span class="tag">qr-code-access</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:49:44.357400Z ·
+     commit fe3bc32 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

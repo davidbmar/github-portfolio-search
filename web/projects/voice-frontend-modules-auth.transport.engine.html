@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>voice-frontend-modules · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "voice-frontend-modules", "one_liner": "Composable Python infrastructure for voice AI apps: WebRTC transport, edge authentication, and pluggable STT/TTS/LLM engines.", "what_it_is": "A modular toolkit for building real-time voice applications. It decouples connectivity (WebRTC/TURN), security (JWT/Cloudflare Access), and AI processing (STT/TTS/LLM) into three independent packages. Developers can mix and match components or swap the reference 'engine-starter' with production-grade providers while maintaining a consistent interface.", "how_its_built": "Python 3.9+ backend using FastAPI for signaling and WebSocket handling. The transport layer manages WebRTC sessions, ICE gathering, and TURN credentials. Edge-auth provides middleware for HTTP and WebSocket authentication. The engine layer defines Abstract Base Classes (ABCs) for speech-to-text, text-to-speech, and LLM interactions, implemented by reference starters (Whisper, Piper, Ollama) that can be replaced by custom implementations.", "how_to_apply": "Install the required packages via pip. Initialize a FastAPI app and mount the signaling server. Implement your conversation logic in an async handler that receives a WebRTCSession object. Use the session's speak() and listen() methods with your chosen STT/TTS providers. Add auth middleware if securing the endpoint.", "quickstart": "pip install voice-frontend[all]\nuvicorn examples.minimal-voice-app.server:app --port 8090", "features": ["Independent WebRTC transport handling with TURN/STUN support", "Pluggable edge authentication for HTTP and WebSockets (Cloudflare, Google JWT)", "Reference STT/TTS/LLM engine with swappable ABC-based architecture", "Browser-ready JS client for WebRTC signaling and audio capture", "Support for barge-in (interruptible playback) and VAD tuning"], "diagram_architecture": "flowchart TD\n    Client[Browser/JS Client] -->|WebSocket| Signaling[Signaling Server]\n    Client -->|WebRTC Media| Session[WebRTC Session]\n    Signaling -->|Auth Check| Auth[Edge Auth Middleware]\n    Auth -->|Validate| Providers[Auth Providers]\n    Session -->|Audio In| STT[STT Provider]\n    STT -->|Text| LLM[LLM Provider]\n    LLM -->|Text Response| TTS[TTS Provider]\n    TTS -->|Audio Out| Session\n    Session -->|Media Stream| Client\n    subgraph Infrastructure\n        Signaling\n        Auth\n        Session\n    end\n    subgraph AI Engine\n        STT\n        LLM\n        TTS\n    end", "diagram_sequence": "sequenceDiagram\n    participant Browser as Browser Client\n    participant FastAPI as FastAPI App\n    participant Auth as Edge Auth\n    participant Signal as Signaling Server\n    participant Session as WebRTC Session\n    participant Engine as AI Engine (STT/LLM/TTS)\n\n    Browser->>FastAPI: GET / (Load JS Client)\n    FastAPI-->>Browser: HTML/JS\n    Browser->>FastAPI: WebSocket Connect /ws\n    FastAPI->>Auth: authenticate_ws()\n    Auth-->>FastAPI: AuthResult\n    alt Authorized\n        FastAPI->>Signal: handle(websocket)\n        Signal->>Session: Create WebRTC Session\n        Session->>Browser: SDP Offer/Answer\n        Browser->>Session: Media Stream\n        loop Voice Interaction\n            Session->>Engine: listen(stt)\n            Engine-->>Session: Utterance Text\n            Session->>Engine: llm.chat(utterance)\n            Engine-->>Session: Response Text\n            Session->>Engine: speak(response, tts)\n            Engine-->>Session: Audio Bytes\n            Session->>Browser: Send Audio Track\n        end\n    else Unauthorized\n        FastAPI->>Browser: Close Connection (4001)\n    end", "capabilities": ["WebRTC Signaling", "TURN Credential Management", "WebSocket Authentication", "Speech-to-Text Integration", "Text-to-Speech Synthesis", "LLM Chat Orchestration", "Voice Activity Detection", "Interruptible Playback"], "components": ["transport", "edge-auth", "engine-starter", "SignalingServer", "WebRTCSession", "AuthProvider", "CompositeProvider", "StarterSTT", "StarterTTS", "StarterLLM"], "tech": ["Python", "FastAPI", "WebRTC", "WebSocket", "Whisper", "Piper", "Ollama", "JavaScript"], "depends_on": ["fastapi", "uvicorn", "websockets", "aiortc", "twilio", "kokoro-onnx", "openai-whisper"], "integrates_with": ["Cloudflare Access", "Google JWT", "Twilio TURN", "Custom STT Providers", "Custom TTS Providers", "Custom LLM Providers"], "patterns": ["Dependency Injection", "Adapter Pattern", "Middleware Pattern", "Async/Await", "Abstract Base Classes"], "reuse_tags": ["voice-ai", "webrtc", "auth-middleware", "stt-tts", "fastapi", "real-time"], "slug": "voice-frontend-modules-auth.transport.engine", "repo_url": "https://github.com/davidbmar/voice-frontend-modules-auth.transport.engine", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:07:34.178755Z", "source_commit": "4f1c3c0", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "voice-frontend-modules",
+  "description": "Composable Python infrastructure for voice AI apps: WebRTC transport, edge authentication, and pluggable STT/TTS/LLM engines.",
+  "codeRepository": "https://github.com/davidbmar/voice-frontend-modules-auth.transport.engine",
+  "programmingLanguage": [
+    "Python",
+    "FastAPI",
+    "WebRTC",
+    "WebSocket",
+    "Whisper",
+    "Piper",
+    "Ollama",
+    "JavaScript"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>voice-frontend-modules</h1>
+  <p class="one-liner">Composable Python infrastructure for voice AI apps: WebRTC transport, edge authentication, and pluggable STT/TTS/LLM engines.</p>
+  <p><a href="https://github.com/davidbmar/voice-frontend-modules-auth.transport.engine">https://github.com/davidbmar/voice-frontend-modules-auth.transport.engine</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A modular toolkit for building real-time voice applications. It decouples connectivity (WebRTC/TURN), security (JWT/Cloudflare Access), and AI processing (STT/TTS/LLM) into three independent packages. Developers can mix and match components or swap the reference &#x27;engine-starter&#x27; with production-grade providers while maintaining a consistent interface.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Independent WebRTC transport handling with TURN/STUN support</li><li>Pluggable edge authentication for HTTP and WebSockets (Cloudflare, Google JWT)</li><li>Reference STT/TTS/LLM engine with swappable ABC-based architecture</li><li>Browser-ready JS client for WebRTC signaling and audio capture</li><li>Support for barge-in (interruptible playback) and VAD tuning</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install voice-frontend[all]
+uvicorn examples.minimal-voice-app.server:app --port 8090</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Browser/JS Client] -->|WebSocket| Signaling[Signaling Server]
+    Client -->|WebRTC Media| Session[WebRTC Session]
+    Signaling -->|Auth Check| Auth[Edge Auth Middleware]
+    Auth -->|Validate| Providers[Auth Providers]
+    Session -->|Audio In| STT[STT Provider]
+    STT -->|Text| LLM[LLM Provider]
+    LLM -->|Text Response| TTS[TTS Provider]
+    TTS -->|Audio Out| Session
+    Session -->|Media Stream| Client
+    subgraph Infrastructure
+        Signaling
+        Auth
+        Session
+    end
+    subgraph AI Engine
+        STT
+        LLM
+        TTS
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Python 3.9+ backend using FastAPI for signaling and WebSocket handling. The transport layer manages WebRTC sessions, ICE gathering, and TURN credentials. Edge-auth provides middleware for HTTP and WebSocket authentication. The engine layer defines Abstract Base Classes (ABCs) for speech-to-text, text-to-speech, and LLM interactions, implemented by reference starters (Whisper, Piper, Ollama) that can be replaced by custom implementations.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Browser as Browser Client
+    participant FastAPI as FastAPI App
+    participant Auth as Edge Auth
+    participant Signal as Signaling Server
+    participant Session as WebRTC Session
+    participant Engine as AI Engine (STT/LLM/TTS)
+
+    Browser->>FastAPI: GET / (Load JS Client)
+    FastAPI-->>Browser: HTML/JS
+    Browser->>FastAPI: WebSocket Connect /ws
+    FastAPI->>Auth: authenticate_ws()
+    Auth-->>FastAPI: AuthResult
+    alt Authorized
+        FastAPI->>Signal: handle(websocket)
+        Signal->>Session: Create WebRTC Session
+        Session->>Browser: SDP Offer/Answer
+        Browser->>Session: Media Stream
+        loop Voice Interaction
+            Session->>Engine: listen(stt)
+            Engine-->>Session: Utterance Text
+            Session->>Engine: llm.chat(utterance)
+            Engine-->>Session: Response Text
+            Session->>Engine: speak(response, tts)
+            Engine-->>Session: Audio Bytes
+            Session->>Browser: Send Audio Track
+        end
+    else Unauthorized
+        FastAPI->>Browser: Close Connection (4001)
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Install the required packages via pip. Initialize a FastAPI app and mount the signaling server. Implement your conversation logic in an async handler that receives a WebRTCSession object. Use the session&#x27;s speak() and listen() methods with your chosen STT/TTS providers. Add auth middleware if securing the endpoint.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">WebRTC Signaling</span><span class="tag">TURN Credential Management</span><span class="tag">WebSocket Authentication</span><span class="tag">Speech-to-Text Integration</span><span class="tag">Text-to-Speech Synthesis</span><span class="tag">LLM Chat Orchestration</span><span class="tag">Voice Activity Detection</span><span class="tag">Interruptible Playback</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">transport</span><span class="tag">edge-auth</span><span class="tag">engine-starter</span><span class="tag">SignalingServer</span><span class="tag">WebRTCSession</span><span class="tag">AuthProvider</span><span class="tag">CompositeProvider</span><span class="tag">StarterSTT</span><span class="tag">StarterTTS</span><span class="tag">StarterLLM</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">WebRTC</span><span class="tag">WebSocket</span><span class="tag">Whisper</span><span class="tag">Piper</span><span class="tag">Ollama</span><span class="tag">JavaScript</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">fastapi</span><span class="tag">uvicorn</span><span class="tag">websockets</span><span class="tag">aiortc</span><span class="tag">twilio</span><span class="tag">kokoro-onnx</span><span class="tag">openai-whisper</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Cloudflare Access</span><span class="tag">Google JWT</span><span class="tag">Twilio TURN</span><span class="tag">Custom STT Providers</span><span class="tag">Custom TTS Providers</span><span class="tag">Custom LLM Providers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Dependency Injection</span><span class="tag">Adapter Pattern</span><span class="tag">Middleware Pattern</span><span class="tag">Async/Await</span><span class="tag">Abstract Base Classes</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-ai</span><span class="tag">webrtc</span><span class="tag">auth-middleware</span><span class="tag">stt-tts</span><span class="tag">fastapi</span><span class="tag">real-time</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:07:34.178755Z ·
+     commit 4f1c3c0 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

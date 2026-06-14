@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stripe-single-subscription-ec2 · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "stripe-single-subscription-ec2", "one_liner": "A Python Flask backend and vanilla JS frontend implementing Stripe Checkout for single subscriptions, configured for EC2 deployment.", "what_it_is": "This project is a reference implementation of a subscription payment flow using Stripe Checkout. It consists of a lightweight Flask server that manages API keys and retrieves checkout session details, paired with a static client-side interface that dynamically loads price IDs and handles post-payment success display. It includes build scripts to validate environment configuration before deployment.", "how_its_built": "The backend is built with Python 3.8+ using Flask for HTTP routing and the `stripe` Python library for API interactions. Environment variables are managed via `python-dotenv`. The frontend uses vanilla JavaScript (ES6+) with `fetch` API calls to communicate with the backend. Configuration validation is handled by a custom Python script (`build.py`).", "how_to_apply": "Use this as a starting point for integrating Stripe Subscriptions into a Python web application. It demonstrates how to securely expose publishable keys and price IDs to the client while keeping secret keys on the server. It is specifically structured for deployment on AWS EC2, including instructions for installing the Stripe CLI on Linux (ARM/x86).", "quickstart": "python3 -m venv myenv\nsource myenv/bin/activate\ncp env.example .env\n# Edit .env to set STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, BASIC_PRICE_ID, PRO_PRICE_ID\npython3 server/build.py\npip install flask stripe python-dotenv\npython3 server/server.py", "features": ["Dynamic fetching of Stripe Price IDs from server configuration", "Stripe Checkout Session creation and redirection", "Post-payment success page displaying session JSON details", "Environment variable validation script to prevent misconfiguration", "Flask-based API endpoints for config and session retrieval"], "diagram_architecture": "flowchart TD\n    Client[Browser Client] -->|GET /| Server[Flask Server]\n    Client -->|GET /config| Server\n    Client -->|GET /checkout-session| Server\n    Server -->|Retrieve Session| StripeAPI[Stripe API]\n    Server -->|Read Env| DotEnv[(.env File)]\n    BuildScript[build.py] -->|Validate| DotEnv", "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant FlaskServer\n    participant StripeAPI\n    \n    Browser->>FlaskServer: GET /\n    FlaskServer->>Browser: Render index.html\n    \n    Browser->>FlaskServer: GET /config\n    FlaskServer->>Browser: Return {publishableKey, basicPrice, proPrice}\n    \n    Note over Browser: User initiates checkout (client-side Stripe.js)\n    Browser->>StripeAPI: Create Checkout Session\n    StripeAPI->>Browser: Return Session ID & Redirect URL\n    \n    Browser->>Browser: Redirect to Success Page\n    Browser->>FlaskServer: GET /checkout-session?sessionId=...\n    FlaskServer->>StripeAPI: Retrieve Session Details\n    StripeAPI->>FlaskServer: Return Session Object\n    FlaskServer->>Browser: Return Session JSON", "capabilities": ["Subscription management", "Payment processing", "Environment validation", "Static file serving"], "components": ["Flask Web Server", "Vanilla JS Frontend", "Stripe CLI Integration", "Build Validation Script"], "tech": ["Python 3.8+", "Flask", "Stripe API", "JavaScript", "HTML/CSS"], "depends_on": ["flask", "stripe", "python-dotenv", "stripe-cli"], "integrates_with": ["Stripe Checkout", "AWS EC2"], "patterns": ["Server-Client Configuration", "Environment Variable Injection", "API Proxy"], "reuse_tags": ["stripe-integration", "python-flask", "subscription-boilerplate", "ec2-deployment"], "slug": "stripe-single-subscription-ec2", "repo_url": "https://github.com/davidbmar/stripe-single-subscription-ec2", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/pip/server/pip-d80e46b4af is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the pip group across 1 directory with 2 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T03:56:53.320222Z", "source_commit": "3dad6c3", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "stripe-single-subscription-ec2",
+  "description": "A Python Flask backend and vanilla JS frontend implementing Stripe Checkout for single subscriptions, configured for EC2 deployment.",
+  "codeRepository": "https://github.com/davidbmar/stripe-single-subscription-ec2",
+  "programmingLanguage": [
+    "Python 3.8+",
+    "Flask",
+    "Stripe API",
+    "JavaScript",
+    "HTML/CSS"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>stripe-single-subscription-ec2</h1>
+  <p class="one-liner">A Python Flask backend and vanilla JS frontend implementing Stripe Checkout for single subscriptions, configured for EC2 deployment.</p>
+  <p><a href="https://github.com/davidbmar/stripe-single-subscription-ec2">https://github.com/davidbmar/stripe-single-subscription-ec2</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project is a reference implementation of a subscription payment flow using Stripe Checkout. It consists of a lightweight Flask server that manages API keys and retrieves checkout session details, paired with a static client-side interface that dynamically loads price IDs and handles post-payment success display. It includes build scripts to validate environment configuration before deployment.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Dynamic fetching of Stripe Price IDs from server configuration</li><li>Stripe Checkout Session creation and redirection</li><li>Post-payment success page displaying session JSON details</li><li>Environment variable validation script to prevent misconfiguration</li><li>Flask-based API endpoints for config and session retrieval</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python3 -m venv myenv
+source myenv/bin/activate
+cp env.example .env
+# Edit .env to set STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, BASIC_PRICE_ID, PRO_PRICE_ID
+python3 server/build.py
+pip install flask stripe python-dotenv
+python3 server/server.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Browser Client] -->|GET /| Server[Flask Server]
+    Client -->|GET /config| Server
+    Client -->|GET /checkout-session| Server
+    Server -->|Retrieve Session| StripeAPI[Stripe API]
+    Server -->|Read Env| DotEnv[(.env File)]
+    BuildScript[build.py] -->|Validate| DotEnv</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is built with Python 3.8+ using Flask for HTTP routing and the `stripe` Python library for API interactions. Environment variables are managed via `python-dotenv`. The frontend uses vanilla JavaScript (ES6+) with `fetch` API calls to communicate with the backend. Configuration validation is handled by a custom Python script (`build.py`).</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Browser
+    participant FlaskServer
+    participant StripeAPI
+    
+    Browser->>FlaskServer: GET /
+    FlaskServer->>Browser: Render index.html
+    
+    Browser->>FlaskServer: GET /config
+    FlaskServer->>Browser: Return {publishableKey, basicPrice, proPrice}
+    
+    Note over Browser: User initiates checkout (client-side Stripe.js)
+    Browser->>StripeAPI: Create Checkout Session
+    StripeAPI->>Browser: Return Session ID & Redirect URL
+    
+    Browser->>Browser: Redirect to Success Page
+    Browser->>FlaskServer: GET /checkout-session?sessionId=...
+    FlaskServer->>StripeAPI: Retrieve Session Details
+    StripeAPI->>FlaskServer: Return Session Object
+    FlaskServer->>Browser: Return Session JSON</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this as a starting point for integrating Stripe Subscriptions into a Python web application. It demonstrates how to securely expose publishable keys and price IDs to the client while keeping secret keys on the server. It is specifically structured for deployment on AWS EC2, including instructions for installing the Stripe CLI on Linux (ARM/x86).</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Subscription management</span><span class="tag">Payment processing</span><span class="tag">Environment validation</span><span class="tag">Static file serving</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Flask Web Server</span><span class="tag">Vanilla JS Frontend</span><span class="tag">Stripe CLI Integration</span><span class="tag">Build Validation Script</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.8+</span><span class="tag">Flask</span><span class="tag">Stripe API</span><span class="tag">JavaScript</span><span class="tag">HTML/CSS</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">flask</span><span class="tag">stripe</span><span class="tag">python-dotenv</span><span class="tag">stripe-cli</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Stripe Checkout</span><span class="tag">AWS EC2</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Server-Client Configuration</span><span class="tag">Environment Variable Injection</span><span class="tag">API Proxy</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">stripe-integration</span><span class="tag">python-flask</span><span class="tag">subscription-boilerplate</span><span class="tag">ec2-deployment</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/pip/server/pip-d80e46b4af is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the pip group across 1 directory with 2 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:56:53.320222Z ·
+     commit 3dad6c3 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sip-voice-transport · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "sip-voice-transport", "one_liner": "PSTN phone call transport for Mac-local voice AI supporting Telnyx and Twilio.", "what_it_is": "A Python library that bridges PSTN telephony providers (Telnyx, Twilio) with local AI pipelines. It handles webhook ingestion, WebSocket media streaming, and automatic audio codec conversion to provide a consistent 16kHz PCM interface for STT/LLM/TTS applications.", "how_its_built": "Built on FastAPI for handling HTTP webhooks and WebSocket connections. It uses an abstract base class pattern to support multiple telephony providers, with specific implementations for Telnyx (L16/16kHz) and Twilio (mulaw/8kHz). Audio conversion is handled via NumPy and custom μ-law decoding tables to avoid deprecated dependencies.", "how_to_apply": "Integrate by instantiating `SipTransport` and iterating over `receive_audio()` in an async loop. Process each 16kHz PCM chunk through your STT model, generate text responses via an LLM, synthesize speech with TTS, and send the resulting PCM bytes back via `send_audio()`.", "quickstart": "python3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[cli,dev]\"\nsip-voice-server --port 8765\npython test_call.py --port 8765", "features": ["Bidirectional audio streaming over WebSocket from Telnyx or Twilio", "Automatic codec conversion (mulaw/8kHz to 16kHz PCM) for consistent input", "DID-based routing to specific LLM models and system prompts", "Mac sleep prevention during active calls using caffeinate", "Async iterator interface for seamless integration with AI pipelines"], "diagram_architecture": "flowchart TD\n    User[Caller] -->|PSTN| Provider[Telnyx/Twilio]\n    Provider -->|Webhook POST| Handler[SipWebhookHandler]\n    Handler -->|TeXML/TwiML| Provider\n    Provider -->|WebSocket Media| Handler\n    Handler -->|Raw Audio| Transport[SipTransport]\n    Transport -->|Codec Convert| Codec[AudioCodec]\n    Codec -->|16kHz PCM| App[Your AI Pipeline]\n    App -->|16kHz PCM| Transport\n    Transport -->|Provider Format| Handler\n    Handler -->|WebSocket Media| Provider", "diagram_sequence": "sequenceDiagram\n    participant Caller\n    participant Provider as Telnyx/Twilio\n    participant Server as SipWebhookHandler\n    participant Transport as SipTransport\n    participant App as AI Pipeline\n    Caller->>Provider: Initiate Call\n    Provider->>Server: POST /sip/{provider}/answer\n    Server-->>Provider: Return TeXML/TwiML with Stream URL\n    Provider->>Server: WebSocket Connect /sip/media-stream\n    Server->>Transport: Initialize Session\n    loop Active Call\n        Provider->>Server: Audio Frame (Provider Format)\n        Server->>Transport: Raw Bytes\n        Transport->>App: Canonical 16kHz PCM\n        App->>Transport: Response 16kHz PCM\n        Transport->>Server: Encoded Bytes\n        Server->>Provider: Audio Frame (Provider Format)\n    end", "capabilities": ["Inbound call handling", "Real-time audio streaming", "Codec transcoding", "DID routing", "System sleep inhibition"], "components": ["SipTransport", "SipWebhookHandler", "BaseSipProvider", "AudioCodec", "DIDRouter", "SleepInhibitor"], "tech": ["Python 3.11+", "FastAPI", "NumPy", "Uvicorn", "WebSockets"], "depends_on": ["fastapi", "uvicorn", "numpy", "pyyaml", "httpx"], "integrates_with": ["Telnyx", "Twilio", "Whisper (STT)", "Ollama (LLM)", "Piper (TTS)"], "patterns": ["Abstract Base Class", "Async Iterator", "Strategy Pattern (Providers)", "Adapter Pattern (Codecs)"], "reuse_tags": ["telephony", "voip", "voice-ai", "real-time-audio", "macos"], "slug": "sip-voice-transport", "repo_url": "https://github.com/davidbmar/sip-voice-transport", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:53:34.967973Z", "source_commit": "d576b26", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "sip-voice-transport",
+  "description": "PSTN phone call transport for Mac-local voice AI supporting Telnyx and Twilio.",
+  "codeRepository": "https://github.com/davidbmar/sip-voice-transport",
+  "programmingLanguage": [
+    "Python 3.11+",
+    "FastAPI",
+    "NumPy",
+    "Uvicorn",
+    "WebSockets"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>sip-voice-transport</h1>
+  <p class="one-liner">PSTN phone call transport for Mac-local voice AI supporting Telnyx and Twilio.</p>
+  <p><a href="https://github.com/davidbmar/sip-voice-transport">https://github.com/davidbmar/sip-voice-transport</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A Python library that bridges PSTN telephony providers (Telnyx, Twilio) with local AI pipelines. It handles webhook ingestion, WebSocket media streaming, and automatic audio codec conversion to provide a consistent 16kHz PCM interface for STT/LLM/TTS applications.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Bidirectional audio streaming over WebSocket from Telnyx or Twilio</li><li>Automatic codec conversion (mulaw/8kHz to 16kHz PCM) for consistent input</li><li>DID-based routing to specific LLM models and system prompts</li><li>Mac sleep prevention during active calls using caffeinate</li><li>Async iterator interface for seamless integration with AI pipelines</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python3 -m venv .venv
+source .venv/bin/activate
+pip install -e &quot;.[cli,dev]&quot;
+sip-voice-server --port 8765
+python test_call.py --port 8765</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[Caller] -->|PSTN| Provider[Telnyx/Twilio]
+    Provider -->|Webhook POST| Handler[SipWebhookHandler]
+    Handler -->|TeXML/TwiML| Provider
+    Provider -->|WebSocket Media| Handler
+    Handler -->|Raw Audio| Transport[SipTransport]
+    Transport -->|Codec Convert| Codec[AudioCodec]
+    Codec -->|16kHz PCM| App[Your AI Pipeline]
+    App -->|16kHz PCM| Transport
+    Transport -->|Provider Format| Handler
+    Handler -->|WebSocket Media| Provider</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built on FastAPI for handling HTTP webhooks and WebSocket connections. It uses an abstract base class pattern to support multiple telephony providers, with specific implementations for Telnyx (L16/16kHz) and Twilio (mulaw/8kHz). Audio conversion is handled via NumPy and custom μ-law decoding tables to avoid deprecated dependencies.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Caller
+    participant Provider as Telnyx/Twilio
+    participant Server as SipWebhookHandler
+    participant Transport as SipTransport
+    participant App as AI Pipeline
+    Caller->>Provider: Initiate Call
+    Provider->>Server: POST /sip/{provider}/answer
+    Server-->>Provider: Return TeXML/TwiML with Stream URL
+    Provider->>Server: WebSocket Connect /sip/media-stream
+    Server->>Transport: Initialize Session
+    loop Active Call
+        Provider->>Server: Audio Frame (Provider Format)
+        Server->>Transport: Raw Bytes
+        Transport->>App: Canonical 16kHz PCM
+        App->>Transport: Response 16kHz PCM
+        Transport->>Server: Encoded Bytes
+        Server->>Provider: Audio Frame (Provider Format)
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Integrate by instantiating `SipTransport` and iterating over `receive_audio()` in an async loop. Process each 16kHz PCM chunk through your STT model, generate text responses via an LLM, synthesize speech with TTS, and send the resulting PCM bytes back via `send_audio()`.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Inbound call handling</span><span class="tag">Real-time audio streaming</span><span class="tag">Codec transcoding</span><span class="tag">DID routing</span><span class="tag">System sleep inhibition</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">SipTransport</span><span class="tag">SipWebhookHandler</span><span class="tag">BaseSipProvider</span><span class="tag">AudioCodec</span><span class="tag">DIDRouter</span><span class="tag">SleepInhibitor</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.11+</span><span class="tag">FastAPI</span><span class="tag">NumPy</span><span class="tag">Uvicorn</span><span class="tag">WebSockets</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">fastapi</span><span class="tag">uvicorn</span><span class="tag">numpy</span><span class="tag">pyyaml</span><span class="tag">httpx</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Telnyx</span><span class="tag">Twilio</span><span class="tag">Whisper (STT)</span><span class="tag">Ollama (LLM)</span><span class="tag">Piper (TTS)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Abstract Base Class</span><span class="tag">Async Iterator</span><span class="tag">Strategy Pattern (Providers)</span><span class="tag">Adapter Pattern (Codecs)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">telephony</span><span class="tag">voip</span><span class="tag">voice-ai</span><span class="tag">real-time-audio</span><span class="tag">macos</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:53:34.967973Z ·
+     commit d576b26 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

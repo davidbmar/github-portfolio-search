@@ -1,0 +1,74 @@
+{
+  "title": "pictures-valentina",
+  "one_liner": "Automated pipeline for generating a 16-year school portrait poster from an Apple Photos library.",
+  "what_it_is": "A Python-based automation tool that scans an Apple Photos library for yearly portraits of a specific subject, allows manual selection via a local web interface, and composites the chosen images into a print-ready 18x24 inch poster. It handles face detection, consistent cropping, background replacement with a studio-blue gradient, and final layout generation.",
+  "how_its_built": "The system is built as a multi-stage pipeline: 1) `find_candidates.py` uses `osxphotos` to query the local Apple Photos database and ranks images by face size and quality. 2) `pick_server.py` serves a lightweight HTTP interface for manual year-by-year selection. 3) `build_poster.py` orchestrates the final composition, using `face_crop.py` (OpenCV YuNet) for consistent framing and `bg_replace.py` (rembg) for background removal on selected images before laying them out on a grid with PIL.",
+  "how_to_apply": "This project is highly specific to macOS users with an Apple Photos library containing tagged faces. It can be adapted for other subjects by changing the `PERSON` constant in `find_candidates.py` or for different layouts by modifying `slots.py`. The background replacement and face cropping modules are reusable components for any batch photo processing task requiring consistent headshots.",
+  "quickstart": "pip install pillow rembg opencv-python-headless numpy osxphotos\npython src/find_candidates.py\npython src/pick_server.py\n# Open http://127.0.0.1:8770 in browser, select photos, and click Generate Board",
+  "features": [
+    "Scans Apple Photos library for specific person tags across multiple years",
+    "Ranks candidates by face size, image quality, and favorite status",
+    "Local web server for manual review and selection of one photo per year",
+    "Face-aware cropping using OpenCV YuNet for consistent head-and-shoulders framing",
+    "AI-powered background removal and replacement with a radial studio-blue gradient",
+    "Generates high-resolution 18x24 inch print-ready PNG and PDF posters"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Apple Photos Library] -->|osxphotos| B(find_candidates.py)\n    B -->|manifest.json| C(pick_server.py)\n    C -->|selections.json| D(build_poster.py)\n    E[models/face_detection_yunet.onnx] -->|OpenCV| F(face_crop.py)\n    G[rembg u2net_human_seg] -->|PIL/Numpy| H(bg_replace.py)\n    F --> D\n    H --> D\n    D --> I[output/poster.png]\n    D --> J[output/poster.pdf]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Finder as find_candidates.py\n    participant Picker as pick_server.py\n    participant Builder as build_poster.py\n    participant FaceCrop as face_crop.py\n    participant BGReplace as bg_replace.py\n    \n    User->>Finder: Run candidate search\n    Finder->>Finder: Query Apple Photos DB\n    Finder->>Finder: Rank & export thumbnails\n    Finder-->>User: manifest.json created\n    \n    User->>Picker: Start web server\n    Picker->>User: Serve candidate grid\n    User->>Picker: Select photos per year\n    Picker->>Picker: Save selections.json\n    User->>Picker: Click Generate Board\n    \n    Picker->>Builder: Trigger build_poster.py\n    Builder->>Builder: Load selections & manifest\n    loop For each selected photo\n        Builder->>FaceCrop: Detect face & crop\n        FaceCrop-->>Builder: Cropped image\n        Builder->>BGReplace: Remove background\n        BGReplace-->>Builder: Subject on blue gradient\n    end\n    Builder->>Builder: Composite grid & add text\n    Builder-->>User: Save poster.png/pdf",
+  "capabilities": [
+    "Batch photo ranking",
+    "Face detection",
+    "Background removal",
+    "Image compositing",
+    "Web-based UI",
+    "PDF generation"
+  ],
+  "components": [
+    "find_candidates.py",
+    "pick_server.py",
+    "build_poster.py",
+    "face_crop.py",
+    "bg_replace.py",
+    "slots.py"
+  ],
+  "tech": [
+    "Python",
+    "Pillow",
+    "OpenCV",
+    "rembg",
+    "osxphotos",
+    "NumPy"
+  ],
+  "depends_on": [
+    "macOS",
+    "Apple Photos Library",
+    "Python 3.8+"
+  ],
+  "integrates_with": [
+    "Apple Photos",
+    "iCloud Photos (optional hires download)"
+  ],
+  "patterns": [
+    "Pipeline Processing",
+    "Human-in-the-loop Selection",
+    "Lazy Model Loading",
+    "Static Site Generation (local)"
+  ],
+  "reuse_tags": [
+    "photo-automation",
+    "face-cropping",
+    "background-replacement",
+    "apple-photos",
+    "poster-generation"
+  ],
+  "slug": "pictures-valentina",
+  "repo_url": "https://github.com/davidbmar/pictures-valentina",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:48:54.180367Z",
+  "source_commit": "96c817c",
+  "model": "qwen3.7-plus"
+}

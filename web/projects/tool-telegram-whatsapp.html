@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whatsup · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "whatsup", "one_liner": "Multi-transport project messaging for Afterburner sprints via Telegram, WhatsApp (planned), and console.", "what_it_is": "A CLI and API tool that sends checkins and lifecycle notifications (sprint started, agent completed, tests failed) to project-specific group chats. It supports pluggable transports (Telegram, Console, planned WhatsApp) and exposes interfaces via CLI, REST API, MCP server, and Claude skills.", "how_its_built": "Python 3.11+ application with a core module handling configuration loading, event filtering, and message formatting. It uses a transport plugin architecture where specific modules (telegram.py, console.py) handle API interactions. Configuration is stored in JSON, and history is logged to JSONL files.", "how_to_apply": "Integrate into CI/CD pipelines or local development hooks to automatically notify team channels when sprints start, agents finish tasks, or tests fail. Use the REST API or MCP server to connect AI agents (like Afterburner) to team communication channels without hardcoding bot logic.", "quickstart": "git clone https://github.com/davidbmar/tool-telegram-whatsapp.git\ncd tool-telegram-whatsapp\npython3 -m venv .venv && source .venv/bin/activate\npip install -e .\nwhatsup setup\nwhatsup send demo \"Hello from whatsup!\"", "features": ["Sends automated checkins and lifecycle notifications to group chats", "Supports multiple transports: Telegram, Console (stdout), and planned WhatsApp", "Exposes four interfaces: CLI, REST API, MCP server, and Claude Skill", "Filters notifications based on project-specific event allowlists", "Logs all message history to JSONL for auditing and debugging", "Includes a web-based config UI for easy Telegram bot setup"], "diagram_architecture": "flowchart TD\n    subgraph Interfaces\n        CLI[CLI: whatsup]\n        REST[REST API :1202]\n        MCP[MCP Server stdio]\n        Skill[Claude Skill]\n    end\n    subgraph Core\n        CoreMod[core.py]\n        Config[config.json]\n        History[history.jsonl]\n    end\n    subgraph Transports\n        Telegram[Telegram Transport]\n        Console[Console Transport]\n        WhatsApp[WhatsApp Transport<br/>(Planned)]\n    end\n    CLI --> CoreMod\n    REST --> CoreMod\n    MCP --> CoreMod\n    Skill --> CoreMod\n    CoreMod --> Config\n    CoreMod --> History\n    CoreMod --> Telegram\n    CoreMod --> Console\n    CoreMod --> WhatsApp", "diagram_sequence": "sequenceDiagram\n    participant User as User/Agent\n    participant Interface as CLI/REST/MCP\n    participant Core as core.py\n    participant Config as config.json\n    participant Transport as Transport Module\n    participant External as Telegram/Console\n    User->>Interface: send/notify command\n    Interface->>Core: call send() or notify()\n    Core->>Config: load_config()\n    Config-->>Core: return project config\n    Core->>Core: check event in notify list\n    alt Event allowed\n        Core->>Transport: format and send message\n        Transport->>External: API call / stdout print\n        External-->>Transport: response/ack\n        Transport-->>Core: result status\n        Core->>Core: log to history.jsonl\n        Core-->>Interface: return result\n    else Event blocked\n        Core-->>Interface: return skipped status\n    end", "capabilities": ["Send checkin messages", "Send lifecycle notifications", "Filter events by project config", "Log message history", "Check transport health", "List configured projects"], "components": ["cli.py", "core.py", "config.py", "messages.py", "transport/telegram.py", "transport/console.py", "server.py"], "tech": ["Python 3.11+", "argparse", "requests", "JSON", "HTTP Server"], "depends_on": ["Python 3.11+", "Telegram Bot API", "Afterburner (optional integration)"], "integrates_with": ["Telegram", "WhatsApp (planned)", "Afterburner", "Claude Skills", "MCP Servers"], "patterns": ["Plugin Architecture", "Configuration-driven Behavior", "Event Filtering", "Audit Logging"], "reuse_tags": ["notification-service", "multi-transport", "cli-tool", "rest-api", "mcp-server", "telegram-bot", "devops-tooling"], "slug": "tool-telegram-whatsapp", "repo_url": "https://github.com/davidbmar/tool-telegram-whatsapp", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:02:05.559185Z", "source_commit": "f28f1bb", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "whatsup",
+  "description": "Multi-transport project messaging for Afterburner sprints via Telegram, WhatsApp (planned), and console.",
+  "codeRepository": "https://github.com/davidbmar/tool-telegram-whatsapp",
+  "programmingLanguage": [
+    "Python 3.11+",
+    "argparse",
+    "requests",
+    "JSON",
+    "HTTP Server"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>whatsup</h1>
+  <p class="one-liner">Multi-transport project messaging for Afterburner sprints via Telegram, WhatsApp (planned), and console.</p>
+  <p><a href="https://github.com/davidbmar/tool-telegram-whatsapp">https://github.com/davidbmar/tool-telegram-whatsapp</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A CLI and API tool that sends checkins and lifecycle notifications (sprint started, agent completed, tests failed) to project-specific group chats. It supports pluggable transports (Telegram, Console, planned WhatsApp) and exposes interfaces via CLI, REST API, MCP server, and Claude skills.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Sends automated checkins and lifecycle notifications to group chats</li><li>Supports multiple transports: Telegram, Console (stdout), and planned WhatsApp</li><li>Exposes four interfaces: CLI, REST API, MCP server, and Claude Skill</li><li>Filters notifications based on project-specific event allowlists</li><li>Logs all message history to JSONL for auditing and debugging</li><li>Includes a web-based config UI for easy Telegram bot setup</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/tool-telegram-whatsapp.git
+cd tool-telegram-whatsapp
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -e .
+whatsup setup
+whatsup send demo &quot;Hello from whatsup!&quot;</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph Interfaces
+        CLI[CLI: whatsup]
+        REST[REST API :1202]
+        MCP[MCP Server stdio]
+        Skill[Claude Skill]
+    end
+    subgraph Core
+        CoreMod[core.py]
+        Config[config.json]
+        History[history.jsonl]
+    end
+    subgraph Transports
+        Telegram[Telegram Transport]
+        Console[Console Transport]
+        WhatsApp[WhatsApp Transport&lt;br/>(Planned)]
+    end
+    CLI --> CoreMod
+    REST --> CoreMod
+    MCP --> CoreMod
+    Skill --> CoreMod
+    CoreMod --> Config
+    CoreMod --> History
+    CoreMod --> Telegram
+    CoreMod --> Console
+    CoreMod --> WhatsApp</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Python 3.11+ application with a core module handling configuration loading, event filtering, and message formatting. It uses a transport plugin architecture where specific modules (telegram.py, console.py) handle API interactions. Configuration is stored in JSON, and history is logged to JSONL files.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as User/Agent
+    participant Interface as CLI/REST/MCP
+    participant Core as core.py
+    participant Config as config.json
+    participant Transport as Transport Module
+    participant External as Telegram/Console
+    User->>Interface: send/notify command
+    Interface->>Core: call send() or notify()
+    Core->>Config: load_config()
+    Config-->>Core: return project config
+    Core->>Core: check event in notify list
+    alt Event allowed
+        Core->>Transport: format and send message
+        Transport->>External: API call / stdout print
+        External-->>Transport: response/ack
+        Transport-->>Core: result status
+        Core->>Core: log to history.jsonl
+        Core-->>Interface: return result
+    else Event blocked
+        Core-->>Interface: return skipped status
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Integrate into CI/CD pipelines or local development hooks to automatically notify team channels when sprints start, agents finish tasks, or tests fail. Use the REST API or MCP server to connect AI agents (like Afterburner) to team communication channels without hardcoding bot logic.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Send checkin messages</span><span class="tag">Send lifecycle notifications</span><span class="tag">Filter events by project config</span><span class="tag">Log message history</span><span class="tag">Check transport health</span><span class="tag">List configured projects</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">cli.py</span><span class="tag">core.py</span><span class="tag">config.py</span><span class="tag">messages.py</span><span class="tag">transport/telegram.py</span><span class="tag">transport/console.py</span><span class="tag">server.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.11+</span><span class="tag">argparse</span><span class="tag">requests</span><span class="tag">JSON</span><span class="tag">HTTP Server</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Python 3.11+</span><span class="tag">Telegram Bot API</span><span class="tag">Afterburner (optional integration)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Telegram</span><span class="tag">WhatsApp (planned)</span><span class="tag">Afterburner</span><span class="tag">Claude Skills</span><span class="tag">MCP Servers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Plugin Architecture</span><span class="tag">Configuration-driven Behavior</span><span class="tag">Event Filtering</span><span class="tag">Audit Logging</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">notification-service</span><span class="tag">multi-transport</span><span class="tag">cli-tool</span><span class="tag">rest-api</span><span class="tag">mcp-server</span><span class="tag">telegram-bot</span><span class="tag">devops-tooling</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:02:05.559185Z ·
+     commit f28f1bb ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

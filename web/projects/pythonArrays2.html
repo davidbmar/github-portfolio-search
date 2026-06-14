@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pythonArrays2 · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "pythonArrays2", "one_liner": "A Python script that reads an array of integers from standard input and prints them in reverse order.", "what_it_is": "A simple command-line utility designed for educational purposes to demonstrate basic array manipulation and standard I/O handling in Python. It solves the specific algorithmic task of reversing an integer array provided via stdin.", "how_its_built": "The project consists of a single Python script (`pythonArrays.py`) that utilizes `sys` for output control and built-in functions for input parsing. It manually iterates through the array indices in reverse order to construct the output string.", "how_to_apply": "Use this script as a reference for basic Python input/output operations, specifically handling space-separated integer inputs and controlling output formatting without trailing newlines using `sys.stdout.write`. It serves as a baseline solution for HackerRank-style array reversal challenges.", "quickstart": "echo '4\\n1 4 3 2' | python pythonArrays.py", "features": ["Reads integer array size and elements from standard input", "Parses space-separated integers into a list", "Iterates through the array in reverse index order", "Outputs reversed elements as a space-separated line"], "diagram_architecture": "flowchart TD\n    A[User Input] -->|stdin| B(pythonArrays.py)\n    B --> C{Parse Input}\n    C -->|Split & Map| D[Integer Array]\n    D --> E[Reverse Iteration Loop]\n    E -->|sys.stdout.write| F[Console Output]", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script as pythonArrays.py\n    participant Sys as sys module\n    \n    User->>Script: Provide n (size) and array elements\n    Script->>Script: Parse n via raw_input()\n    Script->>Script: Parse array via map(int, split())\n    loop For i in range(n)\n        Script->>Script: Calculate reverse index x = n - i - 1\n        Script->>Sys: Write str(arr[x]) + \" \"\n    end\n    Sys-->>User: Display reversed array", "capabilities": ["Standard input parsing", "Array indexing", "Formatted output"], "components": ["pythonArrays.py"], "tech": ["Python 2", "sys module"], "depends_on": ["Python 2 interpreter"], "integrates_with": [], "patterns": ["Standard I/O", "Index-based iteration"], "reuse_tags": ["algorithm", "array-reversal", "educational", "cli-tool"], "slug": "pythonArrays2", "repo_url": "https://github.com/davidbmar/pythonArrays2", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:49:59.820086Z", "source_commit": "b6b7aa6", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "pythonArrays2",
+  "description": "A Python script that reads an array of integers from standard input and prints them in reverse order.",
+  "codeRepository": "https://github.com/davidbmar/pythonArrays2",
+  "programmingLanguage": [
+    "Python 2",
+    "sys module"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>pythonArrays2</h1>
+  <p class="one-liner">A Python script that reads an array of integers from standard input and prints them in reverse order.</p>
+  <p><a href="https://github.com/davidbmar/pythonArrays2">https://github.com/davidbmar/pythonArrays2</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A simple command-line utility designed for educational purposes to demonstrate basic array manipulation and standard I/O handling in Python. It solves the specific algorithmic task of reversing an integer array provided via stdin.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Reads integer array size and elements from standard input</li><li>Parses space-separated integers into a list</li><li>Iterates through the array in reverse index order</li><li>Outputs reversed elements as a space-separated line</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">echo &#x27;4\n1 4 3 2&#x27; | python pythonArrays.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[User Input] -->|stdin| B(pythonArrays.py)
+    B --> C{Parse Input}
+    C -->|Split & Map| D[Integer Array]
+    D --> E[Reverse Iteration Loop]
+    E -->|sys.stdout.write| F[Console Output]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project consists of a single Python script (`pythonArrays.py`) that utilizes `sys` for output control and built-in functions for input parsing. It manually iterates through the array indices in reverse order to construct the output string.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant Script as pythonArrays.py
+    participant Sys as sys module
+    
+    User->>Script: Provide n (size) and array elements
+    Script->>Script: Parse n via raw_input()
+    Script->>Script: Parse array via map(int, split())
+    loop For i in range(n)
+        Script->>Script: Calculate reverse index x = n - i - 1
+        Script->>Sys: Write str(arr[x]) + " "
+    end
+    Sys-->>User: Display reversed array</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this script as a reference for basic Python input/output operations, specifically handling space-separated integer inputs and controlling output formatting without trailing newlines using `sys.stdout.write`. It serves as a baseline solution for HackerRank-style array reversal challenges.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Standard input parsing</span><span class="tag">Array indexing</span><span class="tag">Formatted output</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">pythonArrays.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 2</span><span class="tag">sys module</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Python 2 interpreter</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="muted">—</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Standard I/O</span><span class="tag">Index-based iteration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">algorithm</span><span class="tag">array-reversal</span><span class="tag">educational</span><span class="tag">cli-tool</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:49:59.820086Z ·
+     commit b6b7aa6 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

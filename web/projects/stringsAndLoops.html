@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stringsAndLoops · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "stringsAndLoops", "one_liner": "A Python script that separates even and odd indexed characters from input strings.", "what_it_is": "A command-line utility designed for coding challenges that processes a series of strings, splitting each into two parts: characters at even indices and characters at odd indices, then prints them space-separated.", "how_its_built": "Built with pure Python using standard I/O. It reads the number of test cases from stdin, iterates through each string, classifies characters by index parity into separate lists, and writes the concatenated results to stdout.", "how_to_apply": "Use this as a reference for basic string manipulation, list accumulation patterns, and handling standard input/output in Python 2 environments. It demonstrates O(N) character processing per string.", "quickstart": "python stringsAndLoops.py", "features": ["Reads integer count of test cases from stdin", "Processes each subsequent line as a target string", "Separates characters into even-indexed and odd-indexed groups", "Outputs formatted result lines to stdout"], "diagram_architecture": "flowchart TD\n    A[Start] --> B[Read Test Case Count]\n    B --> C{More Cases?}\n    C -->|Yes| D[Read Input String]\n    D --> E[Initialize Even/Odd Lists]\n    E --> F[Iterate Characters]\n    F --> G{Index Even?}\n    G -->|Yes| H[Append to Even List]\n    G -->|No| I[Append to Odd List]\n    H --> J{Next Char?}\n    I --> J\n    J -->|Yes| F\n    J -->|No| K[Join Even List]\n    K --> L[Join Odd List]\n    L --> M[Print Result]\n    M --> C\n    C -->|No| N[End]", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script\n    participant SysStdout\n    User->>Script: Provide Test Case Count (N)\n    loop For each test case\n        User->>Script: Provide Input String (S)\n        Script->>Script: Initialize evenString, oddString\n        loop For each char in S\n            Script->>Script: Check index parity\n            alt Even Index\n                Script->>Script: Append to evenString\n            else Odd Index\n                Script->>Script: Append to oddString\n            end\n        end\n        Script->>SysStdout: Write evenString chars\n        Script->>SysStdout: Write space\n        Script->>SysStdout: Write oddString chars\n        Script->>SysStdout: Write newline\n    end", "capabilities": ["String indexing", "Standard input parsing", "Conditional logic application", "List accumulation"], "components": ["Main execution block", "Input reader", "Character classifier", "Output writer"], "tech": ["Python 2", "sys module", "raw_input", "stdout.write"], "depends_on": ["Python 2 runtime"], "integrates_with": ["Standard Input (stdin)", "Standard Output (stdout)"], "patterns": ["Accumulator pattern", "Iteration over sequence", "Parity check"], "reuse_tags": ["string-manipulation", "coding-challenge", "basic-algorithm", "stdin-processing"], "slug": "stringsAndLoops", "repo_url": "https://github.com/davidbmar/stringsAndLoops", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:56:31.611672Z", "source_commit": "2e70648", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "stringsAndLoops",
+  "description": "A Python script that separates even and odd indexed characters from input strings.",
+  "codeRepository": "https://github.com/davidbmar/stringsAndLoops",
+  "programmingLanguage": [
+    "Python 2",
+    "sys module",
+    "raw_input",
+    "stdout.write"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>stringsAndLoops</h1>
+  <p class="one-liner">A Python script that separates even and odd indexed characters from input strings.</p>
+  <p><a href="https://github.com/davidbmar/stringsAndLoops">https://github.com/davidbmar/stringsAndLoops</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A command-line utility designed for coding challenges that processes a series of strings, splitting each into two parts: characters at even indices and characters at odd indices, then prints them space-separated.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Reads integer count of test cases from stdin</li><li>Processes each subsequent line as a target string</li><li>Separates characters into even-indexed and odd-indexed groups</li><li>Outputs formatted result lines to stdout</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python stringsAndLoops.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Start] --> B[Read Test Case Count]
+    B --> C{More Cases?}
+    C -->|Yes| D[Read Input String]
+    D --> E[Initialize Even/Odd Lists]
+    E --> F[Iterate Characters]
+    F --> G{Index Even?}
+    G -->|Yes| H[Append to Even List]
+    G -->|No| I[Append to Odd List]
+    H --> J{Next Char?}
+    I --> J
+    J -->|Yes| F
+    J -->|No| K[Join Even List]
+    K --> L[Join Odd List]
+    L --> M[Print Result]
+    M --> C
+    C -->|No| N[End]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with pure Python using standard I/O. It reads the number of test cases from stdin, iterates through each string, classifies characters by index parity into separate lists, and writes the concatenated results to stdout.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant Script
+    participant SysStdout
+    User->>Script: Provide Test Case Count (N)
+    loop For each test case
+        User->>Script: Provide Input String (S)
+        Script->>Script: Initialize evenString, oddString
+        loop For each char in S
+            Script->>Script: Check index parity
+            alt Even Index
+                Script->>Script: Append to evenString
+            else Odd Index
+                Script->>Script: Append to oddString
+            end
+        end
+        Script->>SysStdout: Write evenString chars
+        Script->>SysStdout: Write space
+        Script->>SysStdout: Write oddString chars
+        Script->>SysStdout: Write newline
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this as a reference for basic string manipulation, list accumulation patterns, and handling standard input/output in Python 2 environments. It demonstrates O(N) character processing per string.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">String indexing</span><span class="tag">Standard input parsing</span><span class="tag">Conditional logic application</span><span class="tag">List accumulation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Main execution block</span><span class="tag">Input reader</span><span class="tag">Character classifier</span><span class="tag">Output writer</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 2</span><span class="tag">sys module</span><span class="tag">raw_input</span><span class="tag">stdout.write</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Python 2 runtime</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Standard Input (stdin)</span><span class="tag">Standard Output (stdout)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Accumulator pattern</span><span class="tag">Iteration over sequence</span><span class="tag">Parity check</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">string-manipulation</span><span class="tag">coding-challenge</span><span class="tag">basic-algorithm</span><span class="tag">stdin-processing</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:56:31.611672Z ·
+     commit 2e70648 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

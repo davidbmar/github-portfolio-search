@@ -1,0 +1,84 @@
+{
+  "title": "NVIDIA RNN-T Production Transcription System",
+  "one_liner": "Automated deployment of a GPU-accelerated SpeechBrain Conformer RNN-T speech recognition server with WebSocket streaming and S3 integration.",
+  "what_it_is": "A production-ready shell-scripted deployment framework for NVIDIA RNN-T (Recurrent Neural Network Transducer) models. It provisions AWS GPU instances, installs dependencies, and launches a FastAPI server capable of real-time audio transcription via HTTP or WebSocket, offering lower latency and higher throughput than standard Whisper implementations.",
+  "how_its_built": "The system uses Bash scripts for infrastructure provisioning (AWS EC2 g4dn instances) and environment setup. The core application is a Python FastAPI server wrapping the SpeechBrain `EncoderDecoderASR` model. It utilizes PyTorch for GPU inference, Boto3 for S3 audio retrieval, and WebSockets for low-latency streaming. Client examples are provided in Python and Node.js.",
+  "how_to_apply": "Use this project to deploy a high-performance, low-latency speech-to-text service on AWS. It is suitable for applications requiring word-level timestamps, real-time streaming transcription, or processing large volumes of audio files stored in S3 with minimal GPU memory footprint (~2GB VRAM).",
+  "quickstart": "git clone https://github.com/davidbmar/nvidia-rnn-t-riva-nonmock-really-transcribe.git\ncd nvidia-rnn-t-riva-nonmock-really-transcribe\n./scripts/run-all-steps.sh",
+  "features": [
+    "Real SpeechBrain Conformer RNN-T model execution (not mocked)",
+    "GPU-accelerated inference on Tesla T4/V100 with ~100-200ms latency",
+    "Word-level timestamp generation and confidence scores",
+    "Direct audio file transcription from AWS S3 buckets",
+    "WebSocket support for real-time audio streaming",
+    "Automated AWS EC2 provisioning and configuration via shell scripts"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client App] -->|HTTP POST / WebSocket| API[FastAPI Server :8000]\n    API -->|Load/Query| Model[SpeechBrain RNN-T Model]\n    Model -->|CUDA Inference| GPU[NVIDIA GPU T4/V100]\n    API -->|Fetch Audio| S3[(AWS S3 Bucket)]\n    API -->|JSON Response| Client\n    subgraph Deployment\n        API\n        Model\n        GPU\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant S as FastAPI Server\n    participant M as RNN-T Model\n    participant G as GPU\n    participant B as AWS S3\n\n    alt File Transcription\n        C->>S: POST /transcribe/file (audio.wav)\n        S->>B: GetObject(audio.wav)\n        B-->>S: Audio Data\n        S->>M: Encode & Decode Audio\n        M->>G: CUDA Inference\n        G-->>M: Logits/Transcript\n        M-->>S: Text + Timestamps\n        S-->>C: JSON Response\n    else Streaming Transcription\n        C->>S: WebSocket Connect\n        S-->>C: Connection Established\n        loop Audio Chunks\n            C->>S: Binary Audio Chunk\n            S->>M: Process Chunk\n            M->>G: Incremental Inference\n            G-->>M: Partial Transcript\n            M-->>S: Update State\n            S-->>C: Partial JSON Result\n        end\n        C->>S: Close Connection\n    end",
+  "capabilities": [
+    "Speech-to-Text Transcription",
+    "Real-time Audio Streaming",
+    "AWS S3 Integration",
+    "GPU Acceleration",
+    "Word-Level Timing",
+    "Health Monitoring"
+  ],
+  "components": [
+    "FastAPI Server",
+    "SpeechBrain EncoderDecoderASR",
+    "Deployment Scripts",
+    "WebSocket Handler",
+    "S3 Client",
+    "PyTorch CUDA Backend"
+  ],
+  "tech": [
+    "Python",
+    "Bash",
+    "FastAPI",
+    "PyTorch",
+    "SpeechBrain",
+    "WebSockets",
+    "AWS EC2",
+    "AWS S3"
+  ],
+  "depends_on": [
+    "AWS Account",
+    "NVIDIA GPU Instance (g4dn.xlarge+)",
+    "Python 3.10+",
+    "CUDA Toolkit",
+    "Boto3",
+    "Uvicorn"
+  ],
+  "integrates_with": [
+    "AWS S3",
+    "AWS EC2",
+    "Node.js Clients",
+    "Python Clients",
+    "Web Browsers"
+  ],
+  "patterns": [
+    "REST API",
+    "WebSocket Streaming",
+    "Infrastructure as Code (Shell)",
+    "Model-as-a-Service",
+    "Async Processing"
+  ],
+  "reuse_tags": [
+    "speech-recognition",
+    "gpu-deployment",
+    "aws-automation",
+    "real-time-transcription",
+    "rnnt",
+    "fastapi"
+  ],
+  "slug": "nvidia-rnn-t-riva-nonmock-really-transcribe-",
+  "repo_url": "https://github.com/davidbmar/nvidia-rnn-t-riva-nonmock-really-transcribe-",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:45:13.503142Z",
+  "source_commit": "3ec1411",
+  "model": "qwen3.7-plus"
+}

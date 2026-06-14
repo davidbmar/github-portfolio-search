@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S3 Presigned URL Lambda API Gateway Setup · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "S3 Presigned URL Lambda API Gateway Setup", "one_liner": "A Serverless Framework template for generating secure, rate-limited S3 presigned upload URLs via API Gateway and Lambda.", "what_it_is": "This project provides a ready-to-deploy AWS infrastructure template using the Serverless Framework. It creates an HTTP API endpoint secured by API Keys and Usage Plans that triggers a Lambda function to generate presigned PUT URLs for direct S3 uploads. It is designed for secure, serverless file ingestion without exposing S3 credentials to clients.", "how_its_built": "The infrastructure is defined in `serverless.yml`, provisioning an S3 bucket with public access blocked, a Node.js Lambda function (`urlSigner`) using AWS SDK v3, and an HTTP API Gateway with API Key enforcement. A Python utility script (`generate_key.py`) manages API key creation and association with Usage Plans via boto3.", "how_to_apply": "Clone the repository, install Node.js dependencies, configure AWS CLI credentials, and run `sls deploy`. Use the provided Python script to generate API keys for users, then integrate the returned presigned URLs into your client-side upload logic.", "quickstart": "git clone https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup.git\ncd S3-presignedURL-Lambda-APIGateway-setup\nnpm install\nsls deploy --stage=dev", "features": ["Generates presigned S3 PUT URLs for direct client uploads", "Secures API endpoints with API Gateway API Keys and Usage Plans", "Enforces rate limiting and quotas via configurable Usage Plans", "Validates file extensions and MIME types in Lambda before signing", "Automates resource provisioning via Serverless Framework"], "diagram_architecture": "flowchart TD\n    Client[Client Application] -->|POST /generate-upload-url + API Key| APIGW[API Gateway HTTP API]\n    APIGW -->|Validate API Key & Throttle| UsagePlan[Usage Plan]\n    APIGW -->|Invoke| Lambda[Lambda: urlSigner]\n    Lambda -->|Generate Presigned URL| S3[S3 Bucket]\n    Client -->|PUT File Data| S3\n    Admin[Admin/Script] -->|create_api_key| APIGW_Mgmt[API Gateway Management]\n    APIGW_Mgmt -->|Associate| UsagePlan", "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant G as API Gateway\n    participant L as Lambda (urlSigner)\n    participant S as S3\n    \n    C->>G: POST /generate-upload-url (x-api-key: KEY)\n    G->>G: Validate API Key & Check Quota\n    G->>L: Invoke Function\n    L->>L: Parse body (fileExt, contentType)\n    L->>L: Validate extension whitelist\n    L->>S: Create PutObjectCommand (dry-run/signing)\n    S-->>L: Return Presigned URL\n    L-->>G: 200 OK { uploadUrl, key }\n    G-->>C: 200 OK { uploadUrl, key }\n    \n    C->>S: PUT file data to Presigned URL\n    S-->>C: 200 OK", "capabilities": ["Presigned URL Generation", "API Key Management", "Rate Limiting", "Input Validation", "Serverless Deployment"], "components": ["Lambda Function (Node.js)", "API Gateway (HTTP API)", "S3 Bucket", "Usage Plan", "API Key", "Python Key Generator Script"], "tech": ["AWS Lambda", "Amazon S3", "Amazon API Gateway", "Serverless Framework", "Node.js", "Python", "AWS SDK v3", "boto3"], "depends_on": ["AWS Account", "Node.js >=16", "Python 3", "Serverless CLI", "AWS CLI"], "integrates_with": ["AWS CloudFormation", "AWS IAM", "Client-side Uploaders"], "patterns": ["Presigned URL Pattern", "API Key Authentication", "Serverless Microservice", "Direct-to-S3 Upload"], "reuse_tags": ["aws", "serverless", "s3", "lambda", "api-gateway", "presigned-url", "template"], "slug": "S3-presignedURL-Lambda-APIGateway-setup", "repo_url": "https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/npm_and_yarn-72ef35c8ef is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump @smithy/config-resolver from 4.1.2 to 4.4.17 in the npm_and_yarn group across 1 directory"}], "screenshot_url": "", "generated_at": "2026-06-14T03:52:44.278336Z", "source_commit": "5f7c5cb", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "S3 Presigned URL Lambda API Gateway Setup",
+  "description": "A Serverless Framework template for generating secure, rate-limited S3 presigned upload URLs via API Gateway and Lambda.",
+  "codeRepository": "https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup",
+  "programmingLanguage": [
+    "AWS Lambda",
+    "Amazon S3",
+    "Amazon API Gateway",
+    "Serverless Framework",
+    "Node.js",
+    "Python",
+    "AWS SDK v3",
+    "boto3"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>S3 Presigned URL Lambda API Gateway Setup</h1>
+  <p class="one-liner">A Serverless Framework template for generating secure, rate-limited S3 presigned upload URLs via API Gateway and Lambda.</p>
+  <p><a href="https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup">https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project provides a ready-to-deploy AWS infrastructure template using the Serverless Framework. It creates an HTTP API endpoint secured by API Keys and Usage Plans that triggers a Lambda function to generate presigned PUT URLs for direct S3 uploads. It is designed for secure, serverless file ingestion without exposing S3 credentials to clients.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Generates presigned S3 PUT URLs for direct client uploads</li><li>Secures API endpoints with API Gateway API Keys and Usage Plans</li><li>Enforces rate limiting and quotas via configurable Usage Plans</li><li>Validates file extensions and MIME types in Lambda before signing</li><li>Automates resource provisioning via Serverless Framework</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/S3-presignedURL-Lambda-APIGateway-setup.git
+cd S3-presignedURL-Lambda-APIGateway-setup
+npm install
+sls deploy --stage=dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Client Application] -->|POST /generate-upload-url + API Key| APIGW[API Gateway HTTP API]
+    APIGW -->|Validate API Key & Throttle| UsagePlan[Usage Plan]
+    APIGW -->|Invoke| Lambda[Lambda: urlSigner]
+    Lambda -->|Generate Presigned URL| S3[S3 Bucket]
+    Client -->|PUT File Data| S3
+    Admin[Admin/Script] -->|create_api_key| APIGW_Mgmt[API Gateway Management]
+    APIGW_Mgmt -->|Associate| UsagePlan</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The infrastructure is defined in `serverless.yml`, provisioning an S3 bucket with public access blocked, a Node.js Lambda function (`urlSigner`) using AWS SDK v3, and an HTTP API Gateway with API Key enforcement. A Python utility script (`generate_key.py`) manages API key creation and association with Usage Plans via boto3.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client
+    participant G as API Gateway
+    participant L as Lambda (urlSigner)
+    participant S as S3
+    
+    C->>G: POST /generate-upload-url (x-api-key: KEY)
+    G->>G: Validate API Key & Check Quota
+    G->>L: Invoke Function
+    L->>L: Parse body (fileExt, contentType)
+    L->>L: Validate extension whitelist
+    L->>S: Create PutObjectCommand (dry-run/signing)
+    S-->>L: Return Presigned URL
+    L-->>G: 200 OK { uploadUrl, key }
+    G-->>C: 200 OK { uploadUrl, key }
+    
+    C->>S: PUT file data to Presigned URL
+    S-->>C: 200 OK</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Clone the repository, install Node.js dependencies, configure AWS CLI credentials, and run `sls deploy`. Use the provided Python script to generate API keys for users, then integrate the returned presigned URLs into your client-side upload logic.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Presigned URL Generation</span><span class="tag">API Key Management</span><span class="tag">Rate Limiting</span><span class="tag">Input Validation</span><span class="tag">Serverless Deployment</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Lambda Function (Node.js)</span><span class="tag">API Gateway (HTTP API)</span><span class="tag">S3 Bucket</span><span class="tag">Usage Plan</span><span class="tag">API Key</span><span class="tag">Python Key Generator Script</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">AWS Lambda</span><span class="tag">Amazon S3</span><span class="tag">Amazon API Gateway</span><span class="tag">Serverless Framework</span><span class="tag">Node.js</span><span class="tag">Python</span><span class="tag">AWS SDK v3</span><span class="tag">boto3</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS Account</span><span class="tag">Node.js &gt;=16</span><span class="tag">Python 3</span><span class="tag">Serverless CLI</span><span class="tag">AWS CLI</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS CloudFormation</span><span class="tag">AWS IAM</span><span class="tag">Client-side Uploaders</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Presigned URL Pattern</span><span class="tag">API Key Authentication</span><span class="tag">Serverless Microservice</span><span class="tag">Direct-to-S3 Upload</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">aws</span><span class="tag">serverless</span><span class="tag">s3</span><span class="tag">lambda</span><span class="tag">api-gateway</span><span class="tag">presigned-url</span><span class="tag">template</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/npm_and_yarn-72ef35c8ef is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump @smithy/config-resolver from 4.1.2 to 4.4.17 in the npm_and_yarn group across 1 directory</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:52:44.278336Z ·
+     commit 5f7c5cb ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

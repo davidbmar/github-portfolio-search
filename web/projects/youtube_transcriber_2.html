@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube Phrase Scanner · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "YouTube Phrase Scanner", "one_liner": "A serverless, GPU-accelerated pipeline that downloads YouTube videos, transcribes them with WhisperX, and scans for specific phrases.", "what_it_is": "A distributed system for processing YouTube video content at scale. It uses an SQS queue to manage jobs, AWS S3 for stateful job tracking and result storage, and GPU-enabled workers to perform high-accuracy transcription using WhisperX. The system is designed for resilience, featuring automatic job recovery, segment-level progress tracking, and fallback download mechanisms.", "how_its_built": "The core logic is implemented in Python. It relies on `yt-dlp` (with `PyTubeFix` fallback) for downloading, `ffmpeg` for audio conversion, and `WhisperX` for transcription. State management is handled via a custom `JobTracker` class interacting with AWS S3. The architecture includes a main `worker.py` loop, auxiliary scripts for queue management, and optional AWS Lambda functions for managing RunPod GPU instances.", "how_to_apply": "Deploy the worker script on a GPU-enabled instance (local or cloud). Configure AWS credentials with S3 and SQS permissions. Set environment variables for the target S3 bucket and SQS queue URL. Run the worker to start polling for jobs, and use the helper script to enqueue YouTube URLs for processing.", "quickstart": "git clone https://github.com/davidbmar/youtube_transcriber_2\ncd youtube_transcriber_2\npip install -r requirements.txt\npython worker.py --queue_url YOUR_SQS_QUEUE_URL --s3_bucket YOUR_S3_BUCKET", "features": ["Queue-based processing using AWS SQS for scalable job management", "GPU-accelerated transcription using WhisperX with word-level timestamps", "Resilient download strategy with yt-dlp and PyTubeFix fallbacks", "Self-healing job recovery with segment-level progress tracking in S3", "Automated phrase scanning and statistical analysis of transcripts", "Support for CPU-only mode and containerized deployment via Docker"], "diagram_architecture": "flowchart TD\n    User[User] -->|Enqueue URL| SQS[AWS SQS Queue]\n    SQS -->|Poll| Worker[Worker Instance]\n    Worker -->|Read/Write State| S3[(AWS S3 Bucket)]\n    Worker -->|Download Audio| YT[YouTube]\n    Worker -->|Transcribe| WhisperX[WhisperX Model]\n    Worker -->|Manage GPU| Lambda[AWS Lambda]\n    Lambda -->|API Call| RunPod[RunPod Service]\n    subgraph Storage\n        S3\n    end\n    subgraph Compute\n        Worker\n        WhisperX\n    end", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant Q as SQS Queue\n    participant W as Worker\n    participant S3 as S3 Storage\n    participant DL as Downloader\n    participant TX as Transcriber\n    participant SC as Scanner\n\n    U->>Q: Send YouTube URL\n    loop Polling Interval\n        W->>Q: Receive Message\n        W->>S3: Create Job (queued -> processing)\n        W->>DL: Download Audio (yt-dlp/PyTube)\n        DL-->>W: Return Audio File\n        W->>S3: Update Progress (segment level)\n        W->>TX: Transcribe Segments (WhisperX)\n        TX-->>W: Return Transcript Data\n        W->>SC: Scan for Phrases\n        SC-->>W: Return Results\n        W->>S3: Save Results & Mark Completed\n    end", "capabilities": ["Batch video processing", "Phrase occurrence statistics", "Segment-level resumability", "Spot instance tolerance", "Multi-method video downloading", "JSON result export"], "components": ["worker.py", "job_tracker.py", "downloader.py", "transcriber.py", "scanner.py", "send_to_queue.py", "runpod_manager.py"], "tech": ["Python 3.7+", "WhisperX", "yt-dlp", "ffmpeg", "AWS SQS", "AWS S3", "Boto3", "Docker"], "depends_on": ["AWS Account", "GPU (optional but recommended)", "FFmpeg binary", "RunPod API Key (optional)"], "integrates_with": ["AWS S3", "AWS SQS", "AWS Lambda", "RunPod", "YouTube"], "patterns": ["Worker Queue", "State Machine", "Fallback Strategy", "Serverless Compute", "Event-Driven Architecture"], "reuse_tags": ["video-processing", "transcription", "aws-serverless", "gpu-computing", "data-pipeline", "content-analysis"], "slug": "youtube_transcriber_2", "repo_url": "https://github.com/davidbmar/youtube_transcriber_2", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:12:17.218128Z", "source_commit": "90f9471", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "YouTube Phrase Scanner",
+  "description": "A serverless, GPU-accelerated pipeline that downloads YouTube videos, transcribes them with WhisperX, and scans for specific phrases.",
+  "codeRepository": "https://github.com/davidbmar/youtube_transcriber_2",
+  "programmingLanguage": [
+    "Python 3.7+",
+    "WhisperX",
+    "yt-dlp",
+    "ffmpeg",
+    "AWS SQS",
+    "AWS S3",
+    "Boto3",
+    "Docker"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>YouTube Phrase Scanner</h1>
+  <p class="one-liner">A serverless, GPU-accelerated pipeline that downloads YouTube videos, transcribes them with WhisperX, and scans for specific phrases.</p>
+  <p><a href="https://github.com/davidbmar/youtube_transcriber_2">https://github.com/davidbmar/youtube_transcriber_2</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A distributed system for processing YouTube video content at scale. It uses an SQS queue to manage jobs, AWS S3 for stateful job tracking and result storage, and GPU-enabled workers to perform high-accuracy transcription using WhisperX. The system is designed for resilience, featuring automatic job recovery, segment-level progress tracking, and fallback download mechanisms.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Queue-based processing using AWS SQS for scalable job management</li><li>GPU-accelerated transcription using WhisperX with word-level timestamps</li><li>Resilient download strategy with yt-dlp and PyTubeFix fallbacks</li><li>Self-healing job recovery with segment-level progress tracking in S3</li><li>Automated phrase scanning and statistical analysis of transcripts</li><li>Support for CPU-only mode and containerized deployment via Docker</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/youtube_transcriber_2
+cd youtube_transcriber_2
+pip install -r requirements.txt
+python worker.py --queue_url YOUR_SQS_QUEUE_URL --s3_bucket YOUR_S3_BUCKET</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Enqueue URL| SQS[AWS SQS Queue]
+    SQS -->|Poll| Worker[Worker Instance]
+    Worker -->|Read/Write State| S3[(AWS S3 Bucket)]
+    Worker -->|Download Audio| YT[YouTube]
+    Worker -->|Transcribe| WhisperX[WhisperX Model]
+    Worker -->|Manage GPU| Lambda[AWS Lambda]
+    Lambda -->|API Call| RunPod[RunPod Service]
+    subgraph Storage
+        S3
+    end
+    subgraph Compute
+        Worker
+        WhisperX
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The core logic is implemented in Python. It relies on `yt-dlp` (with `PyTubeFix` fallback) for downloading, `ffmpeg` for audio conversion, and `WhisperX` for transcription. State management is handled via a custom `JobTracker` class interacting with AWS S3. The architecture includes a main `worker.py` loop, auxiliary scripts for queue management, and optional AWS Lambda functions for managing RunPod GPU instances.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant Q as SQS Queue
+    participant W as Worker
+    participant S3 as S3 Storage
+    participant DL as Downloader
+    participant TX as Transcriber
+    participant SC as Scanner
+
+    U->>Q: Send YouTube URL
+    loop Polling Interval
+        W->>Q: Receive Message
+        W->>S3: Create Job (queued -> processing)
+        W->>DL: Download Audio (yt-dlp/PyTube)
+        DL-->>W: Return Audio File
+        W->>S3: Update Progress (segment level)
+        W->>TX: Transcribe Segments (WhisperX)
+        TX-->>W: Return Transcript Data
+        W->>SC: Scan for Phrases
+        SC-->>W: Return Results
+        W->>S3: Save Results & Mark Completed
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the worker script on a GPU-enabled instance (local or cloud). Configure AWS credentials with S3 and SQS permissions. Set environment variables for the target S3 bucket and SQS queue URL. Run the worker to start polling for jobs, and use the helper script to enqueue YouTube URLs for processing.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Batch video processing</span><span class="tag">Phrase occurrence statistics</span><span class="tag">Segment-level resumability</span><span class="tag">Spot instance tolerance</span><span class="tag">Multi-method video downloading</span><span class="tag">JSON result export</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">worker.py</span><span class="tag">job_tracker.py</span><span class="tag">downloader.py</span><span class="tag">transcriber.py</span><span class="tag">scanner.py</span><span class="tag">send_to_queue.py</span><span class="tag">runpod_manager.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.7+</span><span class="tag">WhisperX</span><span class="tag">yt-dlp</span><span class="tag">ffmpeg</span><span class="tag">AWS SQS</span><span class="tag">AWS S3</span><span class="tag">Boto3</span><span class="tag">Docker</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS Account</span><span class="tag">GPU (optional but recommended)</span><span class="tag">FFmpeg binary</span><span class="tag">RunPod API Key (optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3</span><span class="tag">AWS SQS</span><span class="tag">AWS Lambda</span><span class="tag">RunPod</span><span class="tag">YouTube</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Worker Queue</span><span class="tag">State Machine</span><span class="tag">Fallback Strategy</span><span class="tag">Serverless Compute</span><span class="tag">Event-Driven Architecture</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">video-processing</span><span class="tag">transcription</span><span class="tag">aws-serverless</span><span class="tag">gpu-computing</span><span class="tag">data-pipeline</span><span class="tag">content-analysis</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:12:17.218128Z ·
+     commit 90f9471 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speaker Workflow System · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Speaker Workflow System", "one_liner": "A visual editor and runtime engine for declarative, multi-turn conversational workflows defined in JSONL.", "what_it_is": "A vanilla TypeScript application that allows developers to define stateful conversation flows (like transcription or data collection) using a simple JSONL format. It provides a split-pane UI: an interactive graph editor on the left and a linked, color-coded pseudocode view on the right. The system includes a runtime engine that processes user input, manages state transitions, handles intent classification via keywords, and supports features like speech accumulation and template variable resolution.", "how_its_built": "Built with Vite and TypeScript using pure DOM manipulation (no frontend framework). The architecture separates concerns into a workflow engine (state machine), intent classifier (keyword-based), visual map renderer (SVG connectors), code view generator (pseudocode), and editor modules (node/arrow editing). State is managed via a central app context with a callback bag pattern to avoid circular dependencies between UI components and the engine.", "how_to_apply": "Use this system to prototype and debug complex multi-turn dialogues without writing imperative code. Define your flow in `data/workflows.jsonl`, visualize it in the browser, test interactions in real-time, and export the JSONL definition for integration into larger voice or chat applications. It serves as a reference implementation for declarative state machines and bidirectional UI-code linking.", "quickstart": "npm install\nnpm run dev", "features": ["Visual graph editor with interactive node/arrow editing and auto-wiring", "Bidirectional highlighting between graph nodes and pseudocode lines", "Declarative JSONL format for defining states, transitions, and handlers", "Runtime engine with keyword-based intent classification and template variables", "Graph-aware rendering with shared state links and SVG tree connectors", "Interactive testing panel for simulating multi-turn conversations"], "diagram_architecture": "flowchart TD\n    User[User] -->|Input Text/Voice| UI[demo.ts UI Layer]\n    UI -->|Classify Intent| IC[intentClassifier.ts]\n    UI -->|Trigger Action| WM[workflow.ts Engine]\n    WM -->|Load Def| JSONL[data/workflows.jsonl]\n    WM -->|Execute Handler| WH[workflowHandlers.ts]\n    WM -->|Update State| UI\n    UI -->|Render Graph| WMap[workflowMap.ts]\n    UI -->|Render Code| CView[codeView.ts]\n    WMap -->|Click Node| NE[nodeEditor.ts]\n    CView -->|Click Line| NE\n    NE -->|Update Def| WM", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant UI as demo.ts\n    participant IC as intentClassifier.ts\n    participant WF as workflow.ts\n    participant WH as workflowHandlers.ts\n    \n    U->>UI: Types/Speaks Input\n    UI->>IC: classifyIntent(input)\n    IC-->>UI: { intent, score }\n    UI->>WF: processAction(intent)\n    WF->>WF: Resolve Current State\n    WF->>WF: Check Transitions\n    alt Has Handler\n        WF->>WH: executeHandler(state.handler, input)\n        WH-->>WF: Updated Context\n    end\n    WF->>WF: Determine Next State\n    WF-->>UI: { message, nextState, context }\n    UI->>U: Display Message & Update Graph Highlight", "capabilities": ["Declarative workflow definition", "Visual state machine editing", "Real-time conversation simulation", "Keyword-based intent recognition", "Bidirectional code-graph linking", "Template variable resolution", "Speech text accumulation", "Exit phrase handling"], "components": ["workflow.ts (Engine)", "demo.ts (Orchestrator/UI)", "workflowMap.ts (Graph Renderer)", "codeView.ts (Pseudocode Generator)", "intentClassifier.ts (Intent Logic)", "nodeEditor.ts (State Editor)", "arrowEditor.ts (Transition Editor)", "addStateEditor.ts (New State Wizard)"], "tech": ["TypeScript", "Vite", "Vitest", "Vanilla DOM API", "SVG", "JSONL"], "depends_on": [], "integrates_with": ["Web Speech API (via speechRecognition.ts)", "Browser DOM"], "patterns": ["State Machine", "Callback Bag", "Declarative Configuration", "Observer Pattern (implicit via DOM events)", "Module Pattern"], "reuse_tags": ["conversational-ui", "state-machine", "visual-editor", "typescript", "vanilla-js", "workflow-engine", "jsonl", "intent-classification"], "slug": "speaker-workflow-system", "repo_url": "https://github.com/davidbmar/speaker-workflow-system", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/npm_and_yarn-9c2c3d55e5 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 4 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/speaker-workflow-system/main/docs/screenshots/code-view-default.png", "generated_at": "2026-06-14T03:55:44.403812Z", "source_commit": "688964c", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Speaker Workflow System",
+  "description": "A visual editor and runtime engine for declarative, multi-turn conversational workflows defined in JSONL.",
+  "codeRepository": "https://github.com/davidbmar/speaker-workflow-system",
+  "programmingLanguage": [
+    "TypeScript",
+    "Vite",
+    "Vitest",
+    "Vanilla DOM API",
+    "SVG",
+    "JSONL"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Speaker Workflow System</h1>
+  <p class="one-liner">A visual editor and runtime engine for declarative, multi-turn conversational workflows defined in JSONL.</p>
+  <p><a href="https://github.com/davidbmar/speaker-workflow-system">https://github.com/davidbmar/speaker-workflow-system</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/speaker-workflow-system/main/docs/screenshots/code-view-default.png" alt="Speaker Workflow System screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A vanilla TypeScript application that allows developers to define stateful conversation flows (like transcription or data collection) using a simple JSONL format. It provides a split-pane UI: an interactive graph editor on the left and a linked, color-coded pseudocode view on the right. The system includes a runtime engine that processes user input, manages state transitions, handles intent classification via keywords, and supports features like speech accumulation and template variable resolution.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Visual graph editor with interactive node/arrow editing and auto-wiring</li><li>Bidirectional highlighting between graph nodes and pseudocode lines</li><li>Declarative JSONL format for defining states, transitions, and handlers</li><li>Runtime engine with keyword-based intent classification and template variables</li><li>Graph-aware rendering with shared state links and SVG tree connectors</li><li>Interactive testing panel for simulating multi-turn conversations</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">npm install
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Input Text/Voice| UI[demo.ts UI Layer]
+    UI -->|Classify Intent| IC[intentClassifier.ts]
+    UI -->|Trigger Action| WM[workflow.ts Engine]
+    WM -->|Load Def| JSONL[data/workflows.jsonl]
+    WM -->|Execute Handler| WH[workflowHandlers.ts]
+    WM -->|Update State| UI
+    UI -->|Render Graph| WMap[workflowMap.ts]
+    UI -->|Render Code| CView[codeView.ts]
+    WMap -->|Click Node| NE[nodeEditor.ts]
+    CView -->|Click Line| NE
+    NE -->|Update Def| WM</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with Vite and TypeScript using pure DOM manipulation (no frontend framework). The architecture separates concerns into a workflow engine (state machine), intent classifier (keyword-based), visual map renderer (SVG connectors), code view generator (pseudocode), and editor modules (node/arrow editing). State is managed via a central app context with a callback bag pattern to avoid circular dependencies between UI components and the engine.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant UI as demo.ts
+    participant IC as intentClassifier.ts
+    participant WF as workflow.ts
+    participant WH as workflowHandlers.ts
+    
+    U->>UI: Types/Speaks Input
+    UI->>IC: classifyIntent(input)
+    IC-->>UI: { intent, score }
+    UI->>WF: processAction(intent)
+    WF->>WF: Resolve Current State
+    WF->>WF: Check Transitions
+    alt Has Handler
+        WF->>WH: executeHandler(state.handler, input)
+        WH-->>WF: Updated Context
+    end
+    WF->>WF: Determine Next State
+    WF-->>UI: { message, nextState, context }
+    UI->>U: Display Message & Update Graph Highlight</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this system to prototype and debug complex multi-turn dialogues without writing imperative code. Define your flow in `data/workflows.jsonl`, visualize it in the browser, test interactions in real-time, and export the JSONL definition for integration into larger voice or chat applications. It serves as a reference implementation for declarative state machines and bidirectional UI-code linking.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Declarative workflow definition</span><span class="tag">Visual state machine editing</span><span class="tag">Real-time conversation simulation</span><span class="tag">Keyword-based intent recognition</span><span class="tag">Bidirectional code-graph linking</span><span class="tag">Template variable resolution</span><span class="tag">Speech text accumulation</span><span class="tag">Exit phrase handling</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">workflow.ts (Engine)</span><span class="tag">demo.ts (Orchestrator/UI)</span><span class="tag">workflowMap.ts (Graph Renderer)</span><span class="tag">codeView.ts (Pseudocode Generator)</span><span class="tag">intentClassifier.ts (Intent Logic)</span><span class="tag">nodeEditor.ts (State Editor)</span><span class="tag">arrowEditor.ts (Transition Editor)</span><span class="tag">addStateEditor.ts (New State Wizard)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">Vite</span><span class="tag">Vitest</span><span class="tag">Vanilla DOM API</span><span class="tag">SVG</span><span class="tag">JSONL</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="muted">—</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Web Speech API (via speechRecognition.ts)</span><span class="tag">Browser DOM</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">State Machine</span><span class="tag">Callback Bag</span><span class="tag">Declarative Configuration</span><span class="tag">Observer Pattern (implicit via DOM events)</span><span class="tag">Module Pattern</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">conversational-ui</span><span class="tag">state-machine</span><span class="tag">visual-editor</span><span class="tag">typescript</span><span class="tag">vanilla-js</span><span class="tag">workflow-engine</span><span class="tag">jsonl</span><span class="tag">intent-classification</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/npm_and_yarn-9c2c3d55e5 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 4 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:55:44.403812Z ·
+     commit 688964c ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

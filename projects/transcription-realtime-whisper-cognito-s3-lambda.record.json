@@ -1,0 +1,98 @@
+{
+  "title": "CloudDrive: Real-Time Transcription Platform",
+  "one_liner": "A production-ready SaaS for real-time speech-to-text using WhisperLive, AWS Cognito, and serverless backend.",
+  "what_it_is": "CloudDrive is a full-stack web application that provides real-time audio transcription via WebSocket-connected GPU instances running WhisperLive. It features a vanilla JavaScript frontend hosted on S3/CloudFront, authenticated by AWS Cognito, with batch processing capabilities via Node.js Lambda functions. The system supports offline recording with IndexedDB retry queues and includes a transcript editor with word-level highlighting.",
+  "how_its_built": "The frontend is built with vanilla HTML/JS, using the MediaRecorder API and WebSockets. The backend uses the Serverless Framework to deploy Node.js 18.x Lambda functions behind API Gateway. Infrastructure includes an Edge Box (Caddy reverse proxy) and a GPU instance (g4dn.xlarge) for WhisperLive. Deployment is automated via Bash scripts handling AWS CLI, CloudFormation, and instance configuration.",
+  "how_to_apply": "Use this project as a reference architecture for building low-latency AI-powered media services on AWS. It demonstrates how to bridge browser-based media capture with high-performance GPU inference endpoints while maintaining secure, serverless storage and authentication patterns. The template-based UI deployment strategy is also reusable for static sites requiring environment-specific configuration injection.",
+  "quickstart": "./scripts/005-setup-configuration.sh\n./scripts/010-setup-edge-box.sh\n./scripts/305-setup-whisperlive-edge.sh\n./scripts/020-deploy-gpu-instance.sh\n./scripts/310-configure-whisperlive-gpu.sh\n./scripts/030-configure-gpu-security.sh\n./scripts/031-configure-edge-box-security.sh\n./scripts/420-deploy-cognito-stack.sh\n./scripts/425-deploy-recorder-ui.sh\n./scripts/430-create-cognito-user.sh",
+  "features": [
+    "Real-time transcription via WhisperLive over WebSockets",
+    "Batch transcription for uploaded audio files",
+    "Secure authentication and user management via AWS Cognito",
+    "Offline-first recording with IndexedDB and automatic retry",
+    "Interactive transcript editor with word-level highlighting",
+    "Automated infrastructure deployment via Bash scripts"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[Browser Client] -->|WSS| Edge[Caddy Edge Box]\n    User -->|HTTPS| CF[CloudFront CDN]\n    Edge -->|TCP:9090| GPU[GPU Instance: WhisperLive]\n    CF -->|Static Assets| S3[S3 Bucket]\n    CF -->|API Requests| AGW[API Gateway]\n    AGW -->|Auth| Cognito[AWS Cognito]\n    AGW -->|Invoke| Lambda[AWS Lambda Node.js]\n    Lambda -->|Read/Write| S3\n    Lambda -->|Trigger| Batch[Batch Transcription]",
+  "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant Caddy as Edge Box (Caddy)\n    participant Whisper as WhisperLive (GPU)\n    participant S3\n    participant Lambda\n    \n    Browser->>Caddy: WebSocket Connect /transcribe\n    Caddy->>Whisper: Forward Audio Stream\n    Whisper-->>Caddy: Real-time Text Chunks\n    Caddy-->>Browser: Return Transcribed Text\n    \n    Note over Browser,S3: Session End / Batch Upload\n    Browser->>S3: Upload Audio File (via Presigned URL)\n    S3-->>Browser: Confirm Upload\n    Browser->>Lambda: Trigger Batch Transcription\n    Lambda->>Whisper: Submit Audio for Processing\n    Whisper-->>Lambda: Final Transcript\n    Lambda->>S3: Store Transcript JSON",
+  "capabilities": [
+    "Real-time Speech-to-Text",
+    "Batch Audio Processing",
+    "Offline Data Persistence",
+    "Secure User Authentication",
+    "Cloud Storage Integration",
+    "Automated Infrastructure Provisioning"
+  ],
+  "components": [
+    "Vanilla JS Frontend",
+    "Caddy Reverse Proxy",
+    "WhisperLive Inference Engine",
+    "AWS Lambda Functions",
+    "Serverless Framework Config",
+    "Bash Deployment Scripts"
+  ],
+  "tech": [
+    "HTML5",
+    "JavaScript",
+    "Node.js 18.x",
+    "AWS Lambda",
+    "Amazon S3",
+    "Amazon CloudFront",
+    "Amazon Cognito",
+    "WhisperLive",
+    "Faster-Whisper",
+    "Caddy",
+    "Serverless Framework",
+    "Playwright"
+  ],
+  "depends_on": [
+    "AWS CLI",
+    "Node.js 18+",
+    "Bash Shell",
+    "SSH Key Pair",
+    "GPU Instance (g4dn.xlarge)"
+  ],
+  "integrates_with": [
+    "AWS Cognito",
+    "Amazon S3",
+    "Amazon CloudFront",
+    "Google Docs (via API)",
+    "IndexedDB"
+  ],
+  "patterns": [
+    "Serverless Backend",
+    "Edge Computing",
+    "WebSocket Streaming",
+    "Offline-First Architecture",
+    "Infrastructure as Code (Scripts)",
+    "Template-Based UI Deployment"
+  ],
+  "reuse_tags": [
+    "real-time-transcription",
+    "aws-serverless",
+    "whisper-live",
+    "cognito-auth",
+    "gpu-inference",
+    "vanilla-js",
+    "saas-template"
+  ],
+  "slug": "transcription-realtime-whisper-cognito-s3-lambda",
+  "repo_url": "https://github.com/davidbmar/transcription-realtime-whisper-cognito-s3-lambda",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/cognito-stack/npm_and_yarn-e9ce4f7be9 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: chore(deps): Bump uuid from 9.0.1 to 14.0.0 in /cognito-stack in the npm_and_yarn group across 1 directory"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:04:49.819745Z",
+  "source_commit": "82b0f51",
+  "model": "qwen3.7-plus"
+}

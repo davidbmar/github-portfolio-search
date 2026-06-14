@@ -1,0 +1,88 @@
+{
+  "title": "Voice Print",
+  "one_liner": "Real-time speaker diarization and voice fingerprinting system using multiple embedding models.",
+  "what_it_is": "A full-stack application that identifies who is speaking in live audio streams or recorded files. It combines browser-native Whisper transcription (via WebGPU/WASM) with a Python backend for speaker embedding extraction and incremental clustering, allowing users to benchmark different AI models side-by-side without sending audio to external cloud APIs.",
+  "how_its_built": "The frontend uses vanilla HTML/JS with AudioWorklets for low-latency microphone capture and WebSocket binary frames for streaming. The backend is a FastAPI server managing a ring buffer, Faster Whisper for transcription, and a registry of five speaker embedding models (WeSpeaker, CAM++, Resemblyzer, SpeechBrain ECAPA, Pyannote). Clustering is performed incrementally using cosine similarity against speaker centroids.",
+  "how_to_apply": "Use this project as a reference for building real-time audio analysis pipelines. It demonstrates how to handle binary WebSocket streams, implement lazy-loading model registries in Python, perform incremental clustering without pre-defined speaker counts, and run heavy inference tasks (Whisper) entirely in the browser to reduce server load.",
+  "quickstart": "git clone https://github.com/davidbmar/voice-print.git\ncd voice-print\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -r backend/requirements.txt\nbash scripts/serve.sh",
+  "features": [
+    "Real-time live microphone streaming with per-sentence speaker labels",
+    "Supports 5 embedding models: WeSpeaker, CAM++, Resemblyzer, SpeechBrain, Pyannote",
+    "Offline browser-native Whisper transcription via WebGPU/WASM",
+    "Side-by-side model benchmarking and comparison tool",
+    "Incremental cosine-similarity clustering with centroid anchoring",
+    "Per-sentence audio replay from the transcript interface"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph Client [Browser]\n        Mic[Microphone Input]\n        AW[AudioWorklet]\n        UI[Frontend UI]\n        Whisper[Whisper WASM/WebGPU]\n    end\n    subgraph Server [FastAPI Backend]\n        WS[WebSocket Handler]\n        RB[Ring Buffer 30s]\n        SBD[Sentence Boundary Detection]\n        Emb[Embedding Extractor]\n        Cluster[Speaker Clusterer]\n        ModelReg[Model Registry]\n    end\n    Mic -->|16kHz PCM| AW\n    AW -->|Binary Frames| WS\n    WS --> RB\n    RB --> SBD\n    SBD -->|Audio Segment| Emb\n    Emb -->|Load Model| ModelReg\n    Emb -->|Vector| Cluster\n    Cluster -->|Speaker ID| WS\n    WS -->|JSON Label| UI\n    UI -->|Click Replay| Whisper",
+  "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant AudioWorklet\n    participant FastAPI\n    participant RingBuffer\n    participant Embedder\n    participant Clusterer\n    Browser->>AudioWorklet: Start Mic Capture\n    loop Every 100ms\n        AudioWorklet->>FastAPI: Send Binary PCM Chunk (WS)\n        FastAPI->>RingBuffer: Append Audio Data\n        RingBuffer->>FastAPI: Check Sentence Boundary\n        alt Sentence Complete\n            FastAPI->>Embedder: Extract Audio Segment\n            Embedder->>Embedder: Compute Fbank/Features\n            Embedder->>Embedder: Run ONNX/PyTorch Model\n            Embedder->>Clusterer: Return Embedding Vector\n            Clusterer->>Clusterer: Cosine Similarity Check\n            Clusterer->>FastAPI: Assign Speaker ID\n            FastAPI->>Browser: JSON {text, speaker_id}\n        end\n    end",
+  "capabilities": [
+    "Real-time audio streaming",
+    "Speaker diarization",
+    "Voice fingerprinting",
+    "Offline transcription",
+    "Model benchmarking",
+    "Incremental clustering"
+  ],
+  "components": [
+    "FastAPI Backend",
+    "AudioWorklet Frontend",
+    "Speaker Clusterer",
+    "Model Registry",
+    "Ring Buffer",
+    "Whisper WASM"
+  ],
+  "tech": [
+    "Python 3.11+",
+    "FastAPI",
+    "WebSockets",
+    "ONNX Runtime",
+    "PyTorch",
+    "WebGPU",
+    "WebAssembly",
+    "NumPy",
+    "SciPy"
+  ],
+  "depends_on": [
+    "faster-whisper",
+    "onnxruntime",
+    "torch",
+    "scipy",
+    "numpy",
+    "kaldi-native-fbank",
+    "pyannote.audio",
+    "speechbrain",
+    "resemblyzer"
+  ],
+  "integrates_with": [
+    "Hugging Face Models",
+    "Browser Microphone API",
+    "Local File System"
+  ],
+  "patterns": [
+    "Lazy Loading",
+    "Producer-Consumer",
+    "Strategy Pattern (Models)",
+    "Incremental Clustering",
+    "Client-Side Inference"
+  ],
+  "reuse_tags": [
+    "audio-processing",
+    "speaker-diarization",
+    "real-time-streaming",
+    "machine-learning",
+    "websockets",
+    "fastapi",
+    "onnx",
+    "voice-id"
+  ],
+  "slug": "voice-print",
+  "repo_url": "https://github.com/davidbmar/voice-print",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/voice-print/main/frontend/screenshots/stream-transcript.png",
+  "generated_at": "2026-06-14T04:09:02.755182Z",
+  "source_commit": "7902b9e",
+  "model": "qwen3.7-plus"
+}

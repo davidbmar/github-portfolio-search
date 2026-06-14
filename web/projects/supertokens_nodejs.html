@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SuperTokens Passwordless Node.js Demo · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "SuperTokens Passwordless Node.js Demo", "one_liner": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.", "what_it_is": "This project is a reference implementation of passwordless authentication. It replaces traditional passwords with time-limited, single-use magic links sent to the user's email. The system consists of a static HTML frontend for inputting emails and verifying tokens, an Express.js backend handling session management and SuperTokens integration, and a SuperTokens Core instance running in Docker with PostgreSQL for persistent storage.", "how_its_built": "The backend uses the `supertokens-node` SDK with Express middleware to handle auth routes. The SuperTokens Core (v9.3.0) runs in a Docker container alongside PostgreSQL. The frontend is a static site served via `npx serve`, interacting with the backend API. Magic links are logged to the server console instead of being sent via SMTP for demonstration purposes.", "how_to_apply": "Use this as a starting point for integrating passwordless login into Node.js applications. Replace the console-based email delivery with a real SMTP provider (e.g., SendGrid, AWS SES) by modifying the `emailDelivery` override in `server.js`. Customize `appInfo.js` with your production domains.", "quickstart": "docker-compose up -d\nnpm start\nnpx serve -s .", "features": ["Passwordless login via email magic links", "Single-use, time-limited authentication tokens (15 min expiry)", "Session management with HTTP-only cookies", "Dockerized SuperTokens Core and PostgreSQL setup", "Express.js backend with CORS configuration", "Static frontend with login and dashboard views"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| Frontend[Static Frontend :3000]\n    Frontend -->|API Call| Backend[Node.js/Express Server :3001]\n    Backend -->|Auth Logic| ST_SDK[supertokens-node SDK]\n    ST_SDK -->|HTTP API| Core[SuperTokens Core :3567]\n    Core -->|Read/Write| DB[(PostgreSQL :5432)]\n    Backend -->|Log Link| Console[Server Console]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as Frontend (:3000)\n    participant B as Backend (:3001)\n    participant S as SuperTokens Core\n    participant D as PostgreSQL\n\n    U->>F: Enter Email & Click Send\n    F->>B: POST /auth/signinup/code\n    B->>S: Create Code (Email)\n    S->>D: Store Code & Hash\n    S-->>B: Return PreAuthSessionID\n    B-->>F: Success Response\n    B->>B: Log Magic Link to Console\n\n    U->>U: Copy Link from Console\n    U->>F: Open Magic Link\n    F->>B: GET /auth/signinup/code/consume\n    B->>S: Consume Code\n    S->>D: Validate & Delete Code\n    S-->>B: Return Session Tokens\n    B-->>F: Set Session Cookie & Redirect\n    F->>U: Show Dashboard", "capabilities": ["Passwordless Authentication", "Session Management", "Magic Link Generation", "Token Verification", "CORS Handling"], "components": ["Express.js Server", "SuperTokens Node SDK", "SuperTokens Core (Docker)", "PostgreSQL Database", "Static HTML Frontend"], "tech": ["Node.js", "Express", "SuperTokens", "Docker", "PostgreSQL", "HTML/CSS/JS"], "depends_on": ["Node.js 14+", "Docker", "Docker Compose", "npx"], "integrates_with": ["SMTP Providers (via override)", "Any Static Host", "PostgreSQL Compatible DBs"], "patterns": ["Middleware Pattern", "Dependency Injection (SDK Init)", "Override Pattern (Email Delivery)", "Single-Use Token"], "reuse_tags": ["authentication", "passwordless", "nodejs", "supertokens", "docker", "prototype"], "slug": "supertokens_nodejs", "repo_url": "https://github.com/davidbmar/supertokens_nodejs", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:57:35.162023Z", "source_commit": "a19b8d6", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "SuperTokens Passwordless Node.js Demo",
+  "description": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.",
+  "codeRepository": "https://github.com/davidbmar/supertokens_nodejs",
+  "programmingLanguage": [
+    "Node.js",
+    "Express",
+    "SuperTokens",
+    "Docker",
+    "PostgreSQL",
+    "HTML/CSS/JS"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SuperTokens Passwordless Node.js Demo</h1>
+  <p class="one-liner">A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.</p>
+  <p><a href="https://github.com/davidbmar/supertokens_nodejs">https://github.com/davidbmar/supertokens_nodejs</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project is a reference implementation of passwordless authentication. It replaces traditional passwords with time-limited, single-use magic links sent to the user&#x27;s email. The system consists of a static HTML frontend for inputting emails and verifying tokens, an Express.js backend handling session management and SuperTokens integration, and a SuperTokens Core instance running in Docker with PostgreSQL for persistent storage.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Passwordless login via email magic links</li><li>Single-use, time-limited authentication tokens (15 min expiry)</li><li>Session management with HTTP-only cookies</li><li>Dockerized SuperTokens Core and PostgreSQL setup</li><li>Express.js backend with CORS configuration</li><li>Static frontend with login and dashboard views</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">docker-compose up -d
+npm start
+npx serve -s .</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|HTTP Request| Frontend[Static Frontend :3000]
+    Frontend -->|API Call| Backend[Node.js/Express Server :3001]
+    Backend -->|Auth Logic| ST_SDK[supertokens-node SDK]
+    ST_SDK -->|HTTP API| Core[SuperTokens Core :3567]
+    Core -->|Read/Write| DB[(PostgreSQL :5432)]
+    Backend -->|Log Link| Console[Server Console]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend uses the `supertokens-node` SDK with Express middleware to handle auth routes. The SuperTokens Core (v9.3.0) runs in a Docker container alongside PostgreSQL. The frontend is a static site served via `npx serve`, interacting with the backend API. Magic links are logged to the server console instead of being sent via SMTP for demonstration purposes.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant F as Frontend (:3000)
+    participant B as Backend (:3001)
+    participant S as SuperTokens Core
+    participant D as PostgreSQL
+
+    U->>F: Enter Email & Click Send
+    F->>B: POST /auth/signinup/code
+    B->>S: Create Code (Email)
+    S->>D: Store Code & Hash
+    S-->>B: Return PreAuthSessionID
+    B-->>F: Success Response
+    B->>B: Log Magic Link to Console
+
+    U->>U: Copy Link from Console
+    U->>F: Open Magic Link
+    F->>B: GET /auth/signinup/code/consume
+    B->>S: Consume Code
+    S->>D: Validate & Delete Code
+    S-->>B: Return Session Tokens
+    B-->>F: Set Session Cookie & Redirect
+    F->>U: Show Dashboard</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this as a starting point for integrating passwordless login into Node.js applications. Replace the console-based email delivery with a real SMTP provider (e.g., SendGrid, AWS SES) by modifying the `emailDelivery` override in `server.js`. Customize `appInfo.js` with your production domains.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Passwordless Authentication</span><span class="tag">Session Management</span><span class="tag">Magic Link Generation</span><span class="tag">Token Verification</span><span class="tag">CORS Handling</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Express.js Server</span><span class="tag">SuperTokens Node SDK</span><span class="tag">SuperTokens Core (Docker)</span><span class="tag">PostgreSQL Database</span><span class="tag">Static HTML Frontend</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">SuperTokens</span><span class="tag">Docker</span><span class="tag">PostgreSQL</span><span class="tag">HTML/CSS/JS</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js 14+</span><span class="tag">Docker</span><span class="tag">Docker Compose</span><span class="tag">npx</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">SMTP Providers (via override)</span><span class="tag">Any Static Host</span><span class="tag">PostgreSQL Compatible DBs</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Middleware Pattern</span><span class="tag">Dependency Injection (SDK Init)</span><span class="tag">Override Pattern (Email Delivery)</span><span class="tag">Single-Use Token</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">authentication</span><span class="tag">passwordless</span><span class="tag">nodejs</span><span class="tag">supertokens</span><span class="tag">docker</span><span class="tag">prototype</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:57:35.162023Z ·
+     commit a19b8d6 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

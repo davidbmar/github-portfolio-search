@@ -1,0 +1,87 @@
+{
+  "title": "phone-agent-scheduler",
+  "one_liner": "A real-time voice AI agent for trades businesses that handles phone calls, checks Google Calendar availability, and books appointments using a deterministic FSM and LLM safety nets.",
+  "what_it_is": "An open-source Python application that acts as an automated receptionist for service businesses (plumbers, electricians, HVAC). It integrates with Telnyx for real-time voice communication, uses local STT/TTS for low-latency responses, and employs a hybrid architecture combining a deterministic Finite State Machine (FSM) for booking logic with LLMs (Sonnet/Gemini) for natural language understanding. It features a 'Flowstate' shim with 8-layer safety nets to prevent hallucinations and ensure brand compliance during customer interactions.",
+  "how_its_built": "Built with Python and Flask, leveraging the `voiceos` kernel for session management and event handling. It uses a two-agent architecture: one for intent detection and conversation flow, and another for tool execution (Google Calendar API via OAuth). The system enforces business rules through a 13-state FSM for scheduling and a declarative YAML-based 'Flowstate' engine for other assistant types. Security is handled via Bearer token authentication and webhook signature verification.",
+  "how_to_apply": "Deploy on a server with persistent storage for call logs and callback queues. Configure environment variables for Telnyx API keys, Google Calendar OAuth credentials, and Anthropic/Gemini API keys. Use the provided `scripts/tour.py` for initial setup and validation. Integrate with existing business phone numbers via Telnyx DID configuration pointing to the server's WebSocket endpoint.",
+  "quickstart": "python3 scripts/tour.py",
+  "features": [
+    "Real-time voice pipeline via Telnyx WebSocket with sub-3-second response times",
+    "Two-phase commit booking requiring verbal confirmation before calendar writes",
+    "Deterministic 13-state FSM for structured appointment scheduling and business hour enforcement",
+    "Flowstate shim with 19 declarative YAML assistants and 8-layer LLM safety net",
+    "Web UI for chat testing, model switching, and latency monitoring",
+    "After-hours callback queue with JSONL persistence and automated follow-up scheduling"
+  ],
+  "diagram_architecture": "flowchart TD\n    Caller((Caller)) -->|Voice Stream| Telnyx[Telnyx Voice API]\n    Telnyx -->|WebSocket| Server[Phone Agent Server]\n    subgraph Server_Process\n        direction TB\n        Auth[Auth Middleware] --> Router[Request Router]\n        Router -->|Chat/UI| WebUI[Flask Web UI]\n        Router -->|Voice Session| FSM[FSM Engine]\n        FSM -->|Intent Detection| LLM_Intent[LLM Intent Detector]\n        FSM -->|Tool Execution| Tools[Tool Registry]\n        Tools -->|Read/Write| GCal[Google Calendar API]\n        FSM -->|Safety Net| Shim[Flowstate Shim]\n        Shim -->|Delegate| LLM_Core[Core LLM Sonnet/Gemini]\n    end\n    Server -->|Callbacks| Queue[Callback Queue JSONL]\n    Server -->|Logs| CallLog[Call Log]",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Caller\n    participant T as Telnyx\n    participant S as Server (FSM)\n    participant L as LLM (Sonnet)\n    participant G as Google Calendar\n    \n    C->>T: Speaks request\n    T->>S: WebSocket Audio Frame\n    S->>S: STT Processing\n    S->>L: Detect Intent & Extract Entities\n    L-->>S: Intent: Book Appointment\n    S->>S: Check Business Hours & Buffer\n    S->>G: Find Available Slots\n    G-->>S: Return Slots\n    S->>L: Generate Proposal Response\n    L-->>S: Natural Language Proposal\n    S->>T: TTS Audio Response\n    T->>C: Plays Response\n    C->>T: Confirms Booking\n    T->>S: WebSocket Audio Frame\n    S->>S: Two-Phase Commit Verification\n    S->>G: Create Event\n    G-->>S: Event ID\n    S->>S: Log Call & Send SMS Confirmation",
+  "capabilities": [
+    "Real-time voice interaction",
+    "Natural language intent detection",
+    "Google Calendar integration",
+    "Deterministic state management",
+    "After-hours message taking",
+    "Automated SMS notifications",
+    "Web-based administration UI",
+    "LLM safety and brand guarding"
+  ],
+  "components": [
+    "fsm_server.py",
+    "phone_agent/flowstate_shim.py",
+    "phone_agent/business_hours.py",
+    "phone_agent/after_hours.py",
+    "tools/calendar_tools.py",
+    "scripts/tour.py",
+    "scripts/demo_all.py"
+  ],
+  "tech": [
+    "Python",
+    "Flask",
+    "Telnyx API",
+    "Google Calendar API",
+    "Anthropic Sonnet",
+    "Gemini",
+    "WebSockets",
+    "JSONL"
+  ],
+  "depends_on": [
+    "voiceos kernel",
+    "flowstate engine",
+    "FSM-generic",
+    "OAuth2 Credentials",
+    "Telnyx Account"
+  ],
+  "integrates_with": [
+    "Telnyx Voice",
+    "Google Calendar",
+    "SMS Gateway",
+    "Web Browser UI"
+  ],
+  "patterns": [
+    "Finite State Machine",
+    "Two-Phase Commit",
+    "Decorator Pattern (Auth)",
+    "Observer Pattern (Event Bus)",
+    "Shim Pattern (Safety Net)",
+    "Declarative Configuration (YAML)"
+  ],
+  "reuse_tags": [
+    "voice-ai",
+    "scheduling-agent",
+    "calendar-integration",
+    "fsm-workflow",
+    "llm-safety",
+    "trades-business",
+    "real-time-communication"
+  ],
+  "slug": "phone-agent-scheduler",
+  "repo_url": "https://github.com/davidbmar/phone-agent-scheduler",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:48:28.682788Z",
+  "source_commit": "dc3d5f9",
+  "model": "qwen3.7-plus"
+}

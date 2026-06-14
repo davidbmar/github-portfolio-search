@@ -1,0 +1,76 @@
+{
+  "title": "phone-agent-keiko-tv",
+  "one_liner": "A Python-based AI phone agent for keiko.tv that handles customer service calls, manages contacts via SQLite, and integrates with FSM-generic for state-driven scheduling.",
+  "what_it_is": "This project implements an automated phone customer service agent. It combines a Python backend for call logic and contact management with a lightweight web interface. The system normalizes caller IDs, stores lead information in a local SQLite database, and uses an FSM (Finite State Machine) bridge to handle complex conversational states like scheduling, falling back to basic LLM responses if the FSM service is unavailable.",
+  "how_its_built": "The core logic is written in Python, utilizing `sqlite3` for persistent contact storage and `httpx` for asynchronous HTTP communication with external AI/FSM services. The entry point is a standard Python module (`__main__.py`) that launches a server. A minimal JavaScript snippet handles frontend authentication visibility. The architecture separates concerns into contact management (`contacts.py`), conversation bridging (`fsm_bridge.py`), and server orchestration.",
+  "how_to_apply": "Deploy this as a backend service for handling inbound customer support calls. Use it to automatically capture lead details, normalize phone numbers for CRM consistency, and manage appointment scheduling conversations without human intervention. It is suitable for small-to-medium businesses needing 24/7 initial triage.",
+  "quickstart": "pip install -e .\npython -m phone_agent",
+  "features": [
+    "Automated inbound call handling with AI-driven conversation logic",
+    "SQLite-backed contact database for caller ID lookup and lead capture",
+    "Phone number normalization for consistent North American formatting",
+    "Integration with FSM-generic for state-aware scheduling and tool use",
+    "Real-time web UI for monitoring agent status and interactions",
+    "Graceful fallback mechanisms when external FSM services are unavailable"
+  ],
+  "diagram_architecture": "flowchart TD\n    Caller[Inbound Call] --> Telephony[Telephony Gateway]\n    Telephony --> Server[Python Server]\n    Server --> ContactsDB[(SQLite Contacts DB)]\n    Server --> FSMBridge[FSM Bridge]\n    FSMBridge --> FSMGeneric[FSM-Generic Service]\n    FSMBridge --> LLM[Fallback LLM]\n    Server --> WebUI[Real-time Web UI]\n    Admin[Admin User] --> WebUI",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Caller\n    participant S as Phone Agent Server\n    participant DB as Contacts DB\n    participant B as FSM Bridge\n    participant F as FSM-Generic\n    \n    C->>S: Initiate Call\n    S->>DB: Lookup/Normalize Phone Number\n    DB-->>S: Return Contact Info\n    S->>B: Process Conversation Input\n    alt FSM Available\n        B->>F: Send State/Context\n        F-->>B: Return Action/Response\n    else FSM Unavailable\n        B->>B: Fallback to Basic LLM\n    end\n    B-->>S: Return Spoken Response\n    S->>C: Play Audio Response\n    S->>DB: Update Lead Status/Notes",
+  "capabilities": [
+    "Caller ID resolution",
+    "Lead data persistence",
+    "Conversational state management",
+    "Appointment scheduling",
+    "Real-time status monitoring"
+  ],
+  "components": [
+    "phone_agent.server",
+    "phone_agent.contacts",
+    "phone_agent.fsm_bridge",
+    "auth.js"
+  ],
+  "tech": [
+    "Python",
+    "SQLite",
+    "HTTPX",
+    "JavaScript",
+    "Shell"
+  ],
+  "depends_on": [
+    "sqlite3",
+    "httpx",
+    "pytest"
+  ],
+  "integrates_with": [
+    "FSM-generic",
+    "Telephony Providers (via server abstraction)",
+    "Web Browsers (for UI)"
+  ],
+  "patterns": [
+    "Finite State Machine",
+    "Repository Pattern (SQLite)",
+    "Bridge Pattern (FSM integration)",
+    "Fallback Mechanism"
+  ],
+  "reuse_tags": [
+    "customer-service",
+    "ai-agent",
+    "telephony",
+    "lead-capture",
+    "scheduling"
+  ],
+  "slug": "phone-agent-keiko-tv",
+  "repo_url": "https://github.com/davidbmar/phone-agent-keiko-tv",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-scheduler-personality is 1 commit ahead of the default branch"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:46:45.871865Z",
+  "source_commit": "6a8b897",
+  "model": "qwen3.7-plus"
+}

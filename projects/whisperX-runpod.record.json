@@ -1,0 +1,84 @@
+{
+  "title": "whisperX-runpod",
+  "one_liner": "Scripts and handlers for deploying WhisperX with speaker diarization on RunPod or AWS EC2 GPU instances.",
+  "what_it_is": "A deployment toolkit that packages WhisperX (fast automatic speech recognition) with pyannote (speaker diarization) into a Docker container. It provides shell scripts to build the image, push it to Docker Hub, and orchestrate deployments to either AWS EC2 for testing or RunPod for cost-effective production transcription via HTTP API.",
+  "how_its_built": "The project uses Shell scripts for infrastructure orchestration (AWS CLI, RunPod API) and Python for the application logic. The core engine is built on `whisperx` (using `faster-whisper` backend) and `pyannote.audio`. The API layer is implemented with FastAPI (`handler_pod.py`) for pod deployments and a standard RunPod handler (`handler.py`) for serverless endpoints. Docker is used to bundle dependencies and pre-download models.",
+  "how_to_apply": "Use this project when you need high-speed, accurate transcription with speaker identification and word-level timestamps, but want to avoid managing complex GPU environments manually. It is ideal for batch processing podcasts, meetings, or interviews where cost efficiency (via RunPod community cloud) and ease of deployment are priorities.",
+  "quickstart": "git clone https://github.com/davidbmar/whisperX-runpod.git\ncd whisperX-runpod\n./scripts/010-setup--configure-environment.sh\n./scripts/100-build--docker-image.sh\n./scripts/110-build--push-to-dockerhub.sh\n./scripts/300-runpod--create-pod.sh",
+  "features": [
+    "35x realtime speed transcription using faster-whisper backend",
+    "Word-level timestamp alignment via wav2vec2",
+    "Automatic speaker diarization using pyannote.audio",
+    "Support for multiple Whisper model sizes (tiny to large-v3)",
+    "HTTP API for transcribing from URLs or file uploads",
+    "Cost-optimized deployment on RunPod community GPU clouds"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Build Box / Local] -->|1. docker build| B(Docker Image)\n    B -->|2. docker push| C[Docker Hub]\n    A -->|3. AWS CLI| D[AWS EC2 GPU Instance]\n    A -->|4. RunPod API| E[RunPod GPU Pod]\n    C -->|Pull Image| D\n    C -->|Pull Image| E\n    D -->|Run Container| F[FastAPI Server :8000]\n    E -->|Run Container| G[FastAPI Server :8000]\n    F -->|Transcribe| H[(WhisperX + Pyannote)]\n    G -->|Transcribe| H",
+  "diagram_sequence": "sequenceDiagram\n    participant Client\n    participant API as FastAPI Handler\n    participant Transcriber as WhisperXTranscriber\n    participant Model as Whisper/Pyannote Models\n    \n    Client->>API: POST /transcribe {audio_url}\n    API->>API: Download audio to temp file\n    API->>Transcriber: transcribe(audio_path)\n    Transcriber->>Model: Load Whisper model (cached)\n    Model-->>Transcriber: Raw transcription\n    Transcriber->>Model: Align with wav2vec2\n    Model-->>Transcriber: Word-level timestamps\n    alt Diarization Enabled\n        Transcriber->>Model: Load Pyannote models\n        Model-->>Transcriber: Speaker segments\n        Transcriber->>Transcriber: Merge speakers with words\n    end\n    Transcriber-->>API: JSON Result\n    API-->>Client: 200 OK {segments, speakers}",
+  "capabilities": [
+    "Batch audio transcription",
+    "Speaker diarization",
+    "Word-level alignment",
+    "REST API hosting",
+    "GPU cloud orchestration",
+    "Docker containerization"
+  ],
+  "components": [
+    "Shell Scripts (Orchestration)",
+    "Dockerfile",
+    "FastAPI Application",
+    "RunPod Handler",
+    "WhisperX Wrapper",
+    "Utility Modules"
+  ],
+  "tech": [
+    "Python",
+    "Shell",
+    "Docker",
+    "FastAPI",
+    "WhisperX",
+    "Pyannote.audio",
+    "Faster-Whisper",
+    "AWS CLI",
+    "RunPod API"
+  ],
+  "depends_on": [
+    "Docker",
+    "AWS Account (for EC2 testing)",
+    "RunPod Account",
+    "Hugging Face Token (for Pyannote)",
+    "Docker Hub Account"
+  ],
+  "integrates_with": [
+    "RunPod Serverless/Pods",
+    "AWS EC2",
+    "Docker Hub",
+    "Hugging Face Hub"
+  ],
+  "patterns": [
+    "Containerized Microservice",
+    "Infrastructure as Code (Scripted)",
+    "API Gateway Pattern",
+    "Lazy Model Loading",
+    "Cloud Agnostic Deployment"
+  ],
+  "reuse_tags": [
+    "speech-to-text",
+    "gpu-deployment",
+    "runpod",
+    "aws-ec2",
+    "diarization",
+    "whisperx",
+    "fastapi"
+  ],
+  "slug": "whisperX-runpod",
+  "repo_url": "https://github.com/davidbmar/whisperX-runpod",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:11:32.980244Z",
+  "source_commit": "749e292",
+  "model": "qwen3.7-plus"
+}

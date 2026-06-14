@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>recording_app · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "recording_app", "one_liner": "Browser-based voice memo recorder with chunked S3 streaming and local faster-whisper transcription.", "what_it_is": "A privacy-focused voice recording system that captures audio in the browser, streams it in chunks to private AWS S3 storage, and uses a local worker (running on your Mac) to transcribe the audio using faster-whisper. It includes a web interface for live status tracking and supports advanced features like intent recognition ('hey riff') and transcript hydration.", "how_its_built": "The system consists of a Python-based AWS Lambda web application (served via Function URL) for handling uploads and auth, and a separate Python worker process that polls S3 for new recordings. The worker uses `faster-whisper` for transcription and `boto3` for S3 interaction. Frontend logic handles media streaming and intent resolution via vanilla JavaScript.", "how_to_apply": "Deploy the web backend to AWS using the provided shell scripts and IAM policies. Run the transcription worker locally on a machine with GPU/CPU capacity, configured with least-privilege AWS credentials. Use the web app to record memos, which are automatically transcribed by the local worker.", "quickstart": "cp env.sample .env\nexport TOKEN_SECRET=\"$(openssl rand -hex 32)\"\n./scripts/deploy.sh\ncd /path/to/recording_app\npython3 -m venv .wenv\n.wenv/bin/pip install boto3\n.wenv/bin/python -m worker.worker --bucket <bucket> --region us-east-2 --stub", "features": ["Chunked audio streaming from browser to private S3 bucket", "Local transcription worker using faster-whisper for privacy and speed", "Live status updates for recordings in the web interface", "HMAC-based stateless authentication and scoped tokens", "Deterministic intent recognition layer for voice commands", "Transcript hydration and idea generation via LLM integration"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|MediaStream API| Client[Web App Client]\n    Client -->|Chunked Audio POST| Lambda[AWS Lambda Web App]\n    Lambda -->|Auth Check| Auth[src/auth.py]\n    Lambda -->|PutObject| S3[(AWS S3 Bucket)]\n    S3 -->|Poll/ListObjects| Worker[Local Transcription Worker]\n    Worker -->|Download Audio| S3\n    Worker -->|Transcribe| Whisper[faster-whisper]\n    Worker -->|Upload Transcript| S3\n    Worker -->|Hydrate| LLM[DashScope/Qwen API]\n    Lambda -->|Get Status| S3\n    Client -->|Poll Status| Lambda", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser\n    participant L as Lambda API\n    participant S as S3 Bucket\n    participant W as Local Worker\n    participant M as Whisper Model\n\n    U->>B: Start Recording\n    B->>B: Capture MediaStream\n    loop Every Chunk\n        B->>L: POST audio chunk\n        L->>L: Verify HMAC Token\n        L->>S: Upload Chunk\n    end\n    B->>L: Finalize Recording\n    W->>S: List New Objects\n    S-->>W: Return Recording Key\n    W->>S: Download Full Audio\n    W->>M: Transcribe Audio\n    M-->>W: Return Text\n    W->>S: Upload Transcript.txt\n    W->>S: Upload Hydrated.json\n    U->>B: Refresh Page\n    B->>L: Get Recording Status\n    L->>S: Check Metadata\n    S-->>L: Return Status\n    L-->>B: JSON Status\n    B-->>U: Display Transcript", "capabilities": ["Voice Recording", "Audio Streaming", "Speech-to-Text", "Cloud Storage Integration", "Local Processing", "Intent Recognition"], "components": ["Web Client (JS/HTML)", "AWS Lambda Backend", "S3 Storage", "Local Python Worker", "Auth Module", "Intent Resolver"], "tech": ["Python", "JavaScript", "AWS Lambda", "AWS S3", "faster-whisper", "boto3", "Pygments", "Mermaid"], "depends_on": ["boto3", "faster-whisper", "openai", "markdown", "pytest"], "integrates_with": ["AWS S3", "AWS Lambda", "DashScope (Qwen)", "Alibaba Cloud Model Studio"], "patterns": ["Chunked Upload", "Worker Pool", "Stateless Auth", "Polling", "Least Privilege Access"], "reuse_tags": ["voice-memos", "transcription", "aws-serverless", "local-ai", "privacy-first"], "slug": "recording_app", "repo_url": "https://github.com/davidbmar/recording_app", "visibility": "private", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "feat/intent-hydrate-from-server is 8 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/l1-intent-routing is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/l2-intent-catalog is 2 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "fix/deploy-pin-recording-deployer is 2 commits ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #15: fix(deploy): pin recording-deployer profile + fail-fast identity guard"}], "screenshot_url": "", "generated_at": "2026-06-14T03:51:24.814020Z", "source_commit": "ce2786e", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "recording_app",
+  "description": "Browser-based voice memo recorder with chunked S3 streaming and local faster-whisper transcription.",
+  "codeRepository": "https://github.com/davidbmar/recording_app",
+  "programmingLanguage": [
+    "Python",
+    "JavaScript",
+    "AWS Lambda",
+    "AWS S3",
+    "faster-whisper",
+    "boto3",
+    "Pygments",
+    "Mermaid"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>recording_app</h1>
+  <p class="one-liner">Browser-based voice memo recorder with chunked S3 streaming and local faster-whisper transcription.</p>
+  <p><a href="https://github.com/davidbmar/recording_app">https://github.com/davidbmar/recording_app</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A privacy-focused voice recording system that captures audio in the browser, streams it in chunks to private AWS S3 storage, and uses a local worker (running on your Mac) to transcribe the audio using faster-whisper. It includes a web interface for live status tracking and supports advanced features like intent recognition (&#x27;hey riff&#x27;) and transcript hydration.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Chunked audio streaming from browser to private S3 bucket</li><li>Local transcription worker using faster-whisper for privacy and speed</li><li>Live status updates for recordings in the web interface</li><li>HMAC-based stateless authentication and scoped tokens</li><li>Deterministic intent recognition layer for voice commands</li><li>Transcript hydration and idea generation via LLM integration</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">cp env.sample .env
+export TOKEN_SECRET=&quot;$(openssl rand -hex 32)&quot;
+./scripts/deploy.sh
+cd /path/to/recording_app
+python3 -m venv .wenv
+.wenv/bin/pip install boto3
+.wenv/bin/python -m worker.worker --bucket &lt;bucket&gt; --region us-east-2 --stub</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|MediaStream API| Client[Web App Client]
+    Client -->|Chunked Audio POST| Lambda[AWS Lambda Web App]
+    Lambda -->|Auth Check| Auth[src/auth.py]
+    Lambda -->|PutObject| S3[(AWS S3 Bucket)]
+    S3 -->|Poll/ListObjects| Worker[Local Transcription Worker]
+    Worker -->|Download Audio| S3
+    Worker -->|Transcribe| Whisper[faster-whisper]
+    Worker -->|Upload Transcript| S3
+    Worker -->|Hydrate| LLM[DashScope/Qwen API]
+    Lambda -->|Get Status| S3
+    Client -->|Poll Status| Lambda</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system consists of a Python-based AWS Lambda web application (served via Function URL) for handling uploads and auth, and a separate Python worker process that polls S3 for new recordings. The worker uses `faster-whisper` for transcription and `boto3` for S3 interaction. Frontend logic handles media streaming and intent resolution via vanilla JavaScript.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant L as Lambda API
+    participant S as S3 Bucket
+    participant W as Local Worker
+    participant M as Whisper Model
+
+    U->>B: Start Recording
+    B->>B: Capture MediaStream
+    loop Every Chunk
+        B->>L: POST audio chunk
+        L->>L: Verify HMAC Token
+        L->>S: Upload Chunk
+    end
+    B->>L: Finalize Recording
+    W->>S: List New Objects
+    S-->>W: Return Recording Key
+    W->>S: Download Full Audio
+    W->>M: Transcribe Audio
+    M-->>W: Return Text
+    W->>S: Upload Transcript.txt
+    W->>S: Upload Hydrated.json
+    U->>B: Refresh Page
+    B->>L: Get Recording Status
+    L->>S: Check Metadata
+    S-->>L: Return Status
+    L-->>B: JSON Status
+    B-->>U: Display Transcript</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the web backend to AWS using the provided shell scripts and IAM policies. Run the transcription worker locally on a machine with GPU/CPU capacity, configured with least-privilege AWS credentials. Use the web app to record memos, which are automatically transcribed by the local worker.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Voice Recording</span><span class="tag">Audio Streaming</span><span class="tag">Speech-to-Text</span><span class="tag">Cloud Storage Integration</span><span class="tag">Local Processing</span><span class="tag">Intent Recognition</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Web Client (JS/HTML)</span><span class="tag">AWS Lambda Backend</span><span class="tag">S3 Storage</span><span class="tag">Local Python Worker</span><span class="tag">Auth Module</span><span class="tag">Intent Resolver</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">JavaScript</span><span class="tag">AWS Lambda</span><span class="tag">AWS S3</span><span class="tag">faster-whisper</span><span class="tag">boto3</span><span class="tag">Pygments</span><span class="tag">Mermaid</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">boto3</span><span class="tag">faster-whisper</span><span class="tag">openai</span><span class="tag">markdown</span><span class="tag">pytest</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3</span><span class="tag">AWS Lambda</span><span class="tag">DashScope (Qwen)</span><span class="tag">Alibaba Cloud Model Studio</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Chunked Upload</span><span class="tag">Worker Pool</span><span class="tag">Stateless Auth</span><span class="tag">Polling</span><span class="tag">Least Privilege Access</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-memos</span><span class="tag">transcription</span><span class="tag">aws-serverless</span><span class="tag">local-ai</span><span class="tag">privacy-first</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: feat/intent-hydrate-from-server is 8 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/l1-intent-routing is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/l2-intent-catalog is 2 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: fix/deploy-pin-recording-deployer is 2 commits ahead of the default branch</li><li><strong>open_pr</strong>: PR #15: fix(deploy): pin recording-deployer profile + fail-fast identity guard</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:51:24.814020Z ·
+     commit ce2786e ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

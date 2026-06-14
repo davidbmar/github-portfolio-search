@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whisper-runpod · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "whisper-runpod", "one_liner": "Containerized Faster Whisper transcription service optimized for RunPod with S3 integration.", "what_it_is": "A Docker-based solution that deploys a Faster Whisper speech-to-text API server, designed for easy deployment on RunPod.io. It includes utility scripts to fetch audio files from AWS S3 and submit them for transcription via the local API endpoint.", "how_its_built": "The project uses a Dockerfile to build an image containing the Faster Whisper engine and its dependencies. An entrypoint script manages the server lifecycle, ensuring the API remains active. Shell scripts handle external interactions, specifically downloading assets from S3 using AWS CLI and sending HTTP requests to the transcription endpoint.", "how_to_apply": "Deploy the built Docker image to a RunPod instance or run it locally. Use the provided shell scripts to automate the workflow of fetching remote audio files from S3 buckets and posting them to the running container's API for text extraction.", "quickstart": "docker build -t yourusername/whisper-runpod:latest .\ndocker push yourusername/whisper-runpod:latest\ndocker run -p 8000:8000 yourusername/whisper-runpod:latest\ncurl http://localhost:8000/v1/audio/transcriptions -F \"file=@your-audio-file.mp3\" -F \"language=en\"", "features": ["Runs Faster Whisper model for efficient speech-to-text conversion", "Exposes OpenAI-compatible transcription API on port 8000", "Includes shell scripts for automated S3 audio retrieval and processing", "Designed for seamless deployment on RunPod serverless GPU infrastructure", "Monitors and restarts the transcription service via entrypoint logic"], "diagram_architecture": "flowchart TD\n    User[User/Client] -->|HTTP POST| API[Faster Whisper API :8000]\n    Script[S3 Transcribe Script] -->|aws s3 cp| S3[(AWS S3 Bucket)]\n    S3 -->|Audio File| Script\n    Script -->|curl POST| API\n    API -->|Process| Model[Faster Whisper Engine]\n    Model -->|Text Output| API\n    API -->|JSON Response| User\n    API -->|JSON Response| Script\n    Entrypoint[entrypoint.sh] -->|Manages| API", "diagram_sequence": "sequenceDiagram\n    participant U as User/Script\n    participant S as S3 Bucket\n    participant A as API Server (Port 8000)\n    participant M as Faster Whisper Model\n    \n    alt S3 Workflow\n        U->>S: aws s3 cp (Download Audio)\n        S-->>U: Return Audio File\n        U->>A: POST /v1/audio/transcriptions (File + Language)\n    else Direct Workflow\n        U->>A: POST /v1/audio/transcriptions (Local File)\n    end\n    \n    A->>M: Process Audio Stream\n    M-->>A: Return Transcribed Text\n    A-->>U: JSON Response with Text", "capabilities": ["Speech-to-Text Transcription", "S3 Integration", "API Service Hosting", "Containerized Deployment"], "components": ["entrypoint.sh", "test_transcribe_by_fasterWhisperAPI_fromS3.sh", "Dockerfile"], "tech": ["Docker", "Shell Scripting", "Faster Whisper", "Python", "AWS CLI"], "depends_on": ["Docker Runtime", "AWS Credentials", "RunPod Account (Optional)"], "integrates_with": ["AWS S3", "RunPod.io", "OpenAI-compatible Clients"], "patterns": ["Microservice", "Worker Pattern", "Sidecar Scripting"], "reuse_tags": ["speech-to-text", "whisper", "runpod", "docker", "s3", "transcription"], "slug": "whisper-runpod", "repo_url": "https://github.com/davidbmar/whisper-runpod", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:09:53.854800Z", "source_commit": "1565b02", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "whisper-runpod",
+  "description": "Containerized Faster Whisper transcription service optimized for RunPod with S3 integration.",
+  "codeRepository": "https://github.com/davidbmar/whisper-runpod",
+  "programmingLanguage": [
+    "Docker",
+    "Shell Scripting",
+    "Faster Whisper",
+    "Python",
+    "AWS CLI"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>whisper-runpod</h1>
+  <p class="one-liner">Containerized Faster Whisper transcription service optimized for RunPod with S3 integration.</p>
+  <p><a href="https://github.com/davidbmar/whisper-runpod">https://github.com/davidbmar/whisper-runpod</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A Docker-based solution that deploys a Faster Whisper speech-to-text API server, designed for easy deployment on RunPod.io. It includes utility scripts to fetch audio files from AWS S3 and submit them for transcription via the local API endpoint.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Runs Faster Whisper model for efficient speech-to-text conversion</li><li>Exposes OpenAI-compatible transcription API on port 8000</li><li>Includes shell scripts for automated S3 audio retrieval and processing</li><li>Designed for seamless deployment on RunPod serverless GPU infrastructure</li><li>Monitors and restarts the transcription service via entrypoint logic</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">docker build -t yourusername/whisper-runpod:latest .
+docker push yourusername/whisper-runpod:latest
+docker run -p 8000:8000 yourusername/whisper-runpod:latest
+curl http://localhost:8000/v1/audio/transcriptions -F &quot;file=@your-audio-file.mp3&quot; -F &quot;language=en&quot;</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User/Client] -->|HTTP POST| API[Faster Whisper API :8000]
+    Script[S3 Transcribe Script] -->|aws s3 cp| S3[(AWS S3 Bucket)]
+    S3 -->|Audio File| Script
+    Script -->|curl POST| API
+    API -->|Process| Model[Faster Whisper Engine]
+    Model -->|Text Output| API
+    API -->|JSON Response| User
+    API -->|JSON Response| Script
+    Entrypoint[entrypoint.sh] -->|Manages| API</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project uses a Dockerfile to build an image containing the Faster Whisper engine and its dependencies. An entrypoint script manages the server lifecycle, ensuring the API remains active. Shell scripts handle external interactions, specifically downloading assets from S3 using AWS CLI and sending HTTP requests to the transcription endpoint.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User/Script
+    participant S as S3 Bucket
+    participant A as API Server (Port 8000)
+    participant M as Faster Whisper Model
+    
+    alt S3 Workflow
+        U->>S: aws s3 cp (Download Audio)
+        S-->>U: Return Audio File
+        U->>A: POST /v1/audio/transcriptions (File + Language)
+    else Direct Workflow
+        U->>A: POST /v1/audio/transcriptions (Local File)
+    end
+    
+    A->>M: Process Audio Stream
+    M-->>A: Return Transcribed Text
+    A-->>U: JSON Response with Text</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the built Docker image to a RunPod instance or run it locally. Use the provided shell scripts to automate the workflow of fetching remote audio files from S3 buckets and posting them to the running container&#x27;s API for text extraction.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Speech-to-Text Transcription</span><span class="tag">S3 Integration</span><span class="tag">API Service Hosting</span><span class="tag">Containerized Deployment</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">entrypoint.sh</span><span class="tag">test_transcribe_by_fasterWhisperAPI_fromS3.sh</span><span class="tag">Dockerfile</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Docker</span><span class="tag">Shell Scripting</span><span class="tag">Faster Whisper</span><span class="tag">Python</span><span class="tag">AWS CLI</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Docker Runtime</span><span class="tag">AWS Credentials</span><span class="tag">RunPod Account (Optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3</span><span class="tag">RunPod.io</span><span class="tag">OpenAI-compatible Clients</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Microservice</span><span class="tag">Worker Pattern</span><span class="tag">Sidecar Scripting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-to-text</span><span class="tag">whisper</span><span class="tag">runpod</span><span class="tag">docker</span><span class="tag">s3</span><span class="tag">transcription</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:09:53.854800Z ·
+     commit 1565b02 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

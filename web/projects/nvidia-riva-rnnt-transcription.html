@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NVIDIA Riva RNN-T Real-Time Transcription System · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "NVIDIA Riva RNN-T Real-Time Transcription System", "one_liner": "Ultra-low latency real-time audio transcription system leveraging NVIDIA Riva RNN-T on AWS GPU instances.", "what_it_is": "A production-ready deployment framework for NVIDIA Riva Speech Skills, specifically optimized for Recurrent Neural Network Transducer (RNN-T) models. It provides a WebSocket-enabled FastAPI wrapper around the Riva gRPC service, enabling streaming transcription with 100-200ms latency. The system automates the provisioning of AWS EC2 g4dn.xlarge instances, manages S3-based artifact storage for Riva containers, and includes comprehensive health monitoring and testing scripts.", "how_its_built": "The system is constructed using a series of six sequential Bash scripts that handle infrastructure-as-code tasks via AWS CLI. It downloads NVIDIA Riva binaries to S3, launches a GPU-enabled EC2 instance, installs Docker and NVIDIA drivers, and configures the Riva server. The application layer consists of Python FastAPI servers that interface with the Riva gRPC endpoint for transcription and use boto3 for S3 integration. A mock server is also included for CPU-only development and testing.", "how_to_apply": "This project is applied by executing the provided deployment scripts in sequence to provision a dedicated GPU instance in your AWS account. Once deployed, applications can connect to the exposed FastAPI endpoints for file-based or streaming transcription, or directly to the Riva gRPC port for high-performance integration. It is suitable for real-time captioning, live meeting transcription, and voice-controlled interfaces requiring sub-second response times.", "quickstart": "git clone https://github.com/davidbmar/nvidia-riva-rnnt-transcription.git\ncd nvidia-riva-rnnt-transcription\n./scripts/step-001-download-riva-to-s3.sh\n./scripts/step-002-organize-s3-bintarball.sh\n./scripts/step-003-prepare-gpu-instance.sh\n./scripts/step-004-install-riva-from-s3.sh\n./scripts/step-005-configure-riva-services.sh\n./scripts/step-006-test-riva-deployment.sh", "features": ["Ultra-low latency streaming transcription (100-200ms) via WebSocket", "Automated AWS EC2 GPU instance provisioning and Riva installation", "S3-optimized binary management for efficient container deployment", "FastAPI REST wrapper for file upload and S3-triggered transcription", "Comprehensive health checks and performance benchmarking tools", "Mock server support for CPU-based development and testing"], "diagram_architecture": "flowchart TD\n    Client[Client Application] -->|WebSocket/HTTP| FastAPI[FastAPI Server]\n    FastAPI -->|gRPC| Riva[Riva ASR Service]\n    Riva -->|GPU Compute| GPU[NVIDIA GPU]\n    FastAPI -->|Read/Write| S3[(AWS S3 Bucket)]\n    S3 -->|Audio Input| FastAPI\n    FastAPI -->|Transcript Output| S3\n    subgraph AWS EC2 Instance\n        FastAPI\n        Riva\n        GPU\n    end", "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant F as FastAPI Server\n    participant R as Riva gRPC Service\n    participant G as NVIDIA GPU\n    participant S as AWS S3\n\n    C->>F: POST /transcribe/file or WS Connect\n    alt File Upload\n        F->>S: Download Audio File\n        S-->>F: Audio Data\n        F->>R: StreamingRecognize Request\n        R->>G: Process Audio Frames\n        G-->>R: Transcription Tokens\n        R-->>F: Final Transcript\n        F->>S: Upload Transcript JSON\n    else WebSocket Stream\n        C->>F: Stream Audio Chunks\n        F->>R: Forward Audio Chunks\n        R->>G: Real-time Inference\n        G-->>R: Partial/Final Results\n        R-->>F: Stream Response\n        F-->>C: Stream Transcript Updates\n    end", "capabilities": ["Real-time streaming transcription", "Batch file transcription", "S3 event-driven processing", "GPU-accelerated inference", "Automated infrastructure deployment", "Health monitoring and validation"], "components": ["Deployment Scripts (Bash)", "FastAPI Application Server", "Riva Speech Services Container", "Mock RNN-T Server", "AWS CLI Integration", "Docker Compose Configuration"], "tech": ["Python", "Bash", "FastAPI", "NVIDIA Riva", "gRPC", "Docker", "AWS EC2", "AWS S3", "WebSocket"], "depends_on": ["NVIDIA NGC Account", "AWS Account with EC2/S3 permissions", "AWS CLI", "Git", "SSH Key Pair"], "integrates_with": ["AWS S3", "NVIDIA Riva gRPC API", "WebSocket Clients", "REST API Consumers"], "patterns": ["Infrastructure as Code (Scripted)", "Microservices Architecture", "Event-Driven Processing", "Streaming Data Pipeline", "Wrapper Pattern (FastAPI over gRPC)"], "reuse_tags": ["speech-recognition", "nvidia-riva", "aws-deployment", "real-time-transcription", "gpu-acceleration", "fastapi", "websocket-streaming"], "slug": "nvidia-riva-rnnt-transcription", "repo_url": "https://github.com/davidbmar/nvidia-riva-rnnt-transcription", "visibility": "private", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/pip/docker/fast-api-rnnt/pip-14c377a4fb is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump python-multipart from 0.0.6 to 0.0.27 in /docker/fast-api-rnnt in the pip group across 1 directory"}], "screenshot_url": "", "generated_at": "2026-06-14T03:44:25.784875Z", "source_commit": "00f7241", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "NVIDIA Riva RNN-T Real-Time Transcription System",
+  "description": "Ultra-low latency real-time audio transcription system leveraging NVIDIA Riva RNN-T on AWS GPU instances.",
+  "codeRepository": "https://github.com/davidbmar/nvidia-riva-rnnt-transcription",
+  "programmingLanguage": [
+    "Python",
+    "Bash",
+    "FastAPI",
+    "NVIDIA Riva",
+    "gRPC",
+    "Docker",
+    "AWS EC2",
+    "AWS S3",
+    "WebSocket"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NVIDIA Riva RNN-T Real-Time Transcription System</h1>
+  <p class="one-liner">Ultra-low latency real-time audio transcription system leveraging NVIDIA Riva RNN-T on AWS GPU instances.</p>
+  <p><a href="https://github.com/davidbmar/nvidia-riva-rnnt-transcription">https://github.com/davidbmar/nvidia-riva-rnnt-transcription</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A production-ready deployment framework for NVIDIA Riva Speech Skills, specifically optimized for Recurrent Neural Network Transducer (RNN-T) models. It provides a WebSocket-enabled FastAPI wrapper around the Riva gRPC service, enabling streaming transcription with 100-200ms latency. The system automates the provisioning of AWS EC2 g4dn.xlarge instances, manages S3-based artifact storage for Riva containers, and includes comprehensive health monitoring and testing scripts.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Ultra-low latency streaming transcription (100-200ms) via WebSocket</li><li>Automated AWS EC2 GPU instance provisioning and Riva installation</li><li>S3-optimized binary management for efficient container deployment</li><li>FastAPI REST wrapper for file upload and S3-triggered transcription</li><li>Comprehensive health checks and performance benchmarking tools</li><li>Mock server support for CPU-based development and testing</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/nvidia-riva-rnnt-transcription.git
+cd nvidia-riva-rnnt-transcription
+./scripts/step-001-download-riva-to-s3.sh
+./scripts/step-002-organize-s3-bintarball.sh
+./scripts/step-003-prepare-gpu-instance.sh
+./scripts/step-004-install-riva-from-s3.sh
+./scripts/step-005-configure-riva-services.sh
+./scripts/step-006-test-riva-deployment.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Client Application] -->|WebSocket/HTTP| FastAPI[FastAPI Server]
+    FastAPI -->|gRPC| Riva[Riva ASR Service]
+    Riva -->|GPU Compute| GPU[NVIDIA GPU]
+    FastAPI -->|Read/Write| S3[(AWS S3 Bucket)]
+    S3 -->|Audio Input| FastAPI
+    FastAPI -->|Transcript Output| S3
+    subgraph AWS EC2 Instance
+        FastAPI
+        Riva
+        GPU
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system is constructed using a series of six sequential Bash scripts that handle infrastructure-as-code tasks via AWS CLI. It downloads NVIDIA Riva binaries to S3, launches a GPU-enabled EC2 instance, installs Docker and NVIDIA drivers, and configures the Riva server. The application layer consists of Python FastAPI servers that interface with the Riva gRPC endpoint for transcription and use boto3 for S3 integration. A mock server is also included for CPU-only development and testing.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client
+    participant F as FastAPI Server
+    participant R as Riva gRPC Service
+    participant G as NVIDIA GPU
+    participant S as AWS S3
+
+    C->>F: POST /transcribe/file or WS Connect
+    alt File Upload
+        F->>S: Download Audio File
+        S-->>F: Audio Data
+        F->>R: StreamingRecognize Request
+        R->>G: Process Audio Frames
+        G-->>R: Transcription Tokens
+        R-->>F: Final Transcript
+        F->>S: Upload Transcript JSON
+    else WebSocket Stream
+        C->>F: Stream Audio Chunks
+        F->>R: Forward Audio Chunks
+        R->>G: Real-time Inference
+        G-->>R: Partial/Final Results
+        R-->>F: Stream Response
+        F-->>C: Stream Transcript Updates
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>This project is applied by executing the provided deployment scripts in sequence to provision a dedicated GPU instance in your AWS account. Once deployed, applications can connect to the exposed FastAPI endpoints for file-based or streaming transcription, or directly to the Riva gRPC port for high-performance integration. It is suitable for real-time captioning, live meeting transcription, and voice-controlled interfaces requiring sub-second response times.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Real-time streaming transcription</span><span class="tag">Batch file transcription</span><span class="tag">S3 event-driven processing</span><span class="tag">GPU-accelerated inference</span><span class="tag">Automated infrastructure deployment</span><span class="tag">Health monitoring and validation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Deployment Scripts (Bash)</span><span class="tag">FastAPI Application Server</span><span class="tag">Riva Speech Services Container</span><span class="tag">Mock RNN-T Server</span><span class="tag">AWS CLI Integration</span><span class="tag">Docker Compose Configuration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Bash</span><span class="tag">FastAPI</span><span class="tag">NVIDIA Riva</span><span class="tag">gRPC</span><span class="tag">Docker</span><span class="tag">AWS EC2</span><span class="tag">AWS S3</span><span class="tag">WebSocket</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">NVIDIA NGC Account</span><span class="tag">AWS Account with EC2/S3 permissions</span><span class="tag">AWS CLI</span><span class="tag">Git</span><span class="tag">SSH Key Pair</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3</span><span class="tag">NVIDIA Riva gRPC API</span><span class="tag">WebSocket Clients</span><span class="tag">REST API Consumers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Infrastructure as Code (Scripted)</span><span class="tag">Microservices Architecture</span><span class="tag">Event-Driven Processing</span><span class="tag">Streaming Data Pipeline</span><span class="tag">Wrapper Pattern (FastAPI over gRPC)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-recognition</span><span class="tag">nvidia-riva</span><span class="tag">aws-deployment</span><span class="tag">real-time-transcription</span><span class="tag">gpu-acceleration</span><span class="tag">fastapi</span><span class="tag">websocket-streaming</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/pip/docker/fast-api-rnnt/pip-14c377a4fb is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump python-multipart from 0.0.6 to 0.0.27 in /docker/fast-api-rnnt in the pip group across 1 directory</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:44:25.784875Z ·
+     commit 00f7241 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

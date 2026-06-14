@@ -1,0 +1,64 @@
+{
+  "title": "TranscriptionAPI-S3-backend",
+  "one_liner": "A lightweight Flask microservice that generates AWS S3 presigned URLs for secure audio file uploads.",
+  "what_it_is": "This project is a Python-based backend component designed to facilitate the upload of transcription content. It acts as an intermediary between a client application and an AWS S3 bucket. Instead of handling large binary data directly, the service authenticates requests and returns short-lived, presigned URLs. Clients use these URLs to upload audio files directly to S3, reducing server load and bandwidth usage while maintaining security through temporary credentials.",
+  "how_its_built": "The application is built using Flask for the HTTP server layer and Boto3 for AWS SDK interactions. It relies on environment variables for configuration, including the target S3 bucket name, AWS region, and presigned URL expiration time. The core logic involves validating incoming requests, generating a unique key (UUID) for each upload, and using the Boto3 client to create a presigned PUT URL with a configurable timeout.",
+  "how_to_apply": "Deploy this service in environments where you need to accept audio uploads without managing the storage infrastructure yourself. It is suitable for integration into larger transcription pipelines where the frontend or mobile app needs a secure way to push raw audio data to cloud storage before triggering processing jobs. Configure it with your specific AWS credentials and bucket details via environment variables.",
+  "quickstart": "pip install flask boto3 python-dotenv\nexport AWS_ACCESS_KEY_ID=your_key\nexport AWS_SECRET_ACCESS_KEY=your_secret\nexport S3_BUCKET_NAME=your-bucket-name\npython src/AudioTranscriptionAPI.py",
+  "features": [
+    "Generates AWS S3 presigned URLs for direct client-side uploads",
+    "Configurable URL expiration time for security",
+    "Automatic UUID generation for unique file naming",
+    "Environment-based configuration for bucket and region",
+    "Lightweight Flask API with JSON responses"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client App] -->|HTTP GET /upload-url| FlaskApp[Flask Service]\n    FlaskApp -->|Generate Presigned URL| Boto3[Boto3 SDK]\n    Boto3 -->|Sign Request| AWS_S3[AWS S3 Bucket]\n    Client -->|HTTP PUT Audio File| AWS_S3\n    subgraph Configuration\n        Env[Environment Variables]\n    end\n    Env --> FlaskApp",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant F as Flask App\n    participant B as Boto3\n    participant S as AWS S3\n\n    C->>F: GET /generate-presigned-url\n    F->>F: Generate UUID for filename\n    F->>B: generate_presigned_url('put_object')\n    B-->>F: Return Presigned URL\n    F-->>C: JSON { url: '...', key: '...' }\n    C->>S: PUT audio/file.mp3 (using Presigned URL)\n    S-->>C: 200 OK",
+  "capabilities": [
+    "Presigned URL Generation",
+    "S3 Integration",
+    "REST API Endpoint"
+  ],
+  "components": [
+    "Flask Application",
+    "Boto3 Client",
+    "Environment Config Loader"
+  ],
+  "tech": [
+    "Python",
+    "Flask",
+    "Boto3",
+    "AWS S3"
+  ],
+  "depends_on": [
+    "flask",
+    "boto3",
+    "python-dotenv"
+  ],
+  "integrates_with": [
+    "AWS S3",
+    "Frontend Uploaders",
+    "Mobile Applications"
+  ],
+  "patterns": [
+    "Presigned URL Pattern",
+    "Direct-to-Storage Upload",
+    "Microservice"
+  ],
+  "reuse_tags": [
+    "audio-upload",
+    "s3-backend",
+    "flask-api",
+    "presigned-urls"
+  ],
+  "slug": "TranscriptionAPI-S3-backend",
+  "repo_url": "https://github.com/davidbmar/TranscriptionAPI-S3-backend",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T04:05:33.854760Z",
+  "source_commit": "f6c9876",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,64 @@
+{
+  "title": "riot",
+  "one_liner": "A lightweight Python socket server and curses-based client for tracking taxi driver performance ratings.",
+  "what_it_is": "riot is a distributed system for collecting real-time feedback on taxi drivers. It consists of a central server that stores ride data in SQLite, interactive terminal clients for drivers to log rides and toggle 'thumbs up' ratings (promptness, cleanliness, friendliness), and a reporting agent that generates top-10 lists over rolling 48-hour windows.",
+  "how_its_built": "The system is built with Python 2 standard libraries. The server uses raw TCP sockets to accept JSON payloads and writes directly to a local SQLite database. The client uses the `curses` library for a text-based user interface (TUI) to manage ride states and rating toggles before sending JSON data over TCP. Reporting is handled by direct SQL queries against the SQLite file.",
+  "how_to_apply": "Deploy the server on a central machine accessible by all taxis. Run `server.py` to start listening on port 9998. On each taxi's onboard computer or driver device, run `taxi_client.py` with a unique UUID. Drivers use the TUI to start/end rides and toggle ratings. Periodically run `report2.py` on the server machine to generate performance reports.",
+  "quickstart": "python server.py &\npython taxi_client.py\nreset",
+  "features": [
+    "TCP socket server accepting JSON ride data on port 9998",
+    "Curses-based TUI client for drivers to manage rides and ratings",
+    "SQLite backend for persistent storage of ride transactions",
+    "Rolling 48-hour reporting agent for top-10 driver rankings",
+    "Automated test harness for generating CSV-based load data"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[taxi_client.py] -->|JSON over TCP| Server[server.py]\n    Server -->|Write| DB[(taxi.sqlite)]\n    Reporter[report2.py] -->|Read SQL| DB\n    Test[test_taxi_client.py] -->|CSV Input| Client",
+  "diagram_sequence": "sequenceDiagram\n    participant Driver as Driver\n    participant Client as taxi_client.py\n    participant Server as server.py\n    participant DB as taxi.sqlite\n    \n    Driver->>Client: Start Ride (Press 1)\n    Driver->>Client: Toggle Ratings (p/c/f)\n    Driver->>Client: End Ride (Press 2)\n    Client->>Server: Send JSON (UUID, ratings)\n    Server->>Server: Parse JSON & Timestamp\n    Server->>DB: INSERT INTO rides\n    DB-->>Server: Acknowledge\n    Server-->>Client: Close Connection",
+  "capabilities": [
+    "Real-time ride logging",
+    "Category-based rating toggling",
+    "Historical data analysis",
+    "Automated testing via CSV"
+  ],
+  "components": [
+    "server.py",
+    "taxi_client.py",
+    "report2.py",
+    "test_taxi_client.py",
+    "taxi.sqlite"
+  ],
+  "tech": [
+    "Python 2",
+    "SQLite3",
+    "TCP Sockets",
+    "Curses",
+    "JSON"
+  ],
+  "depends_on": [
+    "python-curses",
+    "sqlite3"
+  ],
+  "integrates_with": [],
+  "patterns": [
+    "Client-Server",
+    "Publish-Subscribe (via DB)",
+    "Command Line Interface"
+  ],
+  "reuse_tags": [
+    "iot-feedback",
+    "socket-server",
+    "curses-ui",
+    "sqlite-storage",
+    "python-2"
+  ],
+  "slug": "riot",
+  "repo_url": "https://github.com/davidbmar/riot",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:52:21.237941Z",
+  "source_commit": "fabea06",
+  "model": "qwen3.7-plus"
+}

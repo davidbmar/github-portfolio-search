@@ -1,0 +1,86 @@
+{
+  "title": "spa_react_javascript_auth0",
+  "one_liner": "Auth0 React SPA authentication sample with auxiliary S3 audio upload utilities.",
+  "what_it_is": "A reference implementation demonstrating how to integrate Auth0 user authentication into a React Single-Page Application using React Router 6. The repository also contains standalone JavaScript modules for recording audio, managing an upload queue, and uploading files to AWS S3 via presigned URLs, though these are distinct from the core authentication logic.",
+  "how_its_built": "The application is built with React and React Router 6 for client-side routing. It uses the Auth0 React SDK (@auth0/auth0-react) to handle login, logout, and user profile management. The auxiliary audio features use the Web MediaRecorder API, standard Fetch API for S3 interactions, and vanilla JavaScript for queue management.",
+  "how_to_apply": "Use this project as a starting point for adding secure user authentication to React applications. Developers can copy the Auth0 configuration patterns and protected route wrappers. The audio modules can be reused in projects requiring client-side voice recording and direct-to-S3 uploads.",
+  "quickstart": "npm install\nnpm start",
+  "features": [
+    "User login and logout via Auth0 Universal Login",
+    "Protected routes using React Router 6 and Auth0 context",
+    "User profile display and session management",
+    "Client-side audio recording using MediaRecorder API",
+    "Queue-based upload system for audio blobs",
+    "Direct-to-S3 upload using presigned URLs"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|Interacts| App[React SPA]\n    App -->|Auth Requests| Auth0[Auth0 Identity Platform]\n    App -->|API Calls| Backend[Optional API Server]\n    App -->|Uploads| S3[AWS S3 Bucket]\n    subgraph Client\n        App\n        AudioMod[Audio Modules]\n    end\n    AudioMod -->|Queue| Queue[In-Memory Queue]\n    Queue -->|Fetch Presigned URL| Backend\n    Queue -->|PUT Blob| S3",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant R as React App\n    participant A as Auth0\n    participant M as MediaRecorder\n    participant Q as Audio Queue\n    participant S as S3\n\n    U->>R: Click Login\n    R->>A: Redirect to Login\n    A-->>R: Return ID/Access Token\n    R->>U: Show Protected Content\n\n    U->>M: Start Recording\n    M-->>Q: Add Audio Blob\n    U->>M: Stop Recording\n    Q->>S: Request Presigned URL\n    S-->>Q: Return Signed URL\n    Q->>S: PUT Audio Blob\n    S-->>Q: Confirm Upload",
+  "capabilities": [
+    "Authentication",
+    "Authorization",
+    "Audio Recording",
+    "File Upload",
+    "Queue Management"
+  ],
+  "components": [
+    "Auth0Provider",
+    "useAuth0 Hook",
+    "React Router Routes",
+    "AudioRecorder Module",
+    "S3Uploader Module",
+    "AudioQueue Module"
+  ],
+  "tech": [
+    "React",
+    "JavaScript",
+    "React Router 6",
+    "Auth0 SDK",
+    "Web MediaRecorder API",
+    "AWS S3"
+  ],
+  "depends_on": [
+    "react",
+    "react-dom",
+    "react-router-dom",
+    "@auth0/auth0-react"
+  ],
+  "integrates_with": [
+    "Auth0 Identity Platform",
+    "AWS S3",
+    "External API Servers"
+  ],
+  "patterns": [
+    "Single Page Application",
+    "OAuth 2.0 / OIDC",
+    "Presigned URL Upload",
+    "Producer-Consumer Queue",
+    "Protected Routes"
+  ],
+  "reuse_tags": [
+    "authentication",
+    "react",
+    "auth0",
+    "s3-upload",
+    "audio-recording",
+    "spa"
+  ],
+  "slug": "spa_react_javascript_auth0",
+  "repo_url": "https://github.com/davidbmar/spa_react_javascript_auth0",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-4b3b058ada is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 36 updates"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:54:22.892584Z",
+  "source_commit": "e6ba4b5",
+  "model": "qwen3.7-plus"
+}

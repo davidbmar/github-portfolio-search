@@ -1,0 +1,77 @@
+{
+  "title": "Smart Transcription Router",
+  "one_liner": "Hybrid AWS architecture routing audio transcription between real-time GPU FastAPI and batch SQS processing based on server health.",
+  "what_it_is": "A serverless routing layer that intelligently directs audio transcription requests. It checks the availability of a high-performance GPU-powered FastAPI server; if available, it routes requests directly for low-latency results. If the server is down or busy, it falls back to an SQS queue for deferred batch processing, optimizing for both cost and reliability.",
+  "how_its_built": "Built using AWS Lambda (Python/Shell) for the routing logic, EventBridge for event ingestion, and SQS for queuing. The compute layer consists of Dockerized FastAPI servers running WhisperX or Voxtral models on GPU instances. Infrastructure is managed via shell scripts interacting with AWS CLI.",
+  "how_to_apply": "Deploy the core SQS-only router first to establish reliable batch processing. Optionally add the FastAPI GPU instances for real-time capabilities. Configure environment variables for AWS region, ECR URIs, and SQS queue URLs, then run the provided setup scripts in sequence.",
+  "quickstart": "./scripts/step-000-setup-configuration.sh\n./scripts/step-001-validate-configuration.sh\n./scripts/step-010-setup-iam-permissions.sh\n./scripts/step-011-validate-iam-permissions.sh\n./scripts/step-020-create-sqs-resources.sh\n./scripts/step-021-validate-sqs-resources.sh\n./scripts/step-340-deploy-lambda-router.sh\n./scripts/step-341-configure-eventbridge-trigger.sh\n./scripts/step-342-test-lambda-router.sh",
+  "features": [
+    "Intelligent routing between real-time HTTP and batch SQS based on health checks",
+    "Exponential backoff retry logic (1s, 2s, 4s) for transient failures",
+    "Idempotent processing to skip already transcribed chunks",
+    "Automatic session-level transcript combination upon chunk completion",
+    "Cost optimization by auto-terminating GPU instances when idle"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Audio Upload] -->|EventBridge| B(Lambda Router)\n    B -->|Health Check| C{FastAPI Healthy?}\n    C -->|Yes| D[FastAPI Server GPU]\n    C -->|No| E[SQS Queue]\n    E -->|Scheduled Trigger| F[Batch Worker GPU]\n    D --> G[(S3 Storage)]\n    F --> G",
+  "diagram_sequence": "sequenceDiagram\n    participant User as Audio Source\n    participant EB as EventBridge\n    participant Lambda as Lambda Router\n    participant API as FastAPI Server\n    participant SQS as SQS Queue\n    participant Worker as Batch Worker\n    \n    User->>EB: Upload Audio File\n    EB->>Lambda: Trigger Event\n    Lambda->>Lambda: Check Idempotency\n    alt Already Transcribed\n        Lambda-->>User: Skip Processing\n    else Not Transcribed\n        Lambda->>API: Health Check / Transcribe Request\n        alt Server Healthy\n            API->>API: Process with WhisperX/Voxtral\n            API-->>Lambda: Return Transcript\n            Lambda-->>User: Success\n        else Server Unhealthy/Fail\n            Lambda->>Lambda: Retry with Backoff\n            alt Retries Exhausted\n                Lambda->>SQS: Send Message\n                SQS-->>Lambda: Acknowledge\n                Note over Worker: Scheduled Trigger\n                Worker->>SQS: Receive Message\n                Worker->>Worker: Spin up GPU & Process\n                Worker->>SQS: Delete Message\n            end\n        end\n    end",
+  "capabilities": [
+    "Real-time transcription",
+    "Batch processing",
+    "Health-based routing",
+    "Retry management",
+    "Session assembly"
+  ],
+  "components": [
+    "Lambda Router",
+    "FastAPI Server",
+    "SQS Queue",
+    "Batch Worker",
+    "EventBridge Trigger"
+  ],
+  "tech": [
+    "Python",
+    "Shell",
+    "FastAPI",
+    "AWS Lambda",
+    "Docker",
+    "WhisperX",
+    "Voxtral"
+  ],
+  "depends_on": [
+    "AWS CLI",
+    "Docker",
+    "GPU Instances",
+    "S3 Bucket",
+    "ECR Repository"
+  ],
+  "integrates_with": [
+    "Amazon S3",
+    "Amazon SQS",
+    "Amazon EventBridge",
+    "Amazon CloudWatch"
+  ],
+  "patterns": [
+    "Circuit Breaker",
+    "Dead Letter Queue",
+    "Batch Processing",
+    "Serverless Routing",
+    "Idempotency Key"
+  ],
+  "reuse_tags": [
+    "aws-serverless",
+    "hybrid-cloud",
+    "audio-processing",
+    "gpu-optimization",
+    "event-driven"
+  ],
+  "slug": "smart-transcription-router",
+  "repo_url": "https://github.com/davidbmar/smart-transcription-router",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/smart-transcription-router/main/architecture-diagram.png",
+  "generated_at": "2026-06-14T03:54:00.465980Z",
+  "source_commit": "49dd939",
+  "model": "qwen3.7-plus"
+}

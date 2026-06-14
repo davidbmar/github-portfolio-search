@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ui-audiorecorder-html-sample · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "ui-audiorecorder-html-sample", "one_liner": "Reference implementation for recording independent, playable audio chunks in the browser to avoid WebM container header issues.", "what_it_is": "A set of progressive HTML/JS examples demonstrating how to record microphone audio into continuous, independently playable segments. It solves the common Chrome/WebM issue where intermediate fragments from a single MediaRecorder session lack necessary container headers, rendering them unplayable until the stream stops. The solution involves creating a new MediaRecorder instance for each time slice while reusing the same getUserMedia stream.", "how_its_built": "The project is built using vanilla JavaScript (ES5-safe) and HTML. It leverages the MediaRecorder API with a 'stop-and-restart' pattern per chunk rather than using timeslice data events. Advanced steps integrate IndexedDB for local persistence and include logic for generating pre-signed URLs for cloud storage uploads. Visualization is handled via Canvas API for waveform rendering.", "how_to_apply": "Use this code as a reference pattern when building web-based voice recorders that require immediate playback of segments or reliable upload of partial recordings. It is particularly useful for applications needing to bypass browser-specific demuxer errors associated with fragmented WebM/Ogg streams.", "quickstart": "git clone https://github.com/davidbmar/ui-audiorecorder-html-sample.git\ncd ui-audiorecorder-html-sample\npython3 -m http.server 8000", "features": ["Records audio in continuous, independently playable chunks", "Solves Chrome WebM fragment header issues by restarting MediaRecorder per segment", "Reuses a single getUserMedia stream to avoid repeated permission prompts", "Persists audio chunks locally using IndexedDB", "Includes optional S3 pre-signed URL upload logic", "Real-time waveform visualization using Canvas API"], "diagram_architecture": "flowchart TD\n    User[User] -->|Clicks Start| UI[HTML UI]\n    UI -->|Request Permission| Browser[Browser API]\n    Browser -->|MediaStream| RecorderMgr[Recorder Manager]\n    RecorderMgr -->|Loop| ChunkRec[New MediaRecorder Instance]\n    ChunkRec -->|Audio Data| Blob[Blob Object]\n    Blob -->|Store| Storage[(IndexedDB / Local)]\n    Blob -->|Optional Upload| S3[S3 Cloud Storage]\n    Storage -->|Retrieve| Player[HTML Audio Element]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant UI as HTML Interface\n    participant MR as Recorder Manager\n    participant Stream as MediaStream\n    participant Rec as MediaRecorder (Chunk N)\n    participant DB as IndexedDB\n\n    U->>UI: Click Start Recording\n    UI->>Stream: getUserMedia({audio: true})\n    Stream-->>UI: Return MediaStream\n    UI->>MR: startLoop()\n    loop For each chunk\n        MR->>Rec: new MediaRecorder(stream)\n        Rec->>Rec: start()\n        Note over Rec: Wait for duration (e.g., 5s)\n        Rec->>Rec: stop()\n        Rec->>MR: ondataavailable (Blob)\n        MR->>DB: saveChunk(blob, index)\n        MR->>UI: renderChunk(blob)\n        UI->>U: Display <audio> controls\n    end", "capabilities": ["Chunked Audio Recording", "Local Persistence", "Waveform Visualization", "Cloud Upload Preparation"], "components": ["index-step1-example.html", "step4-indexdb/app.js", "step4-indexdb/storage.js", "audio-lite.js"], "tech": ["HTML5", "JavaScript (ES5)", "MediaRecorder API", "IndexedDB", "Canvas API", "Fetch API"], "depends_on": ["Modern Web Browser", "Microphone Access", "HTTP Server (for local testing)"], "integrates_with": ["AWS S3 (via pre-signed URLs)", "CloudFront (for playback)"], "patterns": ["Per-Chunk Recorder Pattern", "Stream Reuse", "Client-Side Storage", "Progressive Enhancement"], "reuse_tags": ["audio-recording", "media-recorder", "webm-fix", "indexeddb", "vanilla-js", "browser-audio"], "slug": "ui-audiorecorder-html-sample", "repo_url": "https://github.com/davidbmar/ui-audiorecorder-html-sample", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/ui-audiorecorder-html-sample/main/images/ui-waveform-chunked-indexdb.png", "generated_at": "2026-06-14T04:06:33.246751Z", "source_commit": "d71b9ae", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "ui-audiorecorder-html-sample",
+  "description": "Reference implementation for recording independent, playable audio chunks in the browser to avoid WebM container header issues.",
+  "codeRepository": "https://github.com/davidbmar/ui-audiorecorder-html-sample",
+  "programmingLanguage": [
+    "HTML5",
+    "JavaScript (ES5)",
+    "MediaRecorder API",
+    "IndexedDB",
+    "Canvas API",
+    "Fetch API"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ui-audiorecorder-html-sample</h1>
+  <p class="one-liner">Reference implementation for recording independent, playable audio chunks in the browser to avoid WebM container header issues.</p>
+  <p><a href="https://github.com/davidbmar/ui-audiorecorder-html-sample">https://github.com/davidbmar/ui-audiorecorder-html-sample</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/ui-audiorecorder-html-sample/main/images/ui-waveform-chunked-indexdb.png" alt="ui-audiorecorder-html-sample screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A set of progressive HTML/JS examples demonstrating how to record microphone audio into continuous, independently playable segments. It solves the common Chrome/WebM issue where intermediate fragments from a single MediaRecorder session lack necessary container headers, rendering them unplayable until the stream stops. The solution involves creating a new MediaRecorder instance for each time slice while reusing the same getUserMedia stream.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Records audio in continuous, independently playable chunks</li><li>Solves Chrome WebM fragment header issues by restarting MediaRecorder per segment</li><li>Reuses a single getUserMedia stream to avoid repeated permission prompts</li><li>Persists audio chunks locally using IndexedDB</li><li>Includes optional S3 pre-signed URL upload logic</li><li>Real-time waveform visualization using Canvas API</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/ui-audiorecorder-html-sample.git
+cd ui-audiorecorder-html-sample
+python3 -m http.server 8000</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Clicks Start| UI[HTML UI]
+    UI -->|Request Permission| Browser[Browser API]
+    Browser -->|MediaStream| RecorderMgr[Recorder Manager]
+    RecorderMgr -->|Loop| ChunkRec[New MediaRecorder Instance]
+    ChunkRec -->|Audio Data| Blob[Blob Object]
+    Blob -->|Store| Storage[(IndexedDB / Local)]
+    Blob -->|Optional Upload| S3[S3 Cloud Storage]
+    Storage -->|Retrieve| Player[HTML Audio Element]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project is built using vanilla JavaScript (ES5-safe) and HTML. It leverages the MediaRecorder API with a &#x27;stop-and-restart&#x27; pattern per chunk rather than using timeslice data events. Advanced steps integrate IndexedDB for local persistence and include logic for generating pre-signed URLs for cloud storage uploads. Visualization is handled via Canvas API for waveform rendering.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant UI as HTML Interface
+    participant MR as Recorder Manager
+    participant Stream as MediaStream
+    participant Rec as MediaRecorder (Chunk N)
+    participant DB as IndexedDB
+
+    U->>UI: Click Start Recording
+    UI->>Stream: getUserMedia({audio: true})
+    Stream-->>UI: Return MediaStream
+    UI->>MR: startLoop()
+    loop For each chunk
+        MR->>Rec: new MediaRecorder(stream)
+        Rec->>Rec: start()
+        Note over Rec: Wait for duration (e.g., 5s)
+        Rec->>Rec: stop()
+        Rec->>MR: ondataavailable (Blob)
+        MR->>DB: saveChunk(blob, index)
+        MR->>UI: renderChunk(blob)
+        UI->>U: Display &lt;audio> controls
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this code as a reference pattern when building web-based voice recorders that require immediate playback of segments or reliable upload of partial recordings. It is particularly useful for applications needing to bypass browser-specific demuxer errors associated with fragmented WebM/Ogg streams.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Chunked Audio Recording</span><span class="tag">Local Persistence</span><span class="tag">Waveform Visualization</span><span class="tag">Cloud Upload Preparation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">index-step1-example.html</span><span class="tag">step4-indexdb/app.js</span><span class="tag">step4-indexdb/storage.js</span><span class="tag">audio-lite.js</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">HTML5</span><span class="tag">JavaScript (ES5)</span><span class="tag">MediaRecorder API</span><span class="tag">IndexedDB</span><span class="tag">Canvas API</span><span class="tag">Fetch API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Modern Web Browser</span><span class="tag">Microphone Access</span><span class="tag">HTTP Server (for local testing)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3 (via pre-signed URLs)</span><span class="tag">CloudFront (for playback)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Per-Chunk Recorder Pattern</span><span class="tag">Stream Reuse</span><span class="tag">Client-Side Storage</span><span class="tag">Progressive Enhancement</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">audio-recording</span><span class="tag">media-recorder</span><span class="tag">webm-fix</span><span class="tag">indexeddb</span><span class="tag">vanilla-js</span><span class="tag">browser-audio</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:06:33.246751Z ·
+     commit d71b9ae ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

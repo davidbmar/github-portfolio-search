@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTube Phrase Scanner · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "YouTube Phrase Scanner", "one_liner": "Serverless pipeline for downloading, transcribing, and scanning YouTube videos for specific phrases using WhisperX and AWS infrastructure.", "what_it_is": "A distributed system that processes YouTube video URLs from an SQS queue. It downloads audio, generates high-accuracy transcripts using WhisperX on GPU instances (managed via RunPod), scans for user-defined phrases, and stores results in S3. It includes a Lambda-based controller for managing ephemeral GPU resources.", "how_its_built": "Python-based worker architecture containerized with Docker. Uses `yt-dlp` for downloading, `WhisperX` for transcription, and `boto3` for AWS integration (SQS/S3). GPU compute is abstracted via RunPod, controlled by an AWS Lambda function that handles pod lifecycle events.", "how_to_apply": "Deploy the Lambda function to manage RunPod credentials and permissions. Configure the SQS queue to trigger the worker container. Push YouTube URLs to the queue to initiate processing. Results are written to S3 buckets for downstream analysis.", "quickstart": "pip install -r docker/requirements.txt\nexport RUNPOD_API_KEY=your_api_key\npython run.py", "features": ["Automated YouTube audio extraction and processing", "High-accuracy transcription using WhisperX models", "Keyword and phrase detection within video content", "Serverless GPU management via RunPod and AWS Lambda", "Result storage and retrieval via Amazon S3"], "diagram_architecture": "flowchart TD\n    A[Client] -->|Push URL| B(AWS SQS Queue)\n    B -->|Trigger| C[Worker Container]\n    C -->|Download Audio| D[YouTube]\n    C -->|Request GPU| E[AWS Lambda]\n    E -->|Manage Lifecycle| F[RunPod API]\n    F -->|Provision Pod| G[GPU Instance]\n    C -->|Send Audio| G\n    G -->|Run WhisperX| H[Transcription]\n    H -->|Scan Phrases| I[Scanner Module]\n    I -->|Store Results| J(AWS S3 Bucket)", "diagram_sequence": "sequenceDiagram\n    participant Client\n    participant SQS\n    participant Worker\n    participant Lambda\n    participant RunPod\n    participant S3\n    \n    Client->>SQS: Send Video URL\n    SQS->>Worker: Trigger Job\n    Worker->>Lambda: Request GPU Resource\n    Lambda->>RunPod: Create/Get Pod\n    RunPod-->>Lambda: Pod Endpoint\n    Lambda-->>Worker: Return Endpoint\n    Worker->>Worker: Download Audio (yt-dlp)\n    Worker->>RunPod: Upload Audio & Start Transcription\n    RunPod->>RunPod: Process with WhisperX\n    RunPod-->>Worker: Return Transcript\n    Worker->>Worker: Scan for Phrases\n    Worker->>S3: Save Results", "capabilities": ["Audio Extraction", "Speech-to-Text", "Pattern Matching", "Cloud Orchestration", "GPU Management"], "components": ["worker.py", "downloader.py", "transcriber.py", "scanner.py", "runpod_manager.py", "lambda_handler.py"], "tech": ["Python", "WhisperX", "Docker", "AWS Lambda", "RunPod", "yt-dlp"], "depends_on": ["boto3", "runpod", "torch", "whisperx", "yt-dlp"], "integrates_with": ["AWS SQS", "AWS S3", "YouTube", "RunPod API"], "patterns": ["Queue-Based Load Leveling", "Serverless Compute", "Ephemeral Infrastructure", "Worker Pattern"], "reuse_tags": ["media-processing", "ai-transcription", "aws-serverless", "gpu-orchestration", "content-analysis"], "slug": "youtube_transcriber_3", "repo_url": "https://github.com/davidbmar/youtube_transcriber_3", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T04:12:39.849638Z", "source_commit": "64a99a8", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "YouTube Phrase Scanner",
+  "description": "Serverless pipeline for downloading, transcribing, and scanning YouTube videos for specific phrases using WhisperX and AWS infrastructure.",
+  "codeRepository": "https://github.com/davidbmar/youtube_transcriber_3",
+  "programmingLanguage": [
+    "Python",
+    "WhisperX",
+    "Docker",
+    "AWS Lambda",
+    "RunPod",
+    "yt-dlp"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>YouTube Phrase Scanner</h1>
+  <p class="one-liner">Serverless pipeline for downloading, transcribing, and scanning YouTube videos for specific phrases using WhisperX and AWS infrastructure.</p>
+  <p><a href="https://github.com/davidbmar/youtube_transcriber_3">https://github.com/davidbmar/youtube_transcriber_3</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A distributed system that processes YouTube video URLs from an SQS queue. It downloads audio, generates high-accuracy transcripts using WhisperX on GPU instances (managed via RunPod), scans for user-defined phrases, and stores results in S3. It includes a Lambda-based controller for managing ephemeral GPU resources.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Automated YouTube audio extraction and processing</li><li>High-accuracy transcription using WhisperX models</li><li>Keyword and phrase detection within video content</li><li>Serverless GPU management via RunPod and AWS Lambda</li><li>Result storage and retrieval via Amazon S3</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install -r docker/requirements.txt
+export RUNPOD_API_KEY=your_api_key
+python run.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Client] -->|Push URL| B(AWS SQS Queue)
+    B -->|Trigger| C[Worker Container]
+    C -->|Download Audio| D[YouTube]
+    C -->|Request GPU| E[AWS Lambda]
+    E -->|Manage Lifecycle| F[RunPod API]
+    F -->|Provision Pod| G[GPU Instance]
+    C -->|Send Audio| G
+    G -->|Run WhisperX| H[Transcription]
+    H -->|Scan Phrases| I[Scanner Module]
+    I -->|Store Results| J(AWS S3 Bucket)</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Python-based worker architecture containerized with Docker. Uses `yt-dlp` for downloading, `WhisperX` for transcription, and `boto3` for AWS integration (SQS/S3). GPU compute is abstracted via RunPod, controlled by an AWS Lambda function that handles pod lifecycle events.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Client
+    participant SQS
+    participant Worker
+    participant Lambda
+    participant RunPod
+    participant S3
+    
+    Client->>SQS: Send Video URL
+    SQS->>Worker: Trigger Job
+    Worker->>Lambda: Request GPU Resource
+    Lambda->>RunPod: Create/Get Pod
+    RunPod-->>Lambda: Pod Endpoint
+    Lambda-->>Worker: Return Endpoint
+    Worker->>Worker: Download Audio (yt-dlp)
+    Worker->>RunPod: Upload Audio & Start Transcription
+    RunPod->>RunPod: Process with WhisperX
+    RunPod-->>Worker: Return Transcript
+    Worker->>Worker: Scan for Phrases
+    Worker->>S3: Save Results</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the Lambda function to manage RunPod credentials and permissions. Configure the SQS queue to trigger the worker container. Push YouTube URLs to the queue to initiate processing. Results are written to S3 buckets for downstream analysis.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Audio Extraction</span><span class="tag">Speech-to-Text</span><span class="tag">Pattern Matching</span><span class="tag">Cloud Orchestration</span><span class="tag">GPU Management</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">worker.py</span><span class="tag">downloader.py</span><span class="tag">transcriber.py</span><span class="tag">scanner.py</span><span class="tag">runpod_manager.py</span><span class="tag">lambda_handler.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">WhisperX</span><span class="tag">Docker</span><span class="tag">AWS Lambda</span><span class="tag">RunPod</span><span class="tag">yt-dlp</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">boto3</span><span class="tag">runpod</span><span class="tag">torch</span><span class="tag">whisperx</span><span class="tag">yt-dlp</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS SQS</span><span class="tag">AWS S3</span><span class="tag">YouTube</span><span class="tag">RunPod API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Queue-Based Load Leveling</span><span class="tag">Serverless Compute</span><span class="tag">Ephemeral Infrastructure</span><span class="tag">Worker Pattern</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">media-processing</span><span class="tag">ai-transcription</span><span class="tag">aws-serverless</span><span class="tag">gpu-orchestration</span><span class="tag">content-analysis</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T04:12:39.849638Z ·
+     commit 64a99a8 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

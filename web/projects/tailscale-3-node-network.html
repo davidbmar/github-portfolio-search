@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FriendNet · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "FriendNet", "one_liner": "A private network dashboard that aggregates mDNS service discovery from multiple Tailscale-connected homes into a single view.", "what_it_is": "FriendNet is a distributed system for monitoring home networks across multiple physical locations connected via Tailscale. It consists of lightweight Python agents deployed on local machines (e.g., Raspberry Pis) that perform mDNS/Bonjour scanning and port fingerprinting, and a central React/FastAPI dashboard that aggregates this data to provide a unified view of all devices and services across the network.", "how_its_built": "The system uses a hub-and-spoke architecture. The 'Agent' (Python) runs on each node, using `zeroconf` for mDNS discovery and `httpx` for HTTP fingerprinting of services like Plex, Home Assistant, and SSH. It reports findings to the 'Dashboard' (FastAPI + SQLite) via HTTP POST. The Dashboard serves a React frontend (Vite) that visualizes the network topology and service status. Authentication is handled via a client-side SHA-256 hash gate for simplicity.", "how_to_apply": "Deploy the Agent on any machine within a Tailscale network that has visibility to the local subnet (using Tailscale Subnet Routing or exit nodes). Configure the Agent with the Dashboard's URL and a unique House ID. Use the Dashboard to monitor service availability, discover new devices automatically, and verify connectivity between remote homes without exposing ports to the public internet.", "quickstart": "git clone https://github.com/davidbmar/tailscale-3-node-network.git\ncd tailscale-3-node-network\ncd backend\npython3 -m venv .venv && source .venv/bin/activate\npip install -e .\nPYTHONPATH=. python app/main.py\ncd ../frontend\nnpm install\nnpm run dev", "features": ["Automatic mDNS/Bonjour service discovery across local subnets", "Service fingerprinting for Plex, Home Assistant, SSH, SMB, and more", "Centralized dashboard aggregating multiple remote homes via Tailscale", "Lightweight Python agent with configurable scan intervals", "Client-side password protection for dashboard access", "SQLite-backed storage for persistent device history"], "diagram_architecture": "flowchart TD\n    subgraph House_A[\"House A (Remote)\"]\n        Agent_A[\"FriendNet Agent\\n(Python/Zeroconf)\"]\n        Local_Net_A[\"Local LAN Devices\\n(mDNS Services)\"]\n    end\n\n    subgraph House_B[\"House B (Remote)\"]\n        Agent_B[\"FriendNet Agent\\n(Python/Zeroconf)\"]\n        Local_Net_B[\"Local LAN Devices\\n(mDNS Services)\"]\n    end\n\n    subgraph Central[\"Central Dashboard Host\"]\n        Dashboard_API[\"FastAPI Backend\\n(SQLite)\"]\n        Dashboard_UI[\"React Frontend\\n(Vite)\"]\n    end\n\n    Tailscale[\"Tailscale VPN Tunnel\"]\n\n    Local_Net_A -- \"mDNS Scan\" --> Agent_A\n    Local_Net_B -- \"mDNS Scan\" --> Agent_B\n    Agent_A -- \"HTTP POST /report\" --> Tailscale\n    Agent_B -- \"HTTP POST /report\" --> Tailscale\n    Tailscale --> Dashboard_API\n    Dashboard_UI -- \"Fetch Status\" --> Dashboard_API", "diagram_sequence": "sequenceDiagram\n    participant Agent as FriendNet Agent\n    participant Zeroconf as zeroconf Library\n    participant Network as Local LAN\n    participant API as Dashboard API (FastAPI)\n    participant DB as SQLite Database\n\n    loop Every N seconds\n        Agent->>Zeroconf: Start Service Browser\n        Zeroconf->>Network: Send mDNS Queries\n        Network-->>Zeroconf: Return Service Records\n        Zeroconf-->>Agent: Discovered Services List\n        \n        Agent->>Agent: Fingerprint Services (HTTP/Port checks)\n        \n        Agent->>API: POST /api/report (House ID, Services)\n        API->>DB: Upsert Nodes & Services\n        DB-->>API: Confirm Save\n        API-->>Agent: 200 OK\n    end", "capabilities": ["mDNS Discovery", "Service Fingerprinting", "Multi-site Aggregation", "Network Health Monitoring", "Private Dashboarding"], "components": ["Agent (Python)", "Dashboard API (FastAPI)", "Dashboard UI (React)", "SQLite Database", "Auth Gate (JS)"], "tech": ["Python 3.9+", "FastAPI", "React", "Vite", "SQLite", "zeroconf", "httpx", "Tailscale"], "depends_on": ["Node.js 18+", "Python 3.9+", "Tailscale Client"], "integrates_with": ["Plex Media Server", "Home Assistant", "SSH Servers", "SMB/NFS Shares", "Printers (IPP)", "AirPlay/Raop"], "patterns": ["Hub-and-Spoke", "Periodic Polling", "Client-side Auth", "RESTful Reporting"], "reuse_tags": ["home-lab", "network-monitoring", "tailscale", "mdns", "dashboard", "python-agent", "react-ui"], "slug": "tailscale-3-node-network", "repo_url": "https://github.com/davidbmar/tailscale-3-node-network", "visibility": "private", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/frontend/npm_and_yarn-4db41a3a8f is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/uv/backend/uv-7a932ce3d2 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #2: chore(deps): bump the uv group across 2 directories with 2 updates"}, {"kind": "open_pr", "detail": "PR #1: chore(deps): bump the npm_and_yarn group across 1 directory with 2 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T03:58:34.663344Z", "source_commit": "9e58b0a", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "FriendNet",
+  "description": "A private network dashboard that aggregates mDNS service discovery from multiple Tailscale-connected homes into a single view.",
+  "codeRepository": "https://github.com/davidbmar/tailscale-3-node-network",
+  "programmingLanguage": [
+    "Python 3.9+",
+    "FastAPI",
+    "React",
+    "Vite",
+    "SQLite",
+    "zeroconf",
+    "httpx",
+    "Tailscale"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>FriendNet</h1>
+  <p class="one-liner">A private network dashboard that aggregates mDNS service discovery from multiple Tailscale-connected homes into a single view.</p>
+  <p><a href="https://github.com/davidbmar/tailscale-3-node-network">https://github.com/davidbmar/tailscale-3-node-network</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>FriendNet is a distributed system for monitoring home networks across multiple physical locations connected via Tailscale. It consists of lightweight Python agents deployed on local machines (e.g., Raspberry Pis) that perform mDNS/Bonjour scanning and port fingerprinting, and a central React/FastAPI dashboard that aggregates this data to provide a unified view of all devices and services across the network.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Automatic mDNS/Bonjour service discovery across local subnets</li><li>Service fingerprinting for Plex, Home Assistant, SSH, SMB, and more</li><li>Centralized dashboard aggregating multiple remote homes via Tailscale</li><li>Lightweight Python agent with configurable scan intervals</li><li>Client-side password protection for dashboard access</li><li>SQLite-backed storage for persistent device history</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/tailscale-3-node-network.git
+cd tailscale-3-node-network
+cd backend
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -e .
+PYTHONPATH=. python app/main.py
+cd ../frontend
+npm install
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph House_A["House A (Remote)"]
+        Agent_A["FriendNet Agent\n(Python/Zeroconf)"]
+        Local_Net_A["Local LAN Devices\n(mDNS Services)"]
+    end
+
+    subgraph House_B["House B (Remote)"]
+        Agent_B["FriendNet Agent\n(Python/Zeroconf)"]
+        Local_Net_B["Local LAN Devices\n(mDNS Services)"]
+    end
+
+    subgraph Central["Central Dashboard Host"]
+        Dashboard_API["FastAPI Backend\n(SQLite)"]
+        Dashboard_UI["React Frontend\n(Vite)"]
+    end
+
+    Tailscale["Tailscale VPN Tunnel"]
+
+    Local_Net_A -- "mDNS Scan" --> Agent_A
+    Local_Net_B -- "mDNS Scan" --> Agent_B
+    Agent_A -- "HTTP POST /report" --> Tailscale
+    Agent_B -- "HTTP POST /report" --> Tailscale
+    Tailscale --> Dashboard_API
+    Dashboard_UI -- "Fetch Status" --> Dashboard_API</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system uses a hub-and-spoke architecture. The &#x27;Agent&#x27; (Python) runs on each node, using `zeroconf` for mDNS discovery and `httpx` for HTTP fingerprinting of services like Plex, Home Assistant, and SSH. It reports findings to the &#x27;Dashboard&#x27; (FastAPI + SQLite) via HTTP POST. The Dashboard serves a React frontend (Vite) that visualizes the network topology and service status. Authentication is handled via a client-side SHA-256 hash gate for simplicity.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Agent as FriendNet Agent
+    participant Zeroconf as zeroconf Library
+    participant Network as Local LAN
+    participant API as Dashboard API (FastAPI)
+    participant DB as SQLite Database
+
+    loop Every N seconds
+        Agent->>Zeroconf: Start Service Browser
+        Zeroconf->>Network: Send mDNS Queries
+        Network-->>Zeroconf: Return Service Records
+        Zeroconf-->>Agent: Discovered Services List
+        
+        Agent->>Agent: Fingerprint Services (HTTP/Port checks)
+        
+        Agent->>API: POST /api/report (House ID, Services)
+        API->>DB: Upsert Nodes & Services
+        DB-->>API: Confirm Save
+        API-->>Agent: 200 OK
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy the Agent on any machine within a Tailscale network that has visibility to the local subnet (using Tailscale Subnet Routing or exit nodes). Configure the Agent with the Dashboard&#x27;s URL and a unique House ID. Use the Dashboard to monitor service availability, discover new devices automatically, and verify connectivity between remote homes without exposing ports to the public internet.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">mDNS Discovery</span><span class="tag">Service Fingerprinting</span><span class="tag">Multi-site Aggregation</span><span class="tag">Network Health Monitoring</span><span class="tag">Private Dashboarding</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Agent (Python)</span><span class="tag">Dashboard API (FastAPI)</span><span class="tag">Dashboard UI (React)</span><span class="tag">SQLite Database</span><span class="tag">Auth Gate (JS)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.9+</span><span class="tag">FastAPI</span><span class="tag">React</span><span class="tag">Vite</span><span class="tag">SQLite</span><span class="tag">zeroconf</span><span class="tag">httpx</span><span class="tag">Tailscale</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js 18+</span><span class="tag">Python 3.9+</span><span class="tag">Tailscale Client</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Plex Media Server</span><span class="tag">Home Assistant</span><span class="tag">SSH Servers</span><span class="tag">SMB/NFS Shares</span><span class="tag">Printers (IPP)</span><span class="tag">AirPlay/Raop</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Hub-and-Spoke</span><span class="tag">Periodic Polling</span><span class="tag">Client-side Auth</span><span class="tag">RESTful Reporting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">home-lab</span><span class="tag">network-monitoring</span><span class="tag">tailscale</span><span class="tag">mdns</span><span class="tag">dashboard</span><span class="tag">python-agent</span><span class="tag">react-ui</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/frontend/npm_and_yarn-4db41a3a8f is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/uv/backend/uv-7a932ce3d2 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #2: chore(deps): bump the uv group across 2 directories with 2 updates</li><li><strong>open_pr</strong>: PR #1: chore(deps): bump the npm_and_yarn group across 1 directory with 2 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:58:34.663344Z ·
+     commit 9e58b0a ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

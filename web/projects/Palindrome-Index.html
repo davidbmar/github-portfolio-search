@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palindrome-Index · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Palindrome-Index", "one_liner": "A Python utility that identifies the index of a character whose removal converts a string into a palindrome.", "what_it_is": "A command-line script that solves the 'Palindrome Index' algorithmic problem. It accepts a series of lowercase strings and determines if they are already palindromes or if removing a single specific character makes them one. It returns the zero-based index of the removable character, or -1 if the string is already a palindrome.", "how_its_built": "The solution is implemented in a single Python file (`palindromeIndex.py`). It uses a two-pointer approach implicitly by comparing the string with its reverse. When a mismatch is found at index `i`, it tests two hypotheses: removing the character at `i` from the original string, or removing the corresponding character from the end (index `len(s)-1-i`). It validates these hypotheses by checking if the resulting substrings are palindromes.", "how_to_apply": "This code serves as a reference implementation for string manipulation algorithms, specifically for interview preparation involving palindromes and greedy approaches. It demonstrates basic string slicing, reversal, and iterative comparison logic in Python 2/3 compatible syntax.", "quickstart": "python palindromeIndex.py", "features": ["Detects if a string is already a palindrome", "Identifies the specific index of a character to remove to form a palindrome", "Handles multiple test cases via standard input", "Returns -1 for strings that are already palindromes", "Uses efficient string slicing for substring generation"], "diagram_architecture": "flowchart TD\n    A[Start] --> B[Read Input Integer T]\n    B --> C{Loop T times}\n    C -->|Next String S| D[Check isPalindrome(S)]\n    D -->|True| E[Print -1]\n    D -->|False| F[Find Mismatch Index i]\n    F --> G[Test Remove S[i]]\n    G -->|Is Palindrome| H[Print i]\n    G -->|Not Palindrome| I[Test Remove S[len-1-i]]\n    I -->|Is Palindrome| J[Print len-1-i]\n    E --> K{More Cases?}\n    H --> K\n    J --> K\n    K -->|Yes| C\n    K -->|No| L[End]", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Main as palindromeIndex.py\n    participant Logic as palindromeIndex()\n    participant Helper as isPalindrome()\n    \n    User->>Main: Provide Input (T, Strings)\n    loop For each string S\n        Main->>Logic: palindromeIndex(S)\n        Logic->>Helper: isPalindrome(S)\n        alt S is Palindrome\n            Helper-->>Logic: True (1)\n            Logic-->>Main: Return -1\n        else S is Not Palindrome\n            Helper-->>Logic: False (0)\n            Logic->>Logic: Find first mismatch i\n            Logic->>Helper: isPalindrome(S without i)\n            alt Substring is Palindrome\n                Helper-->>Logic: True\n                Logic-->>Main: Return i\n            else Substring is Not Palindrome\n                Helper-->>Logic: False\n                Logic->>Helper: isPalindrome(S without mirror i)\n                Helper-->>Logic: True\n                Logic-->>Main: Return mirror index\n            end\n        end\n        Main->>User: Print Result\n    end", "capabilities": ["String reversal", "Palindrome validation", "Character removal simulation", "Standard input parsing"], "components": ["reverseString", "isPalindrome", "stringWithoutIndex", "palindromeIndex"], "tech": ["Python", "Standard Library"], "depends_on": [], "integrates_with": [], "patterns": ["Two Pointer Technique", "Greedy Algorithm", "Brute Force Validation"], "reuse_tags": ["algorithm", "string-manipulation", "coding-challenge", "interview-prep"], "slug": "Palindrome-Index", "repo_url": "https://github.com/davidbmar/Palindrome-Index", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:46:20.474715Z", "source_commit": "21d081a", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Palindrome-Index",
+  "description": "A Python utility that identifies the index of a character whose removal converts a string into a palindrome.",
+  "codeRepository": "https://github.com/davidbmar/Palindrome-Index",
+  "programmingLanguage": [
+    "Python",
+    "Standard Library"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Palindrome-Index</h1>
+  <p class="one-liner">A Python utility that identifies the index of a character whose removal converts a string into a palindrome.</p>
+  <p><a href="https://github.com/davidbmar/Palindrome-Index">https://github.com/davidbmar/Palindrome-Index</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A command-line script that solves the &#x27;Palindrome Index&#x27; algorithmic problem. It accepts a series of lowercase strings and determines if they are already palindromes or if removing a single specific character makes them one. It returns the zero-based index of the removable character, or -1 if the string is already a palindrome.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Detects if a string is already a palindrome</li><li>Identifies the specific index of a character to remove to form a palindrome</li><li>Handles multiple test cases via standard input</li><li>Returns -1 for strings that are already palindromes</li><li>Uses efficient string slicing for substring generation</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python palindromeIndex.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Start] --> B[Read Input Integer T]
+    B --> C{Loop T times}
+    C -->|Next String S| D[Check isPalindrome(S)]
+    D -->|True| E[Print -1]
+    D -->|False| F[Find Mismatch Index i]
+    F --> G[Test Remove S[i]]
+    G -->|Is Palindrome| H[Print i]
+    G -->|Not Palindrome| I[Test Remove S[len-1-i]]
+    I -->|Is Palindrome| J[Print len-1-i]
+    E --> K{More Cases?}
+    H --> K
+    J --> K
+    K -->|Yes| C
+    K -->|No| L[End]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The solution is implemented in a single Python file (`palindromeIndex.py`). It uses a two-pointer approach implicitly by comparing the string with its reverse. When a mismatch is found at index `i`, it tests two hypotheses: removing the character at `i` from the original string, or removing the corresponding character from the end (index `len(s)-1-i`). It validates these hypotheses by checking if the resulting substrings are palindromes.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant Main as palindromeIndex.py
+    participant Logic as palindromeIndex()
+    participant Helper as isPalindrome()
+    
+    User->>Main: Provide Input (T, Strings)
+    loop For each string S
+        Main->>Logic: palindromeIndex(S)
+        Logic->>Helper: isPalindrome(S)
+        alt S is Palindrome
+            Helper-->>Logic: True (1)
+            Logic-->>Main: Return -1
+        else S is Not Palindrome
+            Helper-->>Logic: False (0)
+            Logic->>Logic: Find first mismatch i
+            Logic->>Helper: isPalindrome(S without i)
+            alt Substring is Palindrome
+                Helper-->>Logic: True
+                Logic-->>Main: Return i
+            else Substring is Not Palindrome
+                Helper-->>Logic: False
+                Logic->>Helper: isPalindrome(S without mirror i)
+                Helper-->>Logic: True
+                Logic-->>Main: Return mirror index
+            end
+        end
+        Main->>User: Print Result
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>This code serves as a reference implementation for string manipulation algorithms, specifically for interview preparation involving palindromes and greedy approaches. It demonstrates basic string slicing, reversal, and iterative comparison logic in Python 2/3 compatible syntax.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">String reversal</span><span class="tag">Palindrome validation</span><span class="tag">Character removal simulation</span><span class="tag">Standard input parsing</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">reverseString</span><span class="tag">isPalindrome</span><span class="tag">stringWithoutIndex</span><span class="tag">palindromeIndex</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Standard Library</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="muted">—</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="muted">—</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Two Pointer Technique</span><span class="tag">Greedy Algorithm</span><span class="tag">Brute Force Validation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">algorithm</span><span class="tag">string-manipulation</span><span class="tag">coding-challenge</span><span class="tag">interview-prep</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:46:20.474715Z ·
+     commit 21d081a ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>
