@@ -1,0 +1,80 @@
+{
+  "title": "generate_title_headline_hooks",
+  "one_liner": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification to prevent hallucinated quotes and unsupported claims.",
+  "what_it_is": "A Python-based API and library that generates multiple headline variants for a given story using specific archetypes (e.g., curiosity gap, contrarian). It enforces a 'fail-closed' integrity gate where every headline must pass deterministic quote verification and LLM-based fact-checking against the source body before being ranked and returned. The system is model-agnostic, supporting Anthropic, Alibaba Qwen, Ollama, and MLX via a unified client protocol.",
+  "how_its_built": "Built with FastAPI for the HTTP interface and a modular Python backend. The core logic resides in a pipeline module that orchestrates spine extraction, archetype-constrained generation, and two-stage integrity gating (regex-based quote check + LLM fact check). Scoring uses a strategy pattern with heuristic and LLM judges. Data persistence uses SQLite via a simple Store class. Provider isolation is enforced via AST tests to ensure only the reference client imports provider-specific SDKs.",
+  "how_to_apply": "Integrate as a microservice for newsrooms or content platforms needing safe, high-quality headline variations. Use the `/headlines` endpoint to submit article text and receive ranked, verified headlines. Extend by implementing new `LLMClient` classes for other providers or adding custom `Scorer` implementations to the ranking pipeline without modifying core logic.",
+  "quickstart": "pip install -e \".[dev]\"\nexport ANTHROPIC_API_KEY=sk-...\nuvicorn api.app:app --reload\ncurl -s localhost:8000/headlines -H 'content-type: application/json' -d '{\"title\": \"Flood\", \"body\": \"The dam held after an intern caught a crack.\", \"style\": \"editorial\"}' | jq",
+  "features": [
+    "Generates headlines across six distinct archetypes (curiosity, number-led, contrarian, etc.)",
+    "Fail-closed integrity gate drops headlines with fabricated quotes or unsupported claims",
+    "Model-agnostic architecture supporting Anthropic, Qwen, Ollama, and MLX",
+    "Deterministic quote verification prevents LLM hallucinations before judging",
+    "Hybrid scoring system combining heuristic rules and LLM judgment",
+    "Provider isolation enforced via AST tests to prevent dependency leakage"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client] -->|POST /headlines| API[FastAPI App]\n    API -->|Depends| Store[(SQLite Store)]\n    API -->|Depends| LLMClient[LLM Client Protocol]\n    LLMClient -.-> Anthropic[Anthropic Claude]\n    LLMClient -.-> DashScope[Alibaba Qwen]\n    LLMClient -.-> Ollama[Local Ollama]\n    LLMClient -.-> MLX[Local MLX]\n    API -->|run| Pipeline[Pipeline Orchestrator]\n    Pipeline --> Spine[Spine Extraction]\n    Spine --> Gen[Archetype Generation]\n    Gen --> Gate[Integrity Gate]\n    Gate -->|Pass| Rank[Ranking & Scoring]\n    Gate -->|Fail| Drop[Drop Variant]\n    Rank --> API",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant A as API\n    participant P as Pipeline\n    participant L as LLM Client\n    participant G as Integrity Gate\n    participant S as Store\n    C->>A: POST /headlines (title, body)\n    A->>P: run(story, options, client)\n    P->>L: complete_json (Extract Spine)\n    L-->>P: Spine Data (tension, stakes, payoff_claims)\n    P->>L: complete_json (Generate Archetypes)\n    L-->>P: Raw Headline Variants\n    loop For each variant\n        P->>G: check_quote_integrity(variant, body)\n        alt Quote not in body\n            G-->>P: DROP\n        else Quote valid\n            G-->>P: PASS\n            P->>L: complete_json (Fact Integrity Check)\n            L-->>P: Verified/Rejected\n        end\n    end\n    P->>P: Score surviving variants\n    P-->>A: Ranked Variants\n    A->>S: save_request()\n    A-->>C: JSON Response (variants)",
+  "capabilities": [
+    "Headline Generation",
+    "Integrity Verification",
+    "Multi-Model Support",
+    "Archetype Constraints",
+    "Automated Ranking",
+    "Quote Validation"
+  ],
+  "components": [
+    "api/app.py",
+    "headline/pipeline.py",
+    "headline/llm.py",
+    "headline/integrity.py",
+    "headline/scorers.py",
+    "headline/db/store.py"
+  ],
+  "tech": [
+    "Python",
+    "FastAPI",
+    "Pydantic",
+    "SQLite",
+    "Uvicorn",
+    "HTTPX"
+  ],
+  "depends_on": [
+    "anthropic",
+    "httpx",
+    "pydantic",
+    "fastapi",
+    "uvicorn",
+    "pytest"
+  ],
+  "integrates_with": [
+    "Anthropic Claude",
+    "Alibaba Cloud Qwen",
+    "Ollama",
+    "MLX (Apple Silicon)"
+  ],
+  "patterns": [
+    "Strategy Pattern (Scorers)",
+    "Protocol Interface (LLMClient)",
+    "Pipeline Architecture",
+    "Fail-Closed Security",
+    "Dependency Injection"
+  ],
+  "reuse_tags": [
+    "content-generation",
+    "nlp-pipeline",
+    "hallucination-prevention",
+    "llm-orchestration",
+    "fastapi-service"
+  ],
+  "slug": "generate_title_headline_hooks",
+  "repo_url": "https://github.com/davidbmar/generate_title_headline_hooks",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T00:18:05.000145Z",
+  "source_commit": "3f1b609",
+  "model": "qwen3.7-plus"
+}
