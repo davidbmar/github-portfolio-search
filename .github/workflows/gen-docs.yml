@@ -1,0 +1,104 @@
+# Auto-generate L0 project docs.
+#
+# Required repo secrets:
+#   GH_PAT              — a PAT with `repo` scope. REQUIRED: the default
+#                         secrets.GITHUB_TOKEN is scoped to THIS repo only and
+#                         cannot list your other repos.
+#   DASHSCOPE_API_KEY   — Alibaba Model Studio (Qwen) key
+#   DASHSCOPE_BASE_URL  — e.g. https://<host>/compatible-mode/v1
+#   DASHSCOPE_MODEL     — e.g. qwen3.7-plus
+# Required only if you enable the deploy step:
+#   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY — creds that can s3:PutObject to
+#     davidbmar-com + cloudfront:CreateInvalidation (see backlog B-020 — grant the
+#     dedicated deployer these so admin creds aren't needed).
+name: Generate project docs (L0)
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Regenerate ALL repos (ignore existing docs)"
+        type: boolean
+        default: false
+      stale:
+        description: "Regenerate repos pushed since their doc (incremental)"
+        type: boolean
+        default: true
+      limit:
+        description: "Cap number of repos (blank = all)"
+        required: false
+      deploy:
+        description: "Deploy to davidbmar.com after generating"
+        type: boolean
+        default: false
+  schedule:
+    # Daily 07:00 UTC — picks up repos checked in since the last run (incremental).
+    - cron: "0 7 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gen-docs
+  cancel-in-progress: false
+
+jobs:
+  gen-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+
+      - name: Generate docs
+        # Inputs are passed via env (never interpolated into the script) to avoid
+        # workflow command injection; limit is validated as numeric before use.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          LLM_PROVIDER: dashscope
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          DASHSCOPE_BASE_URL: ${{ secrets.DASHSCOPE_BASE_URL }}
+          DASHSCOPE_MODEL: ${{ secrets.DASHSCOPE_MODEL }}
+          EVENT_NAME: ${{ github.event_name }}
+          IN_FORCE: ${{ inputs.force }}
+          IN_STALE: ${{ inputs.stale }}
+          IN_LIMIT: ${{ inputs.limit }}
+        run: |
+          set -euo pipefail
+          FLAGS=""
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            FLAGS="--stale"   # scheduled runs only touch repos checked in since their doc
+          else
+            [ "$IN_FORCE" = "true" ] && FLAGS="$FLAGS --force"
+            [ "$IN_STALE" = "true" ] && FLAGS="$FLAGS --stale"
+            if [ -n "$IN_LIMIT" ]; then
+              case "$IN_LIMIT" in
+                *[!0-9]*) echo "limit must be a positive integer" >&2; exit 1 ;;
+                *) FLAGS="$FLAGS --limit $IN_LIMIT" ;;
+              esac
+            fi
+          fi
+          echo "Running: ghps gen-docs $FLAGS"
+          ghps gen-docs $FLAGS
+
+      - name: Commit regenerated docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add projects/ web/projects/ web/data/projects.json
+          if git diff --cached --quiet; then
+            echo "No documentation changes."
+          else
+            git commit -m "chore: regenerate L0 project docs [skip ci]"
+            git push
+          fi
+
+      - name: Deploy to davidbmar.com (optional)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy == 'true' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: make deploy

@@ -65,6 +65,17 @@ class TestFetchRepos:
         assert result[0]["html_url"] == "https://github.com/user/repo-0"
 
     @patch.object(github_client, "_session")
+    def test_captures_pushed_at(self, mock_session_fn):
+        """pushed_at (last push time) is captured for staleness checks."""
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response(
+            [_repo_payload("r", pushed_at="2026-06-01T00:00:00Z")]
+        )
+        result = github_client.fetch_repos("user")
+        assert result[0]["pushed_at"] == "2026-06-01T00:00:00Z"
+
+    @patch.object(github_client, "_session")
     def test_pagination(self, mock_session_fn):
         """Users with >100 repos trigger multiple pages."""
         session = MagicMock()

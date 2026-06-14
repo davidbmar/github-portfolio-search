@@ -24,18 +24,18 @@ class _FakeClient:
         return dict(_LLM_FIELDS)
 
 
-def _repo(name):
+def _repo(name, pushed_at=""):
     return {
         "name": name, "html_url": f"https://github.com/davidbmar/{name}",
         "private": False, "description": "", "language": "Python",
-        "topics": [], "stars": 0, "updated_at": "",
+        "topics": [], "stars": 0, "updated_at": "", "pushed_at": pushed_at,
     }
 
 
-def _fake_gh(*names):
+def _fake_gh(*names, pushed_at=""):
     import types
 
-    repos = [_repo(n) for n in (names or ("alpha",))]
+    repos = [_repo(n, pushed_at) for n in (names or ("alpha",))]
     return types.SimpleNamespace(
         fetch_repos=lambda username: repos,
         fetch_readme=lambda o, r: "# Repo\n\nReal content here for the project.",
@@ -120,6 +120,44 @@ def test_failed_repo_is_recorded_and_does_not_abort_batch(tmp_path):
     # the feed is still rebuilt (empty) even though every repo failed
     feed = json.loads((tmp_path / "web" / "data" / "projects.json").read_text())
     assert feed["count"] == 0
+
+
+def _gen_args(tmp_path):
+    return dict(
+        owner="davidbmar",
+        records_dir=str(tmp_path / "projects"),
+        html_dir=str(tmp_path / "web" / "projects"),
+        feed_path=str(tmp_path / "web" / "data" / "projects.json"),
+    )
+
+
+def test_stale_regenerates_repo_pushed_after_doc(tmp_path):
+    args = _gen_args(tmp_path)
+    generate.generate_all(client=_FakeClient(), gh=_fake_gh("alpha"), **args)
+    # repo pushed far in the future relative to the just-written generated_at
+    gh = _fake_gh("alpha", pushed_at="2999-01-01T00:00:00Z")
+    result = generate.generate_all(client=_FakeClient(), gh=gh, stale=True, **args)
+    assert result["generated"] == 1
+    assert result["skipped"] == 0
+
+
+def test_stale_skips_repo_not_pushed_since_doc(tmp_path):
+    args = _gen_args(tmp_path)
+    generate.generate_all(client=_FakeClient(), gh=_fake_gh("alpha"), **args)
+    # repo last pushed in the distant past → not stale → skipped
+    gh = _fake_gh("alpha", pushed_at="2000-01-01T00:00:00Z")
+    result = generate.generate_all(client=_FakeClient(), gh=gh, stale=True, **args)
+    assert result["generated"] == 0
+    assert result["skipped"] == 1
+
+
+def test_stale_still_generates_missing_repo(tmp_path):
+    # no existing record → stale mode still generates it
+    result = generate.generate_all(
+        client=_FakeClient(), gh=_fake_gh("brandnew", pushed_at=""), stale=True,
+        **_gen_args(tmp_path),
+    )
+    assert result["generated"] == 1
 
 
 def test_limit_caps_repo_count(tmp_path):

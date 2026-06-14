@@ -18,6 +18,21 @@ from ghps.docsgen.record_gen import RecordGenerationError
 logger = logging.getLogger(__name__)
 
 
+def _is_stale(record_path: Path, pushed_at: str) -> bool:
+    """True if the repo was pushed after the record was generated.
+
+    Both timestamps are ISO-8601 UTC with a 'Z' suffix, so a lexicographic
+    comparison is correct. An unreadable record is treated as stale (regenerate).
+    """
+    if not pushed_at:
+        return False
+    try:
+        generated_at = json.loads(record_path.read_text()).get("generated_at", "")
+    except (OSError, json.JSONDecodeError):
+        return True
+    return bool(generated_at) and pushed_at > generated_at
+
+
 def generate_one(
     repo_meta: dict,
     *,
@@ -58,9 +73,14 @@ def generate_all(
     only: str | None = None,
     limit: int | None = None,
     force: bool = False,
+    stale: bool = False,
     model: str | None = None,
 ) -> dict:
     """Generate docs for every repo owned by *owner*.
+
+    Idempotent: an existing record is skipped unless *force* (regenerate all) or
+    *stale* (regenerate only repos whose GitHub ``pushed_at`` is newer than the
+    record's ``generated_at`` — i.e. checked-in since the doc was written).
 
     Returns ``{"generated": int, "skipped": int, "failed": list[str]}``.
     """
@@ -78,9 +98,11 @@ def generate_all(
         slug = repo_meta["name"]
         record_path = Path(records_dir) / f"{slug}.record.json"
         if record_path.exists() and not force:
-            skipped += 1
-            logger.info("skipping %s (record exists)", slug)
-            continue
+            if not (stale and _is_stale(record_path, repo_meta.get("pushed_at", ""))):
+                skipped += 1
+                logger.info("skipping %s (record exists)", slug)
+                continue
+            logger.info("regenerating %s (pushed since last generated)", slug)
         try:
             generate_one(
                 repo_meta,

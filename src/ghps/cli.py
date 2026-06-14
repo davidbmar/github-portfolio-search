@@ -264,9 +264,10 @@ def export(db: str, output: str) -> None:
 @click.option("--only", default=None, help="Generate just one repo by slug.")
 @click.option("--limit", default=None, type=int, help="Cap number of repos (cost control).")
 @click.option("--force", is_flag=True, help="Regenerate even if a record exists.")
+@click.option("--stale", is_flag=True, help="Regenerate only repos pushed since their doc was generated.")
 @click.option("--provider", default=None, help="LLM provider (dashscope|anthropic).")
 @click.option("--model", default=None, help="Override model id (provenance + dial).")
-def gen_docs(owner, only, limit, force, provider, model):
+def gen_docs(owner, only, limit, force, stale, provider, model):
     """Generate AI-written, machine-readable docs (L0) for each repo."""
     from ghps.docsgen import generate
     from ghps.docsgen.llm_client import get_client
@@ -284,6 +285,7 @@ def gen_docs(owner, only, limit, force, provider, model):
         only=only,
         limit=limit,
         force=force,
+        stale=stale,
         model=model,
     )
 

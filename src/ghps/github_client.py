@@ -35,7 +35,8 @@ def fetch_repos(username: str) -> list[dict[str, Any]]:
     falls back to /users/{username}/repos (public only) otherwise.
 
     Returns a list of dicts with keys:
-        name, description, language, topics, stars, updated_at, html_url
+        name, description, language, topics, stars, updated_at, pushed_at,
+        html_url, private
     """
     session = _session()
     repos: list[dict[str, Any]] = []
@@ -65,6 +66,7 @@ def fetch_repos(username: str) -> list[dict[str, Any]]:
                     "topics": r.get("topics", []),
                     "stars": r.get("stargazers_count", 0),
                     "updated_at": r.get("updated_at", ""),
+                    "pushed_at": r.get("pushed_at", ""),
                     "html_url": r.get("html_url", ""),
                     "private": r.get("private", False),
                 }
