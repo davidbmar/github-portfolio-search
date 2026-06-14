@@ -45,4 +45,4 @@ def aggregate_records(records_dir: str, output_path: str) -> dict:
     )
     logger.info("aggregated %d records to %s", len(projects), output_path)
 
-    return {"count": len(projects), "skipped": skipped}
+    return {"count": len(projects), "skipped": skipped, "projects": projects}

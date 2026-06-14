@@ -60,5 +60,7 @@ def test_empty_directory_yields_zero_count(tmp_path):
     out = tmp_path / "projects.json"
 
     result = aggregate.aggregate_records(str(records_dir), str(out))
-    assert result == {"count": 0, "skipped": []}
+    assert result["count"] == 0
+    assert result["skipped"] == []
+    assert result["projects"] == []
     assert json.loads(out.read_text())["projects"] == []

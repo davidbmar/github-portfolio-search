@@ -96,5 +96,14 @@ def generate_all(
             logger.warning("FAILED %s: %s", slug, exc)
             failed.append(slug)
 
-    aggregate.aggregate_records(records_dir, feed_path)
+    summary = aggregate.aggregate_records(records_dir, feed_path)
+
+    # Render the human listing page over ALL records on disk (not just this run).
+    # Ensure html_dir exists even when no repo was generated this run.
+    Path(html_dir).mkdir(parents=True, exist_ok=True)
+    index_path = Path(html_dir) / "index.html"
+    index_path.write_text(
+        render.render_index_page(summary["projects"]), encoding="utf-8"
+    )
+
     return {"generated": generated, "skipped": skipped, "failed": failed}

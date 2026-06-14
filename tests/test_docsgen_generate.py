@@ -71,6 +71,9 @@ def test_generate_all_writes_record_html_and_aggregate(tmp_path):
     assert (tmp_path / "web" / "projects" / "alpha.html").exists()
     feed = json.loads((tmp_path / "web" / "data" / "projects.json").read_text())
     assert feed["count"] == 1
+    # listing page is written and links to the generated page
+    index_html = (tmp_path / "web" / "projects" / "index.html").read_text()
+    assert 'href="alpha.html"' in index_html
 
 
 def test_idempotent_skips_existing_unless_force(tmp_path):

@@ -218,3 +218,87 @@ def render_page(record: dict) -> str:
 </body>
 </html>
 """
+
+
+def _index_card(p: dict) -> str:
+    """One project card (server-rendered, no JS) linking to its detail page."""
+    slug = p.get("slug", "")
+    title = html.escape(p.get("title") or slug)
+    thin = '<span class="badge thin">thin</span>' if p.get("thin") else ""
+    todos = p.get("todos") or []
+    if todos:
+        hyg = f'<span class="hyg warn">⚠ {len(todos)} need attention</span>'
+    else:
+        hyg = '<span class="hyg ok">✓ all on main</span>'
+    tech = "".join(
+        f'<span class="tag">{html.escape(t)}</span>' for t in (p.get("tech") or [])[:4]
+    )
+    shot = ""
+    url = p.get("screenshot_url", "")
+    if url.startswith(("http://", "https://")):
+        shot = (
+            f'<img class="thumb" src="{html.escape(url, quote=True)}" '
+            f'alt="{title} screenshot" loading="lazy">'
+        )
+    return (
+        f'<a class="card" href="{html.escape(slug, quote=True)}.html">'
+        f"{shot}"
+        f'<div class="card-body"><h2>{title}{thin}</h2>'
+        f'<p class="ol">{html.escape(p.get("one_liner", ""))}</p>'
+        f'<div class="tags">{tech}</div>{hyg}</div></a>'
+    )
+
+
+def render_index_page(projects: list[dict]) -> str:
+    """Render the listing page over all generated project docs (server-rendered)."""
+    count = len(projects)
+    if projects:
+        cards = "\n".join(_index_card(p) for p in projects)
+        body = f'<div class="grid">{cards}</div>'
+    else:
+        body = '<p class="muted">No project docs generated yet.</p>'
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Docs · davidbmar.com</title>
+<meta name="description" content="AI-generated documentation for {count} projects.">
+<style>
+  :root {{ color-scheme: light dark; }}
+  body {{ font: 16px/1.6 system-ui, sans-serif; max-width: 1080px; margin: 2rem auto;
+          padding: 0 1.25rem; }}
+  header.top {{ margin-bottom: 1.5rem; }}
+  header.top h1 {{ margin-bottom: .15rem; }}
+  .sub {{ opacity: .7; }}
+  .grid {{ display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }}
+  .card {{ display: flex; flex-direction: column; border: 1px solid #8884; border-radius: 12px;
+           overflow: hidden; text-decoration: none; color: inherit; background: #fff1;
+           transition: box-shadow .15s, transform .15s; }}
+  .card:hover {{ box-shadow: 0 6px 24px #0003; transform: translateY(-2px); }}
+  .thumb {{ width: 100%; height: 150px; object-fit: cover; border-bottom: 1px solid #8883; }}
+  .card-body {{ padding: .85rem 1rem 1rem; display: flex; flex-direction: column; gap: .4rem; flex: 1; }}
+  .card h2 {{ font-size: 1.05rem; margin: 0; }}
+  .ol {{ font-size: .9rem; opacity: .85; margin: 0; flex: 1; }}
+  .tags {{ display: flex; flex-wrap: wrap; gap: .2rem; }}
+  .tag {{ background: #eef; color: #224; border-radius: 6px; padding: .05rem .4rem; font-size: .75rem; }}
+  .badge.thin {{ font-size: .65rem; padding: .1rem .4rem; border-radius: 999px;
+                 background: #b88600; color: #fff; margin-left: .4rem; vertical-align: middle; }}
+  .hyg {{ font-size: .78rem; }}
+  .hyg.ok {{ color: #2a7; }}
+  .hyg.warn {{ color: #d33; }}
+  .muted {{ opacity: .6; }}
+  a.home {{ color: #2563eb; }}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Project Docs</h1>
+  <p class="sub">AI-generated documentation — {count} project{"" if count == 1 else "s"}.
+     <a class="home" href="/">← back to portfolio search</a></p>
+</header>
+{body}
+</body>
+</html>
+"""

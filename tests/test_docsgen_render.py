@@ -149,6 +149,56 @@ def test_escapes_quickstart_and_features():
     assert "<b>x</b>" not in html
 
 
+def _index_projects():
+    return [
+        {"slug": "alpha", "title": "Alpha", "one_liner": "Does A.", "thin": False,
+         "tech": ["python", "fastapi"], "todos": [], "screenshot_url": ""},
+        {"slug": "beta", "title": "Beta", "one_liner": "Does B.", "thin": True,
+         "tech": [], "todos": [{"kind": "open_pr", "detail": "PR #1"}],
+         "screenshot_url": "https://cdn.example.com/b.png"},
+    ]
+
+
+def test_index_lists_all_projects_with_links():
+    html = render.render_index_page(_index_projects())
+    assert 'href="alpha.html"' in html
+    assert 'href="beta.html"' in html
+    assert "Alpha" in html and "Beta" in html
+    assert "2 projects" in html
+
+
+def test_index_shows_hygiene_and_thin_and_thumb():
+    html = render.render_index_page(_index_projects())
+    assert "all on main" in html.lower()        # alpha is clean
+    assert "1 need attention" in html            # beta has an open PR
+    assert "thin" in html.lower()                # beta thin badge
+    assert 'src="https://cdn.example.com/b.png"' in html  # beta screenshot thumb
+
+
+def test_index_escapes_titles_and_has_no_script():
+    html = render.render_index_page(
+        [{"slug": "x", "title": "<script>alert(1)</script>", "one_liner": "",
+          "thin": False, "tech": [], "todos": [], "screenshot_url": ""}]
+    )
+    assert "<script>alert(1)</script>" not in html
+    assert "&lt;script&gt;" in html
+
+
+def test_index_empty_state():
+    html = render.render_index_page([])
+    assert "No project docs generated yet" in html
+    assert "0 projects" in html
+
+
+def test_index_omits_non_http_thumb():
+    html = render.render_index_page(
+        [{"slug": "x", "title": "X", "one_liner": "", "thin": False, "tech": [],
+          "todos": [], "screenshot_url": "javascript:alert(1)"}]
+    )
+    assert "javascript:alert(1)" not in html
+    assert "<img" not in html
+
+
 def test_json_ld_cannot_break_out_of_script_tag():
     """An LLM-authored title with </script> must not terminate the ld+json block."""
     html = render.render_page(_record(title="Evil </script><script>alert(1)"))
