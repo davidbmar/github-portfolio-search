@@ -298,6 +298,49 @@ def gen_docs(owner, only, limit, force, stale, provider, model):
         sys.exit(1)
 
 
+@main.command(name="find-docs")
+@click.argument("query")
+@click.option("--feed", default="web/data/projects.json", help="Path to the L0 docs feed.")
+@click.option("--top-k", default=10, help="Number of results.")
+@click.option("--format", "fmt", type=click.Choice(["text", "json"]), default="text")
+def find_docs(query, feed, top_k, fmt):
+    """Search the generated project docs (L2): 'have we built X?'."""
+    from ghps.docsgen.search_docs import load_feed, search_docs
+
+    projects = load_feed(feed)
+    if not projects:
+        click.echo(
+            click.style("Error: ", fg="red", bold=True)
+            + f"No docs feed at {feed}. Run 'ghps gen-docs' first.",
+            err=True,
+        )
+        sys.exit(1)
+
+    hits = search_docs(projects, query, limit=top_k)
+
+    if fmt == "json":
+        click.echo(json.dumps(hits, indent=2))
+        return
+
+    if not hits:
+        click.echo(f'No project docs match "{query}".')
+        return
+
+    click.echo(
+        click.style(f"\n  {len(hits)} match(es) for ", fg="white")
+        + click.style(f'"{query}"', fg="cyan", bold=True)
+    )
+    for h in hits:
+        click.echo(
+            f"\n  {click.style(h['title'], fg='cyan', bold=True)} "
+            + click.style(f"(score {h['score']})", fg="green")
+        )
+        click.echo(f"    {h['one_liner']}")
+        click.echo(click.style(f"    matched: ", fg="white") + ", ".join(h["matched"]))
+        click.echo(f"    {h['repo_url']}")
+    click.echo()
+
+
 @main.command()
 @click.option("--port", default=8000, help="Port to listen on.")
 @click.option("--db", default=DEFAULT_DB, help="Path to the SQLite-vec database.")

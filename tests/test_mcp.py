@@ -101,7 +101,7 @@ def embedder():
 
 class TestToolDefinitions:
     def test_tool_count(self):
-        assert len(TOOLS) == 4
+        assert len(TOOLS) == 5
 
     def test_tool_names(self):
         names = {t["name"] for t in TOOLS}
@@ -110,6 +110,7 @@ class TestToolDefinitions:
             "portfolio_clusters",
             "portfolio_repo_detail",
             "portfolio_reindex",
+            "portfolio_find_docs",
         }
 
     def test_tools_have_schemas(self):
@@ -141,12 +142,13 @@ class TestMCPProtocol:
         resp = handle_message(msg, mcp_store, embedder)
         assert resp["id"] == 2
         tools = resp["result"]["tools"]
-        assert len(tools) == 4
+        assert len(tools) == 5
         names = {t["name"] for t in tools}
         assert "portfolio_search" in names
         assert "portfolio_clusters" in names
         assert "portfolio_repo_detail" in names
         assert "portfolio_reindex" in names
+        assert "portfolio_find_docs" in names
 
     def test_ping(self, mcp_store, embedder):
         msg = {"jsonrpc": "2.0", "id": 3, "method": "ping", "params": {}}
@@ -451,3 +453,48 @@ class TestNoIndex:
             assert len(clusters) == 0
         else:
             assert "error" in clusters
+
+
+# ---------------------------------------------------------------------------
+# Tests: portfolio_find_docs (L2 docs search)
+# ---------------------------------------------------------------------------
+
+class TestPortfolioFindDocs:
+    def _feed(self, tmp_path):
+        feed = tmp_path / "projects.json"
+        feed.write_text(json.dumps({"count": 1, "projects": [{
+            "slug": "headline-gen", "title": "Headline Generator",
+            "one_liner": "Integrity-checked headlines.",
+            "repo_url": "https://github.com/u/headline-gen",
+            "capabilities": ["headline generation"], "tech": ["python", "fastapi"],
+            "patterns": ["fail-closed gate"], "reuse_tags": ["llm-provider-isolation"],
+            "components": [], "integrates_with": [], "features": [],
+            "what_it_is": "", "how_its_built": "", "how_to_apply": "",
+        }]}))
+        return str(feed)
+
+    def test_find_docs_returns_ranked_hits(self, mcp_store, embedder, tmp_path):
+        msg = {
+            "jsonrpc": "2.0", "id": 70, "method": "tools/call",
+            "params": {"name": "portfolio_find_docs", "arguments": {"query": "fastapi"}},
+        }
+        resp = handle_message(msg, mcp_store, embedder, self._feed(tmp_path))
+        hits = json.loads(resp["result"]["content"][0]["text"])
+        assert hits[0]["slug"] == "headline-gen"
+        assert "tech" in hits[0]["matched"]
+
+    def test_find_docs_empty_query_is_error(self, mcp_store, embedder, tmp_path):
+        msg = {
+            "jsonrpc": "2.0", "id": 71, "method": "tools/call",
+            "params": {"name": "portfolio_find_docs", "arguments": {"query": ""}},
+        }
+        resp = handle_message(msg, mcp_store, embedder, self._feed(tmp_path))
+        assert resp["result"].get("isError") is True
+
+    def test_find_docs_missing_feed_is_error(self, mcp_store, embedder, tmp_path):
+        msg = {
+            "jsonrpc": "2.0", "id": 72, "method": "tools/call",
+            "params": {"name": "portfolio_find_docs", "arguments": {"query": "x"}},
+        }
+        resp = handle_message(msg, mcp_store, embedder, str(tmp_path / "nope.json"))
+        assert resp["result"].get("isError") is True

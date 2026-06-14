@@ -82,6 +82,30 @@ TOOLS: List[Dict[str, Any]] = [
             "properties": {},
         },
     },
+    {
+        "name": "portfolio_find_docs",
+        "description": (
+            "Search the AI-generated project docs to answer 'have we built X?'. "
+            "Matches curated capabilities, tech, patterns, reuse_tags, components, and "
+            "prose across all documented repos. Returns ranked hits with slug, title, "
+            "one_liner, score, the fields that matched, and repo_url."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Capability/tech/pattern to find (e.g. 'fail-closed LLM gate', 'websocket audio ingestion')",
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of results (default 10)",
+                    "default": 10,
+                },
+            },
+            "required": ["query"],
+        },
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -234,6 +258,23 @@ def _handle_portfolio_repo_detail(store: Any, args: dict) -> dict:
     }
 
 
+def _handle_portfolio_find_docs(docs_feed: str, args: dict) -> List[dict]:
+    """Execute portfolio_find_docs — search the L0 docs feed (projects.json)."""
+    from ghps.docsgen.search_docs import load_feed, search_docs
+
+    query = args.get("query", "")
+    if not query:
+        raise ValueError("query is required")
+    limit = args.get("limit", 10)
+
+    projects = load_feed(docs_feed)
+    if not projects:
+        raise ValueError(
+            f"No docs feed found at {docs_feed}. Run 'ghps gen-docs' to build it."
+        )
+    return search_docs(projects, query, limit=limit)
+
+
 def _handle_portfolio_reindex(store: Any, args: dict) -> dict:
     """Execute portfolio_reindex tool."""
     username = args.get("username", "davidbmar")
@@ -283,7 +324,12 @@ def _jsonrpc_error(id: Any, code: int, message: str) -> dict:
     return {"jsonrpc": "2.0", "id": id, "error": {"code": code, "message": message}}
 
 
-def handle_message(msg: dict, store: Any, embedder: Any) -> Optional[dict]:
+def handle_message(
+    msg: dict,
+    store: Any,
+    embedder: Any,
+    docs_feed: str = "web/data/projects.json",
+) -> Optional[dict]:
     """Process a single JSON-RPC message and return a response (or None for notifications)."""
     method = msg.get("method", "")
     msg_id = msg.get("id")
@@ -318,6 +364,8 @@ def handle_message(msg: dict, store: Any, embedder: Any) -> Optional[dict]:
                 result = _handle_portfolio_repo_detail(store, arguments)
             elif tool_name == "portfolio_reindex":
                 result = _handle_portfolio_reindex(store, arguments)
+            elif tool_name == "portfolio_find_docs":
+                result = _handle_portfolio_find_docs(docs_feed, arguments)
             else:
                 return _jsonrpc_error(msg_id, -32601, f"Unknown tool: {tool_name}")
 
@@ -357,7 +405,7 @@ def _write_message(msg: dict, stream) -> None:
     stream.flush()
 
 
-def run_stdio(db_path: str) -> None:
+def run_stdio(db_path: str, docs_feed: str = "web/data/projects.json") -> None:
     """Run the MCP server over stdio (newline-delimited JSON-RPC)."""
     from ghps.embeddings import EmbeddingPipeline
     from ghps.store import VectorStore
@@ -379,7 +427,7 @@ def run_stdio(db_path: str) -> None:
             if msg is None:
                 break
 
-            response = handle_message(msg, store, embedder)
+            response = handle_message(msg, store, embedder, docs_feed)
             if response is not None:
                 _write_message(response, sys.stdout)
     except (KeyboardInterrupt, BrokenPipeError):
@@ -398,10 +446,16 @@ def main() -> None:
         default=os.path.expanduser("~/.ghps/index.db"),
         help="Path to SQLite database (default: ~/.ghps/index.db)",
     )
+    parser.add_argument(
+        "--docs-feed",
+        type=str,
+        default="web/data/projects.json",
+        help="Path to the L0 docs feed for portfolio_find_docs (default: web/data/projects.json)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, stream=sys.stderr)
-    run_stdio(args.db)
+    run_stdio(args.db, args.docs_feed)
 
 
 if __name__ == "__main__":
