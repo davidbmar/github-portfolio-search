@@ -1,0 +1,74 @@
+{
+  "title": "Audio Orchestrator",
+  "one_liner": "A Python-based service that manages audio file processing workflows by coordinating S3 uploads, database task tracking, and SQS worker queues.",
+  "what_it_is": "Audio Orchestrator is a backend service designed to decouple audio file ingestion from processing. It exposes REST APIs for workers to register and claim tasks, persists task state in PostgreSQL, and uses AWS SQS to distribute work items containing presigned S3 URLs to downstream processing workers.",
+  "how_its_built": "Built with Python using Flask for the API layer, psycopg2 for PostgreSQL interaction, and boto3 for AWS integration (SQS, S3, Secrets Manager). Configuration is hybrid, loading sensitive credentials from AWS Secrets Manager and non-sensitive settings from a local YAML file. It uses a singleton Settings class and dataclasses for task modeling.",
+  "how_to_apply": "Deploy this service in an AWS environment where it can access Secrets Manager, SQS, and S3. Use it as the central control plane for any audio processing pipeline (e.g., transcription, enhancement) where you need reliable task tracking, retry logic, and secure file access delegation via presigned URLs.",
+  "quickstart": "python -m venv venv\nsource venv/bin/activate\npip install -r requirements.txt\npython -m orchestrator.main",
+  "features": [
+    "REST API for worker authentication and task claiming",
+    "Integration with AWS SQS for distributed task queuing",
+    "Generation of presigned S3 URLs for secure file access",
+    "PostgreSQL-backed task state management with retry logic",
+    "Hybrid configuration via AWS Secrets Manager and YAML"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Worker/Client] -->|HTTP/Bearer Token| API[Flask API Routes]\n    API --> Auth{Authenticate}\n    Auth -->|Valid| TS[Task Service]\n    Auth -->|Invalid| Err[401 Error]\n    TS --> DB[(PostgreSQL)]\n    TS --> QS[Queue Service]\n    QS --> SQS[AWS SQS]\n    QS --> S3[AWS S3]\n    S3 -->|Presigned URLs| QS\n    Config[Settings] -->|Secrets| ASM[AWS Secrets Manager]\n    Config -->|YAML| Local[Local File]",
+  "diagram_sequence": "sequenceDiagram\n    participant W as Worker\n    participant A as API Routes\n    participant TS as Task Service\n    participant DB as Database\n    participant QS as Queue Service\n    participant S3 as AWS S3\n    participant SQS as AWS SQS\n\n    W->>A: POST /claim-task (Bearer Token)\n    A->>A: Authenticate Token\n    A->>TS: get_next_task()\n    TS->>DB: Query pending tasks\n    DB-->>TS: Return Task Object\n    TS->>QS: send_task_to_queue(task_id, key)\n    QS->>S3: generate_presigned_urls()\n    S3-->>QS: Return Get/Put URLs\n    QS->>SQS: send_message(Task Details + URLs)\n    SQS-->>QS: Message ID\n    QS-->>TS: Success\n    TS-->>A: Task Assigned\n    A-->>W: 200 OK (Task Data)",
+  "capabilities": [
+    "Task Lifecycle Management",
+    "Secure Credential Handling",
+    "Distributed Queue Integration",
+    "Presigned URL Generation",
+    "Worker Authentication"
+  ],
+  "components": [
+    "Flask API Blueprint",
+    "Task Service",
+    "Queue Service",
+    "Database Operations",
+    "Settings Manager",
+    "S3 Utilities"
+  ],
+  "tech": [
+    "Python",
+    "Flask",
+    "PostgreSQL",
+    "AWS SQS",
+    "AWS S3",
+    "AWS Secrets Manager",
+    "boto3",
+    "psycopg2"
+  ],
+  "depends_on": [
+    "AWS Account with SQS/S3/Secrets Manager",
+    "PostgreSQL Database",
+    "Python 3.x"
+  ],
+  "integrates_with": [
+    "AWS Infrastructure",
+    "External Audio Processing Workers"
+  ],
+  "patterns": [
+    "Singleton Configuration",
+    "Service Layer Pattern",
+    "Repository Pattern (DB Ops)",
+    "Decorator Pattern (Auth)"
+  ],
+  "reuse_tags": [
+    "audio-processing",
+    "task-orchestration",
+    "aws-integration",
+    "flask-api",
+    "sqs-worker-pattern"
+  ],
+  "slug": "audio-orchestrator",
+  "repo_url": "https://github.com/davidbmar/audio-orchestrator",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:23:20.352384Z",
+  "source_commit": "6b02577",
+  "model": "qwen3.7-plus"
+}

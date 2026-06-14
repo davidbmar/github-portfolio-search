@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browser Whisper Models Local Showcase · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Browser Whisper Models Local Showcase", "one_liner": "A client-side web application for private, offline speech-to-text transcription using OpenAI's Whisper models via WebGPU or WebAssembly.", "what_it_is": "This project is a static HTML/JavaScript interface that enables users to perform speech-to-text transcription entirely within their browser. It leverages two distinct inference engines: transformers.js (utilizing ONNX Runtime and WebGPU for GPU acceleration) and whisper.cpp (compiled to WebAssembly for CPU optimization). The application supports 13+ Whisper model variants, ranging from Tiny to Large-v3, and handles audio input via file upload or direct microphone recording. All processing occurs locally, ensuring data privacy, with models cached in IndexedDB for subsequent use.", "how_its_built": "The application is built as a client-side single-page app using vanilla HTML, CSS, and JavaScript. It integrates Hugging Face's transformers.js library for WebGPU-based inference and the whisper.cpp C++ codebase compiled to WebAssembly (WASM) for CPU-based inference. It uses the Web Audio API for audio preprocessing and resampling, and relies on Service Workers (specifically coi-serviceworker) to enable Cross-Origin Isolation required for SharedArrayBuffer support in WASM threads.", "how_to_apply": "Developers can use this repository as a reference implementation for integrating local LLMs or ASR models into web applications. It demonstrates how to manage large binary assets (models) in the browser, handle WebGPU vs. WASM fallbacks, and implement real-time audio processing pipelines without backend dependencies. It serves as a template for privacy-focused audio tools.", "quickstart": "git clone https://github.com/davidbmar/browser-whisper-models-local-showcase.git\ncd browser-whisper-models-local-showcase\npython3 -m http.server 8080", "features": ["100% local processing with no data sent to external servers", "Support for 13+ Whisper models (Tiny to Large-v3) with varying speed/accuracy tradeoffs", "Dual engine support: transformers.js (WebGPU) and whisper.cpp (WASM)", "Real-time transcription statistics including processing time and speed metrics", "Audio input via direct microphone recording or file upload", "Automatic model caching in browser IndexedDB for faster reloads"], "diagram_architecture": "flowchart TD\n    User[User] -->|Interacts| UI[HTML Interface]\n    UI -->|Selects Engine| EngineManager[Engine Manager]\n    EngineManager -->|Loads| TransformersJS[transformers.js<br/>ONNX Runtime + WebGPU]\n    EngineManager -->|Loads| WhisperCPP[whisper.cpp<br/>WASM + Web Worker]\n    UI -->|Provides Audio| AudioProc[Web Audio API]\n    AudioProc -->|Resampled PCM| TransformersJS\n    AudioProc -->|Resampled PCM| WhisperCPP\n    TransformersJS -->|Fetches| HF[Hugging Face Hub]\n    WhisperCPP -->|Uses Local| WASM_Binary[libmain.wasm]\n    HF -->|Caches| IDB[(IndexedDB)]\n    IDB -->|Serves| TransformersJS\n    TransformersJS -->|Returns Text| UI\n    WhisperCPP -->|Returns Text| UI", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant I as Index.html\n    participant E as Engine Logic\n    participant W as Web Worker/WASM\n    participant M as Model Cache (IDB)\n    \n    U->>I: Select Model & Engine\n    I->>E: Initialize Engine\n    E->>M: Check for cached model\n    alt Model not cached\n        M-->>E: Miss\n        E->>E: Download from Hugging Face\n        E->>M: Store in IndexedDB\n    else Model cached\n        M-->>E: Hit\n    end\n    E->>W: Load Model into Memory\n    W-->>E: Ready\n    \n    U->>I: Record/Upload Audio\n    I->>E: Process Audio Buffer\n    E->>W: Run Inference (PCM Data)\n    W->>W: Execute Whisper Forward Pass\n    W-->>E: Return Transcription Text\n    E-->>I: Update UI with Results\n    I-->>U: Display Transcript", "capabilities": ["Speech-to-Text Transcription", "Offline Processing", "WebGPU Acceleration", "WebAssembly Execution", "Audio Recording", "File Upload Handling", "Model Caching"], "components": ["index.html", "helpers.js", "coi-serviceworker.js", "libmain.js", "libmain.worker.js"], "tech": ["HTML5", "JavaScript", "WebGPU", "WebAssembly", "Web Audio API", "IndexedDB", "Service Workers"], "depends_on": ["transformers.js", "whisper.cpp", "ONNX Runtime", "Hugging Face Models"], "integrates_with": ["Hugging Face Hub", "Browser MediaRecorder API"], "patterns": ["Client-Side Inference", "Web Worker Offloading", "Lazy Loading", "Cache-First Strategy", "Cross-Origin Isolation"], "reuse_tags": ["privacy-first", "offline-ai", "webgpu", "wasm", "speech-recognition", "static-site"], "slug": "browser-whisper-models-local-showcase", "repo_url": "https://github.com/davidbmar/browser-whisper-models-local-showcase", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/browser-whisper-models-local-showcase/main/screenshots/main-interface.png", "generated_at": "2026-06-14T02:31:53.766201Z", "source_commit": "15fdc1a", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Browser Whisper Models Local Showcase",
+  "description": "A client-side web application for private, offline speech-to-text transcription using OpenAI's Whisper models via WebGPU or WebAssembly.",
+  "codeRepository": "https://github.com/davidbmar/browser-whisper-models-local-showcase",
+  "programmingLanguage": [
+    "HTML5",
+    "JavaScript",
+    "WebGPU",
+    "WebAssembly",
+    "Web Audio API",
+    "IndexedDB",
+    "Service Workers"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Browser Whisper Models Local Showcase</h1>
+  <p class="one-liner">A client-side web application for private, offline speech-to-text transcription using OpenAI&#x27;s Whisper models via WebGPU or WebAssembly.</p>
+  <p><a href="https://github.com/davidbmar/browser-whisper-models-local-showcase">https://github.com/davidbmar/browser-whisper-models-local-showcase</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/browser-whisper-models-local-showcase/main/screenshots/main-interface.png" alt="Browser Whisper Models Local Showcase screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>This project is a static HTML/JavaScript interface that enables users to perform speech-to-text transcription entirely within their browser. It leverages two distinct inference engines: transformers.js (utilizing ONNX Runtime and WebGPU for GPU acceleration) and whisper.cpp (compiled to WebAssembly for CPU optimization). The application supports 13+ Whisper model variants, ranging from Tiny to Large-v3, and handles audio input via file upload or direct microphone recording. All processing occurs locally, ensuring data privacy, with models cached in IndexedDB for subsequent use.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>100% local processing with no data sent to external servers</li><li>Support for 13+ Whisper models (Tiny to Large-v3) with varying speed/accuracy tradeoffs</li><li>Dual engine support: transformers.js (WebGPU) and whisper.cpp (WASM)</li><li>Real-time transcription statistics including processing time and speed metrics</li><li>Audio input via direct microphone recording or file upload</li><li>Automatic model caching in browser IndexedDB for faster reloads</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/browser-whisper-models-local-showcase.git
+cd browser-whisper-models-local-showcase
+python3 -m http.server 8080</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Interacts| UI[HTML Interface]
+    UI -->|Selects Engine| EngineManager[Engine Manager]
+    EngineManager -->|Loads| TransformersJS[transformers.js&lt;br/>ONNX Runtime + WebGPU]
+    EngineManager -->|Loads| WhisperCPP[whisper.cpp&lt;br/>WASM + Web Worker]
+    UI -->|Provides Audio| AudioProc[Web Audio API]
+    AudioProc -->|Resampled PCM| TransformersJS
+    AudioProc -->|Resampled PCM| WhisperCPP
+    TransformersJS -->|Fetches| HF[Hugging Face Hub]
+    WhisperCPP -->|Uses Local| WASM_Binary[libmain.wasm]
+    HF -->|Caches| IDB[(IndexedDB)]
+    IDB -->|Serves| TransformersJS
+    TransformersJS -->|Returns Text| UI
+    WhisperCPP -->|Returns Text| UI</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The application is built as a client-side single-page app using vanilla HTML, CSS, and JavaScript. It integrates Hugging Face&#x27;s transformers.js library for WebGPU-based inference and the whisper.cpp C++ codebase compiled to WebAssembly (WASM) for CPU-based inference. It uses the Web Audio API for audio preprocessing and resampling, and relies on Service Workers (specifically coi-serviceworker) to enable Cross-Origin Isolation required for SharedArrayBuffer support in WASM threads.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant I as Index.html
+    participant E as Engine Logic
+    participant W as Web Worker/WASM
+    participant M as Model Cache (IDB)
+    
+    U->>I: Select Model & Engine
+    I->>E: Initialize Engine
+    E->>M: Check for cached model
+    alt Model not cached
+        M-->>E: Miss
+        E->>E: Download from Hugging Face
+        E->>M: Store in IndexedDB
+    else Model cached
+        M-->>E: Hit
+    end
+    E->>W: Load Model into Memory
+    W-->>E: Ready
+    
+    U->>I: Record/Upload Audio
+    I->>E: Process Audio Buffer
+    E->>W: Run Inference (PCM Data)
+    W->>W: Execute Whisper Forward Pass
+    W-->>E: Return Transcription Text
+    E-->>I: Update UI with Results
+    I-->>U: Display Transcript</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Developers can use this repository as a reference implementation for integrating local LLMs or ASR models into web applications. It demonstrates how to manage large binary assets (models) in the browser, handle WebGPU vs. WASM fallbacks, and implement real-time audio processing pipelines without backend dependencies. It serves as a template for privacy-focused audio tools.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Speech-to-Text Transcription</span><span class="tag">Offline Processing</span><span class="tag">WebGPU Acceleration</span><span class="tag">WebAssembly Execution</span><span class="tag">Audio Recording</span><span class="tag">File Upload Handling</span><span class="tag">Model Caching</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">index.html</span><span class="tag">helpers.js</span><span class="tag">coi-serviceworker.js</span><span class="tag">libmain.js</span><span class="tag">libmain.worker.js</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">HTML5</span><span class="tag">JavaScript</span><span class="tag">WebGPU</span><span class="tag">WebAssembly</span><span class="tag">Web Audio API</span><span class="tag">IndexedDB</span><span class="tag">Service Workers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">transformers.js</span><span class="tag">whisper.cpp</span><span class="tag">ONNX Runtime</span><span class="tag">Hugging Face Models</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Hugging Face Hub</span><span class="tag">Browser MediaRecorder API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Side Inference</span><span class="tag">Web Worker Offloading</span><span class="tag">Lazy Loading</span><span class="tag">Cache-First Strategy</span><span class="tag">Cross-Origin Isolation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">privacy-first</span><span class="tag">offline-ai</span><span class="tag">webgpu</span><span class="tag">wasm</span><span class="tag">speech-recognition</span><span class="tag">static-site</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:31:53.766201Z ·
+     commit 15fdc1a ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

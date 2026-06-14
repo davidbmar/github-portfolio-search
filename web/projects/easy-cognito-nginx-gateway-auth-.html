@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Easy Cognito Nginx Gateway Auth · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Easy Cognito Nginx Gateway Auth", "one_liner": "A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.", "what_it_is": "This project provides a shell-based installation framework to configure an nginx reverse proxy and oauth2-proxy instance. It acts as a centralized authentication layer for web applications, handling OAuth2/OIDC flows with AWS Cognito. Applications behind the gateway receive authenticated user details via HTTP headers (e.g., X-User-Email), enabling zero-code integration of Single Sign-On (SSO).", "how_its_built": "The solution is built using Bash scripts for automation and configuration management. It installs and configures three core components: nginx (as the entry point and reverse proxy), oauth2-proxy (as the OIDC client handler), and AWS Cognito (as the identity provider). Configuration is managed via template files populated by command-line arguments or environment variables, and services are managed via systemd.", "how_to_apply": "Deploy this on an Ubuntu/Debian server where your web applications are hosted. Use the provided install.sh script to configure the gateway with your AWS Cognito credentials and application ports. For infrastructure-as-code workflows, use the bootstrap.sh script within EC2 user_data templates to automate setup during instance initialization.", "quickstart": "git clone https://github.com/davidbmar/easy-cognito-nginx-gateway-auth.git\ncd easy-cognito-nginx-gateway-auth\nsudo ./scripts/install.sh --domain=your-domain.com --cognito-region=us-east-1 --cognito-pool-id=us-east-1_XXXXXXXXX --cognito-client-id=YOUR_CLIENT_ID --cognito-client-secret=YOUR_CLIENT_SECRET --app-port=3000", "features": ["Zero-code authentication integration for existing web apps", "Centralized Single Sign-On (SSO) via AWS Cognito", "Secure OAuth2 Authorization Code Flow with PKCE", "Passes user identity to apps via standard HTTP headers", "Modular nginx configuration for multi-app support", "Automated installation and systemd service management"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS Request| Nginx[Nginx Reverse Proxy]\n    Nginx -->|Auth Check| OAuth2[oauth2-proxy]\n    OAuth2 -->|OIDC Flow| Cognito[AWS Cognito]\n    Cognito -->|Token Validation| OAuth2\n    OAuth2 -->|Set Cookie/Headers| Nginx\n    Nginx -->|Proxy Request + Headers| App[Web Application]\n    App -->|Response| Nginx\n    Nginx -->|Response| User", "diagram_sequence": "sequenceDiagram\n    participant User as User Browser\n    participant Nginx as Nginx Gateway\n    participant Proxy as oauth2-proxy\n    participant Cognito as AWS Cognito\n    participant App as Web App\n\n    User->>Nginx: GET /protected-resource\n    Nginx->>Proxy: auth_request /oauth2/auth\n    alt Not Authenticated\n        Proxy->>User: 302 Redirect to Cognito Login\n        User->>Cognito: Authenticate\n        Cognito->>User: Redirect with Code\n        User->>Proxy: Callback with Code\n        Proxy->>Cognito: Exchange Code for Token\n        Cognito->>Proxy: ID/Access Tokens\n        Proxy->>User: Set Secure Cookie & Redirect\n    else Authenticated\n        Proxy->>Nginx: 200 OK + User Headers\n    end\n    Nginx->>App: Proxy Request + X-User-Email Header\n    App->>Nginx: Application Response\n    Nginx->>User: Final Content", "capabilities": ["Reverse Proxy Authentication", "OIDC Client Management", "Header Injection", "SSL/TLS Termination", "Session Management"], "components": ["nginx", "oauth2-proxy", "install.sh", "bootstrap.sh", "systemd services"], "tech": ["Bash", "Nginx", "oauth2-proxy", "AWS Cognito", "Systemd", "OpenSSL"], "depends_on": ["Ubuntu/Debian Linux", "AWS Account", "Cognito User Pool", "Domain Name"], "integrates_with": ["AWS Cognito", "Express.js", "Any HTTP Web Server", "Terraform"], "patterns": ["Reverse Proxy", "Sidecar Authentication", "Infrastructure as Code", "Zero-Trust Network"], "reuse_tags": ["authentication", "aws-cognito", "nginx", "oauth2", "devops", "security-gateway"], "slug": "easy-cognito-nginx-gateway-auth-", "repo_url": "https://github.com/davidbmar/easy-cognito-nginx-gateway-auth-", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:44:48.964213Z", "source_commit": "e9ac681", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Easy Cognito Nginx Gateway Auth",
+  "description": "A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.",
+  "codeRepository": "https://github.com/davidbmar/easy-cognito-nginx-gateway-auth-",
+  "programmingLanguage": [
+    "Bash",
+    "Nginx",
+    "oauth2-proxy",
+    "AWS Cognito",
+    "Systemd",
+    "OpenSSL"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Easy Cognito Nginx Gateway Auth</h1>
+  <p class="one-liner">A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.</p>
+  <p><a href="https://github.com/davidbmar/easy-cognito-nginx-gateway-auth-">https://github.com/davidbmar/easy-cognito-nginx-gateway-auth-</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project provides a shell-based installation framework to configure an nginx reverse proxy and oauth2-proxy instance. It acts as a centralized authentication layer for web applications, handling OAuth2/OIDC flows with AWS Cognito. Applications behind the gateway receive authenticated user details via HTTP headers (e.g., X-User-Email), enabling zero-code integration of Single Sign-On (SSO).</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Zero-code authentication integration for existing web apps</li><li>Centralized Single Sign-On (SSO) via AWS Cognito</li><li>Secure OAuth2 Authorization Code Flow with PKCE</li><li>Passes user identity to apps via standard HTTP headers</li><li>Modular nginx configuration for multi-app support</li><li>Automated installation and systemd service management</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/easy-cognito-nginx-gateway-auth.git
+cd easy-cognito-nginx-gateway-auth
+sudo ./scripts/install.sh --domain=your-domain.com --cognito-region=us-east-1 --cognito-pool-id=us-east-1_XXXXXXXXX --cognito-client-id=YOUR_CLIENT_ID --cognito-client-secret=YOUR_CLIENT_SECRET --app-port=3000</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|HTTPS Request| Nginx[Nginx Reverse Proxy]
+    Nginx -->|Auth Check| OAuth2[oauth2-proxy]
+    OAuth2 -->|OIDC Flow| Cognito[AWS Cognito]
+    Cognito -->|Token Validation| OAuth2
+    OAuth2 -->|Set Cookie/Headers| Nginx
+    Nginx -->|Proxy Request + Headers| App[Web Application]
+    App -->|Response| Nginx
+    Nginx -->|Response| User</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The solution is built using Bash scripts for automation and configuration management. It installs and configures three core components: nginx (as the entry point and reverse proxy), oauth2-proxy (as the OIDC client handler), and AWS Cognito (as the identity provider). Configuration is managed via template files populated by command-line arguments or environment variables, and services are managed via systemd.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as User Browser
+    participant Nginx as Nginx Gateway
+    participant Proxy as oauth2-proxy
+    participant Cognito as AWS Cognito
+    participant App as Web App
+
+    User->>Nginx: GET /protected-resource
+    Nginx->>Proxy: auth_request /oauth2/auth
+    alt Not Authenticated
+        Proxy->>User: 302 Redirect to Cognito Login
+        User->>Cognito: Authenticate
+        Cognito->>User: Redirect with Code
+        User->>Proxy: Callback with Code
+        Proxy->>Cognito: Exchange Code for Token
+        Cognito->>Proxy: ID/Access Tokens
+        Proxy->>User: Set Secure Cookie & Redirect
+    else Authenticated
+        Proxy->>Nginx: 200 OK + User Headers
+    end
+    Nginx->>App: Proxy Request + X-User-Email Header
+    App->>Nginx: Application Response
+    Nginx->>User: Final Content</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy this on an Ubuntu/Debian server where your web applications are hosted. Use the provided install.sh script to configure the gateway with your AWS Cognito credentials and application ports. For infrastructure-as-code workflows, use the bootstrap.sh script within EC2 user_data templates to automate setup during instance initialization.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Reverse Proxy Authentication</span><span class="tag">OIDC Client Management</span><span class="tag">Header Injection</span><span class="tag">SSL/TLS Termination</span><span class="tag">Session Management</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">nginx</span><span class="tag">oauth2-proxy</span><span class="tag">install.sh</span><span class="tag">bootstrap.sh</span><span class="tag">systemd services</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Bash</span><span class="tag">Nginx</span><span class="tag">oauth2-proxy</span><span class="tag">AWS Cognito</span><span class="tag">Systemd</span><span class="tag">OpenSSL</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Ubuntu/Debian Linux</span><span class="tag">AWS Account</span><span class="tag">Cognito User Pool</span><span class="tag">Domain Name</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS Cognito</span><span class="tag">Express.js</span><span class="tag">Any HTTP Web Server</span><span class="tag">Terraform</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Reverse Proxy</span><span class="tag">Sidecar Authentication</span><span class="tag">Infrastructure as Code</span><span class="tag">Zero-Trust Network</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">authentication</span><span class="tag">aws-cognito</span><span class="tag">nginx</span><span class="tag">oauth2</span><span class="tag">devops</span><span class="tag">security-gateway</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:44:48.964213Z ·
+     commit e9ac681 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

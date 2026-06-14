@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio2ScriptViewer · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Audio2ScriptViewer", "one_liner": "A Python micro-service that processes transcribed audio messages from AWS SQS and compiles them into a sorted CSV script.", "what_it_is": "Audio2ScriptViewer is a backend utility designed to consume transcription outputs, likely from an upstream speech-to-text service. It listens to an AWS SQS queue for JSON messages containing filenames and transcribed text, cleans the text formatting, sorts entries by a numeric key extracted from the filename, and appends them to a local CSV file. It operates as part of a larger media processing pipeline but can function independently as a worker service.", "how_its_built": "The core logic is implemented in Python using the boto3 library for AWS interactions. It uses argparse for CLI configuration, allowing it to run in a continuous loop or a single-pass mode. Text cleaning is handled via regular expressions to normalize newlines and carriage returns. The infrastructure is defined using Terraform, suggesting an AWS-native deployment model involving SQS queues and potentially S3 or EC2 for hosting the script.", "how_to_apply": "This tool is applicable in media production workflows where audio files are transcribed asynchronously. It serves as the aggregation layer that converts scattered transcription events into a unified, chronological script document (CSV) for review or further processing by editors or downstream NLP tasks.", "quickstart": "terraform init\nterraform apply\npython3 audio2Script.py --run-once", "features": ["Consumes transcription results from AWS SQS queues", "Cleans and normalizes transcribed text (handling newlines/carriage returns)", "Sorts output entries chronologically based on numeric filename keys", "Appends processed data to a structured CSV file", "Supports both continuous polling and single-execution modes", "Infrastructure-as-Code setup via Terraform"], "diagram_architecture": "flowchart TD\n    A[Upstream Transcriber] -->|JSON Message| B(AWS SQS Queue)\n    B -->|Poll| C[Audio2ScriptViewer]\n    C -->|Process & Clean| D[Local Storage]\n    D -->|Write| E[(output.csv)]\n    subgraph Infrastructure\n    B\n    C\n    end", "diagram_sequence": "sequenceDiagram\n    participant T as Transcriber\n    participant Q as AWS SQS\n    participant S as Audio2ScriptViewer\n    participant F as Local CSV File\n\n    T->>Q: Send Message (filename, text)\n    loop Every X Seconds or Once\n        S->>Q: Receive Messages\n        Q-->>S: Return Message Batch\n        S->>S: Parse JSON & Extract Key\n        S->>S: Clean Text (regex)\n        S->>S: Sort Messages by Key\n        S->>F: Append Rows to CSV\n    end", "capabilities": ["SQS Message Consumption", "Text Normalization", "CSV Generation", "Filename Parsing", "Batch Sorting"], "components": ["audio2Script.py", "utility.mock_transcribe.py", "Terraform Configs"], "tech": ["Python", "boto3", "AWS SQS", "Terraform", "CSV", "Regex"], "depends_on": ["AWS Account", "SQS Queue Access", "Python 3 Environment"], "integrates_with": ["AWS Speech Services", "Third-party Transcribers", "Media Asset Management Systems"], "patterns": ["Worker Pattern", "Polling Consumer", "ETL (Extract, Transform, Load)"], "reuse_tags": ["aws-integration", "transcription-pipeline", "csv-export", "microservice", "python-script"], "slug": "Audio2ScriptViewer", "repo_url": "https://github.com/davidbmar/Audio2ScriptViewer", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:25:01.525224Z", "source_commit": "ca1fe22", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Audio2ScriptViewer",
+  "description": "A Python micro-service that processes transcribed audio messages from AWS SQS and compiles them into a sorted CSV script.",
+  "codeRepository": "https://github.com/davidbmar/Audio2ScriptViewer",
+  "programmingLanguage": [
+    "Python",
+    "boto3",
+    "AWS SQS",
+    "Terraform",
+    "CSV",
+    "Regex"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Audio2ScriptViewer</h1>
+  <p class="one-liner">A Python micro-service that processes transcribed audio messages from AWS SQS and compiles them into a sorted CSV script.</p>
+  <p><a href="https://github.com/davidbmar/Audio2ScriptViewer">https://github.com/davidbmar/Audio2ScriptViewer</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>Audio2ScriptViewer is a backend utility designed to consume transcription outputs, likely from an upstream speech-to-text service. It listens to an AWS SQS queue for JSON messages containing filenames and transcribed text, cleans the text formatting, sorts entries by a numeric key extracted from the filename, and appends them to a local CSV file. It operates as part of a larger media processing pipeline but can function independently as a worker service.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Consumes transcription results from AWS SQS queues</li><li>Cleans and normalizes transcribed text (handling newlines/carriage returns)</li><li>Sorts output entries chronologically based on numeric filename keys</li><li>Appends processed data to a structured CSV file</li><li>Supports both continuous polling and single-execution modes</li><li>Infrastructure-as-Code setup via Terraform</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">terraform init
+terraform apply
+python3 audio2Script.py --run-once</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Upstream Transcriber] -->|JSON Message| B(AWS SQS Queue)
+    B -->|Poll| C[Audio2ScriptViewer]
+    C -->|Process & Clean| D[Local Storage]
+    D -->|Write| E[(output.csv)]
+    subgraph Infrastructure
+    B
+    C
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The core logic is implemented in Python using the boto3 library for AWS interactions. It uses argparse for CLI configuration, allowing it to run in a continuous loop or a single-pass mode. Text cleaning is handled via regular expressions to normalize newlines and carriage returns. The infrastructure is defined using Terraform, suggesting an AWS-native deployment model involving SQS queues and potentially S3 or EC2 for hosting the script.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant T as Transcriber
+    participant Q as AWS SQS
+    participant S as Audio2ScriptViewer
+    participant F as Local CSV File
+
+    T->>Q: Send Message (filename, text)
+    loop Every X Seconds or Once
+        S->>Q: Receive Messages
+        Q-->>S: Return Message Batch
+        S->>S: Parse JSON & Extract Key
+        S->>S: Clean Text (regex)
+        S->>S: Sort Messages by Key
+        S->>F: Append Rows to CSV
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>This tool is applicable in media production workflows where audio files are transcribed asynchronously. It serves as the aggregation layer that converts scattered transcription events into a unified, chronological script document (CSV) for review or further processing by editors or downstream NLP tasks.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">SQS Message Consumption</span><span class="tag">Text Normalization</span><span class="tag">CSV Generation</span><span class="tag">Filename Parsing</span><span class="tag">Batch Sorting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">audio2Script.py</span><span class="tag">utility.mock_transcribe.py</span><span class="tag">Terraform Configs</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">boto3</span><span class="tag">AWS SQS</span><span class="tag">Terraform</span><span class="tag">CSV</span><span class="tag">Regex</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS Account</span><span class="tag">SQS Queue Access</span><span class="tag">Python 3 Environment</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS Speech Services</span><span class="tag">Third-party Transcribers</span><span class="tag">Media Asset Management Systems</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Worker Pattern</span><span class="tag">Polling Consumer</span><span class="tag">ETL (Extract, Transform, Load)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">aws-integration</span><span class="tag">transcription-pipeline</span><span class="tag">csv-export</span><span class="tag">microservice</span><span class="tag">python-script</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:25:01.525224Z ·
+     commit ca1fe22 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

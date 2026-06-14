@@ -1,0 +1,82 @@
+{
+  "title": "COE-overview",
+  "one_liner": "Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.",
+  "what_it_is": "A Python-based ETL pipeline that ingests error events from multiple security and operations platforms (Jira, Wiz, CrowdStrike, Vibranium), normalizes them into a PostgreSQL database, and prepares data for weekly reporting. It includes schema management via Alembic and supports Kubernetes CronJob execution patterns.",
+  "how_its_built": "Built with Python using SQLAlchemy (async) for database interactions, Pydantic Settings for configuration management, and Structlog for logging. It uses Alembic for database migrations and async/await patterns for concurrent data ingestion from external APIs.",
+  "how_to_apply": "Configure environment variables for source APIs (Jira, Wiz, CrowdStrike, etc.) and database connection. Run the pipeline via the CLI entrypoint to ingest data, then use the stored run_id to trigger downstream reporting or rendering processes.",
+  "quickstart": "pip install -e .\nexport DATABASE_URL=postgresql+asyncpg://user:pass@localhost/db\nexport JIRA_API_TOKEN=your_token\nexport WIZ_CLIENT_ID=your_id\npython -m coe",
+  "features": [
+    "Aggregates events from Jira, Wiz, CrowdStrike, and Vibranium",
+    "Normalizes disparate error formats into a unified schema",
+    "Async ETL pipeline optimized for weekly batch processing",
+    "Database schema management with Alembic migrations",
+    "Kubernetes CronJob compatible with run_id handoff mechanism",
+    "Configurable lookback periods and project allowlists"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[External Sources] -->|Ingest| B(COE Pipeline)\n    B --> C[PostgreSQL Database]\n    C --> D[Alembic Migrations]\n    B --> E[Run ID Output]\n    E --> F[Downstream Renderer]\n    subgraph Sources\n    A1[Jira]\n    A2[Wiz]\n    A3[CrowdStrike]\n    A4[Vibranium]\n    end\n    A1 --> A\n    A2 --> A\n    A3 --> A\n    A4 --> A",
+  "diagram_sequence": "sequenceDiagram\n    participant CLI as __main__.py\n    participant Config as config.py\n    participant DB as SQLAlchemy Engine\n    participant Pipe as pipeline.run\n    participant Src as External APIs\n    CLI->>Config: get_settings()\n    CLI->>DB: create_async_engine()\n    CLI->>Pipe: run(session_factory, settings)\n    Pipe->>Src: Fetch Jira Issues\n    Pipe->>Src: Fetch Wiz Findings\n    Pipe->>Src: Fetch CrowdStrike Detections\n    Pipe->>Src: Fetch Vibranium Events\n    Src-->>Pipe: Raw Data\n    Pipe->>DB: Normalize & Insert Events\n    DB-->>Pipe: Confirm Write\n    Pipe-->>CLI: Return Result (run_id, status)\n    CLI->>CLI: Write run_id to file",
+  "capabilities": [
+    "Multi-source data ingestion",
+    "Data normalization",
+    "Asynchronous processing",
+    "Database migration management",
+    "Environment-based configuration",
+    "Structured logging"
+  ],
+  "components": [
+    "coe/__main__.py",
+    "coe/pipeline.py",
+    "coe/config.py",
+    "coe/db/models.py",
+    "alembic/env.py",
+    "coe/log_capture.py"
+  ],
+  "tech": [
+    "Python",
+    "SQLAlchemy",
+    "Alembic",
+    "Pydantic",
+    "AsyncIO",
+    "Structlog",
+    "PostgreSQL"
+  ],
+  "depends_on": [
+    "asyncpg",
+    "pydantic-settings",
+    "sqlalchemy",
+    "alembic",
+    "structlog"
+  ],
+  "integrates_with": [
+    "Jira",
+    "Wiz",
+    "CrowdStrike",
+    "Vibranium",
+    "Google Docs",
+    "Kubernetes CronJobs"
+  ],
+  "patterns": [
+    "ETL Pipeline",
+    "Repository Pattern",
+    "Dependency Injection",
+    "Configuration via Environment",
+    "Async/Await Concurrency"
+  ],
+  "reuse_tags": [
+    "security-ops",
+    "data-aggregation",
+    "weekly-reporting",
+    "python-etl",
+    "k8s-cronjob"
+  ],
+  "slug": "COE-overview",
+  "repo_url": "https://github.com/davidbmar/COE-overview",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:43:23.048392Z",
+  "source_commit": "de41e66",
+  "model": "qwen3.7-plus"
+}

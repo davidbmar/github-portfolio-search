@@ -1,0 +1,59 @@
+{
+  "title": "interviewnotes",
+  "one_liner": "A structured framework and checklist for conducting five-part technical and behavioral engineering interviews.",
+  "what_it_is": "A documentation repository outlining a comprehensive five-stage interview process for software engineers. It covers code review assessment, systems design, architectural peer review, management potential, and hiring manager final review, emphasizing collaboration, constructive feedback, and core company values.",
+  "how_its_built": "This is a non-code repository consisting primarily of Markdown documentation. It structures interview guidelines into five distinct sections, providing prompts, evaluation criteria, and scenario descriptions for interviewers and candidates.",
+  "how_to_apply": "Review the README.md to understand the five interview stages. Use the provided prompts and checklists to prepare for or conduct interviews. For the code review section, simulate the hypothetical senior/junior engineer scenario using Java examples as suggested.",
+  "quickstart": "",
+  "features": [
+    "Five-part interview structure covering code, design, architecture, and management",
+    "Code review assessment focusing on team interaction and constructive feedback",
+    "Systems design panel evaluating trade-offs, API design, and database choices",
+    "Architectural peer review requiring candidates to explain past complex projects",
+    "Managerial panel assessing talent identification, coaching, and difficult personnel decisions"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[Candidate] --> B[Stage 1: Code Review]\n    A --> C[Stage 2: Systems Design]\n    A --> D[Stage 3: Architectural Peer Review]\n    A --> E[Stage 4: Manager Panel]\n    A --> F[Stage 5: Hiring Manager Review]\n    B --> G[Evaluation: Collaboration & Feedback]\n    C --> H[Evaluation: Trade-offs & Patterns]\n    D --> I[Evaluation: Clarity & Complexity]\n    E --> J[Evaluation: Leadership Potential]\n    F --> K[Final Decision]",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Candidate\n    participant I as Interviewer\n    participant T as Team\n    C->>I: Stage 1: Code Review Assessment\n    I->>C: Provide hypothetical PR (Java)\n    C->>I: Submit feedback on junior/senior interaction\n    I->>T: Evaluate constructive/positive tone\n    C->>I: Stage 2: Systems Design Panel\n    I->>C: Present system requirements (Read/Write heavy)\n    C->>I: Propose DB, Cache, API design\n    I->>C: Discuss trade-offs and blast radius\n    C->>I: Stage 3: Architectural Peer Review\n    C->>I: Share screen of past project\n    C->>I: Explain tools, roadblocks, pivots\n    I->>C: Ask clarifying questions on architecture\n    C->>I: Stage 4: Manager Panel\n    I->>C: Scenario: Identify talent/Coach/Fire\n    C->>I: Describe process and approach\n    C->>I: Stage 5: Hiring Manager Review\n    I->>T: Review scorecards from previous stages\n    T->>I: Final hiring decision",
+  "capabilities": [
+    "Interview Process Definition",
+    "Evaluation Criteria Standardization",
+    "Behavioral Assessment Guidelines",
+    "Technical Scenario Prompting"
+  ],
+  "components": [
+    "Code Review Checklist",
+    "Systems Design Prompts",
+    "Architectural Review Guidelines",
+    "Management Scenario Questions",
+    "Core Values Framework"
+  ],
+  "tech": [
+    "Markdown",
+    "Git"
+  ],
+  "depends_on": [],
+  "integrates_with": [],
+  "patterns": [
+    "Structured Interviewing",
+    "Behavioral Assessment",
+    "Technical Evaluation",
+    "Peer Review Simulation"
+  ],
+  "reuse_tags": [
+    "hiring",
+    "interview-guide",
+    "engineering-management",
+    "technical-assessment",
+    "onboarding"
+  ],
+  "slug": "interviewnotes",
+  "repo_url": "https://github.com/davidbmar/interviewnotes",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:00:41.704966Z",
+  "source_commit": "025ca69",
+  "model": "qwen3.7-plus"
+}

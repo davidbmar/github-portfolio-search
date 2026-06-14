@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>audio_client_server · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "audio_client_server", "one_liner": "A web-based audio recording client that streams sound to a Python Flask server for real-time transcription and processing.", "what_it_is": "This project implements a client-server architecture where a web browser captures audio input via the MediaRecorder API and sends it to a backend server. The server, built with Flask, receives the audio stream, optionally stores it (e.g., in S3), and performs real-time speech-to-text transcription. It includes authentication mechanisms using Auth0 for protected endpoints and supports both lightweight local processing and cloud-integrated workflows.", "how_its_built": "The backend is a Python Flask application structured with blueprints for modularity. It uses PyJWT for validating Auth0 access tokens and guards routes based on permissions. The frontend likely uses standard HTML5 JavaScript APIs for audio capture. The system supports dependency injection for services like message handling and security validation.", "how_to_apply": "Deploy this system to create secure, voice-enabled web applications. Use cases include voice notes, real-time meeting transcription, or accessibility tools where users speak into their browser and receive immediate text feedback. The Auth0 integration makes it suitable for multi-user environments requiring role-based access control.", "quickstart": "", "features": ["Browser-based audio recording using Web APIs", "Real-time audio streaming to a Python Flask backend", "Speech-to-text transcription capabilities", "Auth0 JWT-based authentication and authorization guards", "Modular API structure with public, protected, and admin endpoints", "Optional S3 integration for audio storage"], "diagram_architecture": "flowchart TD\n    Client[Web Browser] -->|Audio Stream| Server[Flask Server]\n    Server -->|Validate Token| Auth0[Auth0 Service]\n    Server -->|Transcribe| STT[Speech Engine]\n    Server -->|Store| S3[(S3 Bucket)]\n    Server -->|Response| Client", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser\n    participant F as Flask Server\n    participant A as Auth0\n    participant T as Transcriber\n    U->>B: Start Recording\n    B->>F: POST Audio Chunk\n    F->>A: Validate JWT\n    A-->>F: Valid Token\n    F->>T: Process Audio\n    T-->>F: Text Result\n    F-->>B: Return Transcription\n    B-->>U: Display Text", "capabilities": ["Audio Capture", "Real-time Streaming", "Speech Recognition", "JWT Authentication", "API Security"], "components": ["Flask Blueprint API", "Auth0 Service", "Message Service", "Security Guards", "Exception Handlers"], "tech": ["Python", "Flask", "JavaScript", "PyJWT", "HTML5 MediaRecorder"], "depends_on": ["Flask", "PyJWT", "Werkzeug", "Requests"], "integrates_with": ["Auth0", "AWS S3", "Web Browsers"], "patterns": ["Client-Server", "Blueprint Modularity", "Decorator-based Security", "Service Layer"], "reuse_tags": ["audio-processing", "flask-api", "auth0-integration", "real-time-transcription", "web-audio"], "slug": "audio_client_server", "repo_url": "https://github.com/davidbmar/audio_client_server", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/auth0/spa_react_javascript/npm_and_yarn-2be76d4b41 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/pip/auth0/api_flask_python/pip-31294bf0f8 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #2: Bump the npm_and_yarn group across 1 directory with 30 updates"}, {"kind": "open_pr", "detail": "PR #1: Bump the pip group across 2 directories with 9 updates"}], "screenshot_url": "https://github.com/davidbmar/audio_client_server/assets/32729467/ab19d948-1074-4fe6-bd61-4f797f07e047", "generated_at": "2026-06-14T02:26:08.494265Z", "source_commit": "b2b56bc", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "audio_client_server",
+  "description": "A web-based audio recording client that streams sound to a Python Flask server for real-time transcription and processing.",
+  "codeRepository": "https://github.com/davidbmar/audio_client_server",
+  "programmingLanguage": [
+    "Python",
+    "Flask",
+    "JavaScript",
+    "PyJWT",
+    "HTML5 MediaRecorder"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>audio_client_server</h1>
+  <p class="one-liner">A web-based audio recording client that streams sound to a Python Flask server for real-time transcription and processing.</p>
+  <p><a href="https://github.com/davidbmar/audio_client_server">https://github.com/davidbmar/audio_client_server</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://github.com/davidbmar/audio_client_server/assets/32729467/ab19d948-1074-4fe6-bd61-4f797f07e047" alt="audio_client_server screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>This project implements a client-server architecture where a web browser captures audio input via the MediaRecorder API and sends it to a backend server. The server, built with Flask, receives the audio stream, optionally stores it (e.g., in S3), and performs real-time speech-to-text transcription. It includes authentication mechanisms using Auth0 for protected endpoints and supports both lightweight local processing and cloud-integrated workflows.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Browser-based audio recording using Web APIs</li><li>Real-time audio streaming to a Python Flask backend</li><li>Speech-to-text transcription capabilities</li><li>Auth0 JWT-based authentication and authorization guards</li><li>Modular API structure with public, protected, and admin endpoints</li><li>Optional S3 integration for audio storage</li></ul></section>
+
+
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Web Browser] -->|Audio Stream| Server[Flask Server]
+    Server -->|Validate Token| Auth0[Auth0 Service]
+    Server -->|Transcribe| STT[Speech Engine]
+    Server -->|Store| S3[(S3 Bucket)]
+    Server -->|Response| Client</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is a Python Flask application structured with blueprints for modularity. It uses PyJWT for validating Auth0 access tokens and guards routes based on permissions. The frontend likely uses standard HTML5 JavaScript APIs for audio capture. The system supports dependency injection for services like message handling and security validation.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant F as Flask Server
+    participant A as Auth0
+    participant T as Transcriber
+    U->>B: Start Recording
+    B->>F: POST Audio Chunk
+    F->>A: Validate JWT
+    A-->>F: Valid Token
+    F->>T: Process Audio
+    T-->>F: Text Result
+    F-->>B: Return Transcription
+    B-->>U: Display Text</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy this system to create secure, voice-enabled web applications. Use cases include voice notes, real-time meeting transcription, or accessibility tools where users speak into their browser and receive immediate text feedback. The Auth0 integration makes it suitable for multi-user environments requiring role-based access control.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Audio Capture</span><span class="tag">Real-time Streaming</span><span class="tag">Speech Recognition</span><span class="tag">JWT Authentication</span><span class="tag">API Security</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Flask Blueprint API</span><span class="tag">Auth0 Service</span><span class="tag">Message Service</span><span class="tag">Security Guards</span><span class="tag">Exception Handlers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Flask</span><span class="tag">JavaScript</span><span class="tag">PyJWT</span><span class="tag">HTML5 MediaRecorder</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Flask</span><span class="tag">PyJWT</span><span class="tag">Werkzeug</span><span class="tag">Requests</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Auth0</span><span class="tag">AWS S3</span><span class="tag">Web Browsers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server</span><span class="tag">Blueprint Modularity</span><span class="tag">Decorator-based Security</span><span class="tag">Service Layer</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">audio-processing</span><span class="tag">flask-api</span><span class="tag">auth0-integration</span><span class="tag">real-time-transcription</span><span class="tag">web-audio</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/auth0/spa_react_javascript/npm_and_yarn-2be76d4b41 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/pip/auth0/api_flask_python/pip-31294bf0f8 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #2: Bump the npm_and_yarn group across 1 directory with 30 updates</li><li><strong>open_pr</strong>: PR #1: Bump the pip group across 2 directories with 9 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:26:08.494265Z ·
+     commit b2b56bc ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

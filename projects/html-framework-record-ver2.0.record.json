@@ -1,0 +1,71 @@
+{
+  "title": "html-framework-record-ver2.0",
+  "one_liner": "A lightweight, web-only audio recorder that captures PCM data and stores it in IndexedDB for persistent local playback.",
+  "what_it_is": "A browser-based JavaScript library for recording audio directly from the microphone. It bypasses standard MediaRecorder blobs in favor of raw PCM capture via ScriptProcessorNode, chunking audio by time intervals, and persisting these chunks in IndexedDB. It includes adapters for both persistent (IndexedDB) and transient (Memory) storage, along with a basic UI harness for testing and playback.",
+  "how_its_built": "The core logic resides in `recorder-box.js`, which manages the Web Audio API graph (AudioContext, AnalyserNode, ScriptProcessorNode). It accumulates Float32 PCM samples, slices them into configurable time chunks (default 2s), and emits events for status, metering, and chunk completion. Storage is abstracted via adapters (`storage-indexeddb.js` for persistence, `storage-memory.js` for tests). The application bootstraps via `boot.js`, which dynamically imports modules and probes for resource availability.",
+  "how_to_apply": "Import `createRecorderBox` and a storage adapter (e.g., `createIndexedDbStorage`). Initialize the storage, pass it to the recorder box, and attach event listeners for 'status', 'meter', and 'chunk' events to update your UI. Call `start()` to begin capturing microphone input and `stop()` to finalize the session.",
+  "quickstart": "git clone https://github.com/davidbmar/html-framework-record-ver2.0.git\ncd html-framework-record-ver2.0\n# Serve the web directory using any static server, e.g.:\nnpx serve web/record-ver2.0\n# Open the provided URL in a modern browser",
+  "features": [
+    "Captures raw PCM audio data using Web Audio API ScriptProcessorNode",
+    "Persists audio chunks locally using IndexedDB for offline access",
+    "Real-time audio metering (RMS/Peak) via AnalyserNode",
+    "Configurable chunk duration for granular storage and streaming potential",
+    "Swappable storage adapters (IndexedDB for production, Memory for testing)",
+    "Lightweight dependency-free implementation"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Interacts| UI[UI Harness]\n    UI -->|Commands| Boot[boot.js]\n    Boot -->|Imports| Recorder[recorder-box.js]\n    Boot -->|Imports| Storage[storage-indexeddb.js]\n    Recorder -->|Web Audio API| Mic[Microphone]\n    Recorder -->|PCM Chunks| Storage\n    Storage -->|Persist| IDB[(IndexedDB)]\n    Recorder -->|Events: status/meter/chunk| UI",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant UI as UI Harness\n    participant RB as RecorderBox\n    participant WA as Web Audio API\n    participant ST as Storage Adapter\n    participant DB as IndexedDB\n\n    U->>UI: Click Record\n    UI->>RB: start()\n    RB->>WA: getUserMedia()\n    WA-->>RB: MediaStream\n    RB->>WA: createScriptProcessor()\n    loop Every Audio Buffer\n        WA->>RB: onaudioprocess(data)\n        RB->>RB: Accumulate PCM\n        alt Chunk Time Reached\n            RB->>ST: putChunk({blob, index})\n            ST->>DB: Transaction Write\n            RB->>UI: emit('chunk')\n        end\n        RB->>RB: Calculate RMS/Peak\n        RB->>UI: emit('meter')\n    end\n    U->>UI: Click Stop\n    UI->>RB: stop()\n    RB->>WA: disconnect nodes\n    RB->>ST: markStatus('completed')\n    RB->>UI: emit('status', 'idle')",
+  "capabilities": [
+    "Audio Recording",
+    "Local Persistence",
+    "Real-time Metering",
+    "Chunked Storage",
+    "PCM Processing"
+  ],
+  "components": [
+    "recorder-box.js",
+    "storage-indexeddb.js",
+    "storage-memory.js",
+    "boot.js",
+    "ui/harness.js",
+    "ui/player-mse.js"
+  ],
+  "tech": [
+    "JavaScript",
+    "Web Audio API",
+    "IndexedDB",
+    "ScriptProcessorNode",
+    "ES Modules"
+  ],
+  "depends_on": [
+    "Modern Browser",
+    "Microphone Access"
+  ],
+  "integrates_with": [
+    "Static Web Servers",
+    "Custom UI Frameworks"
+  ],
+  "patterns": [
+    "Adapter Pattern",
+    "Event Emitter",
+    "Module Pattern",
+    "Async/Await"
+  ],
+  "reuse_tags": [
+    "audio-recording",
+    "indexeddb",
+    "web-audio",
+    "pcm",
+    "no-dependencies"
+  ],
+  "slug": "html-framework-record-ver2.0",
+  "repo_url": "https://github.com/davidbmar/html-framework-record-ver2.0",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:57:27.896664Z",
+  "source_commit": "b791828",
+  "model": "qwen3.7-plus"
+}

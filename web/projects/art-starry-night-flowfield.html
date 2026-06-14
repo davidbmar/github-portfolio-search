@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>art-starry-night-flowfield · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "art-starry-night-flowfield", "one_liner": "WebGPU-accelerated particle flow field visualization inspired by Van Gogh's Starry Night.", "what_it_is": "A real-time generative art engine that simulates fluid dynamics using curl noise and interactive vortices. It renders 50,000+ particles at 60 FPS by leveraging WebGPU for compute-intensive physics and rendering, with a CPU fallback via p5.js. The system samples colors from a reference image or palette to create painterly, impasto-style strokes that mimic the movement and color theory of Van Gogh's work.", "how_its_built": "The application uses a hybrid architecture. A p5.js sketch manages the UI, DOM interactions, and CPU-based rendering fallback. For high-performance mode, it initializes a WebGPU device via ES modules. Compute shaders (WGSL) handle simplex noise generation, flow field calculation, and particle physics integration. A bridge layer synchronizes JavaScript state (vortex positions, turbulence levels) with GPU uniform buffers. Render shaders draw particles with trail fading and brush-like tapering effects.", "how_to_apply": "Use this project as a foundation for high-performance web-based particle systems. It demonstrates how to offload physics calculations to WebGPU compute pipelines while maintaining a familiar p5.js development workflow for UI and interaction. It is suitable for data visualization requiring fluid motion, interactive digital art installations, or educational demos of curl noise and vector fields.", "quickstart": "python3 server.py\nopen http://localhost:8000", "features": ["WebGPU-accelerated rendering with automatic CPU fallback via p5.js", "Interactive vortex editing: click to add, drag to move, scroll to resize", "Reference image color sampling mapped to particle positions", "Zone-based flow characteristics for sky, hills, and village regions", "Real-time controls for turbulence, noise scale, and trail fade", "High-resolution export up to 8x for print-quality output"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|Interacts| UI[p5.js Sketch / UI]\n    UI -->|State Updates| Bridge[WebGPU Bridge]\n    Bridge -->|Uniforms/Storage Buffers| GPU[WebGPU Device]\n    \n    subgraph WebGPU Pipeline\n        ComputeNoise[Compute Shader: Noise]\n        ComputeFlow[Compute Shader: Flow Field]\n        ComputeParticles[Compute Shader: Particle Physics]\n        RenderPass[Render Pass: Particles & Trails]\n    end\n    \n    GPU -->|Dispatch| ComputeNoise\n    ComputeNoise -->|Noise Texture| ComputeFlow\n    Bridge -->|Vortex Data| ComputeFlow\n    ComputeFlow -->|Vector Field| ComputeParticles\n    ComputeParticles -->|Particle Positions| RenderPass\n    RenderPass -->|Draw Calls| Canvas[HTML5 Canvas]\n    \n    subgraph CPU Fallback\n        CurlJS[CurlNoise.js]\n        VortexJS[Vortex.js]\n        ParticleJS[Particle.js]\n        BrushJS[Brush.js]\n    end\n    \n    UI -->|Fallback Mode| CurlJS\n    CurlJS --> VortexJS\n    VortexJS --> ParticleJS\n    ParticleJS --> BrushJS\n    BrushJS --> Canvas", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant P5 as p5.js Sketch\n    participant Bridge as WebGPU Bridge\n    participant GPU as WebGPU Device\n    \n    User->>P5: Interact (Click/Drag/Scroll)\n    P5->>P5: Update Vortex/Config State\n    alt WebGPU Enabled\n        P5->>Bridge: syncState()\n        Bridge->>GPU: writeBuffer (Uniforms/Storage)\n        GPU->>GPU: Dispatch Compute (Noise)\n        GPU->>GPU: Dispatch Compute (Flow Field)\n        GPU->>GPU: Dispatch Compute (Particle Physics)\n        GPU->>GPU: Begin Render Pass\n        GPU->>GPU: Draw Particles\n        GPU->>P5: Present Frame\n    else CPU Fallback\n        P5->>P5: calculateCurlNoise()\n        P5->>P5: updateParticles()\n        P5->>P5: drawBrushStrokes()\n        P5->>User: Render Canvas\n    end", "capabilities": ["Real-time fluid simulation", "GPU-accelerated physics", "Interactive vector field editing", "Image-based color mapping", "High-resolution screenshot export", "Dynamic zone-based behavior"], "components": ["sketch.js", "webgpu/renderer.js", "webgpu/shaders/particles.wgsl", "webgpu/shaders/flowfield.wgsl", "curlnoise.js", "vortex.js", "flowfield.js", "particle.js", "brush.js", "config.js"], "tech": ["JavaScript", "WebGPU", "WGSL", "p5.js", "HTML5 Canvas"], "depends_on": ["WebGPU-compatible browser", "Python 3 (for dev server)"], "integrates_with": ["Reference images (PNG/JPG)", "Standard HTTP servers"], "patterns": ["Compute Shader Physics", "Hybrid CPU/GPU Rendering", "Curl Noise Generation", "Particle System", "State Synchronization Bridge"], "reuse_tags": ["generative-art", "webgpu", "particle-system", "flow-field", "visualization", "van-gogh"], "slug": "art-starry-night-flowfield", "repo_url": "https://github.com/davidbmar/art-starry-night-flowfield", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/art-starry-night-flowfield/main/screenshots/default-view.png", "generated_at": "2026-06-14T02:22:56.391089Z", "source_commit": "2153ed1", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "art-starry-night-flowfield",
+  "description": "WebGPU-accelerated particle flow field visualization inspired by Van Gogh's Starry Night.",
+  "codeRepository": "https://github.com/davidbmar/art-starry-night-flowfield",
+  "programmingLanguage": [
+    "JavaScript",
+    "WebGPU",
+    "WGSL",
+    "p5.js",
+    "HTML5 Canvas"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>art-starry-night-flowfield</h1>
+  <p class="one-liner">WebGPU-accelerated particle flow field visualization inspired by Van Gogh&#x27;s Starry Night.</p>
+  <p><a href="https://github.com/davidbmar/art-starry-night-flowfield">https://github.com/davidbmar/art-starry-night-flowfield</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/art-starry-night-flowfield/main/screenshots/default-view.png" alt="art-starry-night-flowfield screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A real-time generative art engine that simulates fluid dynamics using curl noise and interactive vortices. It renders 50,000+ particles at 60 FPS by leveraging WebGPU for compute-intensive physics and rendering, with a CPU fallback via p5.js. The system samples colors from a reference image or palette to create painterly, impasto-style strokes that mimic the movement and color theory of Van Gogh&#x27;s work.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>WebGPU-accelerated rendering with automatic CPU fallback via p5.js</li><li>Interactive vortex editing: click to add, drag to move, scroll to resize</li><li>Reference image color sampling mapped to particle positions</li><li>Zone-based flow characteristics for sky, hills, and village regions</li><li>Real-time controls for turbulence, noise scale, and trail fade</li><li>High-resolution export up to 8x for print-quality output</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python3 server.py
+open http://localhost:8000</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|Interacts| UI[p5.js Sketch / UI]
+    UI -->|State Updates| Bridge[WebGPU Bridge]
+    Bridge -->|Uniforms/Storage Buffers| GPU[WebGPU Device]
+    
+    subgraph WebGPU Pipeline
+        ComputeNoise[Compute Shader: Noise]
+        ComputeFlow[Compute Shader: Flow Field]
+        ComputeParticles[Compute Shader: Particle Physics]
+        RenderPass[Render Pass: Particles & Trails]
+    end
+    
+    GPU -->|Dispatch| ComputeNoise
+    ComputeNoise -->|Noise Texture| ComputeFlow
+    Bridge -->|Vortex Data| ComputeFlow
+    ComputeFlow -->|Vector Field| ComputeParticles
+    ComputeParticles -->|Particle Positions| RenderPass
+    RenderPass -->|Draw Calls| Canvas[HTML5 Canvas]
+    
+    subgraph CPU Fallback
+        CurlJS[CurlNoise.js]
+        VortexJS[Vortex.js]
+        ParticleJS[Particle.js]
+        BrushJS[Brush.js]
+    end
+    
+    UI -->|Fallback Mode| CurlJS
+    CurlJS --> VortexJS
+    VortexJS --> ParticleJS
+    ParticleJS --> BrushJS
+    BrushJS --> Canvas</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The application uses a hybrid architecture. A p5.js sketch manages the UI, DOM interactions, and CPU-based rendering fallback. For high-performance mode, it initializes a WebGPU device via ES modules. Compute shaders (WGSL) handle simplex noise generation, flow field calculation, and particle physics integration. A bridge layer synchronizes JavaScript state (vortex positions, turbulence levels) with GPU uniform buffers. Render shaders draw particles with trail fading and brush-like tapering effects.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant P5 as p5.js Sketch
+    participant Bridge as WebGPU Bridge
+    participant GPU as WebGPU Device
+    
+    User->>P5: Interact (Click/Drag/Scroll)
+    P5->>P5: Update Vortex/Config State
+    alt WebGPU Enabled
+        P5->>Bridge: syncState()
+        Bridge->>GPU: writeBuffer (Uniforms/Storage)
+        GPU->>GPU: Dispatch Compute (Noise)
+        GPU->>GPU: Dispatch Compute (Flow Field)
+        GPU->>GPU: Dispatch Compute (Particle Physics)
+        GPU->>GPU: Begin Render Pass
+        GPU->>GPU: Draw Particles
+        GPU->>P5: Present Frame
+    else CPU Fallback
+        P5->>P5: calculateCurlNoise()
+        P5->>P5: updateParticles()
+        P5->>P5: drawBrushStrokes()
+        P5->>User: Render Canvas
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this project as a foundation for high-performance web-based particle systems. It demonstrates how to offload physics calculations to WebGPU compute pipelines while maintaining a familiar p5.js development workflow for UI and interaction. It is suitable for data visualization requiring fluid motion, interactive digital art installations, or educational demos of curl noise and vector fields.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Real-time fluid simulation</span><span class="tag">GPU-accelerated physics</span><span class="tag">Interactive vector field editing</span><span class="tag">Image-based color mapping</span><span class="tag">High-resolution screenshot export</span><span class="tag">Dynamic zone-based behavior</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">sketch.js</span><span class="tag">webgpu/renderer.js</span><span class="tag">webgpu/shaders/particles.wgsl</span><span class="tag">webgpu/shaders/flowfield.wgsl</span><span class="tag">curlnoise.js</span><span class="tag">vortex.js</span><span class="tag">flowfield.js</span><span class="tag">particle.js</span><span class="tag">brush.js</span><span class="tag">config.js</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">JavaScript</span><span class="tag">WebGPU</span><span class="tag">WGSL</span><span class="tag">p5.js</span><span class="tag">HTML5 Canvas</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">WebGPU-compatible browser</span><span class="tag">Python 3 (for dev server)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Reference images (PNG/JPG)</span><span class="tag">Standard HTTP servers</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Compute Shader Physics</span><span class="tag">Hybrid CPU/GPU Rendering</span><span class="tag">Curl Noise Generation</span><span class="tag">Particle System</span><span class="tag">State Synchronization Bridge</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">generative-art</span><span class="tag">webgpu</span><span class="tag">particle-system</span><span class="tag">flow-field</span><span class="tag">visualization</span><span class="tag">van-gogh</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:22:56.391089Z ·
+     commit 2153ed1 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

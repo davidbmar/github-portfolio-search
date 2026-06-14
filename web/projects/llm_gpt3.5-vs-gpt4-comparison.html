@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>llm_gpt3.5-vs-gpt4-comparison · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "llm_gpt3.5-vs-gpt4-comparison", "one_liner": "A cost-optimized document summarization pipeline using GPT-3.5 that achieves comparable or better results than GPT-4 by leveraging logical paragraph segmentation and hierarchical summarization.", "what_it_is": "This project demonstrates a method to summarize long documents (such as an hour-long conversation or State of the Union address) at approximately 1/22nd the cost of GPT-4. It replaces fixed-character chunking with logic-based segmentation, breaking text into sentences, grouping them into coherent paragraphs based on topic changes, summarizing each paragraph individually, and then generating a final summary of those sub-summaries using GPT-3.5-16k.", "how_its_built": "The system is built in Python using LangChain for LLM orchestration and OpenAI embeddings. It processes raw text by splitting on punctuation to create sentence fragments, groups these into logical paragraphs, and uses cosine similarity on embeddings to detect topic shifts. Each paragraph is summarized and titled using GPT-3.5-turbo. Finally, the collection of paragraph summaries is fed into GPT-3.5-16k for a global summary. Visualization tools generate heatmaps of topic clusters.", "how_to_apply": "Use this approach when cost is a primary constraint and latency is secondary. It is ideal for batch processing large transcripts, articles, or logs where parallelization is not required. Replace the default 'stateoftheunion.txt' with your target document and ensure your OpenAI API key is configured.", "quickstart": "bash llm_setup.sh\nexport OPENAI_API_KEY=yourkeyhere\npython3 llm_summary.py", "features": ["Logical text segmentation based on sentence boundaries rather than fixed character counts", "Hierarchical summarization: paragraph-level summaries aggregated into a final document summary", "Topic change detection using cosine similarity of OpenAI embeddings", "Cost optimization targeting ~22.5x savings compared to GPT-4", "Visual heatmap generation for topic clustering and chunk analysis"], "diagram_architecture": "flowchart TD\n    A[Raw Text Input] --> B[Sentence Splitter]\n    B --> C[Paragraph Grouping]\n    C --> D[Embedding Generation]\n    D --> E[Cosine Similarity Check]\n    E -->|Topic Change| F[New Paragraph]\n    E -->|Same Topic| C\n    F --> G[GPT-3.5 Summarize Paragraph]\n    G --> H[Collection of Sub-Summaries]\n    H --> I[GPT-3.5-16k Final Summary]\n    I --> J[Final Output]\n    D --> K[Heatmap Visualization]", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script as llm_summary.py\n    participant OpenAI as OpenAI API\n    \n    User->>Script: Execute script with txt file\n    Script->>Script: Split text into sentences\n    Script->>Script: Group sentences into paragraphs\n    loop For each paragraph\n        Script->>OpenAI: Generate Embeddings\n        OpenAI-->>Script: Vector embeddings\n        Script->>Script: Calculate Cosine Similarity\n        Script->>OpenAI: Summarize Paragraph (GPT-3.5)\n        OpenAI-->>Script: Paragraph Summary & Title\n    end\n    Script->>OpenAI: Summarize All Sub-Summaries (GPT-3.5-16k)\n    OpenAI-->>Script: Final Document Summary\n    Script->>User: Display Summary & Save Heatmaps", "capabilities": ["Text Summarization", "Topic Modeling", "Cost Optimization", "Data Visualization"], "components": ["llm_summary.py", "llm_setup.sh", "stateoftheunion.txt"], "tech": ["Python", "LangChain", "OpenAI API", "NumPy", "Pandas", "Matplotlib", "SciPy", "NetworkX"], "depends_on": ["OpenAI API Key", "Python 3.x"], "integrates_with": ["OpenAI Embeddings", "OpenAI Chat Completions"], "patterns": ["Map-Reduce Summarization", "Semantic Chunking", "Hierarchical Processing"], "reuse_tags": ["summarization", "llm", "cost-optimization", "nlp", "langchain"], "slug": "llm_gpt3.5-vs-gpt4-comparison", "repo_url": "https://github.com/davidbmar/llm_gpt3.5-vs-gpt4-comparison", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:05:11.072602Z", "source_commit": "7851f7c", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "llm_gpt3.5-vs-gpt4-comparison",
+  "description": "A cost-optimized document summarization pipeline using GPT-3.5 that achieves comparable or better results than GPT-4 by leveraging logical paragraph segmentation and hierarchical summarization.",
+  "codeRepository": "https://github.com/davidbmar/llm_gpt3.5-vs-gpt4-comparison",
+  "programmingLanguage": [
+    "Python",
+    "LangChain",
+    "OpenAI API",
+    "NumPy",
+    "Pandas",
+    "Matplotlib",
+    "SciPy",
+    "NetworkX"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>llm_gpt3.5-vs-gpt4-comparison</h1>
+  <p class="one-liner">A cost-optimized document summarization pipeline using GPT-3.5 that achieves comparable or better results than GPT-4 by leveraging logical paragraph segmentation and hierarchical summarization.</p>
+  <p><a href="https://github.com/davidbmar/llm_gpt3.5-vs-gpt4-comparison">https://github.com/davidbmar/llm_gpt3.5-vs-gpt4-comparison</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project demonstrates a method to summarize long documents (such as an hour-long conversation or State of the Union address) at approximately 1/22nd the cost of GPT-4. It replaces fixed-character chunking with logic-based segmentation, breaking text into sentences, grouping them into coherent paragraphs based on topic changes, summarizing each paragraph individually, and then generating a final summary of those sub-summaries using GPT-3.5-16k.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Logical text segmentation based on sentence boundaries rather than fixed character counts</li><li>Hierarchical summarization: paragraph-level summaries aggregated into a final document summary</li><li>Topic change detection using cosine similarity of OpenAI embeddings</li><li>Cost optimization targeting ~22.5x savings compared to GPT-4</li><li>Visual heatmap generation for topic clustering and chunk analysis</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">bash llm_setup.sh
+export OPENAI_API_KEY=yourkeyhere
+python3 llm_summary.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Raw Text Input] --> B[Sentence Splitter]
+    B --> C[Paragraph Grouping]
+    C --> D[Embedding Generation]
+    D --> E[Cosine Similarity Check]
+    E -->|Topic Change| F[New Paragraph]
+    E -->|Same Topic| C
+    F --> G[GPT-3.5 Summarize Paragraph]
+    G --> H[Collection of Sub-Summaries]
+    H --> I[GPT-3.5-16k Final Summary]
+    I --> J[Final Output]
+    D --> K[Heatmap Visualization]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system is built in Python using LangChain for LLM orchestration and OpenAI embeddings. It processes raw text by splitting on punctuation to create sentence fragments, groups these into logical paragraphs, and uses cosine similarity on embeddings to detect topic shifts. Each paragraph is summarized and titled using GPT-3.5-turbo. Finally, the collection of paragraph summaries is fed into GPT-3.5-16k for a global summary. Visualization tools generate heatmaps of topic clusters.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant Script as llm_summary.py
+    participant OpenAI as OpenAI API
+    
+    User->>Script: Execute script with txt file
+    Script->>Script: Split text into sentences
+    Script->>Script: Group sentences into paragraphs
+    loop For each paragraph
+        Script->>OpenAI: Generate Embeddings
+        OpenAI-->>Script: Vector embeddings
+        Script->>Script: Calculate Cosine Similarity
+        Script->>OpenAI: Summarize Paragraph (GPT-3.5)
+        OpenAI-->>Script: Paragraph Summary & Title
+    end
+    Script->>OpenAI: Summarize All Sub-Summaries (GPT-3.5-16k)
+    OpenAI-->>Script: Final Document Summary
+    Script->>User: Display Summary & Save Heatmaps</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this approach when cost is a primary constraint and latency is secondary. It is ideal for batch processing large transcripts, articles, or logs where parallelization is not required. Replace the default &#x27;stateoftheunion.txt&#x27; with your target document and ensure your OpenAI API key is configured.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Text Summarization</span><span class="tag">Topic Modeling</span><span class="tag">Cost Optimization</span><span class="tag">Data Visualization</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">llm_summary.py</span><span class="tag">llm_setup.sh</span><span class="tag">stateoftheunion.txt</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">LangChain</span><span class="tag">OpenAI API</span><span class="tag">NumPy</span><span class="tag">Pandas</span><span class="tag">Matplotlib</span><span class="tag">SciPy</span><span class="tag">NetworkX</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">OpenAI API Key</span><span class="tag">Python 3.x</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">OpenAI Embeddings</span><span class="tag">OpenAI Chat Completions</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Map-Reduce Summarization</span><span class="tag">Semantic Chunking</span><span class="tag">Hierarchical Processing</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">summarization</span><span class="tag">llm</span><span class="tag">cost-optimization</span><span class="tag">nlp</span><span class="tag">langchain</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:05:11.072602Z ·
+     commit 7851f7c ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

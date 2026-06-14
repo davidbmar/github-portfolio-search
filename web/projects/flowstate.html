@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flowstate · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "flowstate", "one_liner": "A declarative Finite State Machine engine for multi-turn conversational AI that uses YAML to define states, typed slots, and per-state model selection.", "what_it_is": "flowstate is a Python library that structures complex conversations as deterministic state machines. Instead of relying on long chat histories and fragile system prompts, it breaks conversations into discrete states with specific goals and typed data contracts (slots). Each state can use a different LLM optimized for its specific task, ensuring context isolation, debuggability, and reliable data extraction.", "how_its_built": "The core is a Python engine that loads YAML flow definitions. It uses a `ModelRouter` to dispatch requests to specific `ModelAdapter` implementations (Anthropic, Gemini, MLX, or Fake). The engine maintains a `FlowContext` tracking the current state and filled slots, executing a `step()` function that calls the adapter, parses structured JSON responses, updates slots, and evaluates transition conditions to move to the next state.", "how_to_apply": "Define your conversation logic in a YAML file specifying states, goals, required slots, and transitions. Instantiate a `FlowContext` and load the flow using `load_flow()`. Use the `step()` function in your application loop, passing user input and the current context. Integrate specific LLM adapters via the `ModelRouter` to handle actual generation.", "quickstart": "pip install flowstate\npython scripts/demo_real_pizza.py", "features": ["Declarative YAML configuration for conversation flows", "Per-state LLM model selection for cost and performance optimization", "Typed slot contracts ensuring structured data extraction", "Deterministic state transitions based on slot completion", "Tool side-effect boundaries for safe external integrations", "Empty-turn safety net to prevent conversation stalls"], "diagram_architecture": "flowchart TD\n    User[User Input] --> Engine[flowstate Engine]\n    Engine --> Context[FlowContext]\n    Context --> Router[ModelRouter]\n    Router --> Adapter[Model Adapter]\n    Adapter --> LLM[External LLM]\n    LLM --> Adapter\n    Adapter --> Engine\n    Engine --> Tools[Tool Registry]\n    Tools --> External[External Systems]\n    External --> Tools\n    Engine --> NextState[Next State Decision]", "diagram_sequence": "sequenceDiagram\n    participant App as Application\n    participant Eng as flowstate Engine\n    participant Ctx as FlowContext\n    participant Rtr as ModelRouter\n    participant Adp as ModelAdapter\n    participant LLM as LLM Provider\n\n    App->>Eng: step(input, ctx)\n    Eng->>Ctx: get_current_state()\n    Ctx-->>Eng: state_config\n    Eng->>Rtr: get_adapter(state.model)\n    Rtr-->>Eng: adapter_instance\n    Eng->>Adp: complete(prompt, slots)\n    Adp->>LLM: generate_response()\n    LLM-->>Adp: raw_text/json\n    Adp-->>Eng: AdapterResponse(slots, tool_calls)\n    Eng->>Eng: update_slots(ctx)\n    Eng->>Eng: evaluate_transitions()\n    Eng-->>App: StepResult(next_state, updated_ctx)", "capabilities": ["Multi-turn conversation management", "Structured data extraction", "Dynamic model routing", "State-based goal enforcement", "Tool integration", "Conversation debugging"], "components": ["YAML Loader", "Flow Validator", "State Engine", "Model Router", "Model Adapters", "Tool Registry", "Flow Context"], "tech": ["Python", "YAML", "JSON", "Anthropic SDK", "Google Generative AI SDK", "MLX"], "depends_on": ["pyyaml", "anthropic", "google-generativeai", "mlx-lm"], "integrates_with": ["Anthropic Claude", "Google Gemini", "Local MLX Models", "Custom Tool APIs"], "patterns": ["Finite State Machine", "Adapter Pattern", "Strategy Pattern", "Dependency Injection", "Declarative Configuration"], "reuse_tags": ["conversational-ai", "fsm", "llm-orchestration", "structured-output", "yaml-config"], "slug": "flowstate", "repo_url": "https://github.com/davidbmar/flowstate", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:52:00.561825Z", "source_commit": "0ec715e", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "flowstate",
+  "description": "A declarative Finite State Machine engine for multi-turn conversational AI that uses YAML to define states, typed slots, and per-state model selection.",
+  "codeRepository": "https://github.com/davidbmar/flowstate",
+  "programmingLanguage": [
+    "Python",
+    "YAML",
+    "JSON",
+    "Anthropic SDK",
+    "Google Generative AI SDK",
+    "MLX"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>flowstate</h1>
+  <p class="one-liner">A declarative Finite State Machine engine for multi-turn conversational AI that uses YAML to define states, typed slots, and per-state model selection.</p>
+  <p><a href="https://github.com/davidbmar/flowstate">https://github.com/davidbmar/flowstate</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>flowstate is a Python library that structures complex conversations as deterministic state machines. Instead of relying on long chat histories and fragile system prompts, it breaks conversations into discrete states with specific goals and typed data contracts (slots). Each state can use a different LLM optimized for its specific task, ensuring context isolation, debuggability, and reliable data extraction.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Declarative YAML configuration for conversation flows</li><li>Per-state LLM model selection for cost and performance optimization</li><li>Typed slot contracts ensuring structured data extraction</li><li>Deterministic state transitions based on slot completion</li><li>Tool side-effect boundaries for safe external integrations</li><li>Empty-turn safety net to prevent conversation stalls</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install flowstate
+python scripts/demo_real_pizza.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Input] --> Engine[flowstate Engine]
+    Engine --> Context[FlowContext]
+    Context --> Router[ModelRouter]
+    Router --> Adapter[Model Adapter]
+    Adapter --> LLM[External LLM]
+    LLM --> Adapter
+    Adapter --> Engine
+    Engine --> Tools[Tool Registry]
+    Tools --> External[External Systems]
+    External --> Tools
+    Engine --> NextState[Next State Decision]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The core is a Python engine that loads YAML flow definitions. It uses a `ModelRouter` to dispatch requests to specific `ModelAdapter` implementations (Anthropic, Gemini, MLX, or Fake). The engine maintains a `FlowContext` tracking the current state and filled slots, executing a `step()` function that calls the adapter, parses structured JSON responses, updates slots, and evaluates transition conditions to move to the next state.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant App as Application
+    participant Eng as flowstate Engine
+    participant Ctx as FlowContext
+    participant Rtr as ModelRouter
+    participant Adp as ModelAdapter
+    participant LLM as LLM Provider
+
+    App->>Eng: step(input, ctx)
+    Eng->>Ctx: get_current_state()
+    Ctx-->>Eng: state_config
+    Eng->>Rtr: get_adapter(state.model)
+    Rtr-->>Eng: adapter_instance
+    Eng->>Adp: complete(prompt, slots)
+    Adp->>LLM: generate_response()
+    LLM-->>Adp: raw_text/json
+    Adp-->>Eng: AdapterResponse(slots, tool_calls)
+    Eng->>Eng: update_slots(ctx)
+    Eng->>Eng: evaluate_transitions()
+    Eng-->>App: StepResult(next_state, updated_ctx)</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Define your conversation logic in a YAML file specifying states, goals, required slots, and transitions. Instantiate a `FlowContext` and load the flow using `load_flow()`. Use the `step()` function in your application loop, passing user input and the current context. Integrate specific LLM adapters via the `ModelRouter` to handle actual generation.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Multi-turn conversation management</span><span class="tag">Structured data extraction</span><span class="tag">Dynamic model routing</span><span class="tag">State-based goal enforcement</span><span class="tag">Tool integration</span><span class="tag">Conversation debugging</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">YAML Loader</span><span class="tag">Flow Validator</span><span class="tag">State Engine</span><span class="tag">Model Router</span><span class="tag">Model Adapters</span><span class="tag">Tool Registry</span><span class="tag">Flow Context</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">YAML</span><span class="tag">JSON</span><span class="tag">Anthropic SDK</span><span class="tag">Google Generative AI SDK</span><span class="tag">MLX</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">pyyaml</span><span class="tag">anthropic</span><span class="tag">google-generativeai</span><span class="tag">mlx-lm</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Anthropic Claude</span><span class="tag">Google Gemini</span><span class="tag">Local MLX Models</span><span class="tag">Custom Tool APIs</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Finite State Machine</span><span class="tag">Adapter Pattern</span><span class="tag">Strategy Pattern</span><span class="tag">Dependency Injection</span><span class="tag">Declarative Configuration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">conversational-ai</span><span class="tag">fsm</span><span class="tag">llm-orchestration</span><span class="tag">structured-output</span><span class="tag">yaml-config</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:52:00.561825Z ·
+     commit 0ec715e ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceStream ASR · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "VoiceStream ASR", "one_liner": "A production-ready real-time Automatic Speech Recognition service using browser APIs and WebSocket streaming.", "what_it_is": "VoiceStream ASR is a full-stack TypeScript application that provides real-time speech-to-text transcription. It acts as the 'ears' layer for voice-enabled applications, leveraging the browser's native Web Speech API to capture audio and an Express backend to manage sessions, store transcripts, and stream updates via WebSockets. It requires no external cloud ASR API keys.", "how_its_built": "The project uses a monorepo-style structure with a React frontend (Vite, Tailwind CSS, shadcn/ui) and an Express.js backend. The backend handles REST API requests for session management and WebSocket connections for real-time data pushing. Data persistence is handled via Drizzle ORM (configured for PostgreSQL in config, though README mentions in-memory storage for the demo). The build process uses esbuild for the server and Vite for the client.", "how_to_apply": "Integrate this service as the transcription engine for voice assistants, meeting transcription tools, or conversational AI agents. Use the REST API to create sessions and the WebSocket endpoint to receive live partial and final transcripts with confidence scores. It can be extended by connecting the transcript output to an LLM for response generation.", "quickstart": "git clone https://github.com/davidbmar/browser-Speech-to-Text-realtime-ASR.git\ncd browser-Speech-to-Text-realtime-ASR\nnpm install\nnpm run dev", "features": ["Real-time speech-to-text transcription with partial and final results", "Confidence scoring for each transcribed segment", "WebSocket streaming for low-latency updates", "REST API for session creation, management, and history retrieval", "Zero-dependency on cloud ASR providers (uses Browser Web Speech API)", "Modern React dashboard with dark/light theme support"], "diagram_architecture": "flowchart TD\n    subgraph Client[Browser Client]\n        Mic[Microphone Input]\n        WebSpeech[Web Speech API]\n        ReactUI[React UI Components]\n        WS_Client[WebSocket Client]\n        REST_Client[REST API Client]\n    end\n\n    subgraph Server[Express Server]\n        WS_Server[WebSocket Server /ws]\n        REST_API[REST API /api/*]\n        SessionMgr[Session Manager]\n        Storage[(Storage / In-Memory)]\n    end\n\n    Mic --> WebSpeech\n    WebSpeech --> ReactUI\n    ReactUI --> WS_Client\n    ReactUI --> REST_Client\n    \n    WS_Client <-->|Stream Transcripts| WS_Server\n    REST_Client <-->|Manage Sessions| REST_API\n    \n    WS_Server --> SessionMgr\n    REST_API --> SessionMgr\n    SessionMgr --> Storage", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Browser as React Client\n    participant Server as Express Backend\n    participant Storage as Session Store\n\n    User->>Browser: Click Start Recording\n    Browser->>Server: POST /api/sessions\n    Server->>Storage: Create Session ID\n    Server-->>Browser: Return Session ID\n    \n    Browser->>Server: Connect WebSocket /ws?sessionId=...\n    Server-->>Browser: Connection Established\n    \n    loop Speech Input\n        User->>Browser: Speak\n        Browser->>Browser: Web Speech API Process\n        Browser->>Server: Send Transcript Update (via WS or Internal)\n        Server->>Storage: Save Transcript\n        Server->>Browser: Push Real-time Update (WS)\n        Browser->>User: Display Text & Confidence\n    end\n    \n    User->>Browser: Stop Recording\n    Browser->>Server: POST /api/sessions/:id/end\n    Server->>Storage: Finalize Session", "capabilities": ["Real-time Transcription", "Session Management", "WebSocket Streaming", "REST API Integration", "Confidence Scoring", "Multi-language Support (via Browser API)"], "components": ["React Frontend", "Express Backend", "WebSocket Server", "REST API Endpoints", "Drizzle ORM Schema", "Vite Build System"], "tech": ["TypeScript", "React", "Express.js", "WebSocket (ws)", "Vite", "Tailwind CSS", "Drizzle ORM", "Web Speech API"], "depends_on": ["Node.js 20+", "Chrome/Edge Browser (for Web Speech API)", "npm"], "integrates_with": ["LLMs (GPT/Claude)", "TTS Services (ElevenLabs)", "PostgreSQL (via Drizzle)", "Docker"], "patterns": ["Client-Server Architecture", "Publish-Subscribe (WebSocket)", "RESTful API", "Session-Based State Management", "Monorepo Build Strategy"], "reuse_tags": ["speech-recognition", "real-time", "websocket", "typescript", "react", "express", "voice-agent", "asr"], "slug": "browser-Speech-to-Text-realtime-ASR", "repo_url": "https://github.com/davidbmar/browser-Speech-to-Text-realtime-ASR", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/npm_and_yarn-9decc5948b is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 10 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/browser-Speech-to-Text-realtime-ASR/main/UI.png", "generated_at": "2026-06-14T02:30:09.752925Z", "source_commit": "a5af8ff", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "VoiceStream ASR",
+  "description": "A production-ready real-time Automatic Speech Recognition service using browser APIs and WebSocket streaming.",
+  "codeRepository": "https://github.com/davidbmar/browser-Speech-to-Text-realtime-ASR",
+  "programmingLanguage": [
+    "TypeScript",
+    "React",
+    "Express.js",
+    "WebSocket (ws)",
+    "Vite",
+    "Tailwind CSS",
+    "Drizzle ORM",
+    "Web Speech API"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>VoiceStream ASR</h1>
+  <p class="one-liner">A production-ready real-time Automatic Speech Recognition service using browser APIs and WebSocket streaming.</p>
+  <p><a href="https://github.com/davidbmar/browser-Speech-to-Text-realtime-ASR">https://github.com/davidbmar/browser-Speech-to-Text-realtime-ASR</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/browser-Speech-to-Text-realtime-ASR/main/UI.png" alt="VoiceStream ASR screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>VoiceStream ASR is a full-stack TypeScript application that provides real-time speech-to-text transcription. It acts as the &#x27;ears&#x27; layer for voice-enabled applications, leveraging the browser&#x27;s native Web Speech API to capture audio and an Express backend to manage sessions, store transcripts, and stream updates via WebSockets. It requires no external cloud ASR API keys.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time speech-to-text transcription with partial and final results</li><li>Confidence scoring for each transcribed segment</li><li>WebSocket streaming for low-latency updates</li><li>REST API for session creation, management, and history retrieval</li><li>Zero-dependency on cloud ASR providers (uses Browser Web Speech API)</li><li>Modern React dashboard with dark/light theme support</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/browser-Speech-to-Text-realtime-ASR.git
+cd browser-Speech-to-Text-realtime-ASR
+npm install
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph Client[Browser Client]
+        Mic[Microphone Input]
+        WebSpeech[Web Speech API]
+        ReactUI[React UI Components]
+        WS_Client[WebSocket Client]
+        REST_Client[REST API Client]
+    end
+
+    subgraph Server[Express Server]
+        WS_Server[WebSocket Server /ws]
+        REST_API[REST API /api/*]
+        SessionMgr[Session Manager]
+        Storage[(Storage / In-Memory)]
+    end
+
+    Mic --> WebSpeech
+    WebSpeech --> ReactUI
+    ReactUI --> WS_Client
+    ReactUI --> REST_Client
+    
+    WS_Client &lt;-->|Stream Transcripts| WS_Server
+    REST_Client &lt;-->|Manage Sessions| REST_API
+    
+    WS_Server --> SessionMgr
+    REST_API --> SessionMgr
+    SessionMgr --> Storage</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project uses a monorepo-style structure with a React frontend (Vite, Tailwind CSS, shadcn/ui) and an Express.js backend. The backend handles REST API requests for session management and WebSocket connections for real-time data pushing. Data persistence is handled via Drizzle ORM (configured for PostgreSQL in config, though README mentions in-memory storage for the demo). The build process uses esbuild for the server and Vite for the client.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant Browser as React Client
+    participant Server as Express Backend
+    participant Storage as Session Store
+
+    User->>Browser: Click Start Recording
+    Browser->>Server: POST /api/sessions
+    Server->>Storage: Create Session ID
+    Server-->>Browser: Return Session ID
+    
+    Browser->>Server: Connect WebSocket /ws?sessionId=...
+    Server-->>Browser: Connection Established
+    
+    loop Speech Input
+        User->>Browser: Speak
+        Browser->>Browser: Web Speech API Process
+        Browser->>Server: Send Transcript Update (via WS or Internal)
+        Server->>Storage: Save Transcript
+        Server->>Browser: Push Real-time Update (WS)
+        Browser->>User: Display Text & Confidence
+    end
+    
+    User->>Browser: Stop Recording
+    Browser->>Server: POST /api/sessions/:id/end
+    Server->>Storage: Finalize Session</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Integrate this service as the transcription engine for voice assistants, meeting transcription tools, or conversational AI agents. Use the REST API to create sessions and the WebSocket endpoint to receive live partial and final transcripts with confidence scores. It can be extended by connecting the transcript output to an LLM for response generation.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Real-time Transcription</span><span class="tag">Session Management</span><span class="tag">WebSocket Streaming</span><span class="tag">REST API Integration</span><span class="tag">Confidence Scoring</span><span class="tag">Multi-language Support (via Browser API)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">React Frontend</span><span class="tag">Express Backend</span><span class="tag">WebSocket Server</span><span class="tag">REST API Endpoints</span><span class="tag">Drizzle ORM Schema</span><span class="tag">Vite Build System</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">Express.js</span><span class="tag">WebSocket (ws)</span><span class="tag">Vite</span><span class="tag">Tailwind CSS</span><span class="tag">Drizzle ORM</span><span class="tag">Web Speech API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js 20+</span><span class="tag">Chrome/Edge Browser (for Web Speech API)</span><span class="tag">npm</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">LLMs (GPT/Claude)</span><span class="tag">TTS Services (ElevenLabs)</span><span class="tag">PostgreSQL (via Drizzle)</span><span class="tag">Docker</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server Architecture</span><span class="tag">Publish-Subscribe (WebSocket)</span><span class="tag">RESTful API</span><span class="tag">Session-Based State Management</span><span class="tag">Monorepo Build Strategy</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">speech-recognition</span><span class="tag">real-time</span><span class="tag">websocket</span><span class="tag">typescript</span><span class="tag">react</span><span class="tag">express</span><span class="tag">voice-agent</span><span class="tag">asr</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/npm_and_yarn-9decc5948b is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 10 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:30:09.752925Z ·
+     commit a5af8ff ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

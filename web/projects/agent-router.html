@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Router · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Agent Router", "one_liner": "A federated, multi-agent cockpit that spawns Gemini, Claude, and Codex in real PTYs and bridges them to a browser workspace.", "what_it_is": "Agent Router is a local-first control plane for running multiple AI coding agents simultaneously. It isolates each agent (Gemini CLI, Claude Code, Codex) in its own pseudo-terminal (PTY) on the host machine, streams the output to a web-based terminal via WebSockets, and allows users to inject prompts or switch between agents seamlessly. It supports federation, allowing multiple router instances on different machines to share session visibility and prompt injection capabilities over HTTP.", "how_its_built": "The backend is built with FastAPI and uvicorn, using the `ptyprocess` library to manage real PTY sessions for each agent. A background thread reads PTY output into a deque buffer for history replay. The frontend is a zero-build static HTML application using xterm.js for terminal emulation, xterm-addon-fit for resizing, and SortableJS for draggable tabs. Federation is handled via HTTP APIs and peer discovery mechanisms including mDNS, Tailscale, and gossip protocols.", "how_to_apply": "Use Agent Router when you need to run multiple AI coding agents in parallel without context switching between terminal windows. It is ideal for coordinating complex tasks where one agent might handle backend logic while another handles frontend updates, or when you want to maintain persistent, 'warm' agent sessions that retain history across browser refreshes. The federation features allow scaling across multiple machines for heavy workloads.", "quickstart": "python3 -m venv .venv\nsource .venv/bin/activate\npip install fastapi uvicorn websockets ptyprocess pydantic\npython3 server.py", "features": ["Multi-Terminal Workspace: Spawn and manage multiple agent instances in draggable browser tabs.", "Real PTY Isolation: Each agent runs in a genuine pseudo-terminal with full interactive support.", "Federated Architecture: Merge sessions and inject prompts across multiple machines via HTTP/WebSocket.", "Stateful Persistence: Agents remain warm in the background; switching tabs re-attaches to live PTYs.", "Vision API: REST endpoints allow agents to read screen buffers and inject prompts into other sessions.", "Auto-Discovery: Peers are automatically discovered via mDNS, Tailscale, or manual configuration."], "diagram_architecture": "flowchart TD\n    User[Browser User] -->|HTTP/WebSocket| FE[Static Frontend]\n    FE -->|WS /ws/terminal/{id}| Server[FastAPI Server]\n    Server -->|Manage| PTYMgr[PTY Manager]\n    PTYMgr -->|Spawn| P1[PTY: Claude]\n    PTYMgr -->|Spawn| P2[PTY: Gemini]\n    PTYMgr -->|Spawn| P3[PTY: Codex]\n    P1 -->|Read/Write| Agent1[Claude Code Process]\n    P2 -->|Read/Write| Agent2[Gemini CLI Process]\n    P3 -->|Read/Write| Agent3[Codex Process]\n    Server -->|HTTP /api/*| PeerRouter[Peer Router Instance]\n    PeerRouter -->|Proxy| PeerPTY[Peer PTY Session]", "diagram_sequence": "sequenceDiagram\n    participant U as User Browser\n    participant S as FastAPI Server\n    participant P as PTY Process\n    participant A as AI Agent (e.g. Claude)\n    \n    U->>S: POST /api/sessions (Spawn Agent)\n    S->>P: ptyprocess.spawn(Agent Command)\n    P-->>S: PTY FD Created\n    S-->>U: Session ID & Status\n    \n    U->>S: WebSocket Connect /ws/terminal/{id}\n    S->>P: Attach Reader Thread\n    loop Background Read\n        P->>S: Read Output Chunk\n        S->>U: WS Message (Output)\n    end\n    \n    U->>S: WS Message (User Input/Prompt)\n    S->>P: Write to PTY Master\n    P->>A: Input Received\n    A->>P: Generate Response\n    P->>S: Output Available\n    S->>U: WS Message (Response)", "capabilities": ["PTY Management", "WebSocket Streaming", "HTTP API Federation", "Peer Discovery", "Session Persistence", "Prompt Injection"], "components": ["server.py", "dispatcher.py", "static/index.html", "ARCHITECTURE.md", ".env.example"], "tech": ["Python", "FastAPI", "uvicorn", "websockets", "ptyprocess", "HTML/JS", "xterm.js", "SortableJS"], "depends_on": ["Claude Code CLI", "Gemini CLI", "Codex CLI", "Python 3.8+"], "integrates_with": ["Tailscale", "mDNS", "Riff Switchboard"], "patterns": ["Federated Systems", "PTY Bridging", "Event-Driven UI", "Peer-to-Peer Gossip"], "reuse_tags": ["ai-agents", "terminal-emulator", "federated-learning", "developer-tools", "pty-management"], "slug": "agent-router", "repo_url": "https://github.com/davidbmar/agent-router", "visibility": "private", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "architect/ai-team-best-practices-2026-05-28 is 139 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "coder1/reflexion is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "coder2-command-center-ui is 665 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/artifact-sync-sidecar-pr3 is 1411 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/manager-mode-b is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/qa-browser-verification is 7 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/qa-playwright-mic-tests is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "fix/m-redirect-loop-host-picker is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "qa/dashboard-e2e-ec2-4-2026-05-28 is 117 commits ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "release-mgr/merge-sequence-2026-05-27 is 1 commit ahead of the default branch"}], "screenshot_url": "", "generated_at": "2026-06-14T02:22:27.103011Z", "source_commit": "2da52ef", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Agent Router",
+  "description": "A federated, multi-agent cockpit that spawns Gemini, Claude, and Codex in real PTYs and bridges them to a browser workspace.",
+  "codeRepository": "https://github.com/davidbmar/agent-router",
+  "programmingLanguage": [
+    "Python",
+    "FastAPI",
+    "uvicorn",
+    "websockets",
+    "ptyprocess",
+    "HTML/JS",
+    "xterm.js",
+    "SortableJS"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Agent Router</h1>
+  <p class="one-liner">A federated, multi-agent cockpit that spawns Gemini, Claude, and Codex in real PTYs and bridges them to a browser workspace.</p>
+  <p><a href="https://github.com/davidbmar/agent-router">https://github.com/davidbmar/agent-router</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>Agent Router is a local-first control plane for running multiple AI coding agents simultaneously. It isolates each agent (Gemini CLI, Claude Code, Codex) in its own pseudo-terminal (PTY) on the host machine, streams the output to a web-based terminal via WebSockets, and allows users to inject prompts or switch between agents seamlessly. It supports federation, allowing multiple router instances on different machines to share session visibility and prompt injection capabilities over HTTP.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Multi-Terminal Workspace: Spawn and manage multiple agent instances in draggable browser tabs.</li><li>Real PTY Isolation: Each agent runs in a genuine pseudo-terminal with full interactive support.</li><li>Federated Architecture: Merge sessions and inject prompts across multiple machines via HTTP/WebSocket.</li><li>Stateful Persistence: Agents remain warm in the background; switching tabs re-attaches to live PTYs.</li><li>Vision API: REST endpoints allow agents to read screen buffers and inject prompts into other sessions.</li><li>Auto-Discovery: Peers are automatically discovered via mDNS, Tailscale, or manual configuration.</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">python3 -m venv .venv
+source .venv/bin/activate
+pip install fastapi uvicorn websockets ptyprocess pydantic
+python3 server.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[Browser User] -->|HTTP/WebSocket| FE[Static Frontend]
+    FE -->|WS /ws/terminal/{id}| Server[FastAPI Server]
+    Server -->|Manage| PTYMgr[PTY Manager]
+    PTYMgr -->|Spawn| P1[PTY: Claude]
+    PTYMgr -->|Spawn| P2[PTY: Gemini]
+    PTYMgr -->|Spawn| P3[PTY: Codex]
+    P1 -->|Read/Write| Agent1[Claude Code Process]
+    P2 -->|Read/Write| Agent2[Gemini CLI Process]
+    P3 -->|Read/Write| Agent3[Codex Process]
+    Server -->|HTTP /api/*| PeerRouter[Peer Router Instance]
+    PeerRouter -->|Proxy| PeerPTY[Peer PTY Session]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is built with FastAPI and uvicorn, using the `ptyprocess` library to manage real PTY sessions for each agent. A background thread reads PTY output into a deque buffer for history replay. The frontend is a zero-build static HTML application using xterm.js for terminal emulation, xterm-addon-fit for resizing, and SortableJS for draggable tabs. Federation is handled via HTTP APIs and peer discovery mechanisms including mDNS, Tailscale, and gossip protocols.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User Browser
+    participant S as FastAPI Server
+    participant P as PTY Process
+    participant A as AI Agent (e.g. Claude)
+    
+    U->>S: POST /api/sessions (Spawn Agent)
+    S->>P: ptyprocess.spawn(Agent Command)
+    P-->>S: PTY FD Created
+    S-->>U: Session ID & Status
+    
+    U->>S: WebSocket Connect /ws/terminal/{id}
+    S->>P: Attach Reader Thread
+    loop Background Read
+        P->>S: Read Output Chunk
+        S->>U: WS Message (Output)
+    end
+    
+    U->>S: WS Message (User Input/Prompt)
+    S->>P: Write to PTY Master
+    P->>A: Input Received
+    A->>P: Generate Response
+    P->>S: Output Available
+    S->>U: WS Message (Response)</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use Agent Router when you need to run multiple AI coding agents in parallel without context switching between terminal windows. It is ideal for coordinating complex tasks where one agent might handle backend logic while another handles frontend updates, or when you want to maintain persistent, &#x27;warm&#x27; agent sessions that retain history across browser refreshes. The federation features allow scaling across multiple machines for heavy workloads.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">PTY Management</span><span class="tag">WebSocket Streaming</span><span class="tag">HTTP API Federation</span><span class="tag">Peer Discovery</span><span class="tag">Session Persistence</span><span class="tag">Prompt Injection</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">server.py</span><span class="tag">dispatcher.py</span><span class="tag">static/index.html</span><span class="tag">ARCHITECTURE.md</span><span class="tag">.env.example</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">uvicorn</span><span class="tag">websockets</span><span class="tag">ptyprocess</span><span class="tag">HTML/JS</span><span class="tag">xterm.js</span><span class="tag">SortableJS</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Claude Code CLI</span><span class="tag">Gemini CLI</span><span class="tag">Codex CLI</span><span class="tag">Python 3.8+</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Tailscale</span><span class="tag">mDNS</span><span class="tag">Riff Switchboard</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Federated Systems</span><span class="tag">PTY Bridging</span><span class="tag">Event-Driven UI</span><span class="tag">Peer-to-Peer Gossip</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">ai-agents</span><span class="tag">terminal-emulator</span><span class="tag">federated-learning</span><span class="tag">developer-tools</span><span class="tag">pty-management</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: architect/ai-team-best-practices-2026-05-28 is 139 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: coder1/reflexion is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: coder2-command-center-ui is 665 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/artifact-sync-sidecar-pr3 is 1411 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/manager-mode-b is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/qa-browser-verification is 7 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/qa-playwright-mic-tests is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: fix/m-redirect-loop-host-picker is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: qa/dashboard-e2e-ec2-4-2026-05-28 is 117 commits ahead of the default branch</li><li><strong>unmerged_branch</strong>: release-mgr/merge-sequence-2026-05-27 is 1 commit ahead of the default branch</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:22:27.103011Z ·
+     commit 2da52ef ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

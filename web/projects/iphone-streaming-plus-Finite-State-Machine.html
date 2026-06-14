@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iPhone Streaming Plus Finite State Machine · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "iPhone Streaming Plus Finite State Machine", "one_liner": "Mac-hosted Python voice assistant streaming TTS to iPhone Safari via WebRTC with a hybrid FSM workflow engine for complex queries.", "what_it_is": "A local-first voice agent that runs on macOS and connects to iPhone Safari. It uses Whisper for STT, routes queries via regex to either a fast LLM path or a multi-step Finite State Machine (Research, Deep Dive, Fact Check), and streams Piper TTS audio back to the phone using WebRTC.", "how_its_built": "Python backend using aiohttp for signaling and WebRTC peer connections. The core logic includes a keyword router, an FSM executor for complex workflows, and adapters for Whisper (STT), Piper (TTS), and multiple LLM providers (Ollama, Claude, OpenAI). The frontend is a mobile-optimized web UI with hold-to-talk controls and a workflow debugger.", "how_to_apply": "Deploy on a Mac connected to the same network as your iPhone. Use it for privacy-focused voice assistance, local LLM experimentation, or as a template for building stateful voice agents with WebRTC audio streaming.", "quickstart": "git clone https://github.com/davidbmar/iphone-streaming-plus-Finite-State-Machine.git\ncd iphone-streaming-plus-Finite-State-Machine\npip install -r requirements.txt\npython main.py", "features": ["WebRTC audio streaming from Mac to iPhone Safari with low latency", "Hybrid FSM engine for Research, Deep Dive, and Fact Check workflows", "Sub-millisecond regex keyword router for intent dispatching", "Supports Ollama (local), Claude, and OpenAI with runtime switching", "Input quality filter to reject noise and save LLM costs", "Mobile UI with workflow debugger and step-by-step progress visualization"], "diagram_architecture": "flowchart TD\n    subgraph Mac_Host[\"Mac Host\"]\n        Engine[\"Engine\\nWorkflowRunner\\nKeyword Router\\nFSM Executor\"]\n        Gateway[\"Gateway\\naiohttp Server :8080\\nWebSocket Signaling\\nRTCPeerConnection\"]\n        TTS[\"Piper TTS (ONNX)\"]\n        STT[\"Whisper STT\"]\n        LLM[\"LLM Provider\\n(Ollama/Claude/OpenAI)\"]\n    end\n    subgraph iPhone[\"iPhone Safari\"]\n        UI[\"Voice Agent UI\\nHold-to-Talk\\nWorkflow Debugger\"]\n    end\n    UI -->|Audio/Mic Input| Gateway\n    Gateway -->|Audio Data| STT\n    STT -->|Text| Engine\n    Engine -->|Query| LLM\n    LLM -->|Response Text| Engine\n    Engine -->|Text| TTS\n    TTS -->|Audio Chunks| Gateway\n    Gateway -->|WebRTC Audio Track| UI\n    Engine -->|State Updates| Gateway\n    Gateway -->|Debug Info| UI", "diagram_sequence": "sequenceDiagram\n    participant User as iPhone User\n    participant UI as Safari UI\n    participant GW as Mac Gateway (aiohttp)\n    participant Eng as Engine (FSM/Router)\n    participant LLM as LLM Provider\n    participant TTS as Piper TTS\n    \n    User->>UI: Hold to Talk (Mic Input)\n    UI->>GW: Send Audio via WebSocket\n    GW->>Eng: Forward Audio Data\n    Eng->>Eng: Whisper STT Transcription\n    Eng->>Eng: Keyword Router Decision\n    alt Complex Query\n        Eng->>LLM: FSM State Prompt (e.g., Initial Lookup)\n        LLM-->>Eng: Search Query/Reasoning\n        Eng->>Eng: Execute Tool (Web Search)\n        Eng->>LLM: Next FSM State (Synthesize)\n        LLM-->>Eng: Final Answer Text\n    else Simple Query\n        Eng->>LLM: Direct Chat Completion\n        LLM-->>Eng: Response Text\n    end\n    Eng->>TTS: Generate Audio from Text\n    TTS-->>Eng: Audio Chunks (PCM)\n    Eng->>GW: Stream Audio Chunks\n    GW->>UI: WebRTC Audio Track\n    UI->>User: Play Response Audio", "capabilities": ["Voice Interaction", "WebRTC Streaming", "Finite State Machine Execution", "Local LLM Integration", "Real-time Transcription", "Text-to-Speech Synthesis"], "components": ["engine/workflow.py", "engine/adapter.py", "engine/conversation.py", "engine/fast_path.py", "engine/input_filter.py", "engine/llm.py", "gateway/server.py"], "tech": ["Python", "WebRTC", "aiohttp", "Whisper", "Piper TTS", "Ollama", "Mermaid"], "depends_on": ["macOS Host", "Python 3.10+", "Ollama (optional)", "Anthropic API Key (optional)", "OpenAI API Key (optional)"], "integrates_with": ["iPhone Safari", "Ollama", "Claude API", "OpenAI API", "Web Search Tools"], "patterns": ["Finite State Machine", "Keyword Routing", "Client-Server WebRTC", "Sliding Window Context", "Fast Path Optimization"], "reuse_tags": ["voice-agent", "webrtc-audio", "finite-state-machine", "local-llm", "python-backend", "ios-web-app"], "slug": "iphone-streaming-plus-Finite-State-Machine", "repo_url": "https://github.com/davidbmar/iphone-streaming-plus-Finite-State-Machine", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web-app/npm_and_yarn-d1f9cb5775 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feature/admin-dashboard is 16 commits ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 5 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/iphone-streaming-plus-Finite-State-Machine/main/docs/screenshots/agent-ollama.png", "generated_at": "2026-06-14T03:02:17.956696Z", "source_commit": "b848dbe", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "iPhone Streaming Plus Finite State Machine",
+  "description": "Mac-hosted Python voice assistant streaming TTS to iPhone Safari via WebRTC with a hybrid FSM workflow engine for complex queries.",
+  "codeRepository": "https://github.com/davidbmar/iphone-streaming-plus-Finite-State-Machine",
+  "programmingLanguage": [
+    "Python",
+    "WebRTC",
+    "aiohttp",
+    "Whisper",
+    "Piper TTS",
+    "Ollama",
+    "Mermaid"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>iPhone Streaming Plus Finite State Machine</h1>
+  <p class="one-liner">Mac-hosted Python voice assistant streaming TTS to iPhone Safari via WebRTC with a hybrid FSM workflow engine for complex queries.</p>
+  <p><a href="https://github.com/davidbmar/iphone-streaming-plus-Finite-State-Machine">https://github.com/davidbmar/iphone-streaming-plus-Finite-State-Machine</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/iphone-streaming-plus-Finite-State-Machine/main/docs/screenshots/agent-ollama.png" alt="iPhone Streaming Plus Finite State Machine screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A local-first voice agent that runs on macOS and connects to iPhone Safari. It uses Whisper for STT, routes queries via regex to either a fast LLM path or a multi-step Finite State Machine (Research, Deep Dive, Fact Check), and streams Piper TTS audio back to the phone using WebRTC.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>WebRTC audio streaming from Mac to iPhone Safari with low latency</li><li>Hybrid FSM engine for Research, Deep Dive, and Fact Check workflows</li><li>Sub-millisecond regex keyword router for intent dispatching</li><li>Supports Ollama (local), Claude, and OpenAI with runtime switching</li><li>Input quality filter to reject noise and save LLM costs</li><li>Mobile UI with workflow debugger and step-by-step progress visualization</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/iphone-streaming-plus-Finite-State-Machine.git
+cd iphone-streaming-plus-Finite-State-Machine
+pip install -r requirements.txt
+python main.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph Mac_Host["Mac Host"]
+        Engine["Engine\nWorkflowRunner\nKeyword Router\nFSM Executor"]
+        Gateway["Gateway\naiohttp Server :8080\nWebSocket Signaling\nRTCPeerConnection"]
+        TTS["Piper TTS (ONNX)"]
+        STT["Whisper STT"]
+        LLM["LLM Provider\n(Ollama/Claude/OpenAI)"]
+    end
+    subgraph iPhone["iPhone Safari"]
+        UI["Voice Agent UI\nHold-to-Talk\nWorkflow Debugger"]
+    end
+    UI -->|Audio/Mic Input| Gateway
+    Gateway -->|Audio Data| STT
+    STT -->|Text| Engine
+    Engine -->|Query| LLM
+    LLM -->|Response Text| Engine
+    Engine -->|Text| TTS
+    TTS -->|Audio Chunks| Gateway
+    Gateway -->|WebRTC Audio Track| UI
+    Engine -->|State Updates| Gateway
+    Gateway -->|Debug Info| UI</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Python backend using aiohttp for signaling and WebRTC peer connections. The core logic includes a keyword router, an FSM executor for complex workflows, and adapters for Whisper (STT), Piper (TTS), and multiple LLM providers (Ollama, Claude, OpenAI). The frontend is a mobile-optimized web UI with hold-to-talk controls and a workflow debugger.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as iPhone User
+    participant UI as Safari UI
+    participant GW as Mac Gateway (aiohttp)
+    participant Eng as Engine (FSM/Router)
+    participant LLM as LLM Provider
+    participant TTS as Piper TTS
+    
+    User->>UI: Hold to Talk (Mic Input)
+    UI->>GW: Send Audio via WebSocket
+    GW->>Eng: Forward Audio Data
+    Eng->>Eng: Whisper STT Transcription
+    Eng->>Eng: Keyword Router Decision
+    alt Complex Query
+        Eng->>LLM: FSM State Prompt (e.g., Initial Lookup)
+        LLM-->>Eng: Search Query/Reasoning
+        Eng->>Eng: Execute Tool (Web Search)
+        Eng->>LLM: Next FSM State (Synthesize)
+        LLM-->>Eng: Final Answer Text
+    else Simple Query
+        Eng->>LLM: Direct Chat Completion
+        LLM-->>Eng: Response Text
+    end
+    Eng->>TTS: Generate Audio from Text
+    TTS-->>Eng: Audio Chunks (PCM)
+    Eng->>GW: Stream Audio Chunks
+    GW->>UI: WebRTC Audio Track
+    UI->>User: Play Response Audio</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy on a Mac connected to the same network as your iPhone. Use it for privacy-focused voice assistance, local LLM experimentation, or as a template for building stateful voice agents with WebRTC audio streaming.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Voice Interaction</span><span class="tag">WebRTC Streaming</span><span class="tag">Finite State Machine Execution</span><span class="tag">Local LLM Integration</span><span class="tag">Real-time Transcription</span><span class="tag">Text-to-Speech Synthesis</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">engine/workflow.py</span><span class="tag">engine/adapter.py</span><span class="tag">engine/conversation.py</span><span class="tag">engine/fast_path.py</span><span class="tag">engine/input_filter.py</span><span class="tag">engine/llm.py</span><span class="tag">gateway/server.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">WebRTC</span><span class="tag">aiohttp</span><span class="tag">Whisper</span><span class="tag">Piper TTS</span><span class="tag">Ollama</span><span class="tag">Mermaid</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">macOS Host</span><span class="tag">Python 3.10+</span><span class="tag">Ollama (optional)</span><span class="tag">Anthropic API Key (optional)</span><span class="tag">OpenAI API Key (optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">iPhone Safari</span><span class="tag">Ollama</span><span class="tag">Claude API</span><span class="tag">OpenAI API</span><span class="tag">Web Search Tools</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Finite State Machine</span><span class="tag">Keyword Routing</span><span class="tag">Client-Server WebRTC</span><span class="tag">Sliding Window Context</span><span class="tag">Fast Path Optimization</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-agent</span><span class="tag">webrtc-audio</span><span class="tag">finite-state-machine</span><span class="tag">local-llm</span><span class="tag">python-backend</span><span class="tag">ios-web-app</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web-app/npm_and_yarn-d1f9cb5775 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: feature/admin-dashboard is 16 commits ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 5 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:02:17.956696Z ·
+     commit b848dbe ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

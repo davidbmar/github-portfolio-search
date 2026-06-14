@@ -1,0 +1,95 @@
+{
+  "title": "Browser-Native RAG Retrieval Layer",
+  "one_liner": "A fully local, WebGPU-accelerated RAG retrieval system that runs embedding and vector search entirely in the browser with zero network calls at query time.",
+  "what_it_is": "This project implements a production-shaped prototype for real-time transcription apps where the retrieval pipeline (embedding generation and vector search) executes locally. It consists of an offline Node.js indexer that builds HNSW artifacts from JSONL transcripts and a Vite-based web application that loads these artifacts into IndexedDB. The browser runtime uses Transformers.js with WebGPU acceleration to compute query embeddings and performs cosine similarity search within a Web Worker, ensuring the main thread remains responsive.",
+  "how_its_built": "The system is split into two distinct phases. First, a Node.js CLI (`indexer-node`) uses `hnswlib-node` and `@xenova/transformers` to validate chunks, generate 384-dimensional embeddings, and construct an HNSW index, exporting binary artifacts. Second, a TypeScript web app (`web-app`) fetches these artifacts, caches them, and initializes a Web Worker. The worker loads the ONNX model via Transformers.js (preferring WebGPU) and handles search requests by computing query embeddings and running brute-force or HNSW-based cosine similarity against the cached vectors.",
+  "how_to_apply": "Use this pattern when building privacy-focused or offline-capable applications requiring semantic search over static datasets (like meeting transcripts or documentation). It eliminates latency and costs associated with hosted embedding APIs and vector databases. The architecture is model-agnostic, allowing you to swap ONNX sentence-transformer models without changing the core retrieval logic.",
+  "quickstart": "git clone https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript.git\ncd browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript\ncd indexer-node && npm install\ncd ../web-app && npm install\ncd ..\ncd indexer-node\nnpm run build-index -- --input ../data --out ../artifacts\ncd ../web-app\nmkdir -p public/artifacts\ncp ../artifacts/* public/artifacts/\nnpm run dev",
+  "features": [
+    "Zero network calls at query time; all retrieval happens locally in the browser",
+    "WebGPU-accelerated embedding inference with automatic WASM fallback",
+    "Offline indexing CLI that generates portable HNSW artifacts from JSONL data",
+    "Web Worker isolation for heavy computation to keep UI responsive",
+    "Model-agnostic design supporting any ONNX sentence-transformer model",
+    "~18ms query latency on Apple Silicon after warmup"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph Offline_Indexing[\"Offline Indexing (Node.js)\"]\n        JSONL[\"JSONL Chunks\"] --> Validate[\"Validate & Normalize\"]\n        Validate --> Embed[\"Embed (Transformers.js)\"]\n        Embed --> HNSW[\"Build HNSW Index (hnswlib-node)\"]\n        HNSW --> Artifacts[\"Export Artifacts\\n(config, metadata, embeddings.bin, hnsw.index)\"]\n    end\n\n    subgraph Browser_Runtime[\"Browser Runtime (Vite + TS)\"]\n        MainThread[\"Main Thread: UI & Transcript\"]\n        Worker[\"Web Worker\"]\n        \n        Artifacts -->|Load & Cache| IndexedDB[(\"IndexedDB\")]\n        IndexedDB -->|Fetch| Worker\n        \n        MainThread -->|Query Text| Worker\n        Worker -->|Load Model| TransformersJS[\"Transformers.js\\n(WebGPU/WASM)\"]\n        TransformersJS -->|Query Embedding| Search[\"Cosine Search\"]\n        Search -->|Results| MainThread\n    end\n\n    Offline_Indexing -->|Artifacts Directory| Browser_Runtime",
+  "diagram_sequence": "sequenceDiagram\n    participant User as User\n    participant UI as Main Thread (UI)\n    participant Worker as Search Worker\n    participant DB as IndexedDB\n    participant Model as Transformers.js (WebGPU)\n\n    Note over UI, DB: Initialization Phase\n    UI->>Worker: Post 'init' message with artifacts URL\n    Worker->>DB: Fetch artifacts (config, metadata, embeddings, index)\n    DB-->>Worker: Return cached artifacts\n    Worker->>Model: Load ONNX model\n    Model-->>Worker: Model ready\n    Worker-->>UI: Post 'ready' message\n\n    Note over UI, Model: Query Phase\n    User->>UI: Type query & click Search\n    UI->>Worker: Post 'search' message (query, topK, requestId)\n    Worker->>Model: Compute embedding for query\n    Model-->>Worker: Return query vector\n    Worker->>Worker: Perform cosine similarity search\n    Worker-->>UI: Post 'results' message (matches, latency)\n    UI->>User: Display search results",
+  "capabilities": [
+    "Local Semantic Search",
+    "WebGPU Acceleration",
+    "Offline Indexing",
+    "HNSW Approximate Nearest Neighbor",
+    "Web Worker Concurrency",
+    "IndexedDB Caching"
+  ],
+  "components": [
+    "indexer-node (CLI)",
+    "web-app (Vite Frontend)",
+    "Search Worker",
+    "Embedding Pipeline",
+    "Artifact Exporter"
+  ],
+  "tech": [
+    "TypeScript",
+    "Vite",
+    "Transformers.js",
+    "hnswlib-node",
+    "WebGPU",
+    "ONNX Runtime",
+    "IndexedDB"
+  ],
+  "depends_on": [
+    "Node.js 20+",
+    "Chrome 120+ (for WebGPU)",
+    "npm 10+"
+  ],
+  "integrates_with": [
+    "LLM Generation Models (downstream)",
+    "Real-time Transcription Streams"
+  ],
+  "patterns": [
+    "Retrieval-Augmented Generation (RAG)",
+    "Offline-First Architecture",
+    "Worker-Based Computation",
+    "Model Quantization",
+    "Vector Similarity Search"
+  ],
+  "reuse_tags": [
+    "browser-native",
+    "rag-retrieval",
+    "webgpu",
+    "transformers-js",
+    "hnsw",
+    "offline-search",
+    "typescript",
+    "vite"
+  ],
+  "slug": "browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript",
+  "repo_url": "https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/indexer-node/npm_and_yarn-3fc7e1cf9b is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/web-app/rollup-4.60.4 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #4: Bump rollup from 4.57.1 to 4.60.4 in /web-app"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #3: Bump the npm_and_yarn group across 2 directories with 5 updates"
+    }
+  ],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript/main/docs/full-demo.png",
+  "generated_at": "2026-06-14T02:29:39.749353Z",
+  "source_commit": "2de04ad",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>codefresh-release-stats · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "codefresh-release-stats", "one_liner": "A Python script to count Codefresh Kubernetes releases per cluster over the last week.", "what_it_is": "A lightweight CLI utility that queries the Codefresh API to retrieve Kubernetes release events for specified selectors (clusters) and calculates the number of deployments occurring within the previous seven days. It outputs raw status codes and aggregate counts to stdout.", "how_its_built": "Built with Python 3 using the `requests` library for HTTP communication and `datetime` for time-window calculations. It iterates through a hardcoded list of cluster selectors, authenticates via Bearer token, fetches release metadata, parses Unix timestamps, and filters results based on the current date minus seven days.", "how_to_apply": "Use this script for quick operational audits or dashboarding inputs to track deployment frequency across different environments (e.g., production, internal, external). It requires manual configuration of the API access token and selector list within the source code before execution.", "quickstart": "pip install requests\npython codefresh.py", "features": ["Queries Codefresh API for Kubernetes release events", "Filters releases by a configurable 7-day sliding window", "Iterates across multiple predefined cluster selectors", "Outputs HTTP status codes and release counts per cluster", "Handles JSON parsing errors gracefully"], "diagram_architecture": "flowchart TD\n    A[User] -->|Executes| B(codefresh.py)\n    B -->|Reads Config| C[Access Token & Selectors]\n    B -->|HTTP GET| D[Codefresh API]\n    D -->|JSON Response| B\n    B -->|Parses Timestamps| E[DateTime Logic]\n    E -->|Filters Last 7 Days| F[Count Aggregator]\n    F -->|Prints| G[Stdout]", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script as codefresh.py\n    participant API as Codefresh API\n    \n    User->>Script: Execute script\n    loop For each cluster in selectors\n        Script->>API: GET /api/kubernetes/releases?selector={cluster}\n        API-->>Script: JSON Response (Releases)\n        Script->>Script: Parse JSON & Extract createdAt\n        Script->>Script: Filter by last 7 days\n        Script->>User: Print Status Code & Count\n    end", "capabilities": ["API Integration", "Data Filtering", "CLI Reporting"], "components": ["HTTP Client", "JSON Parser", "Date Calculator", "Loop Controller"], "tech": ["Python", "Requests", "JSON", "Datetime"], "depends_on": ["requests", "python3"], "integrates_with": ["Codefresh API"], "patterns": ["Scripting", "Polling", "Filter-Map-Reduce"], "reuse_tags": ["devops", "monitoring", "codefresh", "kubernetes", "python-script"], "slug": "codefresh", "repo_url": "https://github.com/davidbmar/codefresh", "visibility": "private", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:42:47.720916Z", "source_commit": "a41e6ae", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "codefresh-release-stats",
+  "description": "A Python script to count Codefresh Kubernetes releases per cluster over the last week.",
+  "codeRepository": "https://github.com/davidbmar/codefresh",
+  "programmingLanguage": [
+    "Python",
+    "Requests",
+    "JSON",
+    "Datetime"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>codefresh-release-stats</h1>
+  <p class="one-liner">A Python script to count Codefresh Kubernetes releases per cluster over the last week.</p>
+  <p><a href="https://github.com/davidbmar/codefresh">https://github.com/davidbmar/codefresh</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A lightweight CLI utility that queries the Codefresh API to retrieve Kubernetes release events for specified selectors (clusters) and calculates the number of deployments occurring within the previous seven days. It outputs raw status codes and aggregate counts to stdout.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Queries Codefresh API for Kubernetes release events</li><li>Filters releases by a configurable 7-day sliding window</li><li>Iterates across multiple predefined cluster selectors</li><li>Outputs HTTP status codes and release counts per cluster</li><li>Handles JSON parsing errors gracefully</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install requests
+python codefresh.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[User] -->|Executes| B(codefresh.py)
+    B -->|Reads Config| C[Access Token & Selectors]
+    B -->|HTTP GET| D[Codefresh API]
+    D -->|JSON Response| B
+    B -->|Parses Timestamps| E[DateTime Logic]
+    E -->|Filters Last 7 Days| F[Count Aggregator]
+    F -->|Prints| G[Stdout]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with Python 3 using the `requests` library for HTTP communication and `datetime` for time-window calculations. It iterates through a hardcoded list of cluster selectors, authenticates via Bearer token, fetches release metadata, parses Unix timestamps, and filters results based on the current date minus seven days.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant Script as codefresh.py
+    participant API as Codefresh API
+    
+    User->>Script: Execute script
+    loop For each cluster in selectors
+        Script->>API: GET /api/kubernetes/releases?selector={cluster}
+        API-->>Script: JSON Response (Releases)
+        Script->>Script: Parse JSON & Extract createdAt
+        Script->>Script: Filter by last 7 days
+        Script->>User: Print Status Code & Count
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this script for quick operational audits or dashboarding inputs to track deployment frequency across different environments (e.g., production, internal, external). It requires manual configuration of the API access token and selector list within the source code before execution.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">API Integration</span><span class="tag">Data Filtering</span><span class="tag">CLI Reporting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">HTTP Client</span><span class="tag">JSON Parser</span><span class="tag">Date Calculator</span><span class="tag">Loop Controller</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">Requests</span><span class="tag">JSON</span><span class="tag">Datetime</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">requests</span><span class="tag">python3</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Codefresh API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Scripting</span><span class="tag">Polling</span><span class="tag">Filter-Map-Reduce</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">devops</span><span class="tag">monitoring</span><span class="tag">codefresh</span><span class="tag">kubernetes</span><span class="tag">python-script</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:42:47.720916Z ·
+     commit a41e6ae ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

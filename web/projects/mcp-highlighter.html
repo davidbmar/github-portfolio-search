@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mcp-highlighter · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "mcp-highlighter", "one_liner": "A Chrome extension and MCP bridge system that captures LLM-formatted memory blocks from web pages and persists them for AI context.", "what_it_is": "A distributed system consisting of a Chrome extension, an HTTP bridge client, and an MCP storage server. It allows users to highlight or identify text formatted with specific [MCP-START]/[MCP-END] tags on any webpage, capture that content, and store it in a persistent JSON file or S3 bucket for retrieval by Model Context Protocol-compatible AI assistants like Claude.", "how_its_built": "The system is built with TypeScript across three distinct components: a Chrome Extension (content scripts) for DOM scanning, an Express.js HTTP server acting as a bridge/client, and an MCP SDK-based server for standardized tool/resource exposure. It uses strict regex parsing for block detection and JSON-RPC/Stdio for MCP communication.", "how_to_apply": "Use this project to give stateful memory capabilities to stateless LLM sessions. Developers can extend the storage backend (S3/File), modify the parsing logic for different markup formats, or integrate the MCP server into custom AI agent workflows requiring persistent user context.", "quickstart": "cd mcp-servers/memory-server && npm install && npm run build\ncd ../../mcp_client && npm install && npm run build\nnpm start\ncd ../extension\n# Load unpacked extension in chrome://extensions", "features": ["Strict parsing of [MCP-START]/[MCP-END] delimited text blocks from web pages", "Chrome extension with visual status indicators and manual scan triggers", "HTTP bridge client running on localhost:3001 to receive extension payloads", "Persistent storage via local JSON files or AWS S3 buckets", "Full MCP compliance allowing AI models to list and read stored memories", "Deduplication logic using content hashing to prevent duplicate entries"], "diagram_architecture": "flowchart TD\n    User((User)) -->|Highlights Text| Browser[Chrome Browser]\n    Browser -->|DOM Scan| Ext[Chrome Extension]\n    Ext -->|HTTP POST /mcp/blocks| Bridge[MCP Client Bridge :3001]\n    Bridge -->|JSON-RPC / Stdio| MCPServer[MCP Storage Server]\n    MCPServer -->|Write| LocalStore[(Local JSON File)]\n    MCPServer -->|Write| S3Store[(AWS S3 Bucket)]\n    AI[Claude / LLM] -->|MCP Protocol| MCPServer", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant E as Chrome Extension\n    participant B as MCP Client Bridge\n    participant S as MCP Storage Server\n    participant D as Data Store\n\n    U->>E: Visits page with [MCP-START] block\n    E->>E: scanMCP() regex parse\n    E->>B: POST /mcp/blocks (JSON payload)\n    B->>B: Validate & Hash content\n    B->>S: Forward memory entry\n    S->>D: Append to memories.json\n    S-->>B: Acknowledge storage\n    B-->>E: 200 OK\n    E->>U: Update UI status 'Found 1'", "capabilities": ["Text Capture", "Persistent Storage", "MCP Integration", "Deduplication", "HTTP Bridging"], "components": ["Chrome Extension", "MCP Client Bridge", "Memory Storage Server", "S3 Storage Server"], "tech": ["TypeScript", "Node.js", "Express.js", "Model Context Protocol SDK", "Chrome Extensions API", "AWS SDK"], "depends_on": ["Node.js 18+", "Google Chrome", "npm"], "integrates_with": ["Claude Desktop", "AWS S3", "Local File System"], "patterns": ["Bridge Pattern", "Content Script Injection", "Server-Sent Events (simulated via polling)", "Strict Format Parsing"], "reuse_tags": ["ai-memory", "chrome-extension", "mcp-server", "typescript", "persistent-context"], "slug": "mcp-highlighter", "repo_url": "https://github.com/davidbmar/mcp-highlighter", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/mcp-servers/s3-server/npm_and_yarn-2991eb50e0 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 3 directories with 6 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T03:05:59.264235Z", "source_commit": "952c0c5", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "mcp-highlighter",
+  "description": "A Chrome extension and MCP bridge system that captures LLM-formatted memory blocks from web pages and persists them for AI context.",
+  "codeRepository": "https://github.com/davidbmar/mcp-highlighter",
+  "programmingLanguage": [
+    "TypeScript",
+    "Node.js",
+    "Express.js",
+    "Model Context Protocol SDK",
+    "Chrome Extensions API",
+    "AWS SDK"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>mcp-highlighter</h1>
+  <p class="one-liner">A Chrome extension and MCP bridge system that captures LLM-formatted memory blocks from web pages and persists them for AI context.</p>
+  <p><a href="https://github.com/davidbmar/mcp-highlighter">https://github.com/davidbmar/mcp-highlighter</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A distributed system consisting of a Chrome extension, an HTTP bridge client, and an MCP storage server. It allows users to highlight or identify text formatted with specific [MCP-START]/[MCP-END] tags on any webpage, capture that content, and store it in a persistent JSON file or S3 bucket for retrieval by Model Context Protocol-compatible AI assistants like Claude.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Strict parsing of [MCP-START]/[MCP-END] delimited text blocks from web pages</li><li>Chrome extension with visual status indicators and manual scan triggers</li><li>HTTP bridge client running on localhost:3001 to receive extension payloads</li><li>Persistent storage via local JSON files or AWS S3 buckets</li><li>Full MCP compliance allowing AI models to list and read stored memories</li><li>Deduplication logic using content hashing to prevent duplicate entries</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">cd mcp-servers/memory-server &amp;&amp; npm install &amp;&amp; npm run build
+cd ../../mcp_client &amp;&amp; npm install &amp;&amp; npm run build
+npm start
+cd ../extension
+# Load unpacked extension in chrome://extensions</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User((User)) -->|Highlights Text| Browser[Chrome Browser]
+    Browser -->|DOM Scan| Ext[Chrome Extension]
+    Ext -->|HTTP POST /mcp/blocks| Bridge[MCP Client Bridge :3001]
+    Bridge -->|JSON-RPC / Stdio| MCPServer[MCP Storage Server]
+    MCPServer -->|Write| LocalStore[(Local JSON File)]
+    MCPServer -->|Write| S3Store[(AWS S3 Bucket)]
+    AI[Claude / LLM] -->|MCP Protocol| MCPServer</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system is built with TypeScript across three distinct components: a Chrome Extension (content scripts) for DOM scanning, an Express.js HTTP server acting as a bridge/client, and an MCP SDK-based server for standardized tool/resource exposure. It uses strict regex parsing for block detection and JSON-RPC/Stdio for MCP communication.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant E as Chrome Extension
+    participant B as MCP Client Bridge
+    participant S as MCP Storage Server
+    participant D as Data Store
+
+    U->>E: Visits page with [MCP-START] block
+    E->>E: scanMCP() regex parse
+    E->>B: POST /mcp/blocks (JSON payload)
+    B->>B: Validate & Hash content
+    B->>S: Forward memory entry
+    S->>D: Append to memories.json
+    S-->>B: Acknowledge storage
+    B-->>E: 200 OK
+    E->>U: Update UI status 'Found 1'</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this project to give stateful memory capabilities to stateless LLM sessions. Developers can extend the storage backend (S3/File), modify the parsing logic for different markup formats, or integrate the MCP server into custom AI agent workflows requiring persistent user context.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Text Capture</span><span class="tag">Persistent Storage</span><span class="tag">MCP Integration</span><span class="tag">Deduplication</span><span class="tag">HTTP Bridging</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Chrome Extension</span><span class="tag">MCP Client Bridge</span><span class="tag">Memory Storage Server</span><span class="tag">S3 Storage Server</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">Node.js</span><span class="tag">Express.js</span><span class="tag">Model Context Protocol SDK</span><span class="tag">Chrome Extensions API</span><span class="tag">AWS SDK</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js 18+</span><span class="tag">Google Chrome</span><span class="tag">npm</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Claude Desktop</span><span class="tag">AWS S3</span><span class="tag">Local File System</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Bridge Pattern</span><span class="tag">Content Script Injection</span><span class="tag">Server-Sent Events (simulated via polling)</span><span class="tag">Strict Format Parsing</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">ai-memory</span><span class="tag">chrome-extension</span><span class="tag">mcp-server</span><span class="tag">typescript</span><span class="tag">persistent-context</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/mcp-servers/s3-server/npm_and_yarn-2991eb50e0 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 3 directories with 6 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:05:59.264235Z ·
+     commit 952c0c5 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

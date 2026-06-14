@@ -1,0 +1,88 @@
+{
+  "title": "FSM-generic (Voice OS)",
+  "one_liner": "A generic voice-first operating system framework that defines conversational apps as workflow state machines.",
+  "what_it_is": "FSM-generic is a Python-based framework for building voice-driven applications using finite state machines (FSMs). It separates the core runtime (kernel) from application logic (workflows), allowing developers to define conversational flows as JSONL files. The system handles session management, LLM orchestration, event broadcasting, and tool execution, supporting both voice (via Twilio/WebRTC) and text interfaces. It includes a Research Dashboard for managing intelligence-gathering missions and a Visual Editor for designing workflows.",
+  "how_its_built": "The backend is built with Python 3.11+ using FastAPI for the server interface. The core engine relies on a custom FSM runtime, an event bus for pub/sub communication, and a tool registry for extensible actions. LLM integration is handled via a submodule (engine-repo) supporting Anthropic Claude, OpenAI, or Ollama. Frontends are built with React, TypeScript, Vite, and Tailwind CSS. The architecture follows a layered model: Kernel (runtime/voice pipeline), System Services (memory/transcript), Shell (intent/workflow stack), and Apps (workflow definitions).",
+  "how_to_apply": "Use this framework to build complex, multi-turn conversational agents where strict control over dialogue flow is required. It is suitable for creating research assistants, meeting scribes, or interactive voice response systems. Developers define workflows as state machines, register custom tools (e.g., email sending, web search), and deploy via the provided FastAPI server. The visual editor allows non-developers to inspect and modify workflow logic.",
+  "quickstart": "git clone --recurse-submodules https://github.com/davidbmar/FSM-generic\ncd FSM-generic\n./scripts/setup.sh\necho 'ANTHROPIC_API_KEY=sk-ant-your-key' > .env\n./scripts/run.sh",
+  "features": [
+    "Define conversational apps as JSONL workflow state machines",
+    "Built-in kernel for FSM runtime, session management, and event bus",
+    "Research Operations Dashboard for managing intelligence missions",
+    "Visual Workflow Editor for browser-based state machine design",
+    "Support for voice channels (Twilio, WebRTC) and text CLI demos",
+    "Extensible tool registry for custom actions like email and search"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User/Voice Client] -->|WebRTC/Twilio| Gateway[Gateway/WebRTC Signaling]\n    Gateway -->|Events| Server[FastAPI Server]\n    Server -->|Routes| Shell[Shell Router]\n    Shell -->|Manages| Session[VoiceSession FSM]\n    Session -->|Uses| Kernel[Kernel Runtime]\n    Kernel -->|Orchestrates| Engine[LLM Engine Submodule]\n    Kernel -->|Publishes| EventBus[Event Bus]\n    EventBus -->|Notifies| Services[System Services]\n    Services --> Memory[Memory Service]\n    Services --> Transcript[Transcript Service]\n    Services --> Timer[Timer Service]\n    Session -->|Invokes| Tools[Tool Registry]\n    Tools --> AppTools[App Specific Tools]\n    Server -->|Serves| Frontend[Web Frontends]\n    Frontend --> Dashboard[Research Dashboard]\n    Frontend --> Editor[Visual Editor]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as Frontend (Dashboard/Editor)\n    participant S as FastAPI Server\n    participant SR as Shell Router\n    participant VS as VoiceSession\n    participant K as Kernel/Engine\n    participant T as Tool Registry\n    \n    U->>F: Interacts with UI\n    F->>S: API Request (e.g., start mission)\n    S->>SR: Route Intent\n    SR->>VS: Create/Resume Session\n    VS->>K: Process State (LLM Call)\n    K-->>VS: LLM Response & Action\n    alt Action Required\n        VS->>T: Execute Tool\n        T-->>VS: Tool Result\n    end\n    VS->>S: Update Session State\n    S-->>F: Return Response/Update\n    F-->>U: Display Result",
+  "capabilities": [
+    "State Machine Runtime",
+    "LLM Orchestration",
+    "Event Bus Pub/Sub",
+    "Session Management",
+    "Tool Execution",
+    "Voice Channel Integration",
+    "Workflow Visualization"
+  ],
+  "components": [
+    "Kernel (FSM Runtime, Event Bus)",
+    "Shell (Intent Classifier, Stack Manager)",
+    "System Services (Memory, Timer, Transcript)",
+    "Engine Submodule (LLM, STT, TTS)",
+    "Research Dashboard (React)",
+    "Visual Editor (TypeScript)",
+    "Gateway (WebRTC Signaling)"
+  ],
+  "tech": [
+    "Python 3.11+",
+    "FastAPI",
+    "React",
+    "TypeScript",
+    "Vite",
+    "Tailwind CSS",
+    "Node.js 18+",
+    "Pydantic"
+  ],
+  "depends_on": [
+    "Anthropic API Key",
+    "Git Submodules",
+    "Python Virtual Environment",
+    "Node Package Manager"
+  ],
+  "integrates_with": [
+    "Anthropic Claude",
+    "OpenAI",
+    "Ollama",
+    "Twilio",
+    "WebRTC",
+    "Tavily Search",
+    "Brave Search",
+    "Serper API"
+  ],
+  "patterns": [
+    "Finite State Machine",
+    "Event-Driven Architecture",
+    "Plugin/Tool Registry",
+    "Layered Architecture",
+    "Pub/Sub Messaging"
+  ],
+  "reuse_tags": [
+    "voice-assistant",
+    "state-machine",
+    "llm-orchestration",
+    "conversational-ai",
+    "workflow-engine",
+    "fastapi",
+    "react-dashboard"
+  ],
+  "slug": "FSM-generic",
+  "repo_url": "https://github.com/davidbmar/FSM-generic",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/FSM-generic/main/docs/screenshots/dashboard-overview.png",
+  "generated_at": "2026-06-14T02:53:42.678762Z",
+  "source_commit": "be623f3",
+  "model": "qwen3.7-plus"
+}

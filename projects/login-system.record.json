@@ -1,0 +1,88 @@
+{
+  "title": "login-system",
+  "one_liner": "Serverless authentication backend using AWS Lambda, DynamoDB, and JWT.",
+  "what_it_is": "A template login system implemented as an AWS Lambda function. It handles user registration, login, and token verification. User credentials are stored in a DynamoDB table with passwords hashed via bcrypt. Authentication state is managed using JSON Web Tokens (JWT).",
+  "how_its_built": "The core logic resides in a single Lambda handler (`index.js`) that routes HTTP requests to service modules for registration, login, and verification. It uses the `aws-sdk` for DynamoDB interactions, `bcryptjs` for password hashing, and `jsonwebtoken` for token generation and validation. Responses are formatted as API Gateway-compatible JSON objects.",
+  "how_to_apply": "Deploy this code as an AWS Lambda function behind an API Gateway. Ensure the `audio_client_server_users` DynamoDB table exists in `us-east-2`. Set the `JWT_SECRET` environment variable. Use the exposed endpoints for user management in web or mobile applications.",
+  "quickstart": "",
+  "features": [
+    "User registration with username uniqueness checks",
+    "Secure password hashing using bcryptjs",
+    "JWT-based authentication token generation",
+    "Token verification endpoint for protected routes",
+    "DynamoDB integration for persistent user storage",
+    "CORS-enabled API responses"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Client App] -->|HTTP POST/GET| APIGW[API Gateway]\n    APIGW -->|Event| Lambda[AWS Lambda Handler]\n    Lambda -->|Read/Write| DynamoDB[(DynamoDB Table)]\n    Lambda -->|Sign/Verify| JWT[JSON Web Token]\n    Lambda -->|Hash/Compare| Bcrypt[bcryptjs]\n    subgraph AWS Cloud\n        Lambda\n        DynamoDB\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant L as Lambda Handler\n    participant S as Service Layer\n    participant D as DynamoDB\n    participant A as Auth Utils\n\n    C->>L: POST /register or /login\n    L->>S: Call register() or login()\n    alt Registration\n        S->>D: Get User (check existence)\n        D-->>S: User Data\n        S->>S: Hash Password (bcrypt)\n        S->>D: Save User\n    else Login\n        S->>D: Get User\n        D-->>S: User Data\n        S->>S: Compare Password (bcrypt)\n        S->>A: Generate JWT\n        A-->>S: Token\n    end\n    S-->>L: Response Object\n    L-->>C: JSON Response",
+  "capabilities": [
+    "User Registration",
+    "User Login",
+    "Token Verification",
+    "Health Check"
+  ],
+  "components": [
+    "Lambda Handler",
+    "Register Service",
+    "Login Service",
+    "Verify Service",
+    "Auth Utilities",
+    "Response Utilities"
+  ],
+  "tech": [
+    "JavaScript",
+    "AWS Lambda",
+    "DynamoDB",
+    "JWT",
+    "bcryptjs"
+  ],
+  "depends_on": [
+    "aws-sdk",
+    "bcryptjs",
+    "jsonwebtoken"
+  ],
+  "integrates_with": [
+    "AWS API Gateway",
+    "AWS DynamoDB"
+  ],
+  "patterns": [
+    "Serverless",
+    "Service Layer",
+    "JWT Authentication",
+    "Password Hashing"
+  ],
+  "reuse_tags": [
+    "authentication",
+    "aws-lambda",
+    "dynamodb",
+    "jwt",
+    "backend-template"
+  ],
+  "slug": "login-system",
+  "repo_url": "https://github.com/davidbmar/login-system",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/login-frontend/npm_and_yarn-385942b7a4 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/login-frontend/npm_and_yarn-7078513fe7 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: Bump the npm_and_yarn group across 1 directory with 34 updates"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 2 directories with 35 updates"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:05:35.499962Z",
+  "source_commit": "cb40b4d",
+  "model": "qwen3.7-plus"
+}

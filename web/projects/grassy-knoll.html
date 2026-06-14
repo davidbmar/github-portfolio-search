@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>grassy-knoll · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "grassy-knoll", "one_liner": "A generic voice-first operating system framework that defines conversational apps as workflow state machines.", "what_it_is": "Grassy Knoll is a Python-based framework for building voice-driven applications. It treats conversations as Finite State Machines (FSMs), where the kernel manages runtime execution, event broadcasting, and session state. Developers define apps using JSONL workflow files that specify states, LLM prompts, transitions, and tool invocations, allowing for structured, deterministic voice interactions powered by large language models.", "how_its_built": "The system is built in Python 3.11+ with a modular architecture. The core 'kernel' handles the FSM runtime, event bus, and session management. An external 'engine' submodule (linked via symlink) provides LLM orchestration (Anthropic), STT, and TTS capabilities. System services like memory, timers, and file I/O run as independent components communicating via an internal EventBus. Workflows are defined declaratively in JSONL, while custom logic is implemented as Python tools registered in a ToolRegistry.", "how_to_apply": "Use this framework to build structured voice assistants such as meeting scribes, reservation systems, or interactive briefing agents. It is suitable for developers who need more control than standard chat interfaces but less overhead than building a voice pipeline from scratch. Define your conversation flow in JSONL, implement specific side-effects (like sending emails or querying databases) as Python tools, and let the kernel handle the state transitions and LLM context management.", "quickstart": "git clone --recurse-submodules https://github.com/davidbmar/grassy-knoll\ncd grassy-knoll\n./scripts/setup.sh\necho 'ANTHROPIC_API_KEY=sk-ant-your-key' > .env\n./scripts/run.sh", "features": ["FSM-based workflow engine for deterministic conversation flows", "Declarative app definition using JSONL state machines", "Integrated LLM orchestration via Anthropic API", "Pub/Sub EventBus for observability and service communication", "Extensible ToolRegistry for custom Python side-effects", "Built-in system services for memory, timers, and transcripts"], "diagram_architecture": "flowchart TD\n    User[User/Voice Input] --> Channel[Voice Channel]\n    Channel --> Shell[Shell Router]\n    Shell --> Session[VoiceSession FSM]\n    Session --> Kernel[Kernel Runtime]\n    Kernel --> Engine[Engine Submodule]\n    Engine --> LLM[Anthropic LLM]\n    Kernel --> EventBus[EventBus]\n    EventBus --> Services[System Services]\n    Services --> Memory[Memory Service]\n    Services --> Transcript[Transcript Service]\n    Session --> Tools[Tool Registry]\n    Tools --> AppTools[App Specific Tools]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as ShellRouter\n    participant VS as VoiceSession\n    participant KB as Kernel/FSM\n    participant Eng as Engine (LLM)\n    participant TR as ToolRegistry\n    \n    U->>S: Voice/Input Text\n    S->>VS: Route to Active Workflow\n    VS->>KB: Process Current State\n    KB->>Eng: Generate Response/Action\n    Eng-->>KB: LLM Output\n    alt Tool Call Required\n        KB->>TR: Execute Tool\n        TR-->>KB: Tool Result\n        KB->>VS: Update State/Transition\n    else Direct Response\n        KB->>VS: Update State/Transition\n    end\n    VS-->>S: Formatted Response\n    S-->>U: Output Audio/Text", "capabilities": ["State machine management", "LLM orchestration", "Event broadcasting", "Session persistence", "Tool invocation", "Workflow loading"], "components": ["Kernel", "Shell Router", "VoiceSession", "EventBus", "ToolRegistry", "System Services", "Engine Submodule"], "tech": ["Python 3.11+", "Anthropic API", "JSONL", "AsyncIO", "Pytest"], "depends_on": ["anthropic", "python-dotenv", "pytest", "faster-whisper (optional)", "piper-tts (optional)"], "integrates_with": ["Anthropic Claude", "Twilio (via channels)", "WebRTC (via channels)", "SMTP (via tools)"], "patterns": ["Finite State Machine", "Publish-Subscribe", "Command Pattern (Tools)", "Dependency Injection", "Module Symlinking"], "reuse_tags": ["voice-assistant", "conversational-ai", "state-machine", "llm-framework", "python-library"], "slug": "grassy-knoll", "repo_url": "https://github.com/davidbmar/grassy-knoll", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:56:13.003433Z", "source_commit": "8d4c342", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "grassy-knoll",
+  "description": "A generic voice-first operating system framework that defines conversational apps as workflow state machines.",
+  "codeRepository": "https://github.com/davidbmar/grassy-knoll",
+  "programmingLanguage": [
+    "Python 3.11+",
+    "Anthropic API",
+    "JSONL",
+    "AsyncIO",
+    "Pytest"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>grassy-knoll</h1>
+  <p class="one-liner">A generic voice-first operating system framework that defines conversational apps as workflow state machines.</p>
+  <p><a href="https://github.com/davidbmar/grassy-knoll">https://github.com/davidbmar/grassy-knoll</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>Grassy Knoll is a Python-based framework for building voice-driven applications. It treats conversations as Finite State Machines (FSMs), where the kernel manages runtime execution, event broadcasting, and session state. Developers define apps using JSONL workflow files that specify states, LLM prompts, transitions, and tool invocations, allowing for structured, deterministic voice interactions powered by large language models.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>FSM-based workflow engine for deterministic conversation flows</li><li>Declarative app definition using JSONL state machines</li><li>Integrated LLM orchestration via Anthropic API</li><li>Pub/Sub EventBus for observability and service communication</li><li>Extensible ToolRegistry for custom Python side-effects</li><li>Built-in system services for memory, timers, and transcripts</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone --recurse-submodules https://github.com/davidbmar/grassy-knoll
+cd grassy-knoll
+./scripts/setup.sh
+echo &#x27;ANTHROPIC_API_KEY=sk-ant-your-key&#x27; &gt; .env
+./scripts/run.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User/Voice Input] --> Channel[Voice Channel]
+    Channel --> Shell[Shell Router]
+    Shell --> Session[VoiceSession FSM]
+    Session --> Kernel[Kernel Runtime]
+    Kernel --> Engine[Engine Submodule]
+    Engine --> LLM[Anthropic LLM]
+    Kernel --> EventBus[EventBus]
+    EventBus --> Services[System Services]
+    Services --> Memory[Memory Service]
+    Services --> Transcript[Transcript Service]
+    Session --> Tools[Tool Registry]
+    Tools --> AppTools[App Specific Tools]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system is built in Python 3.11+ with a modular architecture. The core &#x27;kernel&#x27; handles the FSM runtime, event bus, and session management. An external &#x27;engine&#x27; submodule (linked via symlink) provides LLM orchestration (Anthropic), STT, and TTS capabilities. System services like memory, timers, and file I/O run as independent components communicating via an internal EventBus. Workflows are defined declaratively in JSONL, while custom logic is implemented as Python tools registered in a ToolRegistry.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant S as ShellRouter
+    participant VS as VoiceSession
+    participant KB as Kernel/FSM
+    participant Eng as Engine (LLM)
+    participant TR as ToolRegistry
+    
+    U->>S: Voice/Input Text
+    S->>VS: Route to Active Workflow
+    VS->>KB: Process Current State
+    KB->>Eng: Generate Response/Action
+    Eng-->>KB: LLM Output
+    alt Tool Call Required
+        KB->>TR: Execute Tool
+        TR-->>KB: Tool Result
+        KB->>VS: Update State/Transition
+    else Direct Response
+        KB->>VS: Update State/Transition
+    end
+    VS-->>S: Formatted Response
+    S-->>U: Output Audio/Text</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this framework to build structured voice assistants such as meeting scribes, reservation systems, or interactive briefing agents. It is suitable for developers who need more control than standard chat interfaces but less overhead than building a voice pipeline from scratch. Define your conversation flow in JSONL, implement specific side-effects (like sending emails or querying databases) as Python tools, and let the kernel handle the state transitions and LLM context management.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">State machine management</span><span class="tag">LLM orchestration</span><span class="tag">Event broadcasting</span><span class="tag">Session persistence</span><span class="tag">Tool invocation</span><span class="tag">Workflow loading</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Kernel</span><span class="tag">Shell Router</span><span class="tag">VoiceSession</span><span class="tag">EventBus</span><span class="tag">ToolRegistry</span><span class="tag">System Services</span><span class="tag">Engine Submodule</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.11+</span><span class="tag">Anthropic API</span><span class="tag">JSONL</span><span class="tag">AsyncIO</span><span class="tag">Pytest</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">anthropic</span><span class="tag">python-dotenv</span><span class="tag">pytest</span><span class="tag">faster-whisper (optional)</span><span class="tag">piper-tts (optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Anthropic Claude</span><span class="tag">Twilio (via channels)</span><span class="tag">WebRTC (via channels)</span><span class="tag">SMTP (via tools)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Finite State Machine</span><span class="tag">Publish-Subscribe</span><span class="tag">Command Pattern (Tools)</span><span class="tag">Dependency Injection</span><span class="tag">Module Symlinking</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-assistant</span><span class="tag">conversational-ai</span><span class="tag">state-machine</span><span class="tag">llm-framework</span><span class="tag">python-library</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:56:13.003433Z ·
+     commit 8d4c342 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

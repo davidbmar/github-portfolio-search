@@ -1,0 +1,73 @@
+{
+  "title": "iran-intel",
+  "one_liner": "Static intelligence portal for Iran war investigation signals, powered by the Intelligence Briefing Toolkit.",
+  "what_it_is": "A Layer A static site that renders multi-source intelligence on the Iran conflict as readable, footnoted narrative briefs and analytical panels. It aggregates signals from the 'iran_war_investigation' project, filters them by recency and topic relevance, and presents them through daily briefs, wire feeds, and multi-perspective panel debates.",
+  "how_its_built": "Built with Next.js for static site generation. Custom TypeScript build scripts (run via tsx) extract data from external JSON sources (IBT signals, graph configs, and RAG persona files), transform them into API-ready JSON structures in the public directory, and then Next.js SSG renders the pages using this pre-computed data.",
+  "how_to_apply": "Clone the repo, ensure the Intelligence Briefing Toolkit (IBT) and tool-RAG repositories are available locally, set environment variables for their paths, run the build scripts to generate API data, and then build/deploy the static site.",
+  "quickstart": "git clone https://github.com/davidbmar/iran-intel.git\ncd iran-intel\nnpm install\nexport IBT_ROOT=/path/to/intelligence-briefing-toolkit\nexport TOOL_RAG_ROOT=/path/to/tool-RAG-for-split-personalities\nnpx tsx scripts/build-homepage-data.ts\nnpx tsx scripts/build-daily.ts\nnpx tsx scripts/build-panel-data.ts\nnpx tsx scripts/build-panel-debates.ts\nnpm run dev",
+  "features": [
+    "Daily intelligence briefs filtered by recency and topic keywords",
+    "Multi-perspective panel debates featuring technocrat, regime, and civil society personas",
+    "Analytical transparency page showing signal funnel statistics and source tiers",
+    "Wire feed of raw signals sorted by confidence and recency",
+    "Static export ready for S3/CloudFront deployment"
+  ],
+  "diagram_architecture": "flowchart TD\n    subgraph ExternalSources[\"External Data Sources\"]\n        IBT[\"Intelligence Briefing Toolkit\\n(signals.json, pipeline_status)\"]\n        RAG[\"tool-RAG\\n(personas, debate MDs)\"]\n    end\n\n    subgraph BuildScripts[\"Build Scripts (tsx)\"]\n        BuildDaily[\"build-daily.ts\"]\n        BuildHome[\"build-homepage-data.ts\"]\n        BuildPanel[\"build-panel-data.ts\"]\n        BuildDebates[\"build-panel-debates.ts\"]\n        BuildSignals[\"build-signals.ts\"]\n    end\n\n    subgraph StaticSite[\"Next.js Static Site\"]\n        PublicAPI[\"public/api/*.json\"]\n        Pages[\"Next.js Pages (SSG)\"]\n        Out[\"./out/ (Static HTML)\"]\n    end\n\n    IBT --> BuildDaily\n    IBT --> BuildHome\n    IBT --> BuildSignals\n    RAG --> BuildPanel\n    RAG --> BuildDebates\n\n    BuildDaily --> PublicAPI\n    BuildHome --> PublicAPI\n    BuildPanel --> PublicAPI\n    BuildDebates --> PublicAPI\n    BuildSignals --> PublicAPI\n\n    PublicAPI --> Pages\n    Pages --> Out",
+  "diagram_sequence": "sequenceDiagram\n    participant Dev as Developer\n    participant Build as Build Scripts (tsx)\n    participant IBT as IBT Repo\n    participant RAG as Tool-RAG Repo\n    participant Next as Next.js\n    participant FS as File System (public/api)\n\n    Dev->>Build: Execute build scripts\n    Build->>IBT: Read signals.json\n    IBT-->>Build: Return raw signals\n    Build->>IBT: Read graph_config.json\n    IBT-->>Build: Return topic/source config\n    Build->>RAG: Read persona/domain files\n    RAG-->>Build: Return persona metadata\n    Build->>RAG: Read PANEL_DEBATE*.md\n    RAG-->>Build: Return debate transcripts\n    Build->>Build: Filter & Transform Data\n    Build->>FS: Write homepage.json, daily-brief.json, etc.\n    Dev->>Next: Run npm run dev/build\n    Next->>FS: Read generated JSON\n    FS-->>Next: Return structured data\n    Next->>Next: Generate Static HTML\n    Next->>Dev: Serve/Output Static Site",
+  "capabilities": [
+    "Signal aggregation",
+    "Topic filtering",
+    "Recency weighting",
+    "Source tier classification",
+    "Multi-perspective rendering",
+    "Static site generation",
+    "Data transparency metrics"
+  ],
+  "components": [
+    "Daily Brief Page",
+    "Wire Feed Page",
+    "Panel Debate Page",
+    "Signals Statistics Page",
+    "Homepage Dashboard",
+    "Build Scripts",
+    "Source Tier Classifier"
+  ],
+  "tech": [
+    "TypeScript",
+    "Next.js",
+    "tsx",
+    "JSON",
+    "Markdown"
+  ],
+  "depends_on": [
+    "intelligence-briefing-toolkit",
+    "tool-RAG-for-split-personalities"
+  ],
+  "integrates_with": [
+    "S3",
+    "CloudFront"
+  ],
+  "patterns": [
+    "Static Site Generation",
+    "Build-time Data Transformation",
+    "Separation of Data and Presentation",
+    "Fail-fast Build Integrity"
+  ],
+  "reuse_tags": [
+    "intelligence-portal",
+    "static-site",
+    "data-journalism",
+    "nextjs",
+    "typescript"
+  ],
+  "slug": "iran-intel",
+  "repo_url": "https://github.com/davidbmar/iran-intel",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T03:03:29.430617Z",
+  "source_commit": "a4c9595",
+  "model": "qwen3.7-plus"
+}

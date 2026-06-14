@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Memory Bridge · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Claude Memory Bridge", "one_liner": "A Chrome extension that detects specific memory markers in Claude AI chats and bridges them to external storage via webhooks or serverless functions.", "what_it_is": "A browser-based utility that solves Claude's lack of persistent cross-session memory. It injects a content script into claude.ai to monitor page text for specific delimiters ('🧠 PERSISTENT MEMORY:'). When detected, it extracts the data and uses the extension's background service worker to bypass CORS restrictions, sending the payload to a configurable webhook URL or an AWS Lambda/S3 integration.", "how_its_built": "Built as a Manifest V3 Chrome Extension using vanilla JavaScript. It consists of a content script for DOM monitoring, a background service worker for network requests, and a popup for basic configuration. The backend integration is provided as a Node.js AWS Lambda function for storing data in S3.", "how_to_apply": "1. Clone the repository. 2. Load the 'chrome-extension' folder as an unpacked extension in Chrome. 3. Configure the target webhook URL in 'content.js'. 4. Ensure your Claude prompts output text wrapped in the expected memory delimiters.", "quickstart": "git clone https://github.com/davidbmar/claude-memory-bridge.git\ncd claude-memory-bridge/chrome-extension\n# Open Chrome -> chrome://extensions -> Enable Developer Mode\n# Click 'Load unpacked' and select the chrome-extension directory\n# Edit content.js line 36 to set your desired webhookUrl\n# Reload the extension and visit claude.ai", "features": ["Detects memory blocks in Claude chat UI using specific text delimiters", "Bypasses browser CORS restrictions via background service worker", "Visual status indicator (red/green/blue) overlay on the Claude page", "Configurable webhook destination for immediate testing", "Optional serverless integration for persistent S3 storage"], "diagram_architecture": "flowchart TD\n    User[User] -->|Types Prompt| Claude[Claude AI Web App]\n    Claude -->|Renders Response with Delimiters| DOM[Page DOM]\n    ContentScript[Content Script] -->|Polls every 2s| DOM\n    ContentScript -->|Detects Pattern| Extract[Extract Memory Data]\n    Extract -->|chrome.runtime.sendMessage| Background[Background Service Worker]\n    Background -->|POST JSON| Webhook[External Webhook / API]\n    Background -.->|Optional| Lambda[AWS Lambda]\n    Lambda -->|Store| S3[(Amazon S3)]", "diagram_sequence": "sequenceDiagram\n    participant CS as Content Script\n    participant DOM as Page DOM\n    participant BG as Background Worker\n    participant API as External Webhook\n\n    Note over CS, DOM: Polling Loop (2s interval)\n    CS->>DOM: Read document.body.textContent\n    alt Contains '🧠 PERSISTENT MEMORY:'\n        CS->>CS: Extract substring between delimiters\n        CS->>BG: sendMessage({action: 'sendWebhook', data})\n        activate BG\n        BG->>API: POST JSON payload\n        API-->>BG: 200 OK\n        BG-->>CS: sendResponse({success: true})\n        deactivate BG\n        CS->>DOM: Update indicator to 'SENT!' (Blue)\n    else No Match\n        CS->>DOM: Keep indicator 'WORKING!' (Red)\n    end", "capabilities": ["DOM Text Monitoring", "Cross-Origin Requests", "Chrome Extension Messaging", "Serverless Integration"], "components": ["manifest.json", "content.js", "background.js", "popup.html", "popup.js", "serverless-integration/api/memory.js"], "tech": ["JavaScript", "Chrome Extensions API (Manifest V3)", "AWS SDK", "HTML/CSS"], "depends_on": ["Chrome Browser", "Access to claude.ai"], "integrates_with": ["Webhook.site", "Custom REST APIs", "AWS Lambda", "Amazon S3"], "patterns": ["Content Script Injection", "Service Worker Proxy", "Polling", "Message Passing"], "reuse_tags": ["chrome-extension", "ai-memory", "webhook-bridge", "claude-ai", "aws-lambda"], "slug": "claude-memory-bridge", "repo_url": "https://github.com/davidbmar/claude-memory-bridge", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:42:05.961531Z", "source_commit": "ef50d1e", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Claude Memory Bridge",
+  "description": "A Chrome extension that detects specific memory markers in Claude AI chats and bridges them to external storage via webhooks or serverless functions.",
+  "codeRepository": "https://github.com/davidbmar/claude-memory-bridge",
+  "programmingLanguage": [
+    "JavaScript",
+    "Chrome Extensions API (Manifest V3)",
+    "AWS SDK",
+    "HTML/CSS"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Claude Memory Bridge</h1>
+  <p class="one-liner">A Chrome extension that detects specific memory markers in Claude AI chats and bridges them to external storage via webhooks or serverless functions.</p>
+  <p><a href="https://github.com/davidbmar/claude-memory-bridge">https://github.com/davidbmar/claude-memory-bridge</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A browser-based utility that solves Claude&#x27;s lack of persistent cross-session memory. It injects a content script into claude.ai to monitor page text for specific delimiters (&#x27;🧠 PERSISTENT MEMORY:&#x27;). When detected, it extracts the data and uses the extension&#x27;s background service worker to bypass CORS restrictions, sending the payload to a configurable webhook URL or an AWS Lambda/S3 integration.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Detects memory blocks in Claude chat UI using specific text delimiters</li><li>Bypasses browser CORS restrictions via background service worker</li><li>Visual status indicator (red/green/blue) overlay on the Claude page</li><li>Configurable webhook destination for immediate testing</li><li>Optional serverless integration for persistent S3 storage</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/claude-memory-bridge.git
+cd claude-memory-bridge/chrome-extension
+# Open Chrome -&gt; chrome://extensions -&gt; Enable Developer Mode
+# Click &#x27;Load unpacked&#x27; and select the chrome-extension directory
+# Edit content.js line 36 to set your desired webhookUrl
+# Reload the extension and visit claude.ai</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Types Prompt| Claude[Claude AI Web App]
+    Claude -->|Renders Response with Delimiters| DOM[Page DOM]
+    ContentScript[Content Script] -->|Polls every 2s| DOM
+    ContentScript -->|Detects Pattern| Extract[Extract Memory Data]
+    Extract -->|chrome.runtime.sendMessage| Background[Background Service Worker]
+    Background -->|POST JSON| Webhook[External Webhook / API]
+    Background -.->|Optional| Lambda[AWS Lambda]
+    Lambda -->|Store| S3[(Amazon S3)]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built as a Manifest V3 Chrome Extension using vanilla JavaScript. It consists of a content script for DOM monitoring, a background service worker for network requests, and a popup for basic configuration. The backend integration is provided as a Node.js AWS Lambda function for storing data in S3.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant CS as Content Script
+    participant DOM as Page DOM
+    participant BG as Background Worker
+    participant API as External Webhook
+
+    Note over CS, DOM: Polling Loop (2s interval)
+    CS->>DOM: Read document.body.textContent
+    alt Contains '🧠 PERSISTENT MEMORY:'
+        CS->>CS: Extract substring between delimiters
+        CS->>BG: sendMessage({action: 'sendWebhook', data})
+        activate BG
+        BG->>API: POST JSON payload
+        API-->>BG: 200 OK
+        BG-->>CS: sendResponse({success: true})
+        deactivate BG
+        CS->>DOM: Update indicator to 'SENT!' (Blue)
+    else No Match
+        CS->>DOM: Keep indicator 'WORKING!' (Red)
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>1. Clone the repository. 2. Load the &#x27;chrome-extension&#x27; folder as an unpacked extension in Chrome. 3. Configure the target webhook URL in &#x27;content.js&#x27;. 4. Ensure your Claude prompts output text wrapped in the expected memory delimiters.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">DOM Text Monitoring</span><span class="tag">Cross-Origin Requests</span><span class="tag">Chrome Extension Messaging</span><span class="tag">Serverless Integration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">manifest.json</span><span class="tag">content.js</span><span class="tag">background.js</span><span class="tag">popup.html</span><span class="tag">popup.js</span><span class="tag">serverless-integration/api/memory.js</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">JavaScript</span><span class="tag">Chrome Extensions API (Manifest V3)</span><span class="tag">AWS SDK</span><span class="tag">HTML/CSS</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Chrome Browser</span><span class="tag">Access to claude.ai</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Webhook.site</span><span class="tag">Custom REST APIs</span><span class="tag">AWS Lambda</span><span class="tag">Amazon S3</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Content Script Injection</span><span class="tag">Service Worker Proxy</span><span class="tag">Polling</span><span class="tag">Message Passing</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">chrome-extension</span><span class="tag">ai-memory</span><span class="tag">webhook-bridge</span><span class="tag">claude-ai</span><span class="tag">aws-lambda</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:42:05.961531Z ·
+     commit ef50d1e ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

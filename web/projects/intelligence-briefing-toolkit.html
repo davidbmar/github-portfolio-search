@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intelligence Briefing Toolkit · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Intelligence Briefing Toolkit", "one_liner": "A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings.", "what_it_is": "The Intelligence Briefing Toolkit (IBT) is a Python-based framework for automating open-source intelligence (OSINT) workflows. It orchestrates web searching, content extraction, claim detection, and report synthesis using Claude (Anthropic). The system supports both one-off deep research queries and persistent, multi-pass projects that accumulate evidence over time to detect signals and contradictions. It exposes functionality through four interfaces: a CLI for scripting, a Python library for integration, a REST API for web services, and an MCP server for AI agent tool use.", "how_its_built": "Built in Python with a modular adapter pattern for data sources. Core logic resides in `ResearchPipeline`, which coordinates `WebSearchTool` (Serper/DuckDuckGo) and `WebContentTool` (boilerplate stripping). LLM interactions are handled via the Anthropic SDK for claim extraction and synthesis. State management for projects uses local JSON files. The REST API is implemented with FastAPI, and the MCP server follows the Model Context Protocol specification for AI assistant integration.", "how_to_apply": "Use IBT to automate competitive intelligence monitoring, academic literature reviews, or investigative journalism workflows. Integrate the Python library into existing data pipelines to enrich datasets with web-sourced context. Deploy the REST API as a backend for internal research dashboards. Connect the MCP server to Claude Desktop to allow natural-language triggered research agents that can persist findings across sessions.", "quickstart": "pip install git+https://github.com/davidbmar/intelligence-briefing-toolkit.git\nexport ANTHROPIC_API_KEY=\"sk-ant-...\"\nexport SERPER_API_KEY=\"...\"\nibt search \"JFK assassination declassified 2025\" --format json", "features": ["Multi-interface access: CLI, Python Library, REST API, and MCP Server", "Persistent project-based research with evidence accumulation and deduplication", "Automated web searching via Serper.dev or DuckDuckGo fallback", "LLM-driven claim extraction and signal detection from raw web content", "Structured briefing generation synthesizing multiple evidence passes", "Pluggable source adapter architecture for extending beyond web sources"], "diagram_architecture": "flowchart TD\n    User[User/Agent] -->|CLI/API/MCP| Interface[Interface Layer]\n    Interface --> Pipeline[ResearchPipeline]\n    Pipeline --> Config[IntelConfig]\n    Pipeline --> Adapter[Source Adapter]\n    Adapter -->|Search| WebSearch[WebSearchTool]\n    Adapter -->|Fetch| WebContent[WebContentTool]\n    WebSearch -->|Serper/DDG| Internet[(Internet)]\n    WebContent -->|HTTP| Internet\n    Pipeline -->|Extract/Synthesize| LLM[Claude API]\n    Pipeline -->|Store| Evidence[(Local JSON Store)]\n    Evidence --> Pipeline", "diagram_sequence": "sequenceDiagram\n    participant Client as Client (CLI/API)\n    participant Pipeline as ResearchPipeline\n    participant Adapter as WebSourceAdapter\n    participant Search as WebSearchTool\n    participant Fetch as WebContentTool\n    participant LLM as Claude API\n    participant Store as Evidence Store\n\n    Client->>Pipeline: execute research/project collect\n    Pipeline->>Adapter: search(queries)\n    Adapter->>Search: execute(queries)\n    Search-->>Adapter: raw JSON results\n    Adapter-->>Pipeline: parsed results (urls)\n    \n    loop For each URL\n        Pipeline->>Adapter: fetch(url)\n        Adapter->>Fetch: execute(url)\n        Fetch-->>Adapter: raw content\n        Adapter-->>Pipeline: extracted text\n        Pipeline->>LLM: extract claims\n        LLM-->>Pipeline: structured claims\n        Pipeline->>Store: append/deduplicate evidence\n    end\n    \n    Pipeline->>LLM: synthesize briefing/analyze signals\n    LLM-->>Pipeline: final report\n    Pipeline-->>Client: return result", "capabilities": ["Web Search", "Content Extraction", "Claim Detection", "Evidence Accumulation", "Signal Analysis", "Report Generation", "REST API Hosting", "MCP Server Integration"], "components": ["ResearchPipeline", "WebSourceAdapter", "WebSearchTool", "WebContentTool", "IntelConfig", "ContributionTracker", "TokenManager", "FastAPI Server", "MCP Server"], "tech": ["Python", "FastAPI", "Anthropic SDK", "Pydantic", "Model Context Protocol (MCP)", "JSON", "AsyncIO"], "depends_on": ["Anthropic API Key", "Serper.dev API Key (optional)", "Python 3.9+"], "integrates_with": ["Claude Desktop", "CI/CD Pipelines", "Custom Python Applications", "Web Frontends"], "patterns": ["Adapter Pattern", "Pipeline Pattern", "Facade Pattern", "Repository Pattern"], "reuse_tags": ["osint", "research-automation", "llm-orchestration", "cli-tool", "rest-api", "mcp-server", "evidence-tracking"], "slug": "intelligence-briefing-toolkit", "repo_url": "https://github.com/davidbmar/intelligence-briefing-toolkit", "visibility": "private", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "agentB-brief-logic-fixes is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "agentC-bugfix-tests is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "feat/daily-brief-restoration-pr1 is 11 commits ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #2: fix(daily): make per-page LLM timeout actually fire (Phase 1a+1b+1.7)"}], "screenshot_url": "", "generated_at": "2026-06-14T03:00:21.256248Z", "source_commit": "99e9f7c", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Intelligence Briefing Toolkit",
+  "description": "A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings.",
+  "codeRepository": "https://github.com/davidbmar/intelligence-briefing-toolkit",
+  "programmingLanguage": [
+    "Python",
+    "FastAPI",
+    "Anthropic SDK",
+    "Pydantic",
+    "Model Context Protocol (MCP)",
+    "JSON",
+    "AsyncIO"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Intelligence Briefing Toolkit</h1>
+  <p class="one-liner">A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings.</p>
+  <p><a href="https://github.com/davidbmar/intelligence-briefing-toolkit">https://github.com/davidbmar/intelligence-briefing-toolkit</a>
+     &nbsp;·&nbsp; private &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>The Intelligence Briefing Toolkit (IBT) is a Python-based framework for automating open-source intelligence (OSINT) workflows. It orchestrates web searching, content extraction, claim detection, and report synthesis using Claude (Anthropic). The system supports both one-off deep research queries and persistent, multi-pass projects that accumulate evidence over time to detect signals and contradictions. It exposes functionality through four interfaces: a CLI for scripting, a Python library for integration, a REST API for web services, and an MCP server for AI agent tool use.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Multi-interface access: CLI, Python Library, REST API, and MCP Server</li><li>Persistent project-based research with evidence accumulation and deduplication</li><li>Automated web searching via Serper.dev or DuckDuckGo fallback</li><li>LLM-driven claim extraction and signal detection from raw web content</li><li>Structured briefing generation synthesizing multiple evidence passes</li><li>Pluggable source adapter architecture for extending beyond web sources</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install git+https://github.com/davidbmar/intelligence-briefing-toolkit.git
+export ANTHROPIC_API_KEY=&quot;sk-ant-...&quot;
+export SERPER_API_KEY=&quot;...&quot;
+ibt search &quot;JFK assassination declassified 2025&quot; --format json</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User/Agent] -->|CLI/API/MCP| Interface[Interface Layer]
+    Interface --> Pipeline[ResearchPipeline]
+    Pipeline --> Config[IntelConfig]
+    Pipeline --> Adapter[Source Adapter]
+    Adapter -->|Search| WebSearch[WebSearchTool]
+    Adapter -->|Fetch| WebContent[WebContentTool]
+    WebSearch -->|Serper/DDG| Internet[(Internet)]
+    WebContent -->|HTTP| Internet
+    Pipeline -->|Extract/Synthesize| LLM[Claude API]
+    Pipeline -->|Store| Evidence[(Local JSON Store)]
+    Evidence --> Pipeline</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built in Python with a modular adapter pattern for data sources. Core logic resides in `ResearchPipeline`, which coordinates `WebSearchTool` (Serper/DuckDuckGo) and `WebContentTool` (boilerplate stripping). LLM interactions are handled via the Anthropic SDK for claim extraction and synthesis. State management for projects uses local JSON files. The REST API is implemented with FastAPI, and the MCP server follows the Model Context Protocol specification for AI assistant integration.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Client as Client (CLI/API)
+    participant Pipeline as ResearchPipeline
+    participant Adapter as WebSourceAdapter
+    participant Search as WebSearchTool
+    participant Fetch as WebContentTool
+    participant LLM as Claude API
+    participant Store as Evidence Store
+
+    Client->>Pipeline: execute research/project collect
+    Pipeline->>Adapter: search(queries)
+    Adapter->>Search: execute(queries)
+    Search-->>Adapter: raw JSON results
+    Adapter-->>Pipeline: parsed results (urls)
+    
+    loop For each URL
+        Pipeline->>Adapter: fetch(url)
+        Adapter->>Fetch: execute(url)
+        Fetch-->>Adapter: raw content
+        Adapter-->>Pipeline: extracted text
+        Pipeline->>LLM: extract claims
+        LLM-->>Pipeline: structured claims
+        Pipeline->>Store: append/deduplicate evidence
+    end
+    
+    Pipeline->>LLM: synthesize briefing/analyze signals
+    LLM-->>Pipeline: final report
+    Pipeline-->>Client: return result</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use IBT to automate competitive intelligence monitoring, academic literature reviews, or investigative journalism workflows. Integrate the Python library into existing data pipelines to enrich datasets with web-sourced context. Deploy the REST API as a backend for internal research dashboards. Connect the MCP server to Claude Desktop to allow natural-language triggered research agents that can persist findings across sessions.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Web Search</span><span class="tag">Content Extraction</span><span class="tag">Claim Detection</span><span class="tag">Evidence Accumulation</span><span class="tag">Signal Analysis</span><span class="tag">Report Generation</span><span class="tag">REST API Hosting</span><span class="tag">MCP Server Integration</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">ResearchPipeline</span><span class="tag">WebSourceAdapter</span><span class="tag">WebSearchTool</span><span class="tag">WebContentTool</span><span class="tag">IntelConfig</span><span class="tag">ContributionTracker</span><span class="tag">TokenManager</span><span class="tag">FastAPI Server</span><span class="tag">MCP Server</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">Anthropic SDK</span><span class="tag">Pydantic</span><span class="tag">Model Context Protocol (MCP)</span><span class="tag">JSON</span><span class="tag">AsyncIO</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Anthropic API Key</span><span class="tag">Serper.dev API Key (optional)</span><span class="tag">Python 3.9+</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Claude Desktop</span><span class="tag">CI/CD Pipelines</span><span class="tag">Custom Python Applications</span><span class="tag">Web Frontends</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Adapter Pattern</span><span class="tag">Pipeline Pattern</span><span class="tag">Facade Pattern</span><span class="tag">Repository Pattern</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">osint</span><span class="tag">research-automation</span><span class="tag">llm-orchestration</span><span class="tag">cli-tool</span><span class="tag">rest-api</span><span class="tag">mcp-server</span><span class="tag">evidence-tracking</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: agentB-brief-logic-fixes is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: agentC-bugfix-tests is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: feat/daily-brief-restoration-pr1 is 11 commits ahead of the default branch</li><li><strong>open_pr</strong>: PR #2: fix(daily): make per-page LLM timeout actually fire (Phase 1a+1b+1.7)</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:00:21.256248Z ·
+     commit 99e9f7c ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters", "one_liner": "A fully offline, in-browser vector database for real-time RAG retrieval using SQLite WASM and client-side embeddings.", "what_it_is": "This project implements a client-side Retrieval-Augmented Generation (RAG) system that runs entirely in the browser. It uses a pre-built SQLite database containing transcript chunks and their 384-dimensional vector embeddings. The browser loads this database via sql.js (WASM), caches it in IndexedDB, and performs semantic search using Transformers.js for query embedding generation and JavaScript-based dot-product calculations for similarity scoring. It supports metadata filtering by document ID, speaker, and timestamps without requiring external APIs at query time.", "how_its_built": "The system consists of two main parts: a Node.js indexer and a Vite-based web application. The indexer reads JSONL transcript files, generates embeddings using @xenova/transformers, and writes them into a single SQLite file using better-sqlite3 and sqlite-vec. The web app uses sql.js to load this SQLite file in the browser, caches it in IndexedDB for offline use, and uses Transformers.js (WebGPU/WASM) to embed user queries. Search is performed by loading all embeddings into memory as Float32Arrays and computing cosine similarity in JavaScript, combined with SQL WHERE clauses for metadata filtering.", "how_to_apply": "Use this pattern for privacy-focused applications requiring semantic search over static datasets (e.g., meeting transcripts, documentation) where server-side inference is undesirable or too costly. It is ideal for demos, internal tools, or edge-case deployments where network latency or connectivity is a constraint. The architecture separates the heavy lifting of index creation (nightly/offline) from the lightweight, responsive query execution (real-time/browser).", "quickstart": "git clone https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters\ncd browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters\ncd indexer && npm install && cd ..\ncd web-app && npm install && cd ..\n./build_db --input ./data --out ./web-app/public/data/transcripts.db\ncd web-app\nnpm run dev", "features": ["Fully offline semantic search after initial load", "Client-side embedding generation using Transformers.js", "Metadata filtering by document, speaker, and timestamp", "IndexedDB caching for instant subsequent loads", "Single-file SQLite database portability", "Sub-millisecond vector similarity search in-browser"], "diagram_architecture": "flowchart TD\n    subgraph Offline_Indexer[\"Offline Indexer (Node.js)\"]\n        JSONL[\"JSONL Transcripts\"] --> Read[\"Read Chunks\"]\n        Read --> Embed[\"Generate Embeddings\\n(@xenova/transformers)\"]\n        Embed --> DB[\"Build SQLite DB\\n(better-sqlite3 + sqlite-vec)\"]\n    end\n\n    subgraph Browser_Client[\"Browser Client (Vite + TS)\"]\n        Static[\"Static Assets\"] --> Load[\"Load sql.js WASM\"]\n        Load --> Fetch[\"Fetch transcripts.db\"]\n        Fetch --> Cache[\"Cache in IndexedDB\"]\n        Cache --> Open[\"Open SQLite in Memory\"]\n        \n        User[\"User Query\"] --> QEmbed[\"Embed Query\\n(Transformers.js)\"]\n        QEmbed --> Search[\"Vector Search\\n(JS Dot Product)\"]\n        Open --> Filter[\"SQL Metadata Filter\"]\n        Filter --> Search\n        Search --> Results[\"Display Results\"]\n    end\n\n    DB -->|Deploy| Static", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant App as Web App\n    participant IDB as IndexedDB\n    participant SQL as sql.js (WASM)\n    participant Model as Transformers.js\n\n    Note over App, IDB: Initialization Phase\n    App->>IDB: Check for cached transcripts.db\n    alt Not Cached\n        App->>App: Fetch transcripts.db from server\n        App->>IDB: Store transcripts.db\n    else Cached\n        IDB-->>App: Return cached ArrayBuffer\n    end\n    App->>SQL: Open Database from ArrayBuffer\n    App->>Model: Initialize Embedding Model\n    Model-->>App: Model Ready\n\n    Note over U, Model: Search Phase\n    U->>App: Enter Search Query + Filters\n    App->>Model: Embed Query Text\n    Model-->>App: Return Query Vector (Float32Array)\n    App->>SQL: Execute SELECT with Metadata Filters\n    SQL-->>App: Return Filtered Rows (IDs + Embedding Blobs)\n    App->>App: Compute Cosine Similarity (JS)\n    App-->>U: Display Ranked Results", "capabilities": ["Semantic Search", "Vector Similarity", "Offline First", "Metadata Filtering", "Client-side Inference"], "components": ["Indexer CLI", "Web Application", "SQLite Database", "Embedding Model", "WASM Runtime"], "tech": ["TypeScript", "SQLite WASM", "Transformers.js", "Vite", "IndexedDB", "Node.js"], "depends_on": ["sql.js", "@xenova/transformers", "better-sqlite3", "sqlite-vec", "vite"], "integrates_with": ["JSONL Data Sources", "Static File Hosts", "Browser Cache Storage"], "patterns": ["Retrieval-Augmented Generation (RAG)", "Offline-First Architecture", "Client-Side Vector Search", "Pre-computed Embeddings"], "reuse_tags": ["vector-database", "browser-ai", "sqlite-wasm", "rag", "offline-search"], "slug": "browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters", "repo_url": "https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/indexer/npm_and_yarn-4ab8611e94 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web-app/npm_and_yarn-29c67ef7c0 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web-app/rollup-4.60.4 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #5: Bump rollup from 4.57.1 to 4.60.4 in /web-app"}, {"kind": "open_pr", "detail": "PR #4: Bump the npm_and_yarn group across 2 directories with 3 updates"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 3 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters/main/docs/search-results.png", "generated_at": "2026-06-14T02:29:06.160972Z", "source_commit": "f3e9232", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters",
+  "description": "A fully offline, in-browser vector database for real-time RAG retrieval using SQLite WASM and client-side embeddings.",
+  "codeRepository": "https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters",
+  "programmingLanguage": [
+    "TypeScript",
+    "SQLite WASM",
+    "Transformers.js",
+    "Vite",
+    "IndexedDB",
+    "Node.js"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters</h1>
+  <p class="one-liner">A fully offline, in-browser vector database for real-time RAG retrieval using SQLite WASM and client-side embeddings.</p>
+  <p><a href="https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters">https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters/main/docs/search-results.png" alt="browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>This project implements a client-side Retrieval-Augmented Generation (RAG) system that runs entirely in the browser. It uses a pre-built SQLite database containing transcript chunks and their 384-dimensional vector embeddings. The browser loads this database via sql.js (WASM), caches it in IndexedDB, and performs semantic search using Transformers.js for query embedding generation and JavaScript-based dot-product calculations for similarity scoring. It supports metadata filtering by document ID, speaker, and timestamps without requiring external APIs at query time.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Fully offline semantic search after initial load</li><li>Client-side embedding generation using Transformers.js</li><li>Metadata filtering by document, speaker, and timestamp</li><li>IndexedDB caching for instant subsequent loads</li><li>Single-file SQLite database portability</li><li>Sub-millisecond vector similarity search in-browser</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters
+cd browser-RAG-retrieval-realtime-night-index-SQLLiteWASM-and-sqllite-vec-portal-vector-db-with-filters
+cd indexer &amp;&amp; npm install &amp;&amp; cd ..
+cd web-app &amp;&amp; npm install &amp;&amp; cd ..
+./build_db --input ./data --out ./web-app/public/data/transcripts.db
+cd web-app
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph Offline_Indexer["Offline Indexer (Node.js)"]
+        JSONL["JSONL Transcripts"] --> Read["Read Chunks"]
+        Read --> Embed["Generate Embeddings\n(@xenova/transformers)"]
+        Embed --> DB["Build SQLite DB\n(better-sqlite3 + sqlite-vec)"]
+    end
+
+    subgraph Browser_Client["Browser Client (Vite + TS)"]
+        Static["Static Assets"] --> Load["Load sql.js WASM"]
+        Load --> Fetch["Fetch transcripts.db"]
+        Fetch --> Cache["Cache in IndexedDB"]
+        Cache --> Open["Open SQLite in Memory"]
+        
+        User["User Query"] --> QEmbed["Embed Query\n(Transformers.js)"]
+        QEmbed --> Search["Vector Search\n(JS Dot Product)"]
+        Open --> Filter["SQL Metadata Filter"]
+        Filter --> Search
+        Search --> Results["Display Results"]
+    end
+
+    DB -->|Deploy| Static</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system consists of two main parts: a Node.js indexer and a Vite-based web application. The indexer reads JSONL transcript files, generates embeddings using @xenova/transformers, and writes them into a single SQLite file using better-sqlite3 and sqlite-vec. The web app uses sql.js to load this SQLite file in the browser, caches it in IndexedDB for offline use, and uses Transformers.js (WebGPU/WASM) to embed user queries. Search is performed by loading all embeddings into memory as Float32Arrays and computing cosine similarity in JavaScript, combined with SQL WHERE clauses for metadata filtering.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant App as Web App
+    participant IDB as IndexedDB
+    participant SQL as sql.js (WASM)
+    participant Model as Transformers.js
+
+    Note over App, IDB: Initialization Phase
+    App->>IDB: Check for cached transcripts.db
+    alt Not Cached
+        App->>App: Fetch transcripts.db from server
+        App->>IDB: Store transcripts.db
+    else Cached
+        IDB-->>App: Return cached ArrayBuffer
+    end
+    App->>SQL: Open Database from ArrayBuffer
+    App->>Model: Initialize Embedding Model
+    Model-->>App: Model Ready
+
+    Note over U, Model: Search Phase
+    U->>App: Enter Search Query + Filters
+    App->>Model: Embed Query Text
+    Model-->>App: Return Query Vector (Float32Array)
+    App->>SQL: Execute SELECT with Metadata Filters
+    SQL-->>App: Return Filtered Rows (IDs + Embedding Blobs)
+    App->>App: Compute Cosine Similarity (JS)
+    App-->>U: Display Ranked Results</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this pattern for privacy-focused applications requiring semantic search over static datasets (e.g., meeting transcripts, documentation) where server-side inference is undesirable or too costly. It is ideal for demos, internal tools, or edge-case deployments where network latency or connectivity is a constraint. The architecture separates the heavy lifting of index creation (nightly/offline) from the lightweight, responsive query execution (real-time/browser).</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Semantic Search</span><span class="tag">Vector Similarity</span><span class="tag">Offline First</span><span class="tag">Metadata Filtering</span><span class="tag">Client-side Inference</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Indexer CLI</span><span class="tag">Web Application</span><span class="tag">SQLite Database</span><span class="tag">Embedding Model</span><span class="tag">WASM Runtime</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">SQLite WASM</span><span class="tag">Transformers.js</span><span class="tag">Vite</span><span class="tag">IndexedDB</span><span class="tag">Node.js</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">sql.js</span><span class="tag">@xenova/transformers</span><span class="tag">better-sqlite3</span><span class="tag">sqlite-vec</span><span class="tag">vite</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">JSONL Data Sources</span><span class="tag">Static File Hosts</span><span class="tag">Browser Cache Storage</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Retrieval-Augmented Generation (RAG)</span><span class="tag">Offline-First Architecture</span><span class="tag">Client-Side Vector Search</span><span class="tag">Pre-computed Embeddings</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">vector-database</span><span class="tag">browser-ai</span><span class="tag">sqlite-wasm</span><span class="tag">rag</span><span class="tag">offline-search</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/indexer/npm_and_yarn-4ab8611e94 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web-app/npm_and_yarn-29c67ef7c0 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web-app/rollup-4.60.4 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #5: Bump rollup from 4.57.1 to 4.60.4 in /web-app</li><li><strong>open_pr</strong>: PR #4: Bump the npm_and_yarn group across 2 directories with 3 updates</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 3 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:29:06.160972Z ·
+     commit f3e9232 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

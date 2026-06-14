@@ -1,0 +1,53 @@
+{
+  "title": "audio-ui",
+  "one_liner": "Browser-based audio recorder with chunking functionality.",
+  "what_it_is": "A web application designed to record audio directly in the browser and split the recording into manageable chunks.",
+  "how_its_built": "Built using standard web technologies (HTML, CSS, JavaScript) leveraging the Web Audio API or MediaRecorder API for client-side capture.",
+  "how_to_apply": "Integrate as a standalone HTML page or embed components into existing web applications requiring client-side audio capture.",
+  "quickstart": "",
+  "features": [
+    "Records audio directly in the web browser",
+    "Splits recordings into smaller chunks",
+    "Runs entirely on the client side"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[User] -->|Interacts| B(Browser UI)\n    B -->|Captures Stream| C(MediaRecorder API)\n    C -->|Audio Data| D[Chunk Processor]\n    D -->|Stored Chunks| E[Local Storage/Memory]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant UI as Browser UI\n    participant Recorder as MediaRecorder\n    participant Storage as Chunk Handler\n    User->>UI: Click Record\n    UI->>Recorder: start()\n    Recorder->>Storage: ondataavailable (chunk)\n    Storage->>Storage: Store/Process Chunk\n    User->>UI: Click Stop\n    UI->>Recorder: stop()",
+  "capabilities": [
+    "Audio Capture",
+    "Data Chunking"
+  ],
+  "components": [
+    "HTML Interface",
+    "Recording Logic",
+    "Chunk Management"
+  ],
+  "tech": [
+    "HTML",
+    "JavaScript",
+    "Web Audio API"
+  ],
+  "depends_on": [
+    "Modern Web Browser",
+    "Microphone Access"
+  ],
+  "integrates_with": [],
+  "patterns": [
+    "Client-Side Processing",
+    "Event-Driven Recording"
+  ],
+  "reuse_tags": [
+    "audio-recording",
+    "browser-based",
+    "chunking"
+  ],
+  "slug": "audio-ui",
+  "repo_url": "https://github.com/davidbmar/audio-ui",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": true,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:23:32.025695Z",
+  "source_commit": "7ece0be",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>interviewnotes · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "interviewnotes", "one_liner": "A structured framework and checklist for conducting five-part technical and behavioral engineering interviews.", "what_it_is": "A documentation repository outlining a comprehensive five-stage interview process for software engineers. It covers code review assessment, systems design, architectural peer review, management potential, and hiring manager final review, emphasizing collaboration, constructive feedback, and core company values.", "how_its_built": "This is a non-code repository consisting primarily of Markdown documentation. It structures interview guidelines into five distinct sections, providing prompts, evaluation criteria, and scenario descriptions for interviewers and candidates.", "how_to_apply": "Review the README.md to understand the five interview stages. Use the provided prompts and checklists to prepare for or conduct interviews. For the code review section, simulate the hypothetical senior/junior engineer scenario using Java examples as suggested.", "quickstart": "", "features": ["Five-part interview structure covering code, design, architecture, and management", "Code review assessment focusing on team interaction and constructive feedback", "Systems design panel evaluating trade-offs, API design, and database choices", "Architectural peer review requiring candidates to explain past complex projects", "Managerial panel assessing talent identification, coaching, and difficult personnel decisions"], "diagram_architecture": "flowchart TD\n    A[Candidate] --> B[Stage 1: Code Review]\n    A --> C[Stage 2: Systems Design]\n    A --> D[Stage 3: Architectural Peer Review]\n    A --> E[Stage 4: Manager Panel]\n    A --> F[Stage 5: Hiring Manager Review]\n    B --> G[Evaluation: Collaboration & Feedback]\n    C --> H[Evaluation: Trade-offs & Patterns]\n    D --> I[Evaluation: Clarity & Complexity]\n    E --> J[Evaluation: Leadership Potential]\n    F --> K[Final Decision]", "diagram_sequence": "sequenceDiagram\n    participant C as Candidate\n    participant I as Interviewer\n    participant T as Team\n    C->>I: Stage 1: Code Review Assessment\n    I->>C: Provide hypothetical PR (Java)\n    C->>I: Submit feedback on junior/senior interaction\n    I->>T: Evaluate constructive/positive tone\n    C->>I: Stage 2: Systems Design Panel\n    I->>C: Present system requirements (Read/Write heavy)\n    C->>I: Propose DB, Cache, API design\n    I->>C: Discuss trade-offs and blast radius\n    C->>I: Stage 3: Architectural Peer Review\n    C->>I: Share screen of past project\n    C->>I: Explain tools, roadblocks, pivots\n    I->>C: Ask clarifying questions on architecture\n    C->>I: Stage 4: Manager Panel\n    I->>C: Scenario: Identify talent/Coach/Fire\n    C->>I: Describe process and approach\n    C->>I: Stage 5: Hiring Manager Review\n    I->>T: Review scorecards from previous stages\n    T->>I: Final hiring decision", "capabilities": ["Interview Process Definition", "Evaluation Criteria Standardization", "Behavioral Assessment Guidelines", "Technical Scenario Prompting"], "components": ["Code Review Checklist", "Systems Design Prompts", "Architectural Review Guidelines", "Management Scenario Questions", "Core Values Framework"], "tech": ["Markdown", "Git"], "depends_on": [], "integrates_with": [], "patterns": ["Structured Interviewing", "Behavioral Assessment", "Technical Evaluation", "Peer Review Simulation"], "reuse_tags": ["hiring", "interview-guide", "engineering-management", "technical-assessment", "onboarding"], "slug": "interviewnotes", "repo_url": "https://github.com/davidbmar/interviewnotes", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T03:00:41.704966Z", "source_commit": "025ca69", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "interviewnotes",
+  "description": "A structured framework and checklist for conducting five-part technical and behavioral engineering interviews.",
+  "codeRepository": "https://github.com/davidbmar/interviewnotes",
+  "programmingLanguage": [
+    "Markdown",
+    "Git"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>interviewnotes</h1>
+  <p class="one-liner">A structured framework and checklist for conducting five-part technical and behavioral engineering interviews.</p>
+  <p><a href="https://github.com/davidbmar/interviewnotes">https://github.com/davidbmar/interviewnotes</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A documentation repository outlining a comprehensive five-stage interview process for software engineers. It covers code review assessment, systems design, architectural peer review, management potential, and hiring manager final review, emphasizing collaboration, constructive feedback, and core company values.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Five-part interview structure covering code, design, architecture, and management</li><li>Code review assessment focusing on team interaction and constructive feedback</li><li>Systems design panel evaluating trade-offs, API design, and database choices</li><li>Architectural peer review requiring candidates to explain past complex projects</li><li>Managerial panel assessing talent identification, coaching, and difficult personnel decisions</li></ul></section>
+
+
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Candidate] --> B[Stage 1: Code Review]
+    A --> C[Stage 2: Systems Design]
+    A --> D[Stage 3: Architectural Peer Review]
+    A --> E[Stage 4: Manager Panel]
+    A --> F[Stage 5: Hiring Manager Review]
+    B --> G[Evaluation: Collaboration & Feedback]
+    C --> H[Evaluation: Trade-offs & Patterns]
+    D --> I[Evaluation: Clarity & Complexity]
+    E --> J[Evaluation: Leadership Potential]
+    F --> K[Final Decision]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>This is a non-code repository consisting primarily of Markdown documentation. It structures interview guidelines into five distinct sections, providing prompts, evaluation criteria, and scenario descriptions for interviewers and candidates.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Candidate
+    participant I as Interviewer
+    participant T as Team
+    C->>I: Stage 1: Code Review Assessment
+    I->>C: Provide hypothetical PR (Java)
+    C->>I: Submit feedback on junior/senior interaction
+    I->>T: Evaluate constructive/positive tone
+    C->>I: Stage 2: Systems Design Panel
+    I->>C: Present system requirements (Read/Write heavy)
+    C->>I: Propose DB, Cache, API design
+    I->>C: Discuss trade-offs and blast radius
+    C->>I: Stage 3: Architectural Peer Review
+    C->>I: Share screen of past project
+    C->>I: Explain tools, roadblocks, pivots
+    I->>C: Ask clarifying questions on architecture
+    C->>I: Stage 4: Manager Panel
+    I->>C: Scenario: Identify talent/Coach/Fire
+    C->>I: Describe process and approach
+    C->>I: Stage 5: Hiring Manager Review
+    I->>T: Review scorecards from previous stages
+    T->>I: Final hiring decision</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Review the README.md to understand the five interview stages. Use the provided prompts and checklists to prepare for or conduct interviews. For the code review section, simulate the hypothetical senior/junior engineer scenario using Java examples as suggested.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Interview Process Definition</span><span class="tag">Evaluation Criteria Standardization</span><span class="tag">Behavioral Assessment Guidelines</span><span class="tag">Technical Scenario Prompting</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Code Review Checklist</span><span class="tag">Systems Design Prompts</span><span class="tag">Architectural Review Guidelines</span><span class="tag">Management Scenario Questions</span><span class="tag">Core Values Framework</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Markdown</span><span class="tag">Git</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="muted">—</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="muted">—</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Structured Interviewing</span><span class="tag">Behavioral Assessment</span><span class="tag">Technical Evaluation</span><span class="tag">Peer Review Simulation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">hiring</span><span class="tag">interview-guide</span><span class="tag">engineering-management</span><span class="tag">technical-assessment</span><span class="tag">onboarding</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:00:41.704966Z ·
+     commit 025ca69 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

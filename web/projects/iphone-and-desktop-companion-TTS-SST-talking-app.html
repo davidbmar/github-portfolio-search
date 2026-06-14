@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iPhone &amp; Desktop Companion TTS/SST Talking App · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "iPhone & Desktop Companion TTS/SST Talking App", "one_liner": "Mac-hosted Python voice assistant streaming WebRTC audio to iPhone with a hybrid FSM workflow engine for complex research.", "what_it_is": "A local-first voice agent that runs on macOS and connects to an iPhone via Safari. It uses Whisper for speech-to-text, routes queries through a keyword-based router to either a fast LLM path or a Finite State Machine (FSM) engine for deep research/comparison, and streams Piper TTS audio back to the phone via WebRTC.", "how_its_built": "Python backend using aiohttp for signaling and WebRTC peer connections. The core logic includes a regex-based keyword router, an FSM executor for multi-step workflows (Research, Compare, Fact Check), and adapters for LLMs (Ollama, Claude, OpenAI). Audio is handled via WebRTC data channels/tracks, with Piper for TTS and Whisper for STT.", "how_to_apply": "Ideal for developers building local AI assistants who need structured reasoning (FSMs) rather than just chat, and want low-latency audio streaming to mobile devices without native app store deployment.", "quickstart": "pip install -r requirements.txt\npython main.py", "features": ["Hybrid FSM engine decomposes complex queries into multi-step research pipelines", "WebRTC audio streaming from Mac host to iPhone Safari browser", "Keyword router dispatches to specific workflows or direct LLM fallback", "Supports Ollama (local), Claude, and OpenAI models switchable at runtime", "Input quality filter reduces noise and accidental triggers", "Real-time workflow debugger visualizes FSM state progress on mobile"], "diagram_architecture": "flowchart TD\n    subgraph Mac_Host[\"Mac Host\"]\n        Engine[\"Engine\\nWorkflowRunner\\nRouter\\nOrchestrator\"]\n        Gateway[\"Gateway\\naiohttp Server\\nWebSocket\\nRTCPeerConnection\"]\n        TTS[\"Piper TTS\"]\n        STT[\"Whisper STT\"]\n        LLM[\"LLM Provider\\nOllama/Claude/OpenAI\"]\n    end\n    subgraph iPhone[\"iPhone Safari\"]\n        UI[\"Voice Agent UI\"]\n        Mic[\"Microphone Input\"]\n        Speaker[\"Speaker Output\"]\n    end\n    UI -->|Hold to Talk| Mic\n    Mic -->|Audio Stream| Gateway\n    Gateway -->|Signaling + Audio| Engine\n    Engine -->|Query| LLM\n    LLM -->|Response Text| Engine\n    Engine -->|Text to Speak| TTS\n    TTS -->|Audio Chunks| Gateway\n    Gateway -->|WebRTC Audio Track| Speaker\n    Engine -->|Transcribe| STT\n    STT -->|Text| Engine", "diagram_sequence": "sequenceDiagram\n    participant User as iPhone User\n    participant Browser as Safari Browser\n    participant Gateway as Mac Gateway\n    participant Engine as Workflow Engine\n    participant LLM as LLM Provider\n    participant TTS as Piper TTS\n    \n    User->>Browser: Hold button & Speak\n    Browser->>Gateway: Send Audio via WebRTC\n    Gateway->>Engine: Forward Audio Data\n    Engine->>Engine: Whisper STT\n    Engine->>Engine: Keyword Router\n    alt Complex Query\n        Engine->>Engine: Execute FSM State\n        Engine->>LLM: Request Reasoning/Search\n        LLM-->>Engine: Return Structured Data\n        Engine->>Engine: Next FSM State\n    else Simple Query\n        Engine->>LLM: Direct Chat Completion\n        LLM-->>Engine: Return Response Text\n    end\n    Engine->>TTS: Generate Audio from Text\n    TTS-->>Engine: Audio Chunks\n    Engine->>Gateway: Stream Audio Chunks\n    Gateway->>Browser: WebRTC Audio Track\n    Browser->>User: Play Response", "capabilities": ["Speech-to-Text", "Text-to-Speech", "Web Search Integration", "Finite State Machine Execution", "Real-time Audio Streaming", "Multi-LLM Support"], "components": ["Workflow Engine", "Keyword Router", "WebRTC Gateway", "Input Filter", "Conversation History", "Fast Path Intent Matcher"], "tech": ["Python", "aiohttp", "WebRTC", "Whisper", "Piper TTS", "Mermaid"], "depends_on": ["Ollama", "Anthropic API", "OpenAI API", "Node.js (for build tools if any)", "Safari Browser"], "integrates_with": ["Ollama", "Claude", "OpenAI", "Web Search Tools"], "patterns": ["Finite State Machine", "Router Pattern", "Adapter Pattern", "Observer Pattern (WebRTC)", "Chain of Responsibility"], "reuse_tags": ["voice-assistant", "webrtc-audio", "fsm-engine", "local-llm", "python-backend", "mobile-companion"], "slug": "iphone-and-desktop-companion-TTS-SST-talking-app", "repo_url": "https://github.com/davidbmar/iphone-and-desktop-companion-TTS-SST-talking-app", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web-app/npm_and_yarn-d1f9cb5775 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: build(deps): Bump the npm_and_yarn group across 1 directory with 5 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/iphone-and-desktop-companion-TTS-SST-talking-app/main/docs/screenshots/agent-ollama.png", "generated_at": "2026-06-14T03:01:30.483844Z", "source_commit": "3c10f27", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "iPhone & Desktop Companion TTS/SST Talking App",
+  "description": "Mac-hosted Python voice assistant streaming WebRTC audio to iPhone with a hybrid FSM workflow engine for complex research.",
+  "codeRepository": "https://github.com/davidbmar/iphone-and-desktop-companion-TTS-SST-talking-app",
+  "programmingLanguage": [
+    "Python",
+    "aiohttp",
+    "WebRTC",
+    "Whisper",
+    "Piper TTS",
+    "Mermaid"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>iPhone &amp; Desktop Companion TTS/SST Talking App</h1>
+  <p class="one-liner">Mac-hosted Python voice assistant streaming WebRTC audio to iPhone with a hybrid FSM workflow engine for complex research.</p>
+  <p><a href="https://github.com/davidbmar/iphone-and-desktop-companion-TTS-SST-talking-app">https://github.com/davidbmar/iphone-and-desktop-companion-TTS-SST-talking-app</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/iphone-and-desktop-companion-TTS-SST-talking-app/main/docs/screenshots/agent-ollama.png" alt="iPhone &amp; Desktop Companion TTS/SST Talking App screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A local-first voice agent that runs on macOS and connects to an iPhone via Safari. It uses Whisper for speech-to-text, routes queries through a keyword-based router to either a fast LLM path or a Finite State Machine (FSM) engine for deep research/comparison, and streams Piper TTS audio back to the phone via WebRTC.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Hybrid FSM engine decomposes complex queries into multi-step research pipelines</li><li>WebRTC audio streaming from Mac host to iPhone Safari browser</li><li>Keyword router dispatches to specific workflows or direct LLM fallback</li><li>Supports Ollama (local), Claude, and OpenAI models switchable at runtime</li><li>Input quality filter reduces noise and accidental triggers</li><li>Real-time workflow debugger visualizes FSM state progress on mobile</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install -r requirements.txt
+python main.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph Mac_Host["Mac Host"]
+        Engine["Engine\nWorkflowRunner\nRouter\nOrchestrator"]
+        Gateway["Gateway\naiohttp Server\nWebSocket\nRTCPeerConnection"]
+        TTS["Piper TTS"]
+        STT["Whisper STT"]
+        LLM["LLM Provider\nOllama/Claude/OpenAI"]
+    end
+    subgraph iPhone["iPhone Safari"]
+        UI["Voice Agent UI"]
+        Mic["Microphone Input"]
+        Speaker["Speaker Output"]
+    end
+    UI -->|Hold to Talk| Mic
+    Mic -->|Audio Stream| Gateway
+    Gateway -->|Signaling + Audio| Engine
+    Engine -->|Query| LLM
+    LLM -->|Response Text| Engine
+    Engine -->|Text to Speak| TTS
+    TTS -->|Audio Chunks| Gateway
+    Gateway -->|WebRTC Audio Track| Speaker
+    Engine -->|Transcribe| STT
+    STT -->|Text| Engine</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Python backend using aiohttp for signaling and WebRTC peer connections. The core logic includes a regex-based keyword router, an FSM executor for multi-step workflows (Research, Compare, Fact Check), and adapters for LLMs (Ollama, Claude, OpenAI). Audio is handled via WebRTC data channels/tracks, with Piper for TTS and Whisper for STT.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as iPhone User
+    participant Browser as Safari Browser
+    participant Gateway as Mac Gateway
+    participant Engine as Workflow Engine
+    participant LLM as LLM Provider
+    participant TTS as Piper TTS
+    
+    User->>Browser: Hold button & Speak
+    Browser->>Gateway: Send Audio via WebRTC
+    Gateway->>Engine: Forward Audio Data
+    Engine->>Engine: Whisper STT
+    Engine->>Engine: Keyword Router
+    alt Complex Query
+        Engine->>Engine: Execute FSM State
+        Engine->>LLM: Request Reasoning/Search
+        LLM-->>Engine: Return Structured Data
+        Engine->>Engine: Next FSM State
+    else Simple Query
+        Engine->>LLM: Direct Chat Completion
+        LLM-->>Engine: Return Response Text
+    end
+    Engine->>TTS: Generate Audio from Text
+    TTS-->>Engine: Audio Chunks
+    Engine->>Gateway: Stream Audio Chunks
+    Gateway->>Browser: WebRTC Audio Track
+    Browser->>User: Play Response</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Ideal for developers building local AI assistants who need structured reasoning (FSMs) rather than just chat, and want low-latency audio streaming to mobile devices without native app store deployment.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Speech-to-Text</span><span class="tag">Text-to-Speech</span><span class="tag">Web Search Integration</span><span class="tag">Finite State Machine Execution</span><span class="tag">Real-time Audio Streaming</span><span class="tag">Multi-LLM Support</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Workflow Engine</span><span class="tag">Keyword Router</span><span class="tag">WebRTC Gateway</span><span class="tag">Input Filter</span><span class="tag">Conversation History</span><span class="tag">Fast Path Intent Matcher</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">aiohttp</span><span class="tag">WebRTC</span><span class="tag">Whisper</span><span class="tag">Piper TTS</span><span class="tag">Mermaid</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Ollama</span><span class="tag">Anthropic API</span><span class="tag">OpenAI API</span><span class="tag">Node.js (for build tools if any)</span><span class="tag">Safari Browser</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Ollama</span><span class="tag">Claude</span><span class="tag">OpenAI</span><span class="tag">Web Search Tools</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Finite State Machine</span><span class="tag">Router Pattern</span><span class="tag">Adapter Pattern</span><span class="tag">Observer Pattern (WebRTC)</span><span class="tag">Chain of Responsibility</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-assistant</span><span class="tag">webrtc-audio</span><span class="tag">fsm-engine</span><span class="tag">local-llm</span><span class="tag">python-backend</span><span class="tag">mobile-companion</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web-app/npm_and_yarn-d1f9cb5775 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: build(deps): Bump the npm_and_yarn group across 1 directory with 5 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:01:30.483844Z ·
+     commit 3c10f27 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

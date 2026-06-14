@@ -1,0 +1,90 @@
+{
+  "title": "audio_client_server",
+  "one_liner": "A web-based audio recording client that streams sound to a Python Flask server for real-time transcription and processing.",
+  "what_it_is": "This project implements a client-server architecture where a web browser captures audio input via the MediaRecorder API and sends it to a backend server. The server, built with Flask, receives the audio stream, optionally stores it (e.g., in S3), and performs real-time speech-to-text transcription. It includes authentication mechanisms using Auth0 for protected endpoints and supports both lightweight local processing and cloud-integrated workflows.",
+  "how_its_built": "The backend is a Python Flask application structured with blueprints for modularity. It uses PyJWT for validating Auth0 access tokens and guards routes based on permissions. The frontend likely uses standard HTML5 JavaScript APIs for audio capture. The system supports dependency injection for services like message handling and security validation.",
+  "how_to_apply": "Deploy this system to create secure, voice-enabled web applications. Use cases include voice notes, real-time meeting transcription, or accessibility tools where users speak into their browser and receive immediate text feedback. The Auth0 integration makes it suitable for multi-user environments requiring role-based access control.",
+  "quickstart": "",
+  "features": [
+    "Browser-based audio recording using Web APIs",
+    "Real-time audio streaming to a Python Flask backend",
+    "Speech-to-text transcription capabilities",
+    "Auth0 JWT-based authentication and authorization guards",
+    "Modular API structure with public, protected, and admin endpoints",
+    "Optional S3 integration for audio storage"
+  ],
+  "diagram_architecture": "flowchart TD\n    Client[Web Browser] -->|Audio Stream| Server[Flask Server]\n    Server -->|Validate Token| Auth0[Auth0 Service]\n    Server -->|Transcribe| STT[Speech Engine]\n    Server -->|Store| S3[(S3 Bucket)]\n    Server -->|Response| Client",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser\n    participant F as Flask Server\n    participant A as Auth0\n    participant T as Transcriber\n    U->>B: Start Recording\n    B->>F: POST Audio Chunk\n    F->>A: Validate JWT\n    A-->>F: Valid Token\n    F->>T: Process Audio\n    T-->>F: Text Result\n    F-->>B: Return Transcription\n    B-->>U: Display Text",
+  "capabilities": [
+    "Audio Capture",
+    "Real-time Streaming",
+    "Speech Recognition",
+    "JWT Authentication",
+    "API Security"
+  ],
+  "components": [
+    "Flask Blueprint API",
+    "Auth0 Service",
+    "Message Service",
+    "Security Guards",
+    "Exception Handlers"
+  ],
+  "tech": [
+    "Python",
+    "Flask",
+    "JavaScript",
+    "PyJWT",
+    "HTML5 MediaRecorder"
+  ],
+  "depends_on": [
+    "Flask",
+    "PyJWT",
+    "Werkzeug",
+    "Requests"
+  ],
+  "integrates_with": [
+    "Auth0",
+    "AWS S3",
+    "Web Browsers"
+  ],
+  "patterns": [
+    "Client-Server",
+    "Blueprint Modularity",
+    "Decorator-based Security",
+    "Service Layer"
+  ],
+  "reuse_tags": [
+    "audio-processing",
+    "flask-api",
+    "auth0-integration",
+    "real-time-transcription",
+    "web-audio"
+  ],
+  "slug": "audio_client_server",
+  "repo_url": "https://github.com/davidbmar/audio_client_server",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/auth0/spa_react_javascript/npm_and_yarn-2be76d4b41 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/pip/auth0/api_flask_python/pip-31294bf0f8 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: Bump the npm_and_yarn group across 1 directory with 30 updates"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the pip group across 2 directories with 9 updates"
+    }
+  ],
+  "screenshot_url": "https://github.com/davidbmar/audio_client_server/assets/32729467/ab19d948-1074-4fe6-bd61-4f797f07e047",
+  "generated_at": "2026-06-14T02:26:08.494265Z",
+  "source_commit": "b2b56bc",
+  "model": "qwen3.7-plus"
+}

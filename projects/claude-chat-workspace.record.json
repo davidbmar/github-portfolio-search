@@ -1,0 +1,86 @@
+{
+  "title": "claude-chat-workspace",
+  "one_liner": "Lightweight self-hosted chat interface for Claude using Node.js, Express, and SSE.",
+  "what_it_is": "A minimal Node.js/Express server that provides a clean, static single-page UI for chatting with Anthropic's Claude models. It supports Server-Sent Events (SSE) for real-time streaming responses, maintains per-session conversation history in memory, and is designed to be deployed as a containerized workspace pod (e.g., in Kubernetes or via Docker Compose).",
+  "how_its_built": "Built with Node.js and Express for the backend, serving a static HTML/JS frontend. It uses the @anthropic-ai/sdk to interact with the Claude API. Conversation state is held in a JavaScript Map in memory, resetting on restart. The UI communicates with the backend via HTTP POST for sending messages and consumes SSE streams for receiving token-by-token responses.",
+  "how_to_apply": "Deploy as a sidecar or standalone pod in a Kubernetes cluster alongside other development tools, or run locally via Docker Compose for a private, persistent chat interface without relying on third-party hosted UIs.",
+  "quickstart": "cp .env.example .env\n# Edit .env to set ANTHROPIC_API_KEY\ndocker compose up",
+  "features": [
+    "Real-time chat interface with Server-Sent Events (SSE) streaming",
+    "Per-session conversation history maintained in memory",
+    "Configurable Claude model and system prompt via environment variables",
+    "Minimal static single-page UI served directly from the Node.js server",
+    "Container-ready with Docker Compose and ECR push scripts"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP GET /| StaticUI[Static SPA UI]\n    User -->|POST /chat| Server[Node.js Express Server]\n    Server -->|SSE Stream| User\n    Server -->|API Call| Anthropic[Claude API]\n    Server -->|Read/Write| MemStore[(In-Memory Conversation Map)]\n    subgraph Container\n        StaticUI\n        Server\n        MemStore\n    end",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as Express Server\n    participant M as Memory Store\n    participant A as Anthropic API\n    U->>S: POST /chat (message, sessionId)\n    S->>M: Get/Create conversation history\n    S->>A: Stream completion request\n    A-->>S: SSE Token Stream\n    S-->>U: Forward SSE Tokens\n    S->>M: Update conversation history",
+  "capabilities": [
+    "Chat Interface",
+    "SSE Streaming",
+    "Session Management",
+    "Container Deployment"
+  ],
+  "components": [
+    "Express Server",
+    "Static Frontend",
+    "Anthropic SDK Client",
+    "In-Memory Store"
+  ],
+  "tech": [
+    "Node.js",
+    "Express",
+    "Docker",
+    "Server-Sent Events",
+    "Shell"
+  ],
+  "depends_on": [
+    "@anthropic-ai/sdk",
+    "express",
+    "dotenv"
+  ],
+  "integrates_with": [
+    "Anthropic Claude API",
+    "Kubernetes",
+    "AWS ECS/ECR"
+  ],
+  "patterns": [
+    "Server-Sent Events",
+    "In-Memory State",
+    "Containerized Microservice",
+    "Adapter Pattern (LLM Backend)"
+  ],
+  "reuse_tags": [
+    "chat-ui",
+    "claude-wrapper",
+    "self-hosted",
+    "nodejs-template",
+    "sse-streaming"
+  ],
+  "slug": "claude-chat-workspace",
+  "repo_url": "https://github.com/davidbmar/claude-chat-workspace",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentA-file-api is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "agentB-generated-files-ui is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-28b7fe87dd is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: chore(deps): bump the npm_and_yarn group across 1 directory with 2 updates"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:41:43.413008Z",
+  "source_commit": "46c00cb",
+  "model": "qwen3.7-plus"
+}

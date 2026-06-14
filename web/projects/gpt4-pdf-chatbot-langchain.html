@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPT-4 &amp; LangChain PDF Chatbot · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "GPT-4 & LangChain PDF Chatbot", "one_liner": "A Next.js application that enables natural language querying of multiple large PDF documents using GPT-4, LangChain, and Pinecone vector storage.", "what_it_is": "This project is a full-stack web application that allows users to upload or pre-load PDF documents, convert them into vector embeddings, and store them in a Pinecone index. It provides a chat interface where users can ask questions about the content of these PDFs. The system retrieves relevant text chunks from the vector store based on the user's query and uses OpenAI's GPT models to generate contextual answers.", "how_its_built": "The backend is built with Next.js API routes handling the logic. It uses LangChain for orchestrating the LLM calls, document loading, and text splitting. PDFs are parsed using a custom loader, split into chunks, and embedded using OpenAI's embedding model. These embeddings are stored in Pinecone. During chat, the system performs similarity search in Pinecone, constructs a prompt with retrieved context, and streams the GPT response back to the client.", "how_to_apply": "Developers can use this as a starter template for building document-specific Q&A systems. It demonstrates how to integrate vector databases with LLMs for retrieval-augmented generation (RAG). It can be extended to support other document types, different vector stores, or customized prompting strategies for specific domains.", "quickstart": "git clone https://github.com/davidbmar/gpt4-pdf-chatbot-langchain.git\ncd gpt4-pdf-chatbot-langchain\npnpm install\ncp .env.example .env\n# Edit .env with your OPENAI_API_KEY, PINECONE_API_KEY, PINECONE_ENVIRONMENT, and PINECONE_INDEX_NAME\nmkdir docs\n# Add your PDF files to the docs folder\npnpm run ingest\npnpm run dev", "features": ["Chat with multiple large PDF documents using natural language", "Uses GPT-4 (or GPT-3.5-turbo) for high-quality answer generation", "Vector storage and retrieval via Pinecone for scalable document handling", "Streaming responses for a real-time chat experience", "Customizable ingestion pipeline for PDF parsing and chunking"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| NextJS[Next.js App]\n    NextJS -->|API Call| ChatAPI[/api/chat]\n    NextJS -->|Ingest Command| IngestScript[scripts/ingest-data.ts]\n    IngestScript -->|Load & Split| PDFs[PDF Files in /docs]\n    IngestScript -->|Embed| OpenAIEmb[OpenAI Embeddings]\n    IngestScript -->|Store Vectors| Pinecone[(Pinecone Index)]\n    ChatAPI -->|Retrieve Context| Pinecone\n    ChatAPI -->|Generate Answer| OpenAIChat[OpenAI GPT-4/3.5]\n    ChatAPI -->|Stream Response| User", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant N as Next.js Frontend\n    participant A as API Route (/api/chat)\n    participant P as Pinecone\n    participant O as OpenAI API\n\n    U->>N: Types question\n    N->>A: POST /api/chat {question, history}\n    A->>P: Similarity Search (Query Vector)\n    P-->>A: Relevant Document Chunks\n    A->>O: Send Prompt with Context & Question\n    O-->>A: Stream Token Response\n    A-->>N: Stream SSE Data\n    N-->>U: Display Answer Incrementally", "capabilities": ["PDF Ingestion", "Vector Embedding", "Semantic Search", "LLM Chat", "Response Streaming"], "components": ["Next.js Pages/API", "LangChain Chains", "Pinecone Vector Store", "OpenAI Embeddings", "Custom PDF Loader", "Text Splitter"], "tech": ["TypeScript", "Next.js", "LangChain", "Pinecone", "OpenAI API", "pdf-parse"], "depends_on": ["Node.js", "pnpm", "OpenAI Account", "Pinecone Account"], "integrates_with": ["OpenAI GPT-4/3.5", "Pinecone Vector Database"], "patterns": ["Retrieval-Augmented Generation (RAG)", "Server-Sent Events (SSE)", "Vector Similarity Search", "Document Chunking"], "reuse_tags": ["chatbot", "pdf-reader", "langchain", "pinecone", "nextjs", "rag", "gpt-4"], "slug": "gpt4-pdf-chatbot-langchain", "repo_url": "https://github.com/davidbmar/gpt4-pdf-chatbot-langchain", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "snyk-fix-5a5ef42a83f59f4443a473ac0e2f96da is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-7c46553ef7099121463cba81a41f15bc is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-28dbb577a876d9404497ed46c199ef18 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-34ffa1698dd95f159f42198bfaf16fe3 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-79b3f687cd7013587afc305231d4def7 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-329b91dfc2721a4148c91e17b5fe9969 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-652beb074f795981fea42c52188eb9c3 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-663c2c0aa8114fec8d5c58602477b569 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-6702e65b0a6f60cfea7733c435671776 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-53914d9268ef10423e91899572bf08b6 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-bfd15b69abbbf41d13c53fe19332ba59 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-c6aa98f8554e5160f6ea423b5a6c56c2 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-ca7deed55da1542f99cc5b41589f5b67 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-d2a1d5829f4af58fb7f567a063fff277 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-e6dd33c4adace2fbeee0b487b0f5487d is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-e7989f7417948f18cc973456084763ed is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-ee3bafed9ac13ae731678bd6de88b83d is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-f6a86ed1ddf10e6684d18d881d471a56 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-f71cd867ce3849c9489d4be73be0573d is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-f791a697ef52a3f2c71b355a1aa84bae is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-fix-fe96974d7d232cc7fd75995bc7af19ac is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-upgrade-320a15413493f7bd22ab7ef5c4774c55 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-upgrade-06632b0e09d0ee84fb11a74b232d6f1b is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-upgrade-d66ffc4bb632276d76f49c597edb24af is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "snyk-upgrade-f079a8995c3929137e6cca6184ed0bff is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #25: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"}, {"kind": "open_pr", "detail": "PR #24: [Snyk] Security upgrade next from 13.2.3 to 15.5.10"}, {"kind": "open_pr", "detail": "PR #23: [Snyk] Security upgrade react-markdown from 8.0.5 to 9.0.0"}, {"kind": "open_pr", "detail": "PR #22: [Snyk] Security upgrade langchain from 0.0.41 to 0.1.29"}, {"kind": "open_pr", "detail": "PR #21: [Snyk] Security upgrade langchain from 0.0.41 to 0.1.29"}, {"kind": "open_pr", "detail": "PR #20: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"}, {"kind": "open_pr", "detail": "PR #19: [Snyk] Security upgrade next from 13.2.3 to 14.2.32"}, {"kind": "open_pr", "detail": "PR #18: [Snyk] Security upgrade next from 13.2.3 to 15.2.2"}, {"kind": "open_pr", "detail": "PR #17: [Snyk] Security upgrade next from 13.2.3 to 14.2.24"}, {"kind": "open_pr", "detail": "PR #16: [Snyk] Fix for 2 vulnerabilities"}, {"kind": "open_pr", "detail": "PR #15: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"}, {"kind": "open_pr", "detail": "PR #14: [Snyk] Security upgrade next from 13.2.3 to 13.5.8"}, {"kind": "open_pr", "detail": "PR #13: [Snyk] Security upgrade next from 13.2.3 to 14.2.15"}, {"kind": "open_pr", "detail": "PR #12: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"}, {"kind": "open_pr", "detail": "PR #11: [Snyk] Security upgrade langchain from 0.0.41 to 0.3.3"}, {"kind": "open_pr", "detail": "PR #10: [Snyk] Security upgrade next from 13.2.3 to 14.2.7"}, {"kind": "open_pr", "detail": "PR #9: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"}, {"kind": "open_pr", "detail": "PR #8: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"}, {"kind": "open_pr", "detail": "PR #7: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"}, {"kind": "open_pr", "detail": "PR #6: [Snyk] Security upgrade next from 13.2.3 to 13.5.0"}, {"kind": "open_pr", "detail": "PR #5: [Snyk] Security upgrade next from 13.2.3 to 13.5.4"}, {"kind": "open_pr", "detail": "PR #4: [Snyk] Upgrade @pinecone-database/pinecone from 0.0.10 to 0.1.6"}, {"kind": "open_pr", "detail": "PR #3: [Snyk] Upgrade langchain from 0.0.41 to 0.0.123"}, {"kind": "open_pr", "detail": "PR #2: [Snyk] Upgrade lucide-react from 0.125.0 to 0.263.1"}, {"kind": "open_pr", "detail": "PR #1: [Snyk] Upgrade next from 13.2.3 to 13.4.12"}], "screenshot_url": "", "generated_at": "2026-06-14T02:55:21.494155Z", "source_commit": "a6075e5", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "GPT-4 & LangChain PDF Chatbot",
+  "description": "A Next.js application that enables natural language querying of multiple large PDF documents using GPT-4, LangChain, and Pinecone vector storage.",
+  "codeRepository": "https://github.com/davidbmar/gpt4-pdf-chatbot-langchain",
+  "programmingLanguage": [
+    "TypeScript",
+    "Next.js",
+    "LangChain",
+    "Pinecone",
+    "OpenAI API",
+    "pdf-parse"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>GPT-4 &amp; LangChain PDF Chatbot</h1>
+  <p class="one-liner">A Next.js application that enables natural language querying of multiple large PDF documents using GPT-4, LangChain, and Pinecone vector storage.</p>
+  <p><a href="https://github.com/davidbmar/gpt4-pdf-chatbot-langchain">https://github.com/davidbmar/gpt4-pdf-chatbot-langchain</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project is a full-stack web application that allows users to upload or pre-load PDF documents, convert them into vector embeddings, and store them in a Pinecone index. It provides a chat interface where users can ask questions about the content of these PDFs. The system retrieves relevant text chunks from the vector store based on the user&#x27;s query and uses OpenAI&#x27;s GPT models to generate contextual answers.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Chat with multiple large PDF documents using natural language</li><li>Uses GPT-4 (or GPT-3.5-turbo) for high-quality answer generation</li><li>Vector storage and retrieval via Pinecone for scalable document handling</li><li>Streaming responses for a real-time chat experience</li><li>Customizable ingestion pipeline for PDF parsing and chunking</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/gpt4-pdf-chatbot-langchain.git
+cd gpt4-pdf-chatbot-langchain
+pnpm install
+cp .env.example .env
+# Edit .env with your OPENAI_API_KEY, PINECONE_API_KEY, PINECONE_ENVIRONMENT, and PINECONE_INDEX_NAME
+mkdir docs
+# Add your PDF files to the docs folder
+pnpm run ingest
+pnpm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|HTTP Request| NextJS[Next.js App]
+    NextJS -->|API Call| ChatAPI[/api/chat]
+    NextJS -->|Ingest Command| IngestScript[scripts/ingest-data.ts]
+    IngestScript -->|Load & Split| PDFs[PDF Files in /docs]
+    IngestScript -->|Embed| OpenAIEmb[OpenAI Embeddings]
+    IngestScript -->|Store Vectors| Pinecone[(Pinecone Index)]
+    ChatAPI -->|Retrieve Context| Pinecone
+    ChatAPI -->|Generate Answer| OpenAIChat[OpenAI GPT-4/3.5]
+    ChatAPI -->|Stream Response| User</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is built with Next.js API routes handling the logic. It uses LangChain for orchestrating the LLM calls, document loading, and text splitting. PDFs are parsed using a custom loader, split into chunks, and embedded using OpenAI&#x27;s embedding model. These embeddings are stored in Pinecone. During chat, the system performs similarity search in Pinecone, constructs a prompt with retrieved context, and streams the GPT response back to the client.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant N as Next.js Frontend
+    participant A as API Route (/api/chat)
+    participant P as Pinecone
+    participant O as OpenAI API
+
+    U->>N: Types question
+    N->>A: POST /api/chat {question, history}
+    A->>P: Similarity Search (Query Vector)
+    P-->>A: Relevant Document Chunks
+    A->>O: Send Prompt with Context & Question
+    O-->>A: Stream Token Response
+    A-->>N: Stream SSE Data
+    N-->>U: Display Answer Incrementally</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Developers can use this as a starter template for building document-specific Q&amp;A systems. It demonstrates how to integrate vector databases with LLMs for retrieval-augmented generation (RAG). It can be extended to support other document types, different vector stores, or customized prompting strategies for specific domains.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">PDF Ingestion</span><span class="tag">Vector Embedding</span><span class="tag">Semantic Search</span><span class="tag">LLM Chat</span><span class="tag">Response Streaming</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Next.js Pages/API</span><span class="tag">LangChain Chains</span><span class="tag">Pinecone Vector Store</span><span class="tag">OpenAI Embeddings</span><span class="tag">Custom PDF Loader</span><span class="tag">Text Splitter</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">Next.js</span><span class="tag">LangChain</span><span class="tag">Pinecone</span><span class="tag">OpenAI API</span><span class="tag">pdf-parse</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js</span><span class="tag">pnpm</span><span class="tag">OpenAI Account</span><span class="tag">Pinecone Account</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">OpenAI GPT-4/3.5</span><span class="tag">Pinecone Vector Database</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Retrieval-Augmented Generation (RAG)</span><span class="tag">Server-Sent Events (SSE)</span><span class="tag">Vector Similarity Search</span><span class="tag">Document Chunking</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">chatbot</span><span class="tag">pdf-reader</span><span class="tag">langchain</span><span class="tag">pinecone</span><span class="tag">nextjs</span><span class="tag">rag</span><span class="tag">gpt-4</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: snyk-fix-5a5ef42a83f59f4443a473ac0e2f96da is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-7c46553ef7099121463cba81a41f15bc is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-28dbb577a876d9404497ed46c199ef18 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-34ffa1698dd95f159f42198bfaf16fe3 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-79b3f687cd7013587afc305231d4def7 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-329b91dfc2721a4148c91e17b5fe9969 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-652beb074f795981fea42c52188eb9c3 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-663c2c0aa8114fec8d5c58602477b569 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-6702e65b0a6f60cfea7733c435671776 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-53914d9268ef10423e91899572bf08b6 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-bfd15b69abbbf41d13c53fe19332ba59 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-c6aa98f8554e5160f6ea423b5a6c56c2 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-ca7deed55da1542f99cc5b41589f5b67 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-d2a1d5829f4af58fb7f567a063fff277 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-e6dd33c4adace2fbeee0b487b0f5487d is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-e7989f7417948f18cc973456084763ed is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-ee3bafed9ac13ae731678bd6de88b83d is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-f6a86ed1ddf10e6684d18d881d471a56 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-f71cd867ce3849c9489d4be73be0573d is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-f791a697ef52a3f2c71b355a1aa84bae is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-fix-fe96974d7d232cc7fd75995bc7af19ac is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-upgrade-320a15413493f7bd22ab7ef5c4774c55 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-upgrade-06632b0e09d0ee84fb11a74b232d6f1b is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-upgrade-d66ffc4bb632276d76f49c597edb24af is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: snyk-upgrade-f079a8995c3929137e6cca6184ed0bff is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #25: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141</li><li><strong>open_pr</strong>: PR #24: [Snyk] Security upgrade next from 13.2.3 to 15.5.10</li><li><strong>open_pr</strong>: PR #23: [Snyk] Security upgrade react-markdown from 8.0.5 to 9.0.0</li><li><strong>open_pr</strong>: PR #22: [Snyk] Security upgrade langchain from 0.0.41 to 0.1.29</li><li><strong>open_pr</strong>: PR #21: [Snyk] Security upgrade langchain from 0.0.41 to 0.1.29</li><li><strong>open_pr</strong>: PR #20: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141</li><li><strong>open_pr</strong>: PR #19: [Snyk] Security upgrade next from 13.2.3 to 14.2.32</li><li><strong>open_pr</strong>: PR #18: [Snyk] Security upgrade next from 13.2.3 to 15.2.2</li><li><strong>open_pr</strong>: PR #17: [Snyk] Security upgrade next from 13.2.3 to 14.2.24</li><li><strong>open_pr</strong>: PR #16: [Snyk] Fix for 2 vulnerabilities</li><li><strong>open_pr</strong>: PR #15: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141</li><li><strong>open_pr</strong>: PR #14: [Snyk] Security upgrade next from 13.2.3 to 13.5.8</li><li><strong>open_pr</strong>: PR #13: [Snyk] Security upgrade next from 13.2.3 to 14.2.15</li><li><strong>open_pr</strong>: PR #12: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141</li><li><strong>open_pr</strong>: PR #11: [Snyk] Security upgrade langchain from 0.0.41 to 0.3.3</li><li><strong>open_pr</strong>: PR #10: [Snyk] Security upgrade next from 13.2.3 to 14.2.7</li><li><strong>open_pr</strong>: PR #9: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141</li><li><strong>open_pr</strong>: PR #8: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141</li><li><strong>open_pr</strong>: PR #7: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141</li><li><strong>open_pr</strong>: PR #6: [Snyk] Security upgrade next from 13.2.3 to 13.5.0</li><li><strong>open_pr</strong>: PR #5: [Snyk] Security upgrade next from 13.2.3 to 13.5.4</li><li><strong>open_pr</strong>: PR #4: [Snyk] Upgrade @pinecone-database/pinecone from 0.0.10 to 0.1.6</li><li><strong>open_pr</strong>: PR #3: [Snyk] Upgrade langchain from 0.0.41 to 0.0.123</li><li><strong>open_pr</strong>: PR #2: [Snyk] Upgrade lucide-react from 0.125.0 to 0.263.1</li><li><strong>open_pr</strong>: PR #1: [Snyk] Upgrade next from 13.2.3 to 13.4.12</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:55:21.494155Z ·
+     commit a6075e5 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

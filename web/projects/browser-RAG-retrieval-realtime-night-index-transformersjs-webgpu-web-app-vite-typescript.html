@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browser-Native RAG Retrieval Layer · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Browser-Native RAG Retrieval Layer", "one_liner": "A fully local, WebGPU-accelerated RAG retrieval system that runs embedding and vector search entirely in the browser with zero network calls at query time.", "what_it_is": "This project implements a production-shaped prototype for real-time transcription apps where the retrieval pipeline (embedding generation and vector search) executes locally. It consists of an offline Node.js indexer that builds HNSW artifacts from JSONL transcripts and a Vite-based web application that loads these artifacts into IndexedDB. The browser runtime uses Transformers.js with WebGPU acceleration to compute query embeddings and performs cosine similarity search within a Web Worker, ensuring the main thread remains responsive.", "how_its_built": "The system is split into two distinct phases. First, a Node.js CLI (`indexer-node`) uses `hnswlib-node` and `@xenova/transformers` to validate chunks, generate 384-dimensional embeddings, and construct an HNSW index, exporting binary artifacts. Second, a TypeScript web app (`web-app`) fetches these artifacts, caches them, and initializes a Web Worker. The worker loads the ONNX model via Transformers.js (preferring WebGPU) and handles search requests by computing query embeddings and running brute-force or HNSW-based cosine similarity against the cached vectors.", "how_to_apply": "Use this pattern when building privacy-focused or offline-capable applications requiring semantic search over static datasets (like meeting transcripts or documentation). It eliminates latency and costs associated with hosted embedding APIs and vector databases. The architecture is model-agnostic, allowing you to swap ONNX sentence-transformer models without changing the core retrieval logic.", "quickstart": "git clone https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript.git\ncd browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript\ncd indexer-node && npm install\ncd ../web-app && npm install\ncd ..\ncd indexer-node\nnpm run build-index -- --input ../data --out ../artifacts\ncd ../web-app\nmkdir -p public/artifacts\ncp ../artifacts/* public/artifacts/\nnpm run dev", "features": ["Zero network calls at query time; all retrieval happens locally in the browser", "WebGPU-accelerated embedding inference with automatic WASM fallback", "Offline indexing CLI that generates portable HNSW artifacts from JSONL data", "Web Worker isolation for heavy computation to keep UI responsive", "Model-agnostic design supporting any ONNX sentence-transformer model", "~18ms query latency on Apple Silicon after warmup"], "diagram_architecture": "flowchart TD\n    subgraph Offline_Indexing[\"Offline Indexing (Node.js)\"]\n        JSONL[\"JSONL Chunks\"] --> Validate[\"Validate & Normalize\"]\n        Validate --> Embed[\"Embed (Transformers.js)\"]\n        Embed --> HNSW[\"Build HNSW Index (hnswlib-node)\"]\n        HNSW --> Artifacts[\"Export Artifacts\\n(config, metadata, embeddings.bin, hnsw.index)\"]\n    end\n\n    subgraph Browser_Runtime[\"Browser Runtime (Vite + TS)\"]\n        MainThread[\"Main Thread: UI & Transcript\"]\n        Worker[\"Web Worker\"]\n        \n        Artifacts -->|Load & Cache| IndexedDB[(\"IndexedDB\")]\n        IndexedDB -->|Fetch| Worker\n        \n        MainThread -->|Query Text| Worker\n        Worker -->|Load Model| TransformersJS[\"Transformers.js\\n(WebGPU/WASM)\"]\n        TransformersJS -->|Query Embedding| Search[\"Cosine Search\"]\n        Search -->|Results| MainThread\n    end\n\n    Offline_Indexing -->|Artifacts Directory| Browser_Runtime", "diagram_sequence": "sequenceDiagram\n    participant User as User\n    participant UI as Main Thread (UI)\n    participant Worker as Search Worker\n    participant DB as IndexedDB\n    participant Model as Transformers.js (WebGPU)\n\n    Note over UI, DB: Initialization Phase\n    UI->>Worker: Post 'init' message with artifacts URL\n    Worker->>DB: Fetch artifacts (config, metadata, embeddings, index)\n    DB-->>Worker: Return cached artifacts\n    Worker->>Model: Load ONNX model\n    Model-->>Worker: Model ready\n    Worker-->>UI: Post 'ready' message\n\n    Note over UI, Model: Query Phase\n    User->>UI: Type query & click Search\n    UI->>Worker: Post 'search' message (query, topK, requestId)\n    Worker->>Model: Compute embedding for query\n    Model-->>Worker: Return query vector\n    Worker->>Worker: Perform cosine similarity search\n    Worker-->>UI: Post 'results' message (matches, latency)\n    UI->>User: Display search results", "capabilities": ["Local Semantic Search", "WebGPU Acceleration", "Offline Indexing", "HNSW Approximate Nearest Neighbor", "Web Worker Concurrency", "IndexedDB Caching"], "components": ["indexer-node (CLI)", "web-app (Vite Frontend)", "Search Worker", "Embedding Pipeline", "Artifact Exporter"], "tech": ["TypeScript", "Vite", "Transformers.js", "hnswlib-node", "WebGPU", "ONNX Runtime", "IndexedDB"], "depends_on": ["Node.js 20+", "Chrome 120+ (for WebGPU)", "npm 10+"], "integrates_with": ["LLM Generation Models (downstream)", "Real-time Transcription Streams"], "patterns": ["Retrieval-Augmented Generation (RAG)", "Offline-First Architecture", "Worker-Based Computation", "Model Quantization", "Vector Similarity Search"], "reuse_tags": ["browser-native", "rag-retrieval", "webgpu", "transformers-js", "hnsw", "offline-search", "typescript", "vite"], "slug": "browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript", "repo_url": "https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/indexer-node/npm_and_yarn-3fc7e1cf9b is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web-app/rollup-4.60.4 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #4: Bump rollup from 4.57.1 to 4.60.4 in /web-app"}, {"kind": "open_pr", "detail": "PR #3: Bump the npm_and_yarn group across 2 directories with 5 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript/main/docs/full-demo.png", "generated_at": "2026-06-14T02:29:39.749353Z", "source_commit": "2de04ad", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Browser-Native RAG Retrieval Layer",
+  "description": "A fully local, WebGPU-accelerated RAG retrieval system that runs embedding and vector search entirely in the browser with zero network calls at query time.",
+  "codeRepository": "https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript",
+  "programmingLanguage": [
+    "TypeScript",
+    "Vite",
+    "Transformers.js",
+    "hnswlib-node",
+    "WebGPU",
+    "ONNX Runtime",
+    "IndexedDB"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Browser-Native RAG Retrieval Layer</h1>
+  <p class="one-liner">A fully local, WebGPU-accelerated RAG retrieval system that runs embedding and vector search entirely in the browser with zero network calls at query time.</p>
+  <p><a href="https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript">https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript/main/docs/full-demo.png" alt="Browser-Native RAG Retrieval Layer screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>This project implements a production-shaped prototype for real-time transcription apps where the retrieval pipeline (embedding generation and vector search) executes locally. It consists of an offline Node.js indexer that builds HNSW artifacts from JSONL transcripts and a Vite-based web application that loads these artifacts into IndexedDB. The browser runtime uses Transformers.js with WebGPU acceleration to compute query embeddings and performs cosine similarity search within a Web Worker, ensuring the main thread remains responsive.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Zero network calls at query time; all retrieval happens locally in the browser</li><li>WebGPU-accelerated embedding inference with automatic WASM fallback</li><li>Offline indexing CLI that generates portable HNSW artifacts from JSONL data</li><li>Web Worker isolation for heavy computation to keep UI responsive</li><li>Model-agnostic design supporting any ONNX sentence-transformer model</li><li>~18ms query latency on Apple Silicon after warmup</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript.git
+cd browser-RAG-retrieval-realtime-night-index-transformersjs-webgpu-web-app-vite-typescript
+cd indexer-node &amp;&amp; npm install
+cd ../web-app &amp;&amp; npm install
+cd ..
+cd indexer-node
+npm run build-index -- --input ../data --out ../artifacts
+cd ../web-app
+mkdir -p public/artifacts
+cp ../artifacts/* public/artifacts/
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph Offline_Indexing["Offline Indexing (Node.js)"]
+        JSONL["JSONL Chunks"] --> Validate["Validate & Normalize"]
+        Validate --> Embed["Embed (Transformers.js)"]
+        Embed --> HNSW["Build HNSW Index (hnswlib-node)"]
+        HNSW --> Artifacts["Export Artifacts\n(config, metadata, embeddings.bin, hnsw.index)"]
+    end
+
+    subgraph Browser_Runtime["Browser Runtime (Vite + TS)"]
+        MainThread["Main Thread: UI & Transcript"]
+        Worker["Web Worker"]
+        
+        Artifacts -->|Load & Cache| IndexedDB[("IndexedDB")]
+        IndexedDB -->|Fetch| Worker
+        
+        MainThread -->|Query Text| Worker
+        Worker -->|Load Model| TransformersJS["Transformers.js\n(WebGPU/WASM)"]
+        TransformersJS -->|Query Embedding| Search["Cosine Search"]
+        Search -->|Results| MainThread
+    end
+
+    Offline_Indexing -->|Artifacts Directory| Browser_Runtime</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The system is split into two distinct phases. First, a Node.js CLI (`indexer-node`) uses `hnswlib-node` and `@xenova/transformers` to validate chunks, generate 384-dimensional embeddings, and construct an HNSW index, exporting binary artifacts. Second, a TypeScript web app (`web-app`) fetches these artifacts, caches them, and initializes a Web Worker. The worker loads the ONNX model via Transformers.js (preferring WebGPU) and handles search requests by computing query embeddings and running brute-force or HNSW-based cosine similarity against the cached vectors.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as User
+    participant UI as Main Thread (UI)
+    participant Worker as Search Worker
+    participant DB as IndexedDB
+    participant Model as Transformers.js (WebGPU)
+
+    Note over UI, DB: Initialization Phase
+    UI->>Worker: Post 'init' message with artifacts URL
+    Worker->>DB: Fetch artifacts (config, metadata, embeddings, index)
+    DB-->>Worker: Return cached artifacts
+    Worker->>Model: Load ONNX model
+    Model-->>Worker: Model ready
+    Worker-->>UI: Post 'ready' message
+
+    Note over UI, Model: Query Phase
+    User->>UI: Type query & click Search
+    UI->>Worker: Post 'search' message (query, topK, requestId)
+    Worker->>Model: Compute embedding for query
+    Model-->>Worker: Return query vector
+    Worker->>Worker: Perform cosine similarity search
+    Worker-->>UI: Post 'results' message (matches, latency)
+    UI->>User: Display search results</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this pattern when building privacy-focused or offline-capable applications requiring semantic search over static datasets (like meeting transcripts or documentation). It eliminates latency and costs associated with hosted embedding APIs and vector databases. The architecture is model-agnostic, allowing you to swap ONNX sentence-transformer models without changing the core retrieval logic.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Local Semantic Search</span><span class="tag">WebGPU Acceleration</span><span class="tag">Offline Indexing</span><span class="tag">HNSW Approximate Nearest Neighbor</span><span class="tag">Web Worker Concurrency</span><span class="tag">IndexedDB Caching</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">indexer-node (CLI)</span><span class="tag">web-app (Vite Frontend)</span><span class="tag">Search Worker</span><span class="tag">Embedding Pipeline</span><span class="tag">Artifact Exporter</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">Vite</span><span class="tag">Transformers.js</span><span class="tag">hnswlib-node</span><span class="tag">WebGPU</span><span class="tag">ONNX Runtime</span><span class="tag">IndexedDB</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js 20+</span><span class="tag">Chrome 120+ (for WebGPU)</span><span class="tag">npm 10+</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">LLM Generation Models (downstream)</span><span class="tag">Real-time Transcription Streams</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Retrieval-Augmented Generation (RAG)</span><span class="tag">Offline-First Architecture</span><span class="tag">Worker-Based Computation</span><span class="tag">Model Quantization</span><span class="tag">Vector Similarity Search</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">browser-native</span><span class="tag">rag-retrieval</span><span class="tag">webgpu</span><span class="tag">transformers-js</span><span class="tag">hnsw</span><span class="tag">offline-search</span><span class="tag">typescript</span><span class="tag">vite</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/indexer-node/npm_and_yarn-3fc7e1cf9b is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web-app/rollup-4.60.4 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #4: Bump rollup from 4.57.1 to 4.60.4 in /web-app</li><li><strong>open_pr</strong>: PR #3: Bump the npm_and_yarn group across 2 directories with 5 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:29:39.749353Z ·
+     commit 2de04ad ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

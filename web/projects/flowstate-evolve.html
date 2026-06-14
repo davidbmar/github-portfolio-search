@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>flowstate-evolve · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "flowstate-evolve", "one_liner": "Analyzes Flowstate workflow traces to recommend graph improvements and generate auditable before/after reports.", "what_it_is": "A Python analysis tool that ingests scored execution traces from Flowstate-based agents, identifies state-level failures and regressions, and recommends specific graph modifications (such as splitting states or adding guards) without auto-promoting changes.", "how_its_built": "Built in Python using a src-layout. It uses `yaml` to parse workflow definitions and `json` for trace data. The core logic resides in `analyzer.py` for evidence grouping and action recommendation, `compare.py` for metric diffing, and `evidence.py` for normalizing external pass files into a standard JSONL contract. CLI entry points are managed via `argparse` in `cli.py`.", "how_to_apply": "Use this package after running a Flowstate agent (like phone-agent-scheduler) to generate evaluation passes. Run the import command to normalize raw pass JSONs into evidence JSONL, then run the analyze command against your workflow YAML to get a report of recommended changes and a candidate YAML file.", "quickstart": "cd ~/src/flowstate-evolve\npython3 -m venv .venv\n.venv/bin/python -m pip install -e \".[dev]\"\n.venv/bin/flowstate-evolve --help", "features": ["Converts scored workflow traces into state-level evidence groups", "Detects repeated failures, regressions, and response smells", "Recommends actions: refine_state, add_guard, split_state, merge_states", "Generates auditable old-vs-new scorecard comparisons", "Produces candidate YAML files with evolution metadata"], "diagram_architecture": "flowchart TD\n    A[Flowstate Core Runtime] -->|Executes YAML Flows| B(Reference App e.g. phone-agent-scheduler)\n    B -->|Exports Scored Pass JSON| C{flowstate-evolve CLI}\n    C -->|import-phone-pass| D[Evidence Normalizer]\n    D -->|Writes JSONL| E[(Evidence Store)]\n    C -->|analyze| F[Analyzer Engine]\n    F -->|Reads| A\n    F -->|Reads| E\n    F -->|Generates| G[State Evolution Report]\n    F -->|Generates| H[Candidate YAML]\n    C -->|compare| I[Compare Engine]\n    I -->|Reads| J[Old Pass JSON]\n    I -->|Reads| K[New Pass JSON]\n    I -->|Outputs| L[Scorecard Diff]", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant CLI as flowstate-evolve CLI\n    participant Analyzer as analyzer.py\n    participant Evidence as evidence.py\n    participant FS as Flowstate YAML\n\n    User->>CLI: run analyze --flow flow.yaml --passes ./data\n    CLI->>Evidence: phone_pass_to_evidence(pass_files)\n    Evidence-->>CLI: normalized JSONL records\n    CLI->>Analyzer: analyze(flow_yaml, evidence_records)\n    Analyzer->>FS: parse workflow structure\n    Analyzer->>Analyzer: group evidence by state/transition\n    Analyzer->>Analyzer: detect smells & fact tags\n    Analyzer->>Analyzer: recommend actions (split/merge/guard)\n    Analyzer-->>CLI: state_evolution_report.json\n    Analyzer-->>CLI: flow.candidate.yaml\n    CLI-->>User: output files written", "capabilities": ["Trace normalization", "State-level evidence grouping", "Failure pattern detection", "Graph change recommendation", "Metric comparison", "Candidate generation"], "components": ["analyzer.py", "compare.py", "evidence.py", "cli.py", "dashboard/state_evolution.html"], "tech": ["Python", "PyYAML", "JSONL", "Argparse", "Pytest"], "depends_on": ["flowstate", "phone-agent-scheduler (reference data)"], "integrates_with": ["Flowstate runtime", "Phone Agent Scheduler", "Static HTML Dashboard"], "patterns": ["Human-in-the-loop promotion", "Evidence-based refactoring", "Immutable candidate generation", "Normalization layer"], "reuse_tags": ["workflow-analysis", "llm-ops", "graph-evolution", "evaluation-tooling"], "slug": "flowstate-evolve", "repo_url": "https://github.com/davidbmar/flowstate-evolve", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:52:24.682709Z", "source_commit": "6f0a088", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "flowstate-evolve",
+  "description": "Analyzes Flowstate workflow traces to recommend graph improvements and generate auditable before/after reports.",
+  "codeRepository": "https://github.com/davidbmar/flowstate-evolve",
+  "programmingLanguage": [
+    "Python",
+    "PyYAML",
+    "JSONL",
+    "Argparse",
+    "Pytest"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>flowstate-evolve</h1>
+  <p class="one-liner">Analyzes Flowstate workflow traces to recommend graph improvements and generate auditable before/after reports.</p>
+  <p><a href="https://github.com/davidbmar/flowstate-evolve">https://github.com/davidbmar/flowstate-evolve</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A Python analysis tool that ingests scored execution traces from Flowstate-based agents, identifies state-level failures and regressions, and recommends specific graph modifications (such as splitting states or adding guards) without auto-promoting changes.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Converts scored workflow traces into state-level evidence groups</li><li>Detects repeated failures, regressions, and response smells</li><li>Recommends actions: refine_state, add_guard, split_state, merge_states</li><li>Generates auditable old-vs-new scorecard comparisons</li><li>Produces candidate YAML files with evolution metadata</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">cd ~/src/flowstate-evolve
+python3 -m venv .venv
+.venv/bin/python -m pip install -e &quot;.[dev]&quot;
+.venv/bin/flowstate-evolve --help</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    A[Flowstate Core Runtime] -->|Executes YAML Flows| B(Reference App e.g. phone-agent-scheduler)
+    B -->|Exports Scored Pass JSON| C{flowstate-evolve CLI}
+    C -->|import-phone-pass| D[Evidence Normalizer]
+    D -->|Writes JSONL| E[(Evidence Store)]
+    C -->|analyze| F[Analyzer Engine]
+    F -->|Reads| A
+    F -->|Reads| E
+    F -->|Generates| G[State Evolution Report]
+    F -->|Generates| H[Candidate YAML]
+    C -->|compare| I[Compare Engine]
+    I -->|Reads| J[Old Pass JSON]
+    I -->|Reads| K[New Pass JSON]
+    I -->|Outputs| L[Scorecard Diff]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built in Python using a src-layout. It uses `yaml` to parse workflow definitions and `json` for trace data. The core logic resides in `analyzer.py` for evidence grouping and action recommendation, `compare.py` for metric diffing, and `evidence.py` for normalizing external pass files into a standard JSONL contract. CLI entry points are managed via `argparse` in `cli.py`.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant CLI as flowstate-evolve CLI
+    participant Analyzer as analyzer.py
+    participant Evidence as evidence.py
+    participant FS as Flowstate YAML
+
+    User->>CLI: run analyze --flow flow.yaml --passes ./data
+    CLI->>Evidence: phone_pass_to_evidence(pass_files)
+    Evidence-->>CLI: normalized JSONL records
+    CLI->>Analyzer: analyze(flow_yaml, evidence_records)
+    Analyzer->>FS: parse workflow structure
+    Analyzer->>Analyzer: group evidence by state/transition
+    Analyzer->>Analyzer: detect smells & fact tags
+    Analyzer->>Analyzer: recommend actions (split/merge/guard)
+    Analyzer-->>CLI: state_evolution_report.json
+    Analyzer-->>CLI: flow.candidate.yaml
+    CLI-->>User: output files written</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this package after running a Flowstate agent (like phone-agent-scheduler) to generate evaluation passes. Run the import command to normalize raw pass JSONs into evidence JSONL, then run the analyze command against your workflow YAML to get a report of recommended changes and a candidate YAML file.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Trace normalization</span><span class="tag">State-level evidence grouping</span><span class="tag">Failure pattern detection</span><span class="tag">Graph change recommendation</span><span class="tag">Metric comparison</span><span class="tag">Candidate generation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">analyzer.py</span><span class="tag">compare.py</span><span class="tag">evidence.py</span><span class="tag">cli.py</span><span class="tag">dashboard/state_evolution.html</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">PyYAML</span><span class="tag">JSONL</span><span class="tag">Argparse</span><span class="tag">Pytest</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">flowstate</span><span class="tag">phone-agent-scheduler (reference data)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Flowstate runtime</span><span class="tag">Phone Agent Scheduler</span><span class="tag">Static HTML Dashboard</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Human-in-the-loop promotion</span><span class="tag">Evidence-based refactoring</span><span class="tag">Immutable candidate generation</span><span class="tag">Normalization layer</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">workflow-analysis</span><span class="tag">llm-ops</span><span class="tag">graph-evolution</span><span class="tag">evaluation-tooling</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:52:24.682709Z ·
+     commit 6f0a088 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

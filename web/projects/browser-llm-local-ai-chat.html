@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>browser-llm-local-ai-chat · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "browser-llm-local-ai-chat", "one_liner": "A zero-build, vanilla JS browser chat interface supporting Ollama, OpenAI, Anthropic, and in-browser WebGPU/WASM inference.", "what_it_is": "A lightweight, privacy-focused AI chat client that runs entirely in the browser without a build step. It supports multiple inference backends including local Ollama instances, cloud providers (OpenAI/Anthropic), and client-side models via WebLLM or Wllama. The application features a robust tool-calling framework, file analysis capabilities for CSV/TSV data, and conversation export options, all managed through a responsive UI with persistent local settings.", "how_its_built": "Built with vanilla JavaScript ES modules, requiring no framework or bundler for the core web app. It uses an adapter pattern via a ProviderRegistry to normalize interactions with different LLM APIs. Inference is handled by async generators for streaming tokens. The desktop version wraps the web app in Electron, managing a bundled Ollama binary via child processes. State is persisted in localStorage, and security is maintained through context isolation in Electron and XSS-safe DOM rendering.", "how_to_apply": "Clone the repository and serve the static files using a simple HTTP server (e.g., Python's http.server). Connect to a local Ollama instance (ensuring CORS is enabled) or select the in-browser backend to run models directly on the client's GPU/CPU. For desktop usage, install dependencies and run via Electron, which bundles the Ollama binary for a seamless offline experience.", "quickstart": "git clone https://github.com/davidbmar/browser-llm-local-ai-chat.git\ncd browser-llm-local-ai-chat\npython3 -m http.server 8000", "features": ["Multi-backend support: Ollama, OpenAI, Anthropic, and in-browser WebGPU/WASM", "Extensible tool-calling framework with approval controls and prompt-based fallbacks", "File attachment and analysis for CSV/TSV with automatic statistical detection", "Real-time token streaming with performance metrics and timing stats", "Privacy mode restricting connections to local-only backends", "Conversation export to PDF, RTF, Markdown, and HTML"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|Interacts| UI[index.html / js/app.js]\n    UI -->|Manages State| Settings[lib/inference/settings-store.js]\n    UI -->|Requests Inference| Client[lib/inference/inference-client.js]\n    Client -->|Routes To| Registry[lib/inference/provider-registry.js]\n    Registry -->|Adapter| Ollama[providers/ollama.js]\n    Registry -->|Adapter| OpenAI[providers/openai.js]\n    Registry -->|Adapter| Anthropic[providers/anthropic.js]\n    Registry -->|Adapter| InBrowser[providers/in-browser.js]\n    InBrowser -->|WebGPU| WebLLM[engines/webllm]\n    InBrowser -->|WASM| Wllama[engines/wllama]\n    Ollama -->|HTTP| LocalOllama[Local Ollama Instance]\n    OpenAI -->|HTTPS| CloudOpenAI[OpenAI API]\n    Anthropic -->|HTTPS| CloudAnthropic[Anthropic API]\n    UI -->|Processes| FileProc[lib/file-processing/*]\n    UI -->|Executes| Tools[js/tool-calling.js]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant App as js/app.js\n    participant Gen as js/generate.js\n    participant Client as lib/inference/inference-client.js\n    participant Prov as Provider Adapter\n    participant Model as LLM Backend\n\n    U->>App: Click Send Message\n    App->>Gen: generate(messages, options)\n    Gen->>Client: streamResponse(providerId, payload)\n    Client->>Prov: createCompletion(payload)\n    Prov->>Model: POST /chat/completions\n    loop Streaming Tokens\n        Model-->>Prov: Token Chunk\n        Prov-->>Client: Yield Chunk\n        Client-->>Gen: Yield Chunk\n        Gen->>App: Update UI with Token\n    end\n    Gen->>App: Finalize Response\n    App->>U: Display Full Message", "capabilities": ["Multi-provider LLM inference", "Client-side model execution", "Tool use and function calling", "Tabular file analysis", "Conversation persistence", "Desktop app bundling"], "components": ["js/app.js", "js/generate.js", "js/chat.js", "js/tool-calling.js", "lib/inference/provider-registry.js", "lib/inference/inference-client.js", "desktop/main.js", "desktop/ollama-manager.js"], "tech": ["JavaScript", "ES Modules", "WebGPU", "WebAssembly", "Electron", "HTML5", "CSS3"], "depends_on": ["Ollama (optional)", "Python 3 (for local serving)", "Node.js (for Electron build)"], "integrates_with": ["Ollama API", "OpenAI API", "Anthropic API", "WebLLM", "Wllama"], "patterns": ["Adapter Pattern", "Observer Pattern (Event Listeners)", "Singleton (Settings Store)", "Async Generator (Streaming)", "Context Isolation (Electron)"], "reuse_tags": ["ai-chat", "local-llm", "webgpu", "vanilla-js", "electron-app", "privacy-focused"], "slug": "browser-llm-local-ai-chat", "repo_url": "https://github.com/davidbmar/browser-llm-local-ai-chat", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:28:32.881224Z", "source_commit": "df7853e", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "browser-llm-local-ai-chat",
+  "description": "A zero-build, vanilla JS browser chat interface supporting Ollama, OpenAI, Anthropic, and in-browser WebGPU/WASM inference.",
+  "codeRepository": "https://github.com/davidbmar/browser-llm-local-ai-chat",
+  "programmingLanguage": [
+    "JavaScript",
+    "ES Modules",
+    "WebGPU",
+    "WebAssembly",
+    "Electron",
+    "HTML5",
+    "CSS3"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>browser-llm-local-ai-chat</h1>
+  <p class="one-liner">A zero-build, vanilla JS browser chat interface supporting Ollama, OpenAI, Anthropic, and in-browser WebGPU/WASM inference.</p>
+  <p><a href="https://github.com/davidbmar/browser-llm-local-ai-chat">https://github.com/davidbmar/browser-llm-local-ai-chat</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A lightweight, privacy-focused AI chat client that runs entirely in the browser without a build step. It supports multiple inference backends including local Ollama instances, cloud providers (OpenAI/Anthropic), and client-side models via WebLLM or Wllama. The application features a robust tool-calling framework, file analysis capabilities for CSV/TSV data, and conversation export options, all managed through a responsive UI with persistent local settings.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Multi-backend support: Ollama, OpenAI, Anthropic, and in-browser WebGPU/WASM</li><li>Extensible tool-calling framework with approval controls and prompt-based fallbacks</li><li>File attachment and analysis for CSV/TSV with automatic statistical detection</li><li>Real-time token streaming with performance metrics and timing stats</li><li>Privacy mode restricting connections to local-only backends</li><li>Conversation export to PDF, RTF, Markdown, and HTML</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/browser-llm-local-ai-chat.git
+cd browser-llm-local-ai-chat
+python3 -m http.server 8000</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|Interacts| UI[index.html / js/app.js]
+    UI -->|Manages State| Settings[lib/inference/settings-store.js]
+    UI -->|Requests Inference| Client[lib/inference/inference-client.js]
+    Client -->|Routes To| Registry[lib/inference/provider-registry.js]
+    Registry -->|Adapter| Ollama[providers/ollama.js]
+    Registry -->|Adapter| OpenAI[providers/openai.js]
+    Registry -->|Adapter| Anthropic[providers/anthropic.js]
+    Registry -->|Adapter| InBrowser[providers/in-browser.js]
+    InBrowser -->|WebGPU| WebLLM[engines/webllm]
+    InBrowser -->|WASM| Wllama[engines/wllama]
+    Ollama -->|HTTP| LocalOllama[Local Ollama Instance]
+    OpenAI -->|HTTPS| CloudOpenAI[OpenAI API]
+    Anthropic -->|HTTPS| CloudAnthropic[Anthropic API]
+    UI -->|Processes| FileProc[lib/file-processing/*]
+    UI -->|Executes| Tools[js/tool-calling.js]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with vanilla JavaScript ES modules, requiring no framework or bundler for the core web app. It uses an adapter pattern via a ProviderRegistry to normalize interactions with different LLM APIs. Inference is handled by async generators for streaming tokens. The desktop version wraps the web app in Electron, managing a bundled Ollama binary via child processes. State is persisted in localStorage, and security is maintained through context isolation in Electron and XSS-safe DOM rendering.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant App as js/app.js
+    participant Gen as js/generate.js
+    participant Client as lib/inference/inference-client.js
+    participant Prov as Provider Adapter
+    participant Model as LLM Backend
+
+    U->>App: Click Send Message
+    App->>Gen: generate(messages, options)
+    Gen->>Client: streamResponse(providerId, payload)
+    Client->>Prov: createCompletion(payload)
+    Prov->>Model: POST /chat/completions
+    loop Streaming Tokens
+        Model-->>Prov: Token Chunk
+        Prov-->>Client: Yield Chunk
+        Client-->>Gen: Yield Chunk
+        Gen->>App: Update UI with Token
+    end
+    Gen->>App: Finalize Response
+    App->>U: Display Full Message</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Clone the repository and serve the static files using a simple HTTP server (e.g., Python&#x27;s http.server). Connect to a local Ollama instance (ensuring CORS is enabled) or select the in-browser backend to run models directly on the client&#x27;s GPU/CPU. For desktop usage, install dependencies and run via Electron, which bundles the Ollama binary for a seamless offline experience.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Multi-provider LLM inference</span><span class="tag">Client-side model execution</span><span class="tag">Tool use and function calling</span><span class="tag">Tabular file analysis</span><span class="tag">Conversation persistence</span><span class="tag">Desktop app bundling</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">js/app.js</span><span class="tag">js/generate.js</span><span class="tag">js/chat.js</span><span class="tag">js/tool-calling.js</span><span class="tag">lib/inference/provider-registry.js</span><span class="tag">lib/inference/inference-client.js</span><span class="tag">desktop/main.js</span><span class="tag">desktop/ollama-manager.js</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">JavaScript</span><span class="tag">ES Modules</span><span class="tag">WebGPU</span><span class="tag">WebAssembly</span><span class="tag">Electron</span><span class="tag">HTML5</span><span class="tag">CSS3</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Ollama (optional)</span><span class="tag">Python 3 (for local serving)</span><span class="tag">Node.js (for Electron build)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Ollama API</span><span class="tag">OpenAI API</span><span class="tag">Anthropic API</span><span class="tag">WebLLM</span><span class="tag">Wllama</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Adapter Pattern</span><span class="tag">Observer Pattern (Event Listeners)</span><span class="tag">Singleton (Settings Store)</span><span class="tag">Async Generator (Streaming)</span><span class="tag">Context Isolation (Electron)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">ai-chat</span><span class="tag">local-llm</span><span class="tag">webgpu</span><span class="tag">vanilla-js</span><span class="tag">electron-app</span><span class="tag">privacy-focused</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:28:32.881224Z ·
+     commit df7853e ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

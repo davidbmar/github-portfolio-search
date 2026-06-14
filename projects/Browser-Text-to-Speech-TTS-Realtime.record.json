@@ -1,0 +1,271 @@
+{
+  "title": "Browser-Text-to-Speech-TTS-Realtime",
+  "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+  "what_it_is": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It utilizes VITS neural TTS models compiled to WebAssembly via ONNX Runtime, eliminating the need for server-side API calls. It features streaming playback where audio begins as soon as the first sentence is synthesized, multi-core processing via WebAssembly threads, and offline support through browser caching.",
+  "how_its_built": "The application is built with React 18 and TypeScript, bundled with Vite. The core inference engine relies on @diffusionstudio/vits-web, which wraps ONNX Runtime Web. Audio playback is managed via standard HTML5 Audio APIs, while state management for chunk generation and playback status is handled by a custom TTSEngine class and the useTTS React hook. UI components are styled with Tailwind CSS and shadcn/ui.",
+  "how_to_apply": "Integrate the useTTS hook into any React component to enable local voice synthesis. It is suitable for privacy-sensitive applications requiring offline capability, accessibility tools needing natural-sounding voices without cloud dependencies, or educational platforms wanting to reduce API costs. Developers can customize voice IDs, speed, and concurrency limits via the hook's options.",
+  "quickstart": "git clone https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime.git\ncd Browser-Text-to-Speech-TTS-Realtime\nnpm install\nnpm run dev",
+  "features": [
+    "100% client-side processing using WebAssembly and ONNX",
+    "Streaming playback: audio starts while remaining text generates",
+    "Multi-core parallel generation using WebAssembly threads",
+    "8 built-in neural voices (English, German, French, Spanish)",
+    "Offline support with automatic model caching in IndexedDB",
+    "Privacy-first architecture with no external data transmission"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Interface] -->|Input Text| Hook[useTTS Hook]\n    Hook -->|Manage State| Engine[TTSEngine Class]\n    Engine -->|Split Text| Splitter[Sentence Splitter]\n    Splitter -->|Queue Sentences| Generator[Audio Generator]\n    Generator -->|Load Model| WASM[VITS WebAssembly Module]\n    WASM -->|Inference| ONNX[ONNX Runtime Web]\n    Generator -->|Audio Blob| Player[HTML5 Audio Player]\n    Player -->|Playback Events| Hook\n    WASM -->|Cache| IDB[(IndexedDB)]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant H as useTTS Hook\n    participant E as TTSEngine\n    participant W as VITS WASM\n    participant A as Audio Element\n\n    U->>H: speak(text)\n    H->>E: processText(text)\n    E->>E: splitIntoSentences()\n    loop For each sentence\n        E->>W: generateAudio(sentence)\n        W->>W: ONNX Inference\n        W-->>E: return Audio Blob\n        E->>E: updateChunkStatus(ready)\n    end\n    E->>A: play(firstChunk)\n    A-->>H: onplay/onended events\n    H-->>U: update UI state",
+  "capabilities": [
+    "Neural TTS Inference",
+    "WebAssembly Execution",
+    "Streaming Audio Playback",
+    "Offline Model Caching",
+    "Multi-threaded Processing"
+  ],
+  "components": [
+    "useTTS Hook",
+    "TTSEngine Class",
+    "VITS WebAssembly Module",
+    "Sentence Splitter",
+    "Audio Player Manager"
+  ],
+  "tech": [
+    "TypeScript",
+    "React 18",
+    "Vite",
+    "ONNX Runtime Web",
+    "WebAssembly",
+    "Tailwind CSS",
+    "shadcn/ui"
+  ],
+  "depends_on": [
+    "@diffusionstudio/vits-web",
+    "onnxruntime-web",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "integrates_with": [
+    "Browser IndexedDB",
+    "HTML5 Audio API",
+    "Web Workers"
+  ],
+  "patterns": [
+    "Custom React Hook",
+    "Class-based Engine",
+    "Streaming Data Processing",
+    "Lazy Loading Models",
+    "State Management via Callbacks"
+  ],
+  "reuse_tags": [
+    "tts",
+    "webassembly",
+    "onnx",
+    "react-hook",
+    "offline-first",
+    "privacy-focused"
+  ],
+  "slug": "Browser-Text-to-Speech-TTS-Realtime",
+  "repo_url": "https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/github_actions/actions/checkout-6 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/github_actions/actions/setup-node-6 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/brace-expansion-2.1.1 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/development-dependencies-2c25b48037 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/drizzle-orm-0.45.2 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/hookform/resolvers-5.2.2 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/lodash-4.18.1 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/minimatch-9.0.9 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/multi-bf05dc1ecf is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/path-to-regexp-8.4.2 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/production-dependencies-6c6f35f648 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/protobufjs/utf8-1.1.1 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/protobufjs-7.6.1 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/qs-6.15.2 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/radix-ui/react-checkbox-1.3.3 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/radix-ui/react-switch-1.2.6 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/react-hook-form-7.71.1 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/rollup-4.60.4 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/tailwind-merge-3.4.0 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/tanstack/react-query-5.90.20 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/tw-animate-css-1.4.0 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/vite-7.3.3 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/ws-8.20.1 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/yaml-2.9.0 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #35: Bump the production-dependencies group across 1 directory with 22 updates"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #34: Bump ws from 8.18.0 to 8.20.1"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #33: Bump brace-expansion from 2.0.2 to 2.1.1"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #32: Bump qs from 6.14.1 to 6.15.2"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #31: Bump rollup from 4.53.5 to 4.60.4"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #30: Bump protobufjs from 7.5.4 to 7.6.1"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #29: Bump @protobufjs/utf8 from 1.1.0 to 1.1.1"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #28: Bump picomatch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #27: Bump lodash from 4.17.23 to 4.18.1"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #25: Bump vite from 7.3.0 to 7.3.3"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #24: Bump path-to-regexp from 8.3.0 to 8.4.2"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #23: Bump minimatch from 9.0.5 to 9.0.9"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #21: Bump yaml from 2.6.0 to 2.9.0"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #18: Bump drizzle-orm from 0.39.3 to 0.45.2"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #16: Bump the development-dependencies group across 1 directory with 10 updates"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #11: Bump @tanstack/react-query from 5.60.5 to 5.90.20"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #10: Bump react-hook-form from 7.55.0 to 7.71.1"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #9: Bump tw-animate-css from 1.2.5 to 1.4.0"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #8: Bump @hookform/resolvers from 3.10.0 to 5.2.2"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #7: Bump tailwind-merge from 2.6.0 to 3.4.0"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #6: Bump @radix-ui/react-checkbox from 1.1.5 to 1.3.3"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #5: Bump @radix-ui/react-switch from 1.1.4 to 1.2.6"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: Bump actions/setup-node from 4 to 6"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump actions/checkout from 4 to 6"
+    }
+  ],
+  "screenshot_url": "https://raw.githubusercontent.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime/main/UI_Picture.png",
+  "generated_at": "2026-06-14T02:30:51.020222Z",
+  "source_commit": "c46fbe9",
+  "model": "qwen3.7-plus"
+}

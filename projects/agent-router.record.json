@@ -1,0 +1,118 @@
+{
+  "title": "Agent Router",
+  "one_liner": "A federated, multi-agent cockpit that spawns Gemini, Claude, and Codex in real PTYs and bridges them to a browser workspace.",
+  "what_it_is": "Agent Router is a local-first control plane for running multiple AI coding agents simultaneously. It isolates each agent (Gemini CLI, Claude Code, Codex) in its own pseudo-terminal (PTY) on the host machine, streams the output to a web-based terminal via WebSockets, and allows users to inject prompts or switch between agents seamlessly. It supports federation, allowing multiple router instances on different machines to share session visibility and prompt injection capabilities over HTTP.",
+  "how_its_built": "The backend is built with FastAPI and uvicorn, using the `ptyprocess` library to manage real PTY sessions for each agent. A background thread reads PTY output into a deque buffer for history replay. The frontend is a zero-build static HTML application using xterm.js for terminal emulation, xterm-addon-fit for resizing, and SortableJS for draggable tabs. Federation is handled via HTTP APIs and peer discovery mechanisms including mDNS, Tailscale, and gossip protocols.",
+  "how_to_apply": "Use Agent Router when you need to run multiple AI coding agents in parallel without context switching between terminal windows. It is ideal for coordinating complex tasks where one agent might handle backend logic while another handles frontend updates, or when you want to maintain persistent, 'warm' agent sessions that retain history across browser refreshes. The federation features allow scaling across multiple machines for heavy workloads.",
+  "quickstart": "python3 -m venv .venv\nsource .venv/bin/activate\npip install fastapi uvicorn websockets ptyprocess pydantic\npython3 server.py",
+  "features": [
+    "Multi-Terminal Workspace: Spawn and manage multiple agent instances in draggable browser tabs.",
+    "Real PTY Isolation: Each agent runs in a genuine pseudo-terminal with full interactive support.",
+    "Federated Architecture: Merge sessions and inject prompts across multiple machines via HTTP/WebSocket.",
+    "Stateful Persistence: Agents remain warm in the background; switching tabs re-attaches to live PTYs.",
+    "Vision API: REST endpoints allow agents to read screen buffers and inject prompts into other sessions.",
+    "Auto-Discovery: Peers are automatically discovered via mDNS, Tailscale, or manual configuration."
+  ],
+  "diagram_architecture": "flowchart TD\n    User[Browser User] -->|HTTP/WebSocket| FE[Static Frontend]\n    FE -->|WS /ws/terminal/{id}| Server[FastAPI Server]\n    Server -->|Manage| PTYMgr[PTY Manager]\n    PTYMgr -->|Spawn| P1[PTY: Claude]\n    PTYMgr -->|Spawn| P2[PTY: Gemini]\n    PTYMgr -->|Spawn| P3[PTY: Codex]\n    P1 -->|Read/Write| Agent1[Claude Code Process]\n    P2 -->|Read/Write| Agent2[Gemini CLI Process]\n    P3 -->|Read/Write| Agent3[Codex Process]\n    Server -->|HTTP /api/*| PeerRouter[Peer Router Instance]\n    PeerRouter -->|Proxy| PeerPTY[Peer PTY Session]",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User Browser\n    participant S as FastAPI Server\n    participant P as PTY Process\n    participant A as AI Agent (e.g. Claude)\n    \n    U->>S: POST /api/sessions (Spawn Agent)\n    S->>P: ptyprocess.spawn(Agent Command)\n    P-->>S: PTY FD Created\n    S-->>U: Session ID & Status\n    \n    U->>S: WebSocket Connect /ws/terminal/{id}\n    S->>P: Attach Reader Thread\n    loop Background Read\n        P->>S: Read Output Chunk\n        S->>U: WS Message (Output)\n    end\n    \n    U->>S: WS Message (User Input/Prompt)\n    S->>P: Write to PTY Master\n    P->>A: Input Received\n    A->>P: Generate Response\n    P->>S: Output Available\n    S->>U: WS Message (Response)",
+  "capabilities": [
+    "PTY Management",
+    "WebSocket Streaming",
+    "HTTP API Federation",
+    "Peer Discovery",
+    "Session Persistence",
+    "Prompt Injection"
+  ],
+  "components": [
+    "server.py",
+    "dispatcher.py",
+    "static/index.html",
+    "ARCHITECTURE.md",
+    ".env.example"
+  ],
+  "tech": [
+    "Python",
+    "FastAPI",
+    "uvicorn",
+    "websockets",
+    "ptyprocess",
+    "HTML/JS",
+    "xterm.js",
+    "SortableJS"
+  ],
+  "depends_on": [
+    "Claude Code CLI",
+    "Gemini CLI",
+    "Codex CLI",
+    "Python 3.8+"
+  ],
+  "integrates_with": [
+    "Tailscale",
+    "mDNS",
+    "Riff Switchboard"
+  ],
+  "patterns": [
+    "Federated Systems",
+    "PTY Bridging",
+    "Event-Driven UI",
+    "Peer-to-Peer Gossip"
+  ],
+  "reuse_tags": [
+    "ai-agents",
+    "terminal-emulator",
+    "federated-learning",
+    "developer-tools",
+    "pty-management"
+  ],
+  "slug": "agent-router",
+  "repo_url": "https://github.com/davidbmar/agent-router",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "architect/ai-team-best-practices-2026-05-28 is 139 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "coder1/reflexion is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "coder2-command-center-ui is 665 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/artifact-sync-sidecar-pr3 is 1411 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/manager-mode-b is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/qa-browser-verification is 7 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "feat/qa-playwright-mic-tests is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "fix/m-redirect-loop-host-picker is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "qa/dashboard-e2e-ec2-4-2026-05-28 is 117 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "release-mgr/merge-sequence-2026-05-27 is 1 commit ahead of the default branch"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:22:27.103011Z",
+  "source_commit": "2da52ef",
+  "model": "qwen3.7-plus"
+}

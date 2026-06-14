@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browser Voice Agent · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Browser Voice Agent", "one_liner": "A fully browser-native voice agent using local WebGPU LLMs, TTS, and STT with no server requirements.", "what_it_is": "A real-time voice conversation agent that runs entirely in the browser. It uses the Web Speech API for transcription, a local LLM via WebGPU for intent classification and response generation, and Text-to-Speech for audio output. It features an 8-stage Finite State Machine (FSM) architecture to manage the conversation loop, including adaptive bias systems and streaming responses.", "how_its_built": "Built with React 19 and TypeScript, bundled with Vite 7. It uses WebLLM for local LLM inference on WebGPU, vits-web for neural TTS on desktop (falling back to native SpeechSynthesis on mobile), and the Web Speech API for STT. The UI is styled with Tailwind CSS v4 and shadcn/ui components.", "how_to_apply": "Clone the repository, install dependencies, and run the development server. Open the application in Chrome or Edge (WebGPU required). The app automatically loads a small Qwen model on startup. For deployment, use the provided shell script to sync to AWS S3 and CloudFront with necessary COOP/COEP headers.", "quickstart": "git clone https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo.git\ncd browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo\nnpm install\nnpm run dev", "features": ["Local LLM inference via WebGPU with support for 15+ models", "Real-time Speech-to-Text using Web Speech API with silence detection", "Streaming Text-to-Speech with VITS neural voices on desktop", "8-stage FSM architecture for robust conversation management", "Adaptive bias system that adjusts verbosity and confidence based on user feedback", "Mobile optimizations for iOS Chrome with native API fallbacks"], "diagram_architecture": "flowchart TD\n    User[User] -->|Speaks| Mic[Microphone]\n    Mic -->|Audio Stream| STT[Web Speech API]\n    STT -->|Transcribed Text| FSM[FSM Loop Controller]\n    FSM -->|Intent/Context| LLM[WebLLM Local Model]\n    LLM -->|Streamed Tokens| TTS[TTS Engine]\n    TTS -->|Audio Output| Speaker[Speaker]\n    Speaker -->|Heard by| User\n    FSM -->|State Updates| Dashboard[React Dashboard]\n    subgraph Browser\n        STT\n        FSM\n        LLM\n        TTS\n        Dashboard\n    end", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant M as Microphone\n    participant STT as Web Speech API\n    participant FSM as Loop Controller\n    participant LLM as WebLLM\n    participant TTS as TTS Engine\n    \n    U->>M: Speak\n    M->>STT: Audio Stream\n    STT->>FSM: Transcribed Text\n    FSM->>FSM: Detect Signal & Classify Intent\n    FSM->>LLM: Generate Response (Stream)\n    LLM-->>FSM: Token Stream\n    FSM->>TTS: Synthesize Sentence\n    TTS-->>U: Audio Output\n    FSM->>FSM: Observe Feedback & Update Bias", "capabilities": ["Local LLM Inference", "Speech Recognition", "Text-to-Speech", "Intent Classification", "Adaptive Conversation", "Offline Operation"], "components": ["Loop Controller (FSM)", "WebLLM Runtime", "VITS TTS Engine", "Web Speech API Interface", "React Dashboard", "Bias System"], "tech": ["React 19", "TypeScript", "Vite 7", "Tailwind CSS v4", "WebLLM", "vits-web", "Web Speech API", "WebGPU"], "depends_on": ["Chrome 113+", "Edge 113+", "WebGPU Support", "Microphone Access", "1GB+ VRAM"], "integrates_with": ["AWS S3", "CloudFront", "iOS Native SpeechSynthesis", "Desktop VITS Voices"], "patterns": ["Finite State Machine", "Streaming Response", "Local-First Architecture", "Adapter Pattern (TTS)", "Observer Pattern (Feedback)"], "reuse_tags": ["voice-agent", "webgpu", "local-llm", "typescript", "react", "offline-first", "speech-recognition", "text-to-speech"], "slug": "browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo", "repo_url": "https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo/main/docs/screenshots/desktop-dashboard.png", "generated_at": "2026-06-14T02:31:26.349077Z", "source_commit": "e1715fb", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Browser Voice Agent",
+  "description": "A fully browser-native voice agent using local WebGPU LLMs, TTS, and STT with no server requirements.",
+  "codeRepository": "https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo",
+  "programmingLanguage": [
+    "React 19",
+    "TypeScript",
+    "Vite 7",
+    "Tailwind CSS v4",
+    "WebLLM",
+    "vits-web",
+    "Web Speech API",
+    "WebGPU"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Browser Voice Agent</h1>
+  <p class="one-liner">A fully browser-native voice agent using local WebGPU LLMs, TTS, and STT with no server requirements.</p>
+  <p><a href="https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo">https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo/main/docs/screenshots/desktop-dashboard.png" alt="Browser Voice Agent screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A real-time voice conversation agent that runs entirely in the browser. It uses the Web Speech API for transcription, a local LLM via WebGPU for intent classification and response generation, and Text-to-Speech for audio output. It features an 8-stage Finite State Machine (FSM) architecture to manage the conversation loop, including adaptive bias systems and streaming responses.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Local LLM inference via WebGPU with support for 15+ models</li><li>Real-time Speech-to-Text using Web Speech API with silence detection</li><li>Streaming Text-to-Speech with VITS neural voices on desktop</li><li>8-stage FSM architecture for robust conversation management</li><li>Adaptive bias system that adjusts verbosity and confidence based on user feedback</li><li>Mobile optimizations for iOS Chrome with native API fallbacks</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo.git
+cd browser-voice-agent-with-TTS-STT-and-OpenSourceLLMs-demo
+npm install
+npm run dev</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Speaks| Mic[Microphone]
+    Mic -->|Audio Stream| STT[Web Speech API]
+    STT -->|Transcribed Text| FSM[FSM Loop Controller]
+    FSM -->|Intent/Context| LLM[WebLLM Local Model]
+    LLM -->|Streamed Tokens| TTS[TTS Engine]
+    TTS -->|Audio Output| Speaker[Speaker]
+    Speaker -->|Heard by| User
+    FSM -->|State Updates| Dashboard[React Dashboard]
+    subgraph Browser
+        STT
+        FSM
+        LLM
+        TTS
+        Dashboard
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with React 19 and TypeScript, bundled with Vite 7. It uses WebLLM for local LLM inference on WebGPU, vits-web for neural TTS on desktop (falling back to native SpeechSynthesis on mobile), and the Web Speech API for STT. The UI is styled with Tailwind CSS v4 and shadcn/ui components.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant M as Microphone
+    participant STT as Web Speech API
+    participant FSM as Loop Controller
+    participant LLM as WebLLM
+    participant TTS as TTS Engine
+    
+    U->>M: Speak
+    M->>STT: Audio Stream
+    STT->>FSM: Transcribed Text
+    FSM->>FSM: Detect Signal & Classify Intent
+    FSM->>LLM: Generate Response (Stream)
+    LLM-->>FSM: Token Stream
+    FSM->>TTS: Synthesize Sentence
+    TTS-->>U: Audio Output
+    FSM->>FSM: Observe Feedback & Update Bias</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Clone the repository, install dependencies, and run the development server. Open the application in Chrome or Edge (WebGPU required). The app automatically loads a small Qwen model on startup. For deployment, use the provided shell script to sync to AWS S3 and CloudFront with necessary COOP/COEP headers.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Local LLM Inference</span><span class="tag">Speech Recognition</span><span class="tag">Text-to-Speech</span><span class="tag">Intent Classification</span><span class="tag">Adaptive Conversation</span><span class="tag">Offline Operation</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Loop Controller (FSM)</span><span class="tag">WebLLM Runtime</span><span class="tag">VITS TTS Engine</span><span class="tag">Web Speech API Interface</span><span class="tag">React Dashboard</span><span class="tag">Bias System</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">React 19</span><span class="tag">TypeScript</span><span class="tag">Vite 7</span><span class="tag">Tailwind CSS v4</span><span class="tag">WebLLM</span><span class="tag">vits-web</span><span class="tag">Web Speech API</span><span class="tag">WebGPU</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Chrome 113+</span><span class="tag">Edge 113+</span><span class="tag">WebGPU Support</span><span class="tag">Microphone Access</span><span class="tag">1GB+ VRAM</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS S3</span><span class="tag">CloudFront</span><span class="tag">iOS Native SpeechSynthesis</span><span class="tag">Desktop VITS Voices</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Finite State Machine</span><span class="tag">Streaming Response</span><span class="tag">Local-First Architecture</span><span class="tag">Adapter Pattern (TTS)</span><span class="tag">Observer Pattern (Feedback)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-agent</span><span class="tag">webgpu</span><span class="tag">local-llm</span><span class="tag">typescript</span><span class="tag">react</span><span class="tag">offline-first</span><span class="tag">speech-recognition</span><span class="tag">text-to-speech</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:31:26.349077Z ·
+     commit e1715fb ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

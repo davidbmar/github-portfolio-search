@@ -1,0 +1,67 @@
+{
+  "title": "audio-workernode",
+  "one_liner": "A Python-based distributed worker node for audio transcription tasks, designed to run on RunPod infrastructure and communicate with a central orchestrator.",
+  "what_it_is": "audio-workernode is a specialized background service that polls a central orchestrator for audio transcription jobs. It retrieves tasks, processes them using an external transcription API, and reports results back. It is built to be deployed as a scalable worker on the RunPod serverless or cloud GPU platform, handling configuration management and error logging autonomously.",
+  "how_its_built": "The project is built in Python, utilizing the `requests` library for HTTP communication with both the orchestrator and the transcription API. Configuration is managed via a YAML file loaded by a custom `ConfigurationManager`. The core logic resides in the `AudioTranscriptionWorker` class, which implements a polling loop to fetch tasks, execute transcription, and handle lifecycle events like graceful shutdowns.",
+  "how_to_apply": "Deploy this worker on a RunPod instance by setting up the required environment variables and mounting the configuration file. It is suitable for developers building distributed audio processing pipelines who need a reliable, auto-scaling worker component that decouples task execution from task scheduling.",
+  "quickstart": "pip install -r requirements.txt\npython runpod/worker_node_v3.py",
+  "features": [
+    "Polls central orchestrator for new audio transcription tasks",
+    "Integrates with external transcription APIs via configurable endpoints",
+    "Manages secrets and configuration via YAML and environment variables",
+    "Generates unique worker IDs based on RunPod pod identifiers",
+    "Implements robust logging and error handling for production stability"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[RunPod Instance] --> B[AudioTranscriptionWorker]\n    B --> C[ConfigurationManager]\n    C --> D[worker_api.config.yaml]\n    B --> E[Orchestrator Service]\n    B --> F[Transcription API]\n    E -->|Fetch Task| B\n    B -->|Send Result| E\n    B -->|Send Audio| F\n    F -->|Return Transcript| B",
+  "diagram_sequence": "sequenceDiagram\n    participant W as AudioTranscriptionWorker\n    participant O as Orchestrator\n    participant T as Transcription API\n    participant C as ConfigurationManager\n\n    W->>C: Load config (worker_api.config.yaml)\n    C-->>W: Return config (URLs, tokens)\n    loop Polling Loop\n        W->>O: GET /task (with Auth Token)\n        alt Task Available\n            O-->>W: Return Task Data (audio_url)\n            W->>T: POST /transcribe (audio_data)\n            T-->>W: Return Transcript\n            W->>O: POST /result (transcript)\n        else No Task\n            O-->>W: Empty/Wait\n        end\n    end",
+  "capabilities": [
+    "Distributed Task Processing",
+    "API Integration",
+    "Configuration Management",
+    "Cloud Deployment (RunPod)"
+  ],
+  "components": [
+    "AudioTranscriptionWorker",
+    "ConfigurationManager",
+    "Logging Handler"
+  ],
+  "tech": [
+    "Python",
+    "Requests",
+    "YAML",
+    "RunPod SDK"
+  ],
+  "depends_on": [
+    "requests",
+    "pyyaml",
+    "runpod"
+  ],
+  "integrates_with": [
+    "Central Orchestrator",
+    "External Transcription APIs",
+    "RunPod Infrastructure"
+  ],
+  "patterns": [
+    "Worker Pattern",
+    "Polling",
+    "Dependency Injection (Config)",
+    "Facade Pattern (API Client)"
+  ],
+  "reuse_tags": [
+    "distributed-systems",
+    "audio-processing",
+    "worker-node",
+    "runpod",
+    "python-service"
+  ],
+  "slug": "audio-workernode",
+  "repo_url": "https://github.com/davidbmar/audio-workernode",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:24:41.863562Z",
+  "source_commit": "6a78b93",
+  "model": "qwen3.7-plus"
+}

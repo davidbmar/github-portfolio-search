@@ -1,0 +1,70 @@
+{
+  "title": "Claude Memory Bridge",
+  "one_liner": "A Chrome extension that detects specific memory markers in Claude AI chats and bridges them to external storage via webhooks or serverless functions.",
+  "what_it_is": "A browser-based utility that solves Claude's lack of persistent cross-session memory. It injects a content script into claude.ai to monitor page text for specific delimiters ('🧠 PERSISTENT MEMORY:'). When detected, it extracts the data and uses the extension's background service worker to bypass CORS restrictions, sending the payload to a configurable webhook URL or an AWS Lambda/S3 integration.",
+  "how_its_built": "Built as a Manifest V3 Chrome Extension using vanilla JavaScript. It consists of a content script for DOM monitoring, a background service worker for network requests, and a popup for basic configuration. The backend integration is provided as a Node.js AWS Lambda function for storing data in S3.",
+  "how_to_apply": "1. Clone the repository. 2. Load the 'chrome-extension' folder as an unpacked extension in Chrome. 3. Configure the target webhook URL in 'content.js'. 4. Ensure your Claude prompts output text wrapped in the expected memory delimiters.",
+  "quickstart": "git clone https://github.com/davidbmar/claude-memory-bridge.git\ncd claude-memory-bridge/chrome-extension\n# Open Chrome -> chrome://extensions -> Enable Developer Mode\n# Click 'Load unpacked' and select the chrome-extension directory\n# Edit content.js line 36 to set your desired webhookUrl\n# Reload the extension and visit claude.ai",
+  "features": [
+    "Detects memory blocks in Claude chat UI using specific text delimiters",
+    "Bypasses browser CORS restrictions via background service worker",
+    "Visual status indicator (red/green/blue) overlay on the Claude page",
+    "Configurable webhook destination for immediate testing",
+    "Optional serverless integration for persistent S3 storage"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User] -->|Types Prompt| Claude[Claude AI Web App]\n    Claude -->|Renders Response with Delimiters| DOM[Page DOM]\n    ContentScript[Content Script] -->|Polls every 2s| DOM\n    ContentScript -->|Detects Pattern| Extract[Extract Memory Data]\n    Extract -->|chrome.runtime.sendMessage| Background[Background Service Worker]\n    Background -->|POST JSON| Webhook[External Webhook / API]\n    Background -.->|Optional| Lambda[AWS Lambda]\n    Lambda -->|Store| S3[(Amazon S3)]",
+  "diagram_sequence": "sequenceDiagram\n    participant CS as Content Script\n    participant DOM as Page DOM\n    participant BG as Background Worker\n    participant API as External Webhook\n\n    Note over CS, DOM: Polling Loop (2s interval)\n    CS->>DOM: Read document.body.textContent\n    alt Contains '🧠 PERSISTENT MEMORY:'\n        CS->>CS: Extract substring between delimiters\n        CS->>BG: sendMessage({action: 'sendWebhook', data})\n        activate BG\n        BG->>API: POST JSON payload\n        API-->>BG: 200 OK\n        BG-->>CS: sendResponse({success: true})\n        deactivate BG\n        CS->>DOM: Update indicator to 'SENT!' (Blue)\n    else No Match\n        CS->>DOM: Keep indicator 'WORKING!' (Red)\n    end",
+  "capabilities": [
+    "DOM Text Monitoring",
+    "Cross-Origin Requests",
+    "Chrome Extension Messaging",
+    "Serverless Integration"
+  ],
+  "components": [
+    "manifest.json",
+    "content.js",
+    "background.js",
+    "popup.html",
+    "popup.js",
+    "serverless-integration/api/memory.js"
+  ],
+  "tech": [
+    "JavaScript",
+    "Chrome Extensions API (Manifest V3)",
+    "AWS SDK",
+    "HTML/CSS"
+  ],
+  "depends_on": [
+    "Chrome Browser",
+    "Access to claude.ai"
+  ],
+  "integrates_with": [
+    "Webhook.site",
+    "Custom REST APIs",
+    "AWS Lambda",
+    "Amazon S3"
+  ],
+  "patterns": [
+    "Content Script Injection",
+    "Service Worker Proxy",
+    "Polling",
+    "Message Passing"
+  ],
+  "reuse_tags": [
+    "chrome-extension",
+    "ai-memory",
+    "webhook-bridge",
+    "claude-ai",
+    "aws-lambda"
+  ],
+  "slug": "claude-memory-bridge",
+  "repo_url": "https://github.com/davidbmar/claude-memory-bridge",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:42:05.961531Z",
+  "source_commit": "ef50d1e",
+  "model": "qwen3.7-plus"
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4kUpScalerWorker · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "4kUpScalerWorker", "one_liner": "Serverless-style image upscaling worker using AWS S3, SQS, and InvokeAI.", "what_it_is": "A Python-based background worker that listens to an AWS SQS queue for S3 upload events. Upon receiving a notification, it downloads the specified image from S3, prepares it for processing (intended for 4K upscaling via InvokeAI), and manages the file lifecycle between storage and local processing directories.", "how_its_built": "Built with Python 3 and boto3 for AWS interactions. It relies on the InvokeAI environment for the actual upscaling logic. The architecture uses S3 for storage, S3 Event Notifications to trigger SQS messages, and a long-polling or periodic polling script (UpscalerWorker.py) to process jobs.", "how_to_apply": "Deploy this worker on a GPU-enabled instance (e.g., RunPod) with the InvokeAI image. Configure AWS credentials to allow reading from the source S3 bucket and writing to the destination. Use UploadToS3_forProcessing.py to batch-upload images to trigger the workflow.", "quickstart": "git clone https://github.com/davidbmar/4kUpScalerWorker.git\ncd 4kUpScalerWorker\nmkdir -p /root/.aws\n# Copy your AWS config and credentials into /root/.aws/\npython3 UpscalerWorker.py", "features": ["Automated ingestion of images from AWS S3 buckets", "Event-driven processing via AWS SQS queues", "Local file staging for GPU-accelerated upscaling", "Batch upload utility for triggering multiple jobs", "Error handling for S3 upload failures"], "diagram_architecture": "flowchart TD\n    User[User] -->|Uploads Image| S3[S3 Bucket]\n    S3 -->|Put Event| SNS[S3 Event Notification]\n    SNS -->|Send Message| SQS[SQS Queue]\n    Worker[UpscalerWorker.py] -->|Poll/Receive| SQS\n    Worker -->|Download Object| S3\n    Worker -->|Process/Upscale| LocalFS[Local File System]\n    LocalFS -->|Upload Result| S3Processed[S3 Processed Bucket/Folder]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S3 as S3 Bucket\n    participant SQS as SQS Queue\n    participant W as UpscalerWorker\n    \n    U->>S3: PUT object (image.jpg)\n    S3->>SQS: Send event notification\n    loop Polling\n        W->>SQS: ReceiveMessage\n        SQS-->>W: Return message (if available)\n    end\n    W->>S3: GetObject (bucket, key)\n    S3-->>W: Return file content\n    W->>W: Save to local disk\n    W->>W: Execute Upscaling (InvokeAI)\n    W->>S3: Upload processed file (via s3_utils)", "capabilities": ["S3 Object Retrieval", "SQS Message Consumption", "Local File Management", "Image Processing Integration", "AWS Credential Management"], "components": ["UpscalerWorker.py", "UploadToS3_forProcessing.py", "s3_utils.py"], "tech": ["Python", "boto3", "AWS S3", "AWS SQS", "InvokeAI"], "depends_on": ["AWS Account", "S3 Bucket", "SQS Queue", "InvokeAI Environment", "GPU Hardware"], "integrates_with": ["RunPod", "GitHub"], "patterns": ["Event-Driven Architecture", "Producer-Consumer", "Polling Consumer"], "reuse_tags": ["image-upscaling", "aws-worker", "s3-sqs-integration", "invokeai", "python-script"], "slug": "4kUpScalerWorker", "repo_url": "https://github.com/davidbmar/4kUpScalerWorker", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:21:07.844023Z", "source_commit": "89c5550", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "4kUpScalerWorker",
+  "description": "Serverless-style image upscaling worker using AWS S3, SQS, and InvokeAI.",
+  "codeRepository": "https://github.com/davidbmar/4kUpScalerWorker",
+  "programmingLanguage": [
+    "Python",
+    "boto3",
+    "AWS S3",
+    "AWS SQS",
+    "InvokeAI"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>4kUpScalerWorker</h1>
+  <p class="one-liner">Serverless-style image upscaling worker using AWS S3, SQS, and InvokeAI.</p>
+  <p><a href="https://github.com/davidbmar/4kUpScalerWorker">https://github.com/davidbmar/4kUpScalerWorker</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A Python-based background worker that listens to an AWS SQS queue for S3 upload events. Upon receiving a notification, it downloads the specified image from S3, prepares it for processing (intended for 4K upscaling via InvokeAI), and manages the file lifecycle between storage and local processing directories.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Automated ingestion of images from AWS S3 buckets</li><li>Event-driven processing via AWS SQS queues</li><li>Local file staging for GPU-accelerated upscaling</li><li>Batch upload utility for triggering multiple jobs</li><li>Error handling for S3 upload failures</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/4kUpScalerWorker.git
+cd 4kUpScalerWorker
+mkdir -p /root/.aws
+# Copy your AWS config and credentials into /root/.aws/
+python3 UpscalerWorker.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Uploads Image| S3[S3 Bucket]
+    S3 -->|Put Event| SNS[S3 Event Notification]
+    SNS -->|Send Message| SQS[SQS Queue]
+    Worker[UpscalerWorker.py] -->|Poll/Receive| SQS
+    Worker -->|Download Object| S3
+    Worker -->|Process/Upscale| LocalFS[Local File System]
+    LocalFS -->|Upload Result| S3Processed[S3 Processed Bucket/Folder]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>Built with Python 3 and boto3 for AWS interactions. It relies on the InvokeAI environment for the actual upscaling logic. The architecture uses S3 for storage, S3 Event Notifications to trigger SQS messages, and a long-polling or periodic polling script (UpscalerWorker.py) to process jobs.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant S3 as S3 Bucket
+    participant SQS as SQS Queue
+    participant W as UpscalerWorker
+    
+    U->>S3: PUT object (image.jpg)
+    S3->>SQS: Send event notification
+    loop Polling
+        W->>SQS: ReceiveMessage
+        SQS-->>W: Return message (if available)
+    end
+    W->>S3: GetObject (bucket, key)
+    S3-->>W: Return file content
+    W->>W: Save to local disk
+    W->>W: Execute Upscaling (InvokeAI)
+    W->>S3: Upload processed file (via s3_utils)</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy this worker on a GPU-enabled instance (e.g., RunPod) with the InvokeAI image. Configure AWS credentials to allow reading from the source S3 bucket and writing to the destination. Use UploadToS3_forProcessing.py to batch-upload images to trigger the workflow.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">S3 Object Retrieval</span><span class="tag">SQS Message Consumption</span><span class="tag">Local File Management</span><span class="tag">Image Processing Integration</span><span class="tag">AWS Credential Management</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">UpscalerWorker.py</span><span class="tag">UploadToS3_forProcessing.py</span><span class="tag">s3_utils.py</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">boto3</span><span class="tag">AWS S3</span><span class="tag">AWS SQS</span><span class="tag">InvokeAI</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS Account</span><span class="tag">S3 Bucket</span><span class="tag">SQS Queue</span><span class="tag">InvokeAI Environment</span><span class="tag">GPU Hardware</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">RunPod</span><span class="tag">GitHub</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Event-Driven Architecture</span><span class="tag">Producer-Consumer</span><span class="tag">Polling Consumer</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">image-upscaling</span><span class="tag">aws-worker</span><span class="tag">s3-sqs-integration</span><span class="tag">invokeai</span><span class="tag">python-script</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:21:07.844023Z ·
+     commit 89c5550 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

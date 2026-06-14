@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS_tools_for_pricing · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "AWS_tools_for_pricing", "one_liner": "Python scripts to export EC2 instance details and OpenSearch domain configurations for cost analysis.", "what_it_is": "A collection of standalone Python utilities that query AWS services (EC2 and OpenSearch) and output structured data (CSV or JSON) to facilitate infrastructure pricing and auditing. It bridges the gap between raw AWS API responses and human-readable reports.", "how_its_built": "The project consists of independent Python scripts. `ec2_csv_list.py` uses the `boto3` SDK to interact with the EC2 API directly. The OpenSearch scripts (`opensearch2.py`) rely on `subprocess` calls to the AWS CLI, parsing the resulting JSON output. Data is serialized into CSV files for easy import into spreadsheet software.", "how_to_apply": "Use these tools to generate an inventory of running resources. Export EC2 instance types and states to estimate compute costs, or dump OpenSearch cluster configurations to analyze search infrastructure spending. The resulting CSVs can be fed into pricing calculators or internal billing dashboards.", "quickstart": "pip install boto3\npython ec2_csv_list.py\npython opensearch2.py", "features": ["Exports running EC2 instance details (ID, Type, State, Security Groups) to CSV", "Lists OpenSearch domain names using AWS CLI", "Extracts detailed OpenSearch cluster configuration (e.g., dedicated master nodes)", "Generates structured reports for cost estimation and auditing"], "diagram_architecture": "flowchart TD\n    User[User] -->|Executes| Script[Python Script]\n    Script -->|boto3 SDK| EC2_API[EC2 API]\n    Script -->|subprocess| AWS_CLI[AWS CLI]\n    AWS_CLI -->|API Call| OS_API[OpenSearch API]\n    EC2_API -->|Instance Data| Script\n    OS_API -->|Domain Config| AWS_CLI\n    AWS_CLI -->|JSON Output| Script\n    Script -->|Writes| CSV[CSV File]", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant S as Python Script\n    participant B as Boto3/CLI\n    participant A as AWS API\n    \n    U->>S: Run script\n    alt EC2 Mode\n        S->>B: Initialize boto3 client\n        B->>A: describe_instances()\n        A-->>B: Instance Metadata\n        B-->>S: Parsed Objects\n        S->>S: Format to CSV\n        S-->>U: Save running_ec2_instances.csv\n    else OpenSearch Mode\n        S->>B: subprocess.run(aws opensearch...)\n        B->>A: list-domain-names / describe-domain\n        A-->>B: JSON Response\n        B-->>S: Stdout String\n        S->>S: Parse JSON & Extract Details\n        S-->>U: Print/Save Domain Data\n    end", "capabilities": ["EC2 Inventory", "OpenSearch Auditing", "CSV Export", "Cost Analysis Prep"], "components": ["ec2_csv_list.py", "opensearch2.py", "boto3 Client", "AWS CLI Wrapper"], "tech": ["Python 3", "boto3", "AWS CLI", "CSV", "JSON"], "depends_on": ["boto3", "awscli", "python3"], "integrates_with": ["Amazon EC2", "Amazon OpenSearch Service"], "patterns": ["Scripting", "CLI Automation", "Data Extraction"], "reuse_tags": ["aws", "pricing", "inventory", "ec2", "opensearch", "python"], "slug": "AWS_tools_for_pricing", "repo_url": "https://github.com/davidbmar/AWS_tools_for_pricing", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:26:51.093252Z", "source_commit": "f0529c0", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "AWS_tools_for_pricing",
+  "description": "Python scripts to export EC2 instance details and OpenSearch domain configurations for cost analysis.",
+  "codeRepository": "https://github.com/davidbmar/AWS_tools_for_pricing",
+  "programmingLanguage": [
+    "Python 3",
+    "boto3",
+    "AWS CLI",
+    "CSV",
+    "JSON"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AWS_tools_for_pricing</h1>
+  <p class="one-liner">Python scripts to export EC2 instance details and OpenSearch domain configurations for cost analysis.</p>
+  <p><a href="https://github.com/davidbmar/AWS_tools_for_pricing">https://github.com/davidbmar/AWS_tools_for_pricing</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A collection of standalone Python utilities that query AWS services (EC2 and OpenSearch) and output structured data (CSV or JSON) to facilitate infrastructure pricing and auditing. It bridges the gap between raw AWS API responses and human-readable reports.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Exports running EC2 instance details (ID, Type, State, Security Groups) to CSV</li><li>Lists OpenSearch domain names using AWS CLI</li><li>Extracts detailed OpenSearch cluster configuration (e.g., dedicated master nodes)</li><li>Generates structured reports for cost estimation and auditing</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install boto3
+python ec2_csv_list.py
+python opensearch2.py</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User] -->|Executes| Script[Python Script]
+    Script -->|boto3 SDK| EC2_API[EC2 API]
+    Script -->|subprocess| AWS_CLI[AWS CLI]
+    AWS_CLI -->|API Call| OS_API[OpenSearch API]
+    EC2_API -->|Instance Data| Script
+    OS_API -->|Domain Config| AWS_CLI
+    AWS_CLI -->|JSON Output| Script
+    Script -->|Writes| CSV[CSV File]</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project consists of independent Python scripts. `ec2_csv_list.py` uses the `boto3` SDK to interact with the EC2 API directly. The OpenSearch scripts (`opensearch2.py`) rely on `subprocess` calls to the AWS CLI, parsing the resulting JSON output. Data is serialized into CSV files for easy import into spreadsheet software.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant S as Python Script
+    participant B as Boto3/CLI
+    participant A as AWS API
+    
+    U->>S: Run script
+    alt EC2 Mode
+        S->>B: Initialize boto3 client
+        B->>A: describe_instances()
+        A-->>B: Instance Metadata
+        B-->>S: Parsed Objects
+        S->>S: Format to CSV
+        S-->>U: Save running_ec2_instances.csv
+    else OpenSearch Mode
+        S->>B: subprocess.run(aws opensearch...)
+        B->>A: list-domain-names / describe-domain
+        A-->>B: JSON Response
+        B-->>S: Stdout String
+        S->>S: Parse JSON & Extract Details
+        S-->>U: Print/Save Domain Data
+    end</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use these tools to generate an inventory of running resources. Export EC2 instance types and states to estimate compute costs, or dump OpenSearch cluster configurations to analyze search infrastructure spending. The resulting CSVs can be fed into pricing calculators or internal billing dashboards.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">EC2 Inventory</span><span class="tag">OpenSearch Auditing</span><span class="tag">CSV Export</span><span class="tag">Cost Analysis Prep</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">ec2_csv_list.py</span><span class="tag">opensearch2.py</span><span class="tag">boto3 Client</span><span class="tag">AWS CLI Wrapper</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3</span><span class="tag">boto3</span><span class="tag">AWS CLI</span><span class="tag">CSV</span><span class="tag">JSON</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">boto3</span><span class="tag">awscli</span><span class="tag">python3</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Amazon EC2</span><span class="tag">Amazon OpenSearch Service</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Scripting</span><span class="tag">CLI Automation</span><span class="tag">Data Extraction</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">aws</span><span class="tag">pricing</span><span class="tag">inventory</span><span class="tag">ec2</span><span class="tag">opensearch</span><span class="tag">python</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:26:51.093252Z ·
+     commit f0529c0 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

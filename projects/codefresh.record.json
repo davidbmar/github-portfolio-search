@@ -1,0 +1,63 @@
+{
+  "title": "codefresh-release-stats",
+  "one_liner": "A Python script to count Codefresh Kubernetes releases per cluster over the last week.",
+  "what_it_is": "A lightweight CLI utility that queries the Codefresh API to retrieve Kubernetes release events for specified selectors (clusters) and calculates the number of deployments occurring within the previous seven days. It outputs raw status codes and aggregate counts to stdout.",
+  "how_its_built": "Built with Python 3 using the `requests` library for HTTP communication and `datetime` for time-window calculations. It iterates through a hardcoded list of cluster selectors, authenticates via Bearer token, fetches release metadata, parses Unix timestamps, and filters results based on the current date minus seven days.",
+  "how_to_apply": "Use this script for quick operational audits or dashboarding inputs to track deployment frequency across different environments (e.g., production, internal, external). It requires manual configuration of the API access token and selector list within the source code before execution.",
+  "quickstart": "pip install requests\npython codefresh.py",
+  "features": [
+    "Queries Codefresh API for Kubernetes release events",
+    "Filters releases by a configurable 7-day sliding window",
+    "Iterates across multiple predefined cluster selectors",
+    "Outputs HTTP status codes and release counts per cluster",
+    "Handles JSON parsing errors gracefully"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[User] -->|Executes| B(codefresh.py)\n    B -->|Reads Config| C[Access Token & Selectors]\n    B -->|HTTP GET| D[Codefresh API]\n    D -->|JSON Response| B\n    B -->|Parses Timestamps| E[DateTime Logic]\n    E -->|Filters Last 7 Days| F[Count Aggregator]\n    F -->|Prints| G[Stdout]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Script as codefresh.py\n    participant API as Codefresh API\n    \n    User->>Script: Execute script\n    loop For each cluster in selectors\n        Script->>API: GET /api/kubernetes/releases?selector={cluster}\n        API-->>Script: JSON Response (Releases)\n        Script->>Script: Parse JSON & Extract createdAt\n        Script->>Script: Filter by last 7 days\n        Script->>User: Print Status Code & Count\n    end",
+  "capabilities": [
+    "API Integration",
+    "Data Filtering",
+    "CLI Reporting"
+  ],
+  "components": [
+    "HTTP Client",
+    "JSON Parser",
+    "Date Calculator",
+    "Loop Controller"
+  ],
+  "tech": [
+    "Python",
+    "Requests",
+    "JSON",
+    "Datetime"
+  ],
+  "depends_on": [
+    "requests",
+    "python3"
+  ],
+  "integrates_with": [
+    "Codefresh API"
+  ],
+  "patterns": [
+    "Scripting",
+    "Polling",
+    "Filter-Map-Reduce"
+  ],
+  "reuse_tags": [
+    "devops",
+    "monitoring",
+    "codefresh",
+    "kubernetes",
+    "python-script"
+  ],
+  "slug": "codefresh",
+  "repo_url": "https://github.com/davidbmar/codefresh",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:42:47.720916Z",
+  "source_commit": "a41e6ae",
+  "model": "qwen3.7-plus"
+}

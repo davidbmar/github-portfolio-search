@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>login-system · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "login-system", "one_liner": "Serverless authentication backend using AWS Lambda, DynamoDB, and JWT.", "what_it_is": "A template login system implemented as an AWS Lambda function. It handles user registration, login, and token verification. User credentials are stored in a DynamoDB table with passwords hashed via bcrypt. Authentication state is managed using JSON Web Tokens (JWT).", "how_its_built": "The core logic resides in a single Lambda handler (`index.js`) that routes HTTP requests to service modules for registration, login, and verification. It uses the `aws-sdk` for DynamoDB interactions, `bcryptjs` for password hashing, and `jsonwebtoken` for token generation and validation. Responses are formatted as API Gateway-compatible JSON objects.", "how_to_apply": "Deploy this code as an AWS Lambda function behind an API Gateway. Ensure the `audio_client_server_users` DynamoDB table exists in `us-east-2`. Set the `JWT_SECRET` environment variable. Use the exposed endpoints for user management in web or mobile applications.", "quickstart": "", "features": ["User registration with username uniqueness checks", "Secure password hashing using bcryptjs", "JWT-based authentication token generation", "Token verification endpoint for protected routes", "DynamoDB integration for persistent user storage", "CORS-enabled API responses"], "diagram_architecture": "flowchart TD\n    Client[Client App] -->|HTTP POST/GET| APIGW[API Gateway]\n    APIGW -->|Event| Lambda[AWS Lambda Handler]\n    Lambda -->|Read/Write| DynamoDB[(DynamoDB Table)]\n    Lambda -->|Sign/Verify| JWT[JSON Web Token]\n    Lambda -->|Hash/Compare| Bcrypt[bcryptjs]\n    subgraph AWS Cloud\n        Lambda\n        DynamoDB\n    end", "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant L as Lambda Handler\n    participant S as Service Layer\n    participant D as DynamoDB\n    participant A as Auth Utils\n\n    C->>L: POST /register or /login\n    L->>S: Call register() or login()\n    alt Registration\n        S->>D: Get User (check existence)\n        D-->>S: User Data\n        S->>S: Hash Password (bcrypt)\n        S->>D: Save User\n    else Login\n        S->>D: Get User\n        D-->>S: User Data\n        S->>S: Compare Password (bcrypt)\n        S->>A: Generate JWT\n        A-->>S: Token\n    end\n    S-->>L: Response Object\n    L-->>C: JSON Response", "capabilities": ["User Registration", "User Login", "Token Verification", "Health Check"], "components": ["Lambda Handler", "Register Service", "Login Service", "Verify Service", "Auth Utilities", "Response Utilities"], "tech": ["JavaScript", "AWS Lambda", "DynamoDB", "JWT", "bcryptjs"], "depends_on": ["aws-sdk", "bcryptjs", "jsonwebtoken"], "integrates_with": ["AWS API Gateway", "AWS DynamoDB"], "patterns": ["Serverless", "Service Layer", "JWT Authentication", "Password Hashing"], "reuse_tags": ["authentication", "aws-lambda", "dynamodb", "jwt", "backend-template"], "slug": "login-system", "repo_url": "https://github.com/davidbmar/login-system", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/login-frontend/npm_and_yarn-385942b7a4 is 1 commit ahead of the default branch"}, {"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/login-frontend/npm_and_yarn-7078513fe7 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #2: Bump the npm_and_yarn group across 1 directory with 34 updates"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 2 directories with 35 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T03:05:35.499962Z", "source_commit": "cb40b4d", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "login-system",
+  "description": "Serverless authentication backend using AWS Lambda, DynamoDB, and JWT.",
+  "codeRepository": "https://github.com/davidbmar/login-system",
+  "programmingLanguage": [
+    "JavaScript",
+    "AWS Lambda",
+    "DynamoDB",
+    "JWT",
+    "bcryptjs"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>login-system</h1>
+  <p class="one-liner">Serverless authentication backend using AWS Lambda, DynamoDB, and JWT.</p>
+  <p><a href="https://github.com/davidbmar/login-system">https://github.com/davidbmar/login-system</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A template login system implemented as an AWS Lambda function. It handles user registration, login, and token verification. User credentials are stored in a DynamoDB table with passwords hashed via bcrypt. Authentication state is managed using JSON Web Tokens (JWT).</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>User registration with username uniqueness checks</li><li>Secure password hashing using bcryptjs</li><li>JWT-based authentication token generation</li><li>Token verification endpoint for protected routes</li><li>DynamoDB integration for persistent user storage</li><li>CORS-enabled API responses</li></ul></section>
+
+
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    Client[Client App] -->|HTTP POST/GET| APIGW[API Gateway]
+    APIGW -->|Event| Lambda[AWS Lambda Handler]
+    Lambda -->|Read/Write| DynamoDB[(DynamoDB Table)]
+    Lambda -->|Sign/Verify| JWT[JSON Web Token]
+    Lambda -->|Hash/Compare| Bcrypt[bcryptjs]
+    subgraph AWS Cloud
+        Lambda
+        DynamoDB
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The core logic resides in a single Lambda handler (`index.js`) that routes HTTP requests to service modules for registration, login, and verification. It uses the `aws-sdk` for DynamoDB interactions, `bcryptjs` for password hashing, and `jsonwebtoken` for token generation and validation. Responses are formatted as API Gateway-compatible JSON objects.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant C as Client
+    participant L as Lambda Handler
+    participant S as Service Layer
+    participant D as DynamoDB
+    participant A as Auth Utils
+
+    C->>L: POST /register or /login
+    L->>S: Call register() or login()
+    alt Registration
+        S->>D: Get User (check existence)
+        D-->>S: User Data
+        S->>S: Hash Password (bcrypt)
+        S->>D: Save User
+    else Login
+        S->>D: Get User
+        D-->>S: User Data
+        S->>S: Compare Password (bcrypt)
+        S->>A: Generate JWT
+        A-->>S: Token
+    end
+    S-->>L: Response Object
+    L-->>C: JSON Response</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Deploy this code as an AWS Lambda function behind an API Gateway. Ensure the `audio_client_server_users` DynamoDB table exists in `us-east-2`. Set the `JWT_SECRET` environment variable. Use the exposed endpoints for user management in web or mobile applications.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">User Registration</span><span class="tag">User Login</span><span class="tag">Token Verification</span><span class="tag">Health Check</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Lambda Handler</span><span class="tag">Register Service</span><span class="tag">Login Service</span><span class="tag">Verify Service</span><span class="tag">Auth Utilities</span><span class="tag">Response Utilities</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">JavaScript</span><span class="tag">AWS Lambda</span><span class="tag">DynamoDB</span><span class="tag">JWT</span><span class="tag">bcryptjs</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">aws-sdk</span><span class="tag">bcryptjs</span><span class="tag">jsonwebtoken</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS API Gateway</span><span class="tag">AWS DynamoDB</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Serverless</span><span class="tag">Service Layer</span><span class="tag">JWT Authentication</span><span class="tag">Password Hashing</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">authentication</span><span class="tag">aws-lambda</span><span class="tag">dynamodb</span><span class="tag">jwt</span><span class="tag">backend-template</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/login-frontend/npm_and_yarn-385942b7a4 is 1 commit ahead of the default branch</li><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/login-frontend/npm_and_yarn-7078513fe7 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #2: Bump the npm_and_yarn group across 1 directory with 34 updates</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 2 directories with 35 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:05:35.499962Z ·
+     commit cb40b4d ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

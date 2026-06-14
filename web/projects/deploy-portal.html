@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deploy Portal (Capsule Cloud) · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Deploy Portal (Capsule Cloud)", "one_liner": "A self-service web portal for provisioning SSH access and deploying applications to an EC2 gateway instance protected by AWS Cognito authentication.", "what_it_is": "Deploy Portal is a Flask-based web application that acts as a control plane for managing deployments on an AWS EC2 instance. It integrates with AWS Cognito via oauth2-proxy for authentication, automatically manages EC2 Security Group rules to whitelist user IPs for SSH access, and generates deployment kits containing SSH keys and configuration scripts. It supports automated infrastructure setup including nginx reverse proxy configuration, port allocation, and framework-specific Dockerfile generation for applications like Next.js.", "how_its_built": "The core application is built with Python 3.8+ and Flask. It uses boto3 to interact with AWS EC2 APIs for security group management. The frontend is served via Jinja2 templates within Flask. Authentication is handled externally by nginx and oauth2-proxy, which injects the user's email into the `X-User-Email` header. Infrastructure automation is handled via Shell scripts for bootstrapping, SSL setup, and installing helper tools like `capsule-nginx-manager`. The system also includes a Firecracker VM manager module for microVM lifecycle management, though the primary deployment path focuses on containerized or direct application deployment on the host.", "how_to_apply": "This project is suitable for teams needing a lightweight, self-hosted deployment dashboard on AWS. It replaces manual SSH key distribution and security group editing with a web interface. It is ideal for internal tools, staging environments, or small-scale production setups where a full Kubernetes cluster is overkill. Developers can use it to quickly spin up new services with automatic HTTPS and port management.", "quickstart": "git clone https://github.com/davidbmar/deploy-portal.git\ncd deploy-portal\nbash scripts/github-deploy.sh", "features": ["Automatic IP whitelisting in EC2 Security Groups upon login", "One-click generation of SSH deployment kits with keys and instructions", "Integrated application catalog with real-time status monitoring", "Automated nginx configuration and port allocation for deployed apps", "Framework-aware Dockerfile generation (e.g., Next.js, Vite)", "Self-signed SSL support with optional Let's Encrypt migration path"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS| Nginx[nginx :443]\n    Nginx -->|Auth Check| OAuth[oauth2-proxy :4180]\n    OAuth -->|Cognito Auth| Cognito[AWS Cognito]\n    OAuth -->|X-User-Email Header| Flask[Deploy Portal Flask App :5000]\n    Flask -->|boto3 API| EC2[EC2 Security Group Manager]\n    Flask -->|File I/O| Registry[App/Port Registry JSON]\n    Flask -->|Generate| Keys[SSH Key Generator]\n    Flask -->|Detect| Framework[Framework Detector]\n    subgraph Infrastructure\n        EC2\n        Registry\n        Keys\n        Framework\n    end", "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Nginx\n    participant OAuth\n    participant Flask\n    participant AWS\n    participant FS\n    \n    User->>Nginx: GET /deploy/\n    Nginx->>OAuth: Forward request\n    OAuth->>AWS: Validate Cognito Token\n    AWS-->>OAuth: Valid User Email\n    OAuth->>Nginx: Add X-User-Email Header\n    Nginx->>Flask: Proxy Request\n    Flask->>AWS: Get Instance Metadata\n    Flask->>AWS: Resolve Security Group\n    Flask->>AWS: Authorize User IP Ingress\n    Flask->>FS: Generate SSH Key Pair\n    Flask->>FS: Create Deployment Kit Zip\n    Flask-->>Nginx: Return Deployment Kit\n    Nginx-->>User: Download Zip", "capabilities": ["EC2 Security Group Management", "SSH Key Generation and Distribution", "Application Deployment Automation", "Nginx Reverse Proxy Configuration", "Port Allocation and Registry", "Framework Detection (Next.js, Vite, etc.)", "SSL/TLS Certificate Management", "Activity Logging and Monitoring"], "components": ["app.py (Flask Application)", "config.py (Configuration Loader)", "ec2_utils.py (AWS EC2 Manager)", "services/framework_detector.py", "services/dockerfile_generator.py", "firecracker/vm-manager.py", "scripts/bootstrap.sh", "scripts/github-deploy.sh", "infrastructure/install-infrastructure.sh"], "tech": ["Python 3.8+", "Flask", "Boto3", "Shell Scripting", "Nginx", "oauth2-proxy", "AWS Cognito", "Jinja2", "Firecracker (Optional)"], "depends_on": ["AWS EC2 Instance with IAM Role", "AWS Cognito User Pool", "Python 3.8+", "pip", "nginx", "oauth2-proxy", "git"], "integrates_with": ["AWS EC2 API", "AWS Cognito", "Claude Code (via prompts)", "Let's Encrypt (Certbot)", "Systemd"], "patterns": ["Reverse Proxy Authentication", "Infrastructure as Code (Lightweight)", "Self-Service Portal", "Convention over Configuration", "MicroVM Management (Experimental)"], "reuse_tags": ["aws-deployment", "ssh-management", "flask-admin", "self-hosted-paas", "ec2-automation", "nginx-config-gen"], "slug": "deploy-portal", "repo_url": "https://github.com/davidbmar/deploy-portal", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:44:24.490878Z", "source_commit": "79f9dbd", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Deploy Portal (Capsule Cloud)",
+  "description": "A self-service web portal for provisioning SSH access and deploying applications to an EC2 gateway instance protected by AWS Cognito authentication.",
+  "codeRepository": "https://github.com/davidbmar/deploy-portal",
+  "programmingLanguage": [
+    "Python 3.8+",
+    "Flask",
+    "Boto3",
+    "Shell Scripting",
+    "Nginx",
+    "oauth2-proxy",
+    "AWS Cognito",
+    "Jinja2",
+    "Firecracker (Optional)"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Deploy Portal (Capsule Cloud)</h1>
+  <p class="one-liner">A self-service web portal for provisioning SSH access and deploying applications to an EC2 gateway instance protected by AWS Cognito authentication.</p>
+  <p><a href="https://github.com/davidbmar/deploy-portal">https://github.com/davidbmar/deploy-portal</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>Deploy Portal is a Flask-based web application that acts as a control plane for managing deployments on an AWS EC2 instance. It integrates with AWS Cognito via oauth2-proxy for authentication, automatically manages EC2 Security Group rules to whitelist user IPs for SSH access, and generates deployment kits containing SSH keys and configuration scripts. It supports automated infrastructure setup including nginx reverse proxy configuration, port allocation, and framework-specific Dockerfile generation for applications like Next.js.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Automatic IP whitelisting in EC2 Security Groups upon login</li><li>One-click generation of SSH deployment kits with keys and instructions</li><li>Integrated application catalog with real-time status monitoring</li><li>Automated nginx configuration and port allocation for deployed apps</li><li>Framework-aware Dockerfile generation (e.g., Next.js, Vite)</li><li>Self-signed SSL support with optional Let&#x27;s Encrypt migration path</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/deploy-portal.git
+cd deploy-portal
+bash scripts/github-deploy.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|HTTPS| Nginx[nginx :443]
+    Nginx -->|Auth Check| OAuth[oauth2-proxy :4180]
+    OAuth -->|Cognito Auth| Cognito[AWS Cognito]
+    OAuth -->|X-User-Email Header| Flask[Deploy Portal Flask App :5000]
+    Flask -->|boto3 API| EC2[EC2 Security Group Manager]
+    Flask -->|File I/O| Registry[App/Port Registry JSON]
+    Flask -->|Generate| Keys[SSH Key Generator]
+    Flask -->|Detect| Framework[Framework Detector]
+    subgraph Infrastructure
+        EC2
+        Registry
+        Keys
+        Framework
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The core application is built with Python 3.8+ and Flask. It uses boto3 to interact with AWS EC2 APIs for security group management. The frontend is served via Jinja2 templates within Flask. Authentication is handled externally by nginx and oauth2-proxy, which injects the user&#x27;s email into the `X-User-Email` header. Infrastructure automation is handled via Shell scripts for bootstrapping, SSL setup, and installing helper tools like `capsule-nginx-manager`. The system also includes a Firecracker VM manager module for microVM lifecycle management, though the primary deployment path focuses on containerized or direct application deployment on the host.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User
+    participant Nginx
+    participant OAuth
+    participant Flask
+    participant AWS
+    participant FS
+    
+    User->>Nginx: GET /deploy/
+    Nginx->>OAuth: Forward request
+    OAuth->>AWS: Validate Cognito Token
+    AWS-->>OAuth: Valid User Email
+    OAuth->>Nginx: Add X-User-Email Header
+    Nginx->>Flask: Proxy Request
+    Flask->>AWS: Get Instance Metadata
+    Flask->>AWS: Resolve Security Group
+    Flask->>AWS: Authorize User IP Ingress
+    Flask->>FS: Generate SSH Key Pair
+    Flask->>FS: Create Deployment Kit Zip
+    Flask-->>Nginx: Return Deployment Kit
+    Nginx-->>User: Download Zip</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>This project is suitable for teams needing a lightweight, self-hosted deployment dashboard on AWS. It replaces manual SSH key distribution and security group editing with a web interface. It is ideal for internal tools, staging environments, or small-scale production setups where a full Kubernetes cluster is overkill. Developers can use it to quickly spin up new services with automatic HTTPS and port management.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">EC2 Security Group Management</span><span class="tag">SSH Key Generation and Distribution</span><span class="tag">Application Deployment Automation</span><span class="tag">Nginx Reverse Proxy Configuration</span><span class="tag">Port Allocation and Registry</span><span class="tag">Framework Detection (Next.js, Vite, etc.)</span><span class="tag">SSL/TLS Certificate Management</span><span class="tag">Activity Logging and Monitoring</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">app.py (Flask Application)</span><span class="tag">config.py (Configuration Loader)</span><span class="tag">ec2_utils.py (AWS EC2 Manager)</span><span class="tag">services/framework_detector.py</span><span class="tag">services/dockerfile_generator.py</span><span class="tag">firecracker/vm-manager.py</span><span class="tag">scripts/bootstrap.sh</span><span class="tag">scripts/github-deploy.sh</span><span class="tag">infrastructure/install-infrastructure.sh</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.8+</span><span class="tag">Flask</span><span class="tag">Boto3</span><span class="tag">Shell Scripting</span><span class="tag">Nginx</span><span class="tag">oauth2-proxy</span><span class="tag">AWS Cognito</span><span class="tag">Jinja2</span><span class="tag">Firecracker (Optional)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS EC2 Instance with IAM Role</span><span class="tag">AWS Cognito User Pool</span><span class="tag">Python 3.8+</span><span class="tag">pip</span><span class="tag">nginx</span><span class="tag">oauth2-proxy</span><span class="tag">git</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS EC2 API</span><span class="tag">AWS Cognito</span><span class="tag">Claude Code (via prompts)</span><span class="tag">Let&#x27;s Encrypt (Certbot)</span><span class="tag">Systemd</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Reverse Proxy Authentication</span><span class="tag">Infrastructure as Code (Lightweight)</span><span class="tag">Self-Service Portal</span><span class="tag">Convention over Configuration</span><span class="tag">MicroVM Management (Experimental)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">aws-deployment</span><span class="tag">ssh-management</span><span class="tag">flask-admin</span><span class="tag">self-hosted-paas</span><span class="tag">ec2-automation</span><span class="tag">nginx-config-gen</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:44:24.490878Z ·
+     commit 79f9dbd ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

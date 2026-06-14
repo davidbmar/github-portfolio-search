@@ -1,0 +1,276 @@
+{
+  "title": "GPT-4 & LangChain PDF Chatbot",
+  "one_liner": "A Next.js application that enables natural language querying of multiple large PDF documents using GPT-4, LangChain, and Pinecone vector storage.",
+  "what_it_is": "This project is a full-stack web application that allows users to upload or pre-load PDF documents, convert them into vector embeddings, and store them in a Pinecone index. It provides a chat interface where users can ask questions about the content of these PDFs. The system retrieves relevant text chunks from the vector store based on the user's query and uses OpenAI's GPT models to generate contextual answers.",
+  "how_its_built": "The backend is built with Next.js API routes handling the logic. It uses LangChain for orchestrating the LLM calls, document loading, and text splitting. PDFs are parsed using a custom loader, split into chunks, and embedded using OpenAI's embedding model. These embeddings are stored in Pinecone. During chat, the system performs similarity search in Pinecone, constructs a prompt with retrieved context, and streams the GPT response back to the client.",
+  "how_to_apply": "Developers can use this as a starter template for building document-specific Q&A systems. It demonstrates how to integrate vector databases with LLMs for retrieval-augmented generation (RAG). It can be extended to support other document types, different vector stores, or customized prompting strategies for specific domains.",
+  "quickstart": "git clone https://github.com/davidbmar/gpt4-pdf-chatbot-langchain.git\ncd gpt4-pdf-chatbot-langchain\npnpm install\ncp .env.example .env\n# Edit .env with your OPENAI_API_KEY, PINECONE_API_KEY, PINECONE_ENVIRONMENT, and PINECONE_INDEX_NAME\nmkdir docs\n# Add your PDF files to the docs folder\npnpm run ingest\npnpm run dev",
+  "features": [
+    "Chat with multiple large PDF documents using natural language",
+    "Uses GPT-4 (or GPT-3.5-turbo) for high-quality answer generation",
+    "Vector storage and retrieval via Pinecone for scalable document handling",
+    "Streaming responses for a real-time chat experience",
+    "Customizable ingestion pipeline for PDF parsing and chunking"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| NextJS[Next.js App]\n    NextJS -->|API Call| ChatAPI[/api/chat]\n    NextJS -->|Ingest Command| IngestScript[scripts/ingest-data.ts]\n    IngestScript -->|Load & Split| PDFs[PDF Files in /docs]\n    IngestScript -->|Embed| OpenAIEmb[OpenAI Embeddings]\n    IngestScript -->|Store Vectors| Pinecone[(Pinecone Index)]\n    ChatAPI -->|Retrieve Context| Pinecone\n    ChatAPI -->|Generate Answer| OpenAIChat[OpenAI GPT-4/3.5]\n    ChatAPI -->|Stream Response| User",
+  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant N as Next.js Frontend\n    participant A as API Route (/api/chat)\n    participant P as Pinecone\n    participant O as OpenAI API\n\n    U->>N: Types question\n    N->>A: POST /api/chat {question, history}\n    A->>P: Similarity Search (Query Vector)\n    P-->>A: Relevant Document Chunks\n    A->>O: Send Prompt with Context & Question\n    O-->>A: Stream Token Response\n    A-->>N: Stream SSE Data\n    N-->>U: Display Answer Incrementally",
+  "capabilities": [
+    "PDF Ingestion",
+    "Vector Embedding",
+    "Semantic Search",
+    "LLM Chat",
+    "Response Streaming"
+  ],
+  "components": [
+    "Next.js Pages/API",
+    "LangChain Chains",
+    "Pinecone Vector Store",
+    "OpenAI Embeddings",
+    "Custom PDF Loader",
+    "Text Splitter"
+  ],
+  "tech": [
+    "TypeScript",
+    "Next.js",
+    "LangChain",
+    "Pinecone",
+    "OpenAI API",
+    "pdf-parse"
+  ],
+  "depends_on": [
+    "Node.js",
+    "pnpm",
+    "OpenAI Account",
+    "Pinecone Account"
+  ],
+  "integrates_with": [
+    "OpenAI GPT-4/3.5",
+    "Pinecone Vector Database"
+  ],
+  "patterns": [
+    "Retrieval-Augmented Generation (RAG)",
+    "Server-Sent Events (SSE)",
+    "Vector Similarity Search",
+    "Document Chunking"
+  ],
+  "reuse_tags": [
+    "chatbot",
+    "pdf-reader",
+    "langchain",
+    "pinecone",
+    "nextjs",
+    "rag",
+    "gpt-4"
+  ],
+  "slug": "gpt4-pdf-chatbot-langchain",
+  "repo_url": "https://github.com/davidbmar/gpt4-pdf-chatbot-langchain",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-5a5ef42a83f59f4443a473ac0e2f96da is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-7c46553ef7099121463cba81a41f15bc is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-28dbb577a876d9404497ed46c199ef18 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-34ffa1698dd95f159f42198bfaf16fe3 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-79b3f687cd7013587afc305231d4def7 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-329b91dfc2721a4148c91e17b5fe9969 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-652beb074f795981fea42c52188eb9c3 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-663c2c0aa8114fec8d5c58602477b569 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-6702e65b0a6f60cfea7733c435671776 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-53914d9268ef10423e91899572bf08b6 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-bfd15b69abbbf41d13c53fe19332ba59 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-c6aa98f8554e5160f6ea423b5a6c56c2 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-ca7deed55da1542f99cc5b41589f5b67 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-d2a1d5829f4af58fb7f567a063fff277 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-e6dd33c4adace2fbeee0b487b0f5487d is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-e7989f7417948f18cc973456084763ed is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-ee3bafed9ac13ae731678bd6de88b83d is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-f6a86ed1ddf10e6684d18d881d471a56 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-f71cd867ce3849c9489d4be73be0573d is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-f791a697ef52a3f2c71b355a1aa84bae is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-fix-fe96974d7d232cc7fd75995bc7af19ac is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-upgrade-320a15413493f7bd22ab7ef5c4774c55 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-upgrade-06632b0e09d0ee84fb11a74b232d6f1b is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-upgrade-d66ffc4bb632276d76f49c597edb24af is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "snyk-upgrade-f079a8995c3929137e6cca6184ed0bff is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #25: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #24: [Snyk] Security upgrade next from 13.2.3 to 15.5.10"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #23: [Snyk] Security upgrade react-markdown from 8.0.5 to 9.0.0"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #22: [Snyk] Security upgrade langchain from 0.0.41 to 0.1.29"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #21: [Snyk] Security upgrade langchain from 0.0.41 to 0.1.29"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #20: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #19: [Snyk] Security upgrade next from 13.2.3 to 14.2.32"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #18: [Snyk] Security upgrade next from 13.2.3 to 15.2.2"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #17: [Snyk] Security upgrade next from 13.2.3 to 14.2.24"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #16: [Snyk] Fix for 2 vulnerabilities"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #15: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #14: [Snyk] Security upgrade next from 13.2.3 to 13.5.8"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #13: [Snyk] Security upgrade next from 13.2.3 to 14.2.15"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #12: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #11: [Snyk] Security upgrade langchain from 0.0.41 to 0.3.3"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #10: [Snyk] Security upgrade next from 13.2.3 to 14.2.7"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #9: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #8: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #7: [Snyk] Security upgrade langchain from 0.0.41 to 0.0.141"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #6: [Snyk] Security upgrade next from 13.2.3 to 13.5.0"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #5: [Snyk] Security upgrade next from 13.2.3 to 13.5.4"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #4: [Snyk] Upgrade @pinecone-database/pinecone from 0.0.10 to 0.1.6"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #3: [Snyk] Upgrade langchain from 0.0.41 to 0.0.123"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #2: [Snyk] Upgrade lucide-react from 0.125.0 to 0.263.1"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: [Snyk] Upgrade next from 13.2.3 to 13.4.12"
+    }
+  ],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:55:21.494155Z",
+  "source_commit": "a6075e5",
+  "model": "qwen3.7-plus"
+}

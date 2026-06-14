@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser", "one_liner": "Stream generated audio from a Mac host to an iPhone browser via WebRTC and TURN, featuring a voice agent loop with STT, LLM, and TTS.", "what_it_is": "A real-time voice agent system that runs on a Mac host and streams audio responses to an iPhone browser. It captures microphone input via WebRTC, transcribes it using Whisper, processes it with an LLM (Ollama, Claude, or OpenAI), synthesizes speech with Piper TTS, and streams the audio back to the iPhone speaker. It includes robust NAT traversal using TURN servers for cellular connectivity.", "how_its_built": "The backend is a Python aiohttp server acting as a signaling gateway and media engine. It uses faster-whisper for STT, various LLM APIs for reasoning, and Piper for TTS. The frontend is a TypeScript/JavaScript web app that handles WebRTC peer connections, microphone access, and UI state. Communication between client and server uses WebSocket for signaling and WebRTC data/audio channels for media.", "how_to_apply": "Use this project to build low-latency voice assistants that work on mobile browsers without native apps. It serves as a reference for handling WebRTC audio streaming, TURN relay configuration for cellular networks, and integrating local LLMs like Ollama with real-time speech pipelines.", "quickstart": "pip install -r requirements.txt\ncp .env.example .env\npython3 -m gateway.server\nopen http://localhost:8080", "features": ["Real-time voice agent loop: Mic -> STT -> LLM -> TTS -> Speaker", "Supports local Ollama, Anthropic Claude, and OpenAI GPT models", "WebRTC audio streaming with TURN relay for cellular/NAT traversal", "Hold-to-talk UI with live transcription and chat history", "Self-signed HTTPS support for LAN access and Cloudflare Tunnel for remote access"], "diagram_architecture": "flowchart TD\n    subgraph Mac_Host[\"Mac Host\"]\n        Engine[\"Engine\\n(Whisper/LLM/Piper)\"]\n        Gateway[\"Gateway\\n(aiohttp :8080)\\nWebSocket + RTCPeerConnection\"]\n        Engine -->|Audio/Data| Gateway\n    end\n    subgraph iPhone[\"iPhone Browser\"]\n        App[\"web/app.js\\nRTCPeerConnection\\ngetUserMedia\"]\n    end\n    Gateway <-->|WebRTC UDP\\n(via TURN)| App\n    Gateway <-->|WebSocket Signaling| App\n    TURN[\"TURN Server\\n(Twilio)\"]\n    App <-->|Relay| TURN\n    TURN <-->|Relay| Gateway", "diagram_sequence": "sequenceDiagram\n    participant Client as iPhone Browser\n    participant Server as Mac Gateway\n    participant Engine as Voice Engine\n    participant LLM as LLM Provider\n    \n    Client->>Server: WebSocket hello {token}\n    Server-->>Client: hello_ack {voices, ice_servers}\n    \n    Client->>Server: webrtc_offer {sdp}\n    Server->>Server: Create RTCPeerConnection\n    Server-->>Client: webrtc_answer {sdp}\n    \n    Note over Client,Server: Media Stream Established\n    \n    Client->>Server: mic_start (Audio Track)\n    Server->>Engine: Buffer Audio\n    Engine->>Engine: Whisper STT\n    Engine->>LLM: Transcribed Text\n    LLM-->>Engine: Reply Text\n    Engine->>Engine: Piper TTS\n    Engine->>Server: Audio Chunks\n    Server->>Client: WebRTC Audio Track\n    Client->>Client: Play Speaker", "capabilities": ["Speech-to-Text", "Text-to-Speech", "LLM Integration", "WebRTC Streaming", "NAT Traversal"], "components": ["aiohttp Gateway", "Whisper STT", "Piper TTS", "LLM Adapter", "Web Frontend"], "tech": ["Python", "TypeScript", "WebRTC", "WebSocket", "aiohttp", "faster-whisper", "Piper"], "depends_on": ["Ollama", "Twilio TURN", "Cloudflared", "Node.js", "Python 3.9+"], "integrates_with": ["Anthropic Claude", "OpenAI GPT", "Ollama", "Tavily Search", "Brave Search"], "patterns": ["Signaling Server", "Media Relay", "Voice Agent Loop", "Edge AI"], "reuse_tags": ["voice-assistant", "webrtc-audio", "local-llm", "mobile-browser", "turn-server"], "slug": "iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser", "repo_url": "https://github.com/davidbmar/iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/web-app/npm_and_yarn-d1f9cb5775 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 5 updates"}], "screenshot_url": "https://raw.githubusercontent.com/davidbmar/iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser/main/docs/screenshots/agent-ollama.png", "generated_at": "2026-06-14T03:02:59.240617Z", "source_commit": "3bbabe6", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser",
+  "description": "Stream generated audio from a Mac host to an iPhone browser via WebRTC and TURN, featuring a voice agent loop with STT, LLM, and TTS.",
+  "codeRepository": "https://github.com/davidbmar/iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser",
+  "programmingLanguage": [
+    "Python",
+    "TypeScript",
+    "WebRTC",
+    "WebSocket",
+    "aiohttp",
+    "faster-whisper",
+    "Piper"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser</h1>
+  <p class="one-liner">Stream generated audio from a Mac host to an iPhone browser via WebRTC and TURN, featuring a voice agent loop with STT, LLM, and TTS.</p>
+  <p><a href="https://github.com/davidbmar/iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser">https://github.com/davidbmar/iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+<figure class="screenshot"><img src="https://raw.githubusercontent.com/davidbmar/iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser/main/docs/screenshots/agent-ollama.png" alt="iphone-webrtc-TURN-speaker-streaming-machost-iphonebrowser screenshot" loading="lazy"></figure>
+
+<section><h2>What it is</h2><p>A real-time voice agent system that runs on a Mac host and streams audio responses to an iPhone browser. It captures microphone input via WebRTC, transcribes it using Whisper, processes it with an LLM (Ollama, Claude, or OpenAI), synthesizes speech with Piper TTS, and streams the audio back to the iPhone speaker. It includes robust NAT traversal using TURN servers for cellular connectivity.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time voice agent loop: Mic -&gt; STT -&gt; LLM -&gt; TTS -&gt; Speaker</li><li>Supports local Ollama, Anthropic Claude, and OpenAI GPT models</li><li>WebRTC audio streaming with TURN relay for cellular/NAT traversal</li><li>Hold-to-talk UI with live transcription and chat history</li><li>Self-signed HTTPS support for LAN access and Cloudflare Tunnel for remote access</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">pip install -r requirements.txt
+cp .env.example .env
+python3 -m gateway.server
+open http://localhost:8080</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    subgraph Mac_Host["Mac Host"]
+        Engine["Engine\n(Whisper/LLM/Piper)"]
+        Gateway["Gateway\n(aiohttp :8080)\nWebSocket + RTCPeerConnection"]
+        Engine -->|Audio/Data| Gateway
+    end
+    subgraph iPhone["iPhone Browser"]
+        App["web/app.js\nRTCPeerConnection\ngetUserMedia"]
+    end
+    Gateway &lt;-->|WebRTC UDP\n(via TURN)| App
+    Gateway &lt;-->|WebSocket Signaling| App
+    TURN["TURN Server\n(Twilio)"]
+    App &lt;-->|Relay| TURN
+    TURN &lt;-->|Relay| Gateway</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend is a Python aiohttp server acting as a signaling gateway and media engine. It uses faster-whisper for STT, various LLM APIs for reasoning, and Piper for TTS. The frontend is a TypeScript/JavaScript web app that handles WebRTC peer connections, microphone access, and UI state. Communication between client and server uses WebSocket for signaling and WebRTC data/audio channels for media.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant Client as iPhone Browser
+    participant Server as Mac Gateway
+    participant Engine as Voice Engine
+    participant LLM as LLM Provider
+    
+    Client->>Server: WebSocket hello {token}
+    Server-->>Client: hello_ack {voices, ice_servers}
+    
+    Client->>Server: webrtc_offer {sdp}
+    Server->>Server: Create RTCPeerConnection
+    Server-->>Client: webrtc_answer {sdp}
+    
+    Note over Client,Server: Media Stream Established
+    
+    Client->>Server: mic_start (Audio Track)
+    Server->>Engine: Buffer Audio
+    Engine->>Engine: Whisper STT
+    Engine->>LLM: Transcribed Text
+    LLM-->>Engine: Reply Text
+    Engine->>Engine: Piper TTS
+    Engine->>Server: Audio Chunks
+    Server->>Client: WebRTC Audio Track
+    Client->>Client: Play Speaker</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this project to build low-latency voice assistants that work on mobile browsers without native apps. It serves as a reference for handling WebRTC audio streaming, TURN relay configuration for cellular networks, and integrating local LLMs like Ollama with real-time speech pipelines.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Speech-to-Text</span><span class="tag">Text-to-Speech</span><span class="tag">LLM Integration</span><span class="tag">WebRTC Streaming</span><span class="tag">NAT Traversal</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">aiohttp Gateway</span><span class="tag">Whisper STT</span><span class="tag">Piper TTS</span><span class="tag">LLM Adapter</span><span class="tag">Web Frontend</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">TypeScript</span><span class="tag">WebRTC</span><span class="tag">WebSocket</span><span class="tag">aiohttp</span><span class="tag">faster-whisper</span><span class="tag">Piper</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Ollama</span><span class="tag">Twilio TURN</span><span class="tag">Cloudflared</span><span class="tag">Node.js</span><span class="tag">Python 3.9+</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Anthropic Claude</span><span class="tag">OpenAI GPT</span><span class="tag">Ollama</span><span class="tag">Tavily Search</span><span class="tag">Brave Search</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Signaling Server</span><span class="tag">Media Relay</span><span class="tag">Voice Agent Loop</span><span class="tag">Edge AI</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">voice-assistant</span><span class="tag">webrtc-audio</span><span class="tag">local-llm</span><span class="tag">mobile-browser</span><span class="tag">turn-server</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/web-app/npm_and_yarn-d1f9cb5775 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 5 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T03:02:59.240617Z ·
+     commit 3bbabe6 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

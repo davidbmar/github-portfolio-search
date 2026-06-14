@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloudflare Zero Trust Setup Wizard · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "Cloudflare Zero Trust Setup Wizard", "one_liner": "Interactive portal and CLI for provisioning secure, identity-gated localhost tunnels via Cloudflare.", "what_it_is": "A developer tool that automates the creation of Cloudflare Tunnels and Access policies to expose local services securely. It replaces manual dashboard configuration with a guided React-based web portal or terminal script, handling DNS records, tunnel binaries, and macOS launch agents automatically.", "how_its_built": "The project combines Bash scripting for system-level operations (installing cloudflared, managing launchd plists) with a TypeScript/React frontend served by a lightweight Express backend. The backend acts as a bridge, executing shell commands to read/write config.env and check system status, while the frontend provides a visual wizard and real-time status dashboard.", "how_to_apply": "Use this when you need to demo localhost applications to remote stakeholders without exposing your IP or opening firewall ports. It is ideal for developers who want a permanent, authenticated URL for local development environments, ensuring only specific emails can access the service via Cloudflare's edge network.", "quickstart": "git clone https://github.com/davidbmar/cloudflare-zero-trust-setup.git\ncd cloudflare-zero-trust-setup\n./portal.sh", "features": ["Interactive React wizard guides users through Tunnel, DNS, and Access setup", "Automated installation of cloudflared binary and macOS launch agents", "Identity gate enforcement using Cloudflare Access email OTP", "Real-time status dashboard monitoring tunnel and origin health", "CLI alternative for headless or terminal-preferred workflows", "Automatic reconnection and network switching support"], "diagram_architecture": "flowchart TD\n    User[Internet User] -->|HTTPS Request| CF_Access[Cloudflare Access Edge]\n    CF_Access -->|Check Identity| IdP[Identity Provider]\n    IdP -->|OTP/Auth| CF_Access\n    CF_Access -->|Allowed| CF_Tunnel[Cloudflare Tunnel Network]\n    CF_Tunnel -->|Encrypted Outbound| Daemon[cloudflared daemon]\n    Daemon -->|Localhost Proxy| LocalSvc[Local Service :8090]\n    subgraph Local Machine\n        Daemon\n        LocalSvc\n        Portal[Setup Portal :5173]\n        API[Express API :3001]\n        Portal -->|Proxy /api| API\n        API -->|Exec/Read| Config[config.env]\n        API -->|Manage| Daemon\n    end", "diagram_sequence": "sequenceDiagram\n    participant User as Developer\n    participant Portal as React Portal\n    participant API as Express Backend\n    participant FS as File System\n    participant OS as macOS OS\n    \n    User->>Portal: Open Setup Wizard\n    Portal->>API: GET /api/status\n    API->>FS: Read config.env\n    API->>OS: Check cloudflared process\n    OS-->>API: Process status\n    API-->>Portal: JSON Status\n    \n    User->>Portal: Click 'Create Tunnel'\n    Portal->>API: POST /api/setup/tunnel\n    API->>OS: Exec cloudflared tunnel create\n    OS-->>API: Tunnel UUID\n    API->>FS: Write config.env\n    API-->>Portal: Success\n    \n    User->>Portal: Click 'Install Launch Agent'\n    Portal->>API: POST /api/setup/agent\n    API->>FS: Render plist template\n    API->>OS: cp plist to LaunchAgents\n    OS-->>API: Success\n    API-->>Portal: Installed", "capabilities": ["Tunnel provisioning", "DNS record management", "Access policy creation", "Launch agent installation", "Status monitoring", "Configuration persistence"], "components": ["React Frontend", "Express API Server", "Bash Setup Scripts", "Cloudflared Binary", "Launchd Plist Template", "Config Parser"], "tech": ["TypeScript", "React", "Vite", "Express", "Bash", "Cloudflare Tunnels"], "depends_on": ["Node.js", "Homebrew", "macOS", "Cloudflare Account", "Cloudflare Domain"], "integrates_with": ["Cloudflare Zero Trust Dashboard", "Cloudflare DNS", "Localhost Services", "Identity Providers (via Access)"], "patterns": ["Reverse Proxy", "Zero Trust Security", "Wizard UI", "Backend-for-Frontend", "Infrastructure as Code (Lightweight)"], "reuse_tags": ["dev-tools", "security", "tunneling", "cloudflare", "localhost-exposure", "react-wizard"], "slug": "cloudflare-zero-trust-setup", "repo_url": "https://github.com/davidbmar/cloudflare-zero-trust-setup", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/npm_and_yarn/portal/npm_and_yarn-e1451c0123 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 5 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T02:42:31.143551Z", "source_commit": "3bf1864", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Cloudflare Zero Trust Setup Wizard",
+  "description": "Interactive portal and CLI for provisioning secure, identity-gated localhost tunnels via Cloudflare.",
+  "codeRepository": "https://github.com/davidbmar/cloudflare-zero-trust-setup",
+  "programmingLanguage": [
+    "TypeScript",
+    "React",
+    "Vite",
+    "Express",
+    "Bash",
+    "Cloudflare Tunnels"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Cloudflare Zero Trust Setup Wizard</h1>
+  <p class="one-liner">Interactive portal and CLI for provisioning secure, identity-gated localhost tunnels via Cloudflare.</p>
+  <p><a href="https://github.com/davidbmar/cloudflare-zero-trust-setup">https://github.com/davidbmar/cloudflare-zero-trust-setup</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>A developer tool that automates the creation of Cloudflare Tunnels and Access policies to expose local services securely. It replaces manual dashboard configuration with a guided React-based web portal or terminal script, handling DNS records, tunnel binaries, and macOS launch agents automatically.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Interactive React wizard guides users through Tunnel, DNS, and Access setup</li><li>Automated installation of cloudflared binary and macOS launch agents</li><li>Identity gate enforcement using Cloudflare Access email OTP</li><li>Real-time status dashboard monitoring tunnel and origin health</li><li>CLI alternative for headless or terminal-preferred workflows</li><li>Automatic reconnection and network switching support</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/cloudflare-zero-trust-setup.git
+cd cloudflare-zero-trust-setup
+./portal.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[Internet User] -->|HTTPS Request| CF_Access[Cloudflare Access Edge]
+    CF_Access -->|Check Identity| IdP[Identity Provider]
+    IdP -->|OTP/Auth| CF_Access
+    CF_Access -->|Allowed| CF_Tunnel[Cloudflare Tunnel Network]
+    CF_Tunnel -->|Encrypted Outbound| Daemon[cloudflared daemon]
+    Daemon -->|Localhost Proxy| LocalSvc[Local Service :8090]
+    subgraph Local Machine
+        Daemon
+        LocalSvc
+        Portal[Setup Portal :5173]
+        API[Express API :3001]
+        Portal -->|Proxy /api| API
+        API -->|Exec/Read| Config[config.env]
+        API -->|Manage| Daemon
+    end</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The project combines Bash scripting for system-level operations (installing cloudflared, managing launchd plists) with a TypeScript/React frontend served by a lightweight Express backend. The backend acts as a bridge, executing shell commands to read/write config.env and check system status, while the frontend provides a visual wizard and real-time status dashboard.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant User as Developer
+    participant Portal as React Portal
+    participant API as Express Backend
+    participant FS as File System
+    participant OS as macOS OS
+    
+    User->>Portal: Open Setup Wizard
+    Portal->>API: GET /api/status
+    API->>FS: Read config.env
+    API->>OS: Check cloudflared process
+    OS-->>API: Process status
+    API-->>Portal: JSON Status
+    
+    User->>Portal: Click 'Create Tunnel'
+    Portal->>API: POST /api/setup/tunnel
+    API->>OS: Exec cloudflared tunnel create
+    OS-->>API: Tunnel UUID
+    API->>FS: Write config.env
+    API-->>Portal: Success
+    
+    User->>Portal: Click 'Install Launch Agent'
+    Portal->>API: POST /api/setup/agent
+    API->>FS: Render plist template
+    API->>OS: cp plist to LaunchAgents
+    OS-->>API: Success
+    API-->>Portal: Installed</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Use this when you need to demo localhost applications to remote stakeholders without exposing your IP or opening firewall ports. It is ideal for developers who want a permanent, authenticated URL for local development environments, ensuring only specific emails can access the service via Cloudflare&#x27;s edge network.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Tunnel provisioning</span><span class="tag">DNS record management</span><span class="tag">Access policy creation</span><span class="tag">Launch agent installation</span><span class="tag">Status monitoring</span><span class="tag">Configuration persistence</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">React Frontend</span><span class="tag">Express API Server</span><span class="tag">Bash Setup Scripts</span><span class="tag">Cloudflared Binary</span><span class="tag">Launchd Plist Template</span><span class="tag">Config Parser</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Express</span><span class="tag">Bash</span><span class="tag">Cloudflare Tunnels</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">Node.js</span><span class="tag">Homebrew</span><span class="tag">macOS</span><span class="tag">Cloudflare Account</span><span class="tag">Cloudflare Domain</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Cloudflare Zero Trust Dashboard</span><span class="tag">Cloudflare DNS</span><span class="tag">Localhost Services</span><span class="tag">Identity Providers (via Access)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Reverse Proxy</span><span class="tag">Zero Trust Security</span><span class="tag">Wizard UI</span><span class="tag">Backend-for-Frontend</span><span class="tag">Infrastructure as Code (Lightweight)</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">dev-tools</span><span class="tag">security</span><span class="tag">tunneling</span><span class="tag">cloudflare</span><span class="tag">localhost-exposure</span><span class="tag">react-wizard</span></span></div>
+</section>
+
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/npm_and_yarn/portal/npm_and_yarn-e1451c0123 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #1: Bump the npm_and_yarn group across 1 directory with 5 updates</li></ul></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:42:31.143551Z ·
+     commit 3bf1864 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>

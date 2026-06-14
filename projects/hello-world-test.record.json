@@ -1,0 +1,41 @@
+{
+  "title": "hello-world-test",
+  "one_liner": "A minimal GitHub repository used for testing branch edits and README updates.",
+  "what_it_is": "This is a placeholder repository created by David Mar to verify Git workflow operations, specifically testing changes on the 'readme-edits' branch. It contains no executable code, libraries, or application logic.",
+  "how_its_built": "The repository consists solely of a Markdown file (README.md). There are no build scripts, package managers, or compilation steps involved.",
+  "how_to_apply": "This project is not applicable for software integration or deployment. It serves as a reference for basic Git branching and commit history inspection.",
+  "quickstart": "",
+  "features": [
+    "Contains a single README.md file",
+    "Demonstrates a non-main branch workflow (readme-edits)",
+    "Serves as a sandbox for Git commit verification"
+  ],
+  "diagram_architecture": "flowchart TD\n    A[User] -->|Edits| B(README.md)\n    B -->|Commits to| C[readme-edits Branch]\n    C -->|Pushes to| D[GitHub Remote]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant LocalGit\n    participant GitHub\n    User->>LocalGit: Edit README.md\n    User->>LocalGit: git add & commit\n    User->>GitHub: git push origin readme-edits\n    GitHub-->>User: Update confirmed",
+  "capabilities": [],
+  "components": [
+    "README.md"
+  ],
+  "tech": [
+    "Git",
+    "Markdown"
+  ],
+  "depends_on": [],
+  "integrates_with": [],
+  "patterns": [],
+  "reuse_tags": [
+    "test-repo",
+    "documentation-only",
+    "git-workflow-example"
+  ],
+  "slug": "hello-world-test",
+  "repo_url": "https://github.com/davidbmar/hello-world-test",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-06-14T02:57:01.442763Z",
+  "source_commit": "282e237",
+  "model": "qwen3.7-plus"
+}

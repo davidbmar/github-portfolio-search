@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>audio-ui-cf-s3-lambda-cognito · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "audio-ui-cf-s3-lambda-cognito", "one_liner": "A deprecated serverless personal cloud platform featuring secure audio recording and file management via AWS Cognito, Lambda, S3, and CloudFront.", "what_it_is": "This project is a serverless web application that provides two main interfaces: a file manager for CRUD operations on S3 storage and an audio recorder for capturing, chunking, and uploading voice memos. It uses AWS Cognito for user authentication and isolation, ensuring each user's data is stored under their unique ID in S3. The architecture relies on Lambda functions for generating pre-signed URLs and managing metadata, with CloudFront serving the static frontend assets.", "how_its_built": "The backend consists of Node.js Lambda functions (api/audio.js, api/s3.js, api/memory.js) deployed via shell scripts. The frontend is a React-based SPA using in-browser Babel compilation, served as static HTML/JS files from S3/CloudFront. Infrastructure is managed through a series of numbered shell scripts (step-10 to step-47) that handle AWS CLI commands for setting up Cognito User Pools, Identity Pools, API Gateway, and S3 buckets. Templates are used for web files to inject environment-specific configuration during deployment.", "how_to_apply": "Clone the repository, configure AWS CLI credentials, and execute the numbered deployment scripts in sequence (step-10 through step-47). After infrastructure deployment, manually create a Cognito user via AWS CLI. Access the application via the provided CloudFront distribution URL for file management or the /audio.html path for recording.", "quickstart": "git clone https://github.com/davidbmar/audio-ui-cf-s3-lambda-cognito.git\ncd audio-ui-cf-s3-lambda-cognito\nchmod +x step-*.sh\n./step-10-setup.sh\n./step-20-deploy-lambda.sh\n./step-25-update-web-files.sh\n./step-45-validation.sh\n./step-47-test-apis.sh", "features": ["Real-time audio recording with configurable chunked uploads to S3", "Secure file management with user-isolated S3 storage and JWT auth", "Mobile-first responsive UI optimized for iOS touch interactions", "Serverless architecture using Lambda, API Gateway, and CloudFront", "Resumable uploads with retry logic for network instability", "Nested folder navigation and drag-and-drop file support"], "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS| CF[CloudFront Distribution]\n    CF -->|Serves Static Assets| S3Web[S3 Web Bucket]\n    User -->|API Requests| AG[API Gateway]\n    AG -->|Authorizes| Cognito[AWS Cognito]\n    AG -->|Invokes| Lambda[Lambda Functions]\n    Lambda -->|Reads/Writes| S3Data[S3 Data Bucket]\n    Lambda -->|Generates Pre-signed URLs| S3Data\n    User -->|Direct Upload| S3Data", "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as Frontend (HTML/JS)\n    participant G as API Gateway\n    participant L as Lambda (audio.js)\n    participant S as S3 Bucket\n    \n    U->>F: Start Recording\n    F->>F: Capture Audio Chunk\n    F->>G: Request Pre-signed URL (sessionId, chunkNumber)\n    G->>L: Invoke uploadChunk Handler\n    L->>L: Validate Cognito Claims & Input\n    L->>S: Generate Pre-signed PUT URL\n    L-->>G: Return Pre-signed URL\n    G-->>F: Return Pre-signed URL\n    F->>S: PUT Audio Chunk Directly\n    S-->>F: Confirm Upload\n    F->>F: Update UI Progress", "capabilities": ["Audio Recording", "File Management", "User Authentication", "Secure Storage", "Mobile Optimization"], "components": ["Lambda Functions", "API Gateway", "S3 Buckets", "CloudFront Distribution", "Cognito User Pool", "Cognito Identity Pool", "React Frontend"], "tech": ["Node.js", "AWS Lambda", "Amazon S3", "Amazon CloudFront", "Amazon Cognito", "API Gateway", "HTML5 MediaRecorder API", "React"], "depends_on": ["AWS CLI", "Node.js v14+", "npm", "Git"], "integrates_with": ["AWS Cognito", "AWS S3", "AWS Lambda", "AWS CloudFront"], "patterns": ["Serverless", "Pre-signed URLs", "Chunked Upload", "Static Site Hosting", "JWT Authentication"], "reuse_tags": ["aws-serverless", "audio-recording", "cognito-auth", "s3-storage", "cloudfront-cdn", "deprecated"], "slug": "audio-ui-cf-s3-lambda-cognito", "repo_url": "https://github.com/davidbmar/audio-ui-cf-s3-lambda-cognito", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:23:57.626224Z", "source_commit": "7ea1e49", "model": "qwen3.7-plus"}</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "audio-ui-cf-s3-lambda-cognito",
+  "description": "A deprecated serverless personal cloud platform featuring secure audio recording and file management via AWS Cognito, Lambda, S3, and CloudFront.",
+  "codeRepository": "https://github.com/davidbmar/audio-ui-cf-s3-lambda-cognito",
+  "programmingLanguage": [
+    "Node.js",
+    "AWS Lambda",
+    "Amazon S3",
+    "Amazon CloudFront",
+    "Amazon Cognito",
+    "API Gateway",
+    "HTML5 MediaRecorder API",
+    "React"
+  ]
+}</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 920px; margin: 2rem auto;
+          padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  .one-liner { font-size: 1.15rem; opacity: .85; }
+  .badge { font-size: .72rem; padding: .15rem .5rem; border-radius: 999px;
+            background: #ddd; color: #222; margin-left: .5rem; }
+  .badge.thin { background: #b88600; color: #fff; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 6px;
+          padding: .1rem .45rem; margin: .1rem; font-size: .82rem; }
+  .muted { opacity: .5; }
+  .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
+  .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
+              background: #f4fbf7; }
+  .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
+  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
+                    border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
+  figure.screenshot { margin: 1.5rem 0; }
+  figure.screenshot img { max-width: 100%; height: auto; border-radius: 10px;
+                           border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
+  ul.features li { margin: .25rem 0; }
+  a { color: #2563eb; }
+</style>
+</head>
+<body>
+<header>
+  <h1>audio-ui-cf-s3-lambda-cognito</h1>
+  <p class="one-liner">A deprecated serverless personal cloud platform featuring secure audio recording and file management via AWS Cognito, Lambda, S3, and CloudFront.</p>
+  <p><a href="https://github.com/davidbmar/audio-ui-cf-s3-lambda-cognito">https://github.com/davidbmar/audio-ui-cf-s3-lambda-cognito</a>
+     &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+</header>
+
+
+
+<section><h2>What it is</h2><p>This project is a serverless web application that provides two main interfaces: a file manager for CRUD operations on S3 storage and an audio recorder for capturing, chunking, and uploading voice memos. It uses AWS Cognito for user authentication and isolation, ensuring each user&#x27;s data is stored under their unique ID in S3. The architecture relies on Lambda functions for generating pre-signed URLs and managing metadata, with CloudFront serving the static frontend assets.</p></section>
+
+<section><h2>Features</h2><ul class="features"><li>Real-time audio recording with configurable chunked uploads to S3</li><li>Secure file management with user-isolated S3 storage and JWT auth</li><li>Mobile-first responsive UI optimized for iOS touch interactions</li><li>Serverless architecture using Lambda, API Gateway, and CloudFront</li><li>Resumable uploads with retry logic for network instability</li><li>Nested folder navigation and drag-and-drop file support</li></ul></section>
+
+<section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/audio-ui-cf-s3-lambda-cognito.git
+cd audio-ui-cf-s3-lambda-cognito
+chmod +x step-*.sh
+./step-10-setup.sh
+./step-20-deploy-lambda.sh
+./step-25-update-web-files.sh
+./step-45-validation.sh
+./step-47-test-apis.sh</pre></section>
+
+<section><h2>Architecture</h2>
+  <pre class="mermaid">flowchart TD
+    User[User Browser] -->|HTTPS| CF[CloudFront Distribution]
+    CF -->|Serves Static Assets| S3Web[S3 Web Bucket]
+    User -->|API Requests| AG[API Gateway]
+    AG -->|Authorizes| Cognito[AWS Cognito]
+    AG -->|Invokes| Lambda[Lambda Functions]
+    Lambda -->|Reads/Writes| S3Data[S3 Data Bucket]
+    Lambda -->|Generates Pre-signed URLs| S3Data
+    User -->|Direct Upload| S3Data</pre>
+</section>
+
+<section><h2>How it's built</h2><p>The backend consists of Node.js Lambda functions (api/audio.js, api/s3.js, api/memory.js) deployed via shell scripts. The frontend is a React-based SPA using in-browser Babel compilation, served as static HTML/JS files from S3/CloudFront. Infrastructure is managed through a series of numbered shell scripts (step-10 to step-47) that handle AWS CLI commands for setting up Cognito User Pools, Identity Pools, API Gateway, and S3 buckets. Templates are used for web files to inject environment-specific configuration during deployment.</p></section>
+
+<section><h2>How it runs</h2>
+  <pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant F as Frontend (HTML/JS)
+    participant G as API Gateway
+    participant L as Lambda (audio.js)
+    participant S as S3 Bucket
+    
+    U->>F: Start Recording
+    F->>F: Capture Audio Chunk
+    F->>G: Request Pre-signed URL (sessionId, chunkNumber)
+    G->>L: Invoke uploadChunk Handler
+    L->>L: Validate Cognito Claims & Input
+    L->>S: Generate Pre-signed PUT URL
+    L-->>G: Return Pre-signed URL
+    G-->>F: Return Pre-signed URL
+    F->>S: PUT Audio Chunk Directly
+    S-->>F: Confirm Upload
+    F->>F: Update UI Progress</pre>
+</section>
+
+<section><h2>How to apply &amp; reuse</h2><p>Clone the repository, configure AWS CLI credentials, and execute the numbered deployment scripts in sequence (step-10 through step-47). After infrastructure deployment, manually create a Cognito user via AWS CLI. Access the application via the provided CloudFront distribution URL for file management or the /audio.html path for recording.</p></section>
+
+<section><h2>At a glance</h2>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Audio Recording</span><span class="tag">File Management</span><span class="tag">User Authentication</span><span class="tag">Secure Storage</span><span class="tag">Mobile Optimization</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">Lambda Functions</span><span class="tag">API Gateway</span><span class="tag">S3 Buckets</span><span class="tag">CloudFront Distribution</span><span class="tag">Cognito User Pool</span><span class="tag">Cognito Identity Pool</span><span class="tag">React Frontend</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Node.js</span><span class="tag">AWS Lambda</span><span class="tag">Amazon S3</span><span class="tag">Amazon CloudFront</span><span class="tag">Amazon Cognito</span><span class="tag">API Gateway</span><span class="tag">HTML5 MediaRecorder API</span><span class="tag">React</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS CLI</span><span class="tag">Node.js v14+</span><span class="tag">npm</span><span class="tag">Git</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">AWS Cognito</span><span class="tag">AWS S3</span><span class="tag">AWS Lambda</span><span class="tag">AWS CloudFront</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Serverless</span><span class="tag">Pre-signed URLs</span><span class="tag">Chunked Upload</span><span class="tag">Static Site Hosting</span><span class="tag">JWT Authentication</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">aws-serverless</span><span class="tag">audio-recording</span><span class="tag">cognito-auth</span><span class="tag">s3-storage</span><span class="tag">cloudfront-cdn</span><span class="tag">deprecated</span></span></div>
+</section>
+
+<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+
+<footer class="muted">
+  <p>Generated 2026-06-14T02:23:57.626224Z ·
+     commit 7ea1e49 ·
+     model qwen3.7-plus</p>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>
+</body>
+</html>
