@@ -1,9 +1,9 @@
 # Auto-generate L0 project docs.
 #
 # Required repo secrets:
-#   GH_PAT              — a PAT with `repo` scope. REQUIRED: the default
+#   GHPS_PAT            — a PAT with `repo` scope. REQUIRED: the default
 #                         secrets.GITHUB_TOKEN is scoped to THIS repo only and
-#                         cannot list your other repos.
+#                         cannot list your other repos. (Same secret reindex.yml uses.)
 #   DASHSCOPE_API_KEY   — Alibaba Model Studio (Qwen) key
 #   DASHSCOPE_BASE_URL  — e.g. https://<host>/compatible-mode/v1
 #   DASHSCOPE_MODEL     — e.g. qwen3.7-plus
@@ -56,7 +56,7 @@ jobs:
         # Inputs are passed via env (never interpolated into the script) to avoid
         # workflow command injection; limit is validated as numeric before use.
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GHPS_PAT }}
           LLM_PROVIDER: dashscope
           DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
           DASHSCOPE_BASE_URL: ${{ secrets.DASHSCOPE_BASE_URL }}
