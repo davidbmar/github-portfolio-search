@@ -3,8 +3,8 @@ name: Reindex and Deploy
 on:
   workflow_dispatch:
   schedule:
-    # Weekly on Sunday at 06:00 UTC
-    - cron: "0 6 * * 0"
+    # Nightly at 06:00 UTC
+    - cron: "0 6 * * *"
 
 concurrency:
   group: reindex-deploy
@@ -27,7 +27,9 @@ jobs:
 
       - name: Index repositories
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # A user PAT (repo scope) — the built-in GITHUB_TOKEN is repo-scoped
+          # and 403s on /user/repos, so it can't list the account's repos.
+          GITHUB_TOKEN: ${{ secrets.GHPS_PAT }}
         run: ghps index davidbmar --db ghps.db
 
       - name: Export static data
