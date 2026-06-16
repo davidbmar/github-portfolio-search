@@ -1,33 +1,32 @@
 {
   "title": "k3s App Builder Platform",
   "one_liner": "A self-contained platform for deploying apps with plain language and Claude, running entirely within k3s on a single EC2 instance.",
-  "what_it_is": "A local-first application development and deployment platform that allows users to describe an app in natural language, have Claude generate the code, build it into a container, and deploy it to a preview or production environment on a single-node Kubernetes cluster. It isolates apps using Kubernetes namespaces and manages traffic via Traefik.",
-  "how_its_built": "The platform is built with Python (FastAPI) for the backend logic, utilizing the Anthropic SDK for code generation. It uses k3s for container orchestration, Docker for image building, a local Docker registry for storage, and Traefik for ingress routing. Jinja2 templates are used to generate Kubernetes manifests dynamically.",
-  "how_to_apply": "Clone the repository to an Ubuntu 24.04 EC2 instance, install dependencies via provided shell scripts, set the ANTHROPIC_API_KEY, and access the web UI via a nip.io domain pointing to the instance's public IP.",
+  "what_it_is": "A local-first application development and deployment platform that allows users to describe an app in natural language, have Claude generate the code, build it into a container, and deploy it to a preview or production environment on a single-node Kubernetes cluster. It eliminates external dependencies by using a local Docker registry, nip.io for DNS, and Traefik for ingress routing.",
+  "how_its_built": "The platform is built with Python (FastAPI) for the backend logic, utilizing the Anthropic SDK for code generation. It orchestrates infrastructure via subprocess calls to docker and kubectl. The frontend is a web UI that interacts with the backend API. Infrastructure consists of k3s (Kubernetes), Traefik (Ingress Controller), and a local Docker Registry, all running on a single Ubuntu EC2 instance.",
+  "how_to_apply": "Use this project as a prototype for internal developer platforms (IDPs), educational tools for teaching Kubernetes, or lightweight staging environments where cost and complexity must be minimized. It demonstrates how to isolate applications using Kubernetes namespaces, ResourceQuotas, and NetworkPolicies without cloud-managed services.",
   "quickstart": "git clone https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto\ncd 2026-FEB-21-K3-App-Builder-Claude-proto\nchmod +x scripts/*.sh\n./scripts/install-k3s.sh\n./scripts/setup-registry.sh\nexport ANTHROPIC_API_KEY=sk-ant-...\n./scripts/bootstrap-cluster.sh",
   "features": [
     "Natural language app generation using Claude Opus",
     "Live code streaming and preview before deployment",
     "Automated Docker build and push to local registry",
-    "Isolated preview and production environments per app",
-    "One-click rollback to previous versions",
-    "Resource quotas and network policies for isolation"
+    "Isolated Kubernetes namespaces per app with resource quotas",
+    "One-click promotion from Preview to Production with rolling updates",
+    "Instant rollback capability using previous image tags"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| Traefik[Traefik Ingress Controller]\n    Traefik -->|Route: builder.*| BuilderUI[Builder UI Service]\n    Traefik -->|Route: app.*| AppNS[App Namespace Services]\n    \n    subgraph Builder System\n        BuilderUI --> BuildOps[Build Operations]\n        BuildOps -->|Generate Code| Claude[Claude API]\n        BuildOps -->|Build Image| DockerHost[Docker Daemon]\n        DockerHost -->|Push| LocalReg[Local Registry :5050]\n        BuildOps -->|Apply Manifests| K8sAPI[k3s API Server]\n    end\n    \n    subgraph App Namespace\n        K8sAPI --> Deploy[Deployment]\n        Deploy --> Pod[App Pod]\n        AppNS --> Pod\n    end\n    \n    LocalReg -->|Pull Image| Pod",
-  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant UI as Builder UI\n    participant Claude as Claude API\n    participant Docker as Docker Daemon\n    participant Reg as Local Registry\n    participant K8s as k3s Cluster\n\n    User->>UI: Describe App & Click Generate\n    UI->>Claude: Stream Prompt with Context\n    Claude-->>UI: Stream Generated Code Files\n    UI->>User: Display Code Preview\n    \n    User->>UI: Click Build & Deploy Preview\n    UI->>Docker: docker build .\n    Docker->>Reg: Push Image (app:timestamp)\n    UI->>K8s: Apply Preview Deployment Manifest\n    K8s->>Reg: Pull Image\n    K8s->>K8s: Start Preview Pod\n    K8s-->>UI: Deployment Ready\n    UI-->>User: Show Preview URL",
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| NipIO[nip.io DNS]\n    NipIO -->|Resolves IP| EC2[Single EC2 Instance]\n    subgraph Host OS\n        Docker[Docker Daemon]\n        Registry[Local Docker Registry :5050]\n    end\n    subgraph k3s Cluster\n        Traefik[Traefik Ingress Controller]\n        BuilderNS[Namespace: builder-system]\n        AppNS[Namespace: app-{name}]\n        \n        BuilderUI[Builder UI Pod] -->|Exec| Docker\n        BuilderUI -->|kubectl| K8sAPI[k3s API Server]\n        \n        Traefik -->|Route| BuilderUI\n        Traefik -->|Route| AppPreview[Preview Deployment]\n        Traefik -->|Route| AppProd[Production Deployment]\n        \n        AppPreview -->|Pull Image| Registry\n        AppProd -->|Pull Image| Registry\n    end\n    Docker -->|Push Image| Registry\n    K8sAPI -->|Manage| AppPreview\n    K8sAPI -->|Manage| AppProd",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant UI as Builder UI\n    participant Claude as Claude API\n    participant Docker as Docker Daemon\n    participant Reg as Local Registry\n    participant K8s as k3s Cluster\n\n    User->>UI: Describe App & Click Generate\n    UI->>Claude: Stream Prompt with Template\n    Claude-->>UI: Stream Code Files\n    UI->>User: Display Generated Code\n    \n    User->>UI: Click Build & Deploy Preview\n    UI->>Docker: docker build .\n    Docker->>Reg: Push image:tag\n    UI->>K8s: kubectl apply (Preview Deployment)\n    K8s->>Reg: Pull image:tag\n    K8s-->>UI: Deployment Ready\n    UI->>User: Show Preview URL\n    \n    User->>UI: Click Publish to Production\n    UI->>K8s: kubectl set image (Prod Deployment)\n    K8s->>Reg: Pull image:tag\n    K8s-->>UI: Rolling Update Complete",
   "capabilities": [
     "Code Generation",
     "Container Building",
-    "Kubernetes Deployment",
+    "Kubernetes Orchestration",
     "Traffic Routing",
-    "Version Management",
     "Environment Isolation"
   ],
   "components": [
     "Builder UI (FastAPI)",
-    "Build Ops Module",
-    "Claude Ops Module",
-    "K8s Ops Module",
+    "Claude Integration Module",
+    "Build Operations Module",
+    "K8s Operations Module",
     "Traefik Ingress",
     "Local Docker Registry",
     "k3s Control Plane"
@@ -43,10 +42,9 @@
   ],
   "depends_on": [
     "Ubuntu 24.04",
-    "Docker Engine",
-    "Anthropic API Key",
-    "Public IP Address",
-    "Port 80 Access"
+    "ANTHROPIC_API_KEY",
+    "Port 80 Access",
+    "Git"
   ],
   "integrates_with": [
     "Anthropic Claude API",
@@ -54,19 +52,18 @@
     "Local Docker Registry"
   ],
   "patterns": [
-    "GitOps-like Manifest Generation",
-    "Preview/Production Parity",
+    "GitOps-lite",
     "Namespace Isolation",
-    "Streaming AI Response",
-    "Self-hosted CI/CD"
+    "Blue/Green Deployment (Preview/Prod)",
+    "Self-hosted PaaS"
   ],
   "reuse_tags": [
     "k3s",
-    "ai-code-gen",
-    "self-hosted",
+    "claude",
+    "paas",
     "python",
-    "devops-tool",
-    "single-node"
+    "docker",
+    "traefik"
   ],
   "slug": "2026-FEB-21-K3-App-Builder-Claude-proto",
   "repo_url": "https://github.com/davidbmar/2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -84,7 +81,7 @@
     }
   ],
   "screenshot_url": "",
-  "generated_at": "2026-06-14T01:46:20.210106Z",
+  "generated_at": "2026-06-16T20:57:13.211180Z",
   "source_commit": "2d2a29e",
   "model": "qwen3.7-plus"
 }
