@@ -452,9 +452,13 @@ def render_docs_index_page(record: dict, rels: list[str]) -> str:
     slug = record.get("slug", "")
     title = html.escape(record.get("title") or slug)
     slug_attr = html.escape(slug, quote=True)
+    # Root-absolute links so this exact page renders correctly whether it is
+    # served at /projects/<slug>/docs/ (index.html) OR /projects/<slug>/docs
+    # (the flat docs.html copy the CF .html-rewrite resolves to).
+    base = f"/projects/{slug_attr}/docs/"
     if rels:
         items = "\n".join(
-            f'<li><a href="{html.escape(r, quote=True)}">{html.escape(_doc_title(r))}</a>'
+            f'<li><a href="{base}{html.escape(r, quote=True)}">{html.escape(_doc_title(r))}</a>'
             f'<span class="path">{html.escape(r)}</span></li>'
             for r in rels
         )
@@ -486,7 +490,7 @@ def render_docs_index_page(record: dict, rels: list[str]) -> str:
 </style>
 </head>
 <body>
-<nav><a href="../../{slug_attr}.html">&larr; {title}</a> &nbsp;·&nbsp;
+<nav><a href="/projects/{slug_attr}.html">&larr; {title}</a> &nbsp;·&nbsp;
      <a href="/projects/">All projects</a></nav>
 <h1>Documentation</h1>
 <p class="sub">{title}</p>
