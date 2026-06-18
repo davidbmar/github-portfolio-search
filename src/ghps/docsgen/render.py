@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 
 # Use the ESM module build (.mjs) — the .min.js is a UMD bundle with no default
 # export, so `import mermaid from ...` silently fails and diagrams never render.
@@ -177,6 +178,17 @@ def render_page(record: dict) -> str:
     visibility = html.escape(record.get("visibility", ""))
     status = html.escape(record.get("status", ""))
 
+    # Link to the project's own republished docs (docs/**/*.html), if any.
+    docs = record.get("docs") or []
+    slug_attr = html.escape(record.get("slug", ""), quote=True)
+    docs_link = (
+        f'<p class="docs-link"><a href="{slug_attr}/docs/">'
+        f'\U0001F4C4 Project documentation '
+        f'({len(docs)} doc{"" if len(docs) == 1 else "s"}) &rarr;</a></p>'
+        if docs
+        else ""
+    )
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,6 +222,9 @@ def render_page(record: dict) -> str:
                            border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }}
   ul.features li {{ margin: .25rem 0; }}
   a {{ color: #2563eb; }}
+  .docs-link a {{ display: inline-block; margin-top: .35rem; background: #2563eb;
+                  color: #fff; padding: .4rem .85rem; border-radius: 8px;
+                  text-decoration: none; font-weight: 600; }}
 </style>
 </head>
 <body>
@@ -218,6 +233,7 @@ def render_page(record: dict) -> str:
   <p class="one-liner">{html.escape(record.get("one_liner", ""))}</p>
   <p><a href="{html.escape(record.get("repo_url", ""))}">{html.escape(record.get("repo_url", ""))}</a>
      &nbsp;·&nbsp; {visibility} &nbsp;·&nbsp; {status}</p>
+  {docs_link}
 </header>
 
 {_screenshot(record)}
@@ -285,12 +301,24 @@ def _index_card(p: dict) -> str:
             f'<img class="thumb" src="{html.escape(url, quote=True)}" '
             f'alt="{title} screenshot" loading="lazy">'
         )
+    pushed = p.get("pushed_at") or ""
+    date_lbl = (
+        f'<span class="date">{html.escape(pushed[:10])}</span>' if pushed else ""
+    )
+    docs_badge = (
+        ' <span class="docs-badge" title="Has documentation">\U0001F4C4 docs</span>'
+        if p.get("docs")
+        else ""
+    )
+    name_attr = html.escape((p.get("title") or slug).lower(), quote=True)
     return (
-        f'<a class="card" href="{html.escape(slug, quote=True)}.html">'
+        f'<a class="card" href="{html.escape(slug, quote=True)}.html" '
+        f'data-pushed="{html.escape(pushed, quote=True)}" data-name="{name_attr}">'
         f"{shot}"
         f'<div class="card-body"><h2>{title}{thin}</h2>'
         f'<p class="ol">{html.escape(p.get("one_liner", ""))}</p>'
-        f'<div class="tags">{tech}</div>{hyg}</div></a>'
+        f'<div class="tags">{tech}</div>'
+        f'<div class="card-foot">{hyg}{docs_badge}{date_lbl}</div></div></a>'
     )
 
 
@@ -298,10 +326,48 @@ def render_index_page(projects: list[dict]) -> str:
     """Render the listing page over all generated project docs (server-rendered)."""
     count = len(projects)
     if projects:
-        cards = "\n".join(_index_card(p) for p in projects)
-        body = f'<div class="grid">{cards}</div>'
+        # Newest first by default — surfaces the latest repo immediately instead
+        # of burying it in an alphabetical list.
+        ordered = sorted(
+            projects, key=lambda p: (p.get("pushed_at") or ""), reverse=True
+        )
+        cards = "\n".join(_index_card(p) for p in ordered)
+        controls = (
+            '<div class="controls">Sort: '
+            '<button class="sort-btn active" data-sort="newest">Newest</button>'
+            '<button class="sort-btn" data-sort="name">Name A–Z</button>'
+            "</div>"
+        )
+        body = f'{controls}<div class="grid">{cards}</div>'
     else:
         body = '<p class="muted">No project docs generated yet.</p>'
+
+    # Plain (non-f) string so its braces need no escaping inside the f-string.
+    sort_script = """<script>
+  (function () {
+    var grid = document.querySelector('.grid');
+    if (!grid) return;
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
+    function sortBy(mode) {
+      cards.sort(function (a, b) {
+        if (mode === 'name') {
+          return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+        }
+        return (b.dataset.pushed || '').localeCompare(a.dataset.pushed || '');
+      });
+      cards.forEach(function (c) { grid.appendChild(c); });
+    }
+    document.querySelectorAll('.sort-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.sort-btn').forEach(function (b) {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+        sortBy(btn.dataset.sort);
+      });
+    });
+  })();
+</script>"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -334,6 +400,15 @@ def render_index_page(projects: list[dict]) -> str:
   .hyg.ok {{ color: #2a7; }}
   .hyg.warn {{ color: #d33; }}
   .muted {{ opacity: .6; }}
+  .card-foot {{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }}
+  .date {{ font-size: .72rem; opacity: .6; margin-left: auto;
+           font-variant-numeric: tabular-nums; }}
+  .docs-badge {{ font-size: .72rem; color: #2563eb; }}
+  .controls {{ margin: 0 0 1rem; font-size: .85rem; opacity: .85; }}
+  .sort-btn {{ font: inherit; margin-left: .4rem; padding: .2rem .6rem;
+               border: 1px solid #8884; border-radius: 999px; background: transparent;
+               color: inherit; cursor: pointer; }}
+  .sort-btn.active {{ background: #2563eb; color: #fff; border-color: #2563eb; }}
   a.home {{ color: #2563eb; }}
   .llms {{ margin-top: 2rem; padding: .9rem 1.1rem; border: 1px dashed #8886;
            border-radius: 10px; font-size: .9rem; opacity: .9; }}
@@ -353,6 +428,69 @@ def render_index_page(projects: list[dict]) -> str:
   machine-readable index (<a href="/data/projects-index.json">/data/projects-index.json</a>)
   and per-repo records, so you can find what you need without loading everything.
 </aside>
+{sort_script}
+</body>
+</html>
+"""
+
+
+def _doc_title(rel: str) -> str:
+    """A readable label for a doc path like ``business/roadmap.html``."""
+    name = rel.rsplit("/", 1)[-1]
+    if name.lower().endswith(".html"):
+        name = name[: -len(".html")]
+    words = [w for w in re.split(r"[-_\s]+", name) if w]
+    return " ".join(w[:1].upper() + w[1:] for w in words) or rel
+
+
+def render_docs_index_page(record: dict, rels: list[str]) -> str:
+    """Render the per-project docs index (``projects/<slug>/docs/index.html``).
+
+    *rels* are doc paths relative to the docs directory (e.g.
+    ``business/roadmap.html``), which is exactly how they're written to disk.
+    """
+    slug = record.get("slug", "")
+    title = html.escape(record.get("title") or slug)
+    slug_attr = html.escape(slug, quote=True)
+    if rels:
+        items = "\n".join(
+            f'<li><a href="{html.escape(r, quote=True)}">{html.escape(_doc_title(r))}</a>'
+            f'<span class="path">{html.escape(r)}</span></li>'
+            for r in rels
+        )
+        list_html = f'<ul class="doc-list">{items}</ul>'
+    else:
+        list_html = '<p class="muted">No documents.</p>'
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title} — Docs · davidbmar.com</title>
+<style>
+  :root {{ color-scheme: light dark; }}
+  body {{ font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+          padding: 0 1.25rem; }}
+  h1 {{ margin-bottom: .25rem; }}
+  .sub {{ opacity: .7; margin-top: 0; }}
+  .doc-list {{ list-style: none; padding: 0; }}
+  .doc-list li {{ border: 1px solid #8884; border-radius: 10px;
+                  padding: .8rem 1rem; margin: .6rem 0; }}
+  .doc-list a {{ font-weight: 600; color: #2563eb; text-decoration: none;
+                 font-size: 1.05rem; }}
+  .doc-list .path {{ display: block; font-size: .78rem; opacity: .55;
+                     margin-top: .15rem; }}
+  .muted {{ opacity: .6; }}
+  nav a {{ color: #2563eb; }}
+</style>
+</head>
+<body>
+<nav><a href="../../{slug_attr}.html">&larr; {title}</a> &nbsp;·&nbsp;
+     <a href="/projects/">All projects</a></nav>
+<h1>Documentation</h1>
+<p class="sub">{title}</p>
+{list_html}
 </body>
 </html>
 """

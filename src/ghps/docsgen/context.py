@@ -67,6 +67,10 @@ class RepoContext:
     open_prs: list[dict] = field(default_factory=list)
     thin: bool = False
     screenshot_url: str = ""  # first non-badge README image (absolute URL), or ""
+    pushed_at: str = ""  # repo's GitHub last-push time (ISO-8601 Z), for recency
+    # (path, content) for each docs/**/*.html in the repo — republished as the
+    # project's own documentation. Default empty so a thin/docless repo is fine.
+    html_docs: list[tuple[str, str]] = field(default_factory=list)
 
 
 def first_readme_image(readme: str, owner: str, repo: str, branch: str) -> str:
@@ -149,6 +153,13 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
 
     screenshot_url = first_readme_image(readme or "", owner, name, default_branch)
 
+    # Optional: republish a repo's own docs/html/**/*.html. Resolved defensively
+    # via getattr so injected test doubles predating this method still work.
+    fetch_docs = getattr(gh, "fetch_html_docs", None)
+    html_docs = (
+        fetch_docs(owner, name, default_branch=default_branch) if fetch_docs else []
+    )
+
     return RepoContext(
         slug=name,
         owner=owner,
@@ -165,4 +176,6 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
         open_prs=open_prs,
         thin=thin,
         screenshot_url=screenshot_url,
+        pushed_at=repo_meta.get("pushed_at", ""),
+        html_docs=html_docs,
     )

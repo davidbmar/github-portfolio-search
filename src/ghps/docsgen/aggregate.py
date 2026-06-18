@@ -14,7 +14,10 @@ _SUFFIX = ".record.json"
 
 # Fields kept in the compact index (Tier 1) — enough to scan all repos cheaply
 # and decide which full records to fetch, without loading prose/diagrams.
-_INDEX_FIELDS = ("slug", "title", "one_liner", "tech", "reuse_tags", "thin", "repo_url")
+_INDEX_FIELDS = (
+    "slug", "title", "one_liner", "tech", "reuse_tags", "thin", "repo_url",
+    "pushed_at",  # enables recency sort / "latest" views without the full record
+)
 
 
 def compact_entries(projects: list[dict]) -> list[dict]:

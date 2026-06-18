@@ -8,6 +8,8 @@ a RecordGenerationError (caller marks a failure; never renders a broken page).
 
 from __future__ import annotations
 
+import re
+
 from ghps.docsgen import hygiene, schema
 from ghps.docsgen._util import utc_z
 from ghps.docsgen.context import RepoContext
@@ -56,6 +58,8 @@ _GENERATOR_OWNED = (
     "generated_at",
     "source_commit",
     "model",
+    "pushed_at",
+    "docs",
 )
 
 assert set(_LLM_OWNED).isdisjoint(_GENERATOR_OWNED), (
@@ -84,6 +88,18 @@ free of marketing. Mermaid must be valid: start diagram_architecture with
 
 class RecordGenerationError(RuntimeError):
     """Raised when the LLM cannot produce a schema-valid record after retry."""
+
+
+def _humanize_slug(slug: str) -> str:
+    """Turn a repo slug into a readable title.
+
+    ``generate_title_headline_hooks`` -> ``Generate Title Headline Hooks``.
+    Splits on ``-``/``_``/whitespace and capitalizes the first letter of each
+    word while preserving the rest (so ``FSM`` and ``k3s`` survive). Falls back
+    to the raw slug if it contains no word characters.
+    """
+    words = [w for w in re.split(r"[-_\s]+", slug.strip()) if w]
+    return " ".join(w[:1].upper() + w[1:] for w in words) or slug
 
 
 def build_messages(ctx: RepoContext) -> tuple[str, str]:
@@ -157,6 +173,15 @@ def _assemble(ctx: RepoContext, llm_part: dict, model: str) -> dict:
             "generated_at": utc_z(),
             "source_commit": ctx.head_sha[:7] if ctx.head_sha else "",
             "model": model,
+            "pushed_at": ctx.pushed_at,
+            "docs": [{"path": p, "html": c} for p, c in ctx.html_docs],
         }
     )
+
+    # Never ship the raw slug as the title. The LLM occasionally echoes the slug
+    # (or returns nothing); humanize it so grids and search read cleanly.
+    title = (record.get("title") or "").strip()
+    if not title or title.lower() == ctx.slug.lower():
+        record["title"] = _humanize_slug(ctx.slug)
+
     return record

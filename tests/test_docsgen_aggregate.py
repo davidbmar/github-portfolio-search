@@ -58,11 +58,23 @@ def test_compact_entries_keeps_only_index_fields():
     full = {
         "slug": "x", "title": "X", "one_liner": "o", "tech": ["py"],
         "reuse_tags": ["t"], "thin": False, "repo_url": "u",
+        "pushed_at": "2026-06-14T00:00:00Z",
         "what_it_is": "long prose", "diagram_architecture": "flowchart",
     }
     entry = aggregate.compact_entries([full])[0]
-    assert set(entry) == {"slug", "title", "one_liner", "tech", "reuse_tags", "thin", "repo_url"}
+    assert set(entry) == {
+        "slug", "title", "one_liner", "tech", "reuse_tags", "thin", "repo_url",
+        "pushed_at",
+    }
     assert "what_it_is" not in entry and "diagram_architecture" not in entry
+
+
+def test_compact_entries_includes_pushed_at_for_recency():
+    """pushed_at rides along in the compact index so 'latest' views can sort."""
+    entry = aggregate.compact_entries(
+        [{"slug": "x", "pushed_at": "2026-06-14T00:00:00Z"}]
+    )[0]
+    assert entry["pushed_at"] == "2026-06-14T00:00:00Z"
 
 
 def test_write_compact_index(tmp_path):

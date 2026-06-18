@@ -200,6 +200,70 @@ def fetch_top_files(
     return results
 
 
+DOCS_HTML_PREFIX = "docs/html/"
+
+
+def fetch_html_docs(
+    owner: str,
+    repo: str,
+    *,
+    default_branch: str | None = None,
+    max_files: int = 50,
+) -> list[tuple[str, str]]:
+    """Fetch every ``docs/html/**/*.html`` file from the repo's default branch.
+
+    Convention: a project opts a page into its portfolio docs by committing it
+    under ``docs/html/``. Those pages are republished alongside the generated
+    project page (see ``generate.publish_all``). The explicit folder avoids
+    accidentally publishing generated HTML (Sphinx ``docs/_build``, coverage
+    reports, etc.) that often lives elsewhere under ``docs/``.
+
+    Mirrors :func:`fetch_top_files` but filters the tree to ``docs/html/`` HTML
+    and caps blob downloads at *max_files*. Returns ``(path, content)`` tuples
+    with the full repo path (e.g. ``docs/html/roadmap.html``). Empty if missing.
+    """
+    session = _session()
+
+    if not default_branch:
+        repo_resp = session.get(f"{API_BASE}/repos/{owner}/{repo}")
+        if repo_resp.status_code == 404:
+            return []
+        repo_resp.raise_for_status()
+        default_branch = repo_resp.json().get("default_branch", "main")
+
+    tree_resp = session.get(
+        f"{API_BASE}/repos/{owner}/{repo}/git/trees/{default_branch}",
+        params={"recursive": "1"},
+    )
+    if tree_resp.status_code == 404:
+        return []
+    tree_resp.raise_for_status()
+    tree = tree_resp.json().get("tree", [])
+
+    matching = [
+        item
+        for item in tree
+        if item.get("type") == "blob"
+        and item["path"].startswith(DOCS_HTML_PREFIX)
+        and item["path"].lower().endswith(".html")
+    ][:max_files]
+
+    results: list[tuple[str, str]] = []
+    for item in matching:
+        blob_resp = session.get(
+            f"{API_BASE}/repos/{owner}/{repo}/git/blobs/{item['sha']}"
+        )
+        if blob_resp.status_code != 200:
+            continue
+        blob = blob_resp.json()
+        content = blob.get("content", "")
+        if blob.get("encoding") == "base64" and content:
+            content = base64.b64decode(content).decode("utf-8", errors="replace")
+        results.append((item["path"], content))
+
+    return results
+
+
 def fetch_branches(owner: str, repo: str) -> list[dict[str, str]]:
     """List branches for *owner/repo*.
 

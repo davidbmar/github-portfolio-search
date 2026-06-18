@@ -31,6 +31,27 @@ def _write_json(path: Path, data) -> None:
     _write_text(path, json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 
 
+# Repo-side convention: publishable HTML lives under docs/html/. On the site it
+# is served at projects/<slug>/docs/<rel>, dropping the "html" implementation
+# detail. Kept in sync with github_client.DOCS_HTML_PREFIX.
+_DOCS_HTML_PREFIX = "docs/html/"
+
+
+def _safe_doc_rel(path: str) -> str | None:
+    """Normalize a ``docs/html/...`` repo path to a site path under ``<slug>/docs/``.
+
+    Strips the ``docs/html/`` prefix, rejects path traversal (``..``) and
+    anything that isn't an ``.html`` file. Returns the cleaned relative path, or
+    None to skip. The doc HTML comes from GitHub, so the path is not trusted.
+    """
+    rel = path[len(_DOCS_HTML_PREFIX):] if path.startswith(_DOCS_HTML_PREFIX) else path
+    parts = [seg for seg in rel.split("/") if seg not in ("", ".")]
+    if not parts or any(seg == ".." for seg in parts):
+        return None
+    rel = "/".join(parts)
+    return rel if rel.lower().endswith(".html") else None
+
+
 def _is_stale(record_path: Path, pushed_at: str) -> bool:
     """True if the repo was pushed after the record was generated.
 
@@ -96,6 +117,21 @@ def publish_all(
             continue
         _write_text(hd / f"{slug}.html", render.render_page(p))
         _write_json(hd / f"{slug}.record.json", p)
+
+        # Republish the project's own docs/**/*.html under <slug>/docs/, with a
+        # generated index — unless the repo ships its own docs/index.html.
+        written: list[str] = []
+        for d in p.get("docs") or []:
+            rel = _safe_doc_rel(d.get("path", ""))
+            if rel is None:
+                continue
+            _write_text(hd / slug / "docs" / rel, d.get("html", "") or "")
+            written.append(rel)
+        if written and "index.html" not in written:
+            _write_text(
+                hd / slug / "docs" / "index.html",
+                render.render_docs_index_page(p, written),
+            )
 
     aggregate.write_compact_index(
         projects, str(Path(feed_path).parent / "projects-index.json")
