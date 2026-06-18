@@ -83,7 +83,10 @@ genuinely unknown. features: a human-facing overview, 3-6 bullet-sized strings o
 what the project does. The sequenceDiagram MUST reflect how the code actually runs
 (who calls whom) — do not hand-wave it from the README. Keep prose concrete and
 free of marketing. Mermaid must be valid: start diagram_architecture with
-'flowchart' and diagram_sequence with 'sequenceDiagram'."""
+'flowchart' and diagram_sequence with 'sequenceDiagram'. Node and participant
+labels must be PLAIN text with no parentheses, slashes, or punctuation (write
+run_turn, not run_turn()); if a label truly needs a special character, wrap the
+whole label in double quotes."""
 
 
 class RecordGenerationError(RuntimeError):
