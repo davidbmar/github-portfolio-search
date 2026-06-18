@@ -36,8 +36,14 @@ def _mermaid(src: str) -> str:
     break out of the <pre> element. Mermaid arrow syntax contains no ``<``, and
     the browser decodes ``&lt;`` back to ``<`` in textContent before Mermaid reads
     it, so legitimate diagrams are unaffected.
+
+    Also drops empty parens: LLM-authored diagrams often use function-call
+    notation in node labels (``run_turn()``), and Mermaid's flowchart parser
+    errors on ``(`` inside a ``[..]`` label — the red "syntax error" icon. Empty
+    parens carry no meaning in valid Mermaid, so removing them is a safe net
+    (the model is also told to avoid parens in labels; see record_gen._SYSTEM).
     """
-    return src.replace("<", "&lt;")
+    return src.replace("()", "").replace("<", "&lt;")
 
 
 def _json_script(data) -> str:
@@ -211,10 +217,13 @@ def render_page(record: dict) -> str:
   .muted {{ opacity: .5; }}
   .meta-row {{ display: flex; gap: .75rem; margin: .35rem 0; }}
   .meta-label {{ flex: 0 0 9rem; font-weight: 600; opacity: .7; }}
+  /* Panels below hardcode a light background, so pin a dark text colour too —
+     otherwise dark-mode (color-scheme) paints the text white => unreadable. */
   .hygiene {{ border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
-              background: #f4fbf7; }}
+              background: #f4fbf7; color: #1a1f29; }}
   .hygiene.needs-attention {{ border-color: #d33; background: #fdf4f4; }}
-  pre.mermaid {{ background: #fafafa; padding: 1rem; border-radius: 8px; }}
+  .hygiene h2 {{ color: #1a1f29; }}
+  pre.mermaid {{ background: #fafafa; color: #1a1f29; padding: 1rem; border-radius: 8px; }}
   pre.quickstart {{ background: #0d1117; color: #e6edf3; padding: 1rem;
                     border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }}
   figure.screenshot {{ margin: 1.5rem 0; }}

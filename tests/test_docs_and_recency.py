@@ -201,6 +201,22 @@ def test_render_page_no_docs_link_when_absent():
     assert 'class="docs-link"' not in render.render_page(_record(docs=[]))
 
 
+def test_mermaid_strips_empty_parens_that_break_flowchart():
+    # "run_turn()" inside a [..] label trips Mermaid's parser (the red error icon)
+    out = render._mermaid("flowchart TD\n  A[run_turn()] --> B[StateManager]")
+    assert "run_turn()" not in out
+    assert "run_turn" in out and "StateManager" in out
+
+
+def test_hygiene_panel_pins_dark_text_for_dark_mode():
+    # Panel hardcodes a light background; without a pinned colour, dark-mode
+    # paints the text white -> white-on-light. Guard the fix.
+    out = render.render_page(
+        _record(todos=[{"kind": "unmerged_branch", "detail": "x is 1 commit ahead"}])
+    )
+    assert "color: #1a1f29" in out
+
+
 def test_docs_index_lists_docs_with_absolute_links():
     out = render.render_docs_index_page(
         {"slug": "demo", "title": "Demo"}, ["business/roadmap.html", "a.html"]
