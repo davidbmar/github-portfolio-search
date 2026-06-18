@@ -201,13 +201,14 @@ def test_render_page_no_docs_link_when_absent():
     assert 'class="docs-link"' not in render.render_page(_record(docs=[]))
 
 
-def test_docs_index_lists_docs_with_back_link():
+def test_docs_index_lists_docs_with_absolute_links():
     out = render.render_docs_index_page(
         {"slug": "demo", "title": "Demo"}, ["business/roadmap.html", "a.html"]
     )
-    assert 'href="business/roadmap.html"' in out
+    # Root-absolute so the page works at both /docs/ and the flat /docs (docs.html)
+    assert 'href="/projects/demo/docs/business/roadmap.html"' in out
     assert "Roadmap" in out                       # humanized from filename
-    assert 'href="../../demo.html"' in out        # back to project page
+    assert 'href="/projects/demo.html"' in out    # back to project page (absolute)
 
 
 def test_index_grid_orders_newest_first():
@@ -245,6 +246,10 @@ def test_publish_writes_repo_docs_and_rejects_traversal(tmp_path):
     proj = tmp_path / "web" / "projects"
     assert (proj / "demo" / "docs" / "business" / "roadmap.html").read_text() == "<h1>Roadmap</h1>"
     assert (proj / "demo" / "docs" / "index.html").exists()
+    # flat copy so the no-trailing-slash URL (/projects/demo/docs -> docs.html) works
+    flat = (proj / "demo" / "docs.html")
+    assert flat.exists()
+    assert "/projects/demo/docs/business/roadmap.html" in flat.read_text()
     assert 'href="demo/docs/"' in (proj / "demo.html").read_text()
     # the traversal entry must not escape the docs dir
     assert not (tmp_path / "web" / "evil.html").exists()

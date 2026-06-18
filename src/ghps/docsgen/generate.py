@@ -128,10 +128,12 @@ def publish_all(
             _write_text(hd / slug / "docs" / rel, d.get("html", "") or "")
             written.append(rel)
         if written and "index.html" not in written:
-            _write_text(
-                hd / slug / "docs" / "index.html",
-                render.render_docs_index_page(p, written),
-            )
+            docs_index_html = render.render_docs_index_page(p, written)
+            _write_text(hd / slug / "docs" / "index.html", docs_index_html)
+            # Also as a flat file so the no-trailing-slash URL works: the CF
+            # rewrite turns /projects/<slug>/docs into <slug>/docs.html. The
+            # index uses root-absolute links, so it renders correctly here too.
+            _write_text(hd / slug / "docs.html", docs_index_html)
 
     aggregate.write_compact_index(
         projects, str(Path(feed_path).parent / "projects-index.json")
