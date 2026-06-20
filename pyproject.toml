@@ -35,6 +35,12 @@ test = [
     "numpy>=1.24",
     "playwright>=1.40",
 ]
+# Free, local headline engine for `ghps daily --engine mlx-local` (Apple Silicon
+# only — kept out of core deps so Linux/CI installs don't fail). Install with:
+#   pip install -e ".[mlx]"
+mlx = [
+    "mlx-lm>=0.31",
+]
 mcp = [
     "mcp>=1.0; python_version>='3.10'",
 ]

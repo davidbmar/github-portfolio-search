@@ -12,6 +12,7 @@ local MLX server -> deterministic (no LLM, always available).
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import tempfile
 from collections import defaultdict
@@ -76,7 +77,12 @@ class DeterministicEngine:
 
 
 def _parse_json_object(text: str) -> dict:
-    """Extract the first ``{...}`` JSON object from an LLM response."""
+    """Extract the first ``{...}`` JSON object from an LLM response.
+
+    Strips any ``<think>...</think>`` reasoning block first (Qwen-style models),
+    so the JSON answer is found even when the model reasons aloud beforehand.
+    """
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end <= start:
@@ -134,12 +140,46 @@ class MlxEngine:
         return _parse_json_object(resp["choices"][0]["message"]["content"])
 
 
+class MlxLocalEngine:
+    """In-process MLX generation (no HTTP server) — free local engine, robust for
+    batch backfills. Loads the model once; reuses it for every day.
+    """
+
+    DEFAULT_MODEL = "mlx-community/Qwen3.5-4B-MLX-4bit"
+
+    def __init__(self, model: str = DEFAULT_MODEL, max_tokens: int = 600):
+        from mlx_lm import load  # imported lazily so non-MLX runs don't need it
+
+        self._model_obj, self._tokenizer = load(model)
+        self._max_tokens = max_tokens
+
+    def generate(self, date: str, lines: list[str]) -> dict:
+        from mlx_lm import generate as _gen
+
+        messages = [{"role": "system", "content": _SYSTEM},
+                    {"role": "user", "content": _user_prompt(date, lines)}]
+        # Disable Qwen "thinking" so the model emits the JSON directly (kwarg is
+        # ignored by templates that don't support it).
+        try:
+            prompt = self._tokenizer.apply_chat_template(
+                messages, add_generation_prompt=True, tokenize=False,
+                enable_thinking=False)
+        except TypeError:
+            prompt = self._tokenizer.apply_chat_template(
+                messages, add_generation_prompt=True, tokenize=False)
+        text = _gen(self._model_obj, self._tokenizer, prompt=prompt,
+                    max_tokens=self._max_tokens, verbose=False)
+        return _parse_json_object(text)
+
+
 def resolve_engine(name: str = "auto"):
     """Pick an engine. ``auto`` = codex -> mlx (if reachable) -> deterministic."""
     if name == "codex":
         return CodexEngine()
     if name == "mlx":
         return MlxEngine()
+    if name == "mlx-local":
+        return MlxLocalEngine()
     if name == "deterministic":
         return DeterministicEngine()
     # auto

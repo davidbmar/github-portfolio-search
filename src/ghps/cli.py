@@ -321,8 +321,11 @@ def publish_docs():
 @click.option("--owner", default="davidbmar", help="GitHub account to scan.")
 @click.option("--since", default=None,
               help="ISO date/time lower bound for commits (e.g. 2026-05-01).")
-@click.option("--engine", type=click.Choice(["auto", "codex", "mlx", "deterministic"]),
-              default="auto", help="Headline engine (auto = codex -> mlx -> deterministic).")
+@click.option("--engine",
+              type=click.Choice(["auto", "codex", "mlx", "mlx-local", "deterministic"]),
+              default="auto",
+              help="Headline engine. mlx-local = free in-process MLX (Qwen3.5-4B); "
+                   "codex = cloud; auto = codex -> mlx server -> deterministic.")
 @click.option("--token", default=None, help="GitHub PAT (else GITHUB_TOKEN env).")
 def daily_cmd(owner, since, engine, token):
     """Generate the daily headline digest -> web/data/daily.json + /daily page.
