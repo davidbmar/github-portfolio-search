@@ -33,10 +33,13 @@
   .muted { opacity: .5; }
   .meta-row { display: flex; gap: .75rem; margin: .35rem 0; }
   .meta-label { flex: 0 0 9rem; font-weight: 600; opacity: .7; }
+  /* Panels below hardcode a light background, so pin a dark text colour too —
+     otherwise dark-mode (color-scheme) paints the text white => unreadable. */
   .hygiene { border-left: 4px solid #2a7; padding: .5rem 1rem; margin: 1.5rem 0;
-              background: #f4fbf7; }
+              background: #f4fbf7; color: #1a1f29; }
   .hygiene.needs-attention { border-color: #d33; background: #fdf4f4; }
-  pre.mermaid { background: #fafafa; padding: 1rem; border-radius: 8px; }
+  .hygiene h2 { color: #1a1f29; }
+  pre.mermaid { background: #fafafa; color: #1a1f29; padding: 1rem; border-radius: 8px; }
   pre.quickstart { background: #0d1117; color: #e6edf3; padding: 1rem;
                     border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
   figure.screenshot { margin: 1.5rem 0; }
@@ -44,14 +47,22 @@
                            border: 1px solid #0001; box-shadow: 0 2px 12px #0002; }
   ul.features li { margin: .25rem 0; }
   a { color: #2563eb; }
+  .docs-link a { display: inline-block; margin-top: .35rem; background: #2563eb;
+                  color: #fff; padding: .4rem .85rem; border-radius: 8px;
+                  text-decoration: none; font-weight: 600; }
+  .site-bar { display: flex; gap: 1.1rem; align-items: center; padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; font-size: .9rem; }
+  .site-bar a { color: #2563eb; text-decoration: none; }
+  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }
 </style>
 </head>
 <body>
+<nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/#/clusters">Clusters</a></nav>
 <header>
   <h1>riot</h1>
   <p class="one-liner">A lightweight Python socket server and curses-based client for tracking taxi driver performance ratings.</p>
   <p><a href="https://github.com/davidbmar/riot">https://github.com/davidbmar/riot</a>
      &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
+  
 </header>
 
 

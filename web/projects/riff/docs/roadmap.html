@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF — Path to Revenue</title>
+<style>
+  :root{
+    --ink:#16181d; --muted:#5b6470; --line:#e5e7eb; --bg:#fbfbfa;
+    --accent:#1f6feb; --good:#15803d; --warn:#b45309; --bad:#b91c1c;
+    --card:#ffffff; --chip:#eef2ff;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:48px 24px 96px}
+  header.hero{border-bottom:1px solid var(--line); padding-bottom:28px; margin-bottom:36px}
+  .kicker{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:600}
+  h1{font-size:38px; line-height:1.15; margin:.25em 0 .15em; letter-spacing:-.02em}
+  .sub{color:var(--muted); font-size:18px; max-width:62ch}
+  .updated{margin-top:14px; font-size:13px; color:var(--muted)}
+  h2{font-size:24px; margin:48px 0 8px; letter-spacing:-.01em}
+  h2 .num{color:var(--accent); font-variant-numeric:tabular-nums}
+  h3{font-size:17px; margin:22px 0 4px}
+  p{margin:.5em 0}
+  .lead{font-size:17px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin:18px 0}
+  .headline{background:linear-gradient(180deg,#f5f9ff,#fff); border-color:#cfe0ff}
+  .big{font-size:32px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+  .big small{font-size:15px; font-weight:500; color:var(--muted)}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin:14px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .v{font-size:24px; font-weight:700; font-variant-numeric:tabular-nums}
+  .stat .l{font-size:13px; color:var(--muted)}
+  .chip{display:inline-block; font-size:12px; font-weight:600; padding:2px 10px; border-radius:999px; background:var(--chip); color:var(--accent)}
+  .p0{background:#fef2f2; color:var(--bad)} .p1{background:#fffbeb; color:var(--warn)} .p2{background:#f0fdf4; color:var(--good)}
+  ol.tasks{list-style:none; counter-reset:t; padding:0; margin:8px 0}
+  ol.tasks li{counter-increment:t; position:relative; padding:14px 0 14px 46px; border-top:1px solid var(--line)}
+  ol.tasks li:before{content:counter(t); position:absolute; left:0; top:13px; width:30px; height:30px; border-radius:8px; background:var(--ink); color:#fff; font-weight:700; font-size:14px; display:grid; place-items:center}
+  ol.tasks li b{display:block; font-size:16px}
+  ol.tasks li span{color:var(--muted); font-size:14.5px}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line)}
+  th{font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+  td.r,th.r{text-align:right; font-variant-numeric:tabular-nums}
+  .note{font-size:13.5px; color:var(--muted)}
+  .tag-ok{color:var(--good); font-weight:600} .tag-part{color:var(--warn); font-weight:600} .tag-no{color:var(--bad); font-weight:600}
+  code{background:#f1f3f5; padding:1px 6px; border-radius:5px; font-size:13.5px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  footer{margin-top:64px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:13px}
+  .verify{font-size:12px; color:var(--warn); font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">RIFF · Product Status</div>
+    <h1>Path to Revenue</h1>
+    <p class="sub">What it takes to turn RIFF — a working AI voice agent — into a paid after-hours answering service, priced like a night-shift worker: <strong>$1 / hour on shift</strong> (8pm–8am = <strong>$12 a night</strong>, unlimited calls).</p>
+    <div class="updated">Status update · 2026-06-18 · <span class="note">figures illustrative, pending verified vendor pricing</span></div>
+  </header>
+
+  <p class="lead">RIFF already answers real phone calls: Telnyx routes the call, Gemini Live handles the voice, and a deterministic state machine drives the conversation through YAML-defined flows (booking, inquiries, message-taking). The <em>conversation engine is production-grade</em>. The <em>business wrapper around it</em> — billing, multi-tenant accounts, message hand-off, secrets/auth — is the work that stands between today and the first paying customer.</p>
+
+  <h2>The model: a night-shift worker at $1/hour</h2>
+  <div class="card headline">
+    <p style="margin-top:0">You hire RIFF for a shift the way you'd hire a person — <strong>$1 for every hour it's on the line</strong>, billed for the window, not per call or per minute. A typical <strong>8pm–8am shift is 12 hours = $12</strong>. The customer pays for <em>coverage</em> (hours staffed); RIFF only spends money on the <em>talk minutes</em> when calls actually come in. That gap is the margin.</p>
+    <div class="grid">
+      <div class="stat"><div class="v">$12</div><div class="l">a full 8pm–8am night, unlimited calls</div></div>
+      <div class="stat"><div class="v">~$0.15</div><div class="l">illustrative cost per coverage-hour <span class="verify">VERIFY</span></div></div>
+      <div class="stat"><div class="v">~35 min</div><div class="l">talk-minutes per staffed hour before $1/hr loses money</div></div>
+    </div>
+    <p class="note" style="margin-bottom:0">At moderate volume the margin is large; the live risk is a single line that rings nonstop. The companion spreadsheet (<code>riff_cost_per_hour.csv</code>) recalculates all of this from real numbers as soon as vendor prices are filled in.</p>
+  </div>
+
+  <h2>How $12/night sits against the market</h2>
+  <div class="card">
+    <p style="margin-top:0">No competitor prices per shift-hour — the "hire a worker for the night" framing is open whitespace. The two flanks:</p>
+    <table style="margin:0">
+      <thead><tr><th>Alternative</th><th>What you pay</th><th>Catch</th></tr></thead>
+      <tbody>
+        <tr><td>Live human / answering service</td><td>$250–$720/mo, or $15–25/hr</td><td>Per-minute meter + night surcharge; one 10-min 2am call ≈ $20–30</td></tr>
+        <tr><td>Budget AI bots (Rosie, Dialzara)</td><td>$29–$49/mo</td><td>Cheaper sticker, but cap you at 60–250 min/mo</td></tr>
+        <tr><td><strong>RIFF</strong></td><td><strong>$1/hr ($12/night)</strong></td><td>Dedicated coverage for the window, unlimited calls</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-bottom:0"><strong>Positioning:</strong> not the cheapest sticker — the cheapest <em>dedicated worker</em>. The value line: one after-hours call to a human service can cost a whole RIFF night. Lead with reliability (won't hallucinate, takes accurate messages), not price — research shows "too cheap" reads as "untrustworthy" for calls people care about. <span class="note">Competitor pricing verified on vendor sites, June 2026.</span></p>
+  </div>
+
+  <h2>Where RIFF stands today</h2>
+  <table>
+    <thead><tr><th>Capability</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Voice conversation engine</td><td class="tag-ok">Ready</td><td>Telnyx + Gemini Live + deterministic FSM, ~4,800 tests</td></tr>
+      <tr><td>Flow authoring (YAML)</td><td class="tag-ok">Ready</td><td>Booking, inquiry, message-taking flows exist</td></tr>
+      <tr><td>Calendar / SMS providers</td><td class="tag-ok">Ready</td><td>Pluggable, degrade gracefully when down</td></tr>
+      <tr><td>Secrets &amp; config</td><td class="tag-part">Partial</td><td>Local <code>.env</code> (not committed); needs a prod secret store</td></tr>
+      <tr><td>Observability</td><td class="tag-part">Partial</td><td>On-disk logs; no central dashboard or alerts</td></tr>
+      <tr><td>Human message hand-off</td><td class="tag-no">Stub</td><td>The core answering-service job — must be finished</td></tr>
+      <tr><td>Multi-tenant accounts</td><td class="tag-no">Missing</td><td>Single business / number / calendar today</td></tr>
+      <tr><td>Auth on control plane</td><td class="tag-no">Missing</td><td>Call transcripts readable without auth</td></tr>
+      <tr><td>Usage metering &amp; billing</td><td class="tag-no">Missing</td><td>Tokens measured internally; no per-customer billing</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="chip p0">P0</span> Blockers — can't take money without these</h2>
+  <ol class="tasks">
+    <li><b>Verify unit economics</b><span>Fill the cost model with real Telnyx + Gemini Live prices. Confirms $1/hr clears cost. <em>Everything else depends on this answer.</em></span></li>
+    <li><b>Multi-tenancy</b><span>A <code>tenant_id</code> on every session, per-tenant config (flow, business name, calendar, phone-number routing), tenant-scoped storage. Serve customer #2 without a code change.</span></li>
+    <li><b>Secrets off the laptop</b><span>Prod secret store + key rotation; stop reading a shared dev <code>.env</code> in production.</span></li>
+    <li><b>Auth on the web / control plane</b><span>Bearer-token auth; scope every transcript read by tenant. Today anyone on the network can read calls.</span></li>
+    <li><b>Finish human message hand-off</b><span>Reliably take a message and deliver it (SMS/email) or escalate emergencies. This is the actual product, not a nice-to-have.</span></li>
+  </ol>
+
+  <h2><span class="chip p1">P1</span> Required for a reliable paid service</h2>
+  <ol class="tasks">
+    <li><b>Graceful shutdown &amp; call draining</b><span>A deploy mid-call must not drop a customer. Add SIGTERM/SIGINT handlers that drain active calls.</span></li>
+    <li><b>Observability you can debug at 3am</b><span><code>/healthz</code>, structured logs shipped somewhere queryable, alerts on call errors and degraded providers.</span></li>
+    <li><b>Usage metering → billing</b><span>Per-tenant call-minute accounting; wire Stripe. Can't bill hours you can't count.</span></li>
+    <li><b>Concurrency / load shedding</b><span>Decide behavior past the call ceiling (currently hardcoded at 5): queue, busy, or scale.</span></li>
+    <li><b>CI gate</b><span>Run the ~4,800-test suite on every PR so "tests pass" is enforced, not assumed.</span></li>
+  </ol>
+
+  <h2><span class="chip p2">P2</span> Scale &amp; polish — after first customers</h2>
+  <ol class="tasks">
+    <li><b>Deployment artifact</b><span>Real Dockerfile + compose so a new box isn't manual.</span></li>
+    <li><b>Distributed session store</b><span>Move SQLite → Postgres for multi-instance HA.</span></li>
+    <li><b>Self-serve tenant onboarding</b><span>A flow-authoring UI so you're not hand-writing YAML per customer.</span></li>
+    <li><b>Compliance</b><span>Call-recording consent, data retention, PII handling. Varies by state.</span></li>
+  </ol>
+
+  <h2>Cost-optimization lever: Qwen cascade</h2>
+  <div class="card">
+    <p style="margin-top:0">Today's voice path uses <strong>Gemini Live native audio</strong> — the most natural-sounding option, but priced on <em>audio tokens</em> (the dominant cost). An alternative path already partly built in RIFF: a <strong>cascade</strong> of speech-to-text → text LLM → text-to-speech.</p>
+    <ul>
+      <li><strong>Qwen is already wired</strong> (<code>riff/adapters/dashscope.py</code>) — used today only for evaluation, not live calls.</li>
+      <li>A cascade could run <strong>cheap local TTS</strong> (<code>tts_server.py</code>, Piper ≈ free) + <strong>local STT</strong> (Whisper) + a <strong>Qwen text model</strong> via DashScope. Text tokens cost an order of magnitude less than native-audio tokens, and local TTS removes the priciest line entirely.</li>
+      <li><strong>Trade-off:</strong> higher turn latency and a slightly more robotic voice than Gemini Live — generally acceptable for nighttime message-taking, less so for fast back-and-forth.</li>
+      <li><strong>Note:</strong> "Qwen Max" is a <em>text</em> model — it replaces the brain, not the ears/mouth. A cheaper Qwen tier likely suffices for a constrained answering flow. Swapping in Qwen means committing to the cascade architecture, which isn't yet the primary phone path.</li>
+    </ul>
+    <p class="note" style="margin-bottom:0"><span class="verify">NEXT</span> Model both paths side-by-side in the cost sheet (Scenario A: Gemini Live · Scenario B: Qwen cascade) once live Qwen/DashScope pricing is confirmed.</p>
+  </div>
+
+  <h2>Immediate next step</h2>
+  <p>Pull live vendor pricing (Telnyx inbound per-minute, Gemini Live audio tokens, Qwen/DashScope tokens) into <code>riff_cost_per_hour.csv</code>. That single number — <strong>cost per coverage-hour</strong> — tells us whether $1/hr is a business or a hobby, and whether the Qwen cascade is worth building.</p>
+
+  <footer>
+    RIFF — internal product status. Figures are illustrative pending verified vendor pricing. No credentials or customer data on this page.
+  </footer>
+
+</div>
+</body>
+</html>
