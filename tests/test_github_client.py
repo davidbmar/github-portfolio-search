@@ -370,3 +370,49 @@ class TestFetchOpenPRs:
         result = github_client.fetch_open_prs("owner", "repo")
         assert len(result) == 130
         assert session.get.call_count == 2
+
+
+# ---------------------------------------------------------------------------
+# fetch_commits
+# ---------------------------------------------------------------------------
+
+class TestFetchCommits:
+    @patch.object(github_client, "_session")
+    def test_returns_sha_message_firstline_date(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        commits = [
+            {"sha": "abc123", "commit": {"message": "feat: x\n\nlong body",
+                                         "author": {"date": "2026-06-20T04:00:00Z"}}},
+            {"sha": "def456", "commit": {"message": "fix: y",
+                                         "author": {"date": "2026-06-19T10:00:00Z"}}},
+        ]
+        session.get.return_value = _mock_response(commits)  # 2 < PER_PAGE -> one page
+        out = github_client.fetch_commits("o", "r")
+        assert out == [
+            {"sha": "abc123", "message": "feat: x", "date": "2026-06-20T04:00:00Z"},
+            {"sha": "def456", "message": "fix: y", "date": "2026-06-19T10:00:00Z"},
+        ]
+
+    @patch.object(github_client, "_session")
+    def test_empty_repo_409_returns_empty(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response([], status_code=409)
+        assert github_client.fetch_commits("o", "r") == []
+
+    @patch.object(github_client, "_session")
+    def test_missing_repo_404_returns_empty(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response([], status_code=404)
+        assert github_client.fetch_commits("o", "r") == []
+
+    @patch.object(github_client, "_session")
+    def test_since_is_forwarded_as_param(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _mock_response([])
+        github_client.fetch_commits("o", "r", since="2026-06-01T00:00:00Z")
+        _, kwargs = session.get.call_args
+        assert kwargs["params"].get("since") == "2026-06-01T00:00:00Z"

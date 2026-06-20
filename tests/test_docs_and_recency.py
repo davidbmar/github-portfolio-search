@@ -252,6 +252,39 @@ def test_render_page_no_docs_link_when_absent():
     assert 'class="docs-link"' not in render.render_page(_record(docs=[]))
 
 
+def test_render_daily_page_lists_days_with_headlines_and_repos():
+    days = [
+        {"date": "2026-06-20", "headline": "Big Shipping Day", "summary": "Did stuff.",
+         "takeaways": ["Reuse the search index pattern", "Copy the nav component"],
+         "total_commits": 3,
+         "repos": [{"name": "alpha", "commits": 2, "messages": ["add widget", "fix bug"]},
+                   {"name": "beta", "commits": 1, "messages": ["tune perf"]}]},
+        {"date": "2026-06-19", "headline": "Quieter Day", "summary": "One fix.",
+         "takeaways": [], "total_commits": 1,
+         "repos": [{"name": "alpha", "commits": 1, "messages": ["x"]}]},
+    ]
+    out = render.render_daily_page(days)
+    assert 'class="site-bar"' in out                 # unified nav
+    assert "Big Shipping Day" in out and "Quieter Day" in out
+    assert "2026-06-20" in out
+    assert "Did stuff." in out
+    assert "alpha" in out and "beta" in out           # repo chips
+    assert out.index("2026-06-20") < out.index("2026-06-19")  # newest first
+    # tooltip clarifies what the number means
+    assert "commits in alpha" in out or 'title="2 commits' in out
+    # click-to-expand detail (native <details>) with apply-takeaways + commits
+    assert "<details" in out
+    assert "apply" in out.lower()                     # "How you can apply this"
+    assert "Reuse the search index pattern" in out    # takeaway shown
+    assert "add widget" in out                        # commit message shown in detail
+
+
+def test_render_daily_page_empty_state():
+    out = render.render_daily_page([])
+    assert 'class="site-bar"' in out
+    assert "muted" in out                             # empty-state message
+
+
 def test_static_pages_share_unified_site_nav():
     """Every static page carries the same top nav so the site feels integrated
     with the SPA: brand + Search + Projects + Clusters."""

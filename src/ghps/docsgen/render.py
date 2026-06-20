@@ -36,6 +36,7 @@ _SITE_NAV = (
     '<a class="brand" href="/">davidbmar.com</a>'
     '<a href="/#/search">Search</a>'
     '<a href="/projects/">Projects</a>'
+    '<a href="/daily/">Daily</a>'
     '<a href="/#/clusters">Clusters</a>'
     "</nav>"
 )
@@ -600,6 +601,126 @@ def render_markdown_doc_page(record: dict, rel: str, body_html: str) -> str:
         f"{doc_title} — {title}", nav,
         f"<h1>{doc_title}</h1>\n<article>{body_html}</article>",
     )
+
+
+def _daily_card(day: dict) -> str:
+    """Render one day's digest as a click-to-expand ``<details>`` card.
+
+    Collapsed: date, commit count, headline, summary, repo chips (each with a
+    tooltip explaining the number). Expanded: apply-focused takeaways and the
+    per-repo commit list — so a reader can judge what was done and reuse it.
+    """
+    date = html.escape(str(day.get("date", "")))
+    headline = html.escape(str(day.get("headline", "")))
+    summary = html.escape(str(day.get("summary", "")))
+    total = day.get("total_commits", 0)
+    repos = day.get("repos", [])
+
+    chips = "".join(
+        f'<span class="repo-chip" title="{r.get("commits", 0)} commits in '
+        f'{html.escape(str(r.get("name", "")), quote=True)} on this day">'
+        f'{html.escape(str(r.get("name", "")))} <b>{r.get("commits", 0)}</b></span>'
+        for r in repos
+    )
+
+    takeaways = [t for t in day.get("takeaways", []) if str(t).strip()]
+    apply_html = (
+        '<h3>How you can apply this</h3><ul class="takeaways">'
+        + "".join(f"<li>{html.escape(str(t))}</li>" for t in takeaways)
+        + "</ul>"
+        if takeaways else ""
+    )
+
+    commit_blocks = "".join(
+        f'<div class="repo-commits"><b>{html.escape(str(r.get("name", "")))}</b>'
+        + '<ul>' + "".join(
+            f"<li>{html.escape(str(m))}</li>" for m in r.get("messages", [])
+        ) + "</ul></div>"
+        for r in repos
+    )
+
+    return (
+        '<details class="day-card">'
+        '<summary>'
+        f'<div class="day-head"><time>{date}</time>'
+        f'<span class="count" title="Total commits across all repos on this day">'
+        f'{total} commit{"" if total == 1 else "s"}</span></div>'
+        f'<h2>{headline}</h2>'
+        f'<p class="day-summary">{summary}</p>'
+        f'<div class="chips">{chips}</div>'
+        '<span class="more-hint">▸ how to apply &amp; commit details</span>'
+        '</summary>'
+        f'<div class="day-detail">{apply_html}'
+        f'<h3>Commits</h3>{commit_blocks}</div>'
+        '</details>'
+    )
+
+
+def render_daily_page(days: list[dict]) -> str:
+    """Render the daily-digest feed (``/daily/index.html`` + flat ``daily.html``).
+
+    *days* are digest records (newest first) from ``web/data/daily.json``.
+    """
+    if days:
+        body = '<div class="day-feed">' + "\n".join(_daily_card(d) for d in days) + "</div>"
+    else:
+        body = '<p class="muted">No daily digest yet — run <code>ghps daily</code>.</p>'
+
+    css = _SITE_NAV_CSS + """
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  h1 { margin-bottom: .15rem; }
+  .sub { opacity: .7; margin-top: 0; }
+  .day-card { border: 1px solid #8884; border-radius: 12px; padding: 1rem 1.2rem;
+              margin: 1rem 0; }
+  .day-card[open] { border-color: #2563eb66; box-shadow: 0 2px 14px #2563eb14; }
+  .day-card summary { cursor: pointer; list-style: none; }
+  .day-card summary::-webkit-details-marker { display: none; }
+  .day-head { display: flex; justify-content: space-between; align-items: baseline;
+              font-size: .82rem; opacity: .7; }
+  .day-card h2 { margin: .3rem 0 .35rem; font-size: 1.2rem; line-height: 1.25; }
+  .day-summary { margin: 0 0 .7rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .repo-chip { background: #2563eb14; color: #2563eb; border-radius: 999px;
+               padding: .1rem .55rem; font-size: .78rem; cursor: help; }
+  .repo-chip b { font-weight: 700; }
+  .more-hint { display: inline-block; margin-top: .6rem; font-size: .78rem;
+               color: #2563eb; opacity: .85; }
+  .day-card[open] .more-hint { display: none; }
+  .day-detail { margin-top: 1rem; padding-top: .9rem; border-top: 1px solid #8883; }
+  .day-detail h3 { font-size: .9rem; margin: .8rem 0 .35rem; text-transform: uppercase;
+                   letter-spacing: .04em; opacity: .7; }
+  .takeaways { margin: 0 0 .5rem; padding-left: 1.1rem; }
+  .takeaways li { margin: .25rem 0; }
+  .repo-commits { margin: .4rem 0; }
+  .repo-commits b { font-size: .9rem; }
+  .repo-commits ul { margin: .2rem 0 .6rem; padding-left: 1.1rem; font-size: .9rem;
+                     opacity: .9; }
+  .repo-commits li { margin: .12rem 0; }
+  .muted { opacity: .6; }
+  code { font-family: ui-monospace, monospace; }"""
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily · davidbmar.com</title>
+<meta name="description" content="A daily headline digest of portfolio activity.">
+<style>
+{css}
+</style>
+</head>
+<body>
+{_SITE_NAV}
+<header>
+  <h1>Daily</h1>
+  <p class="sub">A headline digest of what changed across the portfolio, by day.</p>
+</header>
+{body}
+</body>
+</html>
+"""
 
 
 def _doc_shell(page_title: str, nav_html: str, body_html: str) -> str:

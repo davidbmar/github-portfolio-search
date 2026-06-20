@@ -301,6 +301,51 @@ def fetch_markdown_docs(
     )
 
 
+def fetch_commits(
+    owner: str,
+    repo: str,
+    *,
+    since: str | None = None,
+    until: str | None = None,
+    max_pages: int = 10,
+) -> list[dict[str, str]]:
+    """List commits for *owner/repo*, newest first, across pages.
+
+    Returns ``[{"sha", "message", "date"}]`` where *message* is the commit's
+    first line and *date* is the author date (ISO-8601 Z). *since*/*until* are
+    forwarded to the API to bound the window. Returns an empty list for a missing
+    (404) or empty (409) repo. Caps at *max_pages* to bound cost.
+    """
+    session = _session()
+    out: list[dict[str, str]] = []
+    page = 1
+    while page <= max_pages:
+        params: dict[str, object] = {"per_page": PER_PAGE, "page": page}
+        if since:
+            params["since"] = since
+        if until:
+            params["until"] = until
+        resp = session.get(f"{API_BASE}/repos/{owner}/{repo}/commits", params=params)
+        if resp.status_code in (404, 409):  # missing repo / empty repo (no commits)
+            return out
+        resp.raise_for_status()
+        data = resp.json()
+        if not data:
+            break
+        for c in data:
+            commit = c.get("commit") or {}
+            msg = (commit.get("message") or "").splitlines()
+            first_line = msg[0].strip() if msg else ""
+            date = (commit.get("author") or {}).get("date") or (
+                commit.get("committer") or {}
+            ).get("date") or ""
+            out.append({"sha": c.get("sha", ""), "message": first_line, "date": date})
+        if len(data) < PER_PAGE:
+            break
+        page += 1
+    return out
+
+
 def fetch_branches(owner: str, repo: str) -> list[dict[str, str]]:
     """List branches for *owner/repo*.
 

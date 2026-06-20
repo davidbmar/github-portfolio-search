@@ -1,0 +1,510 @@
+{
+  "generated_at": "2026-06-20T21:34:11.919276Z",
+  "count": 8,
+  "days": [
+    {
+      "date": "2026-06-20",
+      "headline": "Typed Slots Meet Unified Portfolio Search",
+      "summary": "Across the portfolio, github-portfolio-search unified search over the project corpus and per-project docs while regenerating pages with integrated navigation. In riff, the day focused on typed slot extraction: a semantic slot-type registry, build-time lint gates and ratchets, migrations for names/phones/times/addresses/quantities/emails, DateExpr ambiguity handling, readback fixes, and eval holdouts/fallbacks.",
+      "takeaways": [
+        "Use a shared project corpus as the search index, then wire per-project docs and nav into generated pages for portfolio-wide discovery.",
+        "Move extraction logic behind semantic slot types, starting with a registry/loader gate and migrating flows in batches with baseline counts to track progress.",
+        "Add typed adapters for tricky intents like dates, email, address, and quantity so validation, ambiguity blocking, and readback can live close to the type.",
+        "Gate conversational changes with held-out persona splits and a live judge fallback so evals test generalization instead of only tuned paths."
+      ],
+      "total_commits": 28,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 2,
+          "messages": [
+            "chore(web): regenerate project corpus + pages with unified nav",
+            "feat: unify search on projects corpus + per-project docs + integrated nav"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 26,
+          "messages": [
+            "fix(date): commit orphaned FSM date-confirmation gate (Stage 3 follow-up)",
+            "eval(splits): rebalance to ~1/4 holdout with 12 diverse personas",
+            "feat(date): speakable DateExpr adapter — typed date intent + ambiguity-blocking (Stages 1-3)",
+            "feat(slot-types): migrate apartment_viewing.caller_email->email (baseline 21->20)",
+            "feat(slot-types): migrate tutorial flows + bellas/math stragglers (baseline 34->21)",
+            "feat(slot-types): implement email type (7th type)",
+            "feat(slot-types): migrate address slots (Codex-APPROVED) — baseline 40->34",
+            "feat(slot-types): implement address type + fix type-first name allow_bare",
+            "feat(slot-types): migrate scheduling flows' name/phone/time (baseline 51->40)",
+            "fix(slot-types): quantity type per Codex review + migrate 4 flows",
+            "feat(slot-types): implement the quantity type (re-homes _extract_quantity)",
+            "feat(slot-types): migrate batch 3 — coffee/pizza customer_name, dental_clinic full",
+            "fix(slot-types): contact extractor preflight validates by semantic type (Codex r3)",
+            "fix(slot-types): Codex re-review round 2 — production path + locked_choice + ratchet",
+            "fix(slot-types): address Codex implementation review (5 required changes)",
+            "feat(slot-types): build-time gate — untyped-behavioral-slot lint rule + ratchet",
+            "feat(slot-types): migrate batch 2 (amazon/it_helpdesk/bellas/math name+phone)",
+            "feat(slot-types): migrate taco_truck + restaurant; add verified slot-types tutorial",
+            "feat(slot-types): migrate dog_grooming to typed slots (slice 2 — hypothesis holds)",
+            "feat(slot-types): type-first extraction dispatch + filtered name fallback (slice 1)",
+            "feat(slot-types): registry + loader build-time gate (slice 1 foundation)",
+            "docs(slot-types): Codex-APPROVED design spec for the semantic slot-type registry",
+            "fix(readback): rephrase the 'Got it!' filler into an echo of captured values",
+            "fix(readback): kill 'pickup or delivery delivery' render + the phone area-code dance",
+            "feat(eval): live mid-run judge fallback — Alibaba 403 -> ALERT + switch to Codex",
+            "feat(flow-pipeline): held-out persona split — gate on generalization, not overfit"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-19",
+      "headline": "Local LLMs and Collect Pattern Flow Hardening",
+      "summary": "The day's commits added a local MLX Qwen3.5-9B provider, faithful verbose reporting, and stronger Riff flow extraction, validation, and evaluation paths. Riff also promoted multiple flows into the Collect Pattern while documenting cost, revenue, and showcase plans for go-to-market reuse.",
+      "takeaways": [
+        "Built local MLX Qwen3.5-9B support with reliable no-think JSON; reuse the pattern for provider-specific JSON cleanup before downstream parsing.",
+        "Fixed deterministic time and phone accumulation extractors, plus name-validator garbage tests; use these as regression guards for re-ask loops.",
+        "Converted taco_truck, pizza, restaurant_reservation, amazon_returns, and pet_store to Collect Pattern; gate promotions across both paced and front-load caller paths.",
+        "Added judge retry/backoff, surfaced judge failures, and a Codex CLI fallback after qwen-max; use fallback evaluators without hiding evaluation outages."
+      ],
+      "total_commits": 17,
+      "repos": [
+        {
+          "name": "generate_title_headline_hooks",
+          "commits": 3,
+          "messages": [
+            "feat: faithful summary + spine extracts in a --verbose report",
+            "Merge feat/local-mlx-qwen: local MLX Qwen3.5-9B provider + no-think JSON fix",
+            "feat: local MLX Qwen3.5-9B provider with reliable no-think JSON"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 14,
+          "messages": [
+            "fix(extract): phone accumulation no longer doubles a 555 prefix",
+            "feat(eval): Codex CLI judge as a graceful fallback (qwen-max -> codex)",
+            "docs(gtm): add cost model + path-to-revenue (referenced by roadmap.html)",
+            "test(validators): name-validator garbage-rejection tests (pairs with R3)",
+            "fix(extract): deterministic time + phone-accumulation extractors (the #1 re-ask loop)",
+            "docs(gtm): add showcase-flow plan (the demo call + path to first customer)",
+            "fix(flow-eval): judge retry+backoff, and SURFACE judge failures instead of hiding them",
+            "chore(flows): property_trouble_ticket is NOT a Collect Pattern candidate",
+            "feat(flow-pipeline): gate new flows on BOTH caller paths (paced + front-load)",
+            "chore(flows): record 4 no-lift re-judges (dental/it_helpdesk/bellas/math), rm throwaway",
+            "feat(flows): ship amazon_returns + pet_store to Collect Pattern (batch 2 winners)",
+            "feat(engine): front-load handling algorithm (R2 skip-if-filled + R3 garbage validators)",
+            "feat(flows): convert pizza + restaurant_reservation to Collect Pattern (batch 1)",
+            "feat(flows): convert taco_truck to the Collect Pattern (+1.5 quality, seeded)"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-18",
+      "headline": "Portfolio Docs and Riff Flow Reliability Hardened",
+      "summary": "The portfolio app gained per-project docs publishing, better findability, and route/render hygiene fixes. Riff focused on reusable flow quality infrastructure: eval automation, model/provider comparison, deterministic Collect Pattern guardrails, and gated contact extraction for name/email/phone backed by documented A/B results.",
+      "takeaways": [
+        "Publish per-project docs/html pages with recency/title metadata, and make routes tolerant of missing trailing slashes like `/projects/<slug>/docs`.",
+        "Use an eval bring-up script plus `--repeat N` to reduce single-run judge variance before trusting flow-quality scores.",
+        "Gate LLM extractors default-off and ground them to exact candidates or contiguous digit runs before applying name, email, and phone extraction.",
+        "Add build-time and runtime guardrails for conversational flows: one read-aloud question per state, clean clears behavior, deterministic confirmations, and graceful terminal handoffs."
+      ],
+      "total_commits": 56,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 6,
+          "messages": [
+            "Merge pull request #3 from davidbmar/fix/mermaid-parens-and-dark-mode",
+            "fix(render): Mermaid syntax-error icon + white-on-white hygiene panel",
+            "Merge pull request #2 from davidbmar/fix/docs-no-trailing-slash",
+            "fix(docsgen): make /projects/<slug>/docs work without a trailing slash",
+            "Merge pull request #1 from davidbmar/feat/per-project-docs-and-recency",
+            "feat(docsgen): per-project docs/html publishing + recency/title findability"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 50,
+          "messages": [
+            "feat(flow-eval): flow-pipeline.sh — the flow bring-up pipeline",
+            "feat(flow-eval): --repeat N to kill n=1 judge variance",
+            "docs(tutorials): teach the Collect Pattern + close 5 tutorial teaching gaps",
+            "feat(flows): the Collect Pattern — validated split design + deterministic guardrails",
+            "docs(design): one-act-per-state — Moore-act vs one-slot, Codex-reviewed",
+            "docs(flow-eval): contact-extractor complete (name+email+phone); dental A/B +3.7",
+            "feat(extract): extend gated contact-extractor to PHONE (contiguous digit-run grounded, A/B +3.7)",
+            "docs(flow-eval): email extension shipped (+1.0 apartment); phone deferred, enable-in-eval next",
+            "feat(extract): extend gated contact-extractor to EMAIL (exact-candidate grounded)",
+            "docs(flow-eval): record shipped LLM name-extractor + A/B lift (+1.4 restaurant) + follow-ups",
+            "feat(extract): gated LLM name-extractor for the #1 judged defect (default-OFF, A/B +1.4)",
+            "docs(flow-eval): rule out prompt-strengthening for the contact-miss (it's model compliance, not instruction)",
+            "docs(flow-eval): VERIFIED engine-clean post-all-fixes (24/24 terminal, P1/P3/repr-leak 0)",
+            "docs(flow-eval): last engine P1 fixed; engine lints fully clean, only the gated extractor remains",
+            "fix(turn): drop mid-text questions at a terminal — the last engine P1 double-beat",
+            "docs(flow-eval): raw-dict repr-leak fixed + verified; engine lints now clean",
+            "fix(directive): humanize must_include container slots — stop the model echoing raw dict reprs",
+            "docs(flow-eval): VALIDATE the LLM contact-extractor — qwen-flash 7/7 on the blocked cases",
+            "docs(flow-eval): full 19-flow judged map; contact-extraction is the #1 lever (operator decision)",
+            "docs(flow-eval): graceful handoff shipped; remaining low-quality flows are structural",
+            "fix(turn): graceful no-progress/max-turns handoff line — apologize, don't dismiss",
+            "docs(flow-eval): root-cause the name stale-ask; heuristic extraction Codex-blocked",
+            "docs(flow-eval): judged ranking of 10 originals; repr-leak fixed; repetition is next target",
+            "fix(slot_format): speak the KEYS of a {label: bool} set, never vocalize 'True'",
+            "docs(flow-eval): JUDGED A/B refutes one-thing-per-state decomposition; next = judge originals",
+            "docs(flow-eval): bellas confirm-recognition loop fixed; re-sweep to re-rank next",
+            "fix(turn): deterministic confirm on silent 'yes' at a gate — breaks bellas P3/P4 loop",
+            "docs(flow-eval): P3 phone-loop fixed; bellas confirm-recognition is the next target",
+            "fix(validators): specific re_ask on short phone — breaks the P3 collect-loop",
+            "docs(flow-eval): record one-slot-per-state A/B verdict + double-ask-line linter",
+            "feat(linter): double-ask-line — enforce one read-aloud question per state",
+            "docs(flow-eval): first real-data defect map — P1 fixed, P3 collect-loops next",
+            "fix(turn): suppress redundant entry-line when model already asked (P1 double-beat)",
+            "fix(eval): unblock real sweeps — fast qwen-flash persona/deriver + escalate NameError",
+            "feat(eval): latency-triggered failover to fast Qwen (qwen-flash) when Gemini is slow",
+            "docs(flow-eval): map the remaining judge complaints as MODEL-layer, not engine bugs",
+            "docs(flow-eval): correct slot_hold 'loop' — NOT a bug (locked_choice clears it); thread closed",
+            "docs(flow-eval): root-cause the slot_hold bare-denial loop (real, backstop-bounded, deferred)",
+            "docs(flow-eval): retract the deny-ack double-beat (FakeAdapter artifact, real path clean)",
+            "docs(flow-eval): model comparison runnable via RIFF_EVAL_AGENT (blocked on funding)",
+            "feat(eval): RIFF_EVAL_AGENT provider toggle — compare Gemini / Claude / Qwen",
+            "feat(adapters): AnthropicAdapter (Claude) — answer 'would a stronger model help?'",
+            "Merge pull request #17 from davidbmar/docs/night-shift-pricing",
+            "docs(html): night-shift pricing ($1/hr) marketing page + roadmap reframe",
+            "Merge pull request #16 from davidbmar/docs/portfolio-html",
+            "docs(html): publish the Path-to-Revenue / economics page to the portfolio",
+            "feat(linter): clears hygiene checks — guard the bare-denial primitive at build time",
+            "docs(flow-eval): bare-denial clears primitive shipped + 4 scoped follow-ups",
+            "fix(engine): TransitionDef.clears — break the bare-denial loop (austin focus flow)",
+            "docs(authoring): capture the session's engine patterns for flow authors"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-17",
+      "headline": "Riff Hardens Flow Evaluation With Lints, Backstops, and Failover",
+      "summary": "Riff shipped a broad reliability pass for flow evaluation: provider timeouts, wall-clock deadlines, Gemini-to-Alibaba failover, qwen-max escalation, incremental transcript persistence, and no-progress loop backstops. The same day also closed concrete conversation defects around delivery addresses, appointment times, stale re-asks, raw container read-backs, denial wording, branch-aware scoring, and local security-report hygiene in github-portfolio-search.",
+      "takeaways": [
+        "Added static and trace lints for one-beat turns, invalid final statuses, missing scheduler times, missing delivery addresses, and raw repr read-backs; reuse them as preflight gates before expensive eval sweeps.",
+        "Built eval runtime backstops with hard request timeouts, per-conversation deadlines, provider failover, transcript checkpointing, and model escalation on repeated stalls; apply the pattern to keep LLM test harnesses from hanging or losing evidence.",
+        "Tightened slot-filling behavior with slot-specific reprompts, read-back after fills/corrections/front-loads, branch-aware fill-rate scoring, and distinct denial language; reuse these as state-machine invariants for conversational agents.",
+        "Closed domain-specific flow gaps in pizza, coffee, dental, grooming, tutoring, salon, and apartment scheduling flows; pair transcript audits with static checks for required branch-specific slots."
+      ],
+      "total_commits": 79,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 2,
+          "messages": [
+            "chore: gitignore .gstack/ to keep local security reports out of the public repo",
+            "chore: regenerate L0 project docs [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 77,
+          "messages": [
+            "docs(flow-eval): mark abtest branch-aware fill-rate fixed (eba8bf2)",
+            "fix(abtest): branch-aware fill-rate so conditional slots don't penalize the untaken branch",
+            "docs(flow-eval): record reprompt run-on fix + deferred vagueness/detector-sync work",
+            "fix(rules): clean sentence boundary in the require_question slot-less fallback",
+            "docs(flow-eval): mark rung 2 (Alibaba MAX bump) shipped; value-verification awaits live run",
+            "feat(eval): rung 2 — bump to Alibaba MAX (qwen-max) on the 2nd no-progress stall",
+            "docs(flow-eval): no-progress backstop shipped; rung-2 (Alibaba MAX) + live-wiring next",
+            "feat(engine): no-progress backstop — no flow can loop to max_turns (rungs 1+3)",
+            "docs(flow-eval): ceo_command_center triage-loop root cause + Codex-vetted fix design (not applied)",
+            "docs(flow-eval): log pre-existing plumbing-debug test failure + abtest branch-unaware fill-rate",
+            "fix(generic_inquiry): honest capture-for-callback, kill the confirm-loop (quality 1->)",
+            "docs(flow-eval): self-contained HTML scores table (3 runs x 20 flows)",
+            "fix(coffee+extractor): delivery-address branch for coffee + stop pickup mis-fill",
+            "fix(pizza): collect a delivery address on the delivery branch (judge-penalized defect)",
+            "docs(flow-eval): note deriver-truncation retry covers another contamination source",
+            "fix(eval): retry the deriver on truncated JSON (slow-API quality contamination)",
+            "docs(flow-eval): record provider-failover infra + table-blocked-on-slow-API status",
+            "feat(eval): auto-failover Gemini -> Alibaba/DashScope when the primary flaps",
+            "test(focus-flow): pin austin's clean object-slot read-backs end-to-end",
+            "docs(flow-eval): document the repr-leak runtime trace-lint sentinel",
+            "feat(trace-lint): repr-leak sentinel — flag raw container reprs spoken aloud",
+            "feat(linter): object-slot-no-readback — guard silent container slots in confirms",
+            "docs(authoring-lessons): object-slot read-back trilogy + deny language + hand-driving technique",
+            "docs(flow-eval): austin focus-flow full happy path verified clean end-to-end",
+            "docs(flow-eval): record bare-denial loop follow-up (deny-distinct-language shipped)",
+            "fix(deny): distinct language for deny_order — stop acking a rejection as acceptance",
+            "docs(flow-eval): record 3rd container-leak fix + Claude-subbing-in eval technique",
+            "fix(template): humanize container slots in the BARE {{name}} path (austin repr leak)",
+            "docs(flow-eval): resolve post-confirm watch-for — eval path already acks",
+            "docs(flow-eval): triage caller-repeat in 221255Z (stale P3 + degraded confirm_order)",
+            "docs(flow-eval): record full triage of the 00:40 audit (1 real defect fixed, rest stale)",
+            "docs(flow-eval): mark live-path nested-repr leak fixed (72b8dcf)",
+            "fix(slot-format): flatten nested containers so live read-back never speaks raw repr",
+            "docs(flow-eval): record P4 container-slot fix + live-path nested-repr follow-up",
+            "fix(P4): stale-ask guard skips container-valued slots (austin double-speak)",
+            "docs(flow-eval): convergence note — verified state, blockers, M5 handoffs",
+            "docs(record): restore Invariants section — unblocks 48 primitives tests",
+            "fix(flow-eval): persist transcripts incrementally so a killed sweep keeps evidence",
+            "docs(flow-eval): record path_explorer needs_callback overload bug (M5 decision)",
+            "docs(flow-eval): record FinalStatus-contract lesson + invalid-final-status gate",
+            "fix(flows): enforce FinalStatus contract + add invalid-final-status lint",
+            "test(flow-eval): end-to-end correction re-read-back through run_turn",
+            "docs(flow-eval): AUTHORING-LESSONS P4 section covers all 3 guard shapes",
+            "docs(flow-eval): P4 guard now covers slot corrections at confirmation",
+            "fix(flow-eval): P4 guard re-reads-back a slot CORRECTION at await_confirmation",
+            "docs(flow-eval): P4 extended to greeting-turn front-load",
+            "fix(flow-eval): P4 guard also fires on front-load at the GREETING turn",
+            "test(flow-eval): fix stale deriver assertion (max_tokens 900->600)",
+            "docs(flow-eval): refresh AUTHORING-LESSONS linter table with 5 new checks",
+            "docs(flow-eval): delivery-no-address lint shipped (pizza + coffee)",
+            "feat(flow-eval): static lint for delivery-with-no-address (pizza/coffee)",
+            "docs(flow-eval): P2 CLOSED — 5/5 flows fixed, lint promoted to error gate",
+            "fix(apartment_scheduler): honest callback close + promote scheduler-no-timeslot to error (5/5)",
+            "fix(flows): math_tutoring + bellas_hair_salon collect a time — P2 remediation (4/5)",
+            "docs(flow-eval): P2 remediation 2/5 (dental + dog_grooming fixed)",
+            "fix(dog_grooming): collect appointment_time — P2 fake-completion remediation (2/5)",
+            "fix(dental_clinic): collect appointment_time — no more \"scheduled\" with no time (P2)",
+            "docs(flow-eval): record P2 fake-completion across 5 flows + pizza-no-address finding",
+            "feat(flow-eval): static lint for P2 fake-completion (scheduler flow with no date/time slot)",
+            "fix(flow-eval): deriver requests 3 personas, backfills archetypes — stop derivation timeouts",
+            "fix(flow-eval): give the deriver a 50s timeout so slow derivations don't fall back contentless",
+            "docs(flow-eval): eval-reliability now two-layer (SDK timeout + deadline backstop)",
+            "fix(flow-eval): per-conversation wall-clock deadline — guaranteed sweep-hang backstop",
+            "fix(flow-eval): hard Gemini request timeout so a hung read can't stall a sweep",
+            "docs(flow-eval): record eval-sweep hang + loop tooling added this round",
+            "feat(flow-eval): caller-repeat detector — the caller tells us the agent failed",
+            "docs(flow-eval): record the P3 tool-call hole fix + new --audit/persona tooling",
+            "fix(flow-eval): close P3 hole — slot-specific reprompt when a tool call doesn't fill the missing slot",
+            "feat(flow-eval): `--audit` — rank P1/P3/P4 defects by frequency over transcripts",
+            "feat(flow-eval): add 3 diverse caller personas (terse / oversharer / corrector)",
+            "feat(flow-eval): P4 stale-ask-after-fill guard — read back, don't re-ask filled slots",
+            "docs(codex): answer P3 collect-loop review",
+            "feat(flow-eval): P3 deterministic collect-state re-ask — no more \"Could you tell me?\"",
+            "docs(flow-eval): live Alibaba sweep verifies P1 jam fixed; unmasks P3",
+            "feat(flow-eval): one-beat-per-turn invariant — engine guard + trace-lint + static check",
+            "docs(flow-eval): next-steps handoff for a fresh session",
+            "docs(flow-eval): full arc summary + honest A+B-1 verification results"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-16",
+      "headline": "Reusable Flow Evaluator Lands With Read-Back Runtime Fixes",
+      "summary": "Riff gained a full flow-evaluation stack: typed specs, goal derivation, persona-driven conversation runs, scoring rubrics, reports, CLI access, transcripts, fast no-judge mode, and robust judge parsing. The same sweep hardened runtime flow behavior with real slot read-backs, guarded fallback logic, post-confirmation acknowledgements, silent-terminal linting, and text-mode support for audio-gated flows.",
+      "takeaways": [
+        "Reuse the evaluator shape: flow -> derive goals/personas -> drive conversations -> score -> emit versioned markdown/JSON reports.",
+        "Expose evaluation both as a public `evaluate()` API and a CLI with `--describe`/`--no-judge` so agents and humans can run the same harness at different speeds.",
+        "Make LLM judging resilient with explicit errored states, stop reasons, transcript persistence, balanced-brace JSON parsing, and heuristic-fallback notes.",
+        "Prevent canned or silent endings by formatting actual slot read-backs, gating fallbacks on non-empty summaries, and linting silent success terminals."
+      ],
+      "total_commits": 47,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 project docs [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 46,
+          "messages": [
+            "fix(flows): author closing lines on all 30 silent success terminals (Fix B-1)",
+            "fix: post-confirmation acks + silent-success-terminal linter (Codex-reviewed)",
+            "docs(flow-eval): post-confirmation loop root cause (investigation, not applied)",
+            "fix(runtime): gate read-back fallback on non-empty summary (keiko regression)",
+            "fix(runtime): address Codex review of the P1 read-back fix",
+            "fix(runtime): tool_only_fallback speaks a real read-back via format_slots (P1/P2/P3)",
+            "docs(flow-eval): P1 root cause — tool_only_fallback synthesizes the canned collapse",
+            "feat(flow): read-back micro-experience — format_slots + slots_voiced",
+            "docs(flow-eval): generic remedies from the first full judged sweep",
+            "flow-eval: persist transcripts per run + keep runner tests hermetic",
+            "flow-eval: fix four harness-fidelity bugs + add linter, ratchet gate, DashScope judge",
+            "docs(flow_eval): set wall-clock expectations (full sweep is a batch job)",
+            "docs(flow_eval): document --no-judge fast mode + judge-speed wall (milestone 4)",
+            "feat(flow_eval): --no-judge fast mode (skip the slow judge)",
+            "feat(flow_eval): stop_reason makes incomplete runs interpretable",
+            "fix(flow_eval): skip judge on errored convs (preserve error) + de-parrot judge note",
+            "feat(flow_eval): parse reasoning-model judge output (balanced-brace scan) + stricter prompt",
+            "feat(flow_eval): robust judge JSON parsing + explicit heuristic-fallback note",
+            "fix(flow_eval): resolve FlowLlmConfig model + correct judge adapter call (live bugs)",
+            "feat(flow_eval): compact stdout summary + live smoke test (Bezos/Jobs milestone 2)",
+            "docs(flow_eval): L0 llms.txt + AGENTS.md entry + L2 README (progressive discovery)",
+            "feat(flow_eval): CLI + L1 capability descriptor (--describe) + scripts shim",
+            "feat(flow_eval): runner + public evaluate() API (flow->derive->personas->drive->score->report)",
+            "feat(flow_eval): explicit errored flag — distinguish infra errors from flow failures",
+            "feat(flow_eval): report aggregator + versioned schema (worst-first card, md+json)",
+            "feat(flow_eval): rubric — deterministic success + judge-adapter quality/robustness",
+            "feat(flow_eval): conversation driver (persona <-> run_turn + autostate, error-isolated)",
+            "feat(flow_eval): goal_deriver — flow -> caller goal/facts/3 personas (override > LLM > fallback)",
+            "feat(flow_eval): data types (FlowEvalSpec, ConversationResult, FlowScore, ReportCard)",
+            "refactor: extract advance_text_autostates to riff/turn_autostate.py",
+            "Merge branch 'fix/text-mode-audio-gated-flows' into feat/flow-evaluator",
+            "Merge branch 'feat/alibaba-persona-utterance' into feat/flow-evaluator",
+            "docs(plan): flow evaluator implementation plan (TDD, 10 tasks + Bezos/Jobs gate)",
+            "docs(spec): clarify rubric reuses judge adapter, not session_judge.py",
+            "docs(spec): flow evaluator design (human-like report card, agent-driveable)",
+            "feat(persona): caller utterances via Alibaba (DashScope/Qwen) by default",
+            "test(web): text-mode auto-advance through static/act states",
+            "fix(web): run audio-gated flows in text mode + clean up flow picker",
+            "docs: upgrade Record tutorial and add operator guide for Record-with-export (#11)",
+            "Merge pull request #10 from davidbmar/feat/grounding-gate",
+            "Merge remote-tracking branch 'origin/main' into feat/grounding-gate",
+            "test: stop cwd leaks from poisoning the full-suite run (932 Errno-2 errors)",
+            "test(sim-harness): drive real greeting trigger instead of assuming utterance-advance",
+            "test(sim-harness): exclude underscore configs from all-flows parametrization",
+            "test: fix 6 collection errors via consider_namespace_packages",
+            "test(b-003): assert confirm_record_issue gate, not stale clarify state"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-15",
+      "headline": "Grounding Gates Gain Diagnostics, Tests, and Safer CI",
+      "summary": "Riff advanced a deterministic grounding-gate system from design through shadow wiring to offered-then-affirmed checks, with failure classification, surface-form matching, logging, diagnostics, docs, and tests. github-portfolio-search tightened automation by standardizing docs and reindex workflows on GHPS_PAT and adding a nightly reindex schedule.",
+      "takeaways": [
+        "Build deterministic gates first: Riff landed a pure Phase 0 gate with word-boundary matching, hardened types, design notes, and tests.",
+        "Roll out behavior safely: use observe-only shadow wiring behind a kill switch, then promote offered-then-affirmed logic to reduce shadow false positives.",
+        "Make gate demos reusable: support bare python3 from any directory, --list-flows, per-run JSONL logs, and --review diagnostics.",
+        "Harden CI secrets consistently: share one repo-scoped PAT across generated docs and reindex jobs, then schedule reindexing nightly."
+      ],
+      "total_commits": 16,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 2,
+          "messages": [
+            "fix(ci): gen-docs uses GHPS_PAT (unify with reindex)",
+            "fix(ci): reindex uses GHPS_PAT (repo scope) + nightly schedule"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 14,
+          "messages": [
+            "chore(grounding-gate): land working set — docs, scenario data, audio, tests",
+            "fix(deps): patch 6 Dependabot alerts in web/flow-editor (esbuild RCE, vitest, brace-expansion) (#9)",
+            "docs: add plain-English grounding gate guide",
+            "Add grounding failure classification (i) + surface-form matching (Option C)",
+            "Add --list-flows, per-run JSONL logging, and --review diagnosis to gate demo",
+            "Make grounding_gate_demo runnable with bare python3 from any directory",
+            "Fix is_affirmation false-positive on negators/hedges + add live demo and e2e test",
+            "docs(integrity): runbook + Phase 0-1 complete; loop stop note",
+            "feat(integrity): Phase 1b — wire offered-then-affirmed grounding (cut shadow FPs)",
+            "docs(integrity): progress — Phase 1a shadow wiring done, Phase 1b/2 next",
+            "feat(integrity): Phase 1a — shadow wiring behind kill switch (observe-only)",
+            "docs(integrity): progress log — Phase 0 done, Phase 1 next",
+            "fix(integrity): word-boundary matching + harden type; apply Gates/Jobs review",
+            "feat(integrity): Phase 0 — pure deterministic grounding gate + design/plan"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-14",
+      "headline": "Portfolio Docs Become Searchable AI Discovery Layer",
+      "summary": "github-portfolio-search expanded generated repo docs into L0/L1/L2 discovery: batches documented 132/137 repos, added a project-docs listing, homepage/docs links, an llms.txt manifest, and search/LLM lookup over the docs feed. The same day also hardened Qwen/DashScope handling and shipped picture_qr_code_2_login sign-out UX, ownership-based photo deletion, and sign-out/GIS race fixes.",
+      "takeaways": [
+        "Use llms.txt plus tiered progressive disclosure to make generated project docs easier for AI tools to discover without dumping every detail upfront.",
+        "Pair a docs-feed index/listing page with search/LLM lookup, and filter stopwords so prose-heavy docs do not dominate ranking.",
+        "Automate documentation freshness with an auto-update Action and incremental --stale generation, then track deploy/IAM blockers in backlog notes.",
+        "For Google-photo apps, gate deletes by ownership/admin, show signed-in state, and guard post-sign-out fetches plus GIS onload races."
+      ],
+      "total_commits": 27,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 23,
+          "messages": [
+            "chore: deploy artifacts (For LLMs/AI surfacing)",
+            "docs: surface 'For LLMs / AI' discovery in README + on the live site",
+            "chore: deploy artifacts (L2 AI discovery)",
+            "feat: L2 AI discovery — llms.txt manifest + tiered progressive disclosure",
+            "chore: deploy artifacts (homepage docs link)",
+            "feat: link Project Docs from the homepage + explainer banner",
+            "chore: deploy artifacts (132-doc batch)",
+            "feat: L0 gap-fill — 132/137 repos documented",
+            "docs: backlog B-021 — gen-docs rate-limit backoff",
+            "chore: deploy artifacts (68-doc batch)",
+            "feat: L0 batch — 68 repos documented (62 new this run)",
+            "refactor: organization + efficiency pass on docsgen (Task 14)",
+            "fix: filter stopwords in docs search so prose doesn't skew ranking",
+            "feat: L2 — find repos by search/LLM over the docs feed (Task 15)",
+            "feat: auto-update Action + incremental --stale generation (Task 11)",
+            "chore: deploy artifacts from L0 batch deploy",
+            "feat: L0 batch — generate docs for 5 more repos + listing page",
+            "feat: L1 project-docs index/listing page",
+            "docs: backlog B-020 — deployer IAM lacks s3:PutObject (deploy needs admin)",
+            "chore: record L0 deploy in deploy log",
+            "chore: deploy artifacts from L0 guinea-pig deploy",
+            "feat: L0 guinea-pig — generated docs for generate_title_headline_hooks",
+            "fix: DashScope adapter for Qwen3.x — disable thinking + content fallback"
+          ]
+        },
+        {
+          "name": "picture_qr_code_2_login",
+          "commits": 4,
+          "messages": [
+            "fix: no /photos fetch after sign-out; guard GIS onload race",
+            "feat: sign-out button + 'Signed in as' indicator",
+            "feat: ownership-based photo delete (Google self-delete + admin)",
+            "docs: spec for ownership-based photo delete (drops local accounts)"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-13",
+      "headline": "Self-Documenting Portfolio Pipeline Lands With Safer LLM Docs",
+      "summary": "A new L0 portfolio-docs pipeline now fetches GitHub hygiene signals, assembles per-repo context, generates validated structured records through provider-agnostic LLM support, and renders them into HTML plus an aggregate projects feed. The work also hardened rendering, batching, JSON extraction, Mermaid diagrams, and documentation pages so the generated portfolio output is safer and easier to reuse.",
+      "takeaways": [
+        "Use a small record schema plus validator before publishing LLM output; this keeps generated portfolio data predictable and testable.",
+        "Abstract LLM calls behind a provider-agnostic client for DashScope and Anthropic so docs generation can switch providers without rewriting the pipeline.",
+        "Render structured records as HTML with a JSON island and Mermaid, but escape script, ld+json, and pre content to avoid XSS breakouts.",
+        "Aggregate per-project records into web/data/projects.json and expose a CLI orchestrator with env scaffolding for repeatable portfolio generation."
+      ],
+      "total_commits": 26,
+      "repos": [
+        {
+          "name": "generate_title_headline_hooks",
+          "commits": 1,
+          "messages": [
+            "docs: document multi-provider support + add shareable HTML landing page"
+          ]
+        },
+        {
+          "name": "github-portfolio-search",
+          "commits": 25,
+          "messages": [
+            "fix: render Mermaid via ESM build so diagrams actually render",
+            "docs: L0 implementation plan (writing-plans output)",
+            "docs: session log for L0 project-docs implementation",
+            "fix: handle non-dict LLM JSON + ensure_ascii in script blocks (final review)",
+            "refactor: harden screenshot discovery + cover escaping (Task 12 review)",
+            "feat: human-facing pages — UI screenshot + quickstart + features",
+            "fix: make batch resilient to LLM call failures (Task 9 review)",
+            "feat: gen-docs orchestrator + CLI command + env scaffolding",
+            "refactor: match export.py JSON convention + tighten aggregate tests (Task 8 review)",
+            "feat: aggregate records into web/data/projects.json feed",
+            "fix: close ld+json and <pre> XSS breakout vectors (Task 7 review)",
+            "feat: render structured record to HTML page (JSON island + Mermaid)",
+            "harden: enforce + test record_gen trust boundary (Task 6 review)",
+            "feat: generate validated structured records via LLM seam",
+            "refactor: harden _extract_json + cover Anthropic request shape (Task 5 review)",
+            "feat: provider-agnostic LLM client seam (DashScope + Anthropic)",
+            "refactor: flatten default-branch heuristic + cover no-branches case (Task 4 review)",
+            "feat: assemble per-repo generation context",
+            "fix: paginate fetch_open_prs + log unexpected compare status (Task 3 review)",
+            "feat: add GitHub branch/compare/PR fetchers for hygiene",
+            "refactor: simplify ahead-by guard + cover missing-key path (Task 2 review)",
+            "feat: derive repo-hygiene TODOs from branch/PR state",
+            "refactor: clarify schema empty-string policy + cover validator edge branches",
+            "feat: add L0 record schema + validator",
+            "docs: add L0 self-documenting-portfolio design spec"
+          ]
+        }
+      ]
+    }
+  ]
+}

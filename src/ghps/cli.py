@@ -317,6 +317,47 @@ def publish_docs():
     click.echo(f"  published: {result['published']} project docs")
 
 
+@main.command(name="daily")
+@click.option("--owner", default="davidbmar", help="GitHub account to scan.")
+@click.option("--since", default=None,
+              help="ISO date/time lower bound for commits (e.g. 2026-05-01).")
+@click.option("--engine", type=click.Choice(["auto", "codex", "mlx", "deterministic"]),
+              default="auto", help="Headline engine (auto = codex -> mlx -> deterministic).")
+@click.option("--token", default=None, help="GitHub PAT (else GITHUB_TOKEN env).")
+def daily_cmd(owner, since, engine, token):
+    """Generate the daily headline digest -> web/data/daily.json + /daily page.
+
+    Aggregates each day's commits across all of *owner*'s repos, generates a
+    headline + summary per day via the chosen engine, and renders the /daily feed.
+    """
+    from pathlib import Path as _Path
+
+    from ghps import daily as daily_mod
+    from ghps import github_client
+    from ghps.docsgen import render
+
+    if token:
+        os.environ["GITHUB_TOKEN"] = token
+
+    eng = daily_mod.resolve_engine(engine)
+    click.echo(f"Engine: {type(eng).__name__}")
+    click.echo(f"Collecting commits for {owner} since {since or 'the beginning'}...")
+    repo_commits = daily_mod.collect(owner, github_client, since=since)
+    total = sum(len(v) for v in repo_commits.values())
+    click.echo(f"  {total} commits across {len(repo_commits)} repos")
+
+    click.echo("Generating per-day headlines (calls the engine)...")
+    days = daily_mod.build_digests(repo_commits, eng)
+    path = daily_mod.write_daily(days, "web/data/daily.json")
+    click.echo(f"  wrote {path} ({len(days)} days)")
+
+    daily_html = render.render_daily_page(days)
+    _Path("web/daily").mkdir(parents=True, exist_ok=True)
+    _Path("web/daily/index.html").write_text(daily_html, encoding="utf-8")
+    _Path("web/daily.html").write_text(daily_html, encoding="utf-8")
+    click.echo(click.style(f"Daily digest done: {len(days)} days.", fg="green", bold=True))
+
+
 @main.command(name="find-docs")
 @click.argument("query")
 @click.option("--feed", default="web/data/projects.json", help="Path to the L0 docs feed.")

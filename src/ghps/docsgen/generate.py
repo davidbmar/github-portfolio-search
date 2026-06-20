@@ -198,6 +198,19 @@ def publish_all(
         hd.parent / "llms.txt",
         render.render_llms_txt(projects, base_url=base_url, generated_at=utc_z()),
     )
+
+    # Daily headline digest page, if a daily.json has been generated. Served at
+    # /daily/ (index.html) and /daily (flat daily.html via the CF rewrite).
+    daily_json = Path(feed_path).parent / "daily.json"
+    if daily_json.exists():
+        try:
+            days = json.loads(daily_json.read_text()).get("days", [])
+        except (OSError, json.JSONDecodeError):
+            days = []
+        daily_html = render.render_daily_page(days)
+        _write_text(hd.parent / "daily" / "index.html", daily_html)
+        _write_text(hd.parent / "daily.html", daily_html)
+
     logger.info("published %d project docs to %s", len(projects), html_dir)
     return {"published": len(projects)}
 
