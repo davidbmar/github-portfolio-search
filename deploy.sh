@@ -52,9 +52,27 @@ validate_json() {
     echo "${label}: OK ($(python3 -c "import json; print(len(json.load(open('${file}'))))")  entries)"
 }
 
+# Validate a JSON object feed of the form {"count": N, "<key>": [...]} — the
+# docsgen corpus the SPA now searches over (single source of truth).
+validate_json_obj() {
+    local file="$1" key="$2" min="$3" label="$4"
+    if [ ! -f "$file" ]; then
+        echo "Error: ${label} not found at ${file}" >&2
+        return 1
+    fi
+    if ! python3 -c "import json; d=json.load(open('${file}')); items=d.get('${key}', []); assert isinstance(items, list) and len(items) >= ${min}, f'need ${min}+ ${key}, got {len(items)}'" 2>/dev/null; then
+        echo "Error: ${label} is missing, malformed, or has fewer than ${min} ${key}" >&2
+        return 1
+    fi
+    echo "${label}: OK ($(python3 -c "import json; print(len(json.load(open('${file}')).get('${key}', [])))") ${key})"
+}
+
 echo "Validating data files..."
 validate_json "web/data/repos.json" 1 "repos.json" || exit 1
 validate_json "web/data/clusters.json" 1 "clusters.json" || exit 1
+# The SPA hard-depends on these (search corpus + rich snippet index). Fail fast.
+validate_json_obj "web/data/projects-index.json" "projects" 1 "projects-index.json" || exit 1
+validate_json_obj "web/data/projects-search.json" "entries" 1 "projects-search.json" || exit 1
 
 # 4. Generate deploy metadata
 COMMIT=$(git rev-parse --short HEAD)

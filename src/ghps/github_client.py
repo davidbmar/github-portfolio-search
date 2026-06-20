@@ -201,26 +201,24 @@ def fetch_top_files(
 
 
 DOCS_HTML_PREFIX = "docs/html/"
+DOCS_MD_PREFIX = "docs/md/"
 
 
-def fetch_html_docs(
+def _fetch_docs_under(
     owner: str,
     repo: str,
+    prefix: str,
+    suffix: str,
     *,
-    default_branch: str | None = None,
-    max_files: int = 50,
+    default_branch: str | None,
+    max_files: int,
 ) -> list[tuple[str, str]]:
-    """Fetch every ``docs/html/**/*.html`` file from the repo's default branch.
+    """Fetch every ``<prefix>**/*<suffix>`` blob from the repo's default branch.
 
-    Convention: a project opts a page into its portfolio docs by committing it
-    under ``docs/html/``. Those pages are republished alongside the generated
-    project page (see ``generate.publish_all``). The explicit folder avoids
-    accidentally publishing generated HTML (Sphinx ``docs/_build``, coverage
-    reports, etc.) that often lives elsewhere under ``docs/``.
-
-    Mirrors :func:`fetch_top_files` but filters the tree to ``docs/html/`` HTML
-    and caps blob downloads at *max_files*. Returns ``(path, content)`` tuples
-    with the full repo path (e.g. ``docs/html/roadmap.html``). Empty if missing.
+    Shared engine for :func:`fetch_html_docs` and :func:`fetch_markdown_docs`.
+    The explicit opt-in folder (``docs/html/`` or ``docs/md/``) avoids publishing
+    generated output (Sphinx ``docs/_build``, coverage reports) elsewhere under
+    ``docs/``. Returns ``(path, content)`` tuples with the full repo path.
     """
     session = _session()
 
@@ -244,8 +242,8 @@ def fetch_html_docs(
         item
         for item in tree
         if item.get("type") == "blob"
-        and item["path"].startswith(DOCS_HTML_PREFIX)
-        and item["path"].lower().endswith(".html")
+        and item["path"].startswith(prefix)
+        and item["path"].lower().endswith(suffix)
     ][:max_files]
 
     results: list[tuple[str, str]] = []
@@ -262,6 +260,45 @@ def fetch_html_docs(
         results.append((item["path"], content))
 
     return results
+
+
+def fetch_html_docs(
+    owner: str,
+    repo: str,
+    *,
+    default_branch: str | None = None,
+    max_files: int = 50,
+) -> list[tuple[str, str]]:
+    """Fetch every ``docs/html/**/*.html`` file from the repo's default branch.
+
+    Convention: a project opts a page into its portfolio docs by committing it
+    under ``docs/html/``. Those pages are republished alongside the generated
+    project page (see ``generate.publish_all``). Returns ``(path, content)``
+    tuples (e.g. ``docs/html/roadmap.html``). Empty if missing.
+    """
+    return _fetch_docs_under(
+        owner, repo, DOCS_HTML_PREFIX, ".html",
+        default_branch=default_branch, max_files=max_files,
+    )
+
+
+def fetch_markdown_docs(
+    owner: str,
+    repo: str,
+    *,
+    default_branch: str | None = None,
+    max_files: int = 50,
+) -> list[tuple[str, str]]:
+    """Fetch every ``docs/md/**/*.md`` file from the repo's default branch.
+
+    The markdown counterpart to :func:`fetch_html_docs`: a project opts a
+    markdown page into its portfolio docs by committing it under ``docs/md/``.
+    Returns ``(path, raw_markdown)`` tuples (e.g. ``docs/md/roadmap.md``).
+    """
+    return _fetch_docs_under(
+        owner, repo, DOCS_MD_PREFIX, ".md",
+        default_branch=default_branch, max_files=max_files,
+    )
 
 
 def fetch_branches(owner: str, repo: str) -> list[dict[str, str]]:

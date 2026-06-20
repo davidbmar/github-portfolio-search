@@ -64,6 +64,34 @@ class TestFetchHtmlDocs:
         assert github_client.fetch_html_docs("o", "r", default_branch="main") == []
 
 
+class TestFetchMarkdownDocs:
+    @patch.object(github_client, "_session")
+    def test_returns_only_markdown_under_docs_md(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        tree = {"tree": [
+            {"type": "blob", "path": "docs/md/roadmap.md", "sha": "s1"},
+            {"type": "blob", "path": "docs/md/sub/design.md", "sha": "s2"},
+            {"type": "blob", "path": "docs/md/logo.png", "sha": "s3"},     # not md
+            {"type": "blob", "path": "docs/other.md", "sha": "s4"},        # not docs/md/
+            {"type": "blob", "path": "README.md", "sha": "s5"},            # not under docs/md/
+            {"type": "tree", "path": "docs/md", "sha": "t"},               # not a blob
+        ]}
+        session.get.side_effect = [_resp(tree), _blob("# Roadmap"), _blob("# Design")]
+
+        docs = github_client.fetch_markdown_docs("o", "r", default_branch="main")
+
+        assert [p for p, _ in docs] == ["docs/md/roadmap.md", "docs/md/sub/design.md"]
+        assert docs[0][1] == "# Roadmap"
+
+    @patch.object(github_client, "_session")
+    def test_missing_tree_returns_empty(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        session.get.return_value = _resp({}, status_code=404)
+        assert github_client.fetch_markdown_docs("o", "r", default_branch="main") == []
+
+
 # ---------------------------------------------------------------------------
 # context.build_context
 # ---------------------------------------------------------------------------
@@ -85,6 +113,7 @@ def _ctx_gh(**docs_return):
     gh.fetch_open_prs.return_value = []
     gh.compare_commits.return_value = 0
     gh.fetch_html_docs.return_value = docs_return.get("docs", [])
+    gh.fetch_markdown_docs.return_value = docs_return.get("md_docs", [])
     return gh
 
 
@@ -95,6 +124,12 @@ def test_context_carries_pushed_at_and_html_docs():
     )
     assert ctx.pushed_at == "2026-06-14T00:00:00Z"
     assert ctx.html_docs == [("docs/html/guide.html", "<h1>Guide</h1>")]
+
+
+def test_context_carries_markdown_docs():
+    gh = _ctx_gh(md_docs=[("docs/md/roadmap.md", "# Roadmap")])
+    ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
+    assert ctx.md_docs == [("docs/md/roadmap.md", "# Roadmap")]
 
 
 def test_context_tolerates_gh_without_fetch_html_docs():
@@ -108,6 +143,7 @@ def test_context_tolerates_gh_without_fetch_html_docs():
     )
     ctx = context.build_context(_repo_meta(), owner="davidbmar", gh=gh)
     assert ctx.html_docs == []
+    assert ctx.md_docs == []  # defensively absent too
 
 
 # ---------------------------------------------------------------------------
@@ -173,6 +209,21 @@ def test_record_includes_docs_and_pushed_at():
     assert rec["docs"] == [{"path": "docs/html/r.html", "html": "<p>hi</p>"}]
 
 
+def test_record_includes_markdown_docs_kept_as_raw_source():
+    ctx = _rc(
+        html_docs=[("docs/html/r.html", "<p>hi</p>")],
+        md_docs=[("docs/md/roadmap.md", "# Roadmap\n\nPlan.")],
+    )
+    rec = record_gen.generate_record(ctx, _Client(dict(_LLM_FIELDS)))
+    by_path = {d["path"]: d for d in rec["docs"]}
+    # html entries keep their existing shape (no kind key)
+    assert by_path["docs/html/r.html"] == {"path": "docs/html/r.html", "html": "<p>hi</p>"}
+    # markdown entries carry kind + raw source (rendered later, at publish time)
+    md = by_path["docs/md/roadmap.md"]
+    assert md["kind"] == "md"
+    assert md["markdown"] == "# Roadmap\n\nPlan."
+
+
 # ---------------------------------------------------------------------------
 # render
 # ---------------------------------------------------------------------------
@@ -201,6 +252,19 @@ def test_render_page_no_docs_link_when_absent():
     assert 'class="docs-link"' not in render.render_page(_record(docs=[]))
 
 
+def test_static_pages_share_unified_site_nav():
+    """Every static page carries the same top nav so the site feels integrated
+    with the SPA: brand + Search + Projects + Clusters."""
+    page = render.render_page(_record(slug="demo"))
+    index = render.render_index_page([_record(slug="demo")])
+    docs = render.render_docs_index_page({"slug": "demo", "title": "Demo"}, ["a.html"])
+    for out in (page, index, docs):
+        assert 'class="site-bar"' in out
+        assert 'href="/projects/"' in out          # Projects
+        assert 'href="/#/search"' in out           # back into the search SPA
+        assert ">davidbmar.com<" in out            # brand
+
+
 def test_mermaid_strips_empty_parens_that_break_flowchart():
     # "run_turn()" inside a [..] label trips Mermaid's parser (the red error icon)
     out = render._mermaid("flowchart TD\n  A[run_turn()] --> B[StateManager]")
@@ -225,6 +289,45 @@ def test_docs_index_lists_docs_with_absolute_links():
     assert 'href="/projects/demo/docs/business/roadmap.html"' in out
     assert "Roadmap" in out                       # humanized from filename
     assert 'href="/projects/demo.html"' in out    # back to project page (absolute)
+
+
+def test_docs_index_groups_html_and_md_with_kind_listings():
+    out = render.render_docs_index_page(
+        {"slug": "demo", "title": "Demo"},
+        ["a.html"],                # html docs (under /docs/)
+        ["roadmap.html"],          # md docs (rendered, under /docs/md/)
+    )
+    assert 'href="/projects/demo/docs/a.html"' in out          # html doc
+    assert 'href="/projects/demo/docs/md/roadmap.html"' in out  # md doc (namespaced)
+    assert 'href="/projects/demo/docs/html"' in out            # html listing page
+    assert 'href="/projects/demo/docs/md"' in out              # md listing page
+
+
+def test_docs_kind_page_lists_only_that_kind():
+    html_page = render.render_docs_kind_page(
+        {"slug": "demo", "title": "Demo"}, "html", ["a.html", "sub/b.html"]
+    )
+    assert 'href="/projects/demo/docs/a.html"' in html_page
+    assert 'href="/projects/demo/docs/sub/b.html"' in html_page
+    assert 'href="/projects/demo/docs/"' in html_page          # back to combined index
+
+    md_page = render.render_docs_kind_page(
+        {"slug": "demo", "title": "Demo"}, "md", ["roadmap.html"]
+    )
+    assert 'href="/projects/demo/docs/md/roadmap.html"' in md_page
+    assert "Roadmap" in md_page
+
+
+def test_render_markdown_doc_page_wraps_body_with_nav():
+    out = render.render_markdown_doc_page(
+        {"slug": "demo", "title": "Demo", "repo_url": "https://github.com/x/demo"},
+        "roadmap.html",
+        "<h1>Road</h1><p>Plan.</p>",
+    )
+    assert "<h1>Road</h1>" in out and "Plan." in out
+    assert 'href="/projects/demo/docs/"' in out     # back to docs index
+    assert 'href="/projects/demo.html"' in out      # back to project
+    assert "github.com/x/demo" in out               # link to source repo
 
 
 def test_index_grid_orders_newest_first():
@@ -270,3 +373,44 @@ def test_publish_writes_repo_docs_and_rejects_traversal(tmp_path):
     # the traversal entry must not escape the docs dir
     assert not (tmp_path / "web" / "evil.html").exists()
     assert not (proj / "evil.html").exists()
+
+
+def test_publish_renders_markdown_docs_and_kind_listings(tmp_path):
+    records = tmp_path / "projects"
+    records.mkdir(parents=True)
+    rec = _record(
+        slug="demo",
+        pushed_at="2026-06-14T00:00:00Z",
+        docs=[
+            {"path": "docs/html/guide.html", "html": "<h1>Guide</h1>"},
+            {"path": "docs/md/roadmap.md", "kind": "md",
+             "markdown": "# Roadmap\n\nShip **Part 2**."},
+            {"path": "docs/md/../../evil.md", "kind": "md",
+             "markdown": "nope"},  # traversal → dropped
+        ],
+    )
+    (records / "demo.record.json").write_text(json.dumps(rec))
+
+    generate.publish_all(
+        records_dir=str(records),
+        html_dir=str(tmp_path / "web" / "projects"),
+        feed_path=str(tmp_path / "web" / "data" / "projects.json"),
+    )
+
+    proj = tmp_path / "web" / "projects"
+    # html doc unchanged location
+    assert (proj / "demo" / "docs" / "guide.html").exists()
+    # markdown rendered to HTML under docs/md/
+    md_page = (proj / "demo" / "docs" / "md" / "roadmap.html").read_text()
+    assert "<h1>Roadmap</h1>" in md_page
+    assert "<strong>Part 2</strong>" in md_page       # markdown rendered, not raw
+    # per-kind listing pages
+    assert (proj / "demo" / "docs" / "html.html").exists()
+    assert (proj / "demo" / "docs" / "md.html").exists()
+    # combined index references both kinds
+    index = (proj / "demo" / "docs" / "index.html").read_text()
+    assert "/projects/demo/docs/guide.html" in index
+    assert "/projects/demo/docs/md/roadmap.html" in index
+    # traversal md entry dropped
+    assert not (tmp_path / "web" / "evil.md").exists()
+    assert not (proj / "demo" / "docs" / "md" / "evil.html").exists()

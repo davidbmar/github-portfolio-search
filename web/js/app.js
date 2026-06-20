@@ -243,37 +243,66 @@ const App = (() => {
     content.appendChild(buildLoadingSkeleton());
 
     try {
-      const [reposRes, clustersRes] = await Promise.all([
-        fetch("data/repos.json"),
+      // Primary (searchable) corpus = the docsgen projects index \u2014 the single
+      // source of truth, 132 projects incl. private ones. repos.json is kept as
+      // a metadata SIDECAR: GitHub-only fields (updated_at, language, stars)
+      // that the docsgen corpus lacks are left-joined on by slug === name, so
+      // the homepage recency/language/stars stay populated for the indexed
+      // subset (option A). clusters.json still drives the capability grid.
+      const [projectsRes, clustersRes, reposRes] = await Promise.all([
+        fetch("data/projects-index.json"),
         fetch("data/clusters.json"),
+        fetch("data/repos.json").catch(() => null),
       ]);
 
-      if (!reposRes.ok) throw new Error("Failed to load repos.json");
+      if (!projectsRes.ok) throw new Error("Failed to load projects-index.json");
       if (!clustersRes.ok) throw new Error("Failed to load clusters.json");
 
-      const reposText = await reposRes.text();
+      const projectsText = await projectsRes.text();
       const clustersText = await clustersRes.text();
 
-      const parsedRepos = reposText.trim() ? JSON.parse(reposText) : [];
+      const projectsPayload = projectsText.trim() ? JSON.parse(projectsText) : {};
+      const parsedProjects = Array.isArray(projectsPayload.projects)
+        ? projectsPayload.projects
+        : Array.isArray(projectsPayload) ? projectsPayload : [];
       const parsedClusters = clustersText.trim() ? JSON.parse(clustersText) : [];
 
-      if (!Array.isArray(parsedRepos) || parsedRepos.length === 0) {
-        useFallbackData(content, "No data available \u2014 run ghps index to populate");
+      if (parsedProjects.length === 0) {
+        useFallbackData(content, "No data available \u2014 run ghps gen-docs to populate");
         return;
       }
 
-      repos = parsedRepos;
       clusters = Array.isArray(parsedClusters) ? parsedClusters : [];
 
-      // Ensure topics are arrays
-      repos = repos.map((r) => ({
-        ...r,
-        topics: Array.isArray(r.topics)
-          ? r.topics
-          : typeof r.topics === "string"
-            ? tryParseJSON(r.topics, [])
-            : [],
-      }));
+      // GitHub metadata sidecar, keyed by repo name (== project slug).
+      const repoMeta = Object.create(null);
+      if (reposRes && reposRes.ok) {
+        try {
+          const metaList = await reposRes.json();
+          if (Array.isArray(metaList)) {
+            for (const r of metaList) if (r && r.name) repoMeta[r.name] = r;
+          }
+        } catch (_) { /* sidecar is best-effort */ }
+      }
+
+      // Normalize each project into the "repo" shape the search/render code
+      // already understands, so a project IS a searchable, renderable unit.
+      repos = parsedProjects.map((p) => {
+        const meta = repoMeta[p.slug] || {};
+        return {
+          name: p.slug,                                 // chunk-map key + name match
+          slug: p.slug,
+          title: p.title || p.slug,
+          description: p.one_liner || "",
+          topics: [...(p.tech || []), ...(p.reuse_tags || [])],
+          repo_url: p.repo_url,
+          html_url: p.repo_url,
+          updated_at: p.pushed_at || meta.updated_at || "",
+          language: meta.language || "",
+          stars: meta.stars || 0,
+          thin: p.thin === true,
+        };
+      });
 
       facets = SearchEngine.extractFacets(repos);
 
@@ -282,14 +311,19 @@ const App = (() => {
       // Load optional data files AFTER route (fail silently, never block main render)
       try {
         const optionalFetches = [
-          fetch("data/search-index.json").then((r) => r.ok ? r.json() : null).catch(() => null),
+          fetch("data/projects-search.json").then((r) => r.ok ? r.json() : null).catch(() => null),
           fetch("data/similarity.json").then((r) => r.ok ? r.json() : null).catch(() => null),
           fetch("data/suggestions.json").then((r) => r.ok ? r.json() : null).catch(() => null),
         ];
         const [searchIndex, simData, sugData] = await Promise.all(optionalFetches);
 
-        if (searchIndex && typeof SearchEngine.loadSearchIndex === "function") {
-          SearchEngine.loadSearchIndex(searchIndex);
+        // projects-search.json wraps entries in {entries: [...]}; the legacy
+        // search-index.json was a bare array. Support both.
+        const searchEntries = searchIndex && searchIndex.entries
+          ? searchIndex.entries
+          : searchIndex;
+        if (searchEntries && typeof SearchEngine.loadSearchIndex === "function") {
+          SearchEngine.loadSearchIndex(searchEntries);
         }
         if (simData) similarity = simData;
         if (sugData) suggestions = sugData;
@@ -380,8 +414,10 @@ const App = (() => {
 
       renderSearchResults(query, content);
     } else if (hash.startsWith("#/repo/")) {
+      // Legacy route — the in-app detail view was removed. Forward old links
+      // (bookmarks, embeds) to the project's static page.
       const repoName = decodeURIComponent(hash.slice("#/repo/".length));
-      renderRepoDetail(repoName, content);
+      window.location.replace(projectHref(repoName));
     } else if (hash.startsWith("#/cluster/")) {
       const clusterName = decodeURIComponent(hash.slice("#/cluster/".length));
       renderClusterDetail(clusterName, content);
@@ -392,6 +428,21 @@ const App = (() => {
     } else {
       renderHome(content);
     }
+  }
+
+  /**
+   * Canonical link to a project's rich static page. Search and browse both
+   * resolve to /projects/<slug>.html — the single destination. (The old in-app
+   * #/repo detail view was removed in favor of these pages.) slug === repo name.
+   */
+  function projectHref(repo) {
+    const slug = typeof repo === "string" ? repo : (repo.slug || repo.name);
+    return "/projects/" + encodeURIComponent(slug) + ".html";
+  }
+
+  /** Human title for a project/repo, falling back to its slug/name. */
+  function projectTitle(repo) {
+    return repo.title || repo.name;
   }
 
   /**
@@ -473,7 +524,7 @@ const App = (() => {
         const githubUrl = repo.html_url || repo.url;
         html += '<div class="showcase-card">';
         html += '<div class="showcase-card-header">';
-        html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="repo-name">' + escapeHtml(repo.name) + '</a>';
+        html += '<a href="' + escapeAttr(projectHref(repo)) + '" class="repo-name">' + escapeHtml(projectTitle(repo)) + '</a>';
         html += '<span class="featured-badge">Featured</span>';
         html += '</div>';
         if (repo.highlight) {
@@ -548,7 +599,7 @@ const App = (() => {
         for (const repo of recentRepos) {
           const langColor = LANG_COLORS[repo.language] || "#8b949e";
           html += '<div class="recent-activity-item">';
-          html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="recent-activity-name">' + escapeHtml(repo.name) + '</a>';
+          html += '<a href="' + escapeAttr(projectHref(repo)) + '" class="recent-activity-name">' + escapeHtml(projectTitle(repo)) + '</a>';
           if (repo.language) {
             html += '<span class="language-badge">';
             html += '<span class="language-dot" style="background:' + escapeAttr(langColor) + '"></span>';
@@ -760,221 +811,6 @@ const App = (() => {
   }
 
   /**
-   * Find which cluster a repo belongs to.
-   */
-  function findClusterForRepo(repoName) {
-    for (const cluster of clusters) {
-      if ((cluster.repos || []).includes(repoName)) {
-        return cluster;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Render repo detail page showing full info about a single repository.
-   * Safe: all dynamic values pass through escapeHtml()/escapeAttr() before
-   * DOM insertion, consistent with the existing rendering pattern in this file.
-   */
-  function renderRepoDetail(repoName, container) {
-    // NOTE: All dynamic values below are sanitized via escapeHtml() / escapeAttr()
-    // before insertion. The github-link SVG and static HTML structure are safe literals.
-    // This pattern is consistent with the rest of the codebase (renderHome, renderSearchResults).
-    let html = '<a href="#/" class="back-link">&larr; Back to search</a>';
-
-    const repo = repos.find((r) => r.name === repoName);
-    if (!repo) {
-      html += '<div class="empty-state"><h3>Repository not found</h3></div>';
-      container.innerHTML = html;
-      return;
-    }
-
-    const cluster = findClusterForRepo(repo.name);
-    const langColor = LANG_COLORS[repo.language] || "#8b949e";
-    const githubUrl = repo.html_url || repo.url;
-    const freshness = getFreshnessBadge(repo.updated_at);
-
-    html += '<div class="repo-detail">';
-
-    // Header with name + action buttons
-    html += '<div class="repo-detail-header">';
-    html += '<h2 class="repo-detail-name">' + escapeHtml(repo.name);
-    if (repo.private) {
-      html += ' <span class="secured-badge">Secured</span>';
-    }
-    if (repo.showcase === true) {
-      html += ' <span class="featured-badge">Featured</span>';
-    }
-    html += '</h2>';
-    html += '<div class="repo-detail-actions">';
-    if (repo.liveUrl) {
-      html += '<a href="' + escapeAttr(repo.liveUrl) + '" class="live-demo-btn" target="_blank" rel="noopener">Live Demo</a>';
-    }
-    if (githubUrl) {
-      html += '<a href="' + escapeAttr(githubUrl) + '" class="btn btn-primary" target="_blank" rel="noopener">';
-      html += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>';
-      html += ' View on GitHub</a>';
-    }
-    html += '<button class="share-btn" id="share-repo-btn" title="Copy link to this repo">';
-    html += '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>';
-    html += ' Share</button>';
-    html += '</div></div>';
-
-    // Highlight / tagline
-    if (repo.highlight) {
-      html += '<div class="highlight-text">' + escapeHtml(repo.highlight) + '</div>';
-    }
-
-    // Description
-    if (repo.description) {
-      html += '<p class="repo-detail-description">' + escapeHtml(repo.description) + '</p>';
-    }
-
-    // Stats bar
-    html += '<div class="repo-detail-stats">';
-    if (repo.language) {
-      html += '<div class="stat-chip">';
-      html += '<span class="language-dot" style="background:' + escapeAttr(langColor) + '"></span>';
-      html += escapeHtml(repo.language);
-      html += '</div>';
-    }
-    html += '<div class="stat-chip">&#9733; ' + escapeHtml(String(repo.stars || 0)) + ' stars</div>';
-    if (freshness) {
-      html += '<div class="stat-chip ' + escapeAttr(freshness.className) + '">' + escapeHtml(freshness.label) + '</div>';
-    }
-    if (repo.updated_at) {
-      html += '<div class="stat-chip">Updated ' + escapeHtml(formatDate(repo.updated_at)) + '</div>';
-    }
-    if (cluster) {
-      html += '<div class="stat-chip"><a href="#/cluster/' + escapeAttr(encodeURIComponent(cluster.name)) + '">' + escapeHtml(cluster.name) + '</a></div>';
-    }
-    html += '</div>';
-
-    // Topics — clickable, search by topic
-    const topics = repo.topics || [];
-    if (topics.length > 0) {
-      html += '<div class="repo-detail-topics">';
-      for (const t of topics) {
-        html += '<a href="#/search?q=' + escapeAttr(encodeURIComponent(t)) + '" class="topic-tag">' + escapeHtml(t) + '</a>';
-      }
-      html += '</div>';
-    }
-
-    // Quick start / clone section
-    if (githubUrl) {
-      const cloneUrl = escapeHtml(githubUrl + '.git');
-      const cloneAttr = escapeAttr(githubUrl + '.git');
-      html += '<div class="repo-detail-section">';
-      html += '<h3>Quick Start</h3>';
-      html += '<div class="clone-box">';
-      html += '<code>git clone ' + cloneUrl + '</code>';
-      html += '<button class="btn-copy" data-copy="' + cloneAttr + '">Copy</button>';
-      html += '</div></div>';
-    }
-
-    // README section — assembled from search-index chunks or readme_excerpt
-    const readmeContent = _getRepoReadme(repo);
-    if (readmeContent) {
-      html += '<div class="repo-detail-section">';
-      html += '<h3>README</h3>';
-      html += '<div class="readme-content">' + escapeHtml(readmeContent) + '</div>';
-      if (githubUrl) {
-        html += '<a href="' + escapeAttr(githubUrl + '#readme') + '" class="readme-more" target="_blank" rel="noopener">Read full README on GitHub &rarr;</a>';
-      }
-      html += '</div>';
-    }
-
-    // Tech Stack (builtWith)
-    const builtWith = Array.isArray(repo.builtWith) ? repo.builtWith : [];
-    if (builtWith.length > 0) {
-      html += '<div class="tech-stack">';
-      html += '<h3>Tech Stack</h3>';
-      html += '<div class="tech-stack-badges">';
-      for (const tech of builtWith) {
-        html += '<span class="tech-badge">' + escapeHtml(tech) + '</span>';
-      }
-      html += '</div>';
-      html += '</div>';
-    }
-
-    // Connected Projects (relatedProjects from portfolio.json)
-    const relatedProjects = Array.isArray(repo.relatedProjects) ? repo.relatedProjects : [];
-    if (relatedProjects.length > 0) {
-      html += '<div class="connected-projects">';
-      html += '<h3>Connected Projects</h3>';
-      html += '<div class="connected-projects-list">';
-      for (const rp of relatedProjects) {
-        const rpName = typeof rp === 'string' ? rp : (rp.name || '');
-        const rpRelationship = (typeof rp === 'object' && rp.relationship) ? rp.relationship : '';
-        if (!rpName) continue;
-        html += '<div class="connected-project-item">';
-        html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(rpName)) + '">' + escapeHtml(rpName) + '</a>';
-        if (rpRelationship) {
-          html += '<span class="relationship-separator">&mdash;</span>';
-          html += '<span class="relationship-label">' + escapeHtml(rpRelationship) + '</span>';
-        }
-        html += '</div>';
-      }
-      html += '</div>';
-      html += '</div>';
-    }
-
-    html += '</div>'; // repo-detail
-
-    // Related repos (similarity-based or cluster-based)
-    const related = findRelatedRepos(repo, 6);
-    if (related.length > 0) {
-      const relLabel = related._source === "similarity" ? "Semantically similar" : "from same cluster";
-      html += '<div class="related-repos-section">';
-      html += '<div class="section-header"><h3>Related Repositories</h3>';
-      html += '<span class="count">' + escapeHtml(relLabel) + '</span></div>';
-      html += renderRepoCards(related);
-      html += '</div>';
-    }
-
-    container.innerHTML = html;
-
-    // Wire up copy button (event listener, not inline handler)
-    const copyBtn = container.querySelector('.btn-copy');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        const text = copyBtn.getAttribute('data-copy');
-        navigator.clipboard.writeText(text).then(() => {
-          copyBtn.textContent = 'Copied!';
-          setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
-        });
-      });
-    }
-
-    // Wire up share button
-    const shareRepoBtn = container.querySelector('#share-repo-btn');
-    if (shareRepoBtn) {
-      shareRepoBtn.addEventListener('click', shareCurrentUrl);
-    }
-  }
-
-  /**
-   * Get README content for a repo from search index chunks or readme_excerpt.
-   */
-  function _getRepoReadme(repo) {
-    // Try search index chunks (richer, from search-index.json)
-    if (SearchEngine._chunkRawMap && SearchEngine._chunkRawMap[repo.name]) {
-      const chunks = SearchEngine._chunkRawMap[repo.name];
-      const readmeChunks = chunks.filter((c) =>
-        c.source === "README" || c.source === "README.md"
-      );
-      if (readmeChunks.length > 0) {
-        return readmeChunks.map((c) => c.text).join("\n\n");
-      }
-      // If no README-specific chunks, use all chunks
-      if (chunks.length > 0) {
-        return chunks.map((c) => c.text).join("\n\n");
-      }
-    }
-    return repo.readme_excerpt || null;
-  }
-
-  /**
    * Render clusters listing page.
    */
   function renderClustersPage(container) {
@@ -1125,7 +961,7 @@ const App = (() => {
       html += '<div class="repo-card">';
       html += '<div class="repo-card-header">';
 
-      html += '<a href="#/repo/' + escapeAttr(encodeURIComponent(repo.name)) + '" class="repo-name">' + escapeHtml(repo.name) + "</a>";
+      html += '<a href="' + escapeAttr(projectHref(repo)) + '" class="repo-name">' + escapeHtml(projectTitle(repo)) + "</a>";
       if (repo.private) {
         html += '<span class="secured-badge" title="Private repository — secured access only">Secured</span>';
       }

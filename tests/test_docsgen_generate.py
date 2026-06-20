@@ -84,6 +84,25 @@ def test_generate_all_writes_record_html_and_aggregate(tmp_path):
     assert "projects-index.json" in llms and "portfolio_find_docs" in llms
 
 
+def test_publish_all_writes_search_index(tmp_path):
+    """The SPA search corpus (projects-search.json) is built from the records."""
+    generate.generate_all(
+        owner="davidbmar",
+        records_dir=str(tmp_path / "projects"),
+        html_dir=str(tmp_path / "web" / "projects"),
+        feed_path=str(tmp_path / "web" / "data" / "projects.json"),
+        client=_FakeClient(),
+        gh=_fake_gh("alpha"),
+    )
+    search = json.loads(
+        (tmp_path / "web" / "data" / "projects-search.json").read_text()
+    )
+    assert search["count"] == 1
+    entry = search["entries"][0]
+    assert entry["repo"] == "alpha"
+    assert any(c["source"] == "what_it_is" for c in entry["chunks"])
+
+
 def test_publish_all_rebuilds_web_from_records_without_llm(tmp_path):
     # First generate one record (LLM), then publish from records alone.
     from ghps.docsgen import generate as gen

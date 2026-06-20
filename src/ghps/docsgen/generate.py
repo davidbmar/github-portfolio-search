@@ -12,7 +12,7 @@ import logging
 from pathlib import Path
 
 from ghps import github_client as _default_gh
-from ghps.docsgen import aggregate, context, record_gen, render
+from ghps.docsgen import aggregate, context, markdown, record_gen, render, search_index
 from ghps.docsgen._util import utc_z
 from ghps.docsgen.record_gen import RecordGenerationError
 
@@ -35,21 +35,44 @@ def _write_json(path: Path, data) -> None:
 # is served at projects/<slug>/docs/<rel>, dropping the "html" implementation
 # detail. Kept in sync with github_client.DOCS_HTML_PREFIX.
 _DOCS_HTML_PREFIX = "docs/html/"
+_DOCS_MD_PREFIX = "docs/md/"
+
+
+def _clean_rel_parts(path: str, prefix: str) -> list[str] | None:
+    """Strip *prefix*, split, and reject path traversal. None if unsafe/empty."""
+    rel = path[len(prefix):] if path.startswith(prefix) else path
+    parts = [seg for seg in rel.split("/") if seg not in ("", ".")]
+    if not parts or any(seg == ".." for seg in parts):
+        return None
+    return parts
 
 
 def _safe_doc_rel(path: str) -> str | None:
     """Normalize a ``docs/html/...`` repo path to a site path under ``<slug>/docs/``.
 
-    Strips the ``docs/html/`` prefix, rejects path traversal (``..``) and
-    anything that isn't an ``.html`` file. Returns the cleaned relative path, or
-    None to skip. The doc HTML comes from GitHub, so the path is not trusted.
+    Returns the cleaned ``.html`` relative path, or None to skip. The doc HTML
+    comes from GitHub, so the path is not trusted.
     """
-    rel = path[len(_DOCS_HTML_PREFIX):] if path.startswith(_DOCS_HTML_PREFIX) else path
-    parts = [seg for seg in rel.split("/") if seg not in ("", ".")]
-    if not parts or any(seg == ".." for seg in parts):
+    parts = _clean_rel_parts(path, _DOCS_HTML_PREFIX)
+    if parts is None:
         return None
     rel = "/".join(parts)
     return rel if rel.lower().endswith(".html") else None
+
+
+def _safe_md_rel(path: str) -> str | None:
+    """Normalize a ``docs/md/...md`` repo path to the rendered ``.html`` site rel.
+
+    e.g. ``docs/md/sub/roadmap.md`` -> ``sub/roadmap.html`` (written under
+    ``<slug>/docs/md/``). Rejects traversal and non-``.md`` paths.
+    """
+    parts = _clean_rel_parts(path, _DOCS_MD_PREFIX)
+    if parts is None:
+        return None
+    rel = "/".join(parts)
+    if not rel.lower().endswith(".md"):
+        return None
+    return rel[: -len(".md")] + ".html"
 
 
 def _is_stale(record_path: Path, pushed_at: str) -> bool:
@@ -118,25 +141,57 @@ def publish_all(
         _write_text(hd / f"{slug}.html", render.render_page(p))
         _write_json(hd / f"{slug}.record.json", p)
 
-        # Republish the project's own docs/**/*.html under <slug>/docs/, with a
-        # generated index — unless the repo ships its own docs/index.html.
-        written: list[str] = []
+        # Republish the project's own docs under <slug>/docs/: HTML docs verbatim
+        # at <slug>/docs/<rel>, Markdown docs rendered to HTML at <slug>/docs/md/
+        # <rel>. Generate a combined index plus per-kind listing pages.
+        html_rels: list[str] = []
+        md_rels: list[str] = []
         for d in p.get("docs") or []:
-            rel = _safe_doc_rel(d.get("path", ""))
-            if rel is None:
-                continue
-            _write_text(hd / slug / "docs" / rel, d.get("html", "") or "")
-            written.append(rel)
-        if written and "index.html" not in written:
-            docs_index_html = render.render_docs_index_page(p, written)
-            _write_text(hd / slug / "docs" / "index.html", docs_index_html)
-            # Also as a flat file so the no-trailing-slash URL works: the CF
-            # rewrite turns /projects/<slug>/docs into <slug>/docs.html. The
-            # index uses root-absolute links, so it renders correctly here too.
+            kind = d.get("kind") or ("md" if "markdown" in d else "html")
+            if kind == "md":
+                rel = _safe_md_rel(d.get("path", ""))
+                if rel is None:
+                    continue
+                body = markdown.render(d.get("markdown", "") or "")
+                page = render.render_markdown_doc_page(p, rel, body)
+                _write_text(hd / slug / "docs" / "md" / rel, page)
+                md_rels.append(rel)
+            else:
+                rel = _safe_doc_rel(d.get("path", ""))
+                if rel is None:
+                    continue
+                _write_text(hd / slug / "docs" / rel, d.get("html", "") or "")
+                html_rels.append(rel)
+
+        if html_rels or md_rels:
+            docs_index_html = render.render_docs_index_page(p, html_rels, md_rels)
+            # The combined index — unless the repo shipped its own docs/index.html.
+            if "index.html" not in html_rels:
+                _write_text(hd / slug / "docs" / "index.html", docs_index_html)
+            # Flat copy so the no-trailing-slash URL resolves: the CF rewrite turns
+            # /projects/<slug>/docs into <slug>/docs.html. Root-absolute links work
+            # from either location.
             _write_text(hd / slug / "docs.html", docs_index_html)
+            # Per-kind listing pages: /docs/html and /docs/md (flat .html so the
+            # extensionless URLs resolve via the same CF rewrite).
+            if html_rels:
+                _write_text(
+                    hd / slug / "docs" / "html.html",
+                    render.render_docs_kind_page(p, "html", html_rels),
+                )
+            if md_rels:
+                _write_text(
+                    hd / slug / "docs" / "md.html",
+                    render.render_docs_kind_page(p, "md", md_rels),
+                )
 
     aggregate.write_compact_index(
         projects, str(Path(feed_path).parent / "projects-index.json")
+    )
+    # Single source of truth for the web SPA's client-side search — a rich
+    # index over ALL projects (incl. private ones the GitHub indexer misses).
+    search_index.write_search_index(
+        projects, str(Path(feed_path).parent / "projects-search.json")
     )
     _write_text(hd / "index.html", render.render_index_page(projects))
     _write_text(

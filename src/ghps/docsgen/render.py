@@ -28,6 +28,25 @@ import re
 # Pinned for reproducibility.
 _MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs"
 
+# Unified top nav shared by every static page (project pages, the /projects/
+# index, and docs pages) so the static section feels like one site with the
+# search SPA. Root-absolute links; "Search"/"Clusters" jump into the SPA.
+_SITE_NAV = (
+    '<nav class="site-bar" aria-label="Site">'
+    '<a class="brand" href="/">davidbmar.com</a>'
+    '<a href="/#/search">Search</a>'
+    '<a href="/projects/">Projects</a>'
+    '<a href="/#/clusters">Clusters</a>'
+    "</nav>"
+)
+_SITE_NAV_CSS = (
+    ".site-bar { display: flex; gap: 1.1rem; align-items: center; "
+    "padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; "
+    "font-size: .9rem; }\n"
+    "  .site-bar a { color: #2563eb; text-decoration: none; }\n"
+    "  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }"
+)
+
 
 def _mermaid(src: str) -> str:
     """Make Mermaid source safe to embed raw in <pre> without breaking rendering.
@@ -234,9 +253,11 @@ def render_page(record: dict) -> str:
   .docs-link a {{ display: inline-block; margin-top: .35rem; background: #2563eb;
                   color: #fff; padding: .4rem .85rem; border-radius: 8px;
                   text-decoration: none; font-weight: 600; }}
+  {_SITE_NAV_CSS}
 </style>
 </head>
 <body>
+{_SITE_NAV}
 <header>
   <h1>{title}{thin_badge}</h1>
   <p class="one-liner">{html.escape(record.get("one_liner", ""))}</p>
@@ -422,13 +443,15 @@ def render_index_page(projects: list[dict]) -> str:
   .llms {{ margin-top: 2rem; padding: .9rem 1.1rem; border: 1px dashed #8886;
            border-radius: 10px; font-size: .9rem; opacity: .9; }}
   .llms a {{ color: #2563eb; }}
+  {_SITE_NAV_CSS}
 </style>
 </head>
 <body>
+{_SITE_NAV}
 <header class="top">
   <h1>Project Docs</h1>
   <p class="sub">AI-generated documentation — {count} project{"" if count == 1 else "s"}.
-     <a class="home" href="/">← back to portfolio search</a></p>
+     <a class="home" href="/#/search">← back to search</a></p>
 </header>
 {body}
 <aside class="llms">
@@ -452,58 +475,150 @@ def _doc_title(rel: str) -> str:
     return " ".join(w[:1].upper() + w[1:] for w in words) or rel
 
 
-def render_docs_index_page(record: dict, rels: list[str]) -> str:
+_DOC_CSS = """  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  h1 { margin-bottom: .25rem; }
+  h2 { margin: 1.6rem 0 .4rem; font-size: 1.05rem; }
+  h2 .kind-all { font-size: .8rem; font-weight: 500; margin-left: .5rem; }
+  .sub { opacity: .7; margin-top: 0; }
+  .doc-list { list-style: none; padding: 0; }
+  .doc-list li { border: 1px solid #8884; border-radius: 10px;
+                 padding: .8rem 1rem; margin: .6rem 0; }
+  .doc-list a { font-weight: 600; color: #2563eb; text-decoration: none;
+                font-size: 1.05rem; }
+  .doc-list .path { display: block; font-size: .78rem; opacity: .55;
+                    margin-top: .15rem; }
+  .muted { opacity: .6; }
+  nav { margin-bottom: 1rem; }
+  nav a { color: #2563eb; }
+  article h1, article h2, article h3 { margin: 1.4rem 0 .5rem; }
+  article pre { background: #0d1117; color: #e6edf3; padding: 1rem;
+                border-radius: 8px; overflow-x: auto; }
+  article code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  article blockquote { border-left: 3px solid #2563eb88; margin: 1rem 0;
+                       padding: .2rem 1rem; opacity: .85; }"""
+
+
+def _doc_list_html(base: str, rels: list[str]) -> str:
+    """Render an ``<ul>`` of doc links rooted at *base* (a /projects/.../ path)."""
+    if not rels:
+        return '<p class="muted">No documents.</p>'
+    items = "\n".join(
+        f'<li><a href="{base}{html.escape(r, quote=True)}">{html.escape(_doc_title(r))}</a>'
+        f'<span class="path">{html.escape(r)}</span></li>'
+        for r in rels
+    )
+    return f'<ul class="doc-list">{items}</ul>'
+
+
+def render_docs_index_page(
+    record: dict, html_rels: list[str], md_rels: list[str] | None = None
+) -> str:
     """Render the per-project docs index (``projects/<slug>/docs/index.html``).
 
-    *rels* are doc paths relative to the docs directory (e.g.
-    ``business/roadmap.html``), which is exactly how they're written to disk.
+    Groups docs by kind: HTML docs (served at ``/docs/<rel>``) and Markdown docs
+    (rendered, served at ``/docs/md/<rel>``). Each group links to its dedicated
+    listing page (``/docs/html`` and ``/docs/md``). *_rels* are paths relative to
+    each kind's directory — exactly how they're written to disk.
+
+    Root-absolute links so this page renders correctly whether served at
+    /projects/<slug>/docs/ (index.html) OR /projects/<slug>/docs (the flat
+    docs.html copy the CF .html-rewrite resolves to).
+    """
+    md_rels = md_rels or []
+    slug = record.get("slug", "")
+    title = html.escape(record.get("title") or slug)
+    slug_attr = html.escape(slug, quote=True)
+    docs_root = f"/projects/{slug_attr}/docs/"
+
+    sections: list[str] = []
+    if html_rels:
+        sections.append(
+            f'<h2>HTML <a class="kind-all" href="/projects/{slug_attr}/docs/html">'
+            f'view all ({len(html_rels)}) &rarr;</a></h2>'
+            + _doc_list_html(docs_root, html_rels)
+        )
+    if md_rels:
+        sections.append(
+            f'<h2>Markdown <a class="kind-all" href="/projects/{slug_attr}/docs/md">'
+            f'view all ({len(md_rels)}) &rarr;</a></h2>'
+            + _doc_list_html(docs_root + "md/", md_rels)
+        )
+    body = "\n".join(sections) or '<p class="muted">No documents.</p>'
+
+    nav = (
+        f'<nav><a href="/projects/{slug_attr}.html">&larr; {title}</a> &nbsp;·&nbsp;'
+        f' <a href="/projects/">All projects</a></nav>'
+    )
+    return _doc_shell(f"{title} — Docs", nav, f"<h1>Documentation</h1>"
+                      f'<p class="sub">{title}</p>\n{body}')
+
+
+def render_docs_kind_page(record: dict, kind: str, rels: list[str]) -> str:
+    """Render a single-kind docs listing (``/docs/html`` or ``/docs/md``)."""
+    slug = record.get("slug", "")
+    title = html.escape(record.get("title") or slug)
+    slug_attr = html.escape(slug, quote=True)
+    is_md = kind == "md"
+    label = "Markdown" if is_md else "HTML"
+    base = f"/projects/{slug_attr}/docs/" + ("md/" if is_md else "")
+
+    nav = (
+        f'<nav><a href="/projects/{slug_attr}/docs/">&larr; Docs</a> &nbsp;·&nbsp;'
+        f' <a href="/projects/{slug_attr}.html">{title}</a></nav>'
+    )
+    return _doc_shell(
+        f"{title} — {label} docs", nav,
+        f"<h1>{label} documentation</h1>"
+        f'<p class="sub">{title}</p>\n{_doc_list_html(base, rels)}',
+    )
+
+
+def render_markdown_doc_page(record: dict, rel: str, body_html: str) -> str:
+    """Wrap rendered-Markdown *body_html* in a styled page with project nav.
+
+    *body_html* must already be safe (produced by ``docsgen.markdown.render``,
+    which escapes all text). *rel* is the rendered output path (e.g.
+    ``roadmap.html``) used only for the page title.
     """
     slug = record.get("slug", "")
     title = html.escape(record.get("title") or slug)
     slug_attr = html.escape(slug, quote=True)
-    # Root-absolute links so this exact page renders correctly whether it is
-    # served at /projects/<slug>/docs/ (index.html) OR /projects/<slug>/docs
-    # (the flat docs.html copy the CF .html-rewrite resolves to).
-    base = f"/projects/{slug_attr}/docs/"
-    if rels:
-        items = "\n".join(
-            f'<li><a href="{base}{html.escape(r, quote=True)}">{html.escape(_doc_title(r))}</a>'
-            f'<span class="path">{html.escape(r)}</span></li>'
-            for r in rels
-        )
-        list_html = f'<ul class="doc-list">{items}</ul>'
-    else:
-        list_html = '<p class="muted">No documents.</p>'
+    doc_title = html.escape(_doc_title(rel))
+    repo_url = html.escape(record.get("repo_url") or "", quote=True)
 
+    repo_link = (
+        f' &nbsp;·&nbsp; <a href="{repo_url}" target="_blank" rel="noopener">'
+        f'View on GitHub</a>' if repo_url else ""
+    )
+    nav = (
+        f'<nav><a href="/projects/{slug_attr}.html">&larr; {title}</a> &nbsp;·&nbsp;'
+        f' <a href="/projects/{slug_attr}/docs/">Docs</a>{repo_link}</nav>'
+    )
+    return _doc_shell(
+        f"{doc_title} — {title}", nav,
+        f"<h1>{doc_title}</h1>\n<article>{body_html}</article>",
+    )
+
+
+def _doc_shell(page_title: str, nav_html: str, body_html: str) -> str:
+    """Shared HTML shell for the docs index / listing / rendered-markdown pages."""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title} — Docs · davidbmar.com</title>
+<title>{page_title} · davidbmar.com</title>
 <style>
-  :root {{ color-scheme: light dark; }}
-  body {{ font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
-          padding: 0 1.25rem; }}
-  h1 {{ margin-bottom: .25rem; }}
-  .sub {{ opacity: .7; margin-top: 0; }}
-  .doc-list {{ list-style: none; padding: 0; }}
-  .doc-list li {{ border: 1px solid #8884; border-radius: 10px;
-                  padding: .8rem 1rem; margin: .6rem 0; }}
-  .doc-list a {{ font-weight: 600; color: #2563eb; text-decoration: none;
-                 font-size: 1.05rem; }}
-  .doc-list .path {{ display: block; font-size: .78rem; opacity: .55;
-                     margin-top: .15rem; }}
-  .muted {{ opacity: .6; }}
-  nav a {{ color: #2563eb; }}
+{_DOC_CSS}
+  {_SITE_NAV_CSS}
 </style>
 </head>
 <body>
-<nav><a href="/projects/{slug_attr}.html">&larr; {title}</a> &nbsp;·&nbsp;
-     <a href="/projects/">All projects</a></nav>
-<h1>Documentation</h1>
-<p class="sub">{title}</p>
-{list_html}
+{_SITE_NAV}
+{nav_html}
+{body_html}
 </body>
 </html>
 """

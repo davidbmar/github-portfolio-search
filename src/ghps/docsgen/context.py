@@ -68,9 +68,11 @@ class RepoContext:
     thin: bool = False
     screenshot_url: str = ""  # first non-badge README image (absolute URL), or ""
     pushed_at: str = ""  # repo's GitHub last-push time (ISO-8601 Z), for recency
-    # (path, content) for each docs/**/*.html in the repo — republished as the
-    # project's own documentation. Default empty so a thin/docless repo is fine.
+    # (path, content) for each docs/html/**/*.html in the repo — republished as
+    # the project's own documentation. Default empty so a thin/docless repo is fine.
     html_docs: list[tuple[str, str]] = field(default_factory=list)
+    # (path, raw_markdown) for each docs/md/**/*.md — rendered at publish time.
+    md_docs: list[tuple[str, str]] = field(default_factory=list)
 
 
 def first_readme_image(readme: str, owner: str, repo: str, branch: str) -> str:
@@ -159,6 +161,10 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
     html_docs = (
         fetch_docs(owner, name, default_branch=default_branch) if fetch_docs else []
     )
+    fetch_md = getattr(gh, "fetch_markdown_docs", None)
+    md_docs = (
+        fetch_md(owner, name, default_branch=default_branch) if fetch_md else []
+    )
 
     return RepoContext(
         slug=name,
@@ -178,4 +184,5 @@ def build_context(repo_meta: dict, *, owner: str, gh=_default_gh) -> RepoContext
         screenshot_url=screenshot_url,
         pushed_at=repo_meta.get("pushed_at", ""),
         html_docs=html_docs,
+        md_docs=md_docs,
     )

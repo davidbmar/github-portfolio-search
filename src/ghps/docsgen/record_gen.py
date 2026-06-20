@@ -177,7 +177,10 @@ def _assemble(ctx: RepoContext, llm_part: dict, model: str) -> dict:
             "source_commit": ctx.head_sha[:7] if ctx.head_sha else "",
             "model": model,
             "pushed_at": ctx.pushed_at,
-            "docs": [{"path": p, "html": c} for p, c in ctx.html_docs],
+            "docs": (
+                [{"path": p, "html": c} for p, c in ctx.html_docs]
+                + [{"path": p, "kind": "md", "markdown": c} for p, c in ctx.md_docs]
+            ),
         }
     )
 
