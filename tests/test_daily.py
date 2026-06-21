@@ -91,6 +91,36 @@ def test_build_digests_defaults_takeaways_when_engine_omits_them():
     assert days[0]["takeaways"] == []
 
 
+def test_build_digests_retries_then_falls_back_when_engine_keeps_failing():
+    """One bad LLM response must not kill the whole batch."""
+    class _Broken:
+        calls = 0
+        def generate(self, date, lines):
+            type(self).calls += 1
+            raise ValueError("bad json from model")
+    days = daily.build_digests(
+        {"alpha": [{"sha": "1", "message": "m", "date": "2026-06-20T00:00:00Z"}]},
+        _Broken())
+    assert len(days) == 1                       # still produced a day
+    assert days[0]["headline"]                  # deterministic fallback headline
+    assert days[0]["total_commits"] == 1
+    assert _Broken.calls >= 2                   # retried before giving up
+
+
+def test_build_digests_retry_succeeds_on_a_later_attempt():
+    class _FlakyOnce:
+        calls = 0
+        def generate(self, date, lines):
+            type(self).calls += 1
+            if type(self).calls == 1:
+                raise ValueError("transient")
+            return {"headline": "Recovered", "summary": "S", "takeaways": ["t"]}
+    days = daily.build_digests(
+        {"alpha": [{"sha": "1", "message": "m", "date": "2026-06-20T00:00:00Z"}]},
+        _FlakyOnce())
+    assert days[0]["headline"] == "Recovered"   # retry won
+
+
 def test_write_daily_emits_payload(tmp_path):
     out = tmp_path / "data" / "daily.json"
     days = daily.build_digests(

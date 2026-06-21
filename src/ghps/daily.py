@@ -12,6 +12,7 @@ local MLX server -> deterministic (no LLM, always available).
 from __future__ import annotations
 
 import json
+import logging
 import re
 import subprocess
 import tempfile
@@ -19,6 +20,8 @@ from collections import defaultdict
 from pathlib import Path
 
 from ghps.docsgen._util import utc_z
+
+logger = logging.getLogger(__name__)
 
 # Fixed instruction shared by the LLM engines. The model sees the day's commit
 # lines and must emit ONLY a JSON object — no tools, no invented facts.
@@ -83,11 +86,18 @@ def _parse_json_object(text: str) -> dict:
     so the JSON answer is found even when the model reasons aloud beforehand.
     """
     text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    text = re.sub(r"```(?:json)?|```", "", text)  # strip markdown code fences
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end <= start:
         raise ValueError("no JSON object in response")
-    obj = json.loads(text[start : end + 1])
+    blob = text[start : end + 1]
+    try:
+        obj = json.loads(blob)
+    except json.JSONDecodeError:
+        # Common LLM glitches: trailing commas before } or ]. Repair and retry.
+        repaired = re.sub(r",\s*([}\]])", r"\1", blob)
+        obj = json.loads(repaired)
     takeaways = obj.get("takeaways") or []
     if not isinstance(takeaways, list):
         takeaways = [str(takeaways)]
@@ -198,8 +208,30 @@ def resolve_engine(name: str = "auto"):
 # Digest assembly
 # ---------------------------------------------------------------------------
 
-def build_digests(repo_commits: dict[str, list[dict]], engine) -> list[dict]:
-    """Assemble per-day digest records, newest first, using *engine* for text."""
+def _generate_resilient(engine, date, lines, *, retries=2, fallback=None):
+    """Call *engine*, retrying on any error, then falling back deterministically.
+
+    A single malformed LLM response must never abort a long batch — so each day
+    is retried, and as a last resort gets a deterministic (no-LLM) digest.
+    """
+    last_err = None
+    for _ in range(retries + 1):
+        try:
+            return engine.generate(date, lines)
+        except Exception as exc:  # noqa: BLE001 — any engine/parse failure is recoverable
+            last_err = exc
+    logger.warning("engine failed for %s after %d attempts (%s); using fallback",
+                   date, retries + 1, last_err)
+    return (fallback or DeterministicEngine()).generate(date, lines)
+
+
+def build_digests(repo_commits: dict[str, list[dict]], engine,
+                  *, retries: int = 2) -> list[dict]:
+    """Assemble per-day digest records, newest first, using *engine* for text.
+
+    Each day is generated resiliently: on engine/parse failure it retries, then
+    falls back to a deterministic digest, so one bad response can't drop the batch.
+    """
     days = aggregate_by_day(repo_commits)
     out: list[dict] = []
     for date in sorted(days, reverse=True):
@@ -208,7 +240,7 @@ def build_digests(repo_commits: dict[str, list[dict]], engine) -> list[dict]:
         for c in commits:
             per_repo[c["repo"]].append(c["message"])
         lines = [f"{c['repo']}: {c['message']}" for c in commits]
-        gen = engine.generate(date, lines)
+        gen = _generate_resilient(engine, date, lines, retries=retries)
         out.append({
             "date": date,
             "headline": gen["headline"],
