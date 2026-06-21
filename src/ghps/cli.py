@@ -327,11 +327,15 @@ def publish_docs():
               help="Headline engine. mlx-local = free in-process MLX (Qwen3.5-4B); "
                    "codex = cloud; auto = codex -> mlx server -> deterministic.")
 @click.option("--token", default=None, help="GitHub PAT (else GITHUB_TOKEN env).")
-def daily_cmd(owner, since, engine, token):
+@click.option("--no-cache", is_flag=True, default=False,
+              help="Regenerate every day, ignoring the cache of unchanged days.")
+def daily_cmd(owner, since, engine, token, no_cache):
     """Generate the daily headline digest -> web/data/daily.json + /daily page.
 
     Aggregates each day's commits across all of *owner*'s repos, generates a
     headline + summary per day via the chosen engine, and renders the /daily feed.
+    Days whose commit set is unchanged since the last run are reused from
+    web/data/daily.json (no engine call) unless --no-cache is given.
     """
     from pathlib import Path as _Path
 
@@ -349,8 +353,21 @@ def daily_cmd(owner, since, engine, token):
     total = sum(len(v) for v in repo_commits.values())
     click.echo(f"  {total} commits across {len(repo_commits)} repos")
 
-    click.echo("Generating per-day headlines (calls the engine)...")
-    days = daily_mod.build_digests(repo_commits, eng)
+    prior = {}
+    daily_path = _Path("web/data/daily.json")
+    if not no_cache and daily_path.exists():
+        try:
+            prior = {d["date"]: d for d in json.loads(daily_path.read_text())["days"]}
+            click.echo(f"  cache: {len(prior)} prior days loaded "
+                       "(unchanged days will be reused)")
+        except (OSError, json.JSONDecodeError, KeyError):
+            prior = {}
+
+    click.echo("Generating per-day headlines (cached days skip the engine)...")
+    days = daily_mod.build_digests(repo_commits, eng, prior=prior)
+    reused = sum(1 for d in days if d["date"] in prior
+                 and prior[d["date"]] is d)
+    click.echo(f"  reused {reused} cached days, generated {len(days) - reused}")
     path = daily_mod.write_daily(days, "web/data/daily.json")
     click.echo(f"  wrote {path} ({len(days)} days)")
 

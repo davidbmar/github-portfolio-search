@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-21T02:20:06.762862Z",
+  "generated_at": "2026-06-21T07:19:04.047523Z",
   "count": 145,
   "days": [
     {
@@ -22,7 +22,8 @@
             "feat(eval): SQLite quality DB — scores over time by judge/model/feature (Codex plan)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "e0916f620b26ee19"
     },
     {
       "date": "2026-06-20",
@@ -90,7 +91,8 @@
             "feat(flow-pipeline): held-out persona split — gate on generalization, not overfit"
           ]
         }
-      ]
+      ],
+      "commit_sig": "aa68e28b87929bbe"
     },
     {
       "date": "2026-06-19",
@@ -133,7 +135,8 @@
             "feat(flows): convert taco_truck to the Collect Pattern (+1.5 quality, seeded)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "300a3d186198707f"
     },
     {
       "date": "2026-06-18",
@@ -215,7 +218,8 @@
             "docs(authoring): capture the session's engine patterns for flow authors"
           ]
         }
-      ]
+      ],
+      "commit_sig": "00e069f1249e62c8"
     },
     {
       "date": "2026-06-17",
@@ -320,7 +324,8 @@
             "docs(flow-eval): full arc summary + honest A+B-1 verification results"
           ]
         }
-      ]
+      ],
+      "commit_sig": "10f969f46bf34418"
     },
     {
       "date": "2026-06-16",
@@ -393,7 +398,8 @@
             "test(b-003): assert confirm_record_issue gate, not stale clarify state"
           ]
         }
-      ]
+      ],
+      "commit_sig": "5c583f113fd6fdf3"
     },
     {
       "date": "2026-06-15",
@@ -435,7 +441,8 @@
             "feat(integrity): Phase 0 — pure deterministic grounding gate + design/plan"
           ]
         }
-      ]
+      ],
+      "commit_sig": "1b9e49235834e697"
     },
     {
       "date": "2026-06-14",
@@ -488,7 +495,8 @@
             "docs: spec for ownership-based photo delete (drops local accounts)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "8f328596c951c44a"
     },
     {
       "date": "2026-06-13",
@@ -575,7 +583,8 @@
             "feat: Google Sign-In, photo attribution, and dark login theme"
           ]
         }
-      ]
+      ],
+      "commit_sig": "ebcd1aa78391f0ea"
     },
     {
       "date": "2026-06-12",
@@ -596,7 +605,8 @@
             "docs: login design spec + isolated picture-qr-album-login deployer ARNs"
           ]
         }
-      ]
+      ],
+      "commit_sig": "8d115878b10fa240"
     },
     {
       "date": "2026-06-11",
@@ -623,7 +633,8 @@
             "chore: default graduation-card.pdf to citrus theme (1a)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "854964cd887c4077"
     },
     {
       "date": "2026-06-05",
@@ -661,7 +672,8 @@
             "docs: spec for server-side HEIC->JPEG converter"
           ]
         }
-      ]
+      ],
+      "commit_sig": "57103e1d0112026b"
     },
     {
       "date": "2026-06-04",
@@ -713,7 +725,8 @@
             "docs(spec): weather riff flow (ask-once city, global pref, Open-Meteo)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "f1007d8bcfc0bdbb"
     },
     {
       "date": "2026-06-03",
@@ -765,7 +778,8 @@
             "feat(live): launch-token gate on the Live WS sidecar (TDD) (#6)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "da696fc0d1c70a02"
     },
     {
       "date": "2026-06-02",
@@ -803,7 +817,8 @@
             "docs: hydration pipeline design (provider-agnostic refiner + configurable stages)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "5fc8b92a273ed655"
     },
     {
       "date": "2026-06-01",
@@ -842,7 +857,8 @@
             "docs: add workers & credentials ops doc (md + styled html)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "73cd4db42a622534"
     },
     {
       "date": "2026-05-31",
@@ -926,7 +942,8 @@
             "Design spec: chunked recording app with S3 queue + laptop transcription worker"
           ]
         }
-      ]
+      ],
+      "commit_sig": "d37ee08d5183e23c"
     },
     {
       "date": "2026-05-30",
@@ -1043,7 +1060,8 @@
             "512 line: feature-request flow + store-and-forward to M3 DB"
           ]
         }
-      ]
+      ],
+      "commit_sig": "a9e15ea21e87be7d"
     },
     {
       "date": "2026-05-29",
@@ -1288,7 +1306,8 @@
             "fix: seed live text turns for l2 slot extraction"
           ]
         }
-      ]
+      ],
+      "commit_sig": "fcd9451aeb115cf6"
     },
     {
       "date": "2026-05-28",
@@ -1765,7 +1784,8 @@
             "fix(flow_validation): record l2 stub summary status"
           ]
         }
-      ]
+      ],
+      "commit_sig": "50ba1346b8432cbd"
     },
     {
       "date": "2026-05-27",
@@ -1858,7 +1878,8 @@
             "test: cover property entry permission semantic ack"
           ]
         }
-      ]
+      ],
+      "commit_sig": "924f526c233792fb"
     },
     {
       "date": "2026-05-26",
@@ -1884,7 +1905,8 @@
             "feat: expose expected reality whisper metrics"
           ]
         }
-      ]
+      ],
+      "commit_sig": "69365307195771a6"
     },
     {
       "date": "2026-05-25",
@@ -1969,7 +1991,8 @@
             "feat: add RIFF flow quality gates and OTA audio harness"
           ]
         }
-      ]
+      ],
+      "commit_sig": "894a735de0b4d12a"
     },
     {
       "date": "2026-05-24",
@@ -2010,7 +2033,8 @@
             "feat: support stable phone host modes"
           ]
         }
-      ]
+      ],
+      "commit_sig": "835fcc4922c711b5"
     },
     {
       "date": "2026-05-23",
@@ -2031,7 +2055,8 @@
             "feat(router): per-session JSONL activity logs + /api/logs endpoints"
           ]
         }
-      ]
+      ],
+      "commit_sig": "f7389e9395322141"
     },
     {
       "date": "2026-05-21",
@@ -2116,7 +2141,8 @@
             "Add COE-overview design plan"
           ]
         }
-      ]
+      ],
+      "commit_sig": "b5ffab45bd7eb56a"
     },
     {
       "date": "2026-05-17",
@@ -2147,7 +2173,8 @@
             "feat: implement multi-terminal machine-aware workspace with vision API"
           ]
         }
-      ]
+      ],
+      "commit_sig": "c30c8f97839ad3ec"
     },
     {
       "date": "2026-05-16",
@@ -2231,7 +2258,8 @@
             "chore: checkpoint riff workspace"
           ]
         }
-      ]
+      ],
+      "commit_sig": "d77e25f4d97e2d49"
     },
     {
       "date": "2026-05-15",
@@ -2304,7 +2332,8 @@
             "docs: implementation plan — author-voice rewrite layer"
           ]
         }
-      ]
+      ],
+      "commit_sig": "ab2e10b055918555"
     },
     {
       "date": "2026-05-14",
@@ -2392,7 +2421,8 @@
             "add: domains/ufo-disclosure/ — character personalities for the UFO panel"
           ]
         }
-      ]
+      ],
+      "commit_sig": "de84b797dcb69903"
     },
     {
       "date": "2026-05-13",
@@ -2412,7 +2442,8 @@
             "Redesign: liquid glass UI, Outfit font, disclosure DB integration, interactive lightboxes"
           ]
         }
-      ]
+      ],
+      "commit_sig": "372d25a6779a8eea"
     },
     {
       "date": "2026-05-12",
@@ -2478,7 +2509,8 @@
             "feat: improve worker dashboard state"
           ]
         }
-      ]
+      ],
+      "commit_sig": "739e752ff78d4b4d"
     },
     {
       "date": "2026-05-11",
@@ -2609,7 +2641,8 @@
             "feat: show watcher heartbeats as listening"
           ]
         }
-      ]
+      ],
+      "commit_sig": "74ee520329f01c53"
     },
     {
       "date": "2026-05-10",
@@ -2762,7 +2795,8 @@
             "init: SWITCHBOARD v1 — append-only multi-agent coordination channel"
           ]
         }
-      ]
+      ],
+      "commit_sig": "032acb863c1eeea2"
     },
     {
       "date": "2026-05-09",
@@ -2879,7 +2913,8 @@
             "docs: visual review batch (F-346 → F-358) + designs HTML bundle"
           ]
         }
-      ]
+      ],
+      "commit_sig": "2150a5fb88987a1b"
     },
     {
       "date": "2026-05-08",
@@ -2990,7 +3025,8 @@
             "Publish: support custom seedsDir + return working S3 URL"
           ]
         }
-      ]
+      ],
+      "commit_sig": "181cb3c1b657abc7"
     },
     {
       "date": "2026-05-07",
@@ -3113,7 +3149,8 @@
             "Iran-Intel S-3: domains/iran/ skeleton (Persona RAG layer scaffold)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "99ed1222b3c0df6b"
     },
     {
       "date": "2026-05-06",
@@ -3159,7 +3196,8 @@
             "fix(phone): boot providers before accepting calls"
           ]
         }
-      ]
+      ],
+      "commit_sig": "3c38d5eaeddc8870"
     },
     {
       "date": "2026-05-05",
@@ -3243,7 +3281,8 @@
             "chore: clean up sprint 161/188 artifacts and rotate auth gate hash"
           ]
         }
-      ]
+      ],
+      "commit_sig": "3a98aa5ec5b5b40c"
     },
     {
       "date": "2026-05-04",
@@ -3325,7 +3364,8 @@
             "docs: add call-review design plan"
           ]
         }
-      ]
+      ],
+      "commit_sig": "962e133fd93fde3a"
     },
     {
       "date": "2026-05-03",
@@ -3402,7 +3442,8 @@
             "feat(flow-graph): vertical fan-out for >3 spine siblings + render/click instrumentation"
           ]
         }
-      ]
+      ],
+      "commit_sig": "00db8f7b535cbad7"
     },
     {
       "date": "2026-05-02",
@@ -3584,7 +3625,8 @@
             "docs: add primitives-harden design plan"
           ]
         }
-      ]
+      ],
+      "commit_sig": "cc83f2bb5e483a7c"
     },
     {
       "date": "2026-05-01",
@@ -3618,7 +3660,8 @@
             "Add reusable voice modules and Telnyx audio fixes"
           ]
         }
-      ]
+      ],
+      "commit_sig": "7871b62bf8fc7965"
     },
     {
       "date": "2026-04-30",
@@ -3691,7 +3734,8 @@
             "feat(static-audio): browser Live transport plays pre-rendered play_audio states"
           ]
         }
-      ]
+      ],
+      "commit_sig": "b53f95a2ba829e71"
     },
     {
       "date": "2026-04-29",
@@ -3740,7 +3784,8 @@
             "fix(B-301): durable state-trace writer was dropping locked_choice_evaluated"
           ]
         }
-      ]
+      ],
+      "commit_sig": "20e56035bad4e910"
     },
     {
       "date": "2026-04-28",
@@ -3782,7 +3827,8 @@
             "feat(iter-27): \"Used in:\" footer — find flows that reference each module"
           ]
         }
-      ]
+      ],
+      "commit_sig": "4f868551023c1ef6"
     },
     {
       "date": "2026-04-27",
@@ -3820,7 +3866,8 @@
             "feat(dashboard): Qwen 3.6 MLX providers + project switcher polish"
           ]
         }
-      ]
+      ],
+      "commit_sig": "3e678e8a3b5b064e"
     },
     {
       "date": "2026-04-26",
@@ -3841,7 +3888,8 @@
             "portal+workspace: add Orchestration catalog tile + bake bridge starter"
           ]
         }
-      ]
+      ],
+      "commit_sig": "76dca85bb47f4b8f"
     },
     {
       "date": "2026-04-25",
@@ -3861,7 +3909,8 @@
             "iam: grant sns:Publish on capsule-webhooks-*.fifo to webhook-ingest Lambda"
           ]
         }
-      ]
+      ],
+      "commit_sig": "54615321eafa28d1"
     },
     {
       "date": "2026-04-23",
@@ -3892,7 +3941,8 @@
             "workspace: install Codex + Gemini CLIs alongside Claude Code"
           ]
         }
-      ]
+      ],
+      "commit_sig": "e41963c8b15374f3"
     },
     {
       "date": "2026-04-22",
@@ -3912,7 +3962,8 @@
             "iam: grant lambda:UpdateFunctionConfiguration alongside UpdateFunctionCode"
           ]
         }
-      ]
+      ],
+      "commit_sig": "1ea57d203aaed29a"
     },
     {
       "date": "2026-04-21",
@@ -3940,7 +3991,8 @@
             "iam: add SNS/SQS dev-messaging-write perms to shared EC2 role"
           ]
         }
-      ]
+      ],
+      "commit_sig": "d3e5d3c788592230"
     },
     {
       "date": "2026-04-20",
@@ -3984,7 +4036,8 @@
             "security+docs: stop tracking .env, fix walkthrough caveat after AKIA rotation"
           ]
         }
-      ]
+      ],
+      "commit_sig": "d65c0544ced1aae8"
     },
     {
       "date": "2026-04-19",
@@ -4079,7 +4132,8 @@
             "Add TESSY pipeline: train Qwen3.5-4B + LoRA for phone-agent streaming"
           ]
         }
-      ]
+      ],
+      "commit_sig": "1674f1a3a4e2f073"
     },
     {
       "date": "2026-04-18",
@@ -4136,7 +4190,8 @@
             "webhooks: publish Phase 1 plan and sprint brief"
           ]
         }
-      ]
+      ],
+      "commit_sig": "2eb1329961863b7f"
     },
     {
       "date": "2026-04-15",
@@ -4196,7 +4251,8 @@
             "Sprint 92: coffee before/after finding + F-113 + 19 legacy closes"
           ]
         }
-      ]
+      ],
+      "commit_sig": "bc2460b5704655eb"
     },
     {
       "date": "2026-04-14",
@@ -4345,7 +4401,8 @@
             "Sprint 36: wire browser voice path through flowstate dropdown"
           ]
         }
-      ]
+      ],
+      "commit_sig": "f7a6c18c784cfdf3"
     },
     {
       "date": "2026-04-13",
@@ -4417,7 +4474,8 @@
             "Add flowstate shim integration (B-031)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "47ac0eb27cb71b9d"
     },
     {
       "date": "2026-04-12",
@@ -4448,7 +4506,8 @@
             "UX improvements: greeting, scheduling prompt, address readback"
           ]
         }
-      ]
+      ],
+      "commit_sig": "a87f15b2b40eafc1"
     },
     {
       "date": "2026-04-11",
@@ -4498,7 +4557,8 @@
             "Retrain Phi4-mini on exact FSM prompt format"
           ]
         }
-      ]
+      ],
+      "commit_sig": "f1b790b8fb51de92"
     },
     {
       "date": "2026-04-10",
@@ -4547,7 +4607,8 @@
             "Phone agent training pipeline — 170 conversations, full docs, fine-tuning guide"
           ]
         }
-      ]
+      ],
+      "commit_sig": "514543fe6f4982af"
     },
     {
       "date": "2026-04-09",
@@ -4678,7 +4739,8 @@
             "feat: use custom HTML for seed pages when available"
           ]
         }
-      ]
+      ],
+      "commit_sig": "fdbe4c87e801834d"
     },
     {
       "date": "2026-04-08",
@@ -4866,7 +4928,8 @@
             "Add Afterburner scaffolding"
           ]
         }
-      ]
+      ],
+      "commit_sig": "59b54f33feac54c0"
     },
     {
       "date": "2026-04-07",
@@ -4980,7 +5043,8 @@
             "Initial commit: FriendNet dashboard with Tailscale healthcheck system"
           ]
         }
-      ]
+      ],
+      "commit_sig": "7816fc63dc6df923"
     },
     {
       "date": "2026-04-06",
@@ -5091,7 +5155,8 @@
             "Add hybrid two-pass FSM engine with dual-model routing"
           ]
         }
-      ]
+      ],
+      "commit_sig": "f986684a8cc0413c"
     },
     {
       "date": "2026-04-05",
@@ -5271,7 +5336,8 @@
             "Add graph engine seed docs + updated lifecycle docs"
           ]
         }
-      ]
+      ],
+      "commit_sig": "45f0d762f603ea4c"
     },
     {
       "date": "2026-04-04",
@@ -5530,7 +5596,8 @@
             "feat: clickable citation footnotes with gold highlight and source links"
           ]
         }
-      ]
+      ],
+      "commit_sig": "e6e4fe02388dc61c"
     },
     {
       "date": "2026-04-03",
@@ -5654,7 +5721,8 @@
             "feat: afterburner7 home dir restructure — Phase 0 + QA fixes + Cohere provider"
           ]
         }
-      ]
+      ],
+      "commit_sig": "5d580cc7b9a114c6"
     },
     {
       "date": "2026-04-02",
@@ -5937,7 +6005,8 @@
             "fix: Call button uses Kokoro TTS + auto-play enabled"
           ]
         }
-      ]
+      ],
+      "commit_sig": "595ac74cb774b06d"
     },
     {
       "date": "2026-04-01",
@@ -6098,7 +6167,8 @@
             "feat: rewrite all 6 personas as intelligence agents matching IBT evidence"
           ]
         }
-      ]
+      ],
+      "commit_sig": "0d59e4cc6ab55da4"
     },
     {
       "date": "2026-03-31",
@@ -6268,7 +6338,8 @@
             "chore: write Sprint 19 brief — nav consolidation + multi-project home"
           ]
         }
-      ]
+      ],
+      "commit_sig": "dab2b15048b62271"
     },
     {
       "date": "2026-03-30",
@@ -6438,7 +6509,8 @@
             "fix: publish preview serves CSS/JS by caching projectRoot for sub-resource requests"
           ]
         }
-      ]
+      ],
+      "commit_sig": "2931def710a6596b"
     },
     {
       "date": "2026-03-29",
@@ -6675,7 +6747,8 @@
             "docs: Sprint 181 narrative summary — Fix Critical Chat + UX Polish"
           ]
         }
-      ]
+      ],
+      "commit_sig": "7b4c403ff22793cf"
     },
     {
       "date": "2026-03-28",
@@ -7166,7 +7239,8 @@
             "chore: auto-commit between loops"
           ]
         }
-      ]
+      ],
+      "commit_sig": "54881160614baed3"
     },
     {
       "date": "2026-03-27",
@@ -7666,7 +7740,8 @@
             "fix: handle node:test output format in collect_metrics test count"
           ]
         }
-      ]
+      ],
+      "commit_sig": "489bfe3516ca3822"
     },
     {
       "date": "2026-03-26",
@@ -7935,7 +8010,8 @@
             "feat: 100% RAG coverage — all 600 answers complete"
           ]
         }
-      ]
+      ],
+      "commit_sig": "31f8deeed426b613"
     },
     {
       "date": "2026-03-25",
@@ -8316,7 +8392,8 @@
             "feat: add /summarize skill with project health panel and MCP tool"
           ]
         }
-      ]
+      ],
+      "commit_sig": "eeabb44ea5ce6f3e"
     },
     {
       "date": "2026-03-24",
@@ -8542,7 +8619,8 @@
             "fix: backlog data pipeline + default Open filter + priority sorting"
           ]
         }
-      ]
+      ],
+      "commit_sig": "498d2291a8019f29"
     },
     {
       "date": "2026-03-23",
@@ -8609,7 +8687,8 @@
             "feat: sprint number continuity + current-state.md seed template"
           ]
         }
-      ]
+      ],
+      "commit_sig": "1149a805f727a96a"
     },
     {
       "date": "2026-03-22",
@@ -8846,7 +8925,8 @@
             "fix: remove regex fallback from lifecycle doc generation, require LLM"
           ]
         }
-      ]
+      ],
+      "commit_sig": "8fcb71edab728127"
     },
     {
       "date": "2026-03-21",
@@ -9081,7 +9161,8 @@
             "feat: add /api/project/{slug}/status and /api/project/{slug}/sprints endpoints"
           ]
         }
-      ]
+      ],
+      "commit_sig": "7926b8472d631420"
     },
     {
       "date": "2026-03-20",
@@ -9314,7 +9395,8 @@
             "chore: sprint session scheduling state + sprint skill"
           ]
         }
-      ]
+      ],
+      "commit_sig": "9563d5c1e6ad4639"
     },
     {
       "date": "2026-03-19",
@@ -9559,7 +9641,8 @@
             "fix: normalize python→python3 + continue to report on verification failure"
           ]
         }
-      ]
+      ],
+      "commit_sig": "b58deb27b9524f67"
     },
     {
       "date": "2026-03-18",
@@ -9605,7 +9688,8 @@
             "chore: update projects.json active project + sprint-run.sh improvements"
           ]
         }
-      ]
+      ],
+      "commit_sig": "6310f87c53cfa9c2"
     },
     {
       "date": "2026-03-17",
@@ -9715,7 +9799,8 @@
             "fix: suppress find errors for missing packages/services dirs in sprint-run.sh"
           ]
         }
-      ]
+      ],
+      "commit_sig": "c30e7cec580a0d14"
     },
     {
       "date": "2026-03-16",
@@ -9739,7 +9824,8 @@
             "Resolve merge conflict: add everyone-ai to projects.json"
           ]
         }
-      ]
+      ],
+      "commit_sig": "a427a7c68137e5e1"
     },
     {
       "date": "2026-03-15",
@@ -9800,7 +9886,8 @@
             "feat: dashboard kickoff guide, brief generator modules, LLM settings"
           ]
         }
-      ]
+      ],
+      "commit_sig": "c3ecfba05eecb59c"
     },
     {
       "date": "2026-03-14",
@@ -9830,7 +9917,8 @@
             "fix: seed scan/generate now uses active project root instead of localStorage fallback"
           ]
         }
-      ]
+      ],
+      "commit_sig": "7231b88b6135f736"
     },
     {
       "date": "2026-03-13",
@@ -9903,7 +9991,8 @@
             "Document sprint-run.sh as recommended sprint workflow"
           ]
         }
-      ]
+      ],
+      "commit_sig": "6834c19d98a1fb66"
     },
     {
       "date": "2026-03-12",
@@ -10016,7 +10105,8 @@
             "Add post-merge hooks, fix bugs, update backlog and dashboard"
           ]
         }
-      ]
+      ],
+      "commit_sig": "54b27cc3dd82f3e2"
     },
     {
       "date": "2026-03-11",
@@ -10075,7 +10165,8 @@
             "Fix lifecycle cross-pollination, add view/edit toggle, multi-project support, and isolation tests"
           ]
         }
-      ]
+      ],
+      "commit_sig": "d417ba3841f88f0a"
     },
     {
       "date": "2026-03-10",
@@ -10169,7 +10260,8 @@
             "Save all settings (project root + GitHub token/repo) to .env on either save button"
           ]
         }
-      ]
+      ],
+      "commit_sig": "85a9d96e676296ed"
     },
     {
       "date": "2026-03-09",
@@ -10210,7 +10302,8 @@
             "Add config guide, default docsDir, sync script, and Playwright test suite"
           ]
         }
-      ]
+      ],
+      "commit_sig": "b42c94135bd26bd3"
     },
     {
       "date": "2026-03-08",
@@ -10242,7 +10335,8 @@
             "Add session:"
           ]
         }
-      ]
+      ],
+      "commit_sig": "cd7e54a372e3657a"
     },
     {
       "date": "2026-03-07",
@@ -10314,7 +10408,8 @@
             "Add multi-agent sprint orchestration system"
           ]
         }
-      ]
+      ],
+      "commit_sig": "77f6e66b4cc43863"
     },
     {
       "date": "2026-03-06",
@@ -10377,7 +10472,8 @@
             "Add CEO Dashboard session and ADR for FSM-generic"
           ]
         }
-      ]
+      ],
+      "commit_sig": "aed6d8d227571d56"
     },
     {
       "date": "2026-03-05",
@@ -10429,7 +10525,8 @@
             "feat: add admin panel with model management, VAD/barge-in controls, and voice selection"
           ]
         }
-      ]
+      ],
+      "commit_sig": "5e52f09c78e0780a"
     },
     {
       "date": "2026-03-04",
@@ -10461,7 +10558,8 @@
             "feat: add news collector builder wizard, services, shell, editor, and tests"
           ]
         }
-      ]
+      ],
+      "commit_sig": "9abba23f3ccb675b"
     },
     {
       "date": "2026-03-03",
@@ -10493,7 +10591,8 @@
             "feat: add NewsCollector service for overnight AI news fetch"
           ]
         }
-      ]
+      ],
+      "commit_sig": "c393aa51fb7bf378"
     },
     {
       "date": "2026-03-02",
@@ -10549,7 +10648,8 @@
             "Bootstrap FSM-generic repo with directory scaffold and engine submodule"
           ]
         }
-      ]
+      ],
+      "commit_sig": "d8a8b4eb05b0dc95"
     },
     {
       "date": "2026-02-27",
@@ -10571,7 +10671,8 @@
             "Initial release: PSTN phone call transport for Mac-local voice AI"
           ]
         }
-      ]
+      ],
+      "commit_sig": "496bb95e7aa9e908"
     },
     {
       "date": "2026-02-26",
@@ -10644,7 +10745,8 @@
             "Initial commit: design doc and README"
           ]
         }
-      ]
+      ],
+      "commit_sig": "95576cfec3dd21c1"
     },
     {
       "date": "2026-02-25",
@@ -10698,7 +10800,8 @@
             "Fix gateway namespace collision: append engine-repo to sys.path"
           ]
         }
-      ]
+      ],
+      "commit_sig": "93189811e8ed5853"
     },
     {
       "date": "2026-02-24",
@@ -10728,7 +10831,8 @@
             "Initial commit: voice-driven apartment scheduling FSM"
           ]
         }
-      ]
+      ],
+      "commit_sig": "58dcdf87295b7fff"
     },
     {
       "date": "2026-02-23",
@@ -10748,7 +10852,8 @@
             "Add text input alongside voice — type or speak to the agent"
           ]
         }
-      ]
+      ],
+      "commit_sig": "6efd161e485b74e7"
     },
     {
       "date": "2026-02-22",
@@ -10786,7 +10891,8 @@
             "feat: chunk-per-paragraph rendering, unified build script, playback & UI improvements"
           ]
         }
-      ]
+      ],
+      "commit_sig": "32597380e8827d70"
     },
     {
       "date": "2026-02-21",
@@ -10845,7 +10951,8 @@
             "feat(F-009): extract Whisper segment timestamps and pass through to client"
           ]
         }
-      ]
+      ],
+      "commit_sig": "e23c5debb91d53e0"
     },
     {
       "date": "2026-02-20",
@@ -10892,7 +10999,8 @@
             "Initial commit: Open Source Sound Generator with 9 audio models"
           ]
         }
-      ]
+      ],
+      "commit_sig": "36272e356e972fab"
     },
     {
       "date": "2026-02-19",
@@ -10912,7 +11020,8 @@
             "Upgrade embedding model to nomic-embed-text-v1.5"
           ]
         }
-      ]
+      ],
+      "commit_sig": "a091f3ff7e0e1a95"
     },
     {
       "date": "2026-02-18",
@@ -10974,7 +11083,8 @@
             "Add design doc for real-time streaming speaker detection"
           ]
         }
-      ]
+      ],
+      "commit_sig": "431a30daa7aad12b"
     },
     {
       "date": "2026-02-17",
@@ -10997,7 +11107,8 @@
             "Add FSM workflow engine, mobile UI, and workflow visualization"
           ]
         }
-      ]
+      ],
+      "commit_sig": "0bf9f91ba1af1236"
     },
     {
       "date": "2026-02-16",
@@ -11040,7 +11151,8 @@
             "Add backlog system to project memory template"
           ]
         }
-      ]
+      ],
+      "commit_sig": "89e69957be1ace4e"
     },
     {
       "date": "2026-02-15",
@@ -11076,7 +11188,8 @@
             "Add voice agent loop: mic → STT → LLM → TTS → speaker (Milestone 6)"
           ]
         }
-      ]
+      ],
+      "commit_sig": "6a6502b84d31c87e"
     },
     {
       "date": "2026-02-14",
@@ -11127,7 +11240,8 @@
             "Initial commit"
           ]
         }
-      ]
+      ],
+      "commit_sig": "3c792e5ec36e38d3"
     },
     {
       "date": "2026-02-13",
@@ -11173,7 +11287,8 @@
             "Add embedder-based intent classifier with info modal UI"
           ]
         }
-      ]
+      ],
+      "commit_sig": "9346042bd8533648"
     },
     {
       "date": "2026-02-12",
@@ -11266,7 +11381,8 @@
             "Add UTC times, human-readable commits, and Title field"
           ]
         }
-      ]
+      ],
+      "commit_sig": "0e32793e636d08f6"
     },
     {
       "date": "2026-02-11",
@@ -11296,7 +11412,8 @@
             "Add MIT License to the project"
           ]
         }
-      ]
+      ],
+      "commit_sig": "969b720b7360035d"
     },
     {
       "date": "2026-02-10",
@@ -11345,7 +11462,8 @@
             "[S-2026-02-09-1015-test-hook] Test pre-commit hook auto-index"
           ]
         }
-      ]
+      ],
+      "commit_sig": "a1a1ff1f18856d8e"
     },
     {
       "date": "2026-02-09",
@@ -11385,7 +11503,8 @@
             "[S-2026-02-09-1000-debug-report-framework] Initial implementation"
           ]
         }
-      ]
+      ],
+      "commit_sig": "cdc814f57b71fe9b"
     },
     {
       "date": "2026-02-08",
@@ -11428,7 +11547,8 @@
             "[S-2026-02-08-1400-bootstrap-memory] Bootstrap traceable project memory system"
           ]
         }
-      ]
+      ],
+      "commit_sig": "e2b941a578904442"
     },
     {
       "date": "2026-02-07",
@@ -11448,7 +11568,8 @@
             "Initial commit: browser-native voice agent with TTS, STT, and local LLM"
           ]
         }
-      ]
+      ],
+      "commit_sig": "fb6cf33caf0b18ec"
     },
     {
       "date": "2026-02-06",
@@ -11475,7 +11596,8 @@
             "Initial release: Browser Whisper - Local Speech-to-Text"
           ]
         }
-      ]
+      ],
+      "commit_sig": "3ad09a1354fdc461"
     },
     {
       "date": "2026-02-05",
@@ -11496,7 +11618,8 @@
             "Initial release: Browser-based LLM chat with WebGPU"
           ]
         }
-      ]
+      ],
+      "commit_sig": "4fc208956bbf542e"
     },
     {
       "date": "2026-02-04",
@@ -11519,7 +11642,8 @@
             "Published your App"
           ]
         }
-      ]
+      ],
+      "commit_sig": "43e8cc17094333f4"
     },
     {
       "date": "2026-02-03",
@@ -11573,7 +11697,8 @@
             "Add /deploy-verify skill for post-deployment verification"
           ]
         }
-      ]
+      ],
+      "commit_sig": "4d2802883a46d1b7"
     },
     {
       "date": "2026-02-02",
@@ -11593,7 +11718,8 @@
             "Fix protocol detection: Use detected protocol instead of hardcoded HTTPS"
           ]
         }
-      ]
+      ],
+      "commit_sig": "1877cb15a3572a3e"
     },
     {
       "date": "2026-02-01",
@@ -11643,7 +11769,8 @@
             "Add automated SSL support with self-signed certificates"
           ]
         }
-      ]
+      ],
+      "commit_sig": "9c267dfd29f05cb8"
     },
     {
       "date": "2026-01-31",
@@ -11701,7 +11828,8 @@
             "Add deployment script for 3.87.27.213"
           ]
         }
-      ]
+      ],
+      "commit_sig": "b3c18566dfd3f3c8"
     },
     {
       "date": "2026-01-30",
@@ -11737,7 +11865,8 @@
             "Add deployment automation for multiple portal instances"
           ]
         }
-      ]
+      ],
+      "commit_sig": "039eddb3fb851393"
     },
     {
       "date": "2026-01-29",
@@ -11757,7 +11886,8 @@
             "docs: add JWT authentication user guide"
           ]
         }
-      ]
+      ],
+      "commit_sig": "2e44d46ef2713fba"
     },
     {
       "date": "2026-01-28",
@@ -11782,7 +11912,8 @@
             "feat: add EC2 instance launch feature with auto-configuration"
           ]
         }
-      ]
+      ],
+      "commit_sig": "00095668d91b775e"
     },
     {
       "date": "2026-01-27",
@@ -11828,7 +11959,8 @@
             "Add a test harness to verify core application functionality"
           ]
         }
-      ]
+      ],
+      "commit_sig": "b59958bf95870add"
     },
     {
       "date": "2026-01-26",
@@ -11862,7 +11994,8 @@
             "Initial commit"
           ]
         }
-      ]
+      ],
+      "commit_sig": "ff94577eb81683fa"
     },
     {
       "date": "2026-01-25",
@@ -11903,7 +12036,8 @@
             "Add Phase 1 ASR service design document"
           ]
         }
-      ]
+      ],
+      "commit_sig": "554a79ac64040215"
     },
     {
       "date": "2026-01-22",
@@ -11929,7 +12063,8 @@
             "Add infrastructure setup system for automated deployments"
           ]
         }
-      ]
+      ],
+      "commit_sig": "e21cda5721394c66"
     },
     {
       "date": "2026-01-21",
@@ -11959,7 +12094,8 @@
             "Add SSM permissions to EC2 IAM role for Systems Manager access"
           ]
         }
-      ]
+      ],
+      "commit_sig": "d4788179ed5ac6b1"
     },
     {
       "date": "2026-01-19",
@@ -11987,7 +12123,8 @@
             "Fix OAuth2 proxy permissions and nginx buffer settings"
           ]
         }
-      ]
+      ],
+      "commit_sig": "e5aced15a9e92800"
     },
     {
       "date": "2026-01-18",
@@ -12030,7 +12167,8 @@
             "Add bootstrap automation for website-cloner"
           ]
         }
-      ]
+      ],
+      "commit_sig": "9d9983f6c2283d0e"
     },
     {
       "date": "2026-01-17",
@@ -12052,7 +12190,8 @@
             "Implement pure ZIP-based skill version management and deployment improvements"
           ]
         }
-      ]
+      ],
+      "commit_sig": "fdbb4f4f96a2fcd7"
     },
     {
       "date": "2026-01-14",
@@ -12087,7 +12226,8 @@
             "Add deployment and troubleshooting documentation"
           ]
         }
-      ]
+      ],
+      "commit_sig": "113f6f4644330e41"
     },
     {
       "date": "2026-01-13",
@@ -12139,7 +12279,8 @@
             "Add modular nginx configuration"
           ]
         }
-      ]
+      ],
+      "commit_sig": "76669cefb005eb93"
     },
     {
       "date": "2026-01-12",
@@ -12181,7 +12322,8 @@
             "Refactor: Remove built-in authentication, use gateway headers"
           ]
         }
-      ]
+      ],
+      "commit_sig": "b758467cc746506c"
     },
     {
       "date": "2026-01-11",
@@ -12240,7 +12382,8 @@
             "Add subdirectory deployment support for multiple site hosting"
           ]
         }
-      ]
+      ],
+      "commit_sig": "448e33e24e76825b"
     },
     {
       "date": "2026-01-10",
@@ -12270,7 +12413,8 @@
             "feat: initial commit - Phase 2 (URL enumeration) complete"
           ]
         }
-      ]
+      ],
+      "commit_sig": "40f0a6a91742e7f7"
     },
     {
       "date": "2026-01-08",
@@ -12300,7 +12444,8 @@
             "fix: Use placeholders in transcript-editor-v2 template"
           ]
         }
-      ]
+      ],
+      "commit_sig": "36abd8615c0d823c"
     }
   ]
 }

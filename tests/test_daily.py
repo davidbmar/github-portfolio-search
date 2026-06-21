@@ -121,6 +121,40 @@ def test_build_digests_retry_succeeds_on_a_later_attempt():
     assert days[0]["headline"] == "Recovered"   # retry won
 
 
+class _CountingEngine:
+    calls = 0
+    def __init__(self, headline="GEN"):
+        self._h = headline
+    def generate(self, date, lines):
+        type(self).calls += 1
+        return {"headline": self._h, "summary": "s", "takeaways": []}
+
+
+def test_build_digests_reuses_cached_day_when_commit_sig_matches():
+    rc = {"alpha": [{"sha": "a1", "message": "m", "date": "2026-06-20T00:00:00Z"}]}
+    first = daily.build_digests(rc, _FakeEngine())
+    assert "commit_sig" in first[0]                  # signature stored
+    prior = {d["date"]: d for d in first}
+
+    _CountingEngine.calls = 0
+    second = daily.build_digests(rc, _CountingEngine(headline="SHOULD_NOT_RUN"), prior=prior)
+    assert _CountingEngine.calls == 0               # unchanged day -> engine skipped
+    assert second[0]["headline"] == first[0]["headline"]  # reused verbatim
+
+
+def test_build_digests_regenerates_when_commits_change():
+    rc1 = {"alpha": [{"sha": "a1", "message": "m", "date": "2026-06-20T00:00:00Z"}]}
+    prior = {d["date"]: d for d in daily.build_digests(rc1, _FakeEngine())}
+    rc2 = {"alpha": [
+        {"sha": "a1", "message": "m", "date": "2026-06-20T00:00:00Z"},
+        {"sha": "a2", "message": "n", "date": "2026-06-20T01:00:00Z"},  # new commit
+    ]}
+    _CountingEngine.calls = 0
+    out = daily.build_digests(rc2, _CountingEngine(headline="REGEN"), prior=prior)
+    assert _CountingEngine.calls == 1              # commits changed -> regenerated
+    assert out[0]["headline"] == "REGEN"
+
+
 def test_write_daily_emits_payload(tmp_path):
     out = tmp_path / "data" / "daily.json"
     days = daily.build_digests(

@@ -11,6 +11,7 @@ local MLX server -> deterministic (no LLM, always available).
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -225,17 +226,36 @@ def _generate_resilient(engine, date, lines, *, retries=2, fallback=None):
     return (fallback or DeterministicEngine()).generate(date, lines)
 
 
+def _commit_sig(commits: list[dict]) -> str:
+    """Stable signature of a day's commit set (sorted repo:sha), for caching."""
+    key = "\n".join(sorted(f"{c['repo']}:{c['sha']}" for c in commits))
+    return hashlib.sha256(key.encode()).hexdigest()[:16]
+
+
 def build_digests(repo_commits: dict[str, list[dict]], engine,
-                  *, retries: int = 2) -> list[dict]:
+                  *, retries: int = 2, prior: dict | None = None) -> list[dict]:
     """Assemble per-day digest records, newest first, using *engine* for text.
 
     Each day is generated resiliently: on engine/parse failure it retries, then
     falls back to a deterministic digest, so one bad response can't drop the batch.
+
+    If *prior* (a ``{date: day_record}`` map from an earlier run) is given, any day
+    whose commit set is unchanged (same ``commit_sig``) is reused verbatim — the
+    engine is not called, so re-runs only pay for days that actually changed.
     """
+    prior = prior or {}
     days = aggregate_by_day(repo_commits)
     out: list[dict] = []
+    cached = 0
     for date in sorted(days, reverse=True):
         commits = days[date]
+        sig = _commit_sig(commits)
+        previous = prior.get(date)
+        if previous and previous.get("commit_sig") == sig:
+            out.append(previous)  # unchanged -> reuse, no engine call
+            cached += 1
+            continue
+
         per_repo: dict[str, list[str]] = defaultdict(list)
         for c in commits:
             per_repo[c["repo"]].append(c["message"])
@@ -249,7 +269,11 @@ def build_digests(repo_commits: dict[str, list[dict]], engine,
             "total_commits": len(commits),
             "repos": [{"name": r, "commits": len(m), "messages": m}
                       for r, m in sorted(per_repo.items())],
+            "commit_sig": sig,
         })
+    if prior:
+        logger.info("daily: reused %d cached days, generated %d",
+                    cached, len(out) - cached)
     return out
 
 
