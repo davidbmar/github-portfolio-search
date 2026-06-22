@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holdout Validation — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html" class="active">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Measurement &rsaquo; Holdout validation</div>
+  <h1 class="title">Holdout Validation — the overfitting guard</h1>
+  <p class="lede">You tune against the personas you can read. A fix only counts if it also lifts the personas you <em>never</em> looked at. Otherwise you memorized, you didn't generalize.</p>
+
+  <h2>What &amp; why</h2>
+  <p>A flow is evaluated by simulated <strong>personas</strong> — scripted callers with different styles
+  (cooperative, terse, angry, an over-sharer who front-loads everything). When you fix a flow, you read
+  the failing transcripts and tune against them. The danger is the same as in machine learning:
+  <strong>overfitting</strong>. A change can make the exact transcripts you stared at pass, without
+  improving the flow's real behavior at all. You memorized the test.</p>
+  <p>The guard is a <strong>leave-out split</strong> (Arbor-style): personas are partitioned into a
+  <em>DEV</em> set you iterate against and a <em>HELD-OUT</em> set you <strong>never inspect</strong>
+  while fixing. A fix must clear the bar on the held-out set — different personas, same failure axes —
+  to prove it generalized.</p>
+
+  <h2>How it works — the split</h2>
+  <p>The split is the single source of truth in <code>riff/flow_eval/splits.py</code>. ~1/4 of personas
+  are held out (3 of 12) — enough to be a real generalization signal without halving the dev surface you
+  actually iterate on. The held-out set deliberately mirrors the dev failure axes with
+  <em>different</em> personas, plus stretch axes (adversarial, withholding) that dev omits entirely.</p>
+  <table>
+    <tr><th>axis</th><th>DEV (9) — you read &amp; debug these</th><th>HELD-OUT (3) — never inspected</th></tr>
+    <tr><td>baseline</td><td><code>cooperative</code></td><td>—</td></tr>
+    <tr><td>paced</td><td><code>paced_methodical</code></td><td>—</td></tr>
+    <tr><td>correction</td><td><code>corrector</code>, <code>indecisive</code></td><td>—</td></tr>
+    <tr><td>front-load</td><td><code>oversharer</code></td><td><code>bulk</code> <em>(diff persona, same axis)</em></td></tr>
+    <tr><td>terse</td><td><code>terse</code></td><td>—</td></tr>
+    <tr><td>emotional</td><td><code>angry</code>, <code>chatty</code></td><td>—</td></tr>
+    <tr><td>off-scope</td><td><code>offscope</code></td><td>—</td></tr>
+    <tr><td>adversarial</td><td>—</td><td><code>skeptical</code> <em>(stretch)</em></td></tr>
+    <tr><td>withholding</td><td>—</td><td><code>privacy_guarded</code> <em>(stretch)</em></td></tr>
+  </table>
+  <pre><span class="c"># riff/flow_eval/splits.py</span>
+DEV_PERSONAS     = ("cooperative", "corrector", "oversharer", "paced_methodical",
+                    "terse", "indecisive", "chatty", "angry", "offscope")
+HELDOUT_PERSONAS = ("skeptical", "bulk", "privacy_guarded")
+ALL_GATE_PERSONAS = DEV_PERSONAS + HELDOUT_PERSONAS   <span class="c"># one eval over the union, split after</span></pre>
+
+  <div class="callout bad">
+    <strong>Never debug a fix against held-out transcripts.</strong>
+    The instant you read a held-out transcript to fix it, that persona becomes a dev persona and the
+    guard silently dies — you've contaminated your test set. <code>split_quality()</code> reports the
+    dev mean and held-out mean separately; you act on dev, you <em>gate</em> on held-out.
+  </div>
+
+  <h2>How the gate reads it</h2>
+  <p>The flow build pipeline (<code>scripts/flow-pipeline.sh</code>) runs the union in <em>one</em> eval
+  (cheaper than two runs), then gates on the <strong>held-out mean</strong>, showing dev for comparison.
+  A fix that lifts dev but not held-out is flagged <code>⚠️ OVERFIT</code> — a loud signal that you
+  memorized the dev transcripts instead of generalizing.</p>
+
+  <h2>Use case</h2>
+  <p>You convert a flow to the <a class="x" href="group-cohesion.html">Collect Pattern</a> and the
+  cooperative + oversharer transcripts you were watching now pass — dev mean jumps. Is the flow actually
+  better? The held-out mean answers it. If <code>bulk</code> (a different front-loader you never saw)
+  also improves, the fix generalized. If only dev moved, you tuned to the specific transcripts and the
+  <code>OVERFIT</code> flag fires — back to the drawing board.</p>
+
+  <h2>Example</h2>
+  <pre><span class="c"># the pipeline runs DEV + HELD-OUT in one eval and gates on the held-out mean</span>
+scripts/flow-pipeline.sh austin_plumbing
+<span class="c"># → prints dev mean (for comparison) and held-out mean (the gate);
+<span class="c">#   a dev-only lift is flagged ⚠️ OVERFIT</span></pre>
+  <p>The same two caller behaviors — paced (one answer at a time) and front-load (everything at once) —
+  are exercised inside a single flow's eval, so passing the bar across both held-out personas proves the
+  flow serves both paths. There is nothing to A/B: a brand-new flow has no &ldquo;before,&rdquo; so it is
+  gated against a fixed quality <em>bar</em>, on the held-out split.</p>
+
+  <h2>Where it fits</h2>
+  <p>Holdout discipline governs every flow fix and every pattern rollout. It is the reason the
+  <a class="x" href="methodology.html">Methodology</a> page lists &ldquo;holdout discipline&rdquo; as a
+  hard-won lesson: a guard that you quietly defeat is worse than no guard, because it gives false
+  confidence. The split feeds the judged pipeline; the cheap <a class="x" href="ci-gate.html">CI
+  gate</a> uses a smaller deterministic persona set per commit.</p>
+
+  <footer>Source: <code>riff/flow_eval/splits.py</code>; discipline documented in <code>docs/flow-eval/COLLECT-PATTERN.md</code>.</footer>
+</main>
+</div>
+</body>
+</html>

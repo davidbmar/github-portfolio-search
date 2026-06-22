@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archetypes — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html" class="active">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; The hierarchy &rsaquo; Archetypes</div>
+  <h1 class="title">Archetypes — the same subpart across all flows</h1>
+  <p class="lede">Tier 4. Stop asking &ldquo;is this flow's confirm phase weak?&rdquo; and start asking &ldquo;are our confirm phases weak <em>everywhere</em>?&rdquo;</p>
+
+  <h2>What &amp; why</h2>
+  <p>Every flow has a collect phase, most have a confirm phase, several have an action phase. Those are
+  the <em>same functional subpart</em> wearing different state names. An <strong>archetype</strong>
+  groups all of them into one bucket — every flow's <code>collect</code>, every <code>confirm</code>,
+  every <code>action</code> — and metrics it library-wide. That reveals <strong>systemic</strong>
+  weakness: if the <code>action</code> archetype is weak on average, the fix is the <em>pattern</em>,
+  not one flow. It is the difference between &ldquo;fix this bug&rdquo; and &ldquo;fix this class of
+  bug.&rdquo;</p>
+
+  <h2 id="seg">How it works — segment inference, then canonicalization</h2>
+  <p>Two steps. First, each state is assigned a <strong>segment</strong>
+  (<code>riff/flow_eval/segments.py</code>) by a precedence rule: an authored <code>segment:</code> on
+  the state wins; else its <code>lifecycle_phase</code>; else the <code>speech_act</code> family
+  (<code>ask</code>/<code>listen</code>/<code>static</code> &rarr; <code>collect</code>,
+  <code>confirm</code> &rarr; <code>confirm</code>, <code>act</code> &rarr; <code>action</code>, and so
+  on). So grouping needs no authoring by default, but an authored <code>segment:</code> gives stable
+  IDs for trend analysis.</p>
+  <p>Second, because flows label inconsistently (one tags by lifecycle phase
+  <code>triage</code>/<code>book</code>/<code>enrich</code>, another by speech-act family
+  <code>collect</code>/<code>action</code>), <code>eval_db.py</code> applies a
+  <strong>canonical archetype taxonomy</strong> (<code>_CANON_ARCHETYPE</code>) that folds the variants
+  into one shared vocabulary — <code>enrich</code>/<code>gather</code> &rarr; <code>collect</code>,
+  <code>book</code>/<code>dispatch</code>/<code>commit</code> &rarr; <code>action</code>,
+  <code>readback</code> &rarr; <code>confirm</code>. Without this, austin's <code>book</code> and
+  <code>enrich</code> would sit in lonely one-flow buckets instead of joining the rest of the library's
+  <code>action</code> and <code>collect</code> phases (commit <code>4cd7998</code>). Each archetype
+  carries a <strong>typed goal</strong> (<code>_ARCHETYPE_GOAL</code>): collect &rarr; slot_yield,
+  confirm &rarr; confirmation_success, action &rarr; tool_success.</p>
+
+  <h2>Use case</h2>
+  <p>You are deciding what to invest in next. Per-flow, a dozen flows each have a slightly weak phase —
+  noise, or a pattern? The archetype view answers it: if <code>collect</code> averages 0.92 across 18
+  flows but <code>action</code> averages 0.62 across 3, the leverage is in the action pattern (the
+  backend/booking handoff), and a single structural fix there lifts every action-bearing flow at once.</p>
+
+  <h2>Example</h2>
+  <pre>python scripts/eval_db.py --archetype</pre>
+  <p class="run">Real output from the live <code>quality.db</code>:</p>
+  <pre># Cross-flow ARCHETYPES — the same FSM subpart across ALL flows (worst archetype first)
+
+| Archetype   | goal                              | flows | mean cohesion | spread (worst→best flow)               |
+|-------------|-----------------------------------|-------|---------------|----------------------------------------|
+| **inform**  | convey info + advance             | 1     | ⚠ 0.57       | apartment_viewing 0.57 → 0.57          |
+| **action**  | a tool/program succeeds (tool_…)  | 3     | ⚠ 0.62       | ceo_command_center 0.2 → weather 1.0   |
+| **collect** | fill the target slots (slot_yield)| 18    | ✅ 0.92      | coffee 0.78 → austin_plumbing 1.0      |
+
+mean cohesion = how well this subpart-type collaborates AVERAGED across all flows.
+A low archetype mean = a SYSTEMIC weakness (fix the pattern, not one flow).</pre>
+  <p>The <em>spread</em> column is as useful as the mean: <code>action</code> ranges from
+  <code>ceo_command_center</code> at 0.2 to <code>weather</code> at 1.0, which tells you the weakness is
+  concentrated, not uniform — so the worst flow is the place to learn the fix that generalizes.</p>
+
+  <h2>Where it fits</h2>
+  <p>Archetypes sit one level above <a class="x" href="group-cohesion.html">group cohesion</a> — they
+  reuse the exact same per-(flow, segment) cohesion rows (<code>_cohesion_rows</code>) and average them
+  by canonical archetype. Read group cohesion to fix <em>this</em> flow; read archetypes to decide
+  <em>which class</em> of phase deserves a structural investment across the whole library.</p>
+
+  <footer>Source: <code>scripts/eval_db.py</code> (<code>archetype_cohesion</code>, <code>_CANON_ARCHETYPE</code>, <code>_ARCHETYPE_GOAL</code>), <code>riff/flow_eval/segments.py</code>.</footer>
+</main>
+</div>
+</body>
+</html>

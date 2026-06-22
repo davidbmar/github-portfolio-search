@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Per-State Metrics — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html" class="active">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; The hierarchy &rsaquo; Per-state metrics</div>
+  <h1 class="title">Per-State Metrics — the root-cause layer</h1>
+  <p class="lede">Tier 1. When a flow scores badly, this layer says exactly which state pulled it down — computed deterministically from the live event stream, no LLM.</p>
+
+  <h2>What &amp; why</h2>
+  <p>The flow matrix tells you a flow is weak. It does not tell you <em>where</em>. The per-state layer
+  is the answer: one row per <code>(conversation, state)</code>, with a handful of metrics that localize
+  the failure to a single node. It <strong>complements</strong> the conversation/flow truth in
+  <code>aspect_scores</code> — it does not replace it. Think of <code>aspect_scores</code> as the
+  verdict and <code>state_scores</code> as the autopsy.</p>
+
+  <h2>How it works — the event stream</h2>
+  <p>Every conversation runs on a per-call <a class="x" href="#bus">event bus</a> (<code>riff/events.py</code>).
+  As the FSM drives the call it emits typed events: <code>state_entered</code>,
+  <code>state_exited{to_state, reason}</code>, <code>turn_complete{latency_ms}</code>,
+  <code>guard_evaluated{error, result}</code>, and <code>slot_filled{slot, value}</code>. The driver
+  (<code>riff/flow_eval/driver.py</code>) subscribes to the bus, collects the events for that one
+  session, and hands them to <code>compute_state_aspects</code>
+  (<code>riff/flow_eval/state_aspects.py</code>), which walks the visit timeline and produces the
+  per-state rows. Because it reads only events, it is fully deterministic.</p>
+
+  <h3>The metrics</h3>
+  <table>
+    <tr><th>Metric</th><th>Definition (as computed)</th></tr>
+    <tr><td><code>progress</code></td><td>1 if the state exited to a <em>forward</em> state (advanced), else 0</td></tr>
+    <tr><td><code>stall</code></td><td>1 if it is the <em>last</em> state of a non-completed conversation (stuck here)</td></tr>
+    <tr><td><code>escalation</code></td><td>1 if it exited to an escalation terminal (<code>escalated</code>/<code>escalate</code>)</td></tr>
+    <tr><td><code>revisit</code></td><td>re-entries = entries − 1 (oscillation / re-ask)</td></tr>
+    <tr><td><code>dwell_turns</code></td><td>average agent turns spent in the state per visit</td></tr>
+    <tr><td><code>latency_p95_ms</code></td><td>95th-percentile turn latency while in the state</td></tr>
+    <tr><td><code>guard_error</code></td><td>count of <code>guard_evaluated</code> errors</td></tr>
+    <tr><td id="collect"><code>slot_fill_rate</code></td><td>(collect states) required slots filled before exit ÷ required</td></tr>
+    <tr><td><code>to_states</code></td><td>the set of states this one led to — for the surrounding-states / blast-radius view</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <strong>slot_fill_rate alone is noisy — gate it on progress.</strong>
+    A <code>listen</code> state legitimately reads <code>slot_fill=0</code> when the caller
+    <em>front-loaded</em> the slot earlier (it was filled before this state ran). That is healthy
+    behavior, not a defect. The real signal is low slot_fill <em>and</em> low progress — genuinely
+    stuck collecting. The <code>--analyze</code> root-cause view gates the slot_fill clause on
+    <code>progress &lt; 0.7</code> for exactly this reason (commit <code>dacb181</code>).
+  </div>
+
+  <h3 id="bus">Per-state slot evidence (shipped this session)</h3>
+  <p>For <code>slot_fill_rate</code> to attribute a fill to the <em>right</em> state, a
+  <code>slot_filled</code> event must fire for each public slot at the moment it is committed, tagged
+  with the state that collected it. This session moved that emit to the single commit choke point in
+  <code>StateManager.commit_transition</code> (commit <code>43b232b</code>), so each slot is captured
+  exactly once (tracked in <code>ctx._emitted_slots</code>) and falsy-but-valid values like
+  <code>0</code> / <code>False</code> still count as filled. This is phase 2 of the goal hierarchy —
+  the gating prerequisite for any group metric.</p>
+
+  <h2>Use case</h2>
+  <p>You ran the nightly eval. The matrix shows <code>apartment_viewing</code> at correctness 3.3 on
+  gemini. <em>Why?</em> Open the state matrix and the answer is one row: <code>collect_details</code>
+  stalls 40% of the time with a low slot-fill and a 8.8s p95 latency. Now you have a node to fix, not a
+  flow to stare at.</p>
+
+  <h2>Example</h2>
+  <p>Ingest the per-state metrics from the transcripts, then read the worst-states-first matrix:</p>
+  <pre><span class="c"># 1. fold per-state metrics out of the transcripts into state_scores (tags each row's segment)</span>
+python scripts/eval_db.py --ingest-state-aspects --dirs /tmp/ab_eval/fullcalib
+
+<span class="c"># 2. worst states first (high stall / low progress)</span>
+python scripts/eval_db.py --state-matrix</pre>
+  <p class="run">Real output (truncated) from the live <code>quality.db</code>:</p>
+  <pre># Per-state quality — all flows (worst first)
+
+| Flow                     | State                      | n  | progress | stall   | escal | revisit | dwell | lat_p95(s) | slot_fill |
+|--------------------------|----------------------------|----|----------|---------|-------|---------|-------|------------|-----------|
+| ceo_command_center       | status_query               | 2  | 0.0      | **1.0** | 0.0   | 0.0     | 5.0   | 3.1        | ·         |
+| property_trouble_ticket  | invalid_verification_code  | 13 | 0.0      | **1.0** | 0.0   | 0.0     | 1.0   | 2.6        | ·         |
+| ceo_command_center       | dispatch_send              | 8  | 1.0      | **0.5** | 0.0   | 1.38    | 1.2   | 0.0        | ·         |
+| apartment_viewing        | collect_details            | 5  | 0.6      | **0.4** | 0.0   | 0.0     | 2.4   | 8.8        | 0.1       |
+| ceo_command_center       | dispatch_intent            | 8  | 1.0      | **0.38**| 0.0   | 1.75    | 1.3   | 1.7        | ·         |
+| dog_grooming             | listen_owner               | 9  | 0.22     | **0.33**| 0.44  | 0.0     | 2.6   | 1.7        | 0.0       |
+| ceo_command_center       | triage                     | 13 | 1.0      | **0.31**| 0.0   | 3.31    | 0.6   | 1.6        | ·         |
+
+stall=fraction stuck here · progress=fraction that advanced · revisit=oscillation.
+High stall + low progress = the state pulling the flow down.</pre>
+  <p>Add <code>--flow apartment_viewing</code> to also print each state's neighbors (the
+  <code>to_states</code> graph), so you can see the blast radius — which downstream states a broken
+  node starves.</p>
+
+  <h2>Where it fits</h2>
+  <p>The per-state layer is the bottom of the drill-down. The auto-analysis
+  (<a class="x" href="eval-matrix.html#analyze"><code>--analyze</code></a>) ranks the worst states
+  across all flows for you; <code>--state-matrix</code> is the full table; and the segment rollup
+  (<a class="x" href="group-cohesion.html">group cohesion</a>) aggregates these same rows into the
+  middle tier. The robustness rule from Codex applies throughout: errored conversations (a broken agent
+  integration, an absent backend) are <strong>excluded</strong> from ingest — they are not a flow
+  signal and must not be scored as a zero.</p>
+
+  <footer>Source: <code>riff/flow_eval/state_aspects.py</code>, <code>riff/flow_eval/driver.py</code>, <code>riff/events.py</code>, <code>scripts/eval_db.py</code> (<code>state_matrix</code>, <code>ingest_state_aspects</code>).</footer>
+</main>
+</div>
+</body>
+</html>

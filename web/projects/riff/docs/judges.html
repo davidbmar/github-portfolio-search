@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judges — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html" class="active">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Measurement &rsaquo; Judges</div>
+  <h1 class="title">Judges — scoring the one subjective aspect</h1>
+  <p class="lede">Humanness is the only aspect that needs an LLM. The same transcripts, scored by a swappable roster of judges — the spread between them <em>is</em> the uncertainty.</p>
+
+  <h2>What &amp; why</h2>
+  <p>Correctness, completion, errors, and latency are computed deterministically. Humanness — &ldquo;does
+  this sound like a warm, natural person on the phone, or a robot reading slot names aloud?&rdquo; — is
+  irreducibly subjective, so it is scored by an LLM judge against a fixed rubric. Because any single
+  judge is noisy (~1pt) and biased, RIFF runs a <strong>panel</strong>: several judges score the
+  <em>same</em> transcripts, and their disagreement is the honest error bar on humanness. Averaging
+  &ge;2 judges (median) shrinks it.</p>
+
+  <h3>The rubric</h3>
+  <p>One prompt, schema-locked to a JSON object, scores 0&ndash;10:</p>
+  <pre>humanness = natural phone manner; warm and concise; NOT robotic or repetitive;
+never reads raw slot names / lists / JSON aloud; recovers gracefully with an
+appropriate tone. IGNORE whether the task objectively completed except where a
+failure makes the conversation feel unnatural.
+
+Output ONLY: {"humanness": &lt;int 0-10&gt;, "notes": "&lt;one specific sentence&gt;"}</pre>
+  <p>Task success is deliberately excluded — that is what the computed aspects are for. The judge grades
+  <em>manner</em>, not outcome.</p>
+
+  <h2>The roster</h2>
+  <p><code>scripts/aspect_judge.py</code> holds a named roster spanning remote APIs, local models, and
+  CLI-shelled judges. A generic passthrough (<code>--judge ollama:&lt;model&gt;</code> /
+  <code>mlx:&lt;model&gt;</code>) covers anything else installed.</p>
+  <table>
+    <tr><th>Class</th><th>Judges</th><th>Notes</th></tr>
+    <tr><td>remote API</td><td><code>gemini</code> (gemini-2.5-flash), <code>qwen</code> (qwen3.7-plus), <code>claude</code> (claude-haiku-4-5)</td><td>fast; the everyday panel</td></tr>
+    <tr><td>CLI-shelled</td><td><code>codex</code> (GPT via the Codex CLI), <code>claude-cli</code> (<code>claude -p</code>)</td><td>fallbacks when an API is down — see below</td></tr>
+    <tr><td>local (ollama)</td><td><code>gemma</code>, <code>gemma-big</code>, <code>mistral</code>, <code>phi4</code></td><td>free/unlimited for big sweeps</td></tr>
+    <tr><td>local (mlx)</td><td><code>mlx</code>, <code>gemma-mlx</code>, <code>phi4-mlx</code></td><td>Apple-silicon local inference</td></tr>
+  </table>
+
+  <h3>The CLI judges — why they exist</h3>
+  <p>Two judges shell out to a CLI instead of an API, because the corresponding APIs are unreliable in
+  this environment:</p>
+  <ul>
+    <li><strong>CodexJudgeAdapter</strong> (<code>riff/evaluation/codex_judge.py</code>) runs
+    <code>codex exec</code> in a <em>read-only</em> sandbox with a forced output schema. It is the
+    fallback when the DashScope qwen judge is exhausted (403). Slower (~8s/call) and spawns a
+    subprocess, so it is the fallback, not the default.</li>
+    <li><strong>ClaudeCodeAdapter</strong> (<code>riff/evaluation/claude_code_judge.py</code>) runs
+    <code>claude -p</code> (print mode). The Anthropic <em>API</em> adapter 400s here, but the Claude
+    Code CLI is installed and authenticated separately, so it is a usable Claude judge.</li>
+  </ul>
+  <div class="callout warn">
+    <strong>A broken judge is an instrument fault, not a flow fault.</strong>
+    During this session the broken Claude <em>API</em> agent and a fallback-exhausted qwen judge both
+    produced score craters that <em>looked</em> like flow regressions. The broken Claude agent was
+    dropped from the calibration panel (commit <code>72e36f3</code>). This is the &ldquo;harden the
+    instrument&rdquo; lesson in <a class="x" href="methodology.html">Methodology</a>: measurement flaws
+    masquerade as subject flaws.
+  </div>
+
+  <h2>Robustness — emit every attempt</h2>
+  <p>The judge writes a row for <strong>every</strong> attempt, including failures (humanness = null +
+  a status). A degraded judge that silently dropped its failures would shrink the sample and bias the
+  median upward — so failures are recorded, not omitted (Codex robustness #1). Judges that are
+  schema-locked to <code>{quality, robustness}</code> (the Codex CLI judge) fall back to their
+  holistic <code>quality</code> as the closest naturalness signal.</p>
+
+  <h2>Example</h2>
+  <pre>python scripts/aspect_judge.py OUT/flow-transcripts-*.jsonl \
+    --judge gemini --out H --judged-at 2026-06-22T14:00:00Z
+python scripts/eval_db.py --ingest-humanness --dirs H
+
+<span class="c"># who judged, how often, timeout rate, average quality</span>
+python scripts/eval_db.py --judges</pre>
+  <p class="run">Real output from the live <code>quality.db</code>:</p>
+  <pre># Judges — who scored, how often, timeout rate, avg quality
+
+  (none/heuristic)             n=800   timed_out=0    avg_q=4.98
+  alibaba/qwen3.7-plus         n=162   timed_out=0    avg_q=3.85
+  gemini/gemini-2.5-flash      n=77    timed_out=0    avg_q=4.32
+  codexjudge/codex             n=77    timed_out=0    avg_q=4.29
+  _fallbackjudge/qwen3.7-plus->codex(fallback) n=40  timed_out=0  avg_q=3.63
+  panel:gemma/ollama+codex/cli n=2     timed_out=1    avg_q=8.0</pre>
+  <p>Note the spread of average quality <em>by judge</em> on overlapping work: qwen 3.85 vs gemini 4.32
+  vs codex 4.29 on the same kinds of transcripts. That ~0.5pt gap between judges is real and is why
+  quality is only comparable <em>within</em> a judge column (the <code>--timeline</code> rescore rows
+  make this explicit).</p>
+
+  <h2>Canonicalization — joining judged to computed</h2>
+  <p>When humanness rows are ingested, each is canonicalized against the matching computed row by
+  <code>conversation_id</code>: it copies <code>run_id</code>/<code>run_ts</code>/<code>agent_model</code>/
+  <code>persona</code> from the computed row, so a judgment attributes to the right <em>flow version</em>
+  (run time, not judge time) and joins cleanly. The judge-time is kept separately in
+  <code>details_json</code>. A humanness row with no computed twin is skipped — it can't be placed
+  (Codex robustness #2).</p>
+
+  <h2>Where it fits</h2>
+  <p>Judges feed the humanness column of the <a class="x" href="eval-matrix.html">evaluation matrix</a>.
+  They run nightly (the <a class="x" href="ci-gate.html">per-commit gate</a> is judge-free by design),
+  and the full panel is driven by <code>scripts/full_calibration.sh</code> — 20 flows × 2 agents,
+  computed + per-state, then humanness × 3 judges on the same transcripts.</p>
+
+  <footer>Source: <code>scripts/aspect_judge.py</code>, <code>riff/evaluation/codex_judge.py</code>, <code>riff/evaluation/claude_code_judge.py</code>, <code>scripts/full_calibration.sh</code>.</footer>
+</main>
+</div>
+</body>
+</html>

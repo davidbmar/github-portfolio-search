@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF — The Showcase Flow &amp; Path to First Customer</title>
+<style>
+  :root{
+    --ink:#16181d; --muted:#5b6470; --line:#e5e7eb; --bg:#fbfbfa;
+    --accent:#1f6feb; --good:#15803d; --warn:#b45309; --bad:#b91c1c;
+    --card:#ffffff; --chip:#eef2ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:880px; margin:0 auto; padding:48px 24px 96px}
+  header.hero{border-bottom:1px solid var(--line); padding-bottom:28px; margin-bottom:8px}
+  .kicker{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:600}
+  h1{font-size:36px; line-height:1.15; margin:.25em 0 .15em; letter-spacing:-.02em}
+  .sub{color:var(--muted); font-size:18px; max-width:64ch}
+  .updated{margin-top:14px; font-size:13px; color:var(--muted)}
+  h2{font-size:23px; margin:46px 0 8px; letter-spacing:-.01em}
+  h2 .num{color:var(--accent); font-variant-numeric:tabular-nums}
+  h3{font-size:17px; margin:20px 0 4px}
+  p{margin:.5em 0} .lead{font-size:17px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 22px; margin:16px 0}
+  .headline{background:linear-gradient(180deg,#f5f9ff,#fff); border-color:#cfe0ff}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:14px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .v{font-size:24px; font-weight:700; font-variant-numeric:tabular-nums}
+  .stat .l{font-size:13px; color:var(--muted)}
+  .chip{display:inline-block; font-size:12px; font-weight:600; padding:2px 10px; border-radius:999px; background:var(--chip); color:var(--accent)}
+  .p0{background:#fef2f2; color:var(--bad)} .p1{background:#fffbeb; color:var(--warn)} .p2{background:#f0fdf4; color:var(--good)}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+  .note{font-size:13.5px; color:var(--muted)}
+  .tag-ok{color:var(--good); font-weight:600} .tag-part{color:var(--warn); font-weight:600} .tag-no{color:var(--bad); font-weight:600}
+  ol.tasks{list-style:none; counter-reset:t; padding:0; margin:8px 0}
+  ol.tasks li{counter-increment:t; position:relative; padding:14px 0 14px 46px; border-top:1px solid var(--line)}
+  ol.tasks li:before{content:counter(t); position:absolute; left:0; top:13px; width:30px; height:30px; border-radius:8px; background:var(--ink); color:#fff; font-weight:700; font-size:14px; display:grid; place-items:center}
+  ol.tasks li b{display:block; font-size:16px} ol.tasks li span{color:var(--muted); font-size:14.5px}
+  /* annotated transcript */
+  .call{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:8px 0; margin:16px 0; overflow:hidden}
+  .turn{display:grid; grid-template-columns:1fr 230px; gap:0; border-top:1px solid var(--line)}
+  .turn:first-child{border-top:0}
+  .turn .say{padding:13px 18px}
+  .turn .who{font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+  .turn.caller .who{color:var(--accent)} .turn.agent .who{color:var(--ink)}
+  .turn .txt{margin-top:2px}
+  .turn .feat{padding:13px 18px; background:#f7f9fc; border-left:1px solid var(--line); font-size:13px; color:var(--muted)}
+  .turn .feat b{color:var(--good); display:block; font-size:12px; text-transform:uppercase; letter-spacing:.04em}
+  @media(max-width:660px){.turn{grid-template-columns:1fr}.turn .feat{border-left:0;border-top:1px dashed var(--line)}}
+  code{background:#f1f3f6; padding:1px 5px; border-radius:5px; font-size:13px}
+  .verify{font-size:11px;font-weight:700;color:var(--warn);background:#fff7ed;padding:1px 6px;border-radius:5px;letter-spacing:.04em}
+  footer{margin-top:60px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">RIFF · Go-to-market — internal plan</div>
+  <h1>The Showcase Flow &amp; the Path to a First Customer</h1>
+  <p class="sub">One demo call that makes a prospect <em>see</em> why riff is good — and the concrete work between that demo and a billing customer. Pairs with <a href="roadmap.html">Path to Revenue</a> (business model + infra blockers) and the <a href="night-shift-receptionist.html">customer pitch</a> (pricing).</p>
+  <p class="updated">Draft · 2026-06-19 · scenario chosen: <strong>after-hours night-shift receptionist</strong> · this is a planning artifact, not the product</p>
+</header>
+
+<h2><span class="num">1.</span> The thesis</h2>
+<div class="card headline">
+  <p style="margin-top:0">A prospect doesn't buy an architecture diagram. They buy <strong>one phone call that goes right</strong> — and a reason to believe it'll go right every night. So the centerpiece of the sale is a single <strong>showcase flow</strong>: a realistic after-hours call that, in under a minute, fires <em>every feature that matters</em> and ends with a correct booking and a text in the caller's hand.</p>
+  <p style="margin-bottom:0">The job of this page: (1) script that call and map each moment to the feature it proves, (2) state the <strong>trust story</strong> — why "it won't make things up" is engineered and <em>measured</em>, not claimed, and (3) list what's left to build to turn the demo into a billable service.</p>
+</div>
+
+<h2><span class="num">2.</span> The demo call — one minute, every feature</h2>
+<p class="sub">An after-hours call to a plumbing/HVAC business. The right margin names the feature each turn demonstrates. The caller deliberately <strong>front-loads</strong> (the hard case) to show riff handling it.</p>
+
+<div class="call">
+  <div class="turn agent">
+    <div class="say"><div class="who">RIFF</div><div class="txt">"Thanks for calling Lone Star Plumbing — we're closed, but I can take a message or book you in. What's going on?"</div></div>
+    <div class="feat"><b>Live + framed</b>Answers in ~2s, states what it can do. No phone tree.</div>
+  </div>
+  <div class="turn caller">
+    <div class="say"><div class="who">Caller</div><div class="txt">"Hi, my water heater's leaking — this is Dave Chen, 512-555-0199, can someone come Tuesday morning?"</div></div>
+    <div class="feat"><b>Front-load</b>Four facts in one breath: issue + name + phone + time.</div>
+  </div>
+  <div class="turn agent">
+    <div class="say"><div class="who">RIFF</div><div class="txt">"Got all that, Dave. Let me read it back: a leaking water heater, callback at 512-555-0199, and you'd like Tuesday morning. Is that right?"</div></div>
+    <div class="feat"><b>Skip-if-filled + read-back</b>Captures all four in one pass (front-load algo R2), skips re-asking, then voices every value back (the confirm is never skipped). No "Got it!" dead-air.</div>
+  </div>
+  <div class="turn caller">
+    <div class="say"><div class="who">Caller</div><div class="txt">"Yep — actually make it 8am if you can."</div></div>
+    <div class="feat"><b>Correction</b>Caller revises a slot mid-confirm.</div>
+  </div>
+  <div class="turn agent">
+    <div class="say"><div class="who">RIFF</div><div class="txt">"8am Tuesday it is. We have that slot open — booking it now… you're in. I'm texting you a confirmation."</div></div>
+    <div class="feat"><b>Calendar booking + SMS</b>Writes the real booking, sends the caller an SMS receipt. Never says "booked" unless it committed.</div>
+  </div>
+  <div class="turn agent">
+    <div class="say"><div class="who">RIFF</div><div class="txt">"One thing — a leak can get worse fast. If it floods before then, say 'emergency' and I'll page the on-call tech."</div></div>
+    <div class="feat"><b>Escalation path</b>Recognizes an urgent class, offers a human hand-off — the safety valve.</div>
+  </div>
+</div>
+<p class="note">Two variants to keep in the demo's back pocket: <strong>(a) garbage-rejection</strong> — if the caller mumbles and the name comes through as "a service appointment," riff re-asks instead of confirming junk (validator R3); <strong>(b) degraded-mode</strong> — if Google Calendar is down, it doesn't fake a booking, it takes a message and says a human will confirm (the provider degrade-gracefully contract).</p>
+
+<h2><span class="num">3.</span> What each moment proves</h2>
+<table>
+  <thead><tr><th>Demo moment</th><th>Feature</th><th>Why the customer cares</th></tr></thead>
+  <tbody>
+    <tr><td>Caller dumps 4 facts at once</td><td>Front-load capture + skip-if-filled (R2)</td><td>Real callers don't answer one question at a time. It feels like a competent person, not a form.</td></tr>
+    <tr><td>"Let me read it back…"</td><td>Joined read-back confirm (Collect Pattern)</td><td>The caller catches a wrong number before they hang up. Accurate messages = the whole job.</td></tr>
+    <tr><td>"actually make it 8am"</td><td>Correction handling</td><td>People change their minds. It doesn't get confused or re-ask everything.</td></tr>
+    <tr><td>"booking it now… you're in"</td><td>Calendar write + honest status</td><td>It only says "booked" when the booking committed — no false promises.</td></tr>
+    <tr><td>SMS receipt</td><td>SMS hand-off</td><td>The caller has it in writing; the business has a record.</td></tr>
+    <tr><td>"say 'emergency'"</td><td>Escalation to human</td><td>The 2am flood gets a person. The bot knows its limits.</td></tr>
+    <tr><td>Calendar-down fallback</td><td>Degraded-mode providers</td><td>A vendor outage never means a silently-lost customer.</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="num">4.</span> Why a prospect should believe it (the trust story)</h2>
+<div class="card">
+  <p style="margin-top:0">The roadmap says to <strong>lead with reliability, not price</strong> — "won't hallucinate, takes accurate messages." That claim is only credible because it's <em>engineered and measured</em>:</p>
+  <div class="grid">
+    <div class="stat"><div class="v">+1.5</div><div class="l">quality lift from the Collect Pattern (judged A/B) on the flow that previously "confused the order"</div></div>
+    <div class="stat"><div class="v">−1.2 → +0.4</div><div class="l">the front-load algorithm turned the pattern's worst case into a win — engine-wide</div></div>
+    <div class="stat"><div class="v">both paths</div><div class="l">every flow is gated against paced <em>and</em> front-loading callers before it ships</div></div>
+    <div class="stat"><div class="v">~4,800</div><div class="l">tests; a seeded LLM-judge gate that now fails loud on its own rate-limits</div></div>
+  </div>
+  <p style="margin-bottom:0">The sales line: <strong>"It's not winging it. Every flow passes a graded quality bar — on the easy callers and the messy ones — or it doesn't go live."</strong> That is a differentiator budget bots can't make.</p>
+</div>
+
+<h2><span class="num">5.</span> Build the showcase flow (the actual work)</h2>
+<p class="sub">The demo above is a flow we author and gate like any other — it must clear the bar before it represents us.</p>
+<ol class="tasks">
+  <li><b>Author <code>night_shift_receptionist.yaml</code></b><span>Collect Pattern intake (issue + name + phone + time, multi-slot listens) → joined read-back → branch: <em>book</em> (calendar) vs <em>take message</em> (SMS) vs <em>emergency</em> (escalate). Reuse the shipped patterns from <code>restaurant_reservation</code> + <code>pizza</code> (branch) + the escalation exit.</span></li>
+  <li><b>Wire the real providers in demo mode</b><span>A demo Google Calendar + a demo SMS number, so the booking and the text actually happen on the call. Verify the degraded-mode fallback by killing the calendar mid-demo. <span class="verify">VERIFY</span></span></li>
+  <li><b>Gate it: <code>scripts/flow-pipeline.sh night_shift_receptionist</code></b><span>Must clear ≥7.0 on <code>cooperative + corrector + oversharer</code> (both caller paths) before it's the demo. If it doesn't, the judge's notes say what to fix.</span></li>
+  <li><b>Script the live call</b><span>A repeatable 60-second scenario (the transcript above) + the two back-pocket variants (garbage-reject, calendar-down). Rehearse so the demo is the same every time.</span></li>
+</ol>
+
+<h2><span class="num">6.</span> From "great demo" to "billing customer"</h2>
+<p class="sub">The demo proves the <em>conversation</em>. These are the gaps that make it a <em>service</em> — carried over from <a href="roadmap.html">Path to Revenue</a>, in the order they block a sale.</p>
+<table>
+  <thead><tr><th>Gap</th><th>Status</th><th>Why it blocks a paying customer</th></tr></thead>
+  <tbody>
+    <tr><td><span class="chip p0">P0</span> Verify unit economics</td><td class="tag-part">Partial</td><td>Fill real Telnyx + Gemini Live prices. Confirms $1/hr clears cost — everything depends on it.</td></tr>
+    <tr><td><span class="chip p0">P0</span> Finish human message hand-off</td><td class="tag-no">Stub</td><td>Reliably deliver the message (SMS/email) or escalate. This <em>is</em> the product, and the demo leans on it.</td></tr>
+    <tr><td><span class="chip p0">P0</span> Multi-tenancy</td><td class="tag-no">Missing</td><td>Serve customer #2 without a code change: <code>tenant_id</code>, per-tenant flow/number/calendar.</td></tr>
+    <tr><td><span class="chip p0">P0</span> Auth + secrets off the laptop</td><td class="tag-no">Missing</td><td>Transcripts are readable without auth today; prod needs a secret store + bearer auth.</td></tr>
+    <tr><td><span class="chip p1">P1</span> Usage metering → billing</td><td class="tag-no">Missing</td><td>Can't bill hours you can't count. Wire per-tenant minutes → Stripe.</td></tr>
+  </tbody>
+</table>
+<p class="note"><strong>The honest sequencing:</strong> the showcase flow (§5) is buildable <em>now</em> and lets us run sales conversations + a pilot. The P0 list is what converts a pilot into a billed, multi-customer service. Demo first (proves value, cheap); P0 second (unlocks revenue, heavier).</p>
+
+<h2><span class="num">7.</span> Open decisions (for us to settle)</h2>
+<ol class="tasks">
+  <li><b>Lead vertical</b><span>Plumbing/HVAC (urgent, high-value calls — escalation shines) vs salon/clinic (volume booking — Collect Pattern shines)? The showcase flow is built around one. <em>Recommendation: home-services (plumbing) — the emergency path is the most visceral demo moment.</em></span></li>
+  <li><b>Live call vs recorded</b><span>Dial a real number on the demo (highest impact, needs the providers wired) vs a polished recording (zero risk, less wow). <em>Recommendation: build for live, keep a recording as fallback.</em></span></li>
+  <li><b>Pilot definition</b><span>What's the smallest paid pilot — one business, a few nights, manual billing — that we can run before the full P0 multi-tenancy/billing is done?</span></li>
+</ol>
+
+<footer>
+  RIFF — internal go-to-market planning. The showcase flow is a build target, not yet authored. Figures cite prior judged evals in this repo; vendor economics pending verification. No credentials or customer data on this page.
+</footer>
+
+</div>
+</body>
+</html>

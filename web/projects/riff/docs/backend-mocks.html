@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backend Mocks — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html" class="active">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Measurement &rsaquo; Backend mocks</div>
+  <h1 class="title">Backend Mocks — letting backend-gated flows reach their payoff</h1>
+  <p class="lede">Some flows can only succeed if a real backend tool writes a slot. In eval those backends are degraded — so the flow loops forever and looks broken. The mock fixes that, without ever faking success.</p>
+
+  <h2>What &amp; why</h2>
+  <p>Several flows have a success guard that reads a slot only a real backend tool writes — for example
+  <code>schedule_event</code> writes <code>_booked_event_id</code> via the calendar provider, and the
+  success transition fires on that slot. In eval, the provider runs in degraded mode (per the
+  external-services &ldquo;degraded mode default&rdquo; policy), so the slot never appears, the guard
+  never fires, and the flow loops to <code>max_turns</code> — <strong>un-evaluatable</strong>. You can't
+  measure a flow that can never finish.</p>
+  <p>The backend mock makes a <em>called</em> backend tool succeed deterministically, so the flow can
+  reach its designed payoff and be scored — while preserving the critical distinction between
+  &ldquo;the backend was absent&rdquo; and &ldquo;the flow is broken.&rdquo;</p>
+
+  <h2>How it works</h2>
+  <p>A mock is a <strong>same-name <code>ToolSpec</code></strong> injected via <code>extra_tools</code>.
+  The provider registry keeps the last spec registered under a name, so the mock overrides the
+  real/degraded tool <em>without touching production code</em>. The handler simply writes the success
+  slots and returns <code>{"status": "success"}</code>.</p>
+  <pre><span class="c"># riff/flow_eval/eval_mocks.py — tool_name -> slots the success path writes</span>
+register_eval_backend_mock("schedule_event",
+    {"_booked_event_id": "evt-eval-mock", "_scheduling_confirmation": "confirmed"})
+register_eval_backend_mock("cc_dispatch_inject",      {"_cc_dispatch_completed": True})
+register_eval_backend_mock("cc_get_fleet_status",     {"_cc_status_summary": "All units nominal (eval mock)."})
+register_eval_backend_mock("tutorial_verify_caller_code", {"_caller_verified": True})</pre>
+
+  <div class="callout bad">
+    <strong>The mock NEVER auto-fires a guard.</strong>
+    Codex's key constraint: if a flow never <em>calls</em> the tool, the mock never runs and the guard
+    stays false — so a flow that <em>forgets</em> to call its booking tool still fails. We do not
+    auto-satisfy success; we only make a tool that the agent actually invoked return a deterministic
+    success. That preserves the test's power to catch a flow that doesn't even try to book.
+  </div>
+
+  <p>Mocks are gated entirely by an environment variable — <code>build_eval_backend_tools(flow)</code>
+  returns an empty tuple unless <code>RIFF_EVAL_MOCK_BACKENDS=1</code>, and even then only injects
+  mocks for tools <em>this flow's states actually allow</em>.</p>
+
+  <h2>Use case — the mock as a diagnostic</h2>
+  <p>The mock is not just a crutch; it is a classifier. Turn it on and re-run, and the flows that
+  recover were &ldquo;backend absent,&rdquo; while the flows that still fail are &ldquo;flow
+  broken.&rdquo; Measured 2026-06-21 (commit <code>def3e89</code>, scoped in <code>a142092</code>):</p>
+  <table>
+    <tr><th>Flow</th><th>With mock</th><th>Verdict</th></tr>
+    <tr><td><code>apartment_scheduler</code></td><td>correctness 0 &rarr; 10, reaches <code>success</code></td><td>✅ was genuinely backend-absent</td></tr>
+    <tr><td><code>ceo_command_center</code></td><td>still fails — stalls at <code>dispatch_intent</code> (a confirm/resolve oscillation, cohesion 0.16)</td><td>❌ real flow bug, before the backend</td></tr>
+    <tr><td><code>property_trouble_ticket</code></td><td>still fails — escalates at verification</td><td>❌ real classifier bug, before the backend</td></tr>
+  </table>
+  <p>So the mock proved that <em>only</em> <code>apartment_scheduler</code> was a backend-absence
+  victim. The scope is deliberately narrow and not over-claimed — the other two are real bugs the mock
+  is irrelevant to.</p>
+
+  <h2>Example</h2>
+  <pre><span class="c"># run an eval with backend mocks on — only apartment_scheduler's schedule_event is mocked</span>
+RIFF_EVAL_MOCK_BACKENDS=1 python -m riff.flow_eval --flows apartment_scheduler --no-judge --out OUT
+python scripts/eval_db.py --ingest-aspects --dirs OUT
+python scripts/eval_db.py --matrix | grep apartment_scheduler</pre>
+  <p>Without the flag, the same run leaves <code>apartment_scheduler</code> at correctness 0 (the live
+  matrix shows the gemini-agent, no-mock row at operability 0.3); with it, the booking path completes
+  and the flow becomes scorable.</p>
+
+  <h2>Where it fits</h2>
+  <p>Backend mocks make backend-dependent flows measurable in the <a class="x" href="eval-matrix.html">matrix</a>
+  and the <a class="x" href="per-state-metrics.html">per-state layer</a>. They pair with
+  <code>scripts/stall_detector.py</code>, which classifies a stalled conversation as backend-stall vs
+  flow-bug vs dead-end. The design lives in <code>docs/flow-eval/BACKEND-STALL-DESIGN.md</code>.</p>
+
+  <footer>Source: <code>riff/flow_eval/eval_mocks.py</code>; design in <code>docs/flow-eval/BACKEND-STALL-DESIGN.md</code>.</footer>
+</main>
+</div>
+</body>
+</html>

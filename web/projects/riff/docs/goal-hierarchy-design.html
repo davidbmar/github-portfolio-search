@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Goal-Hierarchy Design — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.55;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}
+  .crumb a{color:var(--mut);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html" class="active">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; The hierarchy &rsaquo; Goal-Hierarchy design</div>
+  <h1 class="title">The Goal-Hierarchy Flow Model</h1>
+  <p class="lede">A flow is not a flat graph of states. It is a three-tier goal hierarchy — and every level declares a goal and is instrumented with a metric for that goal.</p>
+
+  <h2>What &amp; why</h2>
+  <p>A naive view treats a flow as a flat bag of states and scores it with one number. That number
+  hides everything that matters: <em>which</em> phase failed, whether a phase's states cooperate, and
+  whether a weakness is local to one flow or systemic across the whole library. The goal-hierarchy
+  model fixes this by giving each structural level its own goal and its own measurement, authored
+  <strong>top-down from flow creation</strong> rather than reverse-engineered later.</p>
+
+  <div class="card">
+<pre><span class="c">FLOW      goal: complete the caller's task        metric: correctness · completion · humanness</span>
+  └─ GROUP   goal: a TYPED objective (collect/         metric: group_cohesion =
+       │         confirm/act/terminal/handoff)               goal_yield·(0.35·efficiency+0.65·transition_coherence)
+       └─ STATE goal: one bounded capability (≥1 slot)  metric: progress · stall · revisit · dwell · slot_fill</pre>
+  </div>
+
+  <p>(The fourth tier, <a class="x" href="archetypes.html">archetype</a>, is a cross-flow rollup of
+  groups — it is a reporting lens, not an authoring level.)</p>
+
+  <h2>The three tiers and their goals</h2>
+  <table>
+    <tr><th>Tier</th><th>Goal — what &ldquo;good&rdquo; means</th><th>Declared by</th></tr>
+    <tr><td><strong>State</strong></td><td>one bounded <em>capability / speech act</em> — may collect or repair several slots</td><td><code>description</code>, <code>required_slots</code>, <code>speech_act</code></td></tr>
+    <tr><td><strong>Group</strong> (segment)</td><td>a <em>typed</em> objective (not always a slot-contract)</td><td><code>GoalSegment</code>: <code>purpose</code>, <code>kind</code>, <code>target</code>, <code>exit_guard</code>, <code>repair_policy</code></td></tr>
+    <tr><td><strong>Flow</strong></td><td>complete the caller's task</td><td>flow-level <code>completion_slots</code>, <code>final_status</code></td></tr>
+  </table>
+
+  <div class="callout warn">
+    <strong>A state's goal is NOT &ldquo;one slot.&rdquo;</strong>
+    That would resurrect the refuted one-slot decomposition (it re-asks for facts the caller already
+    volunteered). The validated <a class="x" href="per-state-metrics.html#collect">Collect Pattern</a>
+    uses multi-slot <code>listen</code> states that absorb volunteered facts. A state's goal is one
+    <em>bounded capability</em> that may fill or repair several slots.
+  </div>
+
+  <h3>Group goals are TYPED</h3>
+  <p>Not every group is a slot-contract. RIFF groups include collect, confirm, action, terminal, and
+  handoff phases — each with its own typed objective and success metric. A slot-contract is only the
+  <code>collect</code> kind.</p>
+  <table>
+    <tr><th><code>kind</code></th><th>objective</th><th>success metric</th></tr>
+    <tr><td><code>collect</code></td><td>fill the target slots</td><td><code>slot_yield</code></td></tr>
+    <tr><td><code>confirm</code></td><td>get the caller's confirmation</td><td><code>confirmation_success</code></td></tr>
+    <tr><td><code>act</code></td><td>a tool/program succeeds</td><td><code>tool_success</code></td></tr>
+    <tr><td><code>terminal</code></td><td>reach the intended terminal</td><td><code>success_terminal</code></td></tr>
+    <tr><td><code>handoff</code></td><td>safe transfer / escalation</td><td><code>safe_transfer</code></td></tr>
+  </table>
+
+  <h2>The GoalSegment — a group that acts toward its goal</h2>
+  <p>A <code>GoalSegment</code> is a Harel-statechart compound state: a super-state owning a shared
+  objective, with member states as <em>capabilities</em> rather than a hand-wired chain. Statecharts
+  keep transition ownership in the FSM, so the LLM stays language-only. Members declare what they
+  collect/repair and their preconditions/effects — <em>not</em> their next state. The FSM picks the
+  next member <strong>deterministically</strong> (a GOAP-lite selector over the slot contract):</p>
+
+  <div class="card">
+<pre>def choose_next(segment, ctx):
+    apply_slot_observations(ctx)            <span class="c"># extraction/validation only</span>
+    if exit_guard(segment, ctx):       return segment.exit_target
+    repair = first_repair_needed(segment, ctx)
+    if repair:                         return repair.state
+    slot = first_unsatisfied_slot(segment, ctx)
+    if slot is None:                   return segment.exit_target
+    candidates = [s for s in states_that_collect(slot) if preconditions_hold(s, ctx)]
+    if not candidates:                 return segment.fallback_state
+    return min(candidates, key=deterministic_cost_tuple)</pre>
+  </div>
+  <p>Any <code>next_state</code> the LLM suggests is <strong>ignored and logged</strong>. The segment
+  owns the objective and recomputes after every caller turn, so members become tools under one
+  contract — not a brittle <code>ask_name &rarr; ask_phone &rarr; ask_address</code> chain. The schema
+  for this contract shipped this session; see <a class="x" href="goal-segment-schema.html">GoalSegment
+  schema</a>. The selector itself is the <em>last</em> phase, behind a flag.</p>
+
+  <h3>Failure defenses</h3>
+  <table>
+    <tr><th>Failure</th><th>Defense</th></tr>
+    <tr><td>Oscillation</td><td>hysteresis: pursue the current slot until valid / max-attempts / blocked; tie-break by declared order, never by LLM wording</td></tr>
+    <tr><td>Premature exit</td><td>exit only when all required slots are <em>valid</em> (mentioned ≠ valid) and confirmation is satisfied</td></tr>
+    <tr><td>Deadlock</td><td>compile-time check: every required slot has ≥1 collecting state; ordering acyclic; runtime fallback if no candidate is actionable</td></tr>
+    <tr><td>Repair loops</td><td>per-slot + per-segment attempt caps &rarr; deterministic fallback (the shipped <a class="x" href="stall-recovery.html"><code>stalled</code> guard + <code>sets:</code></a>)</td></tr>
+    <tr><td>Contradictory data</td><td>keep slot <em>evidence</em> records; latest explicit correction beats earlier implicit extraction</td></tr>
+  </table>
+
+  <h2>Metrics at every level</h2>
+  <p><strong>Principle:</strong> each level has a typed objective score <em>plus</em> diagnostic
+  submetrics — not one universal scalar. All timestamped, per-agent, flow-versioned.</p>
+  <table>
+    <tr><th>Tier</th><th>Objective + submetrics</th><th>Storage</th></tr>
+    <tr><td>State</td><td>progress, stall, revisit, dwell_turns, slot_fill_rate, latency_p95</td><td><code>state_scores</code></td></tr>
+    <tr><td><strong>Group</strong></td><td>goal_yield · efficiency · transition_coherence &rarr; group_cohesion</td><td>per-segment rollup of <code>state_scores</code></td></tr>
+    <tr><td>Flow</td><td>correctness, completion, errors, latency, humanness</td><td><code>aspect_scores</code></td></tr>
+  </table>
+
+  <h3>The group-cohesion metric</h3>
+  <p>The naive product collapses to zero and hides which part failed. The bounded, visible form:</p>
+  <div class="card">
+<pre>goal_yield           = successful_eligible_visits / eligible_visits   <span class="c"># typed per kind</span>
+efficiency           = clamp(reference_turns / max(actual_turns, reference_turns, 1), 0, 1)
+transition_coherence = clamp(1 − w1·redundant_ask − w2·avoidable_reentry − w3·lost_slot, 0, 1)
+
+group_cohesion       = goal_yield · (0.35·efficiency + 0.65·transition_coherence)   <span class="c"># 0..1</span></pre>
+  </div>
+  <p>Collaboration is <em>emergent</em>: a segment of locally-fine states can collectively thrash —
+  each state &ldquo;progresses,&rdquo; yet the group re-asks across members and takes 8 turns for 3
+  slots. That is visible only at the group level. See <a class="x" href="group-cohesion.html">Group
+  cohesion</a> for the as-shipped computation and a live table.</p>
+
+  <h2>Top-down authoring — a new flow is born with goals</h2>
+  <p>Flows are authored high-level &rarr; decomposed, so goals and groups exist from the first commit:</p>
+  <ol>
+    <li><strong>INTENT</strong> — the flow's task in one line (&ldquo;book a plumbing visit&rdquo;).</li>
+    <li><strong>GROUPS</strong> — decompose into phases (greet &rarr; triage &rarr; collect &rarr; schedule &rarr; confirm &rarr; close); each is a GoalSegment stub with a <code>purpose</code>.</li>
+    <li><strong>CONTRACTS</strong> — for each group, declare <code>target_slots</code> + <code>exit_guard</code> + <code>repair_policy</code>.</li>
+    <li><strong>STATES</strong> — derive member states as capabilities.</li>
+    <li><strong>INSTRUMENT</strong> — metrics attach automatically: state metrics from events, group_cohesion from the contract, flow metrics from <code>completion_slots</code>. Zero extra authoring.</li>
+  </ol>
+
+  <div class="callout">
+    <strong>Build-time gates so the hierarchy can't rot</strong>
+    Every required <code>target_slot</code> has ≥1 collecting state (deadlock check); segment ordering
+    is acyclic; every group has a non-empty <code>purpose</code> + <code>exit_guard</code>; every
+    flow's groups cover all <code>completion_slots</code> (no orphan goal). These run in the flow
+    lint/load path and the <a class="x" href="ci-gate.html">pre-push hook</a> — a new flow can't ship
+    a malformed contract.
+  </div>
+
+  <h2>Implementation phases (as ordered by Codex review)</h2>
+  <ol>
+    <li>Explicit <code>segment</code> + flow-versioned group membership.</li>
+    <li>Fix slot-evidence instrumentation (clean per-state <code>slot_filled</code> capture). <em>Gating prerequisite for any group metric.</em> <span class="pill" style="background:#eafaf0;color:#1f9d55;border-radius:20px;padding:2px 8px;font-size:11px;">shipped</span></li>
+    <li><code>GoalSegment</code> schema (typed kind + target + exit_guard + fallback + repair_policy). <span class="pill" style="background:#eafaf0;color:#1f9d55;border-radius:20px;padding:2px 8px;font-size:11px;">shipped</span></li>
+    <li>Build-time gates integrated into lint/load + pre-push.</li>
+    <li>Contract-backed group metrics. <span class="pill" style="background:#fdf6e3;color:#b8860b;border-radius:20px;padding:2px 8px;font-size:11px;">cohesion proxy shipped</span></li>
+    <li>Top-down authoring assist (intent &rarr; scaffold).</li>
+    <li>GOAP-lite selector — last, behind a flag, with replay / A-B evidence.</li>
+  </ol>
+  <p>This session shipped phases 2 and 3 (per-state slot evidence at the commit choke point, and the
+  GoalSegment schema), plus a working <code>group_cohesion</code> proxy computed from the reliable
+  per-state signals. Source: <code>docs/flow-eval/GOAL-HIERARCHY-DESIGN.md</code>.</p>
+
+  <footer>Source: <code>docs/flow-eval/GOAL-HIERARCHY-DESIGN.md</code>, <code>riff/types.py</code> (<code>class GoalSegment</code>), <code>scripts/eval_db.py</code> (<code>group_cohesion</code>).</footer>
+</main>
+</div>
+</body>
+</html>

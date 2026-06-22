@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI Quality Gate — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html" class="active">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Operations &rsaquo; CI quality gate</div>
+  <h1 class="title">The CI Quality Gate</h1>
+  <p class="lede">A per-commit regression gate that is fast and free — because it scores only the deterministic computed aspects, never an LLM judge. The expensive judged matrix is a separate nightly job.</p>
+
+  <h2>What &amp; why</h2>
+  <p>You want to catch a flow regression <em>before</em> it lands, on every push. But the
+  <a class="x" href="judges.html">judged</a> humanness matrix is slow and costs API money — you can't
+  run it per commit. The resolution is the computed/judged split: the
+  <a class="x" href="eval-matrix.html">computed aspects</a> (correctness, completion) are deterministic,
+  so a per-commit gate can run them on just the changed flows, compare to the DB baseline, and fail the
+  build on a regression — all in ~22 seconds per flow, with zero judge calls.</p>
+
+  <div class="callout">
+    <strong>The cost boundary.</strong>
+    Cheap LINT + computed-aspect gate &rarr; every commit (CI / pre-push). Expensive JUDGED matrix
+    &rarr; nightly. This is the same boundary the flow build pipeline uses: lint+load on every edit, the
+    judged milestone gate only while bringing a new flow up to the bar.
+  </div>
+
+  <h2>How it works</h2>
+  <h3>1. <code>scripts/ci_eval.sh</code> — the gate body</h3>
+  <ol>
+    <li>Determine which flows to gate: explicit args, else the flows touched by the last commit (tutorial/module/underscore flows excluded).</li>
+    <li>Run <em>computed aspects only</em> — fast-tier agent (<code>qwen-flash</code>), 2 personas (<code>cooperative,skeptical</code>), <code>--repeat 1</code>, <code>--no-judge</code>. Deterministic, no LLM judge.</li>
+    <li>Ingest the computed aspects into <code>aspect_scores</code>.</li>
+    <li>Run <code>eval_db.py --gate</code> — its exit code is the build verdict.</li>
+  </ol>
+
+  <h3>2. <code>eval_db.py --gate</code> — the regression check</h3>
+  <p>For each flow it compares the latest run's <code>correctness</code>/<code>completion</code> to the
+  previous run, and <strong>fails (exit 1)</strong> on either a drop &gt; 1.0 point or an absolute below
+  the floor (6.0). It prints a verdict line per flow:</p>
+  <pre>  ✅ weather: correctness 10.0
+  ❌ austin_plumbing: correctness 4.2 &lt; floor 6.0; completion regressed 10.0-&gt;7.0
+
+GATE: FAIL (1 flow(s) regressed)</pre>
+
+  <h3>3. The pre-push hook</h3>
+  <p><code>scripts/hooks/pre-push</code> gates <em>only</em> the flows changed in the commits being
+  pushed (diffed against <code>origin/main</code>), and instant-skips when no flow YAML changed. Install
+  it once per clone:</p>
+  <pre>scripts/install_hooks.sh        <span class="c"># symlinks .git/hooks/pre-push -> scripts/hooks/pre-push</span>
+
+<span class="c"># bypass once when you need to:</span>
+git push --no-verify
+RIFF_SKIP_EVAL=1 git push</pre>
+
+  <h2>Use case</h2>
+  <p>You edit <code>flows/coffee.yaml</code> to reorder the collect questions and push. The hook detects
+  the YAML change, runs the computed-aspect gate on just <code>coffee</code> (~22s), and finds
+  completion dropped from 10 to 7 because your reorder stranded a conditional slot. The push is blocked
+  with an exact verdict line — before a regression ever reaches <code>main</code> or the nightly judged
+  run.</p>
+
+  <h2>Example</h2>
+  <pre><span class="c"># gate explicit flows</span>
+scripts/ci_eval.sh austin_plumbing weather
+
+<span class="c"># or let it auto-detect flows changed in the last commit</span>
+scripts/ci_eval.sh
+
+<span class="c"># the gate alone, against whatever is already in the DB</span>
+python scripts/eval_db.py --gate austin_plumbing weather</pre>
+
+  <h2>Why judge-free is the right call here</h2>
+  <p>Because the gate scores only computed aspects, it has <strong>no noise floor</strong> — a fail is a
+  real regression, not a judge having a bad night. (The judged humanness number swings ~1.5pt run to
+  run; gating on it would produce flaky red builds.) Humanness regressions are caught by the nightly
+  matrix and human review, not the blocking gate. See <a class="x" href="methodology.html">Methodology</a>
+  for the noise-floor evidence.</p>
+
+  <h2>Where it fits</h2>
+  <p>The CI gate is the per-commit floor of the whole system. It reuses the exact same
+  <code>--ingest-aspects</code> path as the <a class="x" href="eval-matrix.html">matrix</a>, so what it
+  gates and what the matrix reports are the same numbers. Above it sit the nightly judged matrix and the
+  <a class="x" href="session-replay.html">replay</a> regression check.</p>
+
+  <footer>Source: <code>scripts/ci_eval.sh</code>, <code>scripts/hooks/pre-push</code>, <code>scripts/install_hooks.sh</code>, <code>scripts/eval_db.py</code> (<code>gate</code>).</footer>
+</main>
+</div>
+</body>
+</html>

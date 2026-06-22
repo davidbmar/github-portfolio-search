@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stall Recovery — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html" class="active">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Operations &rsaquo; Stall recovery (FSM)</div>
+  <h1 class="title">Stall Recovery — the <code>stalled</code> guard &amp; <code>sets:</code> edges</h1>
+  <p class="lede">An adversarial caller who withholds a required slot can loop a flow to escalation forever. This session shipped a deterministic recovery primitive: a declared edge that sets a default and advances — one turn before the engine would give up.</p>
+
+  <h2>What &amp; why</h2>
+  <p>RIFF flows have a no-progress backstop: if the conversation sits in the same non-terminal state
+  making no progress for <code>max_no_progress_loops</code> turns (default 3), the engine forces a
+  graceful exit (a handoff) instead of looping to <code>max_turns</code>. That is correct as a last
+  resort — but for some flows there is a better answer than escalation. If a caller refuses to give a
+  name, a reservation flow could simply book under &ldquo;Guest&rdquo; and move on. The
+  <code>stalled</code> guard + <code>sets:</code> edges give the flow author a way to declare that
+  recovery <em>deterministically</em>, before the engine gives up (commit <code>e22399d</code>).</p>
+
+  <h2>How it works — two primitives</h2>
+  <h3>1. The <code>stalled</code> guard</h3>
+  <p>A registered guard in <code>riff/state_manager.py</code> that fires when the conversation has made
+  no progress for nearly the escalate limit — <strong>one turn before</strong> <code>turn.py</code>'s
+  no-progress backstop would force a handoff. That timing is the whole point: it gives a
+  <em>declared recovery edge</em> a chance to fire first.</p>
+  <pre>@register_guard("stalled")
+def _guard_stalled(ctx):
+    limit = getattr(ctx.flow, "max_no_progress_loops", 3) or 3
+    return ctx.no_progress_streak &gt;= max(1, limit - 1)</pre>
+
+  <h3>2. <code>TransitionDef.sets</code></h3>
+  <p>The mirror of the existing <code>clears:</code> field. Where <code>clears</code> pops stale slots
+  on an edge (the fix for the bare-denial loop), <code>sets</code> <em>assigns</em> default/recovery
+  values when the edge fires. It is stored as <code>((slot, value), …)</code> pairs on the frozen
+  <code>TransitionDef</code> (<code>riff/types.py</code>), authored as a YAML mapping, and applied in
+  the single commit choke point <code>StateManager.commit_transition</code> — <em>before</em> the
+  <code>slot_filled</code> emit, so the recovery value is captured as per-state evidence and is visible
+  to the next hop's guards.</p>
+
+  <h2>Authoring it — put the recovery edge LAST</h2>
+  <p>The recovery edge must be the <em>last</em> transition in the state, so the normal
+  (slots-filled) edge wins whenever the caller actually cooperates. The <code>stalled</code> edge only
+  catches the case where every cooperative path failed. A real example from
+  <code>flows/restaurant_reservation.yaml</code> (the held-out gap this primitive closed):</p>
+  <pre>transitions:
+  <span class="c"># ... normal edges first (they win when the caller cooperates) ...</span>
+  - to: confirm_reservation
+    when: stalled
+    sets: {reservation_time: "7:00 PM"}     <span class="c"># withheld time → sensible default, advance</span>
+  <span class="c"># elsewhere, a name-collection state:</span>
+  - to: read_back
+    when: stalled
+    sets: {name: "Guest"}                    <span class="c"># withheld name → book under Guest</span></pre>
+
+  <div class="callout">
+    <strong>Why this is deterministic and safe.</strong>
+    The guard reads only <code>ctx.no_progress_streak</code> — no LLM. The value comes from the authored
+    edge, not from model reasoning. And because the edge is last, a cooperative caller never triggers
+    it. The flow recovers gracefully from an adversarial/withholding caller instead of dead-ending at
+    escalation.
+  </div>
+
+  <h2>Use case — closing a held-out gap</h2>
+  <p>The <a class="x" href="holdout-validation.html">held-out</a> persona <code>privacy_guarded</code>
+  withholds information on purpose. Against <code>restaurant_reservation</code>, that caller drove the
+  flow into a no-progress loop &rarr; escalation every time, capping the flow's quality. Adding the
+  <code>stalled</code> recovery edges let the flow book under sensible defaults and reach a success
+  terminal — a deterministic fix that generalizes (it isn't tuned to one transcript; it handles the
+  <em>class</em> of withholding caller).</p>
+
+  <h2>Connection to the goal hierarchy</h2>
+  <p>This primitive is exactly how a <a class="x" href="goal-segment-schema.html">GoalSegment</a>'s
+  <code>repair_policy.fallback_state</code> is reached in practice. The design calls for &ldquo;per-slot
+  + per-segment attempt caps &rarr; deterministic fallback&rdquo;; the <code>stalled</code> guard +
+  <code>sets:</code> edge is the shipped, concrete mechanism for that fallback. So a future
+  contract-driven segment doesn't need a new recovery engine — it reuses this one.</p>
+
+  <h2>Example — verify it loads</h2>
+  <pre>python -c "from riff.loader import load_flow; \
+f = load_flow('flows/restaurant_reservation.yaml'); \
+print([(t.to, t.when, t.sets) for s in f.states.values() for t in s.transitions if t.when=='stalled'])"</pre>
+  <p>This prints the recovery edges with their <code>sets</code> pairs — confirming the YAML mapping was
+  parsed into the frozen tuple the runtime applies.</p>
+
+  <h2>Where it fits</h2>
+  <p>Stall recovery is an FSM-runtime primitive that the eval system <em>measures</em>: a flow with good
+  recovery edges shows lower <code>escalation</code> and <code>stall</code> in the
+  <a class="x" href="per-state-metrics.html">per-state layer</a>, and higher
+  <a class="x" href="group-cohesion.html">cohesion</a> in its collect group. It is the deterministic
+  counterpart to the goal hierarchy's repair policy.</p>
+
+  <footer>Source: <code>riff/state_manager.py</code> (<code>_guard_stalled</code>, <code>commit_transition</code>), <code>riff/types.py</code> (<code>TransitionDef.sets</code>), <code>riff/loader.py</code>, <code>flows/restaurant_reservation.yaml</code>; design in <code>docs/flow-eval/BACKEND-STALL-DESIGN.md</code>.</footer>
+</main>
+</div>
+</body>
+</html>

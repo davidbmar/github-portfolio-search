@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Methodology &amp; Lessons — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html" class="active">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Wisdom &rsaquo; Methodology &amp; lessons</div>
+  <h1 class="title">Methodology &amp; Hard-Won Lessons</h1>
+  <p class="lede">The whole system is shaped by a handful of painful discoveries. Each one is a trap that cost real time before it became a rule. Internalize these and the rest of the design explains itself.</p>
+
+  <h2>1. The eval noise floor is ~1.5 points — and it's judge-dominated</h2>
+  <p>Run the <em>same</em> transcripts through two judges and you get a Pearson correlation of ~0.92
+  (rankings agree) but a mean absolute error of ~0.95pt, and the single-run standard deviation is
+  σ&nbsp;≈&nbsp;1.48. In plain terms: <strong>any quality number under ~1.5pt of difference is noise,
+  and most of that noise is the judge, not the flow.</strong></p>
+  <div class="callout warn">
+    <strong>Consequence: repeat-N, and check deltas against the noise floor.</strong>
+    Never claim a regression from a single run. Average ≥2 judges (median) to shrink the floor, run
+    <code>--repeat N</code> for within-cell variance, and compare any delta to σ before believing it.
+    Rankings are reliable; sub-1pt deltas are not.
+  </div>
+  <p>This is why the architecture pushes everything it can to <a class="x" href="eval-matrix.html">computed
+  aspects</a> (zero noise) and isolates the LLM to <em>one</em> axis — humanness — where the noise is
+  unavoidable. It is also why the <a class="x" href="ci-gate.html">CI gate is judge-free</a>: gating on a
+  ±1.5pt number would produce flaky red builds.</p>
+
+  <h2>2. Harden the instrument — measurement flaws masquerade as subject flaws</h2>
+  <p>The single most repeated mistake this session: a broken <em>measuring tool</em> produced a score
+  crater that looked exactly like a broken <em>flow</em>. Every one of these wasted time chasing a flow
+  bug that didn't exist:</p>
+  <table>
+    <tr><th>The instrument fault</th><th>What it looked like</th></tr>
+    <tr><td>The Claude <em>API</em> agent 400s in this environment</td><td>flows &ldquo;regressing&rdquo; — actually errored conversations scored as failures</td></tr>
+    <tr><td>An absent/degraded backend (calendar provider)</td><td><code>apartment_scheduler</code> &ldquo;broken&rdquo; — actually it just couldn't reach its payoff (see <a class="x" href="backend-mocks.html">backend mocks</a>)</td></tr>
+    <tr><td>A persona with an invalid 7-digit phone number</td><td><code>dog_grooming</code> scoring 3.3 — actually the persona supplied un-validatable data</td></tr>
+    <tr><td>A fallback-exhausted qwen judge</td><td>a humanness crater — actually the judge 403'd</td></tr>
+  </table>
+  <p>The defenses are now structural: errored conversations are <strong>excluded</strong> from ingest
+  (not scored as zero — Codex robustness #3); the broken Claude agent was dropped from the calibration
+  panel; the invalid persona phone was normalized (commit <code>5eaa022</code>); judges emit every
+  attempt incl. failures so a degraded judge can't bias the median.
+  <strong>Rule: before believing a subject is broken, prove the instrument is sound.</strong></p>
+
+  <h2>3. Per-persona decomposition — an aggregate hides one broken persona</h2>
+  <p>A flow's mean quality can look mediocre because <em>one</em> persona craters while the rest are
+  robust — and the mean blends them into a flat &ldquo;meh.&rdquo; You will tune the wrong thing. The
+  fix is to never trust the aggregate alone: decompose by persona (the <code>scores_by_persona</code>
+  map), and by state (the <a class="x" href="per-state-metrics.html">per-state layer</a>), so the one
+  broken cell is visible. The same principle scales up: <a class="x" href="group-cohesion.html">group
+  cohesion</a> exists because a group's mean hides one thrashing phase, and
+  <a class="x" href="archetypes.html">archetypes</a> exist because a flow's mean hides a systemic
+  pattern. <strong>At every level, an average can launder a localized failure — always keep the
+  decomposition.</strong></p>
+
+  <h2>4. Holdout discipline — never debug the held-out set</h2>
+  <p>The <a class="x" href="holdout-validation.html">leave-out split</a> is only a generalization signal
+  while it stays untouched. The instant you read a held-out transcript to fix it, that persona becomes a
+  dev persona and the guard silently dies — giving you false confidence that a memorized fix
+  generalized. <strong>You act on dev; you gate on held-out; you never inspect held-out while
+  fixing.</strong> A dev-only lift is flagged <code>⚠️ OVERFIT</code> on purpose.</p>
+
+  <h2>5. Computed vs judged — the cost/noise split is the spine</h2>
+  <p>The clean separation isn't just tidy; it's load-bearing. Computed aspects are deterministic, free,
+  and run per commit. The judged aspect is noisy, costly, and runs nightly. Conflating them gives you
+  the worst of both: flaky gates and expensive per-commit runs. Keeping them separate gives a
+  <strong>cheap deterministic gate that's trustworthy</strong> and an <strong>expensive judged matrix
+  you run only when it pays</strong>.</p>
+  <table>
+    <tr><th>&nbsp;</th><th>Computed</th><th>Judged</th></tr>
+    <tr><td>noise</td><td>none</td><td>~1.5pt</td></tr>
+    <tr><td>cost</td><td>free</td><td>API $</td></tr>
+    <tr><td>cadence</td><td>every commit (<a class="x" href="ci-gate.html">CI gate</a>)</td><td>nightly (<a class="x" href="judges.html">judge panel</a>)</td></tr>
+    <tr><td>gate?</td><td>yes — blocking</td><td>no — human review</td></tr>
+  </table>
+
+  <h2>6. Quality is only comparable within a judge, and within a flow-set</h2>
+  <p>Two subtler traps the <a class="x" href="eval-matrix.html#analyze">timeline</a> view defends
+  against. First, <strong>judge</strong>: the same transcripts score differently under different judges
+  (qwen ~3.85 vs gemini ~4.32 on overlapping work), so a quality trend is only meaningful within one
+  judge column — the <code>rescore</code> / <code>xjudge</code> rows make the cross-judge spread visible
+  as exactly that, noise. Second, <strong>flow-set composition</strong>: a 6-flow re-eval is not
+  comparable to a 60-flow sweep; mixing them reads composition as quality. The <code>--trend</code> view
+  only shows a delta between runs with the <em>same</em> flow set for this reason.</p>
+
+  <h2>7. Tie scores to changes — the three clocks</h2>
+  <p>To answer &ldquo;did the change at time T move the score?&rdquo; you need three separate clocks:
+  the flow's <strong>edit time</strong> (<code>flow_mods</code>, synced from git), the conversation's
+  <strong>run time</strong> (<code>run_ts</code>), and the judgment's <strong>judge time</strong>
+  (<code>judged_at</code>). Aligning edit &rarr; run &rarr; judge against the noise floor is the only
+  honest way to attribute a score shift to a fix rather than to noise. A jump right after an edit is
+  plausibly the edit; a jump with no edit is noise.</p>
+
+  <h2>A worked cautionary tale from this session</h2>
+  <p>The repeat-3 before/after sweep measured the session's cumulative work at <strong>overall quality
+  4.3 &rarr; 4.1</strong> — an apparent small regression. Decomposition (lesson 3) localized it: two
+  flows dropped ~1.1pt and their <em>only</em> change was adding a <code>name</code> slot type, while
+  <code>coffee_split</code> dropped 1.5pt with <em>no flow change at all</em> — i.e. runtime noise or an
+  extractor side-effect. The honest reading, against the σ≈1.48 floor (lesson 1), is &ldquo;small,
+  possibly real, needs a HEAD-vs-HEAD re-run to separate signal from noise&rdquo; — not &ldquo;the
+  session broke quality.&rdquo; That is the methodology in action: <strong>decompose, attribute, and
+  measure against the floor before you believe a delta.</strong></p>
+
+  <h2>The summary rule</h2>
+  <div class="callout good">
+    <strong>Before you believe a number, ask: is the instrument sound, is the delta bigger than the
+    noise floor, and have I looked <em>under</em> the aggregate?</strong>
+    Almost every wasted hour this session came from skipping one of those three checks. The entire
+    four-tier hierarchy, the computed/judged split, the holdout guard, and the replay tools exist to make
+    those checks cheap and automatic.
+  </div>
+
+  <footer>Sources across the build: <code>scripts/eval_db.py</code>, <code>scripts/aspect_judge.py</code>, <code>riff/flow_eval/</code>, <code>docs/flow-eval/*.md</code>, and the session's commit history (<code>git log</code>).</footer>
+</main>
+</div>
+</body>
+</html>

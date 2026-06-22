@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Evaluation Matrix — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html" class="active">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Measurement &rsaquo; The evaluation matrix</div>
+  <h1 class="title">The Evaluation Matrix</h1>
+  <p class="lede">Tier 3. The flow scorecard: deterministic computed aspects from the live event stream, plus judged humanness — crossed by agent so a multi-model run never collapses into one misleading column.</p>
+
+  <h2>What &amp; why</h2>
+  <p>For a long time a flow had one number: &ldquo;quality.&rdquo; That number was noisy, opaque, and
+  conflated objective failure with subjective taste. The matrix replaces it with a per-aspect table that
+  separates what we can <strong>compute</strong> (objective, deterministic, no judge noise) from what we
+  must <strong>judge</strong> (subjective, LLM, ~1.5pt noise). Only one aspect — humanness — pays the
+  judge tax, so most of the scorecard is trustworthy and cheap.</p>
+
+  <h3>The aspects</h3>
+  <table>
+    <tr><th>aspect</th><th>source</th><th>how</th><th>noise</th></tr>
+    <tr><td><strong>correctness</strong></td><td>computed</td><td>reached a success terminal + required/completion slots filled + on-contract <code>final_status</code></td><td>none</td></tr>
+    <tr><td><strong>completion</strong></td><td>computed</td><td><code>completed</code> flag + <code>stop_reason == terminal</code></td><td>none</td></tr>
+    <tr><td><strong>errors</strong></td><td>computed</td><td>count of errors / unsafe stops / max-turns / loops (10 = no errors)</td><td>none</td></tr>
+    <tr><td><strong>latency_p95 / mean</strong></td><td>measured</td><td>wall-clock seconds per agent turn</td><td>none</td></tr>
+    <tr><td><strong>humanness</strong></td><td>judged</td><td>LLM rubric: natural, warm, not robotic/repetitive</td><td>~1pt / judge</td></tr>
+  </table>
+
+  <h2>How it works — the pipeline</h2>
+  <p>Computed aspects come straight from the per-call event stream (no LLM). Humanness is scored
+  separately by a swappable <a class="x" href="judges.html">judge</a>. Everything lands tidy
+  (one row per conversation × aspect × judge) in <code>aspect_scores</code>, where computed rows carry
+  <code>judge='(computed)'</code>.</p>
+  <pre><span class="c"># 1. run the flows (computed aspects ride along in the transcripts; --no-judge keeps it free)</span>
+python -m riff.flow_eval --flows austin_plumbing,weather --no-judge --out OUT
+
+<span class="c"># 2. fold computed aspects into aspect_scores</span>
+python scripts/eval_db.py --ingest-aspects --dirs OUT
+
+<span class="c"># 3. (nightly) score humanness with a judge, then ingest the judged rows</span>
+python scripts/aspect_judge.py OUT/flow-transcripts-*.jsonl --judge gemini --out H --judged-at 2026-06-22T14:00:00Z
+python scripts/eval_db.py --ingest-humanness --dirs H
+
+<span class="c"># 4. read the matrix</span>
+python scripts/eval_db.py --matrix</pre>
+
+  <h3>operability — the gated aggregate</h3>
+  <p>The matrix sorts rows by a single <code>operability</code> number, but it is a <em>gated</em>
+  aggregate, not a vibe. It blends correctness/completion/errors/latency/humanness, then <strong>caps</strong>:
+  if correctness &lt; 10 it is capped at 4.0; if completion &lt; 10, capped at 6.0. So a flow that
+  &ldquo;completes&rdquo; but books nothing can never look healthy. It uses a <em>true median</em> across
+  judges and, crucially, <strong>never fakes humanness</strong> — with no judge it reweights onto the
+  computed aspects instead of inventing a value. The per-aspect cells are the truth; operability is for
+  sorting.</p>
+
+  <div class="callout">
+    <strong>Crossed by agent.</strong>
+    Rows are <code>(flow, agent_model)</code>, not just flow. A qwen-flash run and a gemini run of the
+    same flow are different situations; collapsing them would read the model difference as flow quality.
+    This is the performance-model view: quality ~ judge × agent_model × flow × persona.
+  </div>
+
+  <h2>Example</h2>
+  <pre>python scripts/eval_db.py --matrix</pre>
+  <p class="run">Real output (truncated) from the live <code>quality.db</code>:</p>
+  <pre># Evaluation matrix — (flow × agent) × aspects (computed) + humanness × judge
+
+| Flow                    | Agent        | **operability** | correctness | completion | errors | lat_p95 | turn_count | hum:codex | hum:dashsc | hum:gemini |
+|-------------------------|--------------|-----------------|-------------|------------|--------|---------|------------|-----------|------------|------------|
+| apartment_scheduler     | gemini-2.5-f | **0.3**         | 0.0         | 0.0        | 0.0    | 11.1    | 7.9        | ·         | ·          | ·          |
+| property_trouble_ticket | qwen-flash   | **1.8**         | 0.0         | 4.2        | 0.3    | 4.2     | 5.0        | 1.1       | 0.8        | 2.2        |
+| austin_plumbing         | qwen-flash   | **4.0**         | 6.8         | 10.0       | 2.9    | 3.9     | 7.3        | 1.8       | 0.9        | 2.1        |
+| dental_clinic           | qwen-flash   | **4.0**         | 9.2         | 10.0       | 3.0    | 3.9     | 4.4        | 4.4       | 6.2        | 6.6        |
+| generic_inquiry         | qwen-flash   | **4.0**         | 9.3         | 10.0       | 5.4    | 4.1     | 2.7        | 3.3       | 3.4        | 5.2        |
+
+Units: correctness/completion/errors 0-10 · latency seconds · turn_count raw.
+errors=10 means no errors; latency lower=better. humanness 0-10 (higher better).</pre>
+  <p>Read it across, not down: <code>austin_plumbing</code> completes (10) but its correctness is only
+  6.8 and humanness ~2 — it reaches a terminal but the booking and the manner both need work. A
+  <code>·</code> means no judge ran that cell (gemini-agent rows were computed-only in this run).</p>
+
+  <h2 id="analyze">Auto-analysis — the worklist</h2>
+  <p><code>--analyze</code> synthesizes the flow, segment, and state layers into a prioritized
+  &ldquo;what to work on&rdquo; list, so you start at the highest-impact node instead of reading three
+  tables by hand:</p>
+  <pre>python scripts/eval_db.py --analyze</pre>
+  <p class="run">Real output (truncated):</p>
+  <pre># What to work on — auto-analysis (flow → segment → state)
+
+## Weakest flows (computed correctness, by agent)
+  ❌ apartment_scheduler      correctness 0.0  (agent gemini-2.5-fla)
+  ❌ ceo_command_center       correctness 0.0  (agent qwen-flash)
+
+## Weakest segments (phases that stall/escalate)
+  ⚠ apartment_scheduler/action   stall=0.36 escal=0.64 progress=0.0
+  ⚠ ceo_command_center/action    stall=0.43 escal=0.0  progress=0.86
+
+## Root-cause states (fix these exact nodes)
+  🎯 apartment_scheduler/book_viewing   stall 0.36 · escalates 0.64 · dwell 3.6
+  🎯 dog_grooming/listen_owner          stall 0.33 · escalates 0.44 · slot_fill 0.0 (stuck, prog 0.22)
+
+Drill: --matrix (flow) → --segment-matrix → --state-matrix --flow F.</pre>
+
+  <h2>Other matrix views</h2>
+  <table>
+    <tr><th>Command</th><th>What it shows</th></tr>
+    <tr><td><code>--segment-matrix</code></td><td>per-segment (phase) quality — the middle tier; shows the <em>worst-member state</em> so a phase average can't mask one bad node</td></tr>
+    <tr><td><code>--state-matrix [--flow F]</code></td><td>per-state quality, worst first (see <a class="x" href="per-state-metrics.html">Per-state metrics</a>)</td></tr>
+    <tr><td><code>--timeline</code></td><td>every run by time, change (commit), and judge LLM — quality is comparable only <em>within</em> a judge column</td></tr>
+    <tr><td><code>--flow-table</code></td><td>all flows × (agent model, judge LLM), mean quality per cell — the calibration panel</td></tr>
+    <tr><td><code>--export-csv</code></td><td>tidy CSV of every aspect score, joined to the flow's last edit before that run — graph quality vs fixes</td></tr>
+  </table>
+
+  <h2>Where it fits</h2>
+  <p>The matrix is the top of the drill-down and the public face of flow quality. It is computed every
+  commit for the cheap aspects (the <a class="x" href="ci-gate.html">CI gate</a> reuses the same
+  ingest + a regression check) and fully judged nightly. From any weak row you descend into
+  <a class="x" href="group-cohesion.html">segments</a> and <a class="x" href="per-state-metrics.html">states</a>;
+  across rows you ascend into <a class="x" href="archetypes.html">archetypes</a>.</p>
+
+  <footer>Source: <code>scripts/eval_db.py</code> (<code>matrix</code>, <code>analyze</code>, <code>segment_matrix</code>, <code>operability</code>); design in <code>docs/flow-eval/MULTI-ASPECT-EVAL-DESIGN.md</code> and <code>docs/flow-eval/MATRIX.md</code>.</footer>
+</main>
+</div>
+</body>
+</html>

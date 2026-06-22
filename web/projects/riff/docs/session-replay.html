@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Replay — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  .run{font-size:12px;color:var(--mut);margin:-8px 0 0;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html" class="active">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Operations &rsaquo; Session replay</div>
+  <h1 class="title">Session Replay — the regression check after a change</h1>
+  <p class="lede">Record a known-good conversation once. After any change, re-drive it with the exact same caller utterances and see whether the flow still behaves. Two tools: one for eval recordings, one for live production sessions.</p>
+
+  <h2>What &amp; why</h2>
+  <p>An eval run is non-deterministic on the caller side — the persona LLM phrases things differently
+  each time, so a score wobble can be the caller, not your change. Replay removes that variable: it
+  fixes the caller's words to a <em>recording</em> and re-runs only the side you changed (the flow +
+  agent). Now a different final state or a lower correctness is unambiguously <em>your</em> change.</p>
+
+  <h2>Two tools, two recordings</h2>
+  <table>
+    <tr><th>Tool</th><th>Replays</th><th>Use</th></tr>
+    <tr><td><code>scripts/replay_eval.py</code></td><td>EVAL recordings — <code>flow-transcripts-*.jsonl</code> (every eval run writes these)</td><td>regression-check a flow/agent change against golden eval sessions</td></tr>
+    <tr><td><code>scripts/replay_session.py</code></td><td>LIVE sessions — <code>logs/turns.jsonl</code> (the production turn-logger)</td><td>triage a real call: &ldquo;agent claimed success, calendar shows nothing&rdquo;</td></tr>
+  </table>
+
+  <h3>replay_eval.py — the change regression check</h3>
+  <p>Every eval already writes one JSON line per conversation with the full caller+agent turns. Those
+  <em>are</em> the recordings. Replay re-drives each flow with the <strong>exact caller utterances</strong>
+  from the recording — via a <code>ScriptedClient</code> that emits the recorded lines in order and
+  ignores the LLM prompt — against the <em>current</em> flow + agent. A change that breaks a
+  previously-good session shows up as a different final state or a lower correctness. It exits 1 if any
+  session regressed (correctness dropped &gt;1pt, or a success terminal became a failure), so it can gate
+  a loop after a flow edit.</p>
+  <pre>RIFF_EVAL_AGENT=dashscope RIFF_EVAL_AGENT_MODEL=qwen-flash \
+  python scripts/replay_eval.py docs/flow-eval/flow-transcripts-20260620T042340105571Z.jsonl \
+    --flow austin_plumbing --regressions-only</pre>
+
+  <h3>replay_session.py — the production fabrication triage</h3>
+  <p>This one replays a recorded <em>live</em> session step by step, reconstructing it with a
+  <code>FakeAdapter</code> scripted from the recorded LLM side, and prints a per-turn diff of
+  <strong>RECORDED vs REPLAY</strong> state and slots:</p>
+  <pre>python scripts/replay_session.py &lt;session_id&gt;
+python scripts/replay_session.py &lt;session_id&gt; --to-turn=5 --verbose</pre>
+  <pre>── Turn 3 · 2026-04-22T15:12:18 ──
+  user_utterance: "anytime Wednesday"
+  RECORDED  to_state=offer_scheduling  slots.preferred_date=2026-04-23
+  REPLAY    to_state=offer_scheduling  slots.preferred_date=2026-04-23
+  tool_calls: ✓ 1 call, envelope event_id present
+  ✓ no divergence</pre>
+  <div class="callout">
+    <strong>The smoking-gun check.</strong>
+    Its primary job is B-181-class triage — &ldquo;agent said booked, nothing got booked.&rdquo; Replay
+    the session, watch the tool-call envelopes flow turn by turn, and find the turn where
+    <code>event_id=""</code> but the assistant text says &ldquo;booked.&rdquo; That is the fabrication.
+    The check runs automatically and exits non-zero if it finds the pattern.
+  </div>
+
+  <h2>Use case</h2>
+  <p>You change the slot extractor and want to be sure you didn't break a flow that was passing. Instead
+  of re-running a noisy eval and squinting at a ~1pt delta, you replay the golden transcripts: the caller
+  is identical, so any divergence in final state or correctness is your extractor change, full stop. This
+  was added this session precisely as the deterministic regression check after a runtime change (commit
+  <code>2979f94</code>).</p>
+
+  <h2>Where it fits</h2>
+  <p>Replay is the deterministic complement to the eval. The <a class="x" href="eval-matrix.html">matrix</a>
+  tells you the absolute quality (with judge noise on humanness); replay tells you whether a specific
+  change moved a specific session, with no caller-side noise at all. It pairs with the
+  <a class="x" href="ci-gate.html">CI gate</a> (which catches computed-aspect regressions on changed
+  flows) to cover both &ldquo;did the flow change?&rdquo; and &ldquo;did the runtime change?&rdquo;</p>
+
+  <footer>Source: <code>scripts/replay_eval.py</code>, <code>scripts/replay_session.py</code>.</footer>
+</main>
+</div>
+</body>
+</html>
