@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-22T18:48:13.407590Z",
-  "count": 132,
+  "generated_at": "2026-06-22T22:08:40.268370Z",
+  "count": 137,
   "entries": [
     {
       "repo": "2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -403,16 +403,16 @@
     },
     {
       "repo": "Browser-Text-to-Speech-TTS-Realtime",
-      "title": "Browser-Text-to-Speech-TTS-Realtime",
-      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "title": "Browser Text To Speech TTS Realtime",
+      "one_liner": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio.",
       "keywords": [
         "typescript",
-        "react 18",
+        "react",
         "vite",
-        "onnx runtime web",
         "webassembly",
+        "onnx runtime",
         "tailwind css",
-        "shadcn/ui",
+        "tanstack query",
         "tts",
         "onnx",
         "react-hook",
@@ -422,52 +422,50 @@
       "chunks": [
         {
           "source": "title",
-          "text": "Browser-Text-to-Speech-TTS-Realtime"
+          "text": "Browser Text To Speech TTS Realtime"
         },
         {
           "source": "one_liner",
-          "text": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX."
+          "text": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio."
         },
         {
           "source": "what_it_is",
-          "text": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It utilizes VITS neural TTS models compiled to WebAssembly via ONNX Runtime, eliminating the need for server-side API calls. It features streaming playback where audio begins as soon as the first sentence is synthesized, multi-core processing via WebAssembly threads, and offline support through browser caching."
+          "text": "This project is a high-performance React application that performs neural text-to-speech synthesis entirely in the browser. It leverages VITS models compiled to WebAssembly via ONNX Runtime, enabling offline-capable, privacy-first audio generation with multi-core parallel processing and streaming playback without external API dependencies."
         },
         {
           "source": "how_its_built",
-          "text": "The application is built with React 18 and TypeScript, bundled with Vite. The core inference engine relies on @diffusionstudio/vits-web, which wraps ONNX Runtime Web. Audio playback is managed via standard HTML5 Audio APIs, while state management for chunk generation and playback status is handled by a custom TTSEngine class and the useTTS React hook. UI components are styled with Tailwind CSS and shadcn/ui."
+          "text": "The frontend is built with React 18, TypeScript, and Vite, styled with Tailwind CSS and shadcn/ui. The core inference engine uses @diffusionstudio/vits-web to load ONNX models into WebAssembly. Audio processing utilizes Web Workers for multi-threading, while state management relies on React hooks and TanStack Query for data handling. The server component is minimal, primarily serving static assets with COOP/COEP headers to enable SharedArrayBuffer for WASM threads."
         },
         {
           "source": "how_to_apply",
-          "text": "Integrate the useTTS hook into any React component to enable local voice synthesis. It is suitable for privacy-sensitive applications requiring offline capability, accessibility tools needing natural-sounding voices without cloud dependencies, or educational platforms wanting to reduce API costs. Developers can customize voice IDs, speed, and concurrency limits via the hook's options."
+          "text": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via options. Use the speak method to trigger audio generation from text strings, leveraging built-in sentence splitting for streaming playback. Monitor progress via returned state properties like isGenerating and chunks to update UI indicators."
         },
         {
           "source": "features",
-          "text": "100% client-side processing using WebAssembly and ONNX Streaming playback: audio starts while remaining text generates Multi-core parallel generation using WebAssembly threads 8 built-in neural voices (English, German, French, Spanish) Offline support with automatic model caching in IndexedDB Privacy-first architecture with no external data transmission"
+          "text": "100% client-side neural TTS using WebAssembly and ONNX Streaming playback that starts audio before full generation completes Multi-core processing via WebAssembly threads for faster synthesis Offline support with browser-cached voice models in IndexedDB Eight built-in natural voices across English, German, French, and Spanish Privacy-first architecture with no data sent to external servers"
         }
       ]
     },
     {
       "repo": "COE-overview",
-      "title": "COE-overview",
+      "title": "COE Overview",
       "one_liner": "Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.",
       "keywords": [
         "python",
         "sqlalchemy",
-        "alembic",
         "pydantic",
+        "alembic",
         "asyncio",
         "structlog",
-        "postgresql",
         "security-ops",
         "data-aggregation",
-        "weekly-reporting",
         "python-etl",
-        "k8s-cronjob"
+        "kubernetes-cronjob"
       ],
       "chunks": [
         {
           "source": "title",
-          "text": "COE-overview"
+          "text": "COE Overview"
         },
         {
           "source": "one_liner",
@@ -475,19 +473,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A Python-based ETL pipeline that ingests error events from multiple security and operations platforms (Jira, Wiz, CrowdStrike, Vibranium), normalizes them into a PostgreSQL database, and prepares data for weekly reporting. It includes schema management via Alembic and supports Kubernetes CronJob execution patterns."
+          "text": "A Python-based ETL pipeline that ingests incident data from multiple security and operations platforms, normalizes it into a PostgreSQL database, and prepares it for weekly reporting. It handles authentication, data fetching, and schema management via Alembic."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python using SQLAlchemy (async) for database interactions, Pydantic Settings for configuration management, and Structlog for logging. It uses Alembic for database migrations and async/await patterns for concurrent data ingestion from external APIs."
+          "text": "Built with Python using SQLAlchemy for async database interactions, Pydantic for configuration management, and Alembic for database migrations. It uses structlog for logging and is designed to run as a Kubernetes CronJob."
         },
         {
           "source": "how_to_apply",
-          "text": "Configure environment variables for source APIs (Jira, Wiz, CrowdStrike, etc.) and database connection. Run the pipeline via the CLI entrypoint to ingest data, then use the stored run_id to trigger downstream reporting or rendering processes."
+          "text": "Configure environment variables for source APIs (Jira, Wiz, CrowdStrike, Vibranium) and database connection. Run the CLI entrypoint to execute the ingestion pipeline, which writes a run ID for downstream rendering processes."
         },
         {
           "source": "features",
-          "text": "Aggregates events from Jira, Wiz, CrowdStrike, and Vibranium Normalizes disparate error formats into a unified schema Async ETL pipeline optimized for weekly batch processing Database schema management with Alembic migrations Kubernetes CronJob compatible with run_id handoff mechanism Configurable lookback periods and project allowlists"
+          "text": "Aggregates events from Jira, Wiz, CrowdStrike, and Vibranium Normalizes disparate data sources into a unified PostgreSQL schema Manages database schema changes via Alembic migrations Supports asynchronous data ingestion for performance Integrates with Kubernetes CronJobs via run ID handoff"
         }
       ]
     },
@@ -1195,6 +1193,34 @@
       ]
     },
     {
+      "repo": "aws-tools",
+      "title": "Aws Tools",
+      "one_liner": "Empty repository stub for AWS tools.",
+      "keywords": [],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Aws Tools"
+        },
+        {
+          "source": "one_liner",
+          "text": "Empty repository stub for AWS tools."
+        },
+        {
+          "source": "what_it_is",
+          "text": "A GitHub repository named aws-tools that currently contains no README, source code, or configuration files."
+        },
+        {
+          "source": "how_its_built",
+          "text": "Not applicable as there are no source files or build configurations present."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Not applicable as the repository is empty."
+        }
+      ]
+    },
+    {
       "repo": "bot-customerObsessed-No-Prob-Bob-afterburner",
       "title": "No Prob Bob — Customer Discovery Agent",
       "one_liner": "A conversational AI agent that guides customer discovery interviews, extracts insights, and saves structured seed documents to Afterburner projects.",
@@ -1859,6 +1885,42 @@
       ]
     },
     {
+      "repo": "codefreshbuilds",
+      "title": "Codefreshbuilds",
+      "one_liner": "Thin repository stub for a Codefresh build metrics tool.",
+      "keywords": [
+        "placeholder",
+        "stub",
+        "empty-repo"
+      ],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Codefreshbuilds"
+        },
+        {
+          "source": "one_liner",
+          "text": "Thin repository stub for a Codefresh build metrics tool."
+        },
+        {
+          "source": "what_it_is",
+          "text": "An empty or minimal GitHub repository intended to host a utility for tracking weekly Codefresh CI/CD build counts. The repository currently contains no source code, documentation, or configuration files."
+        },
+        {
+          "source": "how_its_built",
+          "text": "Not applicable. The repository contains no build scripts, package manifests, or source code."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "This repository is currently non-functional. It serves as a placeholder and cannot be installed or executed until source code is added."
+        },
+        {
+          "source": "features",
+          "text": "Placeholder for Codefresh build analytics Intended to calculate builds per week Currently contains no implementation"
+        }
+      ]
+    },
+    {
       "repo": "cognito-lambda-s3-webserver-cloudfront",
       "title": "CloudDrive: Serverless Personal Cloud with Audio Recording",
       "one_liner": "A secure, mobile-first personal cloud platform featuring chunked audio recording, file management, and event-driven architecture on AWS.",
@@ -2044,49 +2106,47 @@
     },
     {
       "repo": "everyone-ai",
-      "title": "everyone-ai",
-      "one_liner": "A self-service internal developer platform that launches isolated Claude Code workspaces on Kubernetes via a web portal.",
+      "title": "Everyone Ai",
+      "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
       "keywords": [
         "node.js",
         "express",
-        "kubernetes (k3s)",
+        "kubernetes",
+        "k3s",
         "helm",
         "traefik",
         "code-server",
-        "claude code",
-        "bash",
-        "playwright",
-        "kubernetes-operator",
-        "dev-portal",
+        "vanilla js",
         "ai-workspace",
-        "self-hosted",
+        "kubernetes-platform",
+        "developer-tools",
         "claude-code",
-        "vscode-web"
+        "self-hosted"
       ],
       "chunks": [
         {
           "source": "title",
-          "text": "everyone-ai"
+          "text": "Everyone Ai"
         },
         {
           "source": "one_liner",
-          "text": "A self-service internal developer platform that launches isolated Claude Code workspaces on Kubernetes via a web portal."
+          "text": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes."
         },
         {
           "source": "what_it_is",
-          "text": "everyone-ai is an internal AI workspace platform designed for teams. It provides a web-based portal where users can select from pre-configured templates (e.g., Python, Node.js, HR Agent) to launch personal VS Code environments backed by Claude Code. The system runs on a lightweight k3s cluster, managing workspace lifecycle (creation, monitoring, deletion) and exposing them via secure HTTPS endpoints without requiring local machine configuration or credential management."
+          "text": "A portal that allows team members to launch isolated VS Code workspaces backed by Claude Code in seconds. It manages the lifecycle of these workspaces on a k3s cluster, providing an app catalog, usage monitoring, and persistent HTTPS endpoints for deployed apps without requiring local machine configuration."
         },
         {
           "source": "how_its_built",
-          "text": "The platform consists of a Node.js/Express backend serving a vanilla JavaScript SPA frontend. It interacts directly with the Kubernetes API to spawn 'workspace' pods (running code-server + Claude Code) and 'target' pods (for deployed apps). Infrastructure is bootstrapped using a custom CLI tool called 'afterburner', which installs k3s on remote Linux VMs via SSH and generates Helm charts for deployment. Traefik acts as the ingress controller."
+          "text": "Built with Node.js and Express for the backend API, vanilla JavaScript for the frontend SPA, and Helm charts for Kubernetes deployment. It uses k3s as the underlying cluster engine, Traefik for ingress routing, and code-server for browser-based VS Code instances. The CLI tool 'afterburner' automates cluster bootstrapping and installation."
         },
         {
           "source": "how_to_apply",
-          "text": "Operators use the `afterburner` CLI to bootstrap a Linux VM into a k3s cluster and generate Helm install commands. Developers connect via VPN, access the team-specific portal URL, select a template from the App Catalog, and click Launch. The system provisions a unique workspace pod and returns a browser-based VS Code link within ~30 seconds."
+          "text": "Operators use the 'afterburner' CLI to bootstrap a Linux VM into a k3s cluster and deploy the portal via Helm. End users connect via VPN, access the web portal, select a template from the App Catalog, and launch a workspace which provides a direct link to a browser-based VS Code instance with Claude Code pre-configured."
         },
         {
           "source": "features",
-          "text": "Self-service App Catalog with pre-configured Claude Code templates Instant provisioning of browser-based VS Code workspaces (<30s) Automated k3s cluster bootstrapping via SSH using the Afterburner CLI Team-isolated namespaces with usage tracking and fleet overview Persistent HTTPS targets for deploying apps from workspaces Zero-config client experience: no local credentials or laptop setup required"
+          "text": "Launch Claude Code workspaces in under 30 seconds via web portal App Catalog with pre-configured templates for Python, Node.js, and HR agents Automated k3s cluster bootstrapping and Helm deployment via afterburner CLI Browser-based VS Code environments with no local setup required Team-wide usage monitoring and fleet overview across multiple portals Persistent HTTPS endpoints for deploying apps from workspaces"
         }
       ]
     },
@@ -2217,8 +2277,8 @@
     },
     {
       "repo": "generate_title_headline_hooks",
-      "title": "generate_title_headline_hooks",
-      "one_liner": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification to prevent hallucinated quotes and unsupported claims.",
+      "title": "Generate Title Headline Hooks",
+      "one_liner": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification.",
       "keywords": [
         "python",
         "fastapi",
@@ -2226,36 +2286,38 @@
         "sqlite",
         "uvicorn",
         "httpx",
-        "content-generation",
-        "nlp-pipeline",
-        "hallucination-prevention",
-        "llm-orchestration",
-        "fastapi-service"
+        "anthropic sdk",
+        "pytest",
+        "headline-generation",
+        "content-integrity",
+        "llm-pipeline",
+        "fastapi-service",
+        "fact-checking"
       ],
       "chunks": [
         {
           "source": "title",
-          "text": "generate_title_headline_hooks"
+          "text": "Generate Title Headline Hooks"
         },
         {
           "source": "one_liner",
-          "text": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification to prevent hallucinated quotes and unsupported claims."
+          "text": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification."
         },
         {
           "source": "what_it_is",
-          "text": "A Python-based API and library that generates multiple headline variants for a given story using specific archetypes (e.g., curiosity gap, contrarian). It enforces a 'fail-closed' integrity gate where every headline must pass deterministic quote verification and LLM-based fact-checking against the source body before being ranked and returned. The system is model-agnostic, supporting Anthropic, Alibaba Qwen, Ollama, and MLX via a unified client protocol."
+          "text": "A Python service that generates audience-catching headlines from a story body while enforcing strict factual integrity. It uses a multi-stage pipeline: extracting the story's structural spine, generating archetype-constrained variants, applying a fail-closed integrity gate (deterministic quote checks and LLM fact-checking), and ranking survivors via heuristic and LLM-based scoring."
         },
         {
           "source": "how_its_built",
-          "text": "Built with FastAPI for the HTTP interface and a modular Python backend. The core logic resides in a pipeline module that orchestrates spine extraction, archetype-constrained generation, and two-stage integrity gating (regex-based quote check + LLM fact check). Scoring uses a strategy pattern with heuristic and LLM judges. Data persistence uses SQLite via a simple Store class. Provider isolation is enforced via AST tests to ensure only the reference client imports provider-specific SDKs."
+          "text": "Built with FastAPI for the API layer and a modular Python backend. It implements a provider-agnostic LLMClient protocol supporting Anthropic, Alibaba DashScope, Ollama, and MLX. The core logic is split into spine extraction, archetype-based generation, deterministic and LLM-based integrity gating, and a pluggable Scorer protocol for ranking. Data persistence uses SQLite via a simple Store class."
         },
         {
           "source": "how_to_apply",
-          "text": "Integrate as a microservice for newsrooms or content platforms needing safe, high-quality headline variations. Use the `/headlines` endpoint to submit article text and receive ranked, verified headlines. Extend by implementing new `LLMClient` classes for other providers or adding custom `Scorer` implementations to the ranking pipeline without modifying core logic."
+          "text": "Integrate as a microservice for newsrooms or content platforms needing high-integrity headline variations. Use the /headlines endpoint to submit story text and receive ranked, verified headline options. Extend the Scorer protocol to add custom ranking criteria like CTR prediction models."
         },
         {
           "source": "features",
-          "text": "Generates headlines across six distinct archetypes (curiosity, number-led, contrarian, etc.) Fail-closed integrity gate drops headlines with fabricated quotes or unsupported claims Model-agnostic architecture supporting Anthropic, Qwen, Ollama, and MLX Deterministic quote verification prevents LLM hallucinations before judging Hybrid scoring system combining heuristic rules and LLM judgment Provider isolation enforced via AST tests to prevent dependency leakage"
+          "text": "Extracts story spine including tension stakes and supported payoff claims Generates headlines across six archetypes like curiosity gap and contrarian Fail-closed integrity gate drops fabricated quotes and unsupported claims Provider-agnostic LLM interface supporting cloud and local models Hybrid ranking system combining heuristic rules and LLM judgment"
         }
       ]
     },
@@ -2265,17 +2327,19 @@
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "keywords": [
         "python",
+        "html",
+        "javascript",
+        "fastapi",
         "sqlite-vec",
         "sentence-transformers",
-        "fastapi",
-        "click",
         "aws lambda",
-        "s3/cloudfront",
-        "portfolio",
-        "search-engine",
-        "knowledge-base",
-        "developer-tools",
-        "ai-assistant"
+        "cloudfront",
+        "s3",
+        "semantic-search",
+        "github-indexer",
+        "portfolio-tool",
+        "mcp-server",
+        "static-ui"
       ],
       "chunks": [
         {
@@ -2288,19 +2352,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories (public and private) into a local vector store, enabling semantic search, capability clustering, and pattern discovery across a developer's portfolio. It provides a CLI, a FastAPI backend, an MCP server for AI agents, and a static web UI."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, REST API, and static web UI. It enables developers to find reusable code patterns and architectures across their own portfolio using natural language queries."
         },
         {
           "source": "how_its_built",
-          "text": "Python-based indexing pipeline using sentence-transformers for embeddings and SQLite-vec for vector storage. The web UI is a static SPA served from S3/CloudFront, consuming JSON exports generated by the indexer. Authentication is handled via Google OAuth Lambda functions, and AI agent integration is provided via an MCP server."
+          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec) and FastAPI for the backend. The frontend is a static HTML/JS application served from S3/CloudFront. It uses GitHub Actions for weekly reindexing and Lambda functions for OAuth handling."
         },
         {
           "source": "how_to_apply",
-          "text": "Use to build a searchable knowledge base of your own code, find reusable patterns across projects, or expose your portfolio to AI assistants via MCP. Deploy the static site to showcase work or run locally for private code exploration."
+          "text": "Clone the repo, configure a GitHub Personal Access Token in .env, run the indexing command against your username, export the data to JSON, and serve the web directory locally or deploy to AWS S3/CloudFront."
         },
         {
           "source": "features",
-          "text": "Semantic search using sentence-transformers embeddings and SQLite-vec TF-IDF client-side search with IDF weighting and chunk matching Auto-clustering of repos into capability categories (e.g., Voice, AI) MCP server for AI agents to search and retrieve repo details Static web UI with faceted filtering, collections, and export options Automated weekly reindexing via GitHub Actions"
+          "text": "Client-side semantic search using TF-IDF and embedding vectors Automatic clustering of repositories into capability categories Faceted filtering by language, tech stack, and star count MCP server integration for AI agent access to portfolio data Static web UI with shareable URLs and localStorage collections Automated weekly reindexing via GitHub Actions"
         }
       ]
     },
@@ -2511,6 +2575,42 @@
       ]
     },
     {
+      "repo": "hello-world2",
+      "title": "Hello World2",
+      "one_liner": "An empty or minimal GitHub repository with no provided documentation or source code.",
+      "keywords": [
+        "empty",
+        "stub",
+        "placeholder"
+      ],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Hello World2"
+        },
+        {
+          "source": "one_liner",
+          "text": "An empty or minimal GitHub repository with no provided documentation or source code."
+        },
+        {
+          "source": "what_it_is",
+          "text": "A placeholder GitHub repository named hello-world2 owned by davidbmar. It contains no README, no listed topics, and no retrieved source files, indicating it is likely a fork, stub, or empty project."
+        },
+        {
+          "source": "how_its_built",
+          "text": "Not applicable as no source code or build configuration files were retrieved."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Not applicable due to lack of functionality or documentation."
+        },
+        {
+          "source": "features",
+          "text": "Empty repository structure No available source code No documentation provided"
+        }
+      ]
+    },
+    {
       "repo": "html-framework-record-ver2.0",
       "title": "html-framework-record-ver2.0",
       "one_liner": "A lightweight, web-only audio recorder that captures PCM data and stores it in IndexedDB for persistent local playback.",
@@ -2592,22 +2692,20 @@
     {
       "repo": "intelligence-briefing-toolkit",
       "title": "Intelligence Briefing Toolkit",
-      "one_liner": "A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings.",
+      "one_liner": "A standalone research pipeline that searches the web, extracts claims, accumulates evidence, and generates intelligence briefings via CLI, Library, REST, or MCP.",
       "keywords": [
         "python",
         "fastapi",
-        "anthropic sdk",
-        "pydantic",
-        "model context protocol (mcp)",
-        "json",
-        "asyncio",
+        "anthropic claude api",
+        "model context protocol mcp",
+        "serper.dev",
+        "duckduckgo",
         "osint",
         "research-automation",
         "llm-orchestration",
         "cli-tool",
         "rest-api",
-        "mcp-server",
-        "evidence-tracking"
+        "mcp-server"
       ],
       "chunks": [
         {
@@ -2616,23 +2714,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings."
+          "text": "A standalone research pipeline that searches the web, extracts claims, accumulates evidence, and generates intelligence briefings via CLI, Library, REST, or MCP."
         },
         {
           "source": "what_it_is",
-          "text": "The Intelligence Briefing Toolkit (IBT) is a Python-based framework for automating open-source intelligence (OSINT) workflows. It orchestrates web searching, content extraction, claim detection, and report synthesis using Claude (Anthropic). The system supports both one-off deep research queries and persistent, multi-pass projects that accumulate evidence over time to detect signals and contradictions. It exposes functionality through four interfaces: a CLI for scripting, a Python library for integration, a REST API for web services, and an MCP server for AI agent tool use."
+          "text": "The Intelligence Briefing Toolkit (IBT) is a Python-based framework for automating open-source intelligence (OSINT) workflows. It orchestrates multi-pass research cycles where an LLM plans queries, searches the web, extracts structured claims from sources, deduplicates findings against existing evidence, and synthesizes final reports. It supports both ephemeral 'one-shot' research and persistent projects that accumulate evidence over time."
         },
         {
           "source": "how_its_built",
-          "text": "Built in Python with a modular adapter pattern for data sources. Core logic resides in `ResearchPipeline`, which coordinates `WebSearchTool` (Serper/DuckDuckGo) and `WebContentTool` (boilerplate stripping). LLM interactions are handled via the Anthropic SDK for claim extraction and synthesis. State management for projects uses local JSON files. The REST API is implemented with FastAPI, and the MCP server follows the Model Context Protocol specification for AI assistant integration."
+          "text": "Built in Python using FastAPI for the REST interface and Model Context Protocol (MCP) for AI agent integration. The core logic relies on an adapter pattern for data sources (defaulting to WebSearchTool/WebContentTool) and uses Anthropic's Claude API for claim extraction, signal detection, and report synthesis. State management for persistent projects is handled via local JSON evidence stores."
         },
         {
           "source": "how_to_apply",
-          "text": "Use IBT to automate competitive intelligence monitoring, academic literature reviews, or investigative journalism workflows. Integrate the Python library into existing data pipelines to enrich datasets with web-sourced context. Deploy the REST API as a backend for internal research dashboards. Connect the MCP server to Claude Desktop to allow natural-language triggered research agents that can persist findings across sessions."
+          "text": "Use IBT to automate deep-dive research tasks, monitor developing news stories through recurring collection passes, or integrate OSINT capabilities into larger AI agents via its MCP server. It is suitable for journalists, analysts, or developers needing structured evidence gathering rather than simple keyword search results."
         },
         {
           "source": "features",
-          "text": "Multi-interface access: CLI, Python Library, REST API, and MCP Server Persistent project-based research with evidence accumulation and deduplication Automated web searching via Serper.dev or DuckDuckGo fallback LLM-driven claim extraction and signal detection from raw web content Structured briefing generation synthesizing multiple evidence passes Pluggable source adapter architecture for extending beyond web sources"
+          "text": "Multi-interface access via CLI, Python library, REST API, and MCP server Persistent project mode with evidence accumulation and deduplication across passes Automated claim extraction and signal detection using LLM analysis Pluggable source adapters supporting web search and content extraction Structured JSON output for easy integration into downstream data pipelines"
         }
       ]
     },
@@ -3198,28 +3296,23 @@
     {
       "repo": "nvidia-parakeet-ver-5",
       "title": "NVIDIA Parakeet Riva ASR Deployment System",
-      "one_liner": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT speech recognition via Riva ASR with WebSocket streaming.",
+      "one_liner": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts.",
       "keywords": [
-        "python 3.10+",
+        "python",
         "fastapi",
         "websockets",
         "grpc",
-        "nvidia riva asr",
         "docker",
-        "nvidia container toolkit",
+        "nvidia riva",
         "pydantic",
         "speechbrain",
-        "boto3",
         "asr",
-        "speech-to-text",
+        "speech recognition",
         "nvidia",
         "riva",
-        "parakeet",
-        "real-time",
         "websocket",
-        "gpu-accelerated",
-        "aws",
-        "deployment-pipeline"
+        "gpu",
+        "deployment"
       ],
       "chunks": [
         {
@@ -3228,23 +3321,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT speech recognition via Riva ASR with WebSocket streaming."
+          "text": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts."
         },
         {
           "source": "what_it_is",
-          "text": "A comprehensive infrastructure project that deploys NVIDIA's Parakeet RNNT automatic speech recognition (ASR) model using either NVIDIA NIM containers or traditional Riva servers. It provides a Python-based WebSocket server and client wrapper to enable real-time, low-latency audio transcription with word-level timestamps and confidence scores."
+          "text": "A deployment framework and client wrapper for running NVIDIA's Parakeet RNNT automatic speech recognition model. It supports both modern NIM containers and traditional Riva server setups, providing low-latency streaming transcription via WebSocket with word-level timestamps and confidence scores."
         },
         {
           "source": "how_its_built",
-          "text": "The system is built on Python 3.10+ and uses FastAPI for the WebSocket server interface. It integrates with NVIDIA Riva ASR via gRPC (port 50051) or HTTP (port 8000) using a custom `RivaASRClient` wrapper that supports both real GPU-accelerated inference and mock modes. Deployment is managed through Bash scripts targeting AWS EC2 GPU instances (g4dn.xlarge), handling driver installation, Docker/NVIDIA Container Runtime setup, and security group configuration."
+          "text": "Built with Python 3.10+ using FastAPI for the server interface, Pydantic for configuration management, and websockets for real-time audio streaming. It integrates with NVIDIA Riva ASR via gRPC clients, uses SpeechBrain for fallback or alternative modeling, and relies on Docker/NVIDIA Container Runtime for GPU-accelerated inference on Tesla T4/V100 instances."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this system to deploy a scalable, low-latency speech-to-text service for applications requiring real-time transcription, such as live captioning, voice assistants, or meeting recorders. It is suitable for environments where GPU acceleration (Tesla T4/V100) is available and sub-second latency is critical."
+          "text": "Deploy on AWS EC2 g4dn.xlarge or similar GPU instances. Use provided bash scripts to configure security groups, install NVIDIA drivers, deploy Riva/NIM containers, and start the WebSocket proxy. Connect client applications (browser or Node.js/Python) to the WebSocket endpoint for real-time transcription."
         },
         {
           "source": "features",
-          "text": "Real-time streaming transcription with ~100-300ms partial result latency Dual deployment support: NVIDIA NIM containers and traditional Riva servers Word-level timestamps and confidence scores for precise alignment Production-grade Python client wrapper with mock mode for testing Structured logging framework with millisecond precision and resource monitoring WebSocket API for easy integration with web and mobile clients"
+          "text": "Real-time streaming transcription with ~100-300ms partial result latency Dual deployment support for NVIDIA NIM containers and traditional Riva servers Word-level timestamps and confidence scores for precise alignment Production-grade structured logging and monitoring framework WebSocket API for browser and application integration Mock mode fallback for development without GPU hardware"
         }
       ]
     },
@@ -3615,19 +3708,21 @@
     {
       "repo": "picture_qr_code_2_login",
       "title": "Picture QR Code Login",
-      "one_liner": "Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution.",
+      "one_liner": "Serverless shared photo album with Google sign-in, guest access, and identity-based delete permissions.",
       "keywords": [
         "aws lambda",
         "amazon s3",
-        "amazon cloudfront",
-        "html5/javascript",
+        "cloudfront",
+        "google sign-in",
+        "html5",
+        "javascript",
         "python",
-        "google identity services",
+        "event-photo-sharing",
         "aws-serverless",
-        "photo-album",
-        "oauth-login",
-        "s3-direct-upload",
-        "qr-code-access"
+        "google-oauth",
+        "s3-presigned-urls",
+        "qr-code-access",
+        "identity-aware-delete"
       ],
       "chunks": [
         {
@@ -3636,23 +3731,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution."
+          "text": "Serverless shared photo album with Google sign-in, guest access, and identity-based delete permissions."
         },
         {
           "source": "what_it_is",
-          "text": "A password-gated, serverless photo album hosted on AWS. Users scan a QR code to access a web interface where they can authenticate via Google OAuth or username/password. Photos are uploaded directly from the browser to S3 using presigned URLs, ensuring the server never handles image bytes. Each upload is attributed to the logged-in user or 'Guest' if using the shared password."
+          "text": "A web-based photo sharing application where users scan a QR code to access a password-gated album. It supports anonymous guest uploads via a shared password and authenticated uploads via Google Sign-In. Photos are attributed to the uploader, and deletion rights are enforced based on identity: Google users can delete their own photos, while an admin passcode allows deletion of any photo."
         },
         {
           "source": "how_its_built",
-          "text": "Built as a single AWS Lambda function serving HTML/JSON via Function URL, backed by an S3 bucket for storage. Authentication uses stateless HMAC tokens for guest access and Google Identity Services for OAuth. Image processing (thumbnails) happens client-side via Canvas; HEIC conversion is handled by a secondary Lambda trigger. Infrastructure is managed via shell scripts and AWS CLI, isolated from other variants by specific naming conventions."
+          "text": "Built on AWS Serverless architecture using a single Lambda function (Node.js/Python runtime implied by context) serving HTML/JS and a JSON API. Images are uploaded directly from the browser to S3 using presigned URLs. Authentication is handled via Google OAuth2 tokens verified by the Lambda. State is stored in S3 metadata or a lightweight database (implied by attribution requirements). CloudFront distributes the frontend with caching disabled for instant updates."
         },
         {
           "source": "how_to_apply",
-          "text": "Deploy to AWS using the provided shell scripts after configuring environment variables for passwords and secrets. Generate a QR code pointing to the CloudFront distribution URL. Print the QR code for physical display at events. Users scan the code, log in, and upload photos directly from their mobile browsers without installing an app."
+          "text": "Deploy to AWS using the provided shell scripts after configuring environment variables for passwords and secrets. Generate a QR code pointing to the CloudFront distribution URL. Print the QR code for physical display at events. Users scan the code, enter the guest password or sign in with Google, and upload photos directly from their mobile browsers."
         },
         {
           "source": "features",
-          "text": "Identity-aware login via Google OAuth or username/password Direct-to-S3 uploads using short-lived presigned URLs Client-side thumbnail generation and HEIC support Per-photo attribution tracking for logged-in users Password-gated access with separate owner delete controls Zero-maintenance serverless architecture on AWS"
+          "text": "QR-code based access to a web-only photo album Dual login modes: shared guest password and Google Sign-In Direct-to-S3 photo uploads via presigned URLs Client-side thumbnail generation using Canvas Identity-aware deletion: users delete own, admin deletes all Per-photo attribution tracking for authenticated users"
         }
       ]
     },
@@ -3697,6 +3792,34 @@
         {
           "source": "features",
           "text": "Scans Apple Photos library for specific person tags across multiple years Ranks candidates by face size, image quality, and favorite status Local web server for manual review and selection of one photo per year Face-aware cropping using OpenCV YuNet for consistent head-and-shoulders framing AI-powered background removal and replacement with a radial studio-blue gradient Generates high-resolution 18x24 inch print-ready PNG and PDF posters"
+        }
+      ]
+    },
+    {
+      "repo": "pythonArrays",
+      "title": "PythonArrays",
+      "one_liner": "An empty or stub repository with no source code or documentation.",
+      "keywords": [],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "PythonArrays"
+        },
+        {
+          "source": "one_liner",
+          "text": "An empty or stub repository with no source code or documentation."
+        },
+        {
+          "source": "what_it_is",
+          "text": "A GitHub repository named pythonArrays that contains no visible source files, README, or description. It appears to be a placeholder, fork, or incomplete project."
+        },
+        {
+          "source": "how_its_built",
+          "text": "Not applicable as there are no source files or build configurations present."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Not applicable due to lack of functionality or documentation."
         }
       ]
     },
@@ -3885,15 +4008,18 @@
       "keywords": [
         "python",
         "yaml",
-        "fastapi",
-        "pytest",
         "mermaid",
-        "mcp",
+        "jsonl",
+        "websockets",
+        "git",
+        "pytest",
         "voice-agent",
-        "fsm",
+        "state-machine",
         "llm-orchestration",
-        "deterministic-ai",
-        "state-machine"
+        "yaml-config",
+        "deterministic-guardrails",
+        "a-b-testing",
+        "observability"
       ],
       "chunks": [
         {
@@ -3906,19 +4032,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models (LLMs) for natural language understanding with declared Finite State Machines (FSMs) for strict workflow enforcement. It allows users to describe a business in plain English, automatically generating a YAML-defined flow that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation) while the FSM 'keeps the beat' (validating slots, enforcing transitions, and preventing hallucinations)."
+          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models (LLMs) for natural language understanding with declared Finite State Machines (FSMs) for strict workflow enforcement. It allows users to describe a business in plain English, automatically generating a YAML-defined flow that handles phone conversations for tasks like ordering, scheduling, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation) while the FSM 'keeps the beat' (validating slots, enforcing transitions, and preventing hallucinations through pure function guardrails)."
         },
         {
           "source": "how_its_built",
-          "text": "The core engine uses a pure-function architecture where guardrails, slot extraction, and state transitions are deterministic. An LLM adapter (supporting Gemini, Gemma, or Claude) processes user intent, but its output is constrained by a StateManager that validates against a declared graph. The system includes an A/B testing harness for observable metric scoring, a web server for real-time inspection, and supports MCP (Model Context Protocol) integration. All non-LLM components are designed as pure functions to ensure reproducibility and ease of testing."
+          "text": "The core engine is built in Python, leveraging a hybrid architecture where an LLM adapter (supporting Gemini, Gemma, or Claude) drives conversation content, while a deterministic state manager enforces business logic via YAML-defined graphs. Key components include a speech-to-text pipeline, a turn execution engine (run_turn), slot extractors with deterministic fallbacks, and a web server for real-time inspection. The system emphasizes observability with JSONL logging, silent failure tracking, and an A/B testing harness that scores agents based on observable metrics like slot completion and turn count without requiring live LLM judges."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, tutoring) or retail scenarios (coffee, pizza). It is ideal for developers who need the flexibility of LLMs for conversation but require the reliability of state machines for data collection and workflow completion. It can be integrated into existing telephony systems via its API or used as a standalone voice interface."
+          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (e.g., plumbing, dental clinics, salons) or retail scenarios (e.g., coffee shops, pizza orders). It is ideal for developers who need the flexibility of LLMs for natural conversation but require the reliability of state machines to prevent errors in critical data collection (like addresses or appointment times). It can be integrated into existing telephony systems via its API or used as a standalone web-based voice interface."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions using YAML-defined FSMs Prevents LLM hallucinations via strict slot validation and guardrails Includes built-in A/B testing harness for observable metric scoring Supports multiple LLM backends including Gemini, Gemma, and Claude Provides real-time web UI for inspecting live agent sessions"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions and slot validation via YAML-defined FSMs Supports multiple LLM backends including Gemini, Gemma, and Claude Includes built-in A/B testing harness with observable metric scoring Provides real-time web UI for inspecting live agent sessions and state Offers pure-function guardrails to prevent LLM hallucinations and enforce business rules"
         }
       ]
     },
@@ -4489,14 +4615,15 @@
     {
       "repo": "supertokens_nodejs",
       "title": "SuperTokens Passwordless Node.js Demo",
-      "one_liner": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.",
+      "one_liner": "A prototype implementation of passwordless authentication using SuperTokens magic links, Node.js, and Docker.",
       "keywords": [
         "node.js",
         "express",
         "supertokens",
-        "docker",
         "postgresql",
-        "html/css/js",
+        "docker",
+        "html",
+        "javascript",
         "authentication",
         "passwordless",
         "nodejs",
@@ -4509,23 +4636,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker."
+          "text": "A prototype implementation of passwordless authentication using SuperTokens magic links, Node.js, and Docker."
         },
         {
           "source": "what_it_is",
-          "text": "This project is a reference implementation of passwordless authentication. It replaces traditional passwords with time-limited, single-use magic links sent to the user's email. The system consists of a static HTML frontend for inputting emails and verifying tokens, an Express.js backend handling session management and SuperTokens integration, and a SuperTokens Core instance running in Docker with PostgreSQL for persistent storage."
+          "text": "This project is a minimal demonstration of passwordless authentication. It uses SuperTokens to generate single-use magic links sent via email (logged to console for demo purposes). The architecture consists of a PostgreSQL database, the SuperTokens Core service, a Node.js Express backend, and a static HTML frontend served via npx serve."
         },
         {
           "source": "how_its_built",
-          "text": "The backend uses the `supertokens-node` SDK with Express middleware to handle auth routes. The SuperTokens Core (v9.3.0) runs in a Docker container alongside PostgreSQL. The frontend is a static site served via `npx serve`, interacting with the backend API. Magic links are logged to the server console instead of being sent via SMTP for demonstration purposes."
+          "text": "The backend is built with Node.js and Express, integrating the supertokens-node SDK for session management and passwordless logic. The SuperTokens Core runs in a Docker container backed by PostgreSQL. The frontend is a vanilla HTML/JS application that interacts with the backend API for login requests and session verification."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this as a starting point for integrating passwordless login into Node.js applications. Replace the console-based email delivery with a real SMTP provider (e.g., SendGrid, AWS SES) by modifying the `emailDelivery` override in `server.js`. Customize `appInfo.js` with your production domains."
+          "text": "Use this repository as a reference implementation for integrating SuperTokens passwordless flow into a Node.js application. It demonstrates how to configure the core, override email delivery for testing, and handle frontend session states without a framework."
         },
         {
           "source": "features",
-          "text": "Passwordless login via email magic links Single-use, time-limited authentication tokens (15 min expiry) Session management with HTTP-only cookies Dockerized SuperTokens Core and PostgreSQL setup Express.js backend with CORS configuration Static frontend with login and dashboard views"
+          "text": "Passwordless login via email magic links Single-use link validation with 15-minute expiration Session management with HTTP-only cookies Dockerized SuperTokens Core and PostgreSQL Vanilla JS frontend with no build step required"
         }
       ]
     },
@@ -4618,6 +4745,38 @@
         {
           "source": "features",
           "text": "Automatic mDNS/Bonjour service discovery across local subnets Service fingerprinting for Plex, Home Assistant, SSH, SMB, and more Centralized dashboard aggregating multiple remote homes via Tailscale Lightweight Python agent with configurable scan intervals Client-side password protection for dashboard access SQLite-backed storage for persistent device history"
+        }
+      ]
+    },
+    {
+      "repo": "testtest",
+      "title": "Testtest",
+      "one_liner": "Empty or stub repository with no source code or documentation.",
+      "keywords": [],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Testtest"
+        },
+        {
+          "source": "one_liner",
+          "text": "Empty or stub repository with no source code or documentation."
+        },
+        {
+          "source": "what_it_is",
+          "text": "A GitHub repository named testtest that currently contains no README, source files, or configuration data."
+        },
+        {
+          "source": "how_its_built",
+          "text": "Not applicable as there are no build scripts, source code, or package manifests present."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Not applicable due to lack of functionality or instructions."
+        },
+        {
+          "source": "features",
+          "text": "No features implemented No documentation available No source code present"
         }
       ]
     },
@@ -5257,7 +5416,7 @@
       "title": "Voice Calendar Scheduler FSM",
       "one_liner": "A 24/7 voice-driven apartment viewing scheduling assistant using Twilio/WebRTC, an 8-step FSM, and Google Calendar integration.",
       "keywords": [
-        "python 3.11+",
+        "python",
         "fastapi",
         "twilio",
         "webrtc",
@@ -5267,11 +5426,10 @@
         "google calendar api",
         "docker",
         "voice-agent",
-        "scheduling-bot",
-        "fsm-conversation",
-        "twilio-integration",
-        "webrtc-audio",
-        "calendar-automation"
+        "scheduling",
+        "fsm",
+        "rag",
+        "calendar-integration"
       ],
       "chunks": [
         {
@@ -5284,19 +5442,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "An automated voice agent that handles inbound calls or browser-based WebRTC connections to schedule apartment viewings. It uses a Finite State Machine (FSM) to guide callers through preference gathering, apartment search via RAG, availability checking, and final booking on Google Calendar, utilizing Piper TTS and Faster-Whisper STT for natural voice interaction."
+          "text": "An automated voice agent that handles inbound calls or browser connections to schedule apartment viewings. It uses a Finite State Machine to guide users through preference gathering, listing search via RAG, availability checking, and final booking on Google Calendar, powered by Faster-Whisper for speech-to-text and Piper for text-to-speech."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python 3.11+ and FastAPI. The core logic resides in a git submodule (`engine-repo`) providing the FSM orchestrator, STT/TTS pipelines, and LLM abstraction. The application layer (`scheduling/`) implements domain-specific tools (Google Calendar, RAG search). A separate `gateway/` module handles WebRTC signaling and TURN credentials. Apartment data is indexed in LanceDB for RAG retrieval."
+          "text": "Built with Python 3.11+ using FastAPI for the backend. It integrates Twilio Media Streams for PSTN and WebRTC for browser audio. The core logic relies on a git submodule engine for FSM orchestration, LLM abstraction (Claude/Ollama), and voice processing. Apartment data is indexed in LanceDB for RAG-based search, and bookings are managed via the Google Calendar API."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repository recursively to include the engine submodule. Run the provided setup script to create a virtual environment and install dependencies. Configure API keys for Twilio, Google Calendar, and your chosen LLM provider (Claude or Ollama) in `.env`. Start the backend, RAG service, and optional editor using the start script."
+          "text": "Clone the repository recursively to include the engine submodule. Run the setup script to create a virtual environment and install dependencies. Configure API keys for LLM, Twilio, and Google Calendar in the .env file. Start the RAG service, backend, and optional editor using the provided start script."
         },
         {
           "source": "features",
-          "text": "Dual-channel input: Supports both Twilio PSTN calls and browser-based WebRTC connections 8-step FSM workflow: Guides conversation from greeting to confirmed booking RAG-powered search: Queries apartment listings in LanceDB based on user preferences Automated scheduling: Checks Google Calendar free/busy status and creates events Local-first voice stack: Uses Piper TTS and Faster-Whisper STT for low-latency audio processing Visual workflow editor: Optional Node.js-based tool for inspecting and editing FSM states"
+          "text": "Dual-channel input via Twilio PSTN and Browser WebRTC 8-step FSM-driven conversation flow for structured scheduling RAG-based apartment listing search using LanceDB and nomic-embed Real-time Google Calendar availability checking and event creation Low-latency STT with Faster-Whisper and TTS with Piper Visual workflow editor and FSM session inspector for debugging"
         }
       ]
     },

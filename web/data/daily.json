@@ -1,29 +1,159 @@
 {
-  "generated_at": "2026-06-21T07:19:04.047523Z",
-  "count": 145,
+  "generated_at": "2026-06-22T22:10:09.678268Z",
+  "count": 146,
   "days": [
     {
-      "date": "2026-06-21",
-      "headline": "Riff Adds Loop Guards and SQLite Quality Tracking",
-      "summary": "Turn handling now catches no-progress state oscillation such as A<->B, not just stalled states. The eval stack adds a SQLite quality database for tracking scores over time by judge, model, and feature.",
+      "date": "2026-06-22",
+      "headline": "Automated Docs Pipeline and GOAP-lite Evaluation Framework",
+      "summary": "Enhanced the portfolio search with nightly auto-deploying documentation and robust error handling for API limits. Simultaneously advanced the Riff project by implementing a typed GOAP-lite selector, deterministic stall-recovery flows, and comprehensive evaluation metrics for goal hierarchies.",
       "takeaways": [
-        "Add no-progress guards that detect alternating state loops, not only repeated identical states.",
-        "Filter bookkeeping slots out of progress checks so metadata churn does not keep a loop alive.",
-        "Use a small SQLite quality DB to compare eval scores over time across judge, model, and feature dimensions."
+        "Implement resilient documentation generators that skip empty repositories and apply exponential backoff on 429 errors to ensure stable nightly builds.",
+        "Adopt a typed GoalSegment schema to structure FSM phases into measurable groups, enabling precise tracking of slot-filling and progress metrics.",
+        "Use deterministic stall-recovery patterns with named failure classes and generic inquiry fallbacks to handle conversational dead-ends reliably.",
+        "Build regression testing tools that replay recorded evaluation sessions to validate flow changes against canonical archetype taxonomies."
       ],
-      "total_commits": 3,
+      "total_commits": 42,
       "repos": [
         {
-          "name": "riff",
-          "commits": 3,
+          "name": "github-portfolio-search",
+          "commits": 5,
           "messages": [
+            "feat(automation): nightly gen-docs now also builds the daily digest + auto-deploys",
+            "chore: regenerate L0 project docs [skip ci]",
+            "fix(gen-docs): skip empty repos (409) + add 429 backoff to DashScope client",
+            "feat(docs): always-complete docs index with a prominent repo-overview card",
+            "docs(riff): republish riff's 17 eval/methodology docs + propagate Daily nav"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 37,
+          "messages": [
+            "test(goap): increment-6 pilot probe + A/B — split fixes mega-collect, GOAP doesn't beat it (#16/#23)",
+            "docs(html): new Transcript Audit page (review_transcripts / --validate)",
+            "docs(html): stall-recovery — add generic_inquiry (2nd flow), name the failure class",
+            "docs(html): mark GOAP lint gates (increment 2) shipped in the status table",
+            "feat(goap): increment 2 — lint gates for selector:goap_lite segments (#16)",
+            "test(goap): increment 5 — _goap_selector_probe flow + A/B proof (#16)",
+            "docs(html): update GOAP-lite selector page to 'built behind a flag' status",
+            "feat(goap): increment 4 — wire choose_next into evaluate_next_step behind dual gate (#16)",
+            "feat(goap): increment 3 — pure goap_selector module + predicate tests (#16)",
+            "feat(goap): increment 1 — additive capability schema for the GOAP-lite selector (#16)",
+            "fix(flow): generic_inquiry stalled-recovery — held-out 2.5/5/7.5 → 10 (reuses stalled/sets primitive)",
+            "docs(html): dedicated GOAP-lite selector page (goal-hierarchy phase 7)",
+            "backlog(F-360): real location-based weather (replace canned stub)",
+            "feat(eval): review_transcripts.py — list/show/VALIDATE recorded flow conversations (audit tool)",
+            "docs(html): move eval+goal-hierarchy docs to docs/html root for publish",
+            "docs(html): comprehensive eval + goal-hierarchy documentation",
+            "feat(flow): GoalSegment schema — typed group contract (goal-hierarchy phase 3, #15)",
+            "feat(fsm): deterministic stall-recovery (sets: edges + stalled guard) — closes restaurant_reservation held-out gap",
+            "feat(eval): replay_eval.py — replay recorded EVAL sessions after a change (regression check)",
+            "fix(eval): normalize persona's bare 7-digit phone → valid 10-digit (dog_grooming 3.3→10)",
+            "fix(eval): --analyze root-cause gates low slot_fill on low progress (real slot_fill is front-load-noisy)",
+            "test(eval): fix stale personas_run assertion (6→live archetype count, task #18)",
+            "chore(eval): drop broken claude agent from full_calibration (anthropic API 400s)",
+            "feat(eval): canonical archetype taxonomy — merge lifecycle_phase + speech_act labels",
+            "feat(eval): --archetype — cross-flow subpart grouping (same FSM phase across ALL flows)",
+            "docs(eval): correct backend-mock scope — apartment_scheduler ONLY, not the class",
+            "feat(eval): group_cohesion metric — 'do a group's states work together?' (GH phase, headline)",
+            "feat(eval): emit slot_filled at the commit choke point — per-state slot evidence (GH phase 2)",
+            "docs(eval): align goal-hierarchy diagram with typed/bounded metrics",
+            "docs(eval): fold Codex review v2 into goal-hierarchy doc (6 REQUIRED fixes)",
+            "docs(eval): Goal-Hierarchy Flow Model — flow→group→state, each with goal+metric",
+            "fix(eval): segment-goals verdict uses reliable progress/stall, not the slot_fill gap",
+            "feat(eval): --segment-goals — derive each group's GOAL + whether it's met",
+            "feat(eval): codex judge works for humanness + claude-code-CLI judge adapter",
+            "fix(eval): exclude errored conversations from aspect/state ingest (Codex robustness #3)",
+            "feat(eval): backend mock layer (Codex stall-design B#1) — gated by RIFF_EVAL_MOCK_BACKENDS=1",
+            "feat(eval): segment worst-member column (Codex group-review A)"
+          ]
+        }
+      ],
+      "commit_sig": "d46f7d8fb556abe9"
+    },
+    {
+      "date": "2026-06-21",
+      "headline": "Build a Crossed-Panel LLM Eval Matrix with Automated Quality Gates",
+      "summary": "Implemented a comprehensive evaluation framework featuring a 3-agent by 3-judge crossed panel, automated CI quality gates, and a SQLite-backed performance model. The system integrates computed operational metrics with judged aspects like humanness to detect regressions and backend stalls.",
+      "takeaways": [
+        "Implement a crossed-panel evaluation design (multiple agents × multiple judges) to decompose variance and isolate judge noise from model performance.",
+        "Use automated pre-push hooks and CI gates to block commits that cause regression in specific computed aspects like latency or completion rates.",
+        "Store evaluation scores in a structured SQLite database tracking changes over time, enabling trend analysis and rescore capabilities without re-running full suites.",
+        "Apply concreteness gates to scheduling flows by parsing natural language time expressions and blocking bookings on vague inputs before state transitions."
+      ],
+      "total_commits": 57,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 2,
+          "messages": [
+            "feat(daily): cache unchanged days — re-runs skip the engine entirely",
+            "feat(daily): regenerate all 145 days with codex + resilient batch generation"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 55,
+          "messages": [
+            "feat(eval): full_calibration.sh — THE complete crossed panel (3 agents × 3 judges × per-state)",
+            "feat(eval): state_data_run.sh — generate per-state data across 3 agents incl claude",
+            "feat(eval): --analyze — after-run auto-analysis (prioritized what-to-work-on)",
+            "feat(eval): aggregated state-GROUPS (segments) — the middle tier (state→segment→flow)",
+            "feat(eval): per-STATE quality layer — state_scores + --state-matrix (Codex-designed)",
+            "docs(eval): Codex specs for state-quality + aggregated state-groups",
+            "docs(eval): aggregated state-GROUPS — the middle tier (state -> group -> flow), for Codex",
+            "docs(eval): state-level quality vision — flow -> state -> quality (for Codex)",
+            "feat(eval): stall_detector.py — capture the backend-stall failure class",
+            "docs(eval): backend-stall capture + mock + permanent-gate design (for Codex)",
+            "feat(eval): pre-push quality gate hook + installer",
+            "feat(eval): CI quality gate — per-commit computed-aspect regression gate",
+            "loop tune: split dog_grooming owner collection (name then phone) — Collect Pattern",
+            "loop fix: persona must give complete 10-digit phones + valid data (systemic eval fix)",
+            "feat(eval): expand judge roster — codex + open-model bench (mistral/phi4/gemma/claude)",
+            "fix(eval): Codex robustness pass — canonicalize humanness, cross matrix by agent",
+            "feat(eval): full_matrix.sh — the complete crossed run (20 flows × 2 agents × 3 judges)",
+            "loop tune: route austin availability path through contact collection",
+            "loop iter: fix austin completion_slots + eval_db --export-csv (graph-able data)",
+            "feat(eval): gated operability aggregate — the matrix is complete",
+            "feat(eval): humanness judged aspect — the matrix is now COMPLETE",
+            "docs(eval): the evaluation matrix — 6-flow computed aspects + what each catches",
+            "feat(eval): aspect_scores tidy table + --ingest-aspects + --matrix (Codex matrix #4)",
+            "feat(eval): conversation identity + correctness aspect (Codex matrix #1-3)",
+            "docs(eval): Codex-constructed evaluation matrix spec (7 aspects + DDL + gated aggregate)",
+            "feat(eval): computed aspects from the live event stream (latency/errors/completion)",
+            "docs(eval): multi-aspect evaluation matrix design — computed vs judged",
+            "feat(eval): add codex (GPT) as 3rd judge to the calibration panel",
+            "feat(eval-db): flow-modification tracking — interleave edits with evals",
+            "feat(eval): calibration panel + --flow-table (all flows × agent × judge)",
+            "docs(eval): timeline + measured judge noise (qwen vs gemini, same transcripts)",
+            "feat(eval-db): --timeline — table over time by change (commit) and judge LLM",
+            "feat(eval): eval_rescore.py — rescore saved transcripts with a 2nd judge (Codex cheap path)",
+            "feat(eval): honest performance model — Codex required changes folded in",
+            "feat(eval): performance model — variance budget + noise floor (judge×model×flow)",
+            "docs(eval): performance-model design — variance decomposition (judge×model×flow×persona)",
+            "feat(eval): record the SITUATION per score — agent model (incl. failover), judge, variance",
+            "docs: repeat-3 before/after result — session work slightly regressed quality (-0.26)",
+            "docs: overnight summary — date/time enforcement complete + repeat-3 sweep status",
+            "feat(date-time): booking preflight — downgrade a vague book to availability (Codex #5)",
+            "feat(lint): ungated-booking-time — warn booked flows with an unflagged date/time slot (Codex #4)",
+            "feat(date-time): book_requires_concrete gate — vague times can't book (Codex-reviewed)",
+            "docs(date-time): FSM concreteness-gate implementation plan (for Codex review)",
+            "feat(date-time): shared is_specific_when() concreteness gate (Codex review #1)",
+            "fix(eval-db): composition-aware trend — only delta same-flow-set runs",
+            "fix(prompt): gate date/time guidance to scheduling flows only",
+            "feat(date-time): prompt guidance — never confirm a booking on a vague time",
+            "test(scheduling): end-to-end 'a calendar slot can be scheduled' + vague-can't-book (with Codex)",
+            "feat(timeexpr): human-time corpus + colloquial parsing (computer + human tests)",
+            "fix(timeexpr): correct noon/midnight regex group (6 not 7) — 4 tests pass",
+            "feat(date-time): TimeExpr concreteness classifier (Codex-reviewed, slice 1)",
+            "docs(date-time): structured TimeExpr + date-type design (for Codex review)",
             "fix(turn): no-progress backstop catches state oscillation (A<->B), not just stalls",
             "fix(turn): no-progress backstop excludes bookkeeping slots — breaks the #1 loop",
             "feat(eval): SQLite quality DB — scores over time by judge/model/feature (Codex plan)"
           ]
         }
       ],
-      "commit_sig": "e0916f620b26ee19"
+      "commit_sig": "4bbb11e8d3103369"
     },
     {
       "date": "2026-06-20",
@@ -3447,15 +3577,14 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Reusable Sweep Gates for Conversation Primitives and Scheduling",
-      "summary": "Riff turned conversational primitives into doc-as-spec modules backed by YAML scenario suites, invariant tests, and reusable sweep scripts across announce, choice, collect, confirm, end, reason, record, run_program, verify_caller, and book_appointment. The day also shipped book_appointment_v1 scheduling guards/provider state, flow-graph layout and zoom fixes, a Gemini 2.5 default migration, plus smaller updates for env-suffixed webhook FIFO ARNs and query_override pipeline coverage.",
+      "headline": "Riff Hardens Core Primitives with Automated Sweep Gates and Spec-Driven Docs",
+      "summary": "The Riff framework completed a comprehensive audit of ten core modules, replacing speculative documentation with invariant-based specs and automated sweep scripts. This update introduces reusable testing gates, fixes critical state management bugs in scheduling and flow graphs, and standardizes error handling across the platform.",
       "takeaways": [
-        "Use doc-as-spec primitive docs plus invariant tests to make conversational module contracts executable and reviewable.",
-        "Reuse the YAML-driven _sweep_base runner pattern to gate behavior across scenario files and emit actionable defects.",
-        "Model appointment booking as a parameterized module with loader checks, guard registration, tentative/booked/error provider fields, and side-effect blocking in confirm states.",
-        "Improve flow editors with a three-column spine layout, SVG overlay edges, width-aware sibling spread, word wrapping, active-state auto-pan, and explicit zoom controls."
+        "Adopt the 'doc-as-spec' template defining explicit Invariants and Failure Modes for each module to replace ambiguous narrative documentation.",
+        "Reuse the `sweep_<module>.py` gate scripts to automatically validate module behavior against YAML-defined scenarios before merging changes.",
+        "Implement parameterized flow definitions using `[[VAR]]` syntax to create reusable, testable microcosms for complex state machines like booking."
       ],
-      "total_commits": 150,
+      "total_commits": 133,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3474,7 +3603,7 @@
         },
         {
           "name": "riff",
-          "commits": 147,
+          "commits": 130,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3605,40 +3734,22 @@
             "refactor(tests): drop redundant sys.path.insert from test_sweep_base",
             "fix(web): redirect docs/ directory URLs to README.md?format=html when present",
             "fix(tests): replace pytest.skip with return in session-scoped linter gate",
-            "fix(scripts): give load_scenarios a diagnostic error on empty YAML files",
-            "docs(flows): add /docs/flows/README.md (Tier 3 index)",
-            "docs(patterns): add /docs/tutorials/composition/README.md placeholder for Tier 2 patterns",
-            "docs(primitives): rebuild README.md as 10-card index with type and tier tags",
-            "web(nav): add top-nav with Docs dropdown to landing page (Primitives/Patterns/Business Flows/Versioning)",
-            "test(primitives): cover _sweep_base.load_scenarios validation",
-            "feat(scripts): add _sweep_base.py (Scenario, load_scenarios, SweepResult; YAML-driven runner)",
-            "test(primitives): gate test session on doc/test alignment",
-            "test(primitives): cover check_doc_test_alignment.py with happy + missing + orphan tests",
-            "feat(scripts): add check_doc_test_alignment.py linter (gates on doc/test drift)",
-            "docs(primitives): add VERSIONING.md (manual propagation default; CI gate deferred to ≥3 dependents)",
-            "docs(primitives): add doc-as-spec template (the contract every primitive doc must follow)",
-            "chore(memory): add backlog/primitives/ scaffold for per-primitive backlogs",
-            "chore(tests): add tests/primitives/ scaffold",
-            "fix(types): add required_tool field to StateDef (was parsed in loader but absent from dataclass)",
-            "docs(impl-plan): add 6-phase primitives-harden implementation plan + test requirements",
-            "chore(primitives-harden): import verify_caller_v1 baseline from feat/visual-editor-v1 WIP",
-            "docs: add primitives-harden design plan"
+            "fix(scripts): give load_scenarios a diagnostic error on empty YAML files"
           ]
         }
       ],
-      "commit_sig": "cc83f2bb5e483a7c"
+      "commit_sig": "ab4831ac98058b9d"
     },
     {
       "date": "2026-05-01",
-      "headline": "Briefing Pipelines Get Budgets, Recency, and Voice Reuse",
-      "summary": "The intelligence briefing toolkit was hardened for long-running daily publishing by switching backends, bounding costly steps, adding wall-clock and per-page timeouts, and preserving partial output. Collection and extraction also improved with rotating-focus recency queries, broader URL date parsing, signal/source date locking, and patched evidence rows, while riff added reusable voice modules and Telnyx audio fixes.",
+      "headline": "Stabilize Intelligence Briefing Pipeline with Ollama and Strict Budgets",
+      "summary": "The daily publishing pipeline switched to an Ollama backend to resolve MLX memory issues while implementing strict time and cost budgets. New extraction features now support wider date patterns and rotating focus queries with robust timeout handling.",
       "takeaways": [
-        "Add hard wall-clock and per-page timeouts to data pipelines, then save partial results so stuck sources do not erase useful progress.",
-        "Bound expensive daily workflow stages by skipping optional verify/extend/counter passes when per-project budgets matter more than exhaustive analysis.",
-        "Improve freshness extraction by wiring recency-aware rotating queries and broader URL date patterns, then patch existing evidence in place.",
-        "Package voice behavior as reusable modules and fix provider-specific audio issues, such as Telnyx handling, for reuse across voice features."
+        "Swap local MLX inference for Ollama backends to prevent out-of-memory errors during long-running text processing tasks.",
+        "Implement hard wall-clock timeouts (e.g., 10 minutes) with partial state saving to ensure pipelines complete even if individual steps stall.",
+        "Use rotating-focus queries combined with recency weighting to dynamically prioritize fresh data in automated collection workflows."
       ],
-      "total_commits": 8,
+      "total_commits": 7,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3652,28 +3763,21 @@
             "feat(collect): rotating-focus query + think-strip parser + recency wired",
             "fix(daily-publish): keep signal date in lockstep with source_url"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 1,
-          "messages": [
-            "Add reusable voice modules and Telnyx audio fixes"
-          ]
         }
       ],
-      "commit_sig": "7871b62bf8fc7965"
+      "commit_sig": "b2c80405f82690f2"
     },
     {
       "date": "2026-04-30",
-      "headline": "Launchd Briefings and Voice Workflow Blocks Land",
-      "summary": "The intelligence briefing toolkit gained a launchd-driven daily collect-to-brief-to-publish pipeline, JSON-LD publish-date extraction, smarter backfill, and recency-tiered briefs with published dates throughout. Riff added a building-block tutorial catalog and composition case studies while hardening its live voice path with choice_stt, MlxWhisperEngine, transcript_sources UI/state trace, audio persistence, timeout cleanup, and smoke tests.",
+      "headline": "Automated Daily Intelligence Pipeline with Recency-Tiered Briefing",
+      "summary": "Implemented a launchd-driven daily pipeline that collects, processes, and publishes intelligence briefs with smarter backfilling and JSON-LD date extraction. The system now features recency-tiered ordering, timezone-aware tiering, and robust cleaning of LLM think-blocks.",
       "takeaways": [
-        "Automate daily research pipelines with launchd, explicit collect/brief/publish stages, and publish-date metadata from JSON-LD.",
-        "Order generated briefs by recency tiers and use timezone-aware published_at fields so backfills stay auditable.",
-        "Package workflow primitives as tutorials and compositions, such as Collect-to-Confirm and Record-to-Reason-to-CRM, for reusable app flows.",
-        "Add live STT incrementally with a transport tee, transcript comparison UI, persisted audio playback, real-engine smoke tests, warmup, and TTL cleanup."
+        "Reuse the launchd configuration to schedule automated collect-brief-publish cycles for any data aggregation workflow.",
+        "Apply the JSON-LD parsing logic to extract accurate publication dates from web sources for improved metadata handling.",
+        "Implement the regex-based stripping of <think> blocks to clean raw LLM outputs before public display.",
+        "Adopt the recency-tiered sorting algorithm to prioritize content freshness in generated reports or dashboards."
       ],
-      "total_commits": 47,
+      "total_commits": 5,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3685,69 +3789,20 @@
             "feat: recency-tiered brief ordering + published dates everywhere",
             "data: snapshot research_projects after 2026-04-30 pipeline runs"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 42,
-          "messages": [
-            "docs(tutorials): 🏁 CLOSING.md — cron loop ENDS at iter-20",
-            "docs+test: T-BB55 GOTCHAS.md + iter-19 final audit",
-            "docs(tutorials): T-BB60 user-action gate + T-BB20/32 callouts (iter-18)",
-            "docs+code: T-BB37/38/43/44 polish + T-BB56 citation audit (iter-17)",
-            "docs(tutorials): T-BB13 production diversity + T-BB27 tool reference",
-            "feat(tutorials): T-BB21 fake provider tool + T-BB45 starter flows",
-            "feat(flows): T-BB42 module retrofit + T-BB50 strict-mode audit",
-            "feat(loader): T-BB40 static safety-gate check (warn-by-default)",
-            "feat(tutorials): comp #4 case study + iter-13+ roadmap — phase 2 done",
-            "feat(tutorials): composition #3 (Record→Reason→CRM) + T-BB39 audit",
-            "feat(tutorials): composition #2 (Confirm→Run Program safety-gate) + B-303",
-            "feat(tutorials): composition #1 (Collect→Confirm) + T-BB31 retrofit",
-            "feat(tutorials): block #8 (Reason) + full-set retro — 8/8 blocks live",
-            "feat(tutorials): block #7 (Record) + T-BB24 guards example column",
-            "feat(tutorials): T-BB17 guards reference + block #6 (End)",
-            "feat(tutorials): T-BB8 index rewrite + block #5 (Run Program)",
-            "feat(tutorials): block #4 (Confirm) — half the catalog now live",
-            "feat(tutorials): block #3 (Collect) + T-BB14 cut-decision",
-            "feat(tutorials): block #2 (Choice) + close 3 iter-1 critiques",
-            "feat(tutorials): building-block tutorial framework + Announce iter-1",
-            "chore: checkpoint operator edits + regenerated static audio",
-            "feat(apartment_scheduler): swap collect_day for modular scheduling_triage",
-            "feat: render transcript_sources comparison live on voice.html",
-            "refactor(B-WC1): transcript-sources panel inline styles → CSS classes",
-            "fix(B-WC9): warm mlx-whisper synchronously at server boot",
-            "fix(B-WC8): trim leading + trailing silence before Whisper transcribe",
-            "test(F-WC2): real-engine smoke tests for MlxWhisperEngine — first slice",
-            "fix(B-WC3, B-WC5): whisper_timeout kwarg + audio TTL sweep at boot",
-            "fix(B-WC7): warm mlx-whisper on WS connect; fix kwarg passing",
-            "fix(B-WC6): timeout branch crashed s2b pump on first call after boot",
-            "docs(B-WC5): file TTL-cleanup follow-up for choice_stt audio persistence",
-            "feat(F-WC1 §11): persist captured audio + play button in State Trace",
-            "feat(F-WC1 Phase 2): assist-mode runtime swap when Whisper rescues",
-            "feat(F-WC3): MlxWhisperEngine — real Apple-Silicon Whisper for live path",
-            "fix(B-WC4): add bare proper nouns to apartment_choice_module examples",
-            "chore(start-riff): default choice_stt ON in shadow mode (F-WC1)",
-            "docs(B-WC4): apartment_choice_module missing bare proper nouns",
-            "docs(B-WC2): Whisper plan baseline — STT garble is 50% of no_matches",
-            "test(F-WC1): cover the transport tee path; address Steve Jobs review",
-            "feat(F-WC1): Phase 0.5 backend — choice_stt + transport tee + session emit",
-            "feat(state-trace): render transcript_sources for Whisper plan Phase 0.5",
-            "feat(static-audio): browser Live transport plays pre-rendered play_audio states"
-          ]
         }
       ],
-      "commit_sig": "b53f95a2ba829e71"
+      "commit_sig": "222a1b9a70e9ff98"
     },
     {
       "date": "2026-04-29",
-      "headline": "Local LLM Briefings and a Reusable Flow Builder Bench",
-      "summary": "intelligence-briefing-toolkit added an MLX backend for a local Qwen3 8B LLM with install and startup health checks, plus preserved source published_at metadata in synthesized reports. riff advanced its Builder with Tier 1 block tooling, choice-route previews, test-bench logs/API docs/parity guards, responsive and accessible palette behavior, and boot/state/style fixes.",
+      "headline": "Local Qwen3 LLM Integration with Robust Health Checks",
+      "summary": "The intelligence briefing toolkit now supports local inference via the MLX backend using Qwen3 8B, complete with automated installation and startup health checks. Additionally, the synthesizer module was updated to preserve source publication dates for improved report accuracy.",
       "takeaways": [
-        "Gate local MLX/Qwen3 runs with install and startup health checks so self-hosted LLM workflows fail fast.",
-        "Preserve published_at in report.sources so generated briefings can retain source timing for sorting, filtering, and citation.",
-        "Build flow editors around block palettes, block-aware inspectors, choice routes, and compiled-tier previews to make branching logic inspectable.",
-        "Pair builder test benches with JSONL examples, timeline parity guards, output logs, status sync, and keyboard-accessible responsive palettes."
+        "Implement MLX backend integration for running Qwen3 8B locally to reduce dependency on external APIs.",
+        "Add install and startup health checks to ensure local LLM services are ready before processing requests.",
+        "Preserve metadata like 'published_at' in data synthesis pipelines to maintain source context and traceability."
       ],
-      "total_commits": 23,
+      "total_commits": 2,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3756,36 +3811,9 @@
             "feat: MLX backend for local LLM (Qwen3 8B); install + startup health checks",
             "feat(synthesizer): preserve published_at in report.sources"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 21,
-          "messages": [
-            "Fix choice keyword prompt compatibility",
-            "feat(builder): \"Build L1\" button — show compiled tiers per choice",
-            "fix(builder): side panel header was hidden behind .studio-top toolbar",
-            "fix(server): repair _interrupt_from_signal — orphan code blocked boot",
-            "feat(flows): apartment_scheduler — modern Builder block walkthrough",
-            "docs(builder): convergence tick — slice complete, awaiting direction",
-            "feat(builder): block-kind tooltips on side chip + palette state counts",
-            "feat(builder): bench log clear affordance + final-loop status sync",
-            "docs/test(builder): bench JSONL examples + timeline parity guard",
-            "feat(builder): bench event hygiene + timeline alt-branch parity",
-            "fix(B-BB1): owner chip loses styling on \"gemini\"; clarify bench API",
-            "feat(builder): bench output log + ambiguous-route warning",
-            "docs(builder): Test Bench API design + status sync for Codex",
-            "feat(builder): YAML preview disclaimer + prefer server runtime_owner",
-            "feat(builder): palette responsive collapse + close out F-BB1/F-BB2",
-            "test(builder): static contract tests + harvest 3 Codex review items",
-            "feat(builder-2): dimmed alternate branches + status-for-codex marker",
-            "a11y(builder): palette gets role=button + Enter/Space keyboard handler",
-            "backlog: file Codex review items (F-FW1/F-FW2/F-BB1)",
-            "feat(builder): block palette, block-aware inspector, choice routes, test bench (Tier 1)",
-            "fix(B-301): durable state-trace writer was dropping locked_choice_evaluated"
-          ]
         }
       ],
-      "commit_sig": "20e56035bad4e910"
+      "commit_sig": "ca79e7e754e204d5"
     },
     {
       "date": "2026-04-28",

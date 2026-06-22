@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-22T18:48:13.406821Z",
-  "count": 132,
+  "generated_at": "2026-06-22T22:08:40.265310Z",
+  "count": 137,
   "projects": [
     {
       "slug": "2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -225,16 +225,16 @@
     },
     {
       "slug": "Browser-Text-to-Speech-TTS-Realtime",
-      "title": "Browser-Text-to-Speech-TTS-Realtime",
-      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "title": "Browser Text To Speech TTS Realtime",
+      "one_liner": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio.",
       "tech": [
         "TypeScript",
-        "React 18",
+        "React",
         "Vite",
-        "ONNX Runtime Web",
         "WebAssembly",
+        "ONNX Runtime",
         "Tailwind CSS",
-        "shadcn/ui"
+        "TanStack Query"
       ],
       "reuse_tags": [
         "tts",
@@ -246,31 +246,29 @@
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime",
-      "pushed_at": null
+      "pushed_at": "2026-06-21T18:04:42Z"
     },
     {
       "slug": "COE-overview",
-      "title": "COE-overview",
+      "title": "COE Overview",
       "one_liner": "Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.",
       "tech": [
         "Python",
         "SQLAlchemy",
-        "Alembic",
         "Pydantic",
+        "Alembic",
         "AsyncIO",
-        "Structlog",
-        "PostgreSQL"
+        "Structlog"
       ],
       "reuse_tags": [
         "security-ops",
         "data-aggregation",
-        "weekly-reporting",
         "python-etl",
-        "k8s-cronjob"
+        "kubernetes-cronjob"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/COE-overview",
-      "pushed_at": null
+      "pushed_at": "2026-06-20T12:21:54Z"
     },
     {
       "slug": "FSM-generic",
@@ -644,6 +642,16 @@
       "pushed_at": null
     },
     {
+      "slug": "aws-tools",
+      "title": "Aws Tools",
+      "one_liner": "Empty repository stub for AWS tools.",
+      "tech": [],
+      "reuse_tags": [],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/aws-tools",
+      "pushed_at": "2023-10-13T18:05:14Z"
+    },
+    {
       "slug": "bot-customerObsessed-No-Prob-Bob-afterburner",
       "title": "No Prob Bob — Customer Discovery Agent",
       "one_liner": "A conversational AI agent that guides customer discovery interviews, extracts insights, and saves structured seed documents to Afterburner projects.",
@@ -1004,6 +1012,20 @@
       "pushed_at": null
     },
     {
+      "slug": "codefreshbuilds",
+      "title": "Codefreshbuilds",
+      "one_liner": "Thin repository stub for a Codefresh build metrics tool.",
+      "tech": [],
+      "reuse_tags": [
+        "placeholder",
+        "stub",
+        "empty-repo"
+      ],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/codefreshbuilds",
+      "pushed_at": "2023-05-24T21:26:58Z"
+    },
+    {
       "slug": "cognito-lambda-s3-webserver-cloudfront",
       "title": "CloudDrive: Serverless Personal Cloud with Audio Recording",
       "one_liner": "A secure, mobile-first personal cloud platform featuring chunked audio recording, file management, and event-driven architecture on AWS.",
@@ -1107,30 +1129,28 @@
     },
     {
       "slug": "everyone-ai",
-      "title": "everyone-ai",
-      "one_liner": "A self-service internal developer platform that launches isolated Claude Code workspaces on Kubernetes via a web portal.",
+      "title": "Everyone Ai",
+      "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
       "tech": [
         "Node.js",
         "Express",
-        "Kubernetes (k3s)",
+        "Kubernetes",
+        "k3s",
         "Helm",
         "Traefik",
         "code-server",
-        "Claude Code",
-        "Bash",
-        "Playwright"
+        "Vanilla JS"
       ],
       "reuse_tags": [
-        "kubernetes-operator",
-        "dev-portal",
         "ai-workspace",
-        "self-hosted",
+        "kubernetes-platform",
+        "developer-tools",
         "claude-code",
-        "vscode-web"
+        "self-hosted"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/everyone-ai",
-      "pushed_at": null
+      "pushed_at": "2026-06-20T14:14:10Z"
     },
     {
       "slug": "exampleLoops",
@@ -1196,26 +1216,28 @@
     },
     {
       "slug": "generate_title_headline_hooks",
-      "title": "generate_title_headline_hooks",
-      "one_liner": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification to prevent hallucinated quotes and unsupported claims.",
+      "title": "Generate Title Headline Hooks",
+      "one_liner": "An integrity-checked headline generation pipeline that separates proposal, judgment, and verification.",
       "tech": [
         "Python",
         "FastAPI",
         "Pydantic",
         "SQLite",
         "Uvicorn",
-        "HTTPX"
+        "HTTPX",
+        "Anthropic SDK",
+        "Pytest"
       ],
       "reuse_tags": [
-        "content-generation",
-        "nlp-pipeline",
-        "hallucination-prevention",
-        "llm-orchestration",
-        "fastapi-service"
+        "headline-generation",
+        "content-integrity",
+        "llm-pipeline",
+        "fastapi-service",
+        "fact-checking"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/generate_title_headline_hooks",
-      "pushed_at": null
+      "pushed_at": "2026-06-19T19:57:10Z"
     },
     {
       "slug": "github-portfolio-search",
@@ -1223,23 +1245,25 @@
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "tech": [
         "Python",
-        "SQLite-vec",
-        "sentence-transformers",
+        "HTML",
+        "JavaScript",
         "FastAPI",
-        "Click",
+        "SQLite-vec",
+        "Sentence-Transformers",
         "AWS Lambda",
-        "S3/CloudFront"
+        "CloudFront",
+        "S3"
       ],
       "reuse_tags": [
-        "portfolio",
-        "search-engine",
-        "knowledge-base",
-        "developer-tools",
-        "ai-assistant"
+        "semantic-search",
+        "github-indexer",
+        "portfolio-tool",
+        "mcp-server",
+        "static-ui"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": null
+      "pushed_at": "2026-06-22T22:02:39Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -1344,6 +1368,20 @@
       "pushed_at": null
     },
     {
+      "slug": "hello-world2",
+      "title": "Hello World2",
+      "one_liner": "An empty or minimal GitHub repository with no provided documentation or source code.",
+      "tech": [],
+      "reuse_tags": [
+        "empty",
+        "stub",
+        "placeholder"
+      ],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/hello-world2",
+      "pushed_at": "2017-10-12T06:59:37Z"
+    },
+    {
       "slug": "html-framework-record-ver2.0",
       "title": "html-framework-record-ver2.0",
       "one_liner": "A lightweight, web-only audio recorder that captures PCM data and stores it in IndexedDB for persistent local playback.",
@@ -1383,15 +1421,14 @@
     {
       "slug": "intelligence-briefing-toolkit",
       "title": "Intelligence Briefing Toolkit",
-      "one_liner": "A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings.",
+      "one_liner": "A standalone research pipeline that searches the web, extracts claims, accumulates evidence, and generates intelligence briefings via CLI, Library, REST, or MCP.",
       "tech": [
         "Python",
         "FastAPI",
-        "Anthropic SDK",
-        "Pydantic",
-        "Model Context Protocol (MCP)",
-        "JSON",
-        "AsyncIO"
+        "Anthropic Claude API",
+        "Model Context Protocol MCP",
+        "Serper.dev",
+        "DuckDuckGo"
       ],
       "reuse_tags": [
         "osint",
@@ -1399,12 +1436,11 @@
         "llm-orchestration",
         "cli-tool",
         "rest-api",
-        "mcp-server",
-        "evidence-tracking"
+        "mcp-server"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/intelligence-briefing-toolkit",
-      "pushed_at": null
+      "pushed_at": "2026-06-16T08:06:43Z"
     },
     {
       "slug": "interviewnotes",
@@ -1700,34 +1736,29 @@
     {
       "slug": "nvidia-parakeet-ver-5",
       "title": "NVIDIA Parakeet Riva ASR Deployment System",
-      "one_liner": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT speech recognition via Riva ASR with WebSocket streaming.",
+      "one_liner": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts.",
       "tech": [
-        "Python 3.10+",
+        "Python",
         "FastAPI",
         "WebSockets",
         "gRPC",
-        "NVIDIA Riva ASR",
         "Docker",
-        "NVIDIA Container Toolkit",
+        "NVIDIA Riva",
         "Pydantic",
-        "SpeechBrain",
-        "Boto3"
+        "SpeechBrain"
       ],
       "reuse_tags": [
         "ASR",
-        "Speech-to-Text",
+        "Speech Recognition",
         "NVIDIA",
         "Riva",
-        "Parakeet",
-        "Real-time",
         "WebSocket",
-        "GPU-Accelerated",
-        "AWS",
-        "Deployment-Pipeline"
+        "GPU",
+        "Deployment"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/nvidia-parakeet-ver-5",
-      "pushed_at": null
+      "pushed_at": "2026-06-16T17:41:02Z"
     },
     {
       "slug": "nvidia-riva-conformer-streaming",
@@ -1930,25 +1961,27 @@
     {
       "slug": "picture_qr_code_2_login",
       "title": "Picture QR Code Login",
-      "one_liner": "Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution.",
+      "one_liner": "Serverless shared photo album with Google sign-in, guest access, and identity-based delete permissions.",
       "tech": [
         "AWS Lambda",
         "Amazon S3",
-        "Amazon CloudFront",
-        "HTML5/JavaScript",
-        "Python",
-        "Google Identity Services"
+        "CloudFront",
+        "Google Sign-In",
+        "HTML5",
+        "JavaScript",
+        "Python"
       ],
       "reuse_tags": [
+        "event-photo-sharing",
         "aws-serverless",
-        "photo-album",
-        "oauth-login",
-        "s3-direct-upload",
-        "qr-code-access"
+        "google-oauth",
+        "s3-presigned-urls",
+        "qr-code-access",
+        "identity-aware-delete"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/picture_qr_code_2_login",
-      "pushed_at": null
+      "pushed_at": "2026-06-15T17:23:48Z"
     },
     {
       "slug": "pictures-valentina",
@@ -1972,6 +2005,16 @@
       "thin": false,
       "repo_url": "https://github.com/davidbmar/pictures-valentina",
       "pushed_at": null
+    },
+    {
+      "slug": "pythonArrays",
+      "title": "PythonArrays",
+      "one_liner": "An empty or stub repository with no source code or documentation.",
+      "tech": [],
+      "reuse_tags": [],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/pythonArrays",
+      "pushed_at": "2018-02-06T07:40:46Z"
     },
     {
       "slug": "pythonArrays2",
@@ -2077,22 +2120,25 @@
       "tech": [
         "Python",
         "YAML",
-        "FastAPI",
-        "Pytest",
         "Mermaid",
-        "MCP"
+        "JSONL",
+        "WebSockets",
+        "Git",
+        "Pytest"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm",
+        "state-machine",
         "llm-orchestration",
         "python",
-        "deterministic-ai",
-        "state-machine"
+        "yaml-config",
+        "deterministic-guardrails",
+        "a-b-testing",
+        "observability"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-18T04:31:51Z"
+      "pushed_at": "2026-06-22T20:53:32Z"
     },
     {
       "slug": "riot",
@@ -2396,26 +2442,27 @@
     {
       "slug": "supertokens_nodejs",
       "title": "SuperTokens Passwordless Node.js Demo",
-      "one_liner": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.",
+      "one_liner": "A prototype implementation of passwordless authentication using SuperTokens magic links, Node.js, and Docker.",
       "tech": [
         "Node.js",
         "Express",
         "SuperTokens",
-        "Docker",
         "PostgreSQL",
-        "HTML/CSS/JS"
+        "Docker",
+        "HTML",
+        "JavaScript"
       ],
       "reuse_tags": [
         "authentication",
         "passwordless",
-        "nodejs",
         "supertokens",
+        "nodejs",
         "docker",
         "prototype"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/supertokens_nodejs",
-      "pushed_at": null
+      "pushed_at": "2026-06-19T02:17:52Z"
     },
     {
       "slug": "switchboard-ai",
@@ -2467,6 +2514,16 @@
       "thin": false,
       "repo_url": "https://github.com/davidbmar/tailscale-3-node-network",
       "pushed_at": null
+    },
+    {
+      "slug": "testtest",
+      "title": "Testtest",
+      "one_liner": "Empty or stub repository with no source code or documentation.",
+      "tech": [],
+      "reuse_tags": [],
+      "thin": true,
+      "repo_url": "https://github.com/davidbmar/testtest",
+      "pushed_at": "2025-09-09T18:39:24Z"
     },
     {
       "slug": "tool-RAG-for-split-personalities",
@@ -2815,7 +2872,7 @@
       "title": "Voice Calendar Scheduler FSM",
       "one_liner": "A 24/7 voice-driven apartment viewing scheduling assistant using Twilio/WebRTC, an 8-step FSM, and Google Calendar integration.",
       "tech": [
-        "Python 3.11+",
+        "Python",
         "FastAPI",
         "Twilio",
         "WebRTC",
@@ -2827,15 +2884,16 @@
       ],
       "reuse_tags": [
         "voice-agent",
-        "scheduling-bot",
-        "fsm-conversation",
-        "twilio-integration",
-        "webrtc-audio",
-        "calendar-automation"
+        "scheduling",
+        "fsm",
+        "rag",
+        "twilio",
+        "webrtc",
+        "calendar-integration"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/voice-calendar-scheduler-FSM",
-      "pushed_at": null
+      "pushed_at": "2026-06-14T10:33:45Z"
     },
     {
       "slug": "voice-frontend-modules-auth.transport.engine",
