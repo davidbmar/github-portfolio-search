@@ -4,24 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NVIDIA Parakeet Riva ASR Deployment System · davidbmar.com</title>
-<script type="application/json" id="project-data">{"title": "NVIDIA Parakeet Riva ASR Deployment System", "one_liner": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT speech recognition via Riva ASR with WebSocket streaming.", "what_it_is": "A comprehensive infrastructure project that deploys NVIDIA's Parakeet RNNT automatic speech recognition (ASR) model using either NVIDIA NIM containers or traditional Riva servers. It provides a Python-based WebSocket server and client wrapper to enable real-time, low-latency audio transcription with word-level timestamps and confidence scores.", "how_its_built": "The system is built on Python 3.10+ and uses FastAPI for the WebSocket server interface. It integrates with NVIDIA Riva ASR via gRPC (port 50051) or HTTP (port 8000) using a custom `RivaASRClient` wrapper that supports both real GPU-accelerated inference and mock modes. Deployment is managed through Bash scripts targeting AWS EC2 GPU instances (g4dn.xlarge), handling driver installation, Docker/NVIDIA Container Runtime setup, and security group configuration.", "how_to_apply": "Use this system to deploy a scalable, low-latency speech-to-text service for applications requiring real-time transcription, such as live captioning, voice assistants, or meeting recorders. It is suitable for environments where GPU acceleration (Tesla T4/V100) is available and sub-second latency is critical.", "quickstart": "git clone https://github.com/davidbmar/nvidia-parakeet.git\ncd nvidia-parakeet-3\n./scripts/riva-010-run-complete-deployment-pipeline.sh", "features": ["Real-time streaming transcription with ~100-300ms partial result latency", "Dual deployment support: NVIDIA NIM containers and traditional Riva servers", "Word-level timestamps and confidence scores for precise alignment", "Production-grade Python client wrapper with mock mode for testing", "Structured logging framework with millisecond precision and resource monitoring", "WebSocket API for easy integration with web and mobile clients"], "diagram_architecture": "flowchart TD\n    Client[\"Client Apps<br/>(Browser/Node.js/Python)\"] -->|\"WebSocket Audio Stream<br/>Port 8443\"| WS[\"WebSocket Server<br/>(FastAPI + RivaASRClient)\"]\n    WS -->|\"gRPC Call<br/>Port 50051\"| Riva[\"NVIDIA Riva ASR<br/>(NIM or Traditional)<br/>Parakeet RNNT Model\"]\n    Riva -->|\"GPU Inference<br/>(Tesla T4/V100)\"| GPU[\"GPU Worker\"]\n    WS -->|\"Structured Logs\"| Logs[\"Logging & Monitoring<br/>(./logs/)\"]\n    subgraph Deployment\n        WS\n        Riva\n        GPU\n    end", "diagram_sequence": "sequenceDiagram\n    participant C as Client App\n    participant W as WebSocket Server\n    participant RC as RivaASRClient\n    participant R as NVIDIA Riva ASR\n    \n    C->>W: Connect WebSocket (ws://.../ws/transcribe)\n    W->>C: Connection Established\n    loop Streaming Audio\n        C->>W: Send Audio Chunk (PCM16)\n        W->>RC: Process Audio Chunk\n        RC->>R: gRPC StreamingRecognize Request\n        R-->>RC: Partial Result (Interim)\n        RC-->>W: Return Partial Transcription\n        W-->>C: Send Partial JSON Result\n    end\n    C->>W: End Stream / Silence Detected\n    W->>RC: Finalize Request\n    RC->>R: Get Final Result\n    R-->>RC: Final Transcription + Timestamps\n    RC-->>W: Return Final Result\n    W-->>C: Send Final JSON Result", "capabilities": ["Streaming Speech Recognition", "Batch File Transcription", "S3 Audio Processing", "Mock Mode Testing", "Health Check Monitoring", "AWS EC2 Deployment Automation"], "components": ["src/asr/riva_client.py", "docker/rnnt-server-websocket.py", "docker/rnnt-server.py", "config/settings.py", "scripts/riva-010-run-complete-deployment-pipeline.sh", "examples/python-client.py", "examples/nodejs-client.js"], "tech": ["Python 3.10+", "FastAPI", "WebSockets", "gRPC", "NVIDIA Riva ASR", "Docker", "NVIDIA Container Toolkit", "Pydantic", "SpeechBrain", "Boto3"], "depends_on": ["AWS Account (EC2/S3)", "GPU Instance (g4dn.xlarge or better)", "NVIDIA Drivers", "Docker Engine", "NVIDIA Container Runtime"], "integrates_with": ["NVIDIA NIM Containers", "Traditional Riva Server", "AWS S3 Storage", "Browser Clients (via HTTPS/WSS)", "Node.js Applications", "Python Applications"], "patterns": ["Client-Server Architecture", "WebSocket Streaming", "gRPC Communication", "Containerized Deployment", "Infrastructure as Code (Bash Scripts)", "Mock Object Pattern"], "reuse_tags": ["ASR", "Speech-to-Text", "NVIDIA", "Riva", "Parakeet", "Real-time", "WebSocket", "GPU-Accelerated", "AWS", "Deployment-Pipeline"], "slug": "nvidia-parakeet-ver-5", "repo_url": "https://github.com/davidbmar/nvidia-parakeet-ver-5", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "open_pr", "detail": "PR #5: Bump the pip group across 1 directory with 10 updates"}], "screenshot_url": "", "generated_at": "2026-06-14T03:13:08.997475Z", "source_commit": "adb3bd7", "model": "qwen3.7-plus"}</script>
+<script type="application/json" id="project-data">{"title": "NVIDIA Parakeet Riva ASR Deployment System", "one_liner": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts.", "what_it_is": "A deployment framework and client wrapper for running NVIDIA's Parakeet RNNT automatic speech recognition model. It supports both modern NIM containers and traditional Riva server setups, providing low-latency streaming transcription via WebSocket with word-level timestamps and confidence scores.", "how_its_built": "Built with Python 3.10+ using FastAPI for the server interface, Pydantic for configuration management, and websockets for real-time audio streaming. It integrates with NVIDIA Riva ASR via gRPC clients, uses SpeechBrain for fallback or alternative modeling, and relies on Docker/NVIDIA Container Runtime for GPU-accelerated inference on Tesla T4/V100 instances.", "how_to_apply": "Deploy on AWS EC2 g4dn.xlarge or similar GPU instances. Use provided bash scripts to configure security groups, install NVIDIA drivers, deploy Riva/NIM containers, and start the WebSocket proxy. Connect client applications (browser or Node.js/Python) to the WebSocket endpoint for real-time transcription.", "quickstart": "git clone https://github.com/davidbmar/nvidia-parakeet.git\ncd nvidia-parakeet-3\n./scripts/riva-010-run-complete-deployment-pipeline.sh", "features": ["Real-time streaming transcription with ~100-300ms partial result latency", "Dual deployment support for NVIDIA NIM containers and traditional Riva servers", "Word-level timestamps and confidence scores for precise alignment", "Production-grade structured logging and monitoring framework", "WebSocket API for browser and application integration", "Mock mode fallback for development without GPU hardware"], "diagram_architecture": "flowchart TD\n    ClientApps[Client Apps Browser or App] -->|WebSocket Audio Stream| WebSocketServer[WebSocket Server Port 8443]\n    WebSocketServer -->|gRPC Client Wrapper| RivaASR[NVIDIA Riva ASR NIM or Traditional]\n    RivaASR -->|GPU Inference| ParakeetRNNT[Parakeet RNNT Model]\n    WebSocketServer -->|Logs| StructuredLogging[Structured Logging and Monitoring]\n    RivaASR -->|Status| StructuredLogging", "diagram_sequence": "sequenceDiagram\n    participant Client as Client Application\n    participant WS as WebSocket Server\n    participant RivaClient as Riva ASR Client Wrapper\n    participant RivaServer as NVIDIA Riva ASR Service\n    Client->>WS: Connect WebSocket\n    WS->>Client: Connection Established\n    Client->>WS: Send Audio Chunk\n    WS->>RivaClient: Forward Audio Data\n    RivaClient->>RivaServer: gRPC Streaming Request\n    RivaServer-->>RivaClient: Partial Transcription Result\n    RivaClient-->>WS: Return Partial Result\n    WS-->>Client: Emit Partial Transcript\n    RivaServer-->>RivaClient: Final Transcription Result\n    RivaClient-->>WS: Return Final Result\n    WS-->>Client: Emit Final Transcript with Timestamps", "capabilities": ["Streaming ASR", "GPU Acceleration", "WebSocket Proxy", "Infrastructure Automation", "Structured Logging"], "components": ["RivaASRClient", "WebSocket Server", "NIM Container", "Traditional Riva Server", "Deployment Scripts", "Config Settings"], "tech": ["Python", "FastAPI", "WebSockets", "gRPC", "Docker", "NVIDIA Riva", "Pydantic", "SpeechBrain"], "depends_on": ["AWS EC2", "NVIDIA GPU Drivers", "Docker Engine", "NVIDIA Container Toolkit", "Python 3.10+"], "integrates_with": ["NVIDIA NIM", "NVIDIA Riva ASR", "AWS S3", "Browser Clients", "Node.js Applications"], "patterns": ["Client-Server", "Streaming RPC", "Proxy Pattern", "Infrastructure as Code", "Observer Pattern"], "reuse_tags": ["ASR", "Speech Recognition", "NVIDIA", "Riva", "WebSocket", "GPU", "Deployment"], "slug": "nvidia-parakeet-ver-5", "repo_url": "https://github.com/davidbmar/nvidia-parakeet-ver-5", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/pip/pip-68779fdd47 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #6: Bump the pip group across 1 directory with 10 updates"}], "screenshot_url": "", "generated_at": "2026-06-22T21:14:37.221203Z", "source_commit": "adb3bd7", "model": "qwen3.7-plus", "pushed_at": "2026-06-16T17:41:02Z", "docs": []}</script>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
   "name": "NVIDIA Parakeet Riva ASR Deployment System",
-  "description": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT speech recognition via Riva ASR with WebSocket streaming.",
+  "description": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts.",
   "codeRepository": "https://github.com/davidbmar/nvidia-parakeet-ver-5",
   "programmingLanguage": [
-    "Python 3.10+",
+    "Python",
     "FastAPI",
     "WebSockets",
     "gRPC",
-    "NVIDIA Riva ASR",
     "Docker",
-    "NVIDIA Container Toolkit",
+    "NVIDIA Riva",
     "Pydantic",
-    "SpeechBrain",
-    "Boto3"
+    "SpeechBrain"
   ]
 }</script>
 <style>
@@ -64,7 +62,7 @@
 <nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/#/clusters">Clusters</a></nav>
 <header>
   <h1>NVIDIA Parakeet Riva ASR Deployment System</h1>
-  <p class="one-liner">Production-ready deployment pipeline for NVIDIA Parakeet RNNT speech recognition via Riva ASR with WebSocket streaming.</p>
+  <p class="one-liner">Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts.</p>
   <p><a href="https://github.com/davidbmar/nvidia-parakeet-ver-5">https://github.com/davidbmar/nvidia-parakeet-ver-5</a>
      &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
   
@@ -72,9 +70,9 @@
 
 
 
-<section><h2>What it is</h2><p>A comprehensive infrastructure project that deploys NVIDIA&#x27;s Parakeet RNNT automatic speech recognition (ASR) model using either NVIDIA NIM containers or traditional Riva servers. It provides a Python-based WebSocket server and client wrapper to enable real-time, low-latency audio transcription with word-level timestamps and confidence scores.</p></section>
+<section><h2>What it is</h2><p>A deployment framework and client wrapper for running NVIDIA&#x27;s Parakeet RNNT automatic speech recognition model. It supports both modern NIM containers and traditional Riva server setups, providing low-latency streaming transcription via WebSocket with word-level timestamps and confidence scores.</p></section>
 
-<section><h2>Features</h2><ul class="features"><li>Real-time streaming transcription with ~100-300ms partial result latency</li><li>Dual deployment support: NVIDIA NIM containers and traditional Riva servers</li><li>Word-level timestamps and confidence scores for precise alignment</li><li>Production-grade Python client wrapper with mock mode for testing</li><li>Structured logging framework with millisecond precision and resource monitoring</li><li>WebSocket API for easy integration with web and mobile clients</li></ul></section>
+<section><h2>Features</h2><ul class="features"><li>Real-time streaming transcription with ~100-300ms partial result latency</li><li>Dual deployment support for NVIDIA NIM containers and traditional Riva servers</li><li>Word-level timestamps and confidence scores for precise alignment</li><li>Production-grade structured logging and monitoring framework</li><li>WebSocket API for browser and application integration</li><li>Mock mode fallback for development without GPU hardware</li></ul></section>
 
 <section><h2>Quickstart</h2><pre class="quickstart">git clone https://github.com/davidbmar/nvidia-parakeet.git
 cd nvidia-parakeet-3
@@ -82,60 +80,50 @@ cd nvidia-parakeet-3
 
 <section><h2>Architecture</h2>
   <pre class="mermaid">flowchart TD
-    Client["Client Apps&lt;br/>(Browser/Node.js/Python)"] -->|"WebSocket Audio Stream&lt;br/>Port 8443"| WS["WebSocket Server&lt;br/>(FastAPI + RivaASRClient)"]
-    WS -->|"gRPC Call&lt;br/>Port 50051"| Riva["NVIDIA Riva ASR&lt;br/>(NIM or Traditional)&lt;br/>Parakeet RNNT Model"]
-    Riva -->|"GPU Inference&lt;br/>(Tesla T4/V100)"| GPU["GPU Worker"]
-    WS -->|"Structured Logs"| Logs["Logging & Monitoring&lt;br/>(./logs/)"]
-    subgraph Deployment
-        WS
-        Riva
-        GPU
-    end</pre>
+    ClientApps[Client Apps Browser or App] -->|WebSocket Audio Stream| WebSocketServer[WebSocket Server Port 8443]
+    WebSocketServer -->|gRPC Client Wrapper| RivaASR[NVIDIA Riva ASR NIM or Traditional]
+    RivaASR -->|GPU Inference| ParakeetRNNT[Parakeet RNNT Model]
+    WebSocketServer -->|Logs| StructuredLogging[Structured Logging and Monitoring]
+    RivaASR -->|Status| StructuredLogging</pre>
 </section>
 
-<section><h2>How it's built</h2><p>The system is built on Python 3.10+ and uses FastAPI for the WebSocket server interface. It integrates with NVIDIA Riva ASR via gRPC (port 50051) or HTTP (port 8000) using a custom `RivaASRClient` wrapper that supports both real GPU-accelerated inference and mock modes. Deployment is managed through Bash scripts targeting AWS EC2 GPU instances (g4dn.xlarge), handling driver installation, Docker/NVIDIA Container Runtime setup, and security group configuration.</p></section>
+<section><h2>How it's built</h2><p>Built with Python 3.10+ using FastAPI for the server interface, Pydantic for configuration management, and websockets for real-time audio streaming. It integrates with NVIDIA Riva ASR via gRPC clients, uses SpeechBrain for fallback or alternative modeling, and relies on Docker/NVIDIA Container Runtime for GPU-accelerated inference on Tesla T4/V100 instances.</p></section>
 
 <section><h2>How it runs</h2>
   <pre class="mermaid">sequenceDiagram
-    participant C as Client App
-    participant W as WebSocket Server
-    participant RC as RivaASRClient
-    participant R as NVIDIA Riva ASR
-    
-    C->>W: Connect WebSocket (ws://.../ws/transcribe)
-    W->>C: Connection Established
-    loop Streaming Audio
-        C->>W: Send Audio Chunk (PCM16)
-        W->>RC: Process Audio Chunk
-        RC->>R: gRPC StreamingRecognize Request
-        R-->>RC: Partial Result (Interim)
-        RC-->>W: Return Partial Transcription
-        W-->>C: Send Partial JSON Result
-    end
-    C->>W: End Stream / Silence Detected
-    W->>RC: Finalize Request
-    RC->>R: Get Final Result
-    R-->>RC: Final Transcription + Timestamps
-    RC-->>W: Return Final Result
-    W-->>C: Send Final JSON Result</pre>
+    participant Client as Client Application
+    participant WS as WebSocket Server
+    participant RivaClient as Riva ASR Client Wrapper
+    participant RivaServer as NVIDIA Riva ASR Service
+    Client->>WS: Connect WebSocket
+    WS->>Client: Connection Established
+    Client->>WS: Send Audio Chunk
+    WS->>RivaClient: Forward Audio Data
+    RivaClient->>RivaServer: gRPC Streaming Request
+    RivaServer-->>RivaClient: Partial Transcription Result
+    RivaClient-->>WS: Return Partial Result
+    WS-->>Client: Emit Partial Transcript
+    RivaServer-->>RivaClient: Final Transcription Result
+    RivaClient-->>WS: Return Final Result
+    WS-->>Client: Emit Final Transcript with Timestamps</pre>
 </section>
 
-<section><h2>How to apply &amp; reuse</h2><p>Use this system to deploy a scalable, low-latency speech-to-text service for applications requiring real-time transcription, such as live captioning, voice assistants, or meeting recorders. It is suitable for environments where GPU acceleration (Tesla T4/V100) is available and sub-second latency is critical.</p></section>
+<section><h2>How to apply &amp; reuse</h2><p>Deploy on AWS EC2 g4dn.xlarge or similar GPU instances. Use provided bash scripts to configure security groups, install NVIDIA drivers, deploy Riva/NIM containers, and start the WebSocket proxy. Connect client applications (browser or Node.js/Python) to the WebSocket endpoint for real-time transcription.</p></section>
 
 <section><h2>At a glance</h2>
-  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Streaming Speech Recognition</span><span class="tag">Batch File Transcription</span><span class="tag">S3 Audio Processing</span><span class="tag">Mock Mode Testing</span><span class="tag">Health Check Monitoring</span><span class="tag">AWS EC2 Deployment Automation</span></span></div>
-  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">src/asr/riva_client.py</span><span class="tag">docker/rnnt-server-websocket.py</span><span class="tag">docker/rnnt-server.py</span><span class="tag">config/settings.py</span><span class="tag">scripts/riva-010-run-complete-deployment-pipeline.sh</span><span class="tag">examples/python-client.py</span><span class="tag">examples/nodejs-client.js</span></span></div>
-  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python 3.10+</span><span class="tag">FastAPI</span><span class="tag">WebSockets</span><span class="tag">gRPC</span><span class="tag">NVIDIA Riva ASR</span><span class="tag">Docker</span><span class="tag">NVIDIA Container Toolkit</span><span class="tag">Pydantic</span><span class="tag">SpeechBrain</span><span class="tag">Boto3</span></span></div>
-  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS Account (EC2/S3)</span><span class="tag">GPU Instance (g4dn.xlarge or better)</span><span class="tag">NVIDIA Drivers</span><span class="tag">Docker Engine</span><span class="tag">NVIDIA Container Runtime</span></span></div>
-  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">NVIDIA NIM Containers</span><span class="tag">Traditional Riva Server</span><span class="tag">AWS S3 Storage</span><span class="tag">Browser Clients (via HTTPS/WSS)</span><span class="tag">Node.js Applications</span><span class="tag">Python Applications</span></span></div>
-  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server Architecture</span><span class="tag">WebSocket Streaming</span><span class="tag">gRPC Communication</span><span class="tag">Containerized Deployment</span><span class="tag">Infrastructure as Code (Bash Scripts)</span><span class="tag">Mock Object Pattern</span></span></div>
-  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">ASR</span><span class="tag">Speech-to-Text</span><span class="tag">NVIDIA</span><span class="tag">Riva</span><span class="tag">Parakeet</span><span class="tag">Real-time</span><span class="tag">WebSocket</span><span class="tag">GPU-Accelerated</span><span class="tag">AWS</span><span class="tag">Deployment-Pipeline</span></span></div>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Streaming ASR</span><span class="tag">GPU Acceleration</span><span class="tag">WebSocket Proxy</span><span class="tag">Infrastructure Automation</span><span class="tag">Structured Logging</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">RivaASRClient</span><span class="tag">WebSocket Server</span><span class="tag">NIM Container</span><span class="tag">Traditional Riva Server</span><span class="tag">Deployment Scripts</span><span class="tag">Config Settings</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">WebSockets</span><span class="tag">gRPC</span><span class="tag">Docker</span><span class="tag">NVIDIA Riva</span><span class="tag">Pydantic</span><span class="tag">SpeechBrain</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">AWS EC2</span><span class="tag">NVIDIA GPU Drivers</span><span class="tag">Docker Engine</span><span class="tag">NVIDIA Container Toolkit</span><span class="tag">Python 3.10+</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">NVIDIA NIM</span><span class="tag">NVIDIA Riva ASR</span><span class="tag">AWS S3</span><span class="tag">Browser Clients</span><span class="tag">Node.js Applications</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">Client-Server</span><span class="tag">Streaming RPC</span><span class="tag">Proxy Pattern</span><span class="tag">Infrastructure as Code</span><span class="tag">Observer Pattern</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">ASR</span><span class="tag">Speech Recognition</span><span class="tag">NVIDIA</span><span class="tag">Riva</span><span class="tag">WebSocket</span><span class="tag">GPU</span><span class="tag">Deployment</span></span></div>
 </section>
 
-<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>open_pr</strong>: PR #5: Bump the pip group across 1 directory with 10 updates</li></ul></section>
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/pip/pip-68779fdd47 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #6: Bump the pip group across 1 directory with 10 updates</li></ul></section>
 
 <footer class="muted">
-  <p>Generated 2026-06-14T03:13:08.997475Z ·
+  <p>Generated 2026-06-22T21:14:37.221203Z ·
      commit adb3bd7 ·
      model qwen3.7-plus</p>
 </footer>

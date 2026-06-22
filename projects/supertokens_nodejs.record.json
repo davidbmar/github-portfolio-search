@@ -1,41 +1,41 @@
 {
   "title": "SuperTokens Passwordless Node.js Demo",
-  "one_liner": "A minimal prototype demonstrating passwordless authentication via magic links using SuperTokens, Node.js, and Docker.",
-  "what_it_is": "This project is a reference implementation of passwordless authentication. It replaces traditional passwords with time-limited, single-use magic links sent to the user's email. The system consists of a static HTML frontend for inputting emails and verifying tokens, an Express.js backend handling session management and SuperTokens integration, and a SuperTokens Core instance running in Docker with PostgreSQL for persistent storage.",
-  "how_its_built": "The backend uses the `supertokens-node` SDK with Express middleware to handle auth routes. The SuperTokens Core (v9.3.0) runs in a Docker container alongside PostgreSQL. The frontend is a static site served via `npx serve`, interacting with the backend API. Magic links are logged to the server console instead of being sent via SMTP for demonstration purposes.",
-  "how_to_apply": "Use this as a starting point for integrating passwordless login into Node.js applications. Replace the console-based email delivery with a real SMTP provider (e.g., SendGrid, AWS SES) by modifying the `emailDelivery` override in `server.js`. Customize `appInfo.js` with your production domains.",
+  "one_liner": "A prototype implementation of passwordless authentication using SuperTokens magic links, Node.js, and Docker.",
+  "what_it_is": "This project is a minimal demonstration of passwordless authentication. It uses SuperTokens to generate single-use magic links sent via email (logged to console for demo purposes). The architecture consists of a PostgreSQL database, the SuperTokens Core service, a Node.js Express backend, and a static HTML frontend served via npx serve.",
+  "how_its_built": "The backend is built with Node.js and Express, integrating the supertokens-node SDK for session management and passwordless logic. The SuperTokens Core runs in a Docker container backed by PostgreSQL. The frontend is a vanilla HTML/JS application that interacts with the backend API for login requests and session verification.",
+  "how_to_apply": "Use this repository as a reference implementation for integrating SuperTokens passwordless flow into a Node.js application. It demonstrates how to configure the core, override email delivery for testing, and handle frontend session states without a framework.",
   "quickstart": "docker-compose up -d\nnpm start\nnpx serve -s .",
   "features": [
     "Passwordless login via email magic links",
-    "Single-use, time-limited authentication tokens (15 min expiry)",
+    "Single-use link validation with 15-minute expiration",
     "Session management with HTTP-only cookies",
-    "Dockerized SuperTokens Core and PostgreSQL setup",
-    "Express.js backend with CORS configuration",
-    "Static frontend with login and dashboard views"
+    "Dockerized SuperTokens Core and PostgreSQL",
+    "Vanilla JS frontend with no build step required"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTP Request| Frontend[Static Frontend :3000]\n    Frontend -->|API Call| Backend[Node.js/Express Server :3001]\n    Backend -->|Auth Logic| ST_SDK[supertokens-node SDK]\n    ST_SDK -->|HTTP API| Core[SuperTokens Core :3567]\n    Core -->|Read/Write| DB[(PostgreSQL :5432)]\n    Backend -->|Log Link| Console[Server Console]",
-  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant F as Frontend (:3000)\n    participant B as Backend (:3001)\n    participant S as SuperTokens Core\n    participant D as PostgreSQL\n\n    U->>F: Enter Email & Click Send\n    F->>B: POST /auth/signinup/code\n    B->>S: Create Code (Email)\n    S->>D: Store Code & Hash\n    S-->>B: Return PreAuthSessionID\n    B-->>F: Success Response\n    B->>B: Log Magic Link to Console\n\n    U->>U: Copy Link from Console\n    U->>F: Open Magic Link\n    F->>B: GET /auth/signinup/code/consume\n    B->>S: Consume Code\n    S->>D: Validate & Delete Code\n    S-->>B: Return Session Tokens\n    B-->>F: Set Session Cookie & Redirect\n    F->>U: Show Dashboard",
+  "diagram_architecture": "flowchart TD\n    User[User Browser]\n    Frontend[Static Frontend Server]\n    Backend[Node.js Express Backend]\n    SuperTokensCore[SuperTokens Core]\n    Database[PostgreSQL Database]\n    User --> Frontend\n    Frontend --> Backend\n    Backend --> SuperTokensCore\n    SuperTokensCore --> Database",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Frontend\n    participant Backend\n    participant SuperTokensCore\n    participant Database\n    User->>Frontend: Enter Email\n    Frontend->>Backend: POST /auth/signinup/code\n    Backend->>SuperTokensCore: Create Code\n    SuperTokensCore->>Database: Store Code\n    SuperTokensCore-->>Backend: Return Link Code\n    Backend->>Backend: Log Magic Link\n    Backend-->>Frontend: Success Response\n    User->>Frontend: Click Magic Link\n    Frontend->>Backend: GET /auth/signinup/code/consume\n    Backend->>SuperTokensCore: Consume Code\n    SuperTokensCore->>Database: Validate and Delete Code\n    SuperTokensCore-->>Backend: Session Tokens\n    Backend-->>Frontend: Set Cookies\n    Frontend-->>User: Show Dashboard",
   "capabilities": [
-    "Passwordless Authentication",
-    "Session Management",
     "Magic Link Generation",
-    "Token Verification",
-    "CORS Handling"
+    "Session Verification",
+    "Email Delivery Override",
+    "CORS Handling",
+    "Health Check API"
   ],
   "components": [
-    "Express.js Server",
-    "SuperTokens Node SDK",
-    "SuperTokens Core (Docker)",
-    "PostgreSQL Database",
-    "Static HTML Frontend"
+    "server.js",
+    "index.html",
+    "appInfo.js",
+    "docker-compose.yml",
+    ".env"
   ],
   "tech": [
     "Node.js",
     "Express",
     "SuperTokens",
-    "Docker",
     "PostgreSQL",
-    "HTML/CSS/JS"
+    "Docker",
+    "HTML",
+    "JavaScript"
   ],
   "depends_on": [
     "Node.js 14+",
@@ -44,21 +44,20 @@
     "npx"
   ],
   "integrates_with": [
-    "SMTP Providers (via override)",
-    "Any Static Host",
-    "PostgreSQL Compatible DBs"
+    "SuperTokens Core",
+    "PostgreSQL"
   ],
   "patterns": [
-    "Middleware Pattern",
-    "Dependency Injection (SDK Init)",
-    "Override Pattern (Email Delivery)",
-    "Single-Use Token"
+    "Passwordless Authentication",
+    "Magic Link Flow",
+    "Session Management",
+    "Microservices via Docker"
   ],
   "reuse_tags": [
     "authentication",
     "passwordless",
-    "nodejs",
     "supertokens",
+    "nodejs",
     "docker",
     "prototype"
   ],
@@ -67,9 +66,20 @@
   "visibility": "public",
   "status": "shipped",
   "thin": false,
-  "todos": [],
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/npm_and_yarn-7e4948c94b is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump nodemailer from 6.10.1 to 9.0.1 in the npm_and_yarn group across 1 directory"
+    }
+  ],
   "screenshot_url": "",
-  "generated_at": "2026-06-14T03:57:35.162023Z",
+  "generated_at": "2026-06-22T21:16:09.838148Z",
   "source_commit": "a19b8d6",
-  "model": "qwen3.7-plus"
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-06-19T02:17:52Z",
+  "docs": []
 }

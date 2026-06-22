@@ -1,27 +1,27 @@
 {
   "title": "Voice Calendar Scheduler FSM",
   "one_liner": "A 24/7 voice-driven apartment viewing scheduling assistant using Twilio/WebRTC, an 8-step FSM, and Google Calendar integration.",
-  "what_it_is": "An automated voice agent that handles inbound calls or browser-based WebRTC connections to schedule apartment viewings. It uses a Finite State Machine (FSM) to guide callers through preference gathering, apartment search via RAG, availability checking, and final booking on Google Calendar, utilizing Piper TTS and Faster-Whisper STT for natural voice interaction.",
-  "how_its_built": "Built with Python 3.11+ and FastAPI. The core logic resides in a git submodule (`engine-repo`) providing the FSM orchestrator, STT/TTS pipelines, and LLM abstraction. The application layer (`scheduling/`) implements domain-specific tools (Google Calendar, RAG search). A separate `gateway/` module handles WebRTC signaling and TURN credentials. Apartment data is indexed in LanceDB for RAG retrieval.",
-  "how_to_apply": "Clone the repository recursively to include the engine submodule. Run the provided setup script to create a virtual environment and install dependencies. Configure API keys for Twilio, Google Calendar, and your chosen LLM provider (Claude or Ollama) in `.env`. Start the backend, RAG service, and optional editor using the start script.",
+  "what_it_is": "An automated voice agent that handles inbound calls or browser connections to schedule apartment viewings. It uses a Finite State Machine to guide users through preference gathering, listing search via RAG, availability checking, and final booking on Google Calendar, powered by Faster-Whisper for speech-to-text and Piper for text-to-speech.",
+  "how_its_built": "Built with Python 3.11+ using FastAPI for the backend. It integrates Twilio Media Streams for PSTN and WebRTC for browser audio. The core logic relies on a git submodule engine for FSM orchestration, LLM abstraction (Claude/Ollama), and voice processing. Apartment data is indexed in LanceDB for RAG-based search, and bookings are managed via the Google Calendar API.",
+  "how_to_apply": "Clone the repository recursively to include the engine submodule. Run the setup script to create a virtual environment and install dependencies. Configure API keys for LLM, Twilio, and Google Calendar in the .env file. Start the RAG service, backend, and optional editor using the provided start script.",
   "quickstart": "git clone --recursive https://github.com/davidbmar/voice-calendar-scheduler-FSM\ncd voice-calendar-scheduler-FSM\n./scripts/setup.sh\ncp .env.example .env\n$EDITOR .env\n./scripts/start.sh",
   "features": [
-    "Dual-channel input: Supports both Twilio PSTN calls and browser-based WebRTC connections",
-    "8-step FSM workflow: Guides conversation from greeting to confirmed booking",
-    "RAG-powered search: Queries apartment listings in LanceDB based on user preferences",
-    "Automated scheduling: Checks Google Calendar free/busy status and creates events",
-    "Local-first voice stack: Uses Piper TTS and Faster-Whisper STT for low-latency audio processing",
-    "Visual workflow editor: Optional Node.js-based tool for inspecting and editing FSM states"
+    "Dual-channel input via Twilio PSTN and Browser WebRTC",
+    "8-step FSM-driven conversation flow for structured scheduling",
+    "RAG-based apartment listing search using LanceDB and nomic-embed",
+    "Real-time Google Calendar availability checking and event creation",
+    "Low-latency STT with Faster-Whisper and TTS with Piper",
+    "Visual workflow editor and FSM session inspector for debugging"
   ],
-  "diagram_architecture": "flowchart TD\n    Caller[Caller Phone/Browser] -->|Twilio PSTN| Twilio[Twilio Media Streams]\n    Caller -->|WebRTC| Gateway[Gateway Signaling WS]\n    Twilio --> Channel[TwilioMediaStreamChannel]\n    Gateway --> Channel2[WebRTCChannel]\n    Channel --> Session[SchedulingSession]\n    Channel2 --> Session\n    Session --> STT[STT: Faster-Whisper]\n    Session --> FSM[FSM Orchestrator]\n    Session --> TTS[TTS: Piper]\n    FSM --> LLM[LLM: Claude/Ollama]\n    FSM --> Tools[Tool Framework]\n    Tools --> RAG[RAG Service: LanceDB]\n    Tools --> GCal[Google Calendar API]\n    STT --> FSM\n    FSM --> TTS\n    TTS --> Channel\n    TTS --> Channel2",
-  "diagram_sequence": "sequenceDiagram\n    participant C as Caller\n    participant G as Gateway/Channel\n    participant S as SchedulingSession\n    participant F as FSM Orchestrator\n    participant T as Tools (RAG/GCal)\n    \n    C->>G: Connect (PSTN/WebRTC)\n    G->>S: Initialize Session\n    S->>F: Start FSM\n    F->>S: Step 1: Greet & Gather Preferences\n    S->>C: Play Greeting (TTS)\n    C->>S: Speak Preferences (STT)\n    S->>F: Update Context\n    F->>T: Step 2: Search Listings\n    T-->>F: Return Matches\n    F->>S: Step 3: Present Options\n    S->>C: Narrate Options (TTS)\n    C->>S: Select Option (STT)\n    F->>T: Step 4: Check Availability\n    T-->>F: Return Free Slots\n    F->>S: Step 5: Propose Times\n    S->>C: Offer Slots (TTS)\n    C->>S: Confirm Slot (STT)\n    F->>S: Step 6: Collect Details\n    S->>C: Ask Name/Email (TTS)\n    C->>S: Provide Details (STT)\n    F->>T: Step 7: Create Booking\n    T-->>F: Event Created\n    F->>S: Step 8: Confirm & Done\n    S->>C: Confirmation (TTS)\n    S->>G: Close Session",
+  "diagram_architecture": "flowchart TD\n    Caller[Caller Phone or Browser]\n    Twilio[Twilio PSTN]\n    WebRTC[Browser WebRTC]\n    MediaStream[TwilioMediaStreamChannel]\n    Signaling[WebRTC Signaling WS]\n    Session[SchedulingSession]\n    STT[STT Faster Whisper]\n    FSM[FSM Orchestrator]\n    TTS[TTS Piper]\n    RAG[RAG Service LanceDB]\n    GCal[Google Calendar API]\n    LLM[LLM Claude or Ollama]\n    Caller -->|PSTN| Twilio\n    Caller -->|WebRTC| WebRTC\n    Twilio --> MediaStream\n    WebRTC --> Signaling\n    MediaStream --> Session\n    Signaling --> Session\n    Session --> STT\n    Session --> FSM\n    Session --> TTS\n    FSM --> RAG\n    FSM --> GCal\n    FSM --> LLM\n    LLM --> FSM",
+  "diagram_sequence": "sequenceDiagram\n    participant Caller\n    participant Channel as Voice Channel\n    participant Session as Scheduling Session\n    participant FSM as FSM Orchestrator\n    participant Tool as External Tools\n    Caller->>Channel: Speak Audio\n    Channel->>Session: Stream PCM Audio\n    Session->>FSM: Process Input\n    FSM->>Tool: Query Listings or Calendar\n    Tool-->>FSM: Return Data\n    FSM->>Session: Generate Response Text\n    Session->>Channel: Synthesize Speech\n    Channel->>Caller: Play Audio",
   "capabilities": [
-    "Voice Interaction",
-    "Finite State Machine Orchestration",
-    "Retrieval-Augmented Generation (RAG)",
-    "Calendar Integration",
-    "WebRTC Signaling",
-    "Telephony Integration"
+    "Voice interaction handling",
+    "Finite State Machine orchestration",
+    "Retrieval Augmented Generation",
+    "Calendar management",
+    "WebRTC signaling",
+    "Twilio media streaming"
   ],
   "components": [
     "Engine Submodule",
@@ -31,7 +31,7 @@
     "Visual Editor"
   ],
   "tech": [
-    "Python 3.11+",
+    "Python",
     "FastAPI",
     "Twilio",
     "WebRTC",
@@ -42,41 +42,53 @@
     "Docker"
   ],
   "depends_on": [
-    "Anthropic Claude API or Ollama",
-    "Twilio Account",
-    "Google Cloud Service Account",
-    "Node.js (optional)",
-    "Docker Compose"
+    "Python 3.11+",
+    "Git",
+    "Docker",
+    "Node.js"
   ],
   "integrates_with": [
-    "Twilio PSTN",
+    "Twilio",
     "Google Calendar",
-    "LanceDB Vector Store",
-    "Browser WebRTC Clients"
+    "Anthropic Claude",
+    "Ollama",
+    "LanceDB"
   ],
   "patterns": [
     "Finite State Machine",
-    "Tool Use / Function Calling",
-    "Retrieval-Augmented Generation",
-    "Client-Server Signaling",
-    "Microservices (RAG)"
+    "Retrieval Augmented Generation",
+    "WebSocket Signaling",
+    "Microservices",
+    "Event Driven"
   ],
   "reuse_tags": [
     "voice-agent",
-    "scheduling-bot",
-    "fsm-conversation",
-    "twilio-integration",
-    "webrtc-audio",
-    "calendar-automation"
+    "scheduling",
+    "fsm",
+    "rag",
+    "twilio",
+    "webrtc",
+    "calendar-integration"
   ],
   "slug": "voice-calendar-scheduler-FSM",
   "repo_url": "https://github.com/davidbmar/voice-calendar-scheduler-FSM",
   "visibility": "public",
   "status": "shipped",
   "thin": false,
-  "todos": [],
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/web/editor/npm_and_yarn-fb0d7b2f20 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the npm_and_yarn group across 1 directory with 3 updates"
+    }
+  ],
   "screenshot_url": "https://raw.githubusercontent.com/davidbmar/voice-calendar-scheduler-FSM/main/screenshots/test-debug-tracing-33-passed.png",
-  "generated_at": "2026-06-14T04:07:04.378610Z",
+  "generated_at": "2026-06-22T21:16:42.783086Z",
   "source_commit": "156e0e4",
-  "model": "qwen3.7-plus"
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-06-14T10:33:45Z",
+  "docs": []
 }

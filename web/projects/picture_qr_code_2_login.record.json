@@ -1,69 +1,70 @@
 {
   "title": "Picture QR Code Login",
-  "one_liner": "Serverless shared photo album with identity-aware login (Google/Email) and per-photo attribution.",
-  "what_it_is": "A password-gated, serverless photo album hosted on AWS. Users scan a QR code to access a web interface where they can authenticate via Google OAuth or username/password. Photos are uploaded directly from the browser to S3 using presigned URLs, ensuring the server never handles image bytes. Each upload is attributed to the logged-in user or 'Guest' if using the shared password.",
-  "how_its_built": "Built as a single AWS Lambda function serving HTML/JSON via Function URL, backed by an S3 bucket for storage. Authentication uses stateless HMAC tokens for guest access and Google Identity Services for OAuth. Image processing (thumbnails) happens client-side via Canvas; HEIC conversion is handled by a secondary Lambda trigger. Infrastructure is managed via shell scripts and AWS CLI, isolated from other variants by specific naming conventions.",
-  "how_to_apply": "Deploy to AWS using the provided shell scripts after configuring environment variables for passwords and secrets. Generate a QR code pointing to the CloudFront distribution URL. Print the QR code for physical display at events. Users scan the code, log in, and upload photos directly from their mobile browsers without installing an app.",
+  "one_liner": "Serverless shared photo album with Google sign-in, guest access, and identity-based delete permissions.",
+  "what_it_is": "A web-based photo sharing application where users scan a QR code to access a password-gated album. It supports anonymous guest uploads via a shared password and authenticated uploads via Google Sign-In. Photos are attributed to the uploader, and deletion rights are enforced based on identity: Google users can delete their own photos, while an admin passcode allows deletion of any photo.",
+  "how_its_built": "Built on AWS Serverless architecture using a single Lambda function (Node.js/Python runtime implied by context) serving HTML/JS and a JSON API. Images are uploaded directly from the browser to S3 using presigned URLs. Authentication is handled via Google OAuth2 tokens verified by the Lambda. State is stored in S3 metadata or a lightweight database (implied by attribution requirements). CloudFront distributes the frontend with caching disabled for instant updates.",
+  "how_to_apply": "Deploy to AWS using the provided shell scripts after configuring environment variables for passwords and secrets. Generate a QR code pointing to the CloudFront distribution URL. Print the QR code for physical display at events. Users scan the code, enter the guest password or sign in with Google, and upload photos directly from their mobile browsers.",
   "quickstart": "export ACCESS_PASSWORD=\"your-guest-password\"\nexport OWNER_PASSCODE=\"your-private-passcode\"\nexport TOKEN_SECRET=\"$(openssl rand -hex 32)\"\n./scripts/deploy.sh\npython scripts/make_qr.py \"<the-printed-url>\" album-qr.png",
   "features": [
-    "Identity-aware login via Google OAuth or username/password",
-    "Direct-to-S3 uploads using short-lived presigned URLs",
-    "Client-side thumbnail generation and HEIC support",
-    "Per-photo attribution tracking for logged-in users",
-    "Password-gated access with separate owner delete controls",
-    "Zero-maintenance serverless architecture on AWS"
+    "QR-code based access to a web-only photo album",
+    "Dual login modes: shared guest password and Google Sign-In",
+    "Direct-to-S3 photo uploads via presigned URLs",
+    "Client-side thumbnail generation using Canvas",
+    "Identity-aware deletion: users delete own, admin deletes all",
+    "Per-photo attribution tracking for authenticated users"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|Scan QR| CF[CloudFront Distribution]\n    CF -->|Proxy Request| LF[Lambda Function URL]\n    LF -->|Verify Token/Auth| Auth[Auth Logic]\n    LF -->|Generate Presigned URL| S3[(S3 Bucket)]\n    User -->|Upload Photo Directly| S3\n    User -->|GET Photos| LF\n    LF -->|List Objects| S3\n    S3 -->|HEIC Upload Trigger| ConvLambda[Converter Lambda]\n    ConvLambda -->|Convert to JPG| S3",
-  "diagram_sequence": "sequenceDiagram\n    participant U as User Browser\n    participant CF as CloudFront\n    participant L as Lambda Function\n    participant S3 as S3 Bucket\n    participant G as Google Auth\n\n    U->>CF: GET / (Scan QR)\n    CF->>L: Forward Request\n    L->>U: Return Login Page\n    U->>G: Sign in with Google\n    G->>U: Return ID Token\n    U->>L: POST /auth/google (ID Token)\n    L->>L: Verify Token & Create Session\n    L->>U: Return Authenticated State\n    U->>L: Request Upload Permission\n    L->>S3: Generate Presigned PUT URL\n    S3-->>L: Return Signed URL\n    L-->>U: Return Signed URL\n    U->>S3: PUT Photo Data (Direct)\n    S3-->>U: 200 OK\n    U->>L: Notify Upload Complete\n    L->>S3: Update Metadata/Attribution",
+  "diagram_architecture": "flowchart TD\n    User[Mobile Browser] -->|Scan QR| CloudFront[CloudFront Distribution]\n    CloudFront -->|Proxy Request| Lambda[Lambda Function]\n    Lambda -->|Verify Token| Google[Google Identity Platform]\n    Lambda -->|Generate Presigned URL| S3[S3 Bucket]\n    User -->|Upload Image| S3\n    User -->|Fetch Gallery| Lambda\n    Lambda -->|List Objects| S3",
+  "diagram_sequence": "sequenceDiagram\n    participant User as Mobile Browser\n    participant CF as CloudFront\n    participant Lambda as Lambda Function\n    participant Google as Google Auth\n    participant S3 as S3 Bucket\n    User->>CF: GET / (Album Page)\n    CF->>Lambda: Forward Request\n    Lambda-->>User: Return HTML/JS\n    User->>Google: Sign In / Enter Password\n    Google-->>User: Return ID Token\n    User->>Lambda: POST /auth/google or /login\n    Lambda->>Google: Verify Token\n    Google-->>Lambda: Valid User Info\n    Lambda-->>User: Session Token\n    User->>Lambda: GET /sign-upload\n    Lambda->>S3: Generate Presigned URL\n    S3-->>Lambda: Presigned URL\n    Lambda-->>User: Return URL\n    User->>S3: PUT Image Data\n    S3-->>User: 200 OK",
   "capabilities": [
+    "Password-gated access",
     "OAuth2 Integration",
     "Presigned URL Generation",
     "Serverless Hosting",
-    "Client-side Image Processing",
-    "Static Site Delivery"
+    "Image Attribution",
+    "Role-Based Delete"
   ],
   "components": [
-    "Lambda Function (Main API)",
-    "Lambda Function (HEIC Converter)",
-    "S3 Bucket (Storage)",
+    "Lambda Function",
+    "S3 Bucket",
     "CloudFront Distribution",
-    "Dev Server Script",
-    "Deployment Scripts"
+    "HTML/JS Frontend",
+    "Deploy Scripts",
+    "QR Generator"
   ],
   "tech": [
     "AWS Lambda",
     "Amazon S3",
-    "Amazon CloudFront",
-    "HTML5/JavaScript",
-    "Python",
-    "Google Identity Services"
+    "CloudFront",
+    "Google Sign-In",
+    "HTML5",
+    "JavaScript",
+    "Python"
   ],
   "depends_on": [
     "AWS CLI",
+    "Google Cloud Console Project",
     "OpenSSL",
-    "Python 3",
-    "qrcode library",
-    "boto3"
+    "qrcode Python Library"
   ],
   "integrates_with": [
-    "Google OAuth",
+    "Google Identity Platform",
     "AWS IAM",
-    "Browser File API",
-    "Canvas API"
+    "Web Browsers"
   ],
   "patterns": [
     "Serverless Backend",
-    "Presigned URL Upload",
+    "Direct-to-Storage Upload",
     "Stateless Authentication",
-    "Edge Caching Passthrough",
-    "Event-Driven Conversion"
+    "Presigned URL Access",
+    "Infrastructure as Code (Scripts)"
   ],
   "reuse_tags": [
+    "event-photo-sharing",
     "aws-serverless",
-    "photo-album",
-    "oauth-login",
-    "s3-direct-upload",
-    "qr-code-access"
+    "google-oauth",
+    "s3-presigned-urls",
+    "qr-code-access",
+    "identity-aware-delete"
   ],
   "slug": "picture_qr_code_2_login",
   "repo_url": "https://github.com/davidbmar/picture_qr_code_2_login",
@@ -72,7 +73,9 @@
   "thin": false,
   "todos": [],
   "screenshot_url": "",
-  "generated_at": "2026-06-14T03:49:44.357400Z",
-  "source_commit": "fe3bc32",
-  "model": "qwen3.7-plus"
+  "generated_at": "2026-06-22T21:15:02.057656Z",
+  "source_commit": "12edff4",
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-06-15T17:23:48Z",
+  "docs": []
 }

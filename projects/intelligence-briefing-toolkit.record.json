@@ -1,66 +1,60 @@
 {
   "title": "Intelligence Briefing Toolkit",
-  "one_liner": "A standalone research pipeline that searches the web, extracts claims via LLMs, accumulates evidence, and generates intelligence briefings.",
-  "what_it_is": "The Intelligence Briefing Toolkit (IBT) is a Python-based framework for automating open-source intelligence (OSINT) workflows. It orchestrates web searching, content extraction, claim detection, and report synthesis using Claude (Anthropic). The system supports both one-off deep research queries and persistent, multi-pass projects that accumulate evidence over time to detect signals and contradictions. It exposes functionality through four interfaces: a CLI for scripting, a Python library for integration, a REST API for web services, and an MCP server for AI agent tool use.",
-  "how_its_built": "Built in Python with a modular adapter pattern for data sources. Core logic resides in `ResearchPipeline`, which coordinates `WebSearchTool` (Serper/DuckDuckGo) and `WebContentTool` (boilerplate stripping). LLM interactions are handled via the Anthropic SDK for claim extraction and synthesis. State management for projects uses local JSON files. The REST API is implemented with FastAPI, and the MCP server follows the Model Context Protocol specification for AI assistant integration.",
-  "how_to_apply": "Use IBT to automate competitive intelligence monitoring, academic literature reviews, or investigative journalism workflows. Integrate the Python library into existing data pipelines to enrich datasets with web-sourced context. Deploy the REST API as a backend for internal research dashboards. Connect the MCP server to Claude Desktop to allow natural-language triggered research agents that can persist findings across sessions.",
+  "one_liner": "A standalone research pipeline that searches the web, extracts claims, accumulates evidence, and generates intelligence briefings via CLI, Library, REST, or MCP.",
+  "what_it_is": "The Intelligence Briefing Toolkit (IBT) is a Python-based framework for automating open-source intelligence (OSINT) workflows. It orchestrates multi-pass research cycles where an LLM plans queries, searches the web, extracts structured claims from sources, deduplicates findings against existing evidence, and synthesizes final reports. It supports both ephemeral 'one-shot' research and persistent projects that accumulate evidence over time.",
+  "how_its_built": "Built in Python using FastAPI for the REST interface and Model Context Protocol (MCP) for AI agent integration. The core logic relies on an adapter pattern for data sources (defaulting to WebSearchTool/WebContentTool) and uses Anthropic's Claude API for claim extraction, signal detection, and report synthesis. State management for persistent projects is handled via local JSON evidence stores.",
+  "how_to_apply": "Use IBT to automate deep-dive research tasks, monitor developing news stories through recurring collection passes, or integrate OSINT capabilities into larger AI agents via its MCP server. It is suitable for journalists, analysts, or developers needing structured evidence gathering rather than simple keyword search results.",
   "quickstart": "pip install git+https://github.com/davidbmar/intelligence-briefing-toolkit.git\nexport ANTHROPIC_API_KEY=\"sk-ant-...\"\nexport SERPER_API_KEY=\"...\"\nibt search \"JFK assassination declassified 2025\" --format json",
   "features": [
-    "Multi-interface access: CLI, Python Library, REST API, and MCP Server",
-    "Persistent project-based research with evidence accumulation and deduplication",
-    "Automated web searching via Serper.dev or DuckDuckGo fallback",
-    "LLM-driven claim extraction and signal detection from raw web content",
-    "Structured briefing generation synthesizing multiple evidence passes",
-    "Pluggable source adapter architecture for extending beyond web sources"
+    "Multi-interface access via CLI, Python library, REST API, and MCP server",
+    "Persistent project mode with evidence accumulation and deduplication across passes",
+    "Automated claim extraction and signal detection using LLM analysis",
+    "Pluggable source adapters supporting web search and content extraction",
+    "Structured JSON output for easy integration into downstream data pipelines"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User/Agent] -->|CLI/API/MCP| Interface[Interface Layer]\n    Interface --> Pipeline[ResearchPipeline]\n    Pipeline --> Config[IntelConfig]\n    Pipeline --> Adapter[Source Adapter]\n    Adapter -->|Search| WebSearch[WebSearchTool]\n    Adapter -->|Fetch| WebContent[WebContentTool]\n    WebSearch -->|Serper/DDG| Internet[(Internet)]\n    WebContent -->|HTTP| Internet\n    Pipeline -->|Extract/Synthesize| LLM[Claude API]\n    Pipeline -->|Store| Evidence[(Local JSON Store)]\n    Evidence --> Pipeline",
-  "diagram_sequence": "sequenceDiagram\n    participant Client as Client (CLI/API)\n    participant Pipeline as ResearchPipeline\n    participant Adapter as WebSourceAdapter\n    participant Search as WebSearchTool\n    participant Fetch as WebContentTool\n    participant LLM as Claude API\n    participant Store as Evidence Store\n\n    Client->>Pipeline: execute research/project collect\n    Pipeline->>Adapter: search(queries)\n    Adapter->>Search: execute(queries)\n    Search-->>Adapter: raw JSON results\n    Adapter-->>Pipeline: parsed results (urls)\n    \n    loop For each URL\n        Pipeline->>Adapter: fetch(url)\n        Adapter->>Fetch: execute(url)\n        Fetch-->>Adapter: raw content\n        Adapter-->>Pipeline: extracted text\n        Pipeline->>LLM: extract claims\n        LLM-->>Pipeline: structured claims\n        Pipeline->>Store: append/deduplicate evidence\n    end\n    \n    Pipeline->>LLM: synthesize briefing/analyze signals\n    LLM-->>Pipeline: final report\n    Pipeline-->>Client: return result",
+  "diagram_architecture": "flowchart TD\n    User[User or Agent]\n    Interface[CLI REST or MCP Interface]\n    Pipeline[ResearchPipeline Orchestrator]\n    Adapter[WebSourceAdapter]\n    SearchTool[WebSearchTool]\n    ContentTool[WebContentTool]\n    LLM[Claude API]\n    Store[Local Evidence Store]\n    \n    User --> Interface\n    Interface --> Pipeline\n    Pipeline --> Adapter\n    Adapter --> SearchTool\n    Adapter --> ContentTool\n    Pipeline --> LLM\n    Pipeline --> Store\n    SearchTool --> ExternalWeb[External Web Sources]\n    ContentTool --> ExternalWeb",
+  "diagram_sequence": "sequenceDiagram\n    participant Client as Client Application\n    participant IBT as IBT Pipeline\n    participant Adapter as WebSourceAdapter\n    participant Tools as Search and Content Tools\n    participant LLM as Claude API\n    participant Store as Evidence Store\n    \n    Client->>IBT: Start Research Project\n    IBT->>LLM: Generate Search Queries\n    LLM-->>IBT: Return Query List\n    IBT->>Adapter: Execute Searches\n    Adapter->>Tools: Fetch Results and Content\n    Tools-->>Adapter: Raw Data\n    Adapter-->>IBT: Structured Results\n    IBT->>LLM: Extract Claims from Content\n    LLM-->>IBT: Structured Claims\n    IBT->>Store: Deduplicate and Save Evidence\n    Store-->>IBT: Confirmation\n    IBT->>LLM: Synthesize Briefing Report\n    LLM-->>IBT: Final Report\n    IBT-->>Client: Return Briefing",
   "capabilities": [
-    "Web Search",
+    "Web Search Integration",
     "Content Extraction",
-    "Claim Detection",
-    "Evidence Accumulation",
-    "Signal Analysis",
+    "Claim Extraction",
+    "Evidence Deduplication",
+    "Signal Detection",
     "Report Generation",
-    "REST API Hosting",
-    "MCP Server Integration"
+    "Persistent State Management"
   ],
   "components": [
     "ResearchPipeline",
     "WebSourceAdapter",
     "WebSearchTool",
     "WebContentTool",
-    "IntelConfig",
     "ContributionTracker",
     "TokenManager",
-    "FastAPI Server",
-    "MCP Server"
+    "IntelConfig"
   ],
   "tech": [
     "Python",
     "FastAPI",
-    "Anthropic SDK",
-    "Pydantic",
-    "Model Context Protocol (MCP)",
-    "JSON",
-    "AsyncIO"
+    "Anthropic Claude API",
+    "Model Context Protocol MCP",
+    "Serper.dev",
+    "DuckDuckGo"
   ],
   "depends_on": [
-    "Anthropic API Key",
-    "Serper.dev API Key (optional)",
-    "Python 3.9+"
+    "ANTHROPIC_API_KEY",
+    "SERPER_API_KEY"
   ],
   "integrates_with": [
     "Claude Desktop",
-    "CI/CD Pipelines",
-    "Custom Python Applications",
+    "AI Agents",
+    "CI Pipelines",
     "Web Frontends"
   ],
   "patterns": [
     "Adapter Pattern",
-    "Pipeline Pattern",
-    "Facade Pattern",
-    "Repository Pattern"
+    "Pipeline Orchestration",
+    "Multi-pass Research",
+    "Evidence Accumulation"
   ],
   "reuse_tags": [
     "osint",
@@ -68,8 +62,7 @@
     "llm-orchestration",
     "cli-tool",
     "rest-api",
-    "mcp-server",
-    "evidence-tracking"
+    "mcp-server"
   ],
   "slug": "intelligence-briefing-toolkit",
   "repo_url": "https://github.com/davidbmar/intelligence-briefing-toolkit",
@@ -87,7 +80,15 @@
     },
     {
       "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/intel_briefing/web/npm_and_yarn-bed0206944 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
       "detail": "feat/daily-brief-restoration-pr1 is 11 commits ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #3: chore(deps-dev): bump vite from 8.0.10 to 8.0.16 in /intel_briefing/web in the npm_and_yarn group across 1 directory"
     },
     {
       "kind": "open_pr",
@@ -95,7 +96,9 @@
     }
   ],
   "screenshot_url": "",
-  "generated_at": "2026-06-14T03:00:21.256248Z",
+  "generated_at": "2026-06-22T21:14:11.919311Z",
   "source_commit": "99e9f7c",
-  "model": "qwen3.7-plus"
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-06-16T08:06:43Z",
+  "docs": []
 }

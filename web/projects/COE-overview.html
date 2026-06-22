@@ -3,22 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>COE-overview · davidbmar.com</title>
-<script type="application/json" id="project-data">{"title": "COE-overview", "one_liner": "Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.", "what_it_is": "A Python-based ETL pipeline that ingests error events from multiple security and operations platforms (Jira, Wiz, CrowdStrike, Vibranium), normalizes them into a PostgreSQL database, and prepares data for weekly reporting. It includes schema management via Alembic and supports Kubernetes CronJob execution patterns.", "how_its_built": "Built with Python using SQLAlchemy (async) for database interactions, Pydantic Settings for configuration management, and Structlog for logging. It uses Alembic for database migrations and async/await patterns for concurrent data ingestion from external APIs.", "how_to_apply": "Configure environment variables for source APIs (Jira, Wiz, CrowdStrike, etc.) and database connection. Run the pipeline via the CLI entrypoint to ingest data, then use the stored run_id to trigger downstream reporting or rendering processes.", "quickstart": "pip install -e .\nexport DATABASE_URL=postgresql+asyncpg://user:pass@localhost/db\nexport JIRA_API_TOKEN=your_token\nexport WIZ_CLIENT_ID=your_id\npython -m coe", "features": ["Aggregates events from Jira, Wiz, CrowdStrike, and Vibranium", "Normalizes disparate error formats into a unified schema", "Async ETL pipeline optimized for weekly batch processing", "Database schema management with Alembic migrations", "Kubernetes CronJob compatible with run_id handoff mechanism", "Configurable lookback periods and project allowlists"], "diagram_architecture": "flowchart TD\n    A[External Sources] -->|Ingest| B(COE Pipeline)\n    B --> C[PostgreSQL Database]\n    C --> D[Alembic Migrations]\n    B --> E[Run ID Output]\n    E --> F[Downstream Renderer]\n    subgraph Sources\n    A1[Jira]\n    A2[Wiz]\n    A3[CrowdStrike]\n    A4[Vibranium]\n    end\n    A1 --> A\n    A2 --> A\n    A3 --> A\n    A4 --> A", "diagram_sequence": "sequenceDiagram\n    participant CLI as __main__.py\n    participant Config as config.py\n    participant DB as SQLAlchemy Engine\n    participant Pipe as pipeline.run\n    participant Src as External APIs\n    CLI->>Config: get_settings()\n    CLI->>DB: create_async_engine()\n    CLI->>Pipe: run(session_factory, settings)\n    Pipe->>Src: Fetch Jira Issues\n    Pipe->>Src: Fetch Wiz Findings\n    Pipe->>Src: Fetch CrowdStrike Detections\n    Pipe->>Src: Fetch Vibranium Events\n    Src-->>Pipe: Raw Data\n    Pipe->>DB: Normalize & Insert Events\n    DB-->>Pipe: Confirm Write\n    Pipe-->>CLI: Return Result (run_id, status)\n    CLI->>CLI: Write run_id to file", "capabilities": ["Multi-source data ingestion", "Data normalization", "Asynchronous processing", "Database migration management", "Environment-based configuration", "Structured logging"], "components": ["coe/__main__.py", "coe/pipeline.py", "coe/config.py", "coe/db/models.py", "alembic/env.py", "coe/log_capture.py"], "tech": ["Python", "SQLAlchemy", "Alembic", "Pydantic", "AsyncIO", "Structlog", "PostgreSQL"], "depends_on": ["asyncpg", "pydantic-settings", "sqlalchemy", "alembic", "structlog"], "integrates_with": ["Jira", "Wiz", "CrowdStrike", "Vibranium", "Google Docs", "Kubernetes CronJobs"], "patterns": ["ETL Pipeline", "Repository Pattern", "Dependency Injection", "Configuration via Environment", "Async/Await Concurrency"], "reuse_tags": ["security-ops", "data-aggregation", "weekly-reporting", "python-etl", "k8s-cronjob"], "slug": "COE-overview", "repo_url": "https://github.com/davidbmar/COE-overview", "visibility": "public", "status": "shipped", "thin": false, "todos": [], "screenshot_url": "", "generated_at": "2026-06-14T02:43:23.048392Z", "source_commit": "de41e66", "model": "qwen3.7-plus"}</script>
+<title>COE Overview · davidbmar.com</title>
+<script type="application/json" id="project-data">{"title": "COE Overview", "one_liner": "Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.", "what_it_is": "A Python-based ETL pipeline that ingests incident data from multiple security and operations platforms, normalizes it into a PostgreSQL database, and prepares it for weekly reporting. It handles authentication, data fetching, and schema management via Alembic.", "how_its_built": "Built with Python using SQLAlchemy for async database interactions, Pydantic for configuration management, and Alembic for database migrations. It uses structlog for logging and is designed to run as a Kubernetes CronJob.", "how_to_apply": "Configure environment variables for source APIs (Jira, Wiz, CrowdStrike, Vibranium) and database connection. Run the CLI entrypoint to execute the ingestion pipeline, which writes a run ID for downstream rendering processes.", "quickstart": "pip install -e .\nexport DATABASE_URL=postgresql+asyncpg://user:pass@localhost/db\nexport JIRA_API_TOKEN=your_token\npython -m coe", "features": ["Aggregates events from Jira, Wiz, CrowdStrike, and Vibranium", "Normalizes disparate data sources into a unified PostgreSQL schema", "Manages database schema changes via Alembic migrations", "Supports asynchronous data ingestion for performance", "Integrates with Kubernetes CronJobs via run ID handoff"], "diagram_architecture": "flowchart TD\n    User[User] --> Config[Configuration]\n    Config --> Pipeline[Ingestion Pipeline]\n    Pipeline --> Jira[Jira API]\n    Pipeline --> Wiz[Wiz API]\n    Pipeline --> CrowdStrike[CrowdStrike API]\n    Pipeline --> Vibranium[Vibranium API]\n    Jira --> Pipeline\n    Wiz --> Pipeline\n    CrowdStrike --> Pipeline\n    Vibranium --> Pipeline\n    Pipeline --> Database[PostgreSQL Database]\n    Pipeline --> Output[Run ID File]", "diagram_sequence": "sequenceDiagram\n    participant Main as Main Entry\n    participant Config as Settings Loader\n    participant Pipeline as Ingestion Pipeline\n    participant Sources as External APIs\n    participant DB as PostgreSQL\n    participant Output as Run ID Writer\n    Main->>Config: Load Settings\n    Config-->>Main: Return Settings\n    Main->>Pipeline: Initialize Session\n    Pipeline->>Sources: Fetch Events\n    Sources-->>Pipeline: Return Raw Data\n    Pipeline->>DB: Normalize and Store\n    DB-->>Pipeline: Confirm Write\n    Pipeline-->>Main: Return Result\n    Main->>Output: Write Run ID", "capabilities": ["Data Ingestion", "Schema Management", "Async Processing", "Configuration Validation", "Logging"], "components": ["CLI Entrypoint", "Configuration Manager", "Ingestion Pipeline", "Database Models", "Alembic Migrations"], "tech": ["Python", "SQLAlchemy", "Pydantic", "Alembic", "AsyncIO", "Structlog"], "depends_on": ["PostgreSQL", "Jira API", "Wiz API", "CrowdStrike API", "Vibranium API"], "integrates_with": ["Kubernetes CronJobs", "Google Docs Rendering"], "patterns": ["ETL Pipeline", "Repository Pattern", "Dependency Injection", "Async/Await"], "reuse_tags": ["security-ops", "data-aggregation", "python-etl", "kubernetes-cronjob"], "slug": "COE-overview", "repo_url": "https://github.com/davidbmar/COE-overview", "visibility": "public", "status": "shipped", "thin": false, "todos": [{"kind": "unmerged_branch", "detail": "dependabot/uv/uv-f7f3875fe2 is 1 commit ahead of the default branch"}, {"kind": "open_pr", "detail": "PR #2: chore(deps): bump cryptography from 48.0.0 to 48.0.1 in the uv group across 1 directory"}], "screenshot_url": "", "generated_at": "2026-06-22T21:09:01.193813Z", "source_commit": "de41e66", "model": "qwen3.7-plus", "pushed_at": "2026-06-20T12:21:54Z", "docs": []}</script>
 <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
-  "name": "COE-overview",
+  "name": "COE Overview",
   "description": "Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.",
   "codeRepository": "https://github.com/davidbmar/COE-overview",
   "programmingLanguage": [
     "Python",
     "SQLAlchemy",
-    "Alembic",
     "Pydantic",
+    "Alembic",
     "AsyncIO",
-    "Structlog",
-    "PostgreSQL"
+    "Structlog"
   ]
 }</script>
 <style>
@@ -60,7 +59,7 @@
 <body>
 <nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/#/clusters">Clusters</a></nav>
 <header>
-  <h1>COE-overview</h1>
+  <h1>COE Overview</h1>
   <p class="one-liner">Weekly aggregator for security and operational errors from Jira, Wiz, CrowdStrike, and Vibranium.</p>
   <p><a href="https://github.com/davidbmar/COE-overview">https://github.com/davidbmar/COE-overview</a>
      &nbsp;·&nbsp; public &nbsp;·&nbsp; shipped</p>
@@ -69,74 +68,68 @@
 
 
 
-<section><h2>What it is</h2><p>A Python-based ETL pipeline that ingests error events from multiple security and operations platforms (Jira, Wiz, CrowdStrike, Vibranium), normalizes them into a PostgreSQL database, and prepares data for weekly reporting. It includes schema management via Alembic and supports Kubernetes CronJob execution patterns.</p></section>
+<section><h2>What it is</h2><p>A Python-based ETL pipeline that ingests incident data from multiple security and operations platforms, normalizes it into a PostgreSQL database, and prepares it for weekly reporting. It handles authentication, data fetching, and schema management via Alembic.</p></section>
 
-<section><h2>Features</h2><ul class="features"><li>Aggregates events from Jira, Wiz, CrowdStrike, and Vibranium</li><li>Normalizes disparate error formats into a unified schema</li><li>Async ETL pipeline optimized for weekly batch processing</li><li>Database schema management with Alembic migrations</li><li>Kubernetes CronJob compatible with run_id handoff mechanism</li><li>Configurable lookback periods and project allowlists</li></ul></section>
+<section><h2>Features</h2><ul class="features"><li>Aggregates events from Jira, Wiz, CrowdStrike, and Vibranium</li><li>Normalizes disparate data sources into a unified PostgreSQL schema</li><li>Manages database schema changes via Alembic migrations</li><li>Supports asynchronous data ingestion for performance</li><li>Integrates with Kubernetes CronJobs via run ID handoff</li></ul></section>
 
 <section><h2>Quickstart</h2><pre class="quickstart">pip install -e .
 export DATABASE_URL=postgresql+asyncpg://user:pass@localhost/db
 export JIRA_API_TOKEN=your_token
-export WIZ_CLIENT_ID=your_id
 python -m coe</pre></section>
 
 <section><h2>Architecture</h2>
   <pre class="mermaid">flowchart TD
-    A[External Sources] -->|Ingest| B(COE Pipeline)
-    B --> C[PostgreSQL Database]
-    C --> D[Alembic Migrations]
-    B --> E[Run ID Output]
-    E --> F[Downstream Renderer]
-    subgraph Sources
-    A1[Jira]
-    A2[Wiz]
-    A3[CrowdStrike]
-    A4[Vibranium]
-    end
-    A1 --> A
-    A2 --> A
-    A3 --> A
-    A4 --> A</pre>
+    User[User] --> Config[Configuration]
+    Config --> Pipeline[Ingestion Pipeline]
+    Pipeline --> Jira[Jira API]
+    Pipeline --> Wiz[Wiz API]
+    Pipeline --> CrowdStrike[CrowdStrike API]
+    Pipeline --> Vibranium[Vibranium API]
+    Jira --> Pipeline
+    Wiz --> Pipeline
+    CrowdStrike --> Pipeline
+    Vibranium --> Pipeline
+    Pipeline --> Database[PostgreSQL Database]
+    Pipeline --> Output[Run ID File]</pre>
 </section>
 
-<section><h2>How it's built</h2><p>Built with Python using SQLAlchemy (async) for database interactions, Pydantic Settings for configuration management, and Structlog for logging. It uses Alembic for database migrations and async/await patterns for concurrent data ingestion from external APIs.</p></section>
+<section><h2>How it's built</h2><p>Built with Python using SQLAlchemy for async database interactions, Pydantic for configuration management, and Alembic for database migrations. It uses structlog for logging and is designed to run as a Kubernetes CronJob.</p></section>
 
 <section><h2>How it runs</h2>
   <pre class="mermaid">sequenceDiagram
-    participant CLI as __main__.py
-    participant Config as config.py
-    participant DB as SQLAlchemy Engine
-    participant Pipe as pipeline.run
-    participant Src as External APIs
-    CLI->>Config: get_settings
-    CLI->>DB: create_async_engine
-    CLI->>Pipe: run(session_factory, settings)
-    Pipe->>Src: Fetch Jira Issues
-    Pipe->>Src: Fetch Wiz Findings
-    Pipe->>Src: Fetch CrowdStrike Detections
-    Pipe->>Src: Fetch Vibranium Events
-    Src-->>Pipe: Raw Data
-    Pipe->>DB: Normalize & Insert Events
-    DB-->>Pipe: Confirm Write
-    Pipe-->>CLI: Return Result (run_id, status)
-    CLI->>CLI: Write run_id to file</pre>
+    participant Main as Main Entry
+    participant Config as Settings Loader
+    participant Pipeline as Ingestion Pipeline
+    participant Sources as External APIs
+    participant DB as PostgreSQL
+    participant Output as Run ID Writer
+    Main->>Config: Load Settings
+    Config-->>Main: Return Settings
+    Main->>Pipeline: Initialize Session
+    Pipeline->>Sources: Fetch Events
+    Sources-->>Pipeline: Return Raw Data
+    Pipeline->>DB: Normalize and Store
+    DB-->>Pipeline: Confirm Write
+    Pipeline-->>Main: Return Result
+    Main->>Output: Write Run ID</pre>
 </section>
 
-<section><h2>How to apply &amp; reuse</h2><p>Configure environment variables for source APIs (Jira, Wiz, CrowdStrike, etc.) and database connection. Run the pipeline via the CLI entrypoint to ingest data, then use the stored run_id to trigger downstream reporting or rendering processes.</p></section>
+<section><h2>How to apply &amp; reuse</h2><p>Configure environment variables for source APIs (Jira, Wiz, CrowdStrike, Vibranium) and database connection. Run the CLI entrypoint to execute the ingestion pipeline, which writes a run ID for downstream rendering processes.</p></section>
 
 <section><h2>At a glance</h2>
-  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Multi-source data ingestion</span><span class="tag">Data normalization</span><span class="tag">Asynchronous processing</span><span class="tag">Database migration management</span><span class="tag">Environment-based configuration</span><span class="tag">Structured logging</span></span></div>
-  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">coe/__main__.py</span><span class="tag">coe/pipeline.py</span><span class="tag">coe/config.py</span><span class="tag">coe/db/models.py</span><span class="tag">alembic/env.py</span><span class="tag">coe/log_capture.py</span></span></div>
-  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">SQLAlchemy</span><span class="tag">Alembic</span><span class="tag">Pydantic</span><span class="tag">AsyncIO</span><span class="tag">Structlog</span><span class="tag">PostgreSQL</span></span></div>
-  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">asyncpg</span><span class="tag">pydantic-settings</span><span class="tag">sqlalchemy</span><span class="tag">alembic</span><span class="tag">structlog</span></span></div>
-  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Jira</span><span class="tag">Wiz</span><span class="tag">CrowdStrike</span><span class="tag">Vibranium</span><span class="tag">Google Docs</span><span class="tag">Kubernetes CronJobs</span></span></div>
-  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">ETL Pipeline</span><span class="tag">Repository Pattern</span><span class="tag">Dependency Injection</span><span class="tag">Configuration via Environment</span><span class="tag">Async/Await Concurrency</span></span></div>
-  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">security-ops</span><span class="tag">data-aggregation</span><span class="tag">weekly-reporting</span><span class="tag">python-etl</span><span class="tag">k8s-cronjob</span></span></div>
+  <div class="meta-row"><span class="meta-label">Capabilities</span><span class="meta-tags"><span class="tag">Data Ingestion</span><span class="tag">Schema Management</span><span class="tag">Async Processing</span><span class="tag">Configuration Validation</span><span class="tag">Logging</span></span></div>
+  <div class="meta-row"><span class="meta-label">Components</span><span class="meta-tags"><span class="tag">CLI Entrypoint</span><span class="tag">Configuration Manager</span><span class="tag">Ingestion Pipeline</span><span class="tag">Database Models</span><span class="tag">Alembic Migrations</span></span></div>
+  <div class="meta-row"><span class="meta-label">Tech</span><span class="meta-tags"><span class="tag">Python</span><span class="tag">SQLAlchemy</span><span class="tag">Pydantic</span><span class="tag">Alembic</span><span class="tag">AsyncIO</span><span class="tag">Structlog</span></span></div>
+  <div class="meta-row"><span class="meta-label">Depends on</span><span class="meta-tags"><span class="tag">PostgreSQL</span><span class="tag">Jira API</span><span class="tag">Wiz API</span><span class="tag">CrowdStrike API</span><span class="tag">Vibranium API</span></span></div>
+  <div class="meta-row"><span class="meta-label">Integrates with</span><span class="meta-tags"><span class="tag">Kubernetes CronJobs</span><span class="tag">Google Docs Rendering</span></span></div>
+  <div class="meta-row"><span class="meta-label">Patterns</span><span class="meta-tags"><span class="tag">ETL Pipeline</span><span class="tag">Repository Pattern</span><span class="tag">Dependency Injection</span><span class="tag">Async/Await</span></span></div>
+  <div class="meta-row"><span class="meta-label">Reuse tags</span><span class="meta-tags"><span class="tag">security-ops</span><span class="tag">data-aggregation</span><span class="tag">python-etl</span><span class="tag">kubernetes-cronjob</span></span></div>
 </section>
 
-<section class="hygiene clean"><h2>Repo hygiene</h2><p>✓ all on main — nothing unmerged.</p></section>
+<section class="hygiene needs-attention"><h2>⚠ Needs attention</h2><ul><li><strong>unmerged_branch</strong>: dependabot/uv/uv-f7f3875fe2 is 1 commit ahead of the default branch</li><li><strong>open_pr</strong>: PR #2: chore(deps): bump cryptography from 48.0.0 to 48.0.1 in the uv group across 1 directory</li></ul></section>
 
 <footer class="muted">
-  <p>Generated 2026-06-14T02:43:23.048392Z ·
+  <p>Generated 2026-06-22T21:09:01.193813Z ·
      commit de41e66 ·
      model qwen3.7-plus</p>
 </footer>

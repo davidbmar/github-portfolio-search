@@ -54,11 +54,13 @@
   <a href="group-cohesion.html">Group cohesion</a>
   <a href="per-state-metrics.html">Per-state metrics</a>
   <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <a href="goap-selector.html">GOAP-lite selector</a>
   <div class="grp">Measurement</div>
   <a href="eval-matrix.html">The evaluation matrix</a>
   <a href="judges.html">Judges</a>
   <a href="backend-mocks.html">Backend mocks</a>
   <a href="holdout-validation.html">Holdout validation</a>
+  <a href="transcript-audit.html">Transcript audit</a>
   <div class="grp">Operations</div>
   <a href="ci-gate.html">CI quality gate</a>
   <a href="session-replay.html">Session replay</a>
@@ -124,12 +126,23 @@ def _guard_stalled(ctx):
   </div>
 
   <h2>Use case — closing a held-out gap</h2>
-  <p>The <a class="x" href="holdout-validation.html">held-out</a> persona <code>privacy_guarded</code>
-  withholds information on purpose. Against <code>restaurant_reservation</code>, that caller drove the
-  flow into a no-progress loop &rarr; escalation every time, capping the flow's quality. Adding the
-  <code>stalled</code> recovery edges let the flow book under sensible defaults and reach a success
-  terminal — a deterministic fix that generalizes (it isn't tuned to one transcript; it handles the
-  <em>class</em> of withholding caller).</p>
+  <p>The <a class="x" href="holdout-validation.html">held-out</a> personas <code>skeptical</code> and
+  <code>privacy_guarded</code> withhold or stall on information on purpose. Against
+  <code>restaurant_reservation</code>, that caller drove the flow into a no-progress loop &rarr;
+  escalation every time, capping the flow's quality. Adding the <code>stalled</code> recovery edges let
+  the flow reach a success terminal under sensible defaults — a deterministic fix that generalizes (it
+  isn't tuned to one transcript; it handles the <em>class</em> of withholding caller).</p>
+
+  <div class="callout good">
+    <strong>One primitive, a whole failure class.</strong>
+    The same <code>stalled</code> + <code>sets:</code> edge later fixed a <em>second</em>, unrelated flow:
+    <code>generic_inquiry</code> was escalating when the caller's inquiry was answered conversationally but
+    the <code>inquiry</code> slot was never captured (held-out skeptical 2.5, privacy 5.0, bulk 7.5 &rarr;
+    <strong>all 10.0</strong>, commit <code>eaf5249</code>). Different surface cause, identical shape —
+    <em>a required slot never gets captured &rarr; no-progress &rarr; escalate</em>. That is the named
+    failure class this primitive closes, and it is the deterministic <code>fallback_state</code> branch of
+    the <a class="x" href="goap-selector.html">GOAP-lite selector</a>.
+  </div>
 
   <h2>Connection to the goal hierarchy</h2>
   <p>This primitive is exactly how a <a class="x" href="goal-segment-schema.html">GoalSegment</a>'s

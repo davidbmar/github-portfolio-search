@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transcript Audit — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <a href="goap-selector.html">GOAP-lite selector</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <a href="transcript-audit.html" class="active">Transcript audit</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Measurement &rsaquo; Transcript audit</div>
+  <h1 class="title">Auditing a Score Against Its Transcript</h1>
+  <p class="lede">A score tells you <em>that</em> a flow scored 10. The transcript tells you <em>why</em>.
+  This is how you confirm a number reflects what actually happened on the call — and never trust a score
+  you can audit.</p>
+
+  <h2>The problem</h2>
+  <p>The quality DB and the <a class="x" href="eval-matrix.html">eval matrix</a> report aggregate scores:
+  <code>weather: correctness 10</code>. But a number can be <em>faithfully computed</em> and still not
+  mean what you assume. Did the caller actually get what they needed? Was the slot caller-given or
+  defaulted? Did a &ldquo;10&rdquo; quietly include an escalation? You cannot tell from the number — only
+  from the conversation that produced it. Every eval run records those conversations as
+  <code>flow-transcripts-*.jsonl</code> (full caller+agent turns, captured slots, computed aspects);
+  the audit tool reads them back.</p>
+
+  <h2>The tool</h2>
+  <p><code>scripts/review_transcripts.py</code> does three things (run under the project venv):</p>
+  <pre><span class="c"># 1. LIST every recorded conversation for a flow, with score + outcome</span>
+.venv/bin/python scripts/review_transcripts.py --flow weather
+
+<span class="c"># 2. SHOW one conversation's full turn-by-turn transcript</span>
+.venv/bin/python scripts/review_transcripts.py --flow weather --show 0
+
+<span class="c"># 3. VALIDATE — does the recorded correctness match the transcript?</span>
+.venv/bin/python scripts/review_transcripts.py --flow weather --validate</pre>
+  <p>Flags: <code>--persona &lt;name&gt;</code> filters; <code>--dir &lt;run&gt;</code> targets a specific
+  run (default searches <code>docs/flow-eval</code> + <code>/tmp/ab_eval/*</code>). The same capability is
+  packaged as the <code>review-transcripts</code> skill.</p>
+
+  <h2>The audit: differential validation</h2>
+  <p><code>--validate</code> independently <strong>recomputes</strong> correctness from the saved
+  outcome + slots, using the same deterministic rule as the live eval
+  (<a class="x" href="eval-matrix.html">aspects.py</a> <code>_correctness</code>: <em>reached a success
+  terminal AND every target slot filled</em>), and diffs it against the recorded score:</p>
+  <pre># Audit: weather — recorded vs recomputed correctness
+# targets (must be filled for 10): ['city']
+   # persona          rec  recomp  match  final_state   basis
+   0 skeptical        10.0  10.0   ✅     report        city=caller-given
+   ...
+6 conversations · 0 score/transcript mismatch(es).</pre>
+  <ul>
+    <li><strong><code>rec</code> vs <code>recomp</code></strong> — recorded vs recomputed-from-transcript.
+      They must match.</li>
+    <li><strong><code>match</code></strong> — ✅ if equal; <code>❌ MISMATCH</code> means the recorded
+      number disagrees with the transcript (a real bug: scoring error or corrupt record). Exit code 1.</li>
+    <li><strong><code>basis</code></strong> — <em>why</em> it scored: which target slots are filled and
+      whether each was <code>caller-given</code>, <code>extracted/other</code>, or <code>DEFAULTED</code>.</li>
+  </ul>
+  <div class="callout">
+    <strong>0 mismatches ≠ &ldquo;the score is meaningful.&rdquo;</strong>
+    The audit proves a score is <em>honestly computed</em>, not that it means what you think. That is why
+    it always prints the <strong>basis</strong> — so you can judge the second question yourself.
+  </div>
+
+  <h2>Two things the audit makes visible</h2>
+  <p>Both were found by running this audit on flows that looked perfect:</p>
+  <table>
+    <tr><th>Finding</th><th>What the number hid</th></tr>
+    <tr><td><strong>Shallow correctness.</strong> <code>weather</code> scores a clean 10 across personas.</td>
+        <td>Correctness only checks <em>a city was captured and a report terminal was reached</em> — not that
+        the weather <em>content</em> was right (it is a fixed stub). A &ldquo;10&rdquo; means the flow worked,
+        not that the caller got accurate weather. (Backlog F-360.)</td></tr>
+    <tr><td><strong>Escalation scored as success.</strong> A <code>restaurant_reservation</code> conversation
+        scored correctness 10 with <code>final_state=escalated</code>.</td>
+        <td>The metric counts &ldquo;non-failure terminal + slots filled&rdquo; as success, and
+        <code>escalated</code> isn't a failure status — so a booking that bailed to a human still scored 10.
+        Fine for a message-taking flow; debatable for a booking. The audit surfaced it by printing
+        <code>final_state</code> next to <code>correctness</code>. (Tracked as an eval-semantics item.)</td></tr>
+  </table>
+
+  <h2>When to reach for it</h2>
+  <ul>
+    <li><strong>&ldquo;Is this flow <em>really</em> a 10?&rdquo;</strong> &rarr; <code>--validate</code>, then
+      read the basis and the final states.</li>
+    <li><strong>&ldquo;Show me what the caller and agent actually said.&rdquo;</strong> &rarr;
+      <code>--show N</code>.</li>
+    <li><strong>Pair it with every held-out draw.</strong> The <a class="x" href="holdout-validation.html">held-out
+      monitoring</a> loop runs <code>--validate</code> on each fresh batch, so every cycle checks both
+      <em>did anything regress?</em> and <em>are the scores honest?</em> — for almost no extra cost, since the
+      run already produced the transcripts.</li>
+  </ul>
+
+  <footer>Tool: <code>scripts/review_transcripts.py</code> · skill: <code>review-transcripts</code> · score rule: <code>riff/flow_eval/aspects.py</code> (<code>_correctness</code>). See also <a class="x" href="eval-matrix.html">the evaluation matrix</a> and <a class="x" href="methodology.html">methodology</a>.</footer>
+</main>
+</div>
+</body>
+</html>

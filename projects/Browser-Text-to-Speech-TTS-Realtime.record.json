@@ -1,61 +1,65 @@
 {
-  "title": "Browser-Text-to-Speech-TTS-Realtime",
-  "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
-  "what_it_is": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It utilizes VITS neural TTS models compiled to WebAssembly via ONNX Runtime, eliminating the need for server-side API calls. It features streaming playback where audio begins as soon as the first sentence is synthesized, multi-core processing via WebAssembly threads, and offline support through browser caching.",
-  "how_its_built": "The application is built with React 18 and TypeScript, bundled with Vite. The core inference engine relies on @diffusionstudio/vits-web, which wraps ONNX Runtime Web. Audio playback is managed via standard HTML5 Audio APIs, while state management for chunk generation and playback status is handled by a custom TTSEngine class and the useTTS React hook. UI components are styled with Tailwind CSS and shadcn/ui.",
-  "how_to_apply": "Integrate the useTTS hook into any React component to enable local voice synthesis. It is suitable for privacy-sensitive applications requiring offline capability, accessibility tools needing natural-sounding voices without cloud dependencies, or educational platforms wanting to reduce API costs. Developers can customize voice IDs, speed, and concurrency limits via the hook's options.",
+  "title": "Browser Text To Speech TTS Realtime",
+  "one_liner": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio.",
+  "what_it_is": "This project is a high-performance React application that performs neural text-to-speech synthesis entirely in the browser. It leverages VITS models compiled to WebAssembly via ONNX Runtime, enabling offline-capable, privacy-first audio generation with multi-core parallel processing and streaming playback without external API dependencies.",
+  "how_its_built": "The frontend is built with React 18, TypeScript, and Vite, styled with Tailwind CSS and shadcn/ui. The core inference engine uses @diffusionstudio/vits-web to load ONNX models into WebAssembly. Audio processing utilizes Web Workers for multi-threading, while state management relies on React hooks and TanStack Query for data handling. The server component is minimal, primarily serving static assets with COOP/COEP headers to enable SharedArrayBuffer for WASM threads.",
+  "how_to_apply": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via options. Use the speak method to trigger audio generation from text strings, leveraging built-in sentence splitting for streaming playback. Monitor progress via returned state properties like isGenerating and chunks to update UI indicators.",
   "quickstart": "git clone https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime.git\ncd Browser-Text-to-Speech-TTS-Realtime\nnpm install\nnpm run dev",
   "features": [
-    "100% client-side processing using WebAssembly and ONNX",
-    "Streaming playback: audio starts while remaining text generates",
-    "Multi-core parallel generation using WebAssembly threads",
-    "8 built-in neural voices (English, German, French, Spanish)",
-    "Offline support with automatic model caching in IndexedDB",
-    "Privacy-first architecture with no external data transmission"
+    "100% client-side neural TTS using WebAssembly and ONNX",
+    "Streaming playback that starts audio before full generation completes",
+    "Multi-core processing via WebAssembly threads for faster synthesis",
+    "Offline support with browser-cached voice models in IndexedDB",
+    "Eight built-in natural voices across English, German, French, and Spanish",
+    "Privacy-first architecture with no data sent to external servers"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User Interface] -->|Input Text| Hook[useTTS Hook]\n    Hook -->|Manage State| Engine[TTSEngine Class]\n    Engine -->|Split Text| Splitter[Sentence Splitter]\n    Splitter -->|Queue Sentences| Generator[Audio Generator]\n    Generator -->|Load Model| WASM[VITS WebAssembly Module]\n    WASM -->|Inference| ONNX[ONNX Runtime Web]\n    Generator -->|Audio Blob| Player[HTML5 Audio Player]\n    Player -->|Playback Events| Hook\n    WASM -->|Cache| IDB[(IndexedDB)]",
-  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant H as useTTS Hook\n    participant E as TTSEngine\n    participant W as VITS WASM\n    participant A as Audio Element\n\n    U->>H: speak(text)\n    H->>E: processText(text)\n    E->>E: splitIntoSentences()\n    loop For each sentence\n        E->>W: generateAudio(sentence)\n        W->>W: ONNX Inference\n        W-->>E: return Audio Blob\n        E->>E: updateChunkStatus(ready)\n    end\n    E->>A: play(firstChunk)\n    A-->>H: onplay/onended events\n    H-->>U: update UI state",
+  "diagram_architecture": "flowchart TD\n    User[User Interface]\n    ReactApp[React Application]\n    UseTTS[useTTS Hook]\n    TTSEngine[TTS Engine Class]\n    SentenceSplitter[Sentence Splitter]\n    ONNXRuntime[ONNX Runtime WASM]\n    VoiceModel[Voice Model Cache]\n    AudioContext[Web Audio API]\n    \n    User --> ReactApp\n    ReactApp --> UseTTS\n    UseTTS --> TTSEngine\n    TTSEngine --> SentenceSplitter\n    SentenceSplitter --> TTSEngine\n    TTSEngine --> ONNXRuntime\n    ONNXRuntime --> VoiceModel\n    ONNXRuntime --> AudioContext\n    AudioContext --> User",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant ReactComponent\n    participant UseTTS\n    participant TTSEngine\n    participant ONNXRuntime\n    participant AudioAPI\n    \n    User->>ReactComponent: Click Speak\n    ReactComponent->>UseTTS: speak text\n    UseTTS->>TTSEngine: process text\n    TTSEngine->>TTSEngine: split into sentences\n    loop For each sentence\n        TTSEngine->>ONNXRuntime: generate audio chunk\n        ONNXRuntime->>ONNXRuntime: infer via WASM\n        ONNXRuntime-->>TTSEngine: return audio blob\n        TTSEngine->>AudioAPI: play chunk\n        AudioAPI-->>User: stream audio\n    end\n    TTSEngine-->>UseTTS: update progress\n    UseTTS-->>ReactComponent: update state",
   "capabilities": [
     "Neural TTS Inference",
     "WebAssembly Execution",
     "Streaming Audio Playback",
     "Offline Model Caching",
-    "Multi-threaded Processing"
+    "Multi-threaded Processing",
+    "Sentence-level Chunking"
   ],
   "components": [
     "useTTS Hook",
     "TTSEngine Class",
-    "VITS WebAssembly Module",
-    "Sentence Splitter",
-    "Audio Player Manager"
+    "VITS Web Wrapper",
+    "ONNX Runtime",
+    "React UI Components",
+    "Query Client"
   ],
   "tech": [
     "TypeScript",
-    "React 18",
+    "React",
     "Vite",
-    "ONNX Runtime Web",
     "WebAssembly",
+    "ONNX Runtime",
     "Tailwind CSS",
-    "shadcn/ui"
+    "TanStack Query"
   ],
   "depends_on": [
     "@diffusionstudio/vits-web",
     "onnxruntime-web",
     "react",
     "typescript",
-    "vite"
+    "vite",
+    "tailwindcss"
   ],
   "integrates_with": [
-    "Browser IndexedDB",
-    "HTML5 Audio API",
-    "Web Workers"
+    "Web Audio API",
+    "IndexedDB",
+    "Web Workers",
+    "SharedArrayBuffer"
   ],
   "patterns": [
-    "Custom React Hook",
+    "Custom React Hooks",
     "Class-based Engine",
     "Streaming Data Processing",
-    "Lazy Loading Models",
-    "State Management via Callbacks"
+    "Client-side Caching",
+    "Progressive Enhancement"
   ],
   "reuse_tags": [
     "tts",
@@ -73,7 +77,7 @@
   "todos": [
     {
       "kind": "unmerged_branch",
-      "detail": "dependabot/github_actions/actions/checkout-6 is 1 commit ahead of the default branch"
+      "detail": "dependabot/github_actions/actions/checkout-7 is 1 commit ahead of the default branch"
     },
     {
       "kind": "unmerged_branch",
@@ -90,6 +94,10 @@
     {
       "kind": "unmerged_branch",
       "detail": "dependabot/npm_and_yarn/drizzle-orm-0.45.2 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/esbuild-0.28.1 is 1 commit ahead of the default branch"
     },
     {
       "kind": "unmerged_branch",
@@ -113,7 +121,7 @@
     },
     {
       "kind": "unmerged_branch",
-      "detail": "dependabot/npm_and_yarn/production-dependencies-6c6f35f648 is 1 commit ahead of the default branch"
+      "detail": "dependabot/npm_and_yarn/production-dependencies-f025cd6e97 is 1 commit ahead of the default branch"
     },
     {
       "kind": "unmerged_branch",
@@ -121,7 +129,7 @@
     },
     {
       "kind": "unmerged_branch",
-      "detail": "dependabot/npm_and_yarn/protobufjs-7.6.1 is 1 commit ahead of the default branch"
+      "detail": "dependabot/npm_and_yarn/protobufjs-7.6.4 is 1 commit ahead of the default branch"
     },
     {
       "kind": "unmerged_branch",
@@ -141,7 +149,7 @@
     },
     {
       "kind": "unmerged_branch",
-      "detail": "dependabot/npm_and_yarn/rollup-4.60.4 is 1 commit ahead of the default branch"
+      "detail": "dependabot/npm_and_yarn/rollup-4.62.0 is 1 commit ahead of the default branch"
     },
     {
       "kind": "unmerged_branch",
@@ -161,7 +169,7 @@
     },
     {
       "kind": "unmerged_branch",
-      "detail": "dependabot/npm_and_yarn/ws-8.20.1 is 1 commit ahead of the default branch"
+      "detail": "dependabot/npm_and_yarn/ws-8.21.0 is 1 commit ahead of the default branch"
     },
     {
       "kind": "unmerged_branch",
@@ -169,11 +177,27 @@
     },
     {
       "kind": "open_pr",
-      "detail": "PR #35: Bump the production-dependencies group across 1 directory with 22 updates"
+      "detail": "PR #41: Bump the production-dependencies group across 1 directory with 20 updates"
     },
     {
       "kind": "open_pr",
-      "detail": "PR #34: Bump ws from 8.18.0 to 8.20.1"
+      "detail": "PR #40: Bump actions/checkout from 4 to 7"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #39: Bump ws from 8.18.0 to 8.21.0"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #38: Bump protobufjs from 7.5.4 to 7.6.4"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #37: Bump rollup from 4.53.5 to 4.62.0"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #36: Bump esbuild from 0.25.12 to 0.28.1"
     },
     {
       "kind": "open_pr",
@@ -182,14 +206,6 @@
     {
       "kind": "open_pr",
       "detail": "PR #32: Bump qs from 6.14.1 to 6.15.2"
-    },
-    {
-      "kind": "open_pr",
-      "detail": "PR #31: Bump rollup from 4.53.5 to 4.60.4"
-    },
-    {
-      "kind": "open_pr",
-      "detail": "PR #30: Bump protobufjs from 7.5.4 to 7.6.1"
     },
     {
       "kind": "open_pr",
@@ -258,14 +274,12 @@
     {
       "kind": "open_pr",
       "detail": "PR #2: Bump actions/setup-node from 4 to 6"
-    },
-    {
-      "kind": "open_pr",
-      "detail": "PR #1: Bump actions/checkout from 4 to 6"
     }
   ],
   "screenshot_url": "https://raw.githubusercontent.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime/main/UI_Picture.png",
-  "generated_at": "2026-06-14T02:30:51.020222Z",
+  "generated_at": "2026-06-22T21:08:31.741779Z",
   "source_commit": "c46fbe9",
-  "model": "qwen3.7-plus"
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-06-21T18:04:42Z",
+  "docs": []
 }
