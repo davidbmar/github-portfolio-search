@@ -188,6 +188,17 @@ class TestFetchTopFiles:
         assert result == []
 
     @patch.object(github_client, "_session")
+    def test_empty_repo_409_returns_empty(self, mock_session_fn):
+        """An empty repo returns 409 on the trees endpoint — skip, don't crash."""
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        repo_resp = _mock_response({"default_branch": "main"})
+        tree_resp = MagicMock()
+        tree_resp.status_code = 409  # GitHub: "Git Repository is empty"
+        session.get.side_effect = [repo_resp, tree_resp]
+        assert github_client.fetch_top_files("owner", "empty-repo") == []
+
+    @patch.object(github_client, "_session")
     def test_custom_extensions(self, mock_session_fn):
         """Custom extensions filter correctly."""
         session = MagicMock()

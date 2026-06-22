@@ -47,6 +47,32 @@ class TestDashScopeClient:
         assert kwargs["headers"]["Authorization"] == "Bearer k"
 
 
+    def test_retries_on_429_then_succeeds(self, monkeypatch):
+        monkeypatch.setattr(llm_client.time, "sleep", lambda _s: None)  # no real wait
+        session = MagicMock()
+        ok = _resp({"choices": [{"message": {"content": "{\"x\": 1}"}}]})
+        session.post.side_effect = [_resp({}, status_code=429), ok]
+        client = llm_client.DashScopeClient(
+            api_key="k", base_url="https://x/v1", model="qwen-plus", session=session
+        )
+        assert client.complete_json("s", "u") == {"x": 1}
+        assert session.post.call_count == 2          # backed off and retried once
+
+    def test_429_exhausts_retries_then_raises(self, monkeypatch):
+        import requests
+        monkeypatch.setattr(llm_client.time, "sleep", lambda _s: None)
+        session = MagicMock()
+        r = MagicMock()
+        r.status_code = 429
+        r.raise_for_status.side_effect = requests.HTTPError("429 Too Many Requests")
+        session.post.return_value = r
+        client = llm_client.DashScopeClient(
+            api_key="k", base_url="https://x/v1", model="qwen-plus", session=session
+        )
+        with pytest.raises(llm_client.LLMError):
+            client.complete_json("s", "u")
+        assert session.post.call_count == llm_client._MAX_RETRIES + 1
+
     def test_http_error_becomes_llm_error(self):
         import requests
 

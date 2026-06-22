@@ -14,11 +14,27 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from typing import Protocol
 
 import requests
 
 _TIMEOUT = 120
+
+# Transient HTTP statuses worth retrying with backoff. 429 = rate limit / quota
+# (DashScope "Requests rate limit exceeded" / "Allocated quota exceeded").
+_RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
+_MAX_RETRIES = 4
+_BACKOFF_BASE = 2.0  # seconds; doubles each attempt, capped
+
+
+def _retry_wait(resp, attempt: int) -> float:
+    """Backoff seconds for *attempt*, honoring a numeric Retry-After if present."""
+    ra = getattr(resp, "headers", {})
+    ra = ra.get("Retry-After") if hasattr(ra, "get") else None
+    if isinstance(ra, (int, float)) or (isinstance(ra, str) and ra.isdigit()):
+        return min(float(ra), 60.0)
+    return min(_BACKOFF_BASE * (2 ** attempt), 30.0)
 _MAX_TOKENS = 4096
 
 # Failures the seam converts into LLMError (so callers don't import requests/json):
@@ -71,35 +87,47 @@ class DashScopeClient:
         self._session = session or requests.Session()
 
     def complete_json(self, system: str, user: str) -> dict:
-        try:
-            resp = self._session.post(
-                f"{self.base_url}/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": self.model,
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": user},
-                    ],
-                    "temperature": 0.3,
-                    "response_format": {"type": "json_object"},
-                    # Qwen3.x defaults to "thinking" mode, which pollutes the JSON
-                    # output; disable it for fast, clean JSON (matches the proven
-                    # generate_title_headline_hooks DashScope client).
-                    "enable_thinking": False,
-                },
-                timeout=_TIMEOUT,
-            )
-            resp.raise_for_status()
-            msg = resp.json()["choices"][0]["message"]
-            # Qwen occasionally returns the payload under reasoning_content.
-            content = msg.get("content") or msg.get("reasoning_content") or ""
-            return _extract_json(content)
-        except _CALL_FAILURES as exc:
-            raise LLMError(f"DashScope call failed: {exc}") from exc
+        body = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "temperature": 0.3,
+            "response_format": {"type": "json_object"},
+            # Qwen3.x defaults to "thinking" mode, which pollutes the JSON output;
+            # disable it for fast, clean JSON (matches the proven
+            # generate_title_headline_hooks DashScope client).
+            "enable_thinking": False,
+        }
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        last_exc: Exception | None = None
+        for attempt in range(_MAX_RETRIES + 1):
+            try:
+                resp = self._session.post(
+                    f"{self.base_url}/chat/completions",
+                    headers=headers, json=body, timeout=_TIMEOUT,
+                )
+            except _CALL_FAILURES as exc:
+                last_exc = exc
+                break
+            # Rate-limited / transient server error -> back off and retry.
+            if getattr(resp, "status_code", None) in _RETRY_STATUSES and attempt < _MAX_RETRIES:
+                time.sleep(_retry_wait(resp, attempt))
+                continue
+            try:
+                resp.raise_for_status()
+                msg = resp.json()["choices"][0]["message"]
+                # Qwen occasionally returns the payload under reasoning_content.
+                content = msg.get("content") or msg.get("reasoning_content") or ""
+                return _extract_json(content)
+            except _CALL_FAILURES as exc:
+                last_exc = exc
+                break
+        raise LLMError(f"DashScope call failed: {last_exc}") from last_exc
 
 
 class AnthropicClient:

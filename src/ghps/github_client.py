@@ -168,7 +168,7 @@ def fetch_top_files(
         f"{API_BASE}/repos/{owner}/{repo}/git/trees/{default_branch}",
         params={"recursive": "1"},
     )
-    if tree_resp.status_code == 404:
+    if tree_resp.status_code in (404, 409):  # missing branch / empty repo
         return []
     tree_resp.raise_for_status()
 
@@ -233,7 +233,7 @@ def _fetch_docs_under(
         f"{API_BASE}/repos/{owner}/{repo}/git/trees/{default_branch}",
         params={"recursive": "1"},
     )
-    if tree_resp.status_code == 404:
+    if tree_resp.status_code in (404, 409):  # missing branch / empty repo
         return []
     tree_resp.raise_for_status()
     tree = tree_resp.json().get("tree", [])
