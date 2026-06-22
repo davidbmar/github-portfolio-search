@@ -83,22 +83,35 @@ jobs:
           echo "Running: ghps gen-docs $FLAGS"
           ghps gen-docs $FLAGS
 
-      - name: Commit regenerated docs
+      - name: Generate daily digest
+        # Cached by per-day commit signature: only new/changed days call the LLM,
+        # so this is cheap nightly. Uses cloud Qwen (CI can't run local MLX/codex).
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHPS_PAT }}
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          DASHSCOPE_BASE_URL: ${{ secrets.DASHSCOPE_BASE_URL }}
+          DASHSCOPE_MODEL: ${{ secrets.DASHSCOPE_MODEL }}
+        run: ghps daily --since 2026-01-01 --engine dashscope
+
+      - name: Commit regenerated docs + daily digest
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add projects/ web/projects/ web/data/projects.json
+          git add projects/ web/
           if git diff --cached --quiet; then
             echo "No documentation changes."
           else
-            git commit -m "chore: regenerate L0 project docs [skip ci]"
+            git commit -m "chore: regenerate L0 docs + daily digest [skip ci]"
             git push
           fi
 
-      - name: Deploy to davidbmar.com (optional)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy == 'true' }}
+      - name: Deploy to davidbmar.com
+        # Auto-deploy on the nightly schedule; also on manual runs when deploy=true.
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true') }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
-        run: make deploy
+        run: |
+          aws s3 sync web/ s3://davidbmar-com/ --delete --exclude "*.pyc"
+          aws cloudfront create-invalidation --distribution-id E3RCY6XA80ANRT --paths "/*"

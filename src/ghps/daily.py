@@ -151,6 +151,38 @@ class MlxEngine:
         return _parse_json_object(resp["choices"][0]["message"]["content"])
 
 
+class DashScopeEngine:
+    """Generate via Alibaba Qwen (DashScope cloud) — for CI / hands-off runs.
+
+    Reuses the docsgen DashScopeClient (incl. its 429 backoff). Reads
+    DASHSCOPE_API_KEY / DASHSCOPE_BASE_URL / DASHSCOPE_MODEL from the env unless a
+    client is injected (tests).
+    """
+
+    def __init__(self, client=None):
+        if client is None:
+            import os as _os
+
+            from ghps.docsgen.llm_client import DashScopeClient
+            client = DashScopeClient(
+                api_key=_os.environ["DASHSCOPE_API_KEY"],
+                base_url=_os.environ["DASHSCOPE_BASE_URL"],
+                model=_os.environ.get("DASHSCOPE_MODEL", "qwen-plus"),
+            )
+        self._client = client
+
+    def generate(self, date: str, lines: list[str]) -> dict:
+        obj = self._client.complete_json(_SYSTEM, _user_prompt(date, lines))
+        takeaways = obj.get("takeaways") or []
+        if not isinstance(takeaways, list):
+            takeaways = [str(takeaways)]
+        return {
+            "headline": str(obj.get("headline", "")).strip(),
+            "summary": str(obj.get("summary", "")).strip(),
+            "takeaways": [str(t).strip() for t in takeaways if str(t).strip()],
+        }
+
+
 class MlxLocalEngine:
     """In-process MLX generation (no HTTP server) — free local engine, robust for
     batch backfills. Loads the model once; reuses it for every day.
@@ -191,6 +223,8 @@ def resolve_engine(name: str = "auto"):
         return MlxEngine()
     if name == "mlx-local":
         return MlxLocalEngine()
+    if name == "dashscope":
+        return DashScopeEngine()
     if name == "deterministic":
         return DeterministicEngine()
     # auto

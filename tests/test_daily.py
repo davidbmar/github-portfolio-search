@@ -42,6 +42,15 @@ def test_aggregate_ignores_commits_without_a_date():
 # DeterministicEngine (no LLM)
 # ---------------------------------------------------------------------------
 
+def test_dashscope_engine_normalizes_client_json():
+    class _FakeClient:
+        def complete_json(self, system, user):
+            return {"headline": "H", "summary": "S",
+                    "takeaways": ["a", "", "b"]}  # blank dropped
+    out = daily.DashScopeEngine(client=_FakeClient()).generate("2026-06-20", ["x"])
+    assert out == {"headline": "H", "summary": "S", "takeaways": ["a", "b"]}
+
+
 def test_deterministic_engine_summarizes_without_an_llm():
     eng = daily.DeterministicEngine()
     out = eng.generate("2026-06-20", ["alpha: fix one", "beta: feat x", "alpha: fix two"])

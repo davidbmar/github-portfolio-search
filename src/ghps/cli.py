@@ -322,10 +322,12 @@ def publish_docs():
 @click.option("--since", default=None,
               help="ISO date/time lower bound for commits (e.g. 2026-05-01).")
 @click.option("--engine",
-              type=click.Choice(["auto", "codex", "mlx", "mlx-local", "deterministic"]),
+              type=click.Choice(
+                  ["auto", "codex", "mlx", "mlx-local", "dashscope", "deterministic"]),
               default="auto",
               help="Headline engine. mlx-local = free in-process MLX (Qwen3.5-4B); "
-                   "codex = cloud; auto = codex -> mlx server -> deterministic.")
+                   "dashscope = Alibaba Qwen cloud (for CI); codex = cloud; "
+                   "auto = codex -> mlx server -> deterministic.")
 @click.option("--token", default=None, help="GitHub PAT (else GITHUB_TOKEN env).")
 @click.option("--no-cache", is_flag=True, default=False,
               help="Regenerate every day, ignoring the cache of unchanged days.")
