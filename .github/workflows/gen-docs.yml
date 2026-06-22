@@ -107,7 +107,7 @@ jobs:
 
       - name: Deploy to davidbmar.com
         # Auto-deploy on the nightly schedule; also on manual runs when deploy=true.
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true') }}
+        if: ${{ github.event_name == 'schedule' || inputs.deploy }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
