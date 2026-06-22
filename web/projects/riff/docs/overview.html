@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF — Evaluation &amp; Goal-Hierarchy System</title>
+<style>
+  :root{
+    --ink:#1a1c20; --mut:#5c6470; --line:#e3e6ea; --bg:#fcfcfd; --card:#fff;
+    --accent:#2f6df0; --accent-soft:#eaf1ff; --good:#1f9d55; --warn:#b8860b; --bad:#c0392b;
+    --code-bg:#1d2127; --code-ink:#e6e8eb;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;gap:0;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;
+    height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;padding-top:8px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;
+    overflow-x:auto;font-size:13px;line-height:1.55;margin:16px 0;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;} pre .k{color:#9ecbff;} pre .s{color:#9be09b;} pre .n{color:#f0a35e;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  td code{font-size:12.5px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);
+    padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  .pill{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;
+    background:#eef0f3;color:var(--mut);padding:2px 8px;border-radius:20px;margin-right:6px;}
+  .tiers{display:grid;grid-template-columns:1fr;gap:0;margin:22px 0;}
+  .tier{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:8px 0;background:#fff;position:relative;}
+  .tier .lvl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  .tier .goal{font-weight:600;margin:2px 0;}
+  .tier .metric{color:var(--mut);font-size:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0;}
+  .grid2 .card{margin:0;}
+  .grid2 a{text-decoration:none;color:inherit;}
+  .grid2 h3{margin:6px 0 2px;font-size:16px;}
+  .grid2 p{margin:2px 0;font-size:13.5px;color:var(--mut);}
+  a.x{color:var(--accent);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <h1 class="title">The RIFF Evaluation &amp; Goal-Hierarchy System</h1>
+  <p class="lede">How a voice-AI flow engine measures itself — at four nested levels, with cheap deterministic gates per commit and an expensive judged matrix at night.</p>
+
+  <p><strong>RIFF</strong> is a voice-AI <em>flow engine</em>. A <em>flow</em> is a conversation
+  script for a phone agent — &ldquo;book a plumbing visit,&rdquo; &ldquo;take a coffee order,&rdquo;
+  &ldquo;reserve a table.&rdquo; Under the hood a flow is a <strong>finite-state machine (FSM)</strong>:
+  a graph of states, with edges (transitions) guarded by <em>deterministic</em> string expressions
+  evaluated against the call's slot bag. The large language model (LLM) only produces <em>language</em>;
+  it never decides which state comes next. That separation — declared graph in the FSM, words from the
+  LLM — is the spine the whole evaluation system is built on.</p>
+
+  <p>This documentation describes everything built to <strong>answer one question reliably:
+  &ldquo;is a flow good, and if not, exactly which part is broken?&rdquo;</strong> The answer is not a
+  single number. It is a <strong>four-tier goal hierarchy</strong>, where every level declares a goal
+  and is instrumented with a metric for that goal.</p>
+
+  <h2>The four-tier hierarchy</h2>
+  <p>Read top-down. Each tier rolls up into the one above it, and each tier has its own &ldquo;what
+  good means&rdquo; and its own measurement.</p>
+
+  <div class="tiers">
+    <div class="tier">
+      <div class="lvl">Tier 4 · Archetype <span class="pill">cross-flow</span></div>
+      <div class="goal">The <em>same FSM subpart-type</em> across <em>all</em> flows — every flow's <code>collect</code>, every <code>confirm</code>, every <code>action</code> — grouped into one bucket.</div>
+      <div class="metric">Metric: mean cohesion across flows → finds <em>systemic</em> weakness (&ldquo;our action phases are weak everywhere&rdquo;) vs a one-flow bug. <a class="x" href="archetypes.html">Archetypes &raquo;</a></div>
+    </div>
+    <div class="tier">
+      <div class="lvl">Tier 3 · Flow</div>
+      <div class="goal">Goal: complete the caller's task.</div>
+      <div class="metric">Metric: correctness · completion · errors · latency · humanness, shown as the <a class="x" href="eval-matrix.html">evaluation matrix</a> (computed aspects + judged humanness).</div>
+    </div>
+    <div class="tier">
+      <div class="lvl">Tier 2 · Group <span class="pill">segment</span></div>
+      <div class="goal">Goal: a <em>typed</em> objective — <code>collect</code> the slots, <code>confirm</code> the read-back, <code>act</code> (a tool succeeds), reach a <code>terminal</code>, or <code>handoff</code> safely.</div>
+      <div class="metric">Metric: <code>group_cohesion = goal_yield · (0.35·efficiency + 0.65·transition_coherence)</code> — do the group's states <em>work together</em>? <a class="x" href="group-cohesion.html">Group cohesion &raquo;</a></div>
+    </div>
+    <div class="tier">
+      <div class="lvl">Tier 1 · State</div>
+      <div class="goal">Goal: one bounded capability / speech act (may fill or repair several slots).</div>
+      <div class="metric">Metric: progress · stall · revisit · dwell_turns · slot_fill_rate · latency_p95. <a class="x" href="per-state-metrics.html">Per-state metrics &raquo;</a></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The one mental model to keep</strong>
+    A bad flow score (Tier 3) is a symptom. You drill <em>down</em> — flow &rarr; group &rarr; state —
+    to find the exact node that is broken, and you roll <em>up</em> across flows (Tier 4) to find
+    weaknesses that are systemic to a <em>kind</em> of subpart, not to one flow. The command path is:
+    <code>--analyze</code> &rarr; <code>--matrix</code> &rarr; <code>--segment-matrix</code> &rarr;
+    <code>--state-matrix --flow F</code>.
+  </div>
+
+  <h2>Computed vs. judged — the cost split</h2>
+  <p>The single most important design decision: <strong>separate what we can compute deterministically
+  from what we must judge with an LLM.</strong></p>
+  <table>
+    <tr><th>&nbsp;</th><th>Computed aspects</th><th>Judged aspect</th></tr>
+    <tr><td>which</td><td>correctness, completion, errors, latency, and <em>all</em> per-state / group metrics</td><td>humanness only</td></tr>
+    <tr><td>source</td><td>the live event stream (state transitions, guards, tool calls, timing)</td><td>an LLM grading a transcript against a rubric</td></tr>
+    <tr><td>noise</td><td>none — deterministic</td><td>~1.5 points single-run (judge-dominated)</td></tr>
+    <tr><td>cost</td><td>free, fast</td><td>API calls, slow</td></tr>
+    <tr><td>cadence</td><td><strong>every commit</strong> (the <a class="x" href="ci-gate.html">CI gate</a>)</td><td><strong>nightly</strong> (the <a class="x" href="judges.html">judge panel</a>)</td></tr>
+  </table>
+  <p>Because only humanness pays the judge-noise tax, most of the scorecard is trustworthy and cheap,
+  and we spend LLM calls only on the genuinely subjective axis. See
+  <a class="x" href="methodology.html">Methodology &amp; lessons</a> for why the noise floor forces
+  repeat-N and why &ldquo;harden the instrument&rdquo; is the prime directive.</p>
+
+  <h2>The quality database</h2>
+  <p>Everything lands in one SQLite file, <code>docs/flow-eval/quality.db</code>, driven by
+  <code>scripts/eval_db.py</code>. Five tables hold the truth; a dozen read-time views slice it.</p>
+  <table>
+    <tr><th>Table</th><th>Grain</th><th>What it holds</th></tr>
+    <tr><td><code>runs</code></td><td>one per eval run</td><td>commit, branch, dirty flag, agent model, judge flags — the <em>feature</em> captured at run start</td></tr>
+    <tr><td><code>scores</code></td><td>flow × persona</td><td>legacy quality/robustness/success + per-cell variance (<code>quality_runs</code>)</td></tr>
+    <tr><td><code>aspect_scores</code></td><td>conversation × aspect × judge</td><td>the tidy long-format matrix; computed rows use <code>judge='(computed)'</code></td></tr>
+    <tr><td><code>state_scores</code></td><td>conversation × state</td><td>per-state root-cause metrics, tagged with the state's <em>segment</em></td></tr>
+    <tr><td><code>flow_mods</code></td><td>flow × commit</td><td>every git commit that touched a flow's YAML — so a score change can be tied to an edit vs. noise</td></tr>
+  </table>
+
+  <h2>Read this in order</h2>
+  <div class="grid2">
+    <a href="goal-hierarchy-design.html"><div class="card"><h3>Goal-Hierarchy design</h3><p>The flagship spec: flow &rarr; group &rarr; state, each with a goal and a metric. Start here.</p></div></a>
+    <a href="eval-matrix.html"><div class="card"><h3>The evaluation matrix</h3><p>Tier-3 flow scorecard. Computed aspects + judged humanness, crossed by agent.</p></div></a>
+    <a href="per-state-metrics.html"><div class="card"><h3>Per-state metrics</h3><p>Tier-1 root cause. How the event stream becomes progress / stall / dwell.</p></div></a>
+    <a href="group-cohesion.html"><div class="card"><h3>Group cohesion</h3><p>Tier-2. Do a group's states collaborate, or thrash? The bounded metric.</p></div></a>
+    <a href="archetypes.html"><div class="card"><h3>Archetypes</h3><p>Tier-4. The same subpart across all flows — systemic-weakness finder.</p></div></a>
+    <a href="goal-segment-schema.html"><div class="card"><h3>GoalSegment schema</h3><p>The typed group contract (new this session) — the data future phases consume.</p></div></a>
+    <a href="judges.html"><div class="card"><h3>Judges</h3><p>The roster: remote, local, and CLI judges. Spread = humanness uncertainty.</p></div></a>
+    <a href="backend-mocks.html"><div class="card"><h3>Backend mocks</h3><p>Letting backend-gated flows reach their payoff in eval — without faking guards.</p></div></a>
+    <a href="holdout-validation.html"><div class="card"><h3>Holdout validation</h3><p>Dev vs. held-out personas — the overfitting guard. Never debug the held-out set.</p></div></a>
+    <a href="ci-gate.html"><div class="card"><h3>CI quality gate</h3><p>The per-commit deterministic gate + the pre-push hook.</p></div></a>
+    <a href="session-replay.html"><div class="card"><h3>Session replay</h3><p>Re-drive recorded sessions after a change — the regression check.</p></div></a>
+    <a href="stall-recovery.html"><div class="card"><h3>Stall recovery (FSM)</h3><p>The <code>stalled</code> guard + <code>sets:</code> edges — deterministic recovery from a withholding caller.</p></div></a>
+    <a href="methodology.html"><div class="card"><h3>Methodology &amp; lessons</h3><p>The noise floor, harden-the-instrument, per-persona decomposition, holdout discipline.</p></div></a>
+  </div>
+
+  <footer>
+    RIFF evaluation documentation. Generated from the codebase at
+    <code>scripts/eval_db.py</code>, <code>riff/flow_eval/</code>, <code>riff/state_manager.py</code>,
+    and <code>docs/flow-eval/</code>. Sample outputs in these pages are real, captured from the live
+    <code>quality.db</code>.
+  </footer>
+</main>
+</div>
+</body>
+</html>

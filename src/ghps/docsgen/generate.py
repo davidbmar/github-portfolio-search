@@ -146,6 +146,7 @@ def publish_all(
         # <rel>. Generate a combined index plus per-kind listing pages.
         html_rels: list[str] = []
         md_rels: list[str] = []
+        overview_rel: str | None = None
         for d in p.get("docs") or []:
             kind = d.get("kind") or ("md" if "markdown" in d else "html")
             if kind == "md":
@@ -160,14 +161,22 @@ def publish_all(
                 rel = _safe_doc_rel(d.get("path", ""))
                 if rel is None:
                     continue
-                _write_text(hd / slug / "docs" / rel, d.get("html", "") or "")
-                html_rels.append(rel)
+                if rel == "index.html":
+                    # The repo ships its own docs homepage. Republish it as
+                    # overview.html and feature it, so our generated /docs/ index
+                    # stays the complete listing (nothing hidden).
+                    _write_text(hd / slug / "docs" / "overview.html", d.get("html", "") or "")
+                    overview_rel = "overview.html"
+                else:
+                    _write_text(hd / slug / "docs" / rel, d.get("html", "") or "")
+                    html_rels.append(rel)
 
-        if html_rels or md_rels:
-            docs_index_html = render.render_docs_index_page(p, html_rels, md_rels)
-            # The combined index — unless the repo shipped its own docs/index.html.
-            if "index.html" not in html_rels:
-                _write_text(hd / slug / "docs" / "index.html", docs_index_html)
+        if html_rels or md_rels or overview_rel:
+            docs_index_html = render.render_docs_index_page(
+                p, html_rels, md_rels, overview_rel=overview_rel)
+            # Always the generated complete index (lists every doc + features any
+            # repo overview).
+            _write_text(hd / slug / "docs" / "index.html", docs_index_html)
             # Flat copy so the no-trailing-slash URL resolves: the CF rewrite turns
             # /projects/<slug>/docs into <slug>/docs.html. Root-absolute links work
             # from either location.

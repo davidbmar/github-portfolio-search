@@ -491,6 +491,19 @@ _DOC_CSS = """  :root { color-scheme: light dark; }
   .doc-list .path { display: block; font-size: .78rem; opacity: .55;
                     margin-top: .15rem; }
   .muted { opacity: .6; }
+  .overview-card { display: block; margin: .25rem 0 1.6rem; padding: 1.15rem 1.3rem;
+                   border: 2px solid #2563eb; border-radius: 14px;
+                   background: linear-gradient(180deg, #2563eb14, #2563eb0a);
+                   color: inherit; text-decoration: none;
+                   box-shadow: 0 4px 18px #2563eb1f; transition: box-shadow .15s, transform .15s; }
+  .overview-card:hover { box-shadow: 0 6px 26px #2563eb33; transform: translateY(-1px); }
+  .overview-kicker { display: block; font-size: .72rem; font-weight: 700;
+                     letter-spacing: .09em; text-transform: uppercase; color: #2563eb; }
+  .overview-title { display: block; font-size: 1.35rem; font-weight: 800;
+                    color: #2563eb; margin: .12rem 0 .3rem; letter-spacing: -.01em; }
+  .overview-desc { display: block; font-size: .92rem; opacity: .8; line-height: 1.5; }
+  .overview-desc code { background: #2563eb1a; padding: .05rem .35rem;
+                        border-radius: 5px; font-size: .86em; }
   nav { margin-bottom: 1rem; }
   nav a { color: #2563eb; }
   article h1, article h2, article h3 { margin: 1.4rem 0 .5rem; }
@@ -514,7 +527,8 @@ def _doc_list_html(base: str, rels: list[str]) -> str:
 
 
 def render_docs_index_page(
-    record: dict, html_rels: list[str], md_rels: list[str] | None = None
+    record: dict, html_rels: list[str], md_rels: list[str] | None = None,
+    *, overview_rel: str | None = None,
 ) -> str:
     """Render the per-project docs index (``projects/<slug>/docs/index.html``).
 
@@ -522,6 +536,11 @@ def render_docs_index_page(
     (rendered, served at ``/docs/md/<rel>``). Each group links to its dedicated
     listing page (``/docs/html`` and ``/docs/md``). *_rels* are paths relative to
     each kind's directory — exactly how they're written to disk.
+
+    If *overview_rel* is given (the repo shipped its own ``docs/html/index.html``,
+    republished under that name), it is featured at the top as the maintainer's
+    overview — so this generated index stays complete while still surfacing the
+    repo's curated page.
 
     Root-absolute links so this page renders correctly whether served at
     /projects/<slug>/docs/ (index.html) OR /projects/<slug>/docs (the flat
@@ -534,6 +553,16 @@ def render_docs_index_page(
     docs_root = f"/projects/{slug_attr}/docs/"
 
     sections: list[str] = []
+    if overview_rel:
+        sections.append(
+            f'<a class="overview-card" href="{docs_root}{html.escape(overview_rel, quote=True)}">'
+            f'<span class="overview-kicker">\U0001F4CB Start here</span>'
+            f'<span class="overview-title">Project Overview &rarr;</span>'
+            f'<span class="overview-desc">The repo’s own docs homepage — its '
+            f'committed <code>docs/html/index.html</code>, hand-curated by the '
+            f'maintainer. The complete list of every doc is below.</span>'
+            f'</a>'
+        )
     if html_rels:
         sections.append(
             f'<h2>HTML <a class="kind-all" href="/projects/{slug_attr}/docs/html">'

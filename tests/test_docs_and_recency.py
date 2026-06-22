@@ -336,6 +336,16 @@ def test_docs_index_groups_html_and_md_with_kind_listings():
     assert 'href="/projects/demo/docs/md"' in out              # md listing page
 
 
+def test_docs_index_features_repo_overview_when_present():
+    out = render.render_docs_index_page(
+        {"slug": "demo", "title": "Demo"}, ["guide.html"], [],
+        overview_rel="overview.html")
+    assert 'href="/projects/demo/docs/overview.html"' in out   # featured overview
+    assert "Overview" in out
+    assert "index.html" in out                                 # explainer names the source
+    assert 'href="/projects/demo/docs/guide.html"' in out       # still lists all docs
+
+
 def test_docs_kind_page_lists_only_that_kind():
     html_page = render.render_docs_kind_page(
         {"slug": "demo", "title": "Demo"}, "html", ["a.html", "sub/b.html"]
@@ -406,6 +416,39 @@ def test_publish_writes_repo_docs_and_rejects_traversal(tmp_path):
     # the traversal entry must not escape the docs dir
     assert not (tmp_path / "web" / "evil.html").exists()
     assert not (proj / "evil.html").exists()
+
+
+def test_publish_repo_index_becomes_overview_and_generated_index_lists_all(tmp_path):
+    """A repo that ships docs/html/index.html: it becomes the featured 'overview',
+    and the generated /docs/ index lists ALL docs so none are hidden."""
+    records = tmp_path / "projects"
+    records.mkdir(parents=True)
+    rec = _record(
+        slug="demo",
+        pushed_at="2026-06-14T00:00:00Z",
+        docs=[
+            {"path": "docs/html/index.html", "html": "<h1>Repo Curated Index</h1>"},
+            {"path": "docs/html/guide.html", "html": "<h1>Guide</h1>"},
+            {"path": "docs/html/extra.html", "html": "<h1>Extra</h1>"},
+        ],
+    )
+    (records / "demo.record.json").write_text(json.dumps(rec))
+
+    generate.publish_all(
+        records_dir=str(records),
+        html_dir=str(tmp_path / "web" / "projects"),
+        feed_path=str(tmp_path / "web" / "data" / "projects.json"),
+    )
+
+    docs = tmp_path / "web" / "projects" / "demo" / "docs"
+    # the repo's own index is republished as overview.html (not the landing)
+    assert (docs / "overview.html").read_text() == "<h1>Repo Curated Index</h1>"
+    # the landing /docs/index.html is the GENERATED complete index (not the repo's)
+    index = (docs / "index.html").read_text()
+    assert "Repo Curated Index" not in index            # not the repo's verbatim page
+    assert "/projects/demo/docs/guide.html" in index    # lists every doc
+    assert "/projects/demo/docs/extra.html" in index
+    assert "/projects/demo/docs/overview.html" in index  # features the overview
 
 
 def test_publish_renders_markdown_docs_and_kind_listings(tmp_path):
