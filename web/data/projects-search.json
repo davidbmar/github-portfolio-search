@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T02:19:00.120676Z",
+  "generated_at": "2026-06-23T02:23:16.052696Z",
   "count": 137,
   "entries": [
     {
@@ -404,7 +404,7 @@
     {
       "repo": "Browser-Text-to-Speech-TTS-Realtime",
       "title": "Browser Text To Speech TTS Realtime",
-      "one_liner": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio.",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
       "keywords": [
         "typescript",
         "react",
@@ -412,10 +412,10 @@
         "webassembly",
         "onnx runtime",
         "tailwind css",
-        "tanstack query",
+        "shadcn ui",
         "tts",
         "onnx",
-        "react-hook",
+        "client-side-ai",
         "offline-first",
         "privacy-focused"
       ],
@@ -426,23 +426,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio."
+          "text": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX."
         },
         {
           "source": "what_it_is",
-          "text": "This project is a high-performance React application that performs neural text-to-speech synthesis entirely in the browser. It leverages VITS models compiled to WebAssembly via ONNX Runtime, enabling offline-capable, privacy-first audio generation with multi-core parallel processing and streaming playback without external API dependencies."
+          "text": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It utilizes VITS neural TTS models compiled to WebAssembly via ONNX Runtime, enabling streaming audio playback, multi-core parallel processing, and offline capability without server costs or API keys."
         },
         {
           "source": "how_its_built",
-          "text": "The frontend is built with React 18, TypeScript, and Vite, styled with Tailwind CSS and shadcn/ui. The core inference engine uses @diffusionstudio/vits-web to load ONNX models into WebAssembly. Audio processing utilizes Web Workers for multi-threading, while state management relies on React hooks and TanStack Query for data handling. The server component is minimal, primarily serving static assets with COOP/COEP headers to enable SharedArrayBuffer for WASM threads."
+          "text": "The application is built with React 18, TypeScript, and Vite. It leverages the @diffusionstudio/vits-web library for model inference. The UI is styled with Tailwind CSS and shadcn/ui components. State management for TTS operations is handled by a custom useTTS hook that interfaces with a TTSEngine class, which manages sentence splitting, chunk generation, and audio playback synchronization."
         },
         {
           "source": "how_to_apply",
-          "text": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via options. Use the speak method to trigger audio generation from text strings, leveraging built-in sentence splitting for streaming playback. Monitor progress via returned state properties like isGenerating and chunks to update UI indicators."
+          "text": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via hook options. Use the returned speak, stop, pause, and resume methods to control playback. Monitor state variables like isReady, isPlaying, and progress to update UI elements dynamically."
         },
         {
           "source": "features",
-          "text": "100% client-side neural TTS using WebAssembly and ONNX Streaming playback that starts audio before full generation completes Multi-core processing via WebAssembly threads for faster synthesis Offline support with browser-cached voice models in IndexedDB Eight built-in natural voices across English, German, French, and Spanish Privacy-first architecture with no data sent to external servers"
+          "text": "100% client-side processing with no server dependencies Streaming playback allowing audio to start before full generation Multi-core WebAssembly threads for parallel sentence processing Eight built-in natural voices across English, German, French, and Spanish Offline support via browser IndexedDB caching of voice models Privacy-first architecture ensuring no data leaves the local machine"
         }
       ]
     },
@@ -2326,17 +2326,21 @@
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "keywords": [
         "python",
+        "html",
+        "javascript",
         "fastapi",
         "sqlite-vec",
         "sentence-transformers",
-        "html/css/js",
-        "aws s3",
+        "aws lambda",
         "cloudfront",
+        "s3",
+        "github actions",
         "semantic-search",
-        "github-indexer",
-        "vector-database",
-        "ai-agent-tool",
-        "portfolio-manager"
+        "github-tools",
+        "portfolio-management",
+        "ai-agent-integration",
+        "code-discovery",
+        "knowledge-base"
       ],
       "chunks": [
         {
@@ -2349,19 +2353,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It helps developers find reusable code patterns and architectures across their own portfolio."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It enables developers to find reusable code patterns and architectures across their own portfolio using semantic similarity and keyword matching."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend with FastAPI for the REST API, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Indexing is handled by a Python pipeline triggered locally or via GitHub Actions. Deployment uses AWS S3 and CloudFront."
+          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the web UI. It uses GitHub Actions for weekly reindexing, AWS S3/CloudFront for hosting, and Lambda functions for OAuth handling. The system combines TF-IDF inverted indices with vector embeddings for hybrid search."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI/MCP server to search your codebase semantically."
+          "text": "Use it to quickly locate past implementations of specific features (e.g., 'voice processing') across hundreds of repos. Integrate it into AI agent workflows via MCP to allow LLMs to discover relevant code snippets without loading entire repositories into context. Deploy it as a personal knowledge base or embed it in resume sites."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-generated capability clusters and related repo suggestions CLI, Web UI, and MCP server interfaces for AI agents Faceted filtering by language, tech stack, and stars Automated weekly reindexing via GitHub Actions Exportable search results and embeddable widget"
+          "text": "Hybrid semantic and TF-IDF search across repository READMEs and metadata Auto-clustering of repositories into capability categories like Voice & Speech or AI & Search MCP server integration for AI agents to search portfolio programmatically Client-side faceted filtering by language, tech stack, and star count Automated weekly reindexing via GitHub Actions to keep data fresh Embeddable widget and shareable URLs for easy distribution of search results"
         }
       ]
     },
@@ -4001,22 +4005,22 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
         "mermaid",
+        "json",
+        "http api",
+        "websockets",
         "pytest",
-        "fastapi",
-        "gemma",
-        "gemini",
-        "claude",
         "voice-agent",
-        "finite-state-machine",
+        "fsm",
         "llm-orchestration",
-        "deterministic-guardrails",
-        "python-framework",
-        "business-automation"
+        "guardrails",
+        "yaml-config",
+        "telephony",
+        "customer-service"
       ],
       "chunks": [
         {
@@ -4025,23 +4029,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "A Python-based voice agent framework that combines Large Language Models for natural language understanding with a declared Finite State Machine (YAML) for strict workflow enforcement. It prevents LLM hallucinations by using pure functions for guardrails, slot validation, and state transitions, ensuring reliable phone conversations for scheduling, ordering, and intake tasks."
+          "text": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows developers to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, or intake. The system ensures reliability by using pure functions for guardrails, slot validation, and state transitions, preventing LLM hallucinations while maintaining conversational fluidity."
         },
         {
           "source": "how_its_built",
-          "text": "Built in Python with a modular architecture separating the LLM adapter layer from the deterministic core. The system uses YAML for flow definitions, a custom SessionContext for state management, and pure functions for guardrails and slot extraction. It includes a built-in web server for UI interaction, an MCP server for tool integration, and supports multiple LLM backends including local Gemma and cloud-based Gemini or Claude."
+          "text": "The core engine uses a `run_turn` pipeline where Speech-to-Text input passes through eight layers of deterministic guardrails before reaching the LLM. The LLM output is validated against a YAML-defined state graph by a `state_manager` which enforces transitions and slot extraction. The system supports multiple LLM adapters (Gemini, Gemma, Claude) and includes a built-in web server for real-time visualization and testing. It features an A/B testing harness based on observable metrics rather than subjective LLM judging, and uses pure functions for all critical logic to ensure reproducibility."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype and deploy voice agents for specific business verticals like plumbing, dental clinics, or retail. Define the business logic in plain English or YAML, generate the flow via the API, and integrate it into phone systems via the provided web interface or custom adapters. It is suitable for developers needing robust, testable voice interfaces that avoid the unpredictability of pure LLM agents."
+          "text": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. Describe your business logic and required data slots in a JSON description, post it to the `/api/flows/generate` endpoint, and receive a fully functional voice agent. Integrate the generated flow into your telephony infrastructure via the provided web server or MCP server interface. Developers can extend existing flows or create new ones by editing YAML state definitions and registering custom guardrails."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces strict state transitions using declared YAML state graphs Prevents hallucinations with deterministic guardrails and slot validators Supports local LLMs like Gemma and cloud models like Gemini and Claude Includes built-in A/B testing harness with observable metric scoring Exposes reusable agent blocks via Model Context Protocol (MCP) server"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces strict conversation paths using YAML-defined Finite State Machines Deterministic guardrails and slot validation prevent LLM hallucinations Built-in A/B testing harness using observable metrics for quality scoring Real-time web UI for visualizing state transitions and debugging calls Supports multiple LLM backends including Gemini, Gemma, and Claude"
         }
       ]
     },

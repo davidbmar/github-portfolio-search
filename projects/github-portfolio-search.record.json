@@ -1,68 +1,82 @@
 {
   "title": "GitHub Portfolio Search",
   "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
-  "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It helps developers find reusable code patterns and architectures across their own portfolio.",
-  "how_its_built": "Python backend with FastAPI for the REST API, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Indexing is handled by a Python pipeline triggered locally or via GitHub Actions. Deployment uses AWS S3 and CloudFront.",
-  "how_to_apply": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI/MCP server to search your codebase semantically.",
-  "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\n# Edit .env to add GITHUB_TOKEN\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
+  "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It enables developers to find reusable code patterns and architectures across their own portfolio using semantic similarity and keyword matching.",
+  "how_its_built": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the web UI. It uses GitHub Actions for weekly reindexing, AWS S3/CloudFront for hosting, and Lambda functions for OAuth handling. The system combines TF-IDF inverted indices with vector embeddings for hybrid search.",
+  "how_to_apply": "Use it to quickly locate past implementations of specific features (e.g., 'voice processing') across hundreds of repos. Integrate it into AI agent workflows via MCP to allow LLMs to discover relevant code snippets without loading entire repositories into context. Deploy it as a personal knowledge base or embed it in resume sites.",
+  "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
   "features": [
-    "Semantic search using embeddings and TF-IDF across READMEs and code",
-    "Auto-generated capability clusters and related repo suggestions",
-    "CLI, Web UI, and MCP server interfaces for AI agents",
-    "Faceted filtering by language, tech stack, and stars",
-    "Automated weekly reindexing via GitHub Actions",
-    "Exportable search results and embeddable widget"
+    "Hybrid semantic and TF-IDF search across repository READMEs and metadata",
+    "Auto-clustering of repositories into capability categories like Voice & Speech or AI & Search",
+    "MCP server integration for AI agents to search portfolio programmatically",
+    "Client-side faceted filtering by language, tech stack, and star count",
+    "Automated weekly reindexing via GitHub Actions to keep data fresh",
+    "Embeddable widget and shareable URLs for easy distribution of search results"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User or AI Agent]\n    WebUI[Web UI Static Files]\n    CLIClient[CLI Client]\n    MCPServer[MCP Server]\n    FastAPI[FastAPI REST API]\n    Indexer[Indexing Pipeline]\n    GitHubAPI[GitHub API]\n    SQLiteVec[SQLite vec Database]\n    S3[S3 Bucket]\n    CloudFront[CloudFront CDN]\n    GitHubActions[GitHub Actions Cron]\n    User --> WebUI\n    User --> CLIClient\n    User --> MCPServer\n    WebUI --> FastAPI\n    CLIClient --> FastAPI\n    MCPServer --> FastAPI\n    FastAPI --> SQLiteVec\n    Indexer --> GitHubAPI\n    Indexer --> SQLiteVec\n    GitHubActions --> Indexer\n    FastAPI --> S3\n    S3 --> CloudFront\n    CloudFront --> WebUI",
-  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant CLIClient as CLI Client\n    participant Indexer as Indexing Pipeline\n    participant GitHubAPI as GitHub API\n    participant SQLiteVec as SQLite vec DB\n    participant FastAPI as FastAPI Server\n    participant WebUI as Web UI\n    User->>CLIClient: ghps index username\n    CLIClient->>Indexer: Start indexing\n    Indexer->>GitHubAPI: Fetch repos and READMEs\n    GitHubAPI-->>Indexer: Return repo data\n    Indexer->>Indexer: Generate embeddings\n    Indexer->>SQLiteVec: Store vectors and metadata\n    SQLiteVec-->>Indexer: Confirm storage\n    Indexer-->>CLIClient: Index complete\n    User->>WebUI: Open search page\n    WebUI->>FastAPI: Request search results\n    FastAPI->>SQLiteVec: Query embeddings\n    SQLiteVec-->>FastAPI: Return matches\n    FastAPI-->>WebUI: Send JSON results\n    WebUI-->>User: Display results",
+  "diagram_architecture": "flowchart TD\n    User[User Browser]\n    CloudFront[CloudFront Distribution]\n    S3[S3 Bucket Static Assets]\n    LambdaOAuth[Lambda GitHub OAuth]\n    LambdaLog[Lambda Signin Log]\n    Indexer[Indexing Pipeline]\n    GitHubAPI[GitHub API]\n    SQLiteVec[SQLite vec Database]\n    MCPServer[MCP Server]\n    AI Agent[AI Agent Claude Code]\n    \n    User --> CloudFront\n    CloudFront --> S3\n    User --> LambdaOAuth\n    LambdaOAuth --> GitHubAPI\n    User --> LambdaLog\n    \n    Indexer --> GitHubAPI\n    Indexer --> SQLiteVec\n    \n    MCPServer --> SQLiteVec\n    AI Agent --> MCPServer\n    \n    GitHubActions[GitHub Actions Cron] --> Indexer",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant WebUI\n    participant APIServer\n    participant SearchEngine\n    participant Database\n    \n    User->>WebUI: Enter search query\n    WebUI->>APIServer: GET /search?q=query\n    APIServer->>SearchEngine: execute_hybrid_search\n    SearchEngine->>Database: Query TF-IDF index\n    Database-->>SearchEngine: Return keyword matches\n    SearchEngine->>Database: Query vector embeddings\n    Database-->>SearchEngine: Return semantic matches\n    SearchEngine-->>APIServer: Combined ranked results\n    APIServer-->>WebUI: JSON response\n    WebUI-->>User: Display repo cards with snippets",
   "capabilities": [
-    "Semantic Search",
-    "Vector Indexing",
-    "REST API",
-    "MCP Server",
-    "Static Web Hosting",
-    "Automated Reindexing"
+    "Semantic search",
+    "Keyword search",
+    "Repository indexing",
+    "Embedding generation",
+    "Faceted filtering",
+    "MCP integration",
+    "Static site generation",
+    "OAuth authentication"
   ],
   "components": [
-    "Indexing Pipeline",
-    "FastAPI Server",
-    "SQLite-vec Storage",
-    "Web UI Frontend",
-    "MCP Server Module",
-    "GitHub Actions Workflow"
+    "Indexing pipeline",
+    "REST API",
+    "Web UI",
+    "MCP server",
+    "Lambda functions",
+    "CloudFront distribution",
+    "S3 storage",
+    "SQLite database"
   ],
   "tech": [
     "Python",
+    "HTML",
+    "JavaScript",
     "FastAPI",
     "SQLite-vec",
     "sentence-transformers",
-    "HTML/CSS/JS",
-    "AWS S3",
-    "CloudFront"
+    "AWS Lambda",
+    "CloudFront",
+    "S3",
+    "GitHub Actions"
   ],
   "depends_on": [
     "GitHub Personal Access Token",
     "Python 3.9+",
-    "AWS CLI"
+    "AWS CLI",
+    "sentence-transformers library",
+    "sqlite-vec extension"
   ],
   "integrates_with": [
     "GitHub API",
-    "Claude Code",
     "Google OAuth",
-    "Telegram Bot API"
+    "Claude Code",
+    "Telegram Bot API",
+    "AWS S3",
+    "AWS CloudFront"
   ],
   "patterns": [
-    "Embedding-based Search",
-    "Static Site Generation",
-    "Serverless Lambda Functions",
-    "Progressive Disclosure for AI"
+    "Hybrid search",
+    "Progressive disclosure",
+    "Static site generation",
+    "Serverless functions",
+    "Vector embedding",
+    "Inverted index"
   ],
   "reuse_tags": [
     "semantic-search",
-    "github-indexer",
-    "vector-database",
-    "ai-agent-tool",
-    "portfolio-manager"
+    "github-tools",
+    "portfolio-management",
+    "ai-agent-integration",
+    "code-discovery",
+    "knowledge-base"
   ],
   "slug": "github-portfolio-search",
   "repo_url": "https://github.com/davidbmar/github-portfolio-search",
@@ -71,9 +85,9 @@
   "thin": false,
   "todos": [],
   "screenshot_url": "",
-  "generated_at": "2026-06-23T00:29:16.216825Z",
-  "source_commit": "3e0e9d4",
+  "generated_at": "2026-06-23T02:22:37.972584Z",
+  "source_commit": "ebde8a1",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-06-22T22:12:23Z",
+  "pushed_at": "2026-06-23T02:19:17Z",
   "docs": []
 }

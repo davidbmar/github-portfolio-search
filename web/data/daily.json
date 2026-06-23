@@ -1,7 +1,39 @@
 {
-  "generated_at": "2026-06-23T00:31:27.056516Z",
-  "count": 146,
+  "generated_at": "2026-06-23T02:24:45.848463Z",
+  "count": 147,
   "days": [
+    {
+      "date": "2026-06-23",
+      "headline": "Riff Implements Four-Tier Evaluation Hierarchy with Shift-Left Gates",
+      "summary": "The Riff framework introduces a structured four-tier evaluation hierarchy, featuring a pure Flow Acceptance evaluator and a live persona-panel driver for correctness gating. Documentation updates visualize this hierarchy while fixing escalation logic for booking flow failures.",
+      "takeaways": [
+        "Implement a four-tier evaluation hierarchy to structure testing rigor, using the provided diagram as a reference for tier definitions.",
+        "Adopt a 'shift-left' gate strategy by integrating a pure Flow Acceptance evaluator early in the pipeline to catch defects sooner.",
+        "Use a live persona-panel driver to simulate real-user interactions for robust correctness gating in acceptance tests."
+      ],
+      "total_commits": 6,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 2,
+          "messages": [
+            "docs(riff): add four-tier evaluation hierarchy diagram + gitignore playwright",
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 4,
+          "messages": [
+            "feat(acceptance): increments 2+3 — live persona-panel driver + correctness gate (#25)",
+            "feat(acceptance): increment 1 — pure Flow Acceptance evaluator (shift-left gate, #25)",
+            "docs: add four-tier evaluation hierarchy diagram",
+            "fix(eval): escalated-as-failure for booking flows in _correctness (#22)"
+          ]
+        }
+      ],
+      "commit_sig": "d996ce1967a5322e"
+    },
     {
       "date": "2026-06-22",
       "headline": "Automated Docs Pipeline and GOAP-lite Evaluation Framework",
@@ -3580,15 +3612,15 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Hardened Voice AI Primitives with Automated Sweep Gates and Flow-Graph UI",
-      "summary": "Implemented a rigorous 'doc-as-spec' testing framework for voice AI modules, introducing automated sweep scripts to validate invariants across ten core primitives. Simultaneously upgraded the flow-graph visualization with a three-column SVG layout and refined the booking module's calendar phrasing and state management.",
+      "headline": "Riff Hardens Core Primitives with Automated Sweeps and Doc-as-Spec",
+      "summary": "The Riff framework executed a comprehensive audit of core conversational modules, replacing speculative documentation with invariant-driven specs and automated defect-sweeping scripts. This update standardizes state management, fixes critical UI/UX latency issues in the flow graph, and enforces strict type safety across booking and scheduling flows.",
       "takeaways": [
-        "Adopt the 'sweep_<module>.py' pattern to automate regression testing against defined invariants and failure modes for any stateful dialogue component.",
-        "Use the rewritten 'doc-as-spec' templates (e.g., 03-collect.md) to formally define module invariants and guardrails before implementation.",
-        "Reuse the three-column SVG flow-graph layout with auto-panning and zoom controls to visualize complex state machines without sibling node overlap.",
-        "Apply the day-relative calendar phrasing logic ('today', 'this coming X') to prevent user confusion loops in scheduling interfaces."
+        "Adopt the 'doc-as-spec' pattern by defining explicit Invariants and Failure Modes for each module, then validate them with dedicated YAML scenario files and Python invariant tests.",
+        "Reuse the `sweep_*.py` gate scripts to automatically cascade dialogue runners against defect logs, ensuring regression testing covers edge cases like stale slots or invalid final statuses.",
+        "Implement width-aware sibling spreading and auto-panning in SVG-based flow graphs to eliminate node overlap and improve readability in complex state machines.",
+        "Standardize calendar interactions by leading with day-relative phrasing (e.g., 'today', 'this coming X') and relaxing time validators to accept natural language inputs like '2pm'."
       ],
-      "total_commits": 132,
+      "total_commits": 128,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3607,7 +3639,7 @@
         },
         {
           "name": "riff",
-          "commits": 129,
+          "commits": 125,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3733,15 +3765,11 @@
             "test(primitives): author confirm.yaml (20 scenarios across 6 behavior classes)",
             "feat(scripts): wire _sweep_base.run_sweep (cascade dialogue runner; reads defects.jsonl)",
             "flow(tutorial_confirm): add revise_order loop-back so F-3 (deny without correction) is exercisable; rename business to BurgerBox",
-            "test(primitives): add test_confirm_invariants.py (I-1 forbid side effects, I-2 guards, I-3 clear on exit)",
-            "docs(confirm): rewrite 04-confirm.md to doc-as-spec template (3 Invariants, 4 Failure modes)",
-            "refactor(tests): drop redundant sys.path.insert from test_sweep_base",
-            "fix(web): redirect docs/ directory URLs to README.md?format=html when present",
-            "fix(tests): replace pytest.skip with return in session-scoped linter gate"
+            "test(primitives): add test_confirm_invariants.py (I-1 forbid side effects, I-2 guards, I-3 clear on exit)"
           ]
         }
       ],
-      "commit_sig": "2f4819fcd4b3147a"
+      "commit_sig": "da826f2e2768be08"
     },
     {
       "date": "2026-05-01",

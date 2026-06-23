@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T02:19:00.074574Z",
+  "generated_at": "2026-06-23T02:23:15.963150Z",
   "count": 137,
   "projects": [
     {
@@ -706,36 +706,36 @@
     },
     {
       "title": "Browser Text To Speech TTS Realtime",
-      "one_liner": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio.",
-      "what_it_is": "This project is a high-performance React application that performs neural text-to-speech synthesis entirely in the browser. It leverages VITS models compiled to WebAssembly via ONNX Runtime, enabling offline-capable, privacy-first audio generation with multi-core parallel processing and streaming playback without external API dependencies.",
-      "how_its_built": "The frontend is built with React 18, TypeScript, and Vite, styled with Tailwind CSS and shadcn/ui. The core inference engine uses @diffusionstudio/vits-web to load ONNX models into WebAssembly. Audio processing utilizes Web Workers for multi-threading, while state management relies on React hooks and TanStack Query for data handling. The server component is minimal, primarily serving static assets with COOP/COEP headers to enable SharedArrayBuffer for WASM threads.",
-      "how_to_apply": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via options. Use the speak method to trigger audio generation from text strings, leveraging built-in sentence splitting for streaming playback. Monitor progress via returned state properties like isGenerating and chunks to update UI indicators.",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "what_it_is": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It utilizes VITS neural TTS models compiled to WebAssembly via ONNX Runtime, enabling streaming audio playback, multi-core parallel processing, and offline capability without server costs or API keys.",
+      "how_its_built": "The application is built with React 18, TypeScript, and Vite. It leverages the @diffusionstudio/vits-web library for model inference. The UI is styled with Tailwind CSS and shadcn/ui components. State management for TTS operations is handled by a custom useTTS hook that interfaces with a TTSEngine class, which manages sentence splitting, chunk generation, and audio playback synchronization.",
+      "how_to_apply": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via hook options. Use the returned speak, stop, pause, and resume methods to control playback. Monitor state variables like isReady, isPlaying, and progress to update UI elements dynamically.",
       "quickstart": "git clone https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime.git\ncd Browser-Text-to-Speech-TTS-Realtime\nnpm install\nnpm run dev",
       "features": [
-        "100% client-side neural TTS using WebAssembly and ONNX",
-        "Streaming playback that starts audio before full generation completes",
-        "Multi-core processing via WebAssembly threads for faster synthesis",
-        "Offline support with browser-cached voice models in IndexedDB",
+        "100% client-side processing with no server dependencies",
+        "Streaming playback allowing audio to start before full generation",
+        "Multi-core WebAssembly threads for parallel sentence processing",
         "Eight built-in natural voices across English, German, French, and Spanish",
-        "Privacy-first architecture with no data sent to external servers"
+        "Offline support via browser IndexedDB caching of voice models",
+        "Privacy-first architecture ensuring no data leaves the local machine"
       ],
-      "diagram_architecture": "flowchart TD\n    User[User Interface]\n    ReactApp[React Application]\n    UseTTS[useTTS Hook]\n    TTSEngine[TTS Engine Class]\n    SentenceSplitter[Sentence Splitter]\n    ONNXRuntime[ONNX Runtime WASM]\n    VoiceModel[Voice Model Cache]\n    AudioContext[Web Audio API]\n    \n    User --> ReactApp\n    ReactApp --> UseTTS\n    UseTTS --> TTSEngine\n    TTSEngine --> SentenceSplitter\n    SentenceSplitter --> TTSEngine\n    TTSEngine --> ONNXRuntime\n    ONNXRuntime --> VoiceModel\n    ONNXRuntime --> AudioContext\n    AudioContext --> User",
-      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant ReactComponent\n    participant UseTTS\n    participant TTSEngine\n    participant ONNXRuntime\n    participant AudioAPI\n    \n    User->>ReactComponent: Click Speak\n    ReactComponent->>UseTTS: speak text\n    UseTTS->>TTSEngine: process text\n    TTSEngine->>TTSEngine: split into sentences\n    loop For each sentence\n        TTSEngine->>ONNXRuntime: generate audio chunk\n        ONNXRuntime->>ONNXRuntime: infer via WASM\n        ONNXRuntime-->>TTSEngine: return audio blob\n        TTSEngine->>AudioAPI: play chunk\n        AudioAPI-->>User: stream audio\n    end\n    TTSEngine-->>UseTTS: update progress\n    UseTTS-->>ReactComponent: update state",
+      "diagram_architecture": "flowchart TD\n    User[User Interface]\n    Hook[useTTS Hook]\n    Engine[TTS Engine Class]\n    Splitter[Sentence Splitter]\n    ModelLoader[Model Loader]\n    WASM[WebAssembly Runtime]\n    ONNX[ONNX Inference]\n    AudioPlayer[HTML Audio Element]\n    Cache[IndexedDB Cache]\n    User --> Hook\n    Hook --> Engine\n    Engine --> Splitter\n    Engine --> ModelLoader\n    ModelLoader --> Cache\n    ModelLoader --> WASM\n    WASM --> ONNX\n    ONNX --> AudioPlayer\n    AudioPlayer --> User",
+      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Component\n    participant Hook as useTTS\n    participant Engine as TTSEngine\n    participant WASM as WebAssembly\n    participant Audio as HTMLAudioElement\n    User->>Component: Click Speak\n    Component->>Hook: speak text\n    Hook->>Engine: process text\n    Engine->>Engine: split into sentences\n    loop For each sentence\n        Engine->>WASM: generate audio chunk\n        WASM-->>Engine: return audio blob\n        Engine->>Audio: play chunk\n        Audio-->>User: output sound\n    end\n    Engine-->>Hook: update progress\n    Hook-->>Component: update state\n    Component-->>User: render progress",
       "capabilities": [
-        "Neural TTS Inference",
-        "WebAssembly Execution",
-        "Streaming Audio Playback",
-        "Offline Model Caching",
-        "Multi-threaded Processing",
-        "Sentence-level Chunking"
+        "Real-time neural speech synthesis",
+        "Parallel multi-core processing",
+        "Streaming audio playback",
+        "Offline model caching",
+        "Voice selection and configuration",
+        "Playback control pause resume stop"
       ],
       "components": [
-        "useTTS Hook",
-        "TTSEngine Class",
-        "VITS Web Wrapper",
-        "ONNX Runtime",
-        "React UI Components",
-        "Query Client"
+        "useTTS React hook",
+        "TTSEngine class",
+        "VITS WebAssembly models",
+        "Sentence splitter utility",
+        "shadcn UI components",
+        "Tailwind CSS styles"
       ],
       "tech": [
         "TypeScript",
@@ -744,34 +744,35 @@
         "WebAssembly",
         "ONNX Runtime",
         "Tailwind CSS",
-        "TanStack Query"
+        "shadcn ui"
       ],
       "depends_on": [
         "@diffusionstudio/vits-web",
-        "onnxruntime-web",
         "react",
         "typescript",
         "vite",
-        "tailwindcss"
+        "tailwindcss",
+        "clsx",
+        "tailwind-merge"
       ],
       "integrates_with": [
+        "Browser IndexedDB",
         "Web Audio API",
-        "IndexedDB",
-        "Web Workers",
-        "SharedArrayBuffer"
+        "Web Workers"
       ],
       "patterns": [
         "Custom React Hooks",
-        "Class-based Engine",
-        "Streaming Data Processing",
-        "Client-side Caching",
-        "Progressive Enhancement"
+        "Class based engine logic",
+        "Streaming data processing",
+        "Client side caching",
+        "Component composition"
       ],
       "reuse_tags": [
         "tts",
         "webassembly",
         "onnx",
-        "react-hook",
+        "react",
+        "client-side-ai",
         "offline-first",
         "privacy-focused"
       ],
@@ -855,7 +856,7 @@
         },
         {
           "kind": "unmerged_branch",
-          "detail": "dependabot/npm_and_yarn/rollup-4.62.0 is 1 commit ahead of the default branch"
+          "detail": "dependabot/npm_and_yarn/rollup-4.62.2 is 1 commit ahead of the default branch"
         },
         {
           "kind": "unmerged_branch",
@@ -883,6 +884,10 @@
         },
         {
           "kind": "open_pr",
+          "detail": "PR #42: Bump rollup from 4.53.5 to 4.62.2"
+        },
+        {
+          "kind": "open_pr",
           "detail": "PR #41: Bump the production-dependencies group across 1 directory with 20 updates"
         },
         {
@@ -896,10 +901,6 @@
         {
           "kind": "open_pr",
           "detail": "PR #38: Bump protobufjs from 7.5.4 to 7.6.4"
-        },
-        {
-          "kind": "open_pr",
-          "detail": "PR #37: Bump rollup from 4.53.5 to 4.62.0"
         },
         {
           "kind": "open_pr",
@@ -983,10 +984,10 @@
         }
       ],
       "screenshot_url": "https://raw.githubusercontent.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime/main/UI_Picture.png",
-      "generated_at": "2026-06-22T21:08:31.741779Z",
+      "generated_at": "2026-06-23T02:21:51.346460Z",
       "source_commit": "c46fbe9",
       "model": "qwen3.7-plus",
-      "pushed_at": "2026-06-21T18:04:42Z",
+      "pushed_at": "2026-06-23T01:21:49Z",
       "docs": []
     },
     {
@@ -4325,68 +4326,82 @@
     {
       "title": "GitHub Portfolio Search",
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
-      "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It helps developers find reusable code patterns and architectures across their own portfolio.",
-      "how_its_built": "Python backend with FastAPI for the REST API, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Indexing is handled by a Python pipeline triggered locally or via GitHub Actions. Deployment uses AWS S3 and CloudFront.",
-      "how_to_apply": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI/MCP server to search your codebase semantically.",
-      "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\n# Edit .env to add GITHUB_TOKEN\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
+      "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It enables developers to find reusable code patterns and architectures across their own portfolio using semantic similarity and keyword matching.",
+      "how_its_built": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the web UI. It uses GitHub Actions for weekly reindexing, AWS S3/CloudFront for hosting, and Lambda functions for OAuth handling. The system combines TF-IDF inverted indices with vector embeddings for hybrid search.",
+      "how_to_apply": "Use it to quickly locate past implementations of specific features (e.g., 'voice processing') across hundreds of repos. Integrate it into AI agent workflows via MCP to allow LLMs to discover relevant code snippets without loading entire repositories into context. Deploy it as a personal knowledge base or embed it in resume sites.",
+      "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
       "features": [
-        "Semantic search using embeddings and TF-IDF across READMEs and code",
-        "Auto-generated capability clusters and related repo suggestions",
-        "CLI, Web UI, and MCP server interfaces for AI agents",
-        "Faceted filtering by language, tech stack, and stars",
-        "Automated weekly reindexing via GitHub Actions",
-        "Exportable search results and embeddable widget"
+        "Hybrid semantic and TF-IDF search across repository READMEs and metadata",
+        "Auto-clustering of repositories into capability categories like Voice & Speech or AI & Search",
+        "MCP server integration for AI agents to search portfolio programmatically",
+        "Client-side faceted filtering by language, tech stack, and star count",
+        "Automated weekly reindexing via GitHub Actions to keep data fresh",
+        "Embeddable widget and shareable URLs for easy distribution of search results"
       ],
-      "diagram_architecture": "flowchart TD\n    User[User or AI Agent]\n    WebUI[Web UI Static Files]\n    CLIClient[CLI Client]\n    MCPServer[MCP Server]\n    FastAPI[FastAPI REST API]\n    Indexer[Indexing Pipeline]\n    GitHubAPI[GitHub API]\n    SQLiteVec[SQLite vec Database]\n    S3[S3 Bucket]\n    CloudFront[CloudFront CDN]\n    GitHubActions[GitHub Actions Cron]\n    User --> WebUI\n    User --> CLIClient\n    User --> MCPServer\n    WebUI --> FastAPI\n    CLIClient --> FastAPI\n    MCPServer --> FastAPI\n    FastAPI --> SQLiteVec\n    Indexer --> GitHubAPI\n    Indexer --> SQLiteVec\n    GitHubActions --> Indexer\n    FastAPI --> S3\n    S3 --> CloudFront\n    CloudFront --> WebUI",
-      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant CLIClient as CLI Client\n    participant Indexer as Indexing Pipeline\n    participant GitHubAPI as GitHub API\n    participant SQLiteVec as SQLite vec DB\n    participant FastAPI as FastAPI Server\n    participant WebUI as Web UI\n    User->>CLIClient: ghps index username\n    CLIClient->>Indexer: Start indexing\n    Indexer->>GitHubAPI: Fetch repos and READMEs\n    GitHubAPI-->>Indexer: Return repo data\n    Indexer->>Indexer: Generate embeddings\n    Indexer->>SQLiteVec: Store vectors and metadata\n    SQLiteVec-->>Indexer: Confirm storage\n    Indexer-->>CLIClient: Index complete\n    User->>WebUI: Open search page\n    WebUI->>FastAPI: Request search results\n    FastAPI->>SQLiteVec: Query embeddings\n    SQLiteVec-->>FastAPI: Return matches\n    FastAPI-->>WebUI: Send JSON results\n    WebUI-->>User: Display results",
+      "diagram_architecture": "flowchart TD\n    User[User Browser]\n    CloudFront[CloudFront Distribution]\n    S3[S3 Bucket Static Assets]\n    LambdaOAuth[Lambda GitHub OAuth]\n    LambdaLog[Lambda Signin Log]\n    Indexer[Indexing Pipeline]\n    GitHubAPI[GitHub API]\n    SQLiteVec[SQLite vec Database]\n    MCPServer[MCP Server]\n    AI Agent[AI Agent Claude Code]\n    \n    User --> CloudFront\n    CloudFront --> S3\n    User --> LambdaOAuth\n    LambdaOAuth --> GitHubAPI\n    User --> LambdaLog\n    \n    Indexer --> GitHubAPI\n    Indexer --> SQLiteVec\n    \n    MCPServer --> SQLiteVec\n    AI Agent --> MCPServer\n    \n    GitHubActions[GitHub Actions Cron] --> Indexer",
+      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant WebUI\n    participant APIServer\n    participant SearchEngine\n    participant Database\n    \n    User->>WebUI: Enter search query\n    WebUI->>APIServer: GET /search?q=query\n    APIServer->>SearchEngine: execute_hybrid_search\n    SearchEngine->>Database: Query TF-IDF index\n    Database-->>SearchEngine: Return keyword matches\n    SearchEngine->>Database: Query vector embeddings\n    Database-->>SearchEngine: Return semantic matches\n    SearchEngine-->>APIServer: Combined ranked results\n    APIServer-->>WebUI: JSON response\n    WebUI-->>User: Display repo cards with snippets",
       "capabilities": [
-        "Semantic Search",
-        "Vector Indexing",
-        "REST API",
-        "MCP Server",
-        "Static Web Hosting",
-        "Automated Reindexing"
+        "Semantic search",
+        "Keyword search",
+        "Repository indexing",
+        "Embedding generation",
+        "Faceted filtering",
+        "MCP integration",
+        "Static site generation",
+        "OAuth authentication"
       ],
       "components": [
-        "Indexing Pipeline",
-        "FastAPI Server",
-        "SQLite-vec Storage",
-        "Web UI Frontend",
-        "MCP Server Module",
-        "GitHub Actions Workflow"
+        "Indexing pipeline",
+        "REST API",
+        "Web UI",
+        "MCP server",
+        "Lambda functions",
+        "CloudFront distribution",
+        "S3 storage",
+        "SQLite database"
       ],
       "tech": [
         "Python",
+        "HTML",
+        "JavaScript",
         "FastAPI",
         "SQLite-vec",
         "sentence-transformers",
-        "HTML/CSS/JS",
-        "AWS S3",
-        "CloudFront"
+        "AWS Lambda",
+        "CloudFront",
+        "S3",
+        "GitHub Actions"
       ],
       "depends_on": [
         "GitHub Personal Access Token",
         "Python 3.9+",
-        "AWS CLI"
+        "AWS CLI",
+        "sentence-transformers library",
+        "sqlite-vec extension"
       ],
       "integrates_with": [
         "GitHub API",
-        "Claude Code",
         "Google OAuth",
-        "Telegram Bot API"
+        "Claude Code",
+        "Telegram Bot API",
+        "AWS S3",
+        "AWS CloudFront"
       ],
       "patterns": [
-        "Embedding-based Search",
-        "Static Site Generation",
-        "Serverless Lambda Functions",
-        "Progressive Disclosure for AI"
+        "Hybrid search",
+        "Progressive disclosure",
+        "Static site generation",
+        "Serverless functions",
+        "Vector embedding",
+        "Inverted index"
       ],
       "reuse_tags": [
         "semantic-search",
-        "github-indexer",
-        "vector-database",
-        "ai-agent-tool",
-        "portfolio-manager"
+        "github-tools",
+        "portfolio-management",
+        "ai-agent-integration",
+        "code-discovery",
+        "knowledge-base"
       ],
       "slug": "github-portfolio-search",
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
@@ -4395,10 +4410,10 @@
       "thin": false,
       "todos": [],
       "screenshot_url": "",
-      "generated_at": "2026-06-23T00:29:16.216825Z",
-      "source_commit": "3e0e9d4",
+      "generated_at": "2026-06-23T02:22:37.972584Z",
+      "source_commit": "ebde8a1",
       "model": "qwen3.7-plus",
-      "pushed_at": "2026-06-22T22:12:23Z",
+      "pushed_at": "2026-06-23T02:19:17Z",
       "docs": []
     },
     {
@@ -7453,80 +7468,82 @@
     },
     {
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
-      "what_it_is": "A Python-based voice agent framework that combines Large Language Models for natural language understanding with a declared Finite State Machine (YAML) for strict workflow enforcement. It prevents LLM hallucinations by using pure functions for guardrails, slot validation, and state transitions, ensuring reliable phone conversations for scheduling, ordering, and intake tasks.",
-      "how_its_built": "Built in Python with a modular architecture separating the LLM adapter layer from the deterministic core. The system uses YAML for flow definitions, a custom SessionContext for state management, and pure functions for guardrails and slot extraction. It includes a built-in web server for UI interaction, an MCP server for tool integration, and supports multiple LLM backends including local Gemma and cloud-based Gemini or Claude.",
-      "how_to_apply": "Use riff to rapidly prototype and deploy voice agents for specific business verticals like plumbing, dental clinics, or retail. Define the business logic in plain English or YAML, generate the flow via the API, and integrate it into phone systems via the provided web interface or custom adapters. It is suitable for developers needing robust, testable voice interfaces that avoid the unpredictability of pure LLM agents.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
+      "what_it_is": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows developers to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, or intake. The system ensures reliability by using pure functions for guardrails, slot validation, and state transitions, preventing LLM hallucinations while maintaining conversational fluidity.",
+      "how_its_built": "The core engine uses a `run_turn` pipeline where Speech-to-Text input passes through eight layers of deterministic guardrails before reaching the LLM. The LLM output is validated against a YAML-defined state graph by a `state_manager` which enforces transitions and slot extraction. The system supports multiple LLM adapters (Gemini, Gemma, Claude) and includes a built-in web server for real-time visualization and testing. It features an A/B testing harness based on observable metrics rather than subjective LLM judging, and uses pure functions for all critical logic to ensure reproducibility.",
+      "how_to_apply": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. Describe your business logic and required data slots in a JSON description, post it to the `/api/flows/generate` endpoint, and receive a fully functional voice agent. Integrate the generated flow into your telephony infrastructure via the provided web server or MCP server interface. Developers can extend existing flows or create new ones by editing YAML state definitions and registering custom guardrails.",
       "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server\ncurl -X POST localhost:8765/api/flows/generate -H \"Content-Type: application/json\" -d '{\"description\":\"Hair salon in Austin. Book cuts and colors.\"}'",
       "features": [
         "Generates voice agent flows from plain English business descriptions",
-        "Enforces strict state transitions using declared YAML state graphs",
-        "Prevents hallucinations with deterministic guardrails and slot validators",
-        "Supports local LLMs like Gemma and cloud models like Gemini and Claude",
-        "Includes built-in A/B testing harness with observable metric scoring",
-        "Exposes reusable agent blocks via Model Context Protocol (MCP) server"
+        "Enforces strict conversation paths using YAML-defined Finite State Machines",
+        "Deterministic guardrails and slot validation prevent LLM hallucinations",
+        "Built-in A/B testing harness using observable metrics for quality scoring",
+        "Real-time web UI for visualizing state transitions and debugging calls",
+        "Supports multiple LLM backends including Gemini, Gemma, and Claude"
       ],
-      "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[Speech to Text]\n    STT --> RunTurn[run_turn pipeline]\n    RunTurn --> Guardrails[Guardrails Pure Functions]\n    RunTurn --> LLMCall[LLM Adapter Call]\n    RunTurn --> StateManager[State Manager FSM]\n    Guardrails --> TurnResult[Turn Result]\n    LLMCall --> TurnResult\n    StateManager --> TurnResult\n    TurnResult --> SlotExtractor[Slot Extractor]\n    TurnResult --> EvalFramework[Evaluation Framework]\n    TurnResult --> TurnLogger[Turn Logger JSONL]\n    SlotExtractor --> TTS[Text to Speech]\n    TTS --> Caller",
-      "diagram_sequence": "sequenceDiagram\n    participant User as Caller\n    participant STT as STT Engine\n    participant Server as riff Web Server\n    participant Pipeline as run_turn Pipeline\n    participant FSM as State Manager\n    participant LLM as LLM Adapter\n    participant TTS as TTS Engine\n    User->>STT: Speaks utterance\n    STT->>Server: Sends text transcript\n    Server->>Pipeline: Initiates turn processing\n    Pipeline->>FSM: Get current state and constraints\n    FSM->>Pipeline: Return valid transitions and slots\n    Pipeline->>LLM: Request response with context\n    LLM->>Pipeline: Return generated text\n    Pipeline->>FSM: Validate transition and extract slots\n    FSM->>Pipeline: Confirm state update\n    Pipeline->>TTS: Send response text\n    TTS->>User: Plays audio response",
+      "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[Speech to Text]\n    STT --> RunTurn[run_turn pipeline]\n    RunTurn --> Guardrails[Guardrails Layer]\n    Guardrails --> LLM[LLM Adapter]\n    LLM --> StateManager[State Manager]\n    StateManager --> SlotExtractor[Slot Extractor]\n    StateManager --> TurnLogger[Turn Logger]\n    SlotExtractor --> TTS[Text to Speech]\n    TTS --> Caller\n    Guardrails --> StateManager",
+      "diagram_sequence": "sequenceDiagram\n    participant User as Caller\n    participant STT as STT Service\n    participant Server as riff Web Server\n    participant Pipeline as run_turn Pipeline\n    participant FSM as State Manager\n    participant LLM as LLM Adapter\n    participant TTS as TTS Service\n    User->>STT: Speaks utterance\n    STT->>Server: Sends text transcript\n    Server->>Pipeline: Initiates turn processing\n    Pipeline->>FSM: Get current state context\n    FSM->>Pipeline: Return state definition\n    Pipeline->>LLM: Send prompt with context\n    LLM->>Pipeline: Return generated response\n    Pipeline->>FSM: Validate transition and slots\n    FSM->>Pipeline: Confirm valid state change\n    Pipeline->>TTS: Send response text\n    TTS->>User: Plays audio response",
       "capabilities": [
-        "Plain English to Voice Agent Flow Generation",
+        "Plain English to Voice Agent Generation",
         "Deterministic State Machine Enforcement",
-        "Multi-LLM Backend Support",
-        "Real-time Web UI for Conversation Monitoring",
-        "A/B Testing with Observable Metrics",
+        "Multi-LLM Adapter Support",
+        "Real-time Conversation Visualization",
+        "Observable A/B Testing",
+        "Slot Extraction and Validation",
+        "Guardrail Enforcement",
         "MCP Server Integration"
       ],
       "components": [
-        "web_server",
+        "run_turn pipeline",
         "state_manager",
-        "run_turn_pipeline",
-        "flow_loader",
-        "session_store",
-        "guardrails_engine",
+        "guardrails layer",
         "slot_extractor",
-        "mcp_server"
+        "turn_logger",
+        "web_server",
+        "mcp_server",
+        "abtest harness",
+        "session_store",
+        "event_bus"
       ],
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "Pytest",
-        "FastAPI",
-        "Gemma",
-        "Gemini",
-        "Claude"
+        "JSON",
+        "HTTP API",
+        "WebSockets",
+        "Pytest"
       ],
       "depends_on": [
+        "Google Gemini API",
+        "Google Gemma",
+        "Anthropic Claude",
         "pytest",
-        "pyyaml",
-        "fastapi",
-        "uvicorn",
-        "google-generativeai",
-        "anthropic",
-        "mcp"
+        "mcp cli"
       ],
       "integrates_with": [
-        "Google Gemini",
-        "Anthropic Claude",
-        "Local Gemma",
-        "Model Context Protocol Clients",
-        "Web Browsers via Voice HTML Interface"
+        "Telephony Systems",
+        "Browser Clients",
+        "MCP Clients",
+        "Custom Business Logic"
       ],
       "patterns": [
-        "LLM Riffs FSM Keeps Beat",
-        "Pure Function Guardrails",
-        "Declared State Graph",
+        "Finite State Machine Orchestration",
+        "Deterministic Guardrails",
+        "Pure Function Validation",
         "Observable Metric Scoring",
-        "Silent Failure Tracking",
-        "LRU Cache Helper"
+        "Adapter Pattern for LLMs",
+        "Event Bus Communication"
       ],
       "reuse_tags": [
         "voice-agent",
-        "finite-state-machine",
+        "fsm",
         "llm-orchestration",
-        "deterministic-guardrails",
-        "python-framework",
-        "business-automation"
+        "guardrails",
+        "python",
+        "yaml-config",
+        "telephony",
+        "customer-service"
       ],
       "slug": "riff",
       "repo_url": "https://github.com/davidbmar/riff",
@@ -7572,10 +7589,10 @@
         }
       ],
       "screenshot_url": "",
-      "generated_at": "2026-06-23T00:29:54.062382Z",
-      "source_commit": "597d18f",
+      "generated_at": "2026-06-23T02:23:15.950593Z",
+      "source_commit": "435e065",
       "model": "qwen3.7-plus",
-      "pushed_at": "2026-06-22T23:29:34Z",
+      "pushed_at": "2026-06-23T01:53:47Z",
       "docs": [
         {
           "path": "docs/html/archetypes.html",

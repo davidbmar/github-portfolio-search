@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T02:19:00.119650Z",
+  "generated_at": "2026-06-23T02:23:16.049262Z",
   "count": 137,
   "projects": [
     {
@@ -226,7 +226,7 @@
     {
       "slug": "Browser-Text-to-Speech-TTS-Realtime",
       "title": "Browser Text To Speech TTS Realtime",
-      "one_liner": "A zero-server, client-side neural text-to-speech engine using WebAssembly and ONNX for real-time streaming audio.",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
       "tech": [
         "TypeScript",
         "React",
@@ -234,19 +234,20 @@
         "WebAssembly",
         "ONNX Runtime",
         "Tailwind CSS",
-        "TanStack Query"
+        "shadcn ui"
       ],
       "reuse_tags": [
         "tts",
         "webassembly",
         "onnx",
-        "react-hook",
+        "react",
+        "client-side-ai",
         "offline-first",
         "privacy-focused"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime",
-      "pushed_at": "2026-06-21T18:04:42Z"
+      "pushed_at": "2026-06-23T01:21:49Z"
     },
     {
       "slug": "COE-overview",
@@ -1244,23 +1245,27 @@
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "tech": [
         "Python",
+        "HTML",
+        "JavaScript",
         "FastAPI",
         "SQLite-vec",
         "sentence-transformers",
-        "HTML/CSS/JS",
-        "AWS S3",
-        "CloudFront"
+        "AWS Lambda",
+        "CloudFront",
+        "S3",
+        "GitHub Actions"
       ],
       "reuse_tags": [
         "semantic-search",
-        "github-indexer",
-        "vector-database",
-        "ai-agent-tool",
-        "portfolio-manager"
+        "github-tools",
+        "portfolio-management",
+        "ai-agent-integration",
+        "code-discovery",
+        "knowledge-base"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-22T22:12:23Z"
+      "pushed_at": "2026-06-23T02:19:17Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2113,28 +2118,29 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "Pytest",
-        "FastAPI",
-        "Gemma",
-        "Gemini",
-        "Claude"
+        "JSON",
+        "HTTP API",
+        "WebSockets",
+        "Pytest"
       ],
       "reuse_tags": [
         "voice-agent",
-        "finite-state-machine",
+        "fsm",
         "llm-orchestration",
-        "deterministic-guardrails",
-        "python-framework",
-        "business-automation"
+        "guardrails",
+        "python",
+        "yaml-config",
+        "telephony",
+        "customer-service"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-22T23:29:34Z"
+      "pushed_at": "2026-06-23T01:53:47Z"
     },
     {
       "slug": "riot",
