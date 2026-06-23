@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF — Effective LLM Policy (per-state model routing)</title>
+<style>
+  :root{
+    --ink:#1a1c20; --mut:#5c6470; --line:#e3e6ea; --bg:#fcfcfd; --card:#fff;
+    --accent:#2f6df0; --accent-soft:#eaf1ff; --good:#1f9d55; --warn:#b8860b; --bad:#c0392b;
+    --code-bg:#1d2127; --code-ink:#e6e8eb;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;gap:0;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;
+    height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.here{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;padding-top:8px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;
+    overflow-x:auto;font-size:13px;line-height:1.55;margin:16px 0;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;} pre .k{color:#9ecbff;} pre .s{color:#9be09b;} pre .n{color:#f0a35e;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  td code{font-size:12.5px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);
+    padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  figure.fig{margin:26px 0 30px;}
+  figure.fig svg{display:block;width:100%;height:auto;border:1px solid var(--line);
+    border-radius:8px;background:#fff;box-shadow:0 10px 28px rgba(31,53,98,.08);}
+  figure.fig figcaption{margin-top:9px;color:var(--mut);font-size:13.5px;line-height:1.45;}
+  .pill{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;
+    background:#eef0f3;color:var(--mut);padding:2px 8px;border-radius:20px;margin-right:6px;}
+  .pill.new{background:var(--good);color:#fff;}
+  .case{border:1px solid var(--line);border-radius:10px;padding:6px 20px;margin:14px 0;background:#fff;}
+  .case .lvl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-top:12px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0;}
+  .grid2 .card{margin:0;}
+  a.x{color:var(--accent);}
+  .status{display:inline-block;font-size:12px;background:#fdf6e3;color:var(--warn);
+    border:1px solid #ecdca6;padding:2px 10px;border-radius:20px;font-weight:600;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <a href="goap-selector.html">GOAP-lite selector</a>
+  <div class="grp">Design (proposed)</div>
+  <a href="llm-policy.html" class="here">Effective LLM Policy</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <a href="transcript-audit.html">Transcript audit</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="shift-left-acceptance.html">Shift-left acceptance</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <p><span class="pill new">New</span><span class="pill">2026-06-23</span> <span class="status">Proposed design — not yet wired into the live turn</span></p>
+  <h1 class="title">Effective LLM Policy</h1>
+  <p class="lede">One conversation does not need one model. RIFF is a finite-state machine, so the natural unit of model choice is the <strong>state</strong> — route a greeting, a slot read-back, and a booking-confirmation to the model each one actually needs.</p>
+
+  <p>Today every turn in a call runs on one model picked per session. But a flow's states are
+  not equally hard. A greeting is deterministic. A simple slot grab is easy. A booking
+  confirmation, where a wrong &ldquo;yes&rdquo; books the wrong appointment, is where you want your
+  strongest reasoning. <strong>Effective LLM Policy</strong> lets a flow declare the right model per
+  state, falling back to sane defaults so you only override what matters.</p>
+
+  <div class="callout">
+    <strong>The one idea</strong>
+    Model choice is <em>inheritance with override</em>, exactly like CSS or a subclass. A broad tier
+    sets the default; a narrower tier overrides it. Resolution walks most-specific-first and takes the
+    first tier that sets a value.
+  </div>
+
+  <h2>How a model gets chosen: the cascade</h2>
+  <p>Four tiers, broad to narrow. Each tier may set a value or stay silent (<code>inherit</code>).
+  The resolver walks from the most specific tier it can and takes the first one that speaks.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 720 330" role="img" aria-label="Resolution cascade from global to flow to group to state, most specific wins">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#2f6df0"/>
+        </marker>
+      </defs>
+      <text x="20" y="28" font-size="13" fill="#5c6470" font-family="sans-serif">BROADEST default</text>
+      <text x="540" y="28" font-size="13" fill="#5c6470" font-family="sans-serif">MOST SPECIFIC wins</text>
+      <!-- tiers -->
+      <g font-family="sans-serif">
+        <rect x="20" y="44" width="150" height="74" rx="10" fill="#f4f6f9" stroke="#e3e6ea"/>
+        <text x="95" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#2f6df0">global</text>
+        <text x="95" y="93" text-anchor="middle" font-size="11.5" fill="#5c6470">server default</text>
+        <text x="95" y="108" text-anchor="middle" font-size="11.5" fill="#5c6470">e.g. fast</text>
+
+        <rect x="200" y="44" width="150" height="74" rx="10" fill="#fff" stroke="#e3e6ea"/>
+        <text x="275" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#2f6df0">flow</text>
+        <text x="275" y="93" text-anchor="middle" font-size="11.5" fill="#5c6470">FlowLlmConfig</text>
+        <text x="275" y="108" text-anchor="middle" font-size="11.5" fill="#5c6470">default_class</text>
+
+        <rect x="380" y="44" width="150" height="74" rx="10" fill="#fff" stroke="#e3e6ea"/>
+        <text x="455" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#2f6df0">group</text>
+        <text x="455" y="93" text-anchor="middle" font-size="11.5" fill="#5c6470">GoalSegment.llm</text>
+        <text x="455" y="108" text-anchor="middle" font-size="11.5" fill="#5c6470">(new field)</text>
+
+        <rect x="560" y="44" width="140" height="74" rx="10" fill="#eaf1ff" stroke="#2f6df0"/>
+        <text x="630" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#2f6df0">state</text>
+        <text x="630" y="93" text-anchor="middle" font-size="11.5" fill="#5c6470">StateDef.llm</text>
+        <text x="630" y="108" text-anchor="middle" font-size="11.5" fill="#5c6470">e.g. smart</text>
+
+        <line x1="170" y1="81" x2="198" y2="81" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar)"/>
+        <line x1="350" y1="81" x2="378" y2="81" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar)"/>
+        <line x1="530" y1="81" x2="558" y2="81" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar)"/>
+      </g>
+      <!-- second lookup -->
+      <text x="20" y="168" font-size="13" fill="#5c6470" font-family="sans-serif">Then resolve the winning value (second ordered lookup):</text>
+      <g font-family="sans-serif">
+        <rect x="20" y="184" width="210" height="58" rx="10" fill="#fff" stroke="#e3e6ea"/>
+        <text x="125" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1c20">class? (fast/smart/local)</text>
+        <text x="125" y="227" text-anchor="middle" font-size="11.5" fill="#5c6470">look up flow class table</text>
+
+        <rect x="262" y="184" width="200" height="58" rx="10" fill="#fff" stroke="#e3e6ea"/>
+        <text x="362" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1c20">else literal model</text>
+        <text x="362" y="227" text-anchor="middle" font-size="11.5" fill="#5c6470">gemini-2.5-pro</text>
+
+        <rect x="494" y="184" width="206" height="58" rx="10" fill="#eafaf0" stroke="#1f9d55"/>
+        <text x="597" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#1f9d55">concrete model</text>
+        <text x="597" y="227" text-anchor="middle" font-size="11.5" fill="#5c6470">&rarr; adapter (cached)</text>
+
+        <line x1="230" y1="213" x2="260" y2="213" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar)"/>
+        <line x1="462" y1="213" x2="492" y2="213" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar)"/>
+      </g>
+      <!-- example -->
+      <text x="20" y="288" font-size="13" fill="#5c6470" font-family="sans-serif" font-weight="700">Example</text>
+      <text x="20" y="308" font-size="13" fill="#1a1c20" font-family="monospace">await_confirmation: state says "smart" &rarr; flow maps smart&rarr;gemini-2.5-pro &rarr; cached Gemini adapter</text>
+    </svg>
+    <figcaption>Two ordered lookups. First the <strong>tier</strong> cascade picks <em>which</em> tier's value to use (state &rarr; group &rarr; flow &rarr; global, most-specific-wins). Then a second lookup turns that value into a concrete model: a class name resolves through the flow's class table; anything else is a literal model. <code>inherit</code> means &ldquo;keep walking up.&rdquo;</figcaption>
+  </figure>
+
+  <h2>The four cases we want to prove</h2>
+  <p>Each is a <em>separate hypothesis</em> with its own measurement. We do not assume any of them.
+  We test each one per state against the current single-model baseline.</p>
+
+  <div class="case">
+    <div class="lvl">Case 1 · Right-sizing</div>
+    <h3>A smaller model gives equivalent results</h3>
+    <p>For many states (greet, simple collect, routing), a cheap model scores the same on correctness
+    and humanness as the expensive one. If so, route those states to the cheap model and bank the cost
+    and latency. RIFF's <a class="x" href="eval-matrix.html">per-state cert matrix</a> already measures
+    exactly which model passes which state — this case is &ldquo;act on a green cell.&rdquo;</p>
+    <p><strong>Win:</strong> cost &darr; and latency &darr; with correctness/humanness flat (inside the noise floor).</p>
+  </div>
+
+  <div class="case">
+    <div class="lvl">Case 2 · Escalation</div>
+    <h3>When a small model fails, escalate to a smarter one</h3>
+    <p>Run cheap-first; on a detectable failure — low confidence, a validation fail, a repair loop, a
+    refusal — re-run the turn on a stronger model. RIFF already emits these signals (slot validators, the
+    <code>stalled</code> guard, the no-progress backstop). This is the classic <em>cascade</em>: cheap
+    model first, escalate on a quality threshold.</p>
+    <p><strong>Win:</strong> same end correctness as always-smart, lower average cost, with the retry's
+    extra latency paid only on the minority of turns that trip the signal. Watch the escalation rate.</p>
+  </div>
+
+  <div class="case">
+    <div class="lvl">Case 3 · Ease of deployment</div>
+    <h3>Override one risky state without touching the rest</h3>
+    <p>A layered config is easier to operate: set a sane global default once, override a single state in
+    one line, and roll a model change out (or back) at one tier. A <strong>load-time gate</strong>
+    catches a typo&rsquo;d model name or an unreachable class at boot — never on a live call.</p>
+    <p><strong>Win:</strong> an operator changes the model for <code>await_confirmation</code> only, in
+    one line, with a build error on a bad reference.</p>
+  </div>
+
+  <div class="case">
+    <div class="lvl">Case 4 · The latency ladder</div>
+    <h3>Deterministic first, then escalate to smarter models</h3>
+    <p>The cheapest model is <em>no model</em>. Some states are deterministic — a fixed greeting, a
+    yes/no gate, a menu choice. Serve those with static audio or a rule at <strong>zero LLM
+    latency</strong>, and only climb to small &rarr; large LLMs when the deterministic path can&rsquo;t
+    resolve the input. RIFF already has the bottom rung (the Collect Pattern&rsquo;s fast-path and
+    deterministic <a class="x" href="stall-recovery.html">stall recovery</a>); this generalizes it into
+    an explicit ladder.</p>
+    <p><strong>Win:</strong> median turn latency &darr; with correctness held, because a measurable
+    fraction of turns never reach an LLM.</p>
+  </div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 720 220" role="img" aria-label="Latency ladder: deterministic to small LLM to large LLM, escalating on miss">
+      <defs>
+        <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#b8860b"/>
+        </marker>
+      </defs>
+      <g font-family="sans-serif">
+        <rect x="24" y="70" width="190" height="80" rx="12" fill="#eafaf0" stroke="#1f9d55"/>
+        <text x="119" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#1f9d55">deterministic</text>
+        <text x="119" y="120" text-anchor="middle" font-size="12" fill="#5c6470">regex / static / rule</text>
+        <text x="119" y="138" text-anchor="middle" font-size="12" fill="#1f9d55">no latency · no cost</text>
+
+        <rect x="266" y="70" width="180" height="80" rx="12" fill="#eaf1ff" stroke="#2f6df0"/>
+        <text x="356" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#2f6df0">small LLM</text>
+        <text x="356" y="120" text-anchor="middle" font-size="12" fill="#5c6470">fast / cheap</text>
+        <text x="356" y="138" text-anchor="middle" font-size="12" fill="#5c6470">handles most turns</text>
+
+        <rect x="498" y="70" width="198" height="80" rx="12" fill="#fdf6e3" stroke="#b8860b"/>
+        <text x="597" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#b8860b">large LLM</text>
+        <text x="597" y="120" text-anchor="middle" font-size="12" fill="#5c6470">smart / strong</text>
+        <text x="597" y="138" text-anchor="middle" font-size="12" fill="#5c6470">hard / risky states</text>
+
+        <line x1="214" y1="110" x2="264" y2="110" stroke="#b8860b" stroke-width="2" marker-end="url(#ar2)"/>
+        <line x1="446" y1="110" x2="496" y2="110" stroke="#b8860b" stroke-width="2" marker-end="url(#ar2)"/>
+        <text x="239" y="60" text-anchor="middle" font-size="11.5" fill="#b8860b" font-weight="700">on miss</text>
+        <text x="471" y="60" text-anchor="middle" font-size="11.5" fill="#b8860b" font-weight="700">on miss</text>
+        <text x="360" y="190" text-anchor="middle" font-size="12.5" fill="#5c6470">Climb only as far as the input forces. Most turns stop at the cheapest rung that resolves them.</text>
+      </g>
+    </svg>
+    <figcaption>The ladder (Case 4) extends the cascade with a non-LLM tier 0. A turn climbs only when the rung below cannot resolve it, so the expensive model is reached only for the inputs that truly need it.</figcaption>
+  </figure>
+
+  <h2>How we prove it — and keep proving it</h2>
+  <p>Nothing ships on intuition. Every case is an A/B against the current per-flow baseline, scored on
+  four axes, run on a repeatable harness so we can re-run it on every change — not once. Correctness is
+  a <strong>hard gate</strong>: a model that fails a state's acceptance check is never routed, at any
+  price, before cost or latency is even considered.</p>
+
+  <div class="callout warn">
+    <strong>Two honest caveats for this review</strong>
+    <strong>(1) Intelligence is measurable today; per-state cost and latency are not yet.</strong> The
+    cert matrix already scores correctness/pass per state, but per-state <em>tokens and latency</em>
+    come from PR1's per-turn logging — until that lands the harness records those axes as empty rather
+    than guessing. The methodology is real; two of its four axes go live with PR1.
+    <strong>(2) Cost figures are illustrative</strong> public list prices (editable in one table,
+    <code>MODEL_PRICES</code>); final numbers come from our actual contract. The mechanism and the
+    deltas are what this review asks you to approve, not the absolute dollar values.
+  </div>
+
+  <table>
+    <tr><th>Axis</th><th>What we measure</th><th>Existing tool</th></tr>
+    <tr><td><strong>Cost</strong></td><td>tokens &times; per-model price; escalation rate; deterministic hit rate</td><td><code>eval_db.py</code> + per-turn model log</td></tr>
+    <tr><td><strong>Latency</strong></td><td>time-to-first-audio, full-turn wall-clock, per-rung breakdown</td><td><code>latency_bench.py</code>, <code>timing_benchmark.py</code></td></tr>
+    <tr><td><strong>Intelligence</strong></td><td>per-state correctness / cert pass-fail</td><td><code>flow_certify.py</code>, <code>evaluate_flows.py</code></td></tr>
+    <tr><td><strong>Human-ness</strong></td><td>judged humanness (curt/robotic vs natural)</td><td>rubric + multi-judge panel</td></tr>
+  </table>
+
+  <figure class="fig">
+    <svg viewBox="0 0 720 250" role="img" aria-label="Continuous proof loop: baseline, treatment, A/B on four axes, decide per state, gate">
+      <defs>
+        <marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#2f6df0"/>
+        </marker>
+      </defs>
+      <g font-family="sans-serif">
+        <rect x="30" y="40" width="150" height="58" rx="10" fill="#f4f6f9" stroke="#e3e6ea"/>
+        <text x="105" y="64" text-anchor="middle" font-size="13" font-weight="700">1 · Baseline</text>
+        <text x="105" y="82" text-anchor="middle" font-size="11.5" fill="#5c6470">per-flow model</text>
+
+        <rect x="220" y="40" width="150" height="58" rx="10" fill="#fff" stroke="#e3e6ea"/>
+        <text x="295" y="64" text-anchor="middle" font-size="13" font-weight="700">2 · Treatment</text>
+        <text x="295" y="82" text-anchor="middle" font-size="11.5" fill="#5c6470">one state, flag on</text>
+
+        <rect x="410" y="40" width="150" height="58" rx="10" fill="#eaf1ff" stroke="#2f6df0"/>
+        <text x="485" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="#2f6df0">3 · A/B</text>
+        <text x="485" y="78" text-anchor="middle" font-size="11" fill="#5c6470">cost · latency</text>
+        <text x="485" y="91" text-anchor="middle" font-size="11" fill="#5c6470">intel · humanness</text>
+
+        <rect x="600" y="40" width="96" height="58" rx="10" fill="#eafaf0" stroke="#1f9d55"/>
+        <text x="648" y="64" text-anchor="middle" font-size="13" font-weight="700" fill="#1f9d55">4 · Decide</text>
+        <text x="648" y="82" text-anchor="middle" font-size="11" fill="#5c6470">per state</text>
+
+        <line x1="180" y1="69" x2="218" y2="69" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar3)"/>
+        <line x1="370" y1="69" x2="408" y2="69" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar3)"/>
+        <line x1="560" y1="69" x2="598" y2="69" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar3)"/>
+
+        <!-- gate / loop back -->
+        <rect x="250" y="150" width="220" height="56" rx="10" fill="#fdf6e3" stroke="#b8860b"/>
+        <text x="360" y="174" text-anchor="middle" font-size="13" font-weight="700" fill="#b8860b">Noise-floor gate</text>
+        <text x="360" y="192" text-anchor="middle" font-size="11.5" fill="#5c6470">&ge;2 judges, &ge;2 repeats · sub-1pt delta = noise</text>
+
+        <path d="M648,98 L648,178 L472,178" fill="none" stroke="#1f9d55" stroke-width="2" marker-end="url(#ar3)"/>
+        <path d="M250,178 L105,178 L105,100" fill="none" stroke="#b8860b" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar3)"/>
+        <text x="150" y="142" font-size="11" fill="#b8860b">re-run on every change</text>
+      </g>
+    </svg>
+    <figcaption>The continuous proof loop. A decision only counts if it clears the noise-floor gate (RIFF eval is judge-dominated: &asymp;1.5&nbsp;pt single-run, so a sub-1-pt &ldquo;win&rdquo; is noise). The harness re-runs on every change, so a routing choice that was right last month is re-checked when a model or prompt moves under it.</figcaption>
+  </figure>
+
+  <h2>The data is the asset — tiered, per-LLM, kept across switches</h2>
+  <p>The four axes are not measured once and thrown away. They accumulate into a
+  <strong>retained, append-only profile</strong> keyed per <strong>LLM &times; architectural
+  scope</strong>. That is what turns &ldquo;which model for this state?&rdquo; into a standing
+  capability instead of a one-off study.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 720 250" role="img" aria-label="Cost and quality roll up state to group to flow to system, pinned per model, appended to a retained profile">
+      <defs>
+        <marker id="ar4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#1f9d55"/>
+        </marker>
+      </defs>
+      <g font-family="sans-serif">
+        <rect x="24" y="40" width="120" height="46" rx="9" fill="#eaf1ff" stroke="#2f6df0"/>
+        <text x="84" y="60" text-anchor="middle" font-size="12.5" font-weight="700">state</text>
+        <text x="84" y="76" text-anchor="middle" font-size="10.5" fill="#5c6470">per-call cost</text>
+
+        <rect x="186" y="40" width="120" height="46" rx="9" fill="#fff" stroke="#e3e6ea"/>
+        <text x="246" y="60" text-anchor="middle" font-size="12.5" font-weight="700">group</text>
+        <text x="246" y="76" text-anchor="middle" font-size="10.5" fill="#5c6470">sum · AND-pass</text>
+
+        <rect x="348" y="40" width="120" height="46" rx="9" fill="#fff" stroke="#e3e6ea"/>
+        <text x="408" y="60" text-anchor="middle" font-size="12.5" font-weight="700">flow</text>
+        <text x="408" y="76" text-anchor="middle" font-size="10.5" fill="#5c6470">sum of states</text>
+
+        <rect x="510" y="40" width="120" height="46" rx="9" fill="#eafaf0" stroke="#1f9d55"/>
+        <text x="570" y="60" text-anchor="middle" font-size="12.5" font-weight="700">system</text>
+        <text x="570" y="76" text-anchor="middle" font-size="10.5" fill="#5c6470">cross-flow</text>
+
+        <line x1="144" y1="63" x2="184" y2="63" stroke="#1f9d55" stroke-width="2" marker-end="url(#ar4)"/>
+        <line x1="306" y1="63" x2="346" y2="63" stroke="#1f9d55" stroke-width="2" marker-end="url(#ar4)"/>
+        <line x1="468" y1="63" x2="508" y2="63" stroke="#1f9d55" stroke-width="2" marker-end="url(#ar4)"/>
+        <text x="360" y="28" text-anchor="middle" font-size="12" fill="#1f9d55" font-weight="700">cost sums up · quality turn-weighted · every tier pinned per LLM</text>
+
+        <!-- retained profile -->
+        <rect x="120" y="130" width="480" height="90" rx="12" fill="#f4f6f9" stroke="#e3e6ea"/>
+        <text x="360" y="153" text-anchor="middle" font-size="13" font-weight="700">profile.jsonl — append-only, retained</text>
+        <text x="140" y="178" font-size="11.5" fill="#5c6470" font-family="monospace">coffee::flow::coffee::gemini-2.5-pro    cost humanness latency …</text>
+        <text x="140" y="196" font-size="11.5" fill="#5c6470" font-family="monospace">coffee::flow::coffee::gemini-2.5-flash  cost humanness latency …  ← switch keeps both</text>
+        <text x="140" y="214" font-size="11.5" fill="#5c6470" font-family="monospace">coffee::state::await_confirmation::…    cost humanness latency …</text>
+        <line x1="360" y1="92" x2="360" y2="128" stroke="#5c6470" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar4)"/>
+      </g>
+    </svg>
+    <figcaption>Cost <strong>sums</strong> up the tiers; quality axes are <strong>turn-weighted</strong>; <code>cert_pass</code> <strong>ANDs</strong>. Every row is pinned to its model, and the store is append-only — switching the live model adds rows without deleting the old model's history. So a cost/human-ness/latency tradeoff can be re-decided at any level, any time, on accumulated evidence.</figcaption>
+  </figure>
+
+  <div class="callout warn">
+    <strong>The risk this measurement guards against</strong>
+    Switching models mid-conversation causes real <em>drift</em>: downgrades hurt most, drift compounds
+    with conversation depth, and <em>dissimilar</em> models disrupt more than similar ones (Model-Switching
+    Drift, 2026; &ldquo;LLMs Get Lost in Multi-Turn&rdquo; reports a 39% multi-turn drop before any switch).
+    Two RIFF facts make this manageable — and the harness must confirm them:
+  </div>
+  <ul>
+    <li><strong>Stay in-family.</strong> RIFF&rsquo;s classes are <code>fast: gemini-2.5-flash</code> and
+    <code>smart: gemini-2.5-pro</code> — same family, the <em>low-drift</em> case. Cross-family hops spike
+    drift, tool-format mismatch, and prompt-cache loss at once.</li>
+    <li><strong>Switch at boundaries; never downgrade into late states.</strong> Route at state/segment
+    edges, not mid-context. RIFF carries <em>structured slots</em> in the session, not just raw chat — a
+    built-in grounding mitigation.</li>
+  </ul>
+
+  <h2>What exists, what&rsquo;s proposed</h2>
+  <table>
+    <tr><th>Tier</th><th>Status</th><th>Where</th></tr>
+    <tr><td>global default</td><td>exists (implicit)</td><td>server-default adapter</td></tr>
+    <tr><td>flow</td><td>exists</td><td><code>FlowLlmConfig.default_class</code> + class table</td></tr>
+    <tr><td>group</td><td><span class="status">proposed</span></td><td>add <code>llm</code> field to <code>GoalSegment</code></td></tr>
+    <tr><td>state</td><td>exists</td><td><code>StateDef.llm</code></td></tr>
+    <tr><td>primary-turn routing</td><td><span class="status">not wired</span></td><td>today only the continuation cue calls <code>resolve_adapter</code></td></tr>
+  </table>
+
+  <div class="callout">
+    <strong>Sequencing</strong>
+    <strong>PR1</strong> wires <code>resolve_adapter</code> into the primary turn behind
+    <code>RIFF_PRIMARY_LLM_ROUTING</code> (off by default), with an adapter cache and per-turn model
+    logging — this is the unblock that makes any case <em>measurable</em>. <strong>PR2</strong> adds the
+    group tier and the cascade. Per-flow stays the production default until a state has A/B evidence that
+    switching improves the outcome.
+  </div>
+
+  <footer>
+    Effective LLM Policy — proposed design, published for stakeholder review before build.
+    Full spec: <code>docs/flow-eval/LLM-POLICY.md</code>. Continuous proof harness:
+    <code>scripts/llm_policy_bench.py</code>. Prior art: OrchestraLLM (NAACL 2024), RouteLLM (ICLR 2025),
+    FrugalGPT. Builds on the <a class="x" href="index.html">RIFF evaluation system</a> and the
+    <a class="x" href="eval-matrix.html">per-state cert matrix</a>.
+  </footer>
+</main>
+</div>
+</body>
+</html>

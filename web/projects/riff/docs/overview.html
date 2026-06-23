@@ -63,6 +63,10 @@
   .grid2 a{text-decoration:none;color:inherit;}
   .grid2 h3{margin:6px 0 2px;font-size:16px;}
   .grid2 p{margin:2px 0;font-size:13.5px;color:var(--mut);}
+  .badge-new{display:inline-block;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
+    background:var(--good);color:#fff;padding:1px 7px;border-radius:20px;margin-left:6px;vertical-align:middle;font-weight:700;}
+  .badge-date{display:inline-block;font-size:11px;color:var(--mut);margin-left:5px;vertical-align:middle;}
+  nav.side a .badge-new{margin-left:5px;padding:0 6px;font-size:9.5px;}
   a.x{color:var(--accent);}
   footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
   @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}.grid2{grid-template-columns:1fr}}
@@ -81,6 +85,8 @@
   <a href="per-state-metrics.html">Per-state metrics</a>
   <a href="goal-segment-schema.html">GoalSegment schema</a>
   <a href="goap-selector.html">GOAP-lite selector</a>
+  <div class="grp">Design (proposed)</div>
+  <a href="llm-policy.html">Effective LLM Policy<span class="badge-new">New</span></a>
   <div class="grp">Measurement</div>
   <a href="eval-matrix.html">The evaluation matrix</a>
   <a href="judges.html">Judges</a>
@@ -89,6 +95,7 @@
   <a href="transcript-audit.html">Transcript audit</a>
   <div class="grp">Operations</div>
   <a href="ci-gate.html">CI quality gate</a>
+  <a href="shift-left-acceptance.html">Shift-left acceptance</a>
   <a href="session-replay.html">Session replay</a>
   <a href="stall-recovery.html">Stall recovery (FSM)</a>
   <div class="grp">Wisdom</div>
@@ -182,6 +189,7 @@
 
   <h2>Read this in order</h2>
   <div class="grid2">
+    <a href="llm-policy.html"><div class="card"><h3>Effective LLM Policy<span class="badge-new">New</span><span class="badge-date">2026-06-23</span></h3><p>Proposed: route the right model per state (inheritance + override). The four cases, the proof harness, the drift risk. Stakeholder review before build.</p></div></a>
     <a href="goal-hierarchy-design.html"><div class="card"><h3>Goal-Hierarchy design</h3><p>The flagship spec: flow &rarr; group &rarr; state, each with a goal and a metric. Start here.</p></div></a>
     <a href="eval-matrix.html"><div class="card"><h3>The evaluation matrix</h3><p>Tier-3 flow scorecard. Computed aspects + judged humanness, crossed by agent.</p></div></a>
     <a href="per-state-metrics.html"><div class="card"><h3>Per-state metrics</h3><p>Tier-1 root cause. How the event stream becomes progress / stall / dwell.</p></div></a>

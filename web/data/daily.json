@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-23T10:37:01.643101Z",
+  "generated_at": "2026-06-23T21:08:35.600449Z",
   "count": 147,
   "days": [
     {
       "date": "2026-06-23",
-      "headline": "Riff Adds DashScope Streaming, Certification Matrix, and Shift-Left Evaluation Gates",
-      "summary": "The Riff framework integrates a DashScope adapter with streaming sentence emission to reduce voice latency, alongside a new CLI-driven certification matrix for per-state model validation. It also introduces shift-left acceptance testing gates and refines conversational naturalness by fixing slot-label leaks in reprompt logic.",
+      "headline": "Automated LLM Certification Matrix and Streaming Voice Benchmarks",
+      "summary": "Implemented a CLI-driven certification matrix for per-state model validation and added DashScope streaming adapters to prove voice latency improvements. The workflow integrates shift-left acceptance gates with automated documentation regeneration to ensure deterministic flow correctness.",
       "takeaways": [
-        "Implement low-latency voice responses by adopting the DashScope adapter's streaming sentence-emission pattern for LLM outputs.",
-        "Reuse the flow_certify CLI and per-state certification matrix builder to automate model validation across specific dialogue states.",
-        "Apply the pure Flow Acceptance evaluator as a shift-left gate to catch correctness issues before full integration testing.",
-        "Improve conversational naturalness by passing slot labels to read-back guards and using slot_types to drive natural reask phrasing."
+        "Reuse the flow_certify CLI to build per-state model certification matrices that drive panel testing and enforce correctness gates.",
+        "Apply the DashScope adapter pattern to enable streaming sentence emission, reducing voice latency while maintaining natural slot reasking.",
+        "Adopt the four-tier evaluation hierarchy and defensive transcript persistence to prevent evidence loss in partial conversations during automated reviews."
       ],
-      "total_commits": 22,
+      "total_commits": 28,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 4,
+          "commits": 5,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "feat(docs): republish docs/html/ binary assets (images/css/js) automatically",
             "chore: regenerate L0 docs + daily digest [skip ci]",
             "docs(riff): add four-tier evaluation hierarchy diagram + gitignore playwright",
@@ -26,8 +26,13 @@
         },
         {
           "name": "riff",
-          "commits": 18,
+          "commits": 23,
           "messages": [
+            "fix(llm-policy): apply Antigravity (Gemini 3.1) review — 3rd independent pass",
+            "docs(llm-policy): apply Gemini-CLI review findings",
+            "docs(llm-policy): Effective LLM Policy — stakeholder page + spec + proof harness (#llm-policy)",
+            "docs: consolidated morning-review handoff for the overnight session",
+            "docs(html): shift-left acceptance + per-state certification page (sellable features)",
             "fix(cert): exclude greet states from certification (deterministic opener, never an LLM turn)",
             "feat(cert): flow_certify CLI — drive the panel per model, build the certification matrix (#2, increment 2)",
             "test(deriver): derive expected persona count from live _FALLBACK_PERSONAS (was stale ==6)",
@@ -49,7 +54,7 @@
           ]
         }
       ],
-      "commit_sig": "664adf87f903d60c"
+      "commit_sig": "31fcc31c32460218"
     },
     {
       "date": "2026-06-22",
@@ -3629,15 +3634,14 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Riff Hardens Core Primitives with Invariant Testing and Flow Graph Overhaul",
-      "summary": "The Riff framework completes a comprehensive audit of core modules like collect, choice, and booking by implementing strict invariant testing, parameterized YAML specs, and automated sweep scripts. Concurrently, the flow-graph visualization receives a major UX upgrade with a three-column layout and zoom controls, while scheduling logic adopts flexible natural language parsing.",
+      "headline": "Riff Hardens Core Primitives with Doc-as-Spec and Automated Sweep Gates",
+      "summary": "The Riff framework completes a comprehensive audit of core modules like collect, choice, and book-appointment, enforcing strict invariants through new YAML scenario suites and automated sweep scripts. This effort standardizes documentation into a spec-driven template, fixes critical state management bugs, and upgrades the underlying Gemini model to 2.5-flash.",
       "takeaways": [
-        "Adopt the 'doc-as-spec' pattern by defining module invariants and failure modes in Markdown, then enforcing them with dedicated YAML scenario files and Python invariant tests.",
-        "Implement reusable 'sweep' scripts to automatically gate deployments based on passing all defined behavioral scenarios for a specific primitive module.",
-        "Use parameterized YAML flows with variable substitution to create reusable templates for common patterns like appointment booking or data collection.",
-        "Replace strict time-format validators with flexible natural language parsing to support inputs like '2pm' or 'afternoon', reducing user friction."
+        "Adopt the 'doc-as-spec' pattern by defining explicit Invariants and Failure modes in module docs, then validating them with dedicated YAML scenario files and Python invariant tests.",
+        "Implement reusable 'sweep' scripts as CI gates to automatically execute hundreds of edge-case scenarios across parameterized modules before merging.",
+        "Use parameterized YAML flows with variable substitution to create reusable module templates that defend against common state errors like stale slots or invalid final statuses."
       ],
-      "total_commits": 114,
+      "total_commits": 109,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3656,7 +3660,7 @@
         },
         {
           "name": "riff",
-          "commits": 111,
+          "commits": 106,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3763,16 +3767,11 @@
             "flow(tutorial_announce): fictional business_profile + minimal chained audio path",
             "test(primitives): add test_announce_invariants.py (loader rejects bad play_audio shapes)",
             "docs(announce): rewrite 01-announce.md to doc-as-spec template (3 Invariants, 3 Failure modes)",
-            "fix(tutorial_announce): drop trailing junk text from play_audio narration",
-            "test(end): use guaranteed-invalid first utterance for pivot_no_then_yes_lands_success (token_subset would have matched \"i'm not sure\" via \"sure\"=\"yes\" alias)",
-            "test(end): rewrite reframe pivot scenarios to use invalid-first-utterance (closes B-002)",
-            "test(confirm): assert _order_denied_reason also clears on state exit (full I-3 contract)",
-            "flow(tutorial_confirm): use final_status: booked (was 'confirmed', outside FinalStatus Literal — same F-2 instance Task 10 fixed in tutorial_end.yaml)",
-            "docs(scripts): correct sweep docstrings to describe session_id attribution (defect schema has no tags field)"
+            "fix(tutorial_announce): drop trailing junk text from play_audio narration"
           ]
         }
       ],
-      "commit_sig": "805030e660f458d1"
+      "commit_sig": "ea2b94fe7d675804"
     },
     {
       "date": "2026-05-01",

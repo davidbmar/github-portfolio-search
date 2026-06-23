@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T10:35:32.705627Z",
+  "generated_at": "2026-06-23T21:07:13.211168Z",
   "count": 137,
   "projects": [
     {
@@ -1242,25 +1242,24 @@
     {
       "slug": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub portfolios using embeddings and TF-IDF.",
+      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "tech": [
         "Python",
-        "HTML",
-        "JavaScript",
-        "SQLite-vec",
         "FastAPI",
-        "sentence-transformers"
+        "SQLite-vec",
+        "HTML/CSS/JS",
+        "AWS S3",
+        "CloudFront"
       ],
       "reuse_tags": [
-        "semantic-search",
-        "github-indexer",
-        "portfolio-tool",
-        "mcp-server",
-        "vector-database"
+        "portfolio-management",
+        "code-search",
+        "ai-assistant",
+        "developer-tools"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-23T03:23:35Z"
+      "pushed_at": "2026-06-23T10:37:03Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -1733,29 +1732,27 @@
     {
       "slug": "nvidia-parakeet-ver-5",
       "title": "NVIDIA Parakeet Riva ASR Deployment System",
-      "one_liner": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts.",
+      "one_liner": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT ASR via Riva with WebSocket streaming and comprehensive infrastructure automation.",
       "tech": [
         "Python",
         "FastAPI",
         "WebSockets",
-        "gRPC",
         "Docker",
         "NVIDIA Riva",
         "Pydantic",
-        "SpeechBrain"
+        "Bash"
       ],
       "reuse_tags": [
-        "ASR",
-        "Speech Recognition",
-        "NVIDIA",
-        "Riva",
-        "WebSocket",
-        "GPU",
-        "Deployment"
+        "asr",
+        "speech-to-text",
+        "nvidia-riva",
+        "websocket",
+        "aws-deployment",
+        "gpu-inference"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/nvidia-parakeet-ver-5",
-      "pushed_at": "2026-06-16T17:41:02Z"
+      "pushed_at": "2026-06-23T20:16:55Z"
     },
     {
       "slug": "nvidia-riva-conformer-streaming",
@@ -2113,12 +2110,12 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "pytest",
+        "Pytest",
         "FastAPI",
         "WebSockets"
       ],
@@ -2126,12 +2123,13 @@
         "voice-agent",
         "fsm",
         "llm-orchestration",
-        "deterministic-ai",
-        "python-framework"
+        "guardrails",
+        "ab-testing",
+        "deterministic-ai"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-23T10:01:09Z"
+      "pushed_at": "2026-06-23T20:14:05Z"
     },
     {
       "slug": "riot",

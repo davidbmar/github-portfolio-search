@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T10:35:32.708615Z",
+  "generated_at": "2026-06-23T21:07:13.214158Z",
   "count": 137,
   "entries": [
     {
@@ -2323,19 +2323,18 @@
     {
       "repo": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub portfolios using embeddings and TF-IDF.",
+      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "keywords": [
         "python",
-        "html",
-        "javascript",
-        "sqlite-vec",
         "fastapi",
-        "sentence-transformers",
-        "semantic-search",
-        "github-indexer",
-        "portfolio-tool",
-        "mcp-server",
-        "vector-database"
+        "sqlite-vec",
+        "html/css/js",
+        "aws s3",
+        "cloudfront",
+        "portfolio-management",
+        "code-search",
+        "ai-assistant",
+        "developer-tools"
       ],
       "chunks": [
         {
@@ -2344,23 +2343,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Semantic search engine for personal GitHub portfolios using embeddings and TF-IDF."
+          "text": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF."
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, generates embeddings from READMEs, and provides a searchable interface via CLI, web UI, and MCP server to find reusable code patterns across a user's portfolio."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a semantic search interface via CLI, REST API, and static web UI. It enables developers to find reusable code patterns across their own portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend with FastAPI for REST services, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Deployment uses AWS S3, CloudFront, and Lambda for OAuth."
+          "text": "Python backend with FastAPI for serving data, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Indexing is handled by a Python pipeline triggered by GitHub Actions or CLI."
         },
         {
           "source": "how_to_apply",
-          "text": "Install the package, configure a GitHub token, index your repositories, and serve the web UI or use the CLI/MCP server to search your codebase semantically."
+          "text": "Clone the repo, configure a GitHub token, index your repositories using the CLI, and serve the web UI or deploy to S3/CloudFront. Use the MCP server to allow AI agents to search your portfolio."
         },
         {
           "source": "features",
-          "text": "Client-side semantic search using TF-IDF and embeddings Auto-clustering of repos into capability categories MCP server integration for AI agent access Faceted filtering by language, topics, and stars Weekly automated reindexing via GitHub Actions Embeddable widget and shareable search URLs"
+          "text": "Semantic search using embeddings and TF-IDF across READMEs Auto-clustering of repos into capability categories Static web UI with faceted filtering and autocomplete MCP server for AI agent integration Weekly automated reindexing via GitHub Actions Exportable search results and shareable URLs"
         }
       ]
     },
@@ -3292,23 +3291,21 @@
     {
       "repo": "nvidia-parakeet-ver-5",
       "title": "NVIDIA Parakeet Riva ASR Deployment System",
-      "one_liner": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts.",
+      "one_liner": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT ASR via Riva with WebSocket streaming and comprehensive infrastructure automation.",
       "keywords": [
         "python",
         "fastapi",
         "websockets",
-        "grpc",
         "docker",
         "nvidia riva",
         "pydantic",
-        "speechbrain",
+        "bash",
         "asr",
-        "speech recognition",
-        "nvidia",
-        "riva",
+        "speech-to-text",
+        "nvidia-riva",
         "websocket",
-        "gpu",
-        "deployment"
+        "aws-deployment",
+        "gpu-inference"
       ],
       "chunks": [
         {
@@ -3317,23 +3314,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Production-ready deployment of NVIDIA Parakeet RNNT via Riva ASR with WebSocket streaming and comprehensive infrastructure scripts."
+          "text": "Production-ready deployment pipeline for NVIDIA Parakeet RNNT ASR via Riva with WebSocket streaming and comprehensive infrastructure automation."
         },
         {
           "source": "what_it_is",
-          "text": "A deployment framework and client wrapper for running NVIDIA's Parakeet RNNT automatic speech recognition model. It supports both modern NIM containers and traditional Riva server setups, providing low-latency streaming transcription via WebSocket with word-level timestamps and confidence scores."
+          "text": "A complete infrastructure-as-code and client-wrapper system for deploying NVIDIA's Parakeet Recurrent Neural Network Transducer (RNNT) model. It supports both modern NIM containers and traditional Riva servers, providing low-latency real-time transcription via WebSocket with word-level timestamps and confidence scores."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python 3.10+ using FastAPI for the server interface, Pydantic for configuration management, and websockets for real-time audio streaming. It integrates with NVIDIA Riva ASR via gRPC clients, uses SpeechBrain for fallback or alternative modeling, and relies on Docker/NVIDIA Container Runtime for GPU-accelerated inference on Tesla T4/V100 instances."
+          "text": "Built with Python 3.10+ using FastAPI for the backend server, Pydantic for configuration management, and websockets for real-time audio streaming. It integrates NVIDIA Riva ASR gRPC services or SpeechBrain Conformer models, orchestrated via Bash scripts for AWS EC2 GPU instance provisioning, Docker container management, and security group configuration."
         },
         {
           "source": "how_to_apply",
-          "text": "Deploy on AWS EC2 g4dn.xlarge or similar GPU instances. Use provided bash scripts to configure security groups, install NVIDIA drivers, deploy Riva/NIM containers, and start the WebSocket proxy. Connect client applications (browser or Node.js/Python) to the WebSocket endpoint for real-time transcription."
+          "text": "Use this system to deploy a scalable, GPU-accelerated speech-to-text service on AWS. It is suitable for applications requiring ultra-low latency transcription, such as live captioning, voice assistants, or meeting transcription tools, where word-level timing and high throughput are critical."
         },
         {
           "source": "features",
-          "text": "Real-time streaming transcription with ~100-300ms partial result latency Dual deployment support for NVIDIA NIM containers and traditional Riva servers Word-level timestamps and confidence scores for precise alignment Production-grade structured logging and monitoring framework WebSocket API for browser and application integration Mock mode fallback for development without GPU hardware"
+          "text": "Real-time streaming transcription with 100-300ms partial result latency Dual deployment support for NVIDIA NIM containers and traditional Riva servers Word-level timestamps and confidence scores for precise alignment Automated AWS EC2 GPU instance provisioning and driver installation Production-grade structured logging and error tracking framework WebSocket API with Python and Node.js client examples"
         }
       ]
     },
@@ -4000,7 +3997,7 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
@@ -4011,8 +4008,9 @@
         "voice-agent",
         "fsm",
         "llm-orchestration",
-        "deterministic-ai",
-        "python-framework"
+        "guardrails",
+        "ab-testing",
+        "deterministic-ai"
       ],
       "chunks": [
         {
@@ -4021,23 +4019,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "A Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It prevents LLM hallucinations in critical business tasks like scheduling and intake by using pure functions for guardrails, slot validation, and state transitions, while the LLM handles only the conversational 'riffing'."
+          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business in plain text, automatically generating a voice flow that handles tasks like scheduling, ordering, and intake while preventing hallucinations through deterministic guardrails and slot validation."
         },
         {
           "source": "how_its_built",
-          "text": "Built in Python with a modular architecture separating the LLM adapter layer from the deterministic core. The core uses YAML-defined state graphs, pure function guardrails, and an event bus for observability. It supports multiple LLM backends (Gemini, Gemma, Claude) and includes a built-in web server for real-time inspection and testing."
+          "text": "The core engine uses a pure-function architecture where every component except the LLM call is deterministic. It features an 8-layer guardrail system, a YAML-defined state graph manager, deterministic slot extraction with fallbacks, and a turn-based execution loop. The system supports multiple LLM adapters (Gemini, Gemma, Claude) and includes built-in A/B testing harnesses using observable metrics rather than expensive LLM judges."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to build reliable voice agents for service businesses (plumbing, dental, salons) or retail ordering. Define your business logic in plain English or YAML, generate the flow, and deploy via the included web server or integrate into existing telephony systems via the API. Ideal for developers needing strict control over conversation outcomes without sacrificing natural language fluency."
+          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, tutoring) or retail scenarios (coffee, pizza). It is ideal for developers who need reliable, hallucination-free voice interactions where specific data slots (name, time, address) must be collected accurately before proceeding."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces strict state transitions and slot validation via YAML-defined FSMs Deterministic guardrails and pure function validators prevent LLM hallucinations Real-time web UI for inspecting live conversations and FSM states Supports multiple LLM backends including local Gemma and cloud Gemini/Claude Built-in A/B testing harness using observable metrics without LLM judges"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces strict conversation paths using YAML-defined Finite State Machines Deterministic guardrails and slot validation prevent LLM hallucinations Built-in A/B testing harness using observable metrics without live LLM judges Supports multiple LLM backends including Gemini, Gemma, and Claude Real-time web UI for inspecting live FSM states and conversation logs"
         }
       ]
     },

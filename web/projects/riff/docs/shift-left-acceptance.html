@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shift-Left Acceptance &amp; Per-State Certification — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <a href="goap-selector.html">GOAP-lite selector</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <a href="transcript-audit.html">Transcript audit</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="shift-left-acceptance.html" class="active">Shift-left acceptance</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Operations &rsaquo; Shift-left acceptance</div>
+  <h1 class="title">Proving a Flow Before It Ships</h1>
+  <p class="lede">Catch the bad call in CI, not in production. A persona panel + deterministic scanners
+  turn &ldquo;does this flow hold up?&rdquo; into a pass/fail gate — and per-state certification proves
+  <em>which model</em> can drive <em>which state</em>.</p>
+
+  <h2>The problem it solves</h2>
+  <p>A flow can lint clean, pass its unit tests, and still fall apart on a real call: it re-asks for
+  something the caller already gave, loops a confirmation, reads an internal slot name aloud, or quietly
+  escalates instead of finishing. None of that shows up until a person dials in. <strong>Shift-left
+  acceptance</strong> runs a panel of caller personas against the flow and scans the resulting transcripts
+  for those exact failure shapes — <em>before</em> deploy, deterministically, with no human in the loop.</p>
+
+  <h2>The acceptance gate</h2>
+  <p><code>scripts/flow_acceptance.py</code> drives the persona panel (cooperative, oversharer, corrector,
+  privacy-guarded, skeptical) against a flow, then composes deterministic <em>turn-invariant scanners</em>
+  over every conversation. Exit 0 = pass, 1 = fail, 2 = error — drop it straight into CI.</p>
+  <pre><span class="c"># prove the flagship maintenance-intake flow across the persona panel</span>
+python scripts/flow_acceptance.py --flow apartment_intake_SFO</pre>
+  <p>Each scanner targets one observable failure mode — no LLM judge, no flake:</p>
+  <table>
+    <tr><th>Scanner</th><th>Catches</th></tr>
+    <tr><td><code>scan_caller_repeats</code></td><td>caller has to repeat something already given (&ldquo;I already told you&hellip;&rdquo;)</td></tr>
+    <tr><td><code>scan_stale_asks</code></td><td>the agent asks for a slot that is already filled</td></tr>
+    <tr><td><code>scan_collect_loops</code></td><td>a collection state revisited without progress</td></tr>
+    <tr><td><code>scan_repr_leaks</code></td><td>a raw internal slot name spoken aloud (&ldquo;entry permission&rdquo;)</td></tr>
+    <tr><td><code>find_double_beat</code></td><td>two questions crammed into one agent turn</td></tr>
+    <tr><td><em>correctness gate</em></td><td>a <em>cooperative</em> caller must actually complete the task (correctness 10)</td></tr>
+  </table>
+  <div class="callout good">
+    <strong>Why deterministic scanners, not a judge?</strong>
+    The <a class="x" href="judges.html">LLM judge</a> is for nuance (humanness) and is noise-dominated
+    (&plusmn;1.5 pts single-run). A regression gate must be <em>repeatable</em>: the same transcript
+    always yields the same verdict. These scanners check structural facts about the conversation, so the
+    gate never flakes — exactly what CI needs.
+  </div>
+
+  <h2>Per-state model certification</h2>
+  <p>A flow&rsquo;s acceptance is <strong>model-specific</strong>. The same flow that sails through on one
+  model can trip stale-asks or confirmation loops on another — and not everywhere, just at <em>particular
+  states</em>. Rather than picking one model for the whole flow (and paying for the strongest everywhere),
+  certify each state to the cheapest model proven to drive it cleanly.</p>
+  <p><code>scripts/flow_certify.py</code> runs the acceptance panel under each candidate model, attributes
+  every scanner finding to the state that produced it, and builds a <code>state &times; model</code>
+  matrix — assigning each state its cheapest <em>passing</em> model:</p>
+  <pre><span class="c"># certify apartment_intake_SFO across two models, cheapest-first</span>
+python scripts/flow_certify.py --flow apartment_intake_SFO \
+    --models dashscope:qwen-flash,gemini:gemini-2.5-flash \
+    --personas cooperative,oversharer --write</pre>
+  <p>Real output (abridged):</p>
+  <pre># certification matrix — apartment_intake_SFO  (qwen-flash  gemini-2.5-flash)
+  ask_issue            qwen-flash=pass      gemini-2.5-flash=untested  -&gt; qwen-flash
+  ask_entry            qwen-flash=pass      gemini-2.5-flash=pass      -&gt; qwen-flash
+  await_confirmation   qwen-flash=pass      <span style="color:#ff8080">gemini-2.5-flash=fail</span>      -&gt; qwen-flash</pre>
+  <div class="callout">
+    <strong>The matrix <em>localizes</em> a model&rsquo;s weakness.</strong>
+    Here gemini is fine almost everywhere but <em>fails at <code>await_confirmation</code></em> — so the
+    finding isn&rsquo;t &ldquo;don&rsquo;t use gemini for this flow,&rdquo; it&rsquo;s &ldquo;gemini is fine
+    except this one state.&rdquo; The runtime then routes each state to its certified model.
+  </div>
+  <p>Three honest design rules the builder enforces:</p>
+  <ul>
+    <li><strong>An unvisited state is <code>untested</code>, never silently <code>pass</code>.</strong>
+      If the panel never reached a state, the matrix says so — it does not pretend coverage it
+      doesn&rsquo;t have.</li>
+    <li><strong>Greetings and other deterministic announces aren&rsquo;t certified.</strong> They never
+      call the model, so there is nothing to certify.</li>
+    <li><strong>Coverage is the real cost.</strong> A small panel under the
+      <a class="x" href="goap-selector.html">GOAP-lite selector</a> (one slot at a time, any order) visits
+      only a subset of states per call, so certifying a <em>whole</em> flow needs many persona&times;repeat
+      runs or targeted per-state scenarios. The matrix makes that gap visible instead of hiding it.</li>
+  </ul>
+
+  <h2>Where it fits</h2>
+  <p>Acceptance is the deterministic floor; the <a class="x" href="eval-matrix.html">eval matrix</a> and
+  <a class="x" href="judges.html">judges</a> measure quality above it; the
+  <a class="x" href="transcript-audit.html">transcript audit</a> confirms any number against its
+  conversation. Together: a flow can&rsquo;t ship until it <em>provably</em> handles its persona panel, on
+  a model <em>proven</em> to drive each of its states.</p>
+
+  <footer>RIFF Eval · Shift-left acceptance &amp; per-state certification ·
+  <code>riff/flow_eval/acceptance.py</code>, <code>riff/flow_eval/certification.py</code></footer>
+</main>
+</div>
+</body>
+</html>
