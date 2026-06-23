@@ -202,23 +202,33 @@ def fetch_top_files(
 
 DOCS_HTML_PREFIX = "docs/html/"
 DOCS_MD_PREFIX = "docs/md/"
+# Binary web assets republished alongside docs/html/ pages (images/css/js/fonts).
+DOC_ASSET_SUFFIXES = (
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico", ".avif",
+    ".css", ".js", ".woff", ".woff2", ".ttf", ".otf",
+)
+_MAX_ASSET_BYTES = 15 * 1024 * 1024  # skip a single asset larger than 15 MB
 
 
 def _fetch_docs_under(
     owner: str,
     repo: str,
     prefix: str,
-    suffix: str,
+    suffix,
     *,
     default_branch: str | None,
     max_files: int,
-) -> list[tuple[str, str]]:
+    decode: bool = True,
+    max_bytes: int | None = None,
+):
     """Fetch every ``<prefix>**/*<suffix>`` blob from the repo's default branch.
 
-    Shared engine for :func:`fetch_html_docs` and :func:`fetch_markdown_docs`.
-    The explicit opt-in folder (``docs/html/`` or ``docs/md/``) avoids publishing
-    generated output (Sphinx ``docs/_build``, coverage reports) elsewhere under
-    ``docs/``. Returns ``(path, content)`` tuples with the full repo path.
+    Shared engine for :func:`fetch_html_docs`, :func:`fetch_markdown_docs`, and
+    :func:`fetch_html_doc_assets`. *suffix* may be a string or a tuple of
+    extensions. With ``decode=True`` returns ``(path, str)`` (text docs); with
+    ``decode=False`` returns ``(path, bytes)`` (binary assets). *max_bytes* skips
+    oversized blobs. The explicit ``docs/html/`` / ``docs/md/`` folder avoids
+    publishing generated output elsewhere under ``docs/``.
     """
     session = _session()
 
@@ -244,9 +254,10 @@ def _fetch_docs_under(
         if item.get("type") == "blob"
         and item["path"].startswith(prefix)
         and item["path"].lower().endswith(suffix)
+        and (max_bytes is None or item.get("size", 0) <= max_bytes)
     ][:max_files]
 
-    results: list[tuple[str, str]] = []
+    results: list = []
     for item in matching:
         blob_resp = session.get(
             f"{API_BASE}/repos/{owner}/{repo}/git/blobs/{item['sha']}"
@@ -256,10 +267,32 @@ def _fetch_docs_under(
         blob = blob_resp.json()
         content = blob.get("content", "")
         if blob.get("encoding") == "base64" and content:
-            content = base64.b64decode(content).decode("utf-8", errors="replace")
+            raw = base64.b64decode(content)
+            content = raw.decode("utf-8", errors="replace") if decode else raw
+        elif not decode:
+            content = content.encode()  # rare: non-base64 blob, normalize to bytes
         results.append((item["path"], content))
 
     return results
+
+
+def fetch_html_doc_assets(
+    owner: str,
+    repo: str,
+    *,
+    default_branch: str | None = None,
+    max_files: int = 50,
+) -> list[tuple[str, bytes]]:
+    """Fetch binary web assets (images/css/js/fonts) under ``docs/html/``.
+
+    Returns ``(path, bytes)`` so they can be republished verbatim alongside the
+    HTML docs. Oversized assets (> 15 MB) are skipped.
+    """
+    return _fetch_docs_under(
+        owner, repo, DOCS_HTML_PREFIX, DOC_ASSET_SUFFIXES,
+        default_branch=default_branch, max_files=max_files,
+        decode=False, max_bytes=_MAX_ASSET_BYTES,
+    )
 
 
 def fetch_html_docs(

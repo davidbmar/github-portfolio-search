@@ -84,6 +84,26 @@ def test_generate_all_writes_record_html_and_aggregate(tmp_path):
     assert "projects-index.json" in llms and "portfolio_find_docs" in llms
 
 
+def test_generate_all_publishes_docs_html_binary_assets(tmp_path):
+    """A repo's docs/html/ image assets are republished under <slug>/docs/<rel>."""
+    gh = _fake_gh("demo")
+    gh.fetch_html_doc_assets = lambda owner, repo: [
+        ("docs/html/assets/diagram.png", b"\x89PNGbinary"),
+        ("docs/html/../evil.png", b"nope"),  # traversal -> dropped
+    ]
+    generate.generate_all(
+        owner="davidbmar",
+        records_dir=str(tmp_path / "projects"),
+        html_dir=str(tmp_path / "web" / "projects"),
+        feed_path=str(tmp_path / "web" / "data" / "projects.json"),
+        client=_FakeClient(),
+        gh=gh,
+    )
+    asset = tmp_path / "web" / "projects" / "demo" / "docs" / "assets" / "diagram.png"
+    assert asset.read_bytes() == b"\x89PNGbinary"
+    assert not (tmp_path / "web" / "projects" / "demo" / "docs" / "evil.png").exists()
+
+
 def test_publish_all_writes_search_index(tmp_path):
     """The SPA search corpus (projects-search.json) is built from the records."""
     generate.generate_all(

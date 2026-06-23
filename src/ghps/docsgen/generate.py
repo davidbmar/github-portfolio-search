@@ -60,6 +60,36 @@ def _safe_doc_rel(path: str) -> str | None:
     return rel if rel.lower().endswith(".html") else None
 
 
+def _safe_asset_rel(path: str) -> str | None:
+    """Normalize a ``docs/html/...`` asset path to a site rel under ``<slug>/docs/``.
+
+    e.g. ``docs/html/assets/diagram.png`` -> ``assets/diagram.png``. Rejects
+    traversal. The extension allowlist is enforced upstream by the fetcher.
+    """
+    parts = _clean_rel_parts(path, _DOCS_HTML_PREFIX)
+    return "/".join(parts) if parts else None
+
+
+def _publish_doc_assets(gh, owner: str, slug: str, html_dir: str) -> int:
+    """Fetch the repo's ``docs/html/`` binary assets and write them verbatim under
+    ``<slug>/docs/<rel>`` so images/css/js referenced by the docs resolve. Returns
+    the count written. No-op if the gh client predates asset support.
+    """
+    fetch = getattr(gh, "fetch_html_doc_assets", None)
+    if not fetch:
+        return 0
+    written = 0
+    for path, data in fetch(owner, slug):
+        rel = _safe_asset_rel(path)
+        if rel is None:
+            continue
+        out = Path(html_dir) / slug / "docs" / rel
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_bytes(data if isinstance(data, (bytes, bytearray)) else str(data).encode())
+        written += 1
+    return written
+
+
 def _safe_md_rel(path: str) -> str | None:
     """Normalize a ``docs/md/...md`` repo path to the rendered ``.html`` site rel.
 
@@ -275,6 +305,9 @@ def generate_all(
                 model=model,
             )
             generated += 1
+            # Republish any images/css/js the repo committed under docs/html/, so
+            # "commit to docs/html/ -> shows on the site" holds for assets too.
+            _publish_doc_assets(gh, owner, slug, html_dir)
         except (RecordGenerationError, KeyError, OSError) as exc:
             logger.warning("FAILED %s: %s", slug, exc)
             failed.append(slug)

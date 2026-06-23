@@ -420,6 +420,26 @@ class TestFetchCommits:
         assert github_client.fetch_commits("o", "r") == []
 
     @patch.object(github_client, "_session")
+    def test_assets_returns_binary_skips_html_and_oversize(self, mock_session_fn):
+        import base64 as b64
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        png = b"\x89PNG\r\n\x1a\nDATA"
+        tree = {"tree": [
+            {"type": "blob", "path": "docs/html/assets/d.png", "sha": "s1", "size": 100},
+            {"type": "blob", "path": "docs/html/index.html", "sha": "s2", "size": 50},   # html skipped
+            {"type": "blob", "path": "docs/html/assets/huge.png", "sha": "s3", "size": 99_000_000},  # oversize
+            {"type": "blob", "path": "docs/html/app.css", "sha": "s4", "size": 30},
+        ]}
+        blob_png = _mock_response({"content": b64.b64encode(png).decode(), "encoding": "base64"})
+        blob_css = _mock_response({"content": b64.b64encode(b"body{}").decode(), "encoding": "base64"})
+        session.get.side_effect = [_mock_response(tree), blob_png, blob_css]
+        out = github_client.fetch_html_doc_assets("o", "r", default_branch="main")
+        assert [p for p, _ in out] == ["docs/html/assets/d.png", "docs/html/app.css"]
+        assert out[0][1] == png                       # raw bytes, not decoded text
+        assert isinstance(out[0][1], (bytes, bytearray))
+
+    @patch.object(github_client, "_session")
     def test_since_is_forwarded_as_param(self, mock_session_fn):
         session = MagicMock()
         mock_session_fn.return_value = session
