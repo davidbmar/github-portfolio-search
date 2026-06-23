@@ -47,6 +47,10 @@
   .callout.bad{border-color:var(--bad);background:#fdecea;}
   .callout.good{border-color:var(--good);background:#eafaf0;}
   .callout strong{display:block;margin-bottom:3px;}
+  .hierarchy-figure{margin:28px 0 34px;}
+  .hierarchy-figure img{display:block;width:100%;height:auto;border:1px solid var(--line);
+    border-radius:8px;background:#fff;box-shadow:0 10px 28px rgba(31,53,98,.08);}
+  .hierarchy-figure figcaption{margin-top:9px;color:var(--mut);font-size:13.5px;line-height:1.45;}
   .pill{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;
     background:#eef0f3;color:var(--mut);padding:2px 8px;border-radius:20px;margin-right:6px;}
   .tiers{display:grid;grid-template-columns:1fr;gap:0;margin:22px 0;}
@@ -106,6 +110,11 @@
   &ldquo;is a flow good, and if not, exactly which part is broken?&rdquo;</strong> The answer is not a
   single number. It is a <strong>four-tier goal hierarchy</strong>, where every level declares a goal
   and is instrumented with a metric for that goal.</p>
+
+  <figure class="hierarchy-figure">
+    <img src="assets/four-tier-evaluation-hierarchy.png" alt="Four-tier RIFF evaluation hierarchy showing state, group segment, flow, and cross-flow archetype metrics" loading="lazy" width="1024" height="1536">
+    <figcaption>The evaluation stack reads both directions: state metrics roll up into group cohesion and flow quality, while archetypes compare the same phase across flows to identify systemic weaknesses.</figcaption>
+  </figure>
 
   <h2>The four-tier hierarchy</h2>
   <p>Read top-down. Each tier rolls up into the one above it, and each tier has its own &ldquo;what
