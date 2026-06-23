@@ -1,30 +1,47 @@
 {
-  "generated_at": "2026-06-23T02:24:45.848463Z",
+  "generated_at": "2026-06-23T10:37:01.643101Z",
   "count": 147,
   "days": [
     {
       "date": "2026-06-23",
-      "headline": "Riff Implements Four-Tier Evaluation Hierarchy with Shift-Left Gates",
-      "summary": "The Riff framework introduces a structured four-tier evaluation hierarchy, featuring a pure Flow Acceptance evaluator and a live persona-panel driver for correctness gating. Documentation updates visualize this hierarchy while fixing escalation logic for booking flow failures.",
+      "headline": "Riff Adds DashScope Streaming, Certification Matrix, and Shift-Left Evaluation Gates",
+      "summary": "The Riff framework integrates a DashScope adapter with streaming sentence emission to reduce voice latency, alongside a new CLI-driven certification matrix for per-state model validation. It also introduces shift-left acceptance testing gates and refines conversational naturalness by fixing slot-label leaks in reprompt logic.",
       "takeaways": [
-        "Implement a four-tier evaluation hierarchy to structure testing rigor, using the provided diagram as a reference for tier definitions.",
-        "Adopt a 'shift-left' gate strategy by integrating a pure Flow Acceptance evaluator early in the pipeline to catch defects sooner.",
-        "Use a live persona-panel driver to simulate real-user interactions for robust correctness gating in acceptance tests."
+        "Implement low-latency voice responses by adopting the DashScope adapter's streaming sentence-emission pattern for LLM outputs.",
+        "Reuse the flow_certify CLI and per-state certification matrix builder to automate model validation across specific dialogue states.",
+        "Apply the pure Flow Acceptance evaluator as a shift-left gate to catch correctness issues before full integration testing.",
+        "Improve conversational naturalness by passing slot labels to read-back guards and using slot_types to drive natural reask phrasing."
       ],
-      "total_commits": 6,
+      "total_commits": 22,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 2,
+          "commits": 4,
           "messages": [
+            "feat(docs): republish docs/html/ binary assets (images/css/js) automatically",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "docs(riff): add four-tier evaluation hierarchy diagram + gitignore playwright",
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
         },
         {
           "name": "riff",
-          "commits": 4,
+          "commits": 18,
           "messages": [
+            "fix(cert): exclude greet states from certification (deterministic opener, never an LLM turn)",
+            "feat(cert): flow_certify CLI — drive the panel per model, build the certification matrix (#2, increment 2)",
+            "test(deriver): derive expected persona count from live _FALLBACK_PERSONAS (was stale ==6)",
+            "test(lint): baseline the intentional unscoreable-escalate-false-10 finding on apartment_scheduler",
+            "fix(eval): defensive transcript persistence — partial convs no longer lose evidence",
+            "feat(cert): per-state model certification matrix builder (#2, increment 1)",
+            "docs(latency): Voice Latency & Naturalness design + benchmark data",
+            "feat(latency): benchmark proving the LLM-streaming win (data-validated, #latency)",
+            "feat(latency): streaming sentence-emit in DashScope adapter (#1 voice-latency lever)",
+            "fix(humanness): pass slot labels to the stale-ask-guard read-back too (#24, partial)",
+            "fix(humanness): reduce slot-name leaks across reprompt/directive/read-back composers (#24, partial)",
+            "fix(humanness): natural slot reask phrasing — collect_reprompt honors slot_types reask: (#24)",
+            "feat(web): add DashScope/Qwen adapter to the voice server (#25)",
+            "feat(flow): apartment_intake_SFO — maintenance-request voice intake (flagship shift-left demo, #25)",
             "feat(acceptance): increments 2+3 — live persona-panel driver + correctness gate (#25)",
             "feat(acceptance): increment 1 — pure Flow Acceptance evaluator (shift-left gate, #25)",
             "docs: add four-tier evaluation hierarchy diagram",
@@ -32,7 +49,7 @@
           ]
         }
       ],
-      "commit_sig": "d996ce1967a5322e"
+      "commit_sig": "664adf87f903d60c"
     },
     {
       "date": "2026-06-22",
@@ -3612,15 +3629,15 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Riff Hardens Core Primitives with Automated Sweeps and Doc-as-Spec",
-      "summary": "The Riff framework executed a comprehensive audit of core conversational modules, replacing speculative documentation with invariant-driven specs and automated defect-sweeping scripts. This update standardizes state management, fixes critical UI/UX latency issues in the flow graph, and enforces strict type safety across booking and scheduling flows.",
+      "headline": "Riff Hardens Core Primitives with Invariant Testing and Flow Graph Overhaul",
+      "summary": "The Riff framework completes a comprehensive audit of core modules like collect, choice, and booking by implementing strict invariant testing, parameterized YAML specs, and automated sweep scripts. Concurrently, the flow-graph visualization receives a major UX upgrade with a three-column layout and zoom controls, while scheduling logic adopts flexible natural language parsing.",
       "takeaways": [
-        "Adopt the 'doc-as-spec' pattern by defining explicit Invariants and Failure Modes for each module, then validate them with dedicated YAML scenario files and Python invariant tests.",
-        "Reuse the `sweep_*.py` gate scripts to automatically cascade dialogue runners against defect logs, ensuring regression testing covers edge cases like stale slots or invalid final statuses.",
-        "Implement width-aware sibling spreading and auto-panning in SVG-based flow graphs to eliminate node overlap and improve readability in complex state machines.",
-        "Standardize calendar interactions by leading with day-relative phrasing (e.g., 'today', 'this coming X') and relaxing time validators to accept natural language inputs like '2pm'."
+        "Adopt the 'doc-as-spec' pattern by defining module invariants and failure modes in Markdown, then enforcing them with dedicated YAML scenario files and Python invariant tests.",
+        "Implement reusable 'sweep' scripts to automatically gate deployments based on passing all defined behavioral scenarios for a specific primitive module.",
+        "Use parameterized YAML flows with variable substitution to create reusable templates for common patterns like appointment booking or data collection.",
+        "Replace strict time-format validators with flexible natural language parsing to support inputs like '2pm' or 'afternoon', reducing user friction."
       ],
-      "total_commits": 128,
+      "total_commits": 114,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3639,7 +3656,7 @@
         },
         {
           "name": "riff",
-          "commits": 125,
+          "commits": 111,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3751,25 +3768,11 @@
             "test(end): rewrite reframe pivot scenarios to use invalid-first-utterance (closes B-002)",
             "test(confirm): assert _order_denied_reason also clears on state exit (full I-3 contract)",
             "flow(tutorial_confirm): use final_status: booked (was 'confirmed', outside FinalStatus Literal — same F-2 instance Task 10 fixed in tutorial_end.yaml)",
-            "docs(scripts): correct sweep docstrings to describe session_id attribution (defect schema has no tags field)",
-            "docs(memory): sprint-182-end-harden capstone (B-003 microcosm escalation gap is the standout finding)",
-            "docs(backlog): file end-sweep findings as backlog items",
-            "feat(scripts): add sweep_end.py (gate)",
-            "test(primitives): author end.yaml (20 scenarios across 6 behavior classes)",
-            "flow(tutorial_end): set EndKit Demo profile; ensure escalate + complete terminals exist",
-            "test(primitives): add test_end_invariants.py (I-1 short-circuit, I-2 verdict, I-3 loader rejects) (+ B-001 backlog because loader doesn't enforce I-3)",
-            "docs(end): rewrite 06-end.md to doc-as-spec template (3 Invariants, 3 Failure modes)",
-            "docs(memory): sprint-181-confirm-harden capstone + B-004 (load-time validation gap)",
-            "docs(backlog): file B-001/B-002/B-003 from confirm sweep first run",
-            "feat(scripts): add sweep_confirm.py (gate)",
-            "test(primitives): author confirm.yaml (20 scenarios across 6 behavior classes)",
-            "feat(scripts): wire _sweep_base.run_sweep (cascade dialogue runner; reads defects.jsonl)",
-            "flow(tutorial_confirm): add revise_order loop-back so F-3 (deny without correction) is exercisable; rename business to BurgerBox",
-            "test(primitives): add test_confirm_invariants.py (I-1 forbid side effects, I-2 guards, I-3 clear on exit)"
+            "docs(scripts): correct sweep docstrings to describe session_id attribution (defect schema has no tags field)"
           ]
         }
       ],
-      "commit_sig": "da826f2e2768be08"
+      "commit_sig": "805030e660f458d1"
     },
     {
       "date": "2026-05-01",
