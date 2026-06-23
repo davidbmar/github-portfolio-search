@@ -1,23 +1,25 @@
 {
-  "generated_at": "2026-06-22T22:10:09.678268Z",
+  "generated_at": "2026-06-23T00:31:27.056516Z",
   "count": 146,
   "days": [
     {
       "date": "2026-06-22",
       "headline": "Automated Docs Pipeline and GOAP-lite Evaluation Framework",
-      "summary": "Enhanced the portfolio search with nightly auto-deploying documentation and robust error handling for API limits. Simultaneously advanced the Riff project by implementing a typed GOAP-lite selector, deterministic stall-recovery flows, and comprehensive evaluation metrics for goal hierarchies.",
+      "summary": "Enhanced the portfolio search with auto-deploying daily digests and resilient doc generation, while advancing the Riff project with a typed GOAP-lite selector and comprehensive evaluation tooling. Key additions include deterministic stall-recovery flows, archetype-based metrics, and regression testing utilities for conversational AI.",
       "takeaways": [
-        "Implement resilient documentation generators that skip empty repositories and apply exponential backoff on 429 errors to ensure stable nightly builds.",
-        "Adopt a typed GoalSegment schema to structure FSM phases into measurable groups, enabling precise tracking of slot-filling and progress metrics.",
-        "Use deterministic stall-recovery patterns with named failure classes and generic inquiry fallbacks to handle conversational dead-ends reliably.",
-        "Build regression testing tools that replay recorded evaluation sessions to validate flow changes against canonical archetype taxonomies."
+        "Implement resilient documentation pipelines by adding HTTP 429 backoff logic to API clients and skipping empty repositories during index generation.",
+        "Reuse the `replay_eval.py` utility to replay recorded evaluation sessions for regression testing after code changes.",
+        "Apply the `--archetype` flag to group conversational states across different flows using a canonical taxonomy for cross-flow analysis.",
+        "Adopt the deterministic stall-recovery pattern using explicit edge sets and stalled guards to close gaps in finite state machine flows."
       ],
-      "total_commits": 42,
+      "total_commits": 45,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 5,
+          "commits": 7,
           "messages": [
+            "fix(ci): deploy step condition for boolean input (inputs.deploy, not == 'true')",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "feat(automation): nightly gen-docs now also builds the daily digest + auto-deploys",
             "chore: regenerate L0 project docs [skip ci]",
             "fix(gen-docs): skip empty repos (409) + add 429 backoff to DashScope client",
@@ -27,8 +29,9 @@
         },
         {
           "name": "riff",
-          "commits": 37,
+          "commits": 38,
           "messages": [
+            "feat(linter): warn on unscoreable-escalate-false-10 flows (#22 build-time guard)",
             "test(goap): increment-6 pilot probe + A/B — split fixes mega-collect, GOAP doesn't beat it (#16/#23)",
             "docs(html): new Transcript Audit page (review_transcripts / --validate)",
             "docs(html): stall-recovery — add generic_inquiry (2nd flow), name the failure class",
@@ -69,7 +72,7 @@
           ]
         }
       ],
-      "commit_sig": "d46f7d8fb556abe9"
+      "commit_sig": "50135e3765021f96"
     },
     {
       "date": "2026-06-21",
@@ -3577,14 +3580,15 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Riff Hardens Core Primitives with Automated Sweep Gates and Spec-Driven Docs",
-      "summary": "The Riff framework completed a comprehensive audit of ten core modules, replacing speculative documentation with invariant-based specs and automated sweep scripts. This update introduces reusable testing gates, fixes critical state management bugs in scheduling and flow graphs, and standardizes error handling across the platform.",
+      "headline": "Hardened Voice AI Primitives with Automated Sweep Gates and Flow-Graph UI",
+      "summary": "Implemented a rigorous 'doc-as-spec' testing framework for voice AI modules, introducing automated sweep scripts to validate invariants across ten core primitives. Simultaneously upgraded the flow-graph visualization with a three-column SVG layout and refined the booking module's calendar phrasing and state management.",
       "takeaways": [
-        "Adopt the 'doc-as-spec' template defining explicit Invariants and Failure Modes for each module to replace ambiguous narrative documentation.",
-        "Reuse the `sweep_<module>.py` gate scripts to automatically validate module behavior against YAML-defined scenarios before merging changes.",
-        "Implement parameterized flow definitions using `[[VAR]]` syntax to create reusable, testable microcosms for complex state machines like booking."
+        "Adopt the 'sweep_<module>.py' pattern to automate regression testing against defined invariants and failure modes for any stateful dialogue component.",
+        "Use the rewritten 'doc-as-spec' templates (e.g., 03-collect.md) to formally define module invariants and guardrails before implementation.",
+        "Reuse the three-column SVG flow-graph layout with auto-panning and zoom controls to visualize complex state machines without sibling node overlap.",
+        "Apply the day-relative calendar phrasing logic ('today', 'this coming X') to prevent user confusion loops in scheduling interfaces."
       ],
-      "total_commits": 133,
+      "total_commits": 132,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3603,7 +3607,7 @@
         },
         {
           "name": "riff",
-          "commits": 130,
+          "commits": 129,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3733,12 +3737,11 @@
             "docs(confirm): rewrite 04-confirm.md to doc-as-spec template (3 Invariants, 4 Failure modes)",
             "refactor(tests): drop redundant sys.path.insert from test_sweep_base",
             "fix(web): redirect docs/ directory URLs to README.md?format=html when present",
-            "fix(tests): replace pytest.skip with return in session-scoped linter gate",
-            "fix(scripts): give load_scenarios a diagnostic error on empty YAML files"
+            "fix(tests): replace pytest.skip with return in session-scoped linter gate"
           ]
         }
       ],
-      "commit_sig": "ab4831ac98058b9d"
+      "commit_sig": "2f4819fcd4b3147a"
     },
     {
       "date": "2026-05-01",

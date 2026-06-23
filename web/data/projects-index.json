@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-22T22:08:40.265310Z",
+  "generated_at": "2026-06-23T00:29:54.135803Z",
   "count": 137,
   "projects": [
     {
@@ -1138,19 +1138,18 @@
         "k3s",
         "Helm",
         "Traefik",
-        "code-server",
         "Vanilla JS"
       ],
       "reuse_tags": [
         "ai-workspace",
         "kubernetes-platform",
-        "developer-tools",
+        "developer-portal",
         "claude-code",
         "self-hosted"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/everyone-ai",
-      "pushed_at": "2026-06-20T14:14:10Z"
+      "pushed_at": "2026-06-22T23:42:03Z"
     },
     {
       "slug": "exampleLoops",
@@ -1245,25 +1244,23 @@
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "tech": [
         "Python",
-        "HTML",
-        "JavaScript",
         "FastAPI",
         "SQLite-vec",
-        "Sentence-Transformers",
-        "AWS Lambda",
-        "CloudFront",
-        "S3"
+        "sentence-transformers",
+        "HTML/CSS/JS",
+        "AWS S3",
+        "CloudFront"
       ],
       "reuse_tags": [
         "semantic-search",
         "github-indexer",
-        "portfolio-tool",
-        "mcp-server",
-        "static-ui"
+        "vector-database",
+        "ai-agent-tool",
+        "portfolio-manager"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-22T22:02:39Z"
+      "pushed_at": "2026-06-22T22:12:23Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2116,29 +2113,28 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "JSONL",
-        "WebSockets",
-        "Git",
-        "Pytest"
+        "Pytest",
+        "FastAPI",
+        "Gemma",
+        "Gemini",
+        "Claude"
       ],
       "reuse_tags": [
         "voice-agent",
-        "state-machine",
+        "finite-state-machine",
         "llm-orchestration",
-        "python",
-        "yaml-config",
         "deterministic-guardrails",
-        "a-b-testing",
-        "observability"
+        "python-framework",
+        "business-automation"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-22T20:53:32Z"
+      "pushed_at": "2026-06-22T23:29:34Z"
     },
     {
       "slug": "riot",

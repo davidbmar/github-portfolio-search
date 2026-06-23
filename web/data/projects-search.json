@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-22T22:08:40.268370Z",
+  "generated_at": "2026-06-23T00:29:54.138692Z",
   "count": 137,
   "entries": [
     {
@@ -2115,11 +2115,10 @@
         "k3s",
         "helm",
         "traefik",
-        "code-server",
         "vanilla js",
         "ai-workspace",
         "kubernetes-platform",
-        "developer-tools",
+        "developer-portal",
         "claude-code",
         "self-hosted"
       ],
@@ -2134,19 +2133,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A portal that allows team members to launch isolated VS Code workspaces backed by Claude Code in seconds. It manages the lifecycle of these workspaces on a k3s cluster, providing an app catalog, usage monitoring, and persistent HTTPS endpoints for deployed apps without requiring local machine configuration."
+          "text": "A portal that allows team members to launch pre-configured VS Code workspaces backed by Claude Code without local setup. It manages Kubernetes pods, ingress routes, and workspace templates through a Node.js API and static frontend."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Node.js and Express for the backend API, vanilla JavaScript for the frontend SPA, and Helm charts for Kubernetes deployment. It uses k3s as the underlying cluster engine, Traefik for ingress routing, and code-server for browser-based VS Code instances. The CLI tool 'afterburner' automates cluster bootstrapping and installation."
+          "text": "Built with Node.js/Express for the backend API, vanilla JavaScript for the frontend SPA, and Helm charts for Kubernetes deployment. Uses k3s for lightweight cluster management and Traefik for ingress routing. Includes a CLI tool called afterburner for bootstrapping and management."
         },
         {
           "source": "how_to_apply",
-          "text": "Operators use the 'afterburner' CLI to bootstrap a Linux VM into a k3s cluster and deploy the portal via Helm. End users connect via VPN, access the web portal, select a template from the App Catalog, and launch a workspace which provides a direct link to a browser-based VS Code instance with Claude Code pre-configured."
+          "text": "Operators use the afterburner CLI to bootstrap k3s on Linux VMs and deploy the portal via Helm. End users connect via VPN, access the portal URL, select a template from the App Catalog, and launch a workspace to get a browser-based VS Code instance with Claude Code ready."
         },
         {
           "source": "features",
-          "text": "Launch Claude Code workspaces in under 30 seconds via web portal App Catalog with pre-configured templates for Python, Node.js, and HR agents Automated k3s cluster bootstrapping and Helm deployment via afterburner CLI Browser-based VS Code environments with no local setup required Team-wide usage monitoring and fleet overview across multiple portals Persistent HTTPS endpoints for deploying apps from workspaces"
+          "text": "App Catalog with pre-configured Claude Code templates One-click launch of personal VS Code workspaces in browser Automatic Kubernetes pod and ingress management Team-wide usage monitoring and fleet overview CLI tools for operator bootstrap and lifecycle management"
         }
       ]
     },
@@ -2327,19 +2326,17 @@
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "keywords": [
         "python",
-        "html",
-        "javascript",
         "fastapi",
         "sqlite-vec",
         "sentence-transformers",
-        "aws lambda",
+        "html/css/js",
+        "aws s3",
         "cloudfront",
-        "s3",
         "semantic-search",
         "github-indexer",
-        "portfolio-tool",
-        "mcp-server",
-        "static-ui"
+        "vector-database",
+        "ai-agent-tool",
+        "portfolio-manager"
       ],
       "chunks": [
         {
@@ -2352,19 +2349,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, REST API, and static web UI. It enables developers to find reusable code patterns and architectures across their own portfolio using natural language queries."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It helps developers find reusable code patterns and architectures across their own portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec) and FastAPI for the backend. The frontend is a static HTML/JS application served from S3/CloudFront. It uses GitHub Actions for weekly reindexing and Lambda functions for OAuth handling."
+          "text": "Python backend with FastAPI for the REST API, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Indexing is handled by a Python pipeline triggered locally or via GitHub Actions. Deployment uses AWS S3 and CloudFront."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repo, configure a GitHub Personal Access Token in .env, run the indexing command against your username, export the data to JSON, and serve the web directory locally or deploy to AWS S3/CloudFront."
+          "text": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI/MCP server to search your codebase semantically."
         },
         {
           "source": "features",
-          "text": "Client-side semantic search using TF-IDF and embedding vectors Automatic clustering of repositories into capability categories Faceted filtering by language, tech stack, and star count MCP server integration for AI agent access to portfolio data Static web UI with shareable URLs and localStorage collections Automated weekly reindexing via GitHub Actions"
+          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-generated capability clusters and related repo suggestions CLI, Web UI, and MCP server interfaces for AI agents Faceted filtering by language, tech stack, and stars Automated weekly reindexing via GitHub Actions Exportable search results and embeddable widget"
         }
       ]
     },
@@ -4004,22 +4001,22 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
         "mermaid",
-        "jsonl",
-        "websockets",
-        "git",
         "pytest",
+        "fastapi",
+        "gemma",
+        "gemini",
+        "claude",
         "voice-agent",
-        "state-machine",
+        "finite-state-machine",
         "llm-orchestration",
-        "yaml-config",
         "deterministic-guardrails",
-        "a-b-testing",
-        "observability"
+        "python-framework",
+        "business-automation"
       ],
       "chunks": [
         {
@@ -4028,23 +4025,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models (LLMs) for natural language understanding with declared Finite State Machines (FSMs) for strict workflow enforcement. It allows users to describe a business in plain English, automatically generating a YAML-defined flow that handles phone conversations for tasks like ordering, scheduling, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation) while the FSM 'keeps the beat' (validating slots, enforcing transitions, and preventing hallucinations through pure function guardrails)."
+          "text": "A Python-based voice agent framework that combines Large Language Models for natural language understanding with a declared Finite State Machine (YAML) for strict workflow enforcement. It prevents LLM hallucinations by using pure functions for guardrails, slot validation, and state transitions, ensuring reliable phone conversations for scheduling, ordering, and intake tasks."
         },
         {
           "source": "how_its_built",
-          "text": "The core engine is built in Python, leveraging a hybrid architecture where an LLM adapter (supporting Gemini, Gemma, or Claude) drives conversation content, while a deterministic state manager enforces business logic via YAML-defined graphs. Key components include a speech-to-text pipeline, a turn execution engine (run_turn), slot extractors with deterministic fallbacks, and a web server for real-time inspection. The system emphasizes observability with JSONL logging, silent failure tracking, and an A/B testing harness that scores agents based on observable metrics like slot completion and turn count without requiring live LLM judges."
+          "text": "Built in Python with a modular architecture separating the LLM adapter layer from the deterministic core. The system uses YAML for flow definitions, a custom SessionContext for state management, and pure functions for guardrails and slot extraction. It includes a built-in web server for UI interaction, an MCP server for tool integration, and supports multiple LLM backends including local Gemma and cloud-based Gemini or Claude."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (e.g., plumbing, dental clinics, salons) or retail scenarios (e.g., coffee shops, pizza orders). It is ideal for developers who need the flexibility of LLMs for natural conversation but require the reliability of state machines to prevent errors in critical data collection (like addresses or appointment times). It can be integrated into existing telephony systems via its API or used as a standalone web-based voice interface."
+          "text": "Use riff to rapidly prototype and deploy voice agents for specific business verticals like plumbing, dental clinics, or retail. Define the business logic in plain English or YAML, generate the flow via the API, and integrate it into phone systems via the provided web interface or custom adapters. It is suitable for developers needing robust, testable voice interfaces that avoid the unpredictability of pure LLM agents."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions and slot validation via YAML-defined FSMs Supports multiple LLM backends including Gemini, Gemma, and Claude Includes built-in A/B testing harness with observable metric scoring Provides real-time web UI for inspecting live agent sessions and state Offers pure-function guardrails to prevent LLM hallucinations and enforce business rules"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces strict state transitions using declared YAML state graphs Prevents hallucinations with deterministic guardrails and slot validators Supports local LLMs like Gemma and cloud models like Gemini and Claude Includes built-in A/B testing harness with observable metric scoring Exposes reusable agent blocks via Model Context Protocol (MCP) server"
         }
       ]
     },

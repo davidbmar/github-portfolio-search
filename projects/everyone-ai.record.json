@@ -1,26 +1,25 @@
 {
   "title": "Everyone Ai",
   "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
-  "what_it_is": "A portal that allows team members to launch isolated VS Code workspaces backed by Claude Code in seconds. It manages the lifecycle of these workspaces on a k3s cluster, providing an app catalog, usage monitoring, and persistent HTTPS endpoints for deployed apps without requiring local machine configuration.",
-  "how_its_built": "Built with Node.js and Express for the backend API, vanilla JavaScript for the frontend SPA, and Helm charts for Kubernetes deployment. It uses k3s as the underlying cluster engine, Traefik for ingress routing, and code-server for browser-based VS Code instances. The CLI tool 'afterburner' automates cluster bootstrapping and installation.",
-  "how_to_apply": "Operators use the 'afterburner' CLI to bootstrap a Linux VM into a k3s cluster and deploy the portal via Helm. End users connect via VPN, access the web portal, select a template from the App Catalog, and launch a workspace which provides a direct link to a browser-based VS Code instance with Claude Code pre-configured.",
+  "what_it_is": "A portal that allows team members to launch pre-configured VS Code workspaces backed by Claude Code without local setup. It manages Kubernetes pods, ingress routes, and workspace templates through a Node.js API and static frontend.",
+  "how_its_built": "Built with Node.js/Express for the backend API, vanilla JavaScript for the frontend SPA, and Helm charts for Kubernetes deployment. Uses k3s for lightweight cluster management and Traefik for ingress routing. Includes a CLI tool called afterburner for bootstrapping and management.",
+  "how_to_apply": "Operators use the afterburner CLI to bootstrap k3s on Linux VMs and deploy the portal via Helm. End users connect via VPN, access the portal URL, select a template from the App Catalog, and launch a workspace to get a browser-based VS Code instance with Claude Code ready.",
   "quickstart": "npx afterburner bootstrap --host <ip> --ssh-key ~/.ssh/id_rsa\nnpx afterburner install\nhelm install everyone-ai-portal ./charts/portal -f profiles/k3s.yaml -f config.yaml --namespace myteam --create-namespace\nopen https://portal.<your-domain>",
   "features": [
-    "Launch Claude Code workspaces in under 30 seconds via web portal",
-    "App Catalog with pre-configured templates for Python, Node.js, and HR agents",
-    "Automated k3s cluster bootstrapping and Helm deployment via afterburner CLI",
-    "Browser-based VS Code environments with no local setup required",
-    "Team-wide usage monitoring and fleet overview across multiple portals",
-    "Persistent HTTPS endpoints for deploying apps from workspaces"
+    "App Catalog with pre-configured Claude Code templates",
+    "One-click launch of personal VS Code workspaces in browser",
+    "Automatic Kubernetes pod and ingress management",
+    "Team-wide usage monitoring and fleet overview",
+    "CLI tools for operator bootstrap and lifecycle management"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS| Traefik[Traefik Ingress]\n    Traefik --> Portal[Portal Server Express]\n    Portal --> K8sClient[Kubernetes Client]\n    K8sClient --> K3sCluster[k3s Cluster]\n    K3sCluster --> WorkspacePod[Workspace Pod code-server]\n    K3sCluster --> TargetPod[Target Pod User App]\n    WorkspacePod --> ClaudeCode[Claude Code Terminal]",
-  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Portal\n    participant K8sClient\n    participant K3s\n    participant Workspace\n    User->>Portal: POST /api/workspaces\n    Portal->>K8sClient: createWorkspace\n    K8sClient->>K3s: deploy pod\n    K3s-->>K8sClient: pod running\n    K8sClient-->>Portal: workspace id\n    Portal-->>User: workspace url\n    User->>Workspace: open vscode\n    Workspace->>Workspace: start claude code",
+  "diagram_architecture": "flowchart TD\n    User[User VPN] --> Traefik[Traefik Ingress]\n    Traefik --> Portal[Portal Server Node Express]\n    Portal --> K8sClient[K8s Client Module]\n    K8sClient --> WorkspacePods[Workspace Pods code-server]\n    K8sClient --> TargetPods[Target Pods user apps]\n    Portal --> Config[Config JS Team Identity]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Browser\n    participant Portal\n    participant K8s\n    participant Workspace\n    User->>Browser: Click Launch\n    Browser->>Portal: POST /api/workspaces\n    Portal->>K8s: Create Pod and IngressRoute\n    K8s-->>Portal: Pod Created\n    Portal-->>Browser: Return Workspace ID\n    Browser->>Portal: GET /api/workspaces/id/events\n    Portal->>K8s: Watch Pod Status\n    K8s-->>Portal: Pod Ready\n    Portal-->>Browser: SSE Event Ready\n    Browser->>Workspace: Open VS Code URL",
   "capabilities": [
     "Workspace provisioning",
-    "Cluster bootstrapping",
-    "Template management",
-    "Ingress routing",
-    "Usage tracking"
+    "Ingress management",
+    "Template execution",
+    "Fleet monitoring",
+    "CLI automation"
   ],
   "components": [
     "Portal Server",
@@ -36,7 +35,6 @@
     "k3s",
     "Helm",
     "Traefik",
-    "code-server",
     "Vanilla JS"
   ],
   "depends_on": [
@@ -48,20 +46,20 @@
   ],
   "integrates_with": [
     "Claude Code",
-    "VS Code",
-    "EC2",
+    "VS Code Server",
+    "ECR",
     "VPN"
   ],
   "patterns": [
     "Self-service portal",
     "GitOps-lite",
     "Ephemeral environments",
-    "CLI automation"
+    "CLI-driven infrastructure"
   ],
   "reuse_tags": [
     "ai-workspace",
     "kubernetes-platform",
-    "developer-tools",
+    "developer-portal",
     "claude-code",
     "self-hosted"
   ],
@@ -73,17 +71,25 @@
   "todos": [
     {
       "kind": "unmerged_branch",
-      "detail": "dependabot/npm_and_yarn/portal/npm_and_yarn-7a6fb951bc is 1 commit ahead of the default branch"
+      "detail": "dependabot/npm_and_yarn/portal/npm_and_yarn-3080cc7252 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/npm_and_yarn/portal/tar-7.5.16 is 1 commit ahead of the default branch"
     },
     {
       "kind": "open_pr",
-      "detail": "PR #6: chore(deps): bump the npm_and_yarn group across 2 directories with 9 updates"
+      "detail": "PR #8: chore(deps): bump tar from 7.5.11 to 7.5.16 in /portal"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #7: chore(deps): bump the npm_and_yarn group across 2 directories with 9 updates"
     }
   ],
   "screenshot_url": "",
-  "generated_at": "2026-06-22T21:11:34.061251Z",
+  "generated_at": "2026-06-23T00:28:29.458831Z",
   "source_commit": "f9f66b6",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-06-20T14:14:10Z",
+  "pushed_at": "2026-06-22T23:42:03Z",
   "docs": []
 }
