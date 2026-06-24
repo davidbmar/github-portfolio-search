@@ -1,73 +1,74 @@
 {
   "title": "Riff",
-  "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
-  "what_it_is": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business in plain text, automatically generating a voice flow that handles tasks like scheduling, ordering, and intake while preventing hallucinations through deterministic guardrails and slot validation.",
-  "how_its_built": "The core engine uses a pure-function architecture where every component except the LLM call is deterministic. It features an 8-layer guardrail system, a YAML-defined state graph manager, deterministic slot extraction with fallbacks, and a turn-based execution loop. The system supports multiple LLM adapters (Gemini, Gemma, Claude) and includes built-in A/B testing harnesses using observable metrics rather than expensive LLM judges.",
-  "how_to_apply": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, tutoring) or retail scenarios (coffee, pizza). It is ideal for developers who need reliable, hallucination-free voice interactions where specific data slots (name, time, address) must be collected accurately before proceeding.",
+  "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+  "what_it_is": "A Python-based voice agent framework that combines Large Language Models for natural language understanding with a declared YAML state graph for strict workflow enforcement. It prevents LLM hallucinations by using pure functions for guardrails, slot validation, and state transitions, ensuring reliable phone conversations for scheduling, ordering, and intake tasks.",
+  "how_its_built": "Built in Python with a modular architecture separating the LLM adapter layer from the deterministic state manager. It uses YAML for flow definitions, pure functions for guardrails and slot extraction, and a web server for real-time inspection and API access. The system relies on a session store to manage context and an event bus for internal communication.",
+  "how_to_apply": "Use riff to rapidly prototype and deploy voice agents for specific business verticals (e.g., plumbing, salons, tutoring) without writing complex orchestration code. Describe the business logic in plain English to generate a flow, or manually edit YAML states for fine-grained control over conversation paths, entry prompts, and slot requirements.",
   "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server",
   "features": [
     "Generates voice agent flows from plain English business descriptions",
-    "Enforces strict conversation paths using YAML-defined Finite State Machines",
-    "Deterministic guardrails and slot validation prevent LLM hallucinations",
-    "Built-in A/B testing harness using observable metrics without live LLM judges",
-    "Supports multiple LLM backends including Gemini, Gemma, and Claude",
-    "Real-time web UI for inspecting live FSM states and conversation logs"
+    "Enforces deterministic state transitions via YAML-defined graphs",
+    "Prevents hallucinations with pure-function guardrails and validators",
+    "Includes 11 pre-built flows for retail and service industries",
+    "Provides real-time web UI for inspecting live FSM states and logs",
+    "Supports local Gemma or cloud Gemini/Claude LLM adapters"
   ],
-  "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[STT]\n    STT --> RunTurn[run_turn]\n    RunTurn --> Guardrails[Guardrails]\n    RunTurn --> LLMCall[LLM Call]\n    RunTurn --> StateManager[State Manager]\n    Guardrails --> TurnResult[Turn Result]\n    LLMCall --> TurnResult\n    StateManager --> TurnResult\n    TurnResult --> SlotExtractor[Slot Extractor]\n    TurnResult --> EvalFramework[Eval Framework]\n    TurnResult --> TurnLogger[Turn Logger]\n    SlotExtractor --> TTS[TTS]\n    TTS --> Caller",
-  "diagram_sequence": "sequenceDiagram\n    participant Caller\n    participant STT\n    participant RunTurn\n    participant Guardrails\n    participant LLM\n    participant StateManager\n    participant TTS\n    Caller->>STT: Speaks\n    STT->>RunTurn: Text Input\n    RunTurn->>Guardrails: Validate Input\n    Guardrails->>RunTurn: Pass/Fail\n    RunTurn->>StateManager: Get Current State\n    StateManager->>RunTurn: State Context\n    RunTurn->>LLM: Generate Response\n    LLM->>RunTurn: Raw Output\n    RunTurn->>StateManager: Update State\n    StateManager->>RunTurn: Transition Result\n    RunTurn->>TTS: Audio Output\n    TTS->>Caller: Speaks Response",
+  "diagram_architecture": "flowchart TD\n    Caller[Caller]\n    STT[Speech to Text]\n    RunTurn[run_turn pipeline]\n    Guardrails[Guardrails Pure Functions]\n    LLMCall[LLM Adapter Gemini Gemma Claude]\n    StateManager[State Manager Declared Graph]\n    TTS[Text to Speech]\n    SlotExtractor[Slot Extractor Deterministic]\n    EvalFramework[Evaluation Framework]\n    TurnLogger[Turn Logger JSONL]\n    Caller --> STT\n    STT --> RunTurn\n    RunTurn --> Guardrails\n    RunTurn --> LLMCall\n    RunTurn --> StateManager\n    Guardrails --> RunTurn\n    LLMCall --> RunTurn\n    StateManager --> RunTurn\n    RunTurn --> SlotExtractor\n    RunTurn --> EvalFramework\n    RunTurn --> TurnLogger\n    RunTurn --> TTS\n    TTS --> Caller",
+  "diagram_sequence": "sequenceDiagram\n    participant Caller\n    participant STT\n    participant RunTurn\n    participant Guardrails\n    participant LLMAdapter\n    participant StateManager\n    participant TTS\n    Caller->>STT: Speaks audio\n    STT->>RunTurn: Transcribed text\n    RunTurn->>Guardrails: Validate input\n    Guardrails-->>RunTurn: Validation result\n    RunTurn->>StateManager: Get current state and transitions\n    StateManager-->>RunTurn: State context and allowed actions\n    RunTurn->>LLMAdapter: Generate response based on state\n    LLMAdapter-->>RunTurn: LLM response text\n    RunTurn->>StateManager: Update state and extract slots\n    StateManager-->>RunTurn: New state and slot data\n    RunTurn->>TTS: Synthesize speech\n    TTS->>Caller: Plays audio response",
   "capabilities": [
-    "Plain English to Voice Flow Generation",
-    "Deterministic State Machine Enforcement",
-    "Multi-LLM Adapter Support",
-    "Real-time Conversation Inspection",
-    "Observable A/B Testing",
-    "Slot Validation and Extraction"
+    "Plain English to Voice Agent Flow Generation",
+    "Deterministic State Machine Orchestration",
+    "Multi-LLM Adapter Support (Gemini, Gemma, Claude)",
+    "Real-time Conversation Inspection and Debugging",
+    "A/B Testing with Observable Metrics",
+    "Silent Failure Tracking and Observability"
   ],
   "components": [
-    "Web Server",
-    "State Manager",
-    "LLM Adapters",
-    "Guardrail System",
-    "Slot Extractor",
-    "Event Bus",
-    "Session Store",
-    "A/B Test Harness"
+    "web_server",
+    "state_manager",
+    "run_turn",
+    "load_flow",
+    "session_store",
+    "adapters",
+    "guardrails",
+    "slot_extractor",
+    "event_bus",
+    "abtest"
   ],
   "tech": [
     "Python",
     "YAML",
     "Mermaid",
-    "Pytest",
+    "pytest",
     "FastAPI",
     "WebSockets"
   ],
   "depends_on": [
     "Google Gemini API",
-    "Gemma Local Model",
-    "Claude API",
-    "pytest",
-    "mcp"
+    "Local Gemma Model",
+    "Anthropic Claude API",
+    "Standard Library OrderedDict"
   ],
   "integrates_with": [
     "Model Context Protocol MCP",
     "Browser Web UI",
-    "JSONL Logging Systems"
+    "JSONL Log Streams"
   ],
   "patterns": [
-    "Finite State Machine Orchestration",
+    "LLM Riffs FSM Beats",
     "Pure Function Guardrails",
+    "Declared State Graph",
     "Deterministic Slot Extraction",
-    "Observable Metric Scoring",
-    "LRU Cache Bounding",
-    "Silent Failure Tracking"
+    "Silent Failure Tracking",
+    "LRU Cache for Previews"
   ],
   "reuse_tags": [
     "voice-agent",
-    "fsm",
-    "llm-orchestration",
-    "guardrails",
-    "ab-testing",
-    "deterministic-ai"
+    "fsm-orchestration",
+    "llm-guardrails",
+    "yaml-workflows",
+    "deterministic-ai",
+    "python-framework"
   ],
   "slug": "riff",
   "repo_url": "https://github.com/davidbmar/riff",
@@ -113,10 +114,10 @@
     }
   ],
   "screenshot_url": "",
-  "generated_at": "2026-06-23T21:07:11.700484Z",
-  "source_commit": "141d1f4",
+  "generated_at": "2026-06-24T10:20:42.177233Z",
+  "source_commit": "d360e37",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-06-23T20:14:05Z",
+  "pushed_at": "2026-06-24T08:34:01Z",
   "docs": [
     {
       "path": "docs/html/archetypes.html",

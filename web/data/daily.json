@@ -1,22 +1,54 @@
 {
-  "generated_at": "2026-06-23T21:08:35.600449Z",
-  "count": 147,
+  "generated_at": "2026-06-24T10:21:51.755408Z",
+  "count": 148,
   "days": [
     {
-      "date": "2026-06-23",
-      "headline": "Automated LLM Certification Matrix and Streaming Voice Benchmarks",
-      "summary": "Implemented a CLI-driven certification matrix for per-state model validation and added DashScope streaming adapters to prove voice latency improvements. The workflow integrates shift-left acceptance gates with automated documentation regeneration to ensure deterministic flow correctness.",
+      "date": "2026-06-24",
+      "headline": "Implementing Env-Gated LLM Routing and A/B Evidence Collection",
+      "summary": "This update introduces environment-gated A/B testing for question collection gates and establishes a certified LLM routing policy with persistent audit artifacts. It also refines scanner logic to reduce false positives and records lint findings into a quality database for evidence-based evaluation.",
       "takeaways": [
-        "Reuse the flow_certify CLI to build per-state model certification matrices that drive panel testing and enforce correctness gates.",
-        "Apply the DashScope adapter pattern to enable streaming sentence emission, reducing voice latency while maintaining natural slot reasking.",
-        "Adopt the four-tier evaluation hierarchy and defensive transcript persistence to prevent evidence loss in partial conversations during automated reviews."
+        "Implement environment-gated feature flags with default OFF states to safely run A/B experiments on user interaction flows.",
+        "Persist 'judge-the-judge' reports as detached artifacts to enable auditable, certified routing decisions in LLM policies.",
+        "Reduce scanner false positives by adding mock-conversation tests that pin real-vs-false-positive scenarios for stale ask detection."
       ],
-      "total_commits": 28,
+      "total_commits": 10,
+      "repos": [
+        {
+          "name": "riff",
+          "commits": 10,
+          "messages": [
+            "Revert \"experiment(turn): env-gated require_question collect-gate (default OFF) + A/B evidence\"",
+            "experiment(turn): env-gated require_question collect-gate (default OFF) + A/B evidence",
+            "feat(eval): record lint-finding A/B evidence into quality.db (lint_findings table)",
+            "fix(scanner): collect-complete gate for p4-stale-ask (#2 flow-load + #1 telemetry) — 60% were false positives",
+            "test(scanner): mock-conversation test pins p4-stale-ask real-vs-false-positive",
+            "docs: validation update — await_confirmation routing win is a misdiagnosis (data)",
+            "docs: LLM-policy session handoff (routing win + spot-audit + open decisions)",
+            "feat(llm-policy): persist judge-the-judge report so the detached trigger leaves an artifact",
+            "feat(llm-policy): first routing win — Case-2 escalation + certified await_confirmation→qwen",
+            "feat(llm-policy): Codex-CLI judge backend + env-gated trigger on every judge run"
+          ]
+        }
+      ],
+      "commit_sig": "d2ce02156011e718"
+    },
+    {
+      "date": "2026-06-23",
+      "headline": "Builds LLM Policy Engine with Per-State Routing and Certification Matrix",
+      "summary": "Implemented a robust LLM policy framework featuring per-state routing, a 'judge-the-judge' audit system, and automated certification matrices. Enhanced voice interaction quality through DashScope streaming integration and refined slot-handling logic for natural conversational flows.",
+      "takeaways": [
+        "Implement per-state LLM routing using a flow_llm_map to dynamically assign models based on conversation context, enabling cost and performance optimization.",
+        "Adopt a 'judge-the-judge' spot-audit mechanism where a powerful model reviews a subset of outputs from cheaper models to ensure quality without full overhead.",
+        "Automate model certification by building a matrix builder that tests specific states against defined personas, shifting quality assurance left in the development cycle.",
+        "Reduce conversational friction by passing slot labels to read-back guards and refining reprompt phrasing to prevent leaking internal slot names to users."
+      ],
+      "total_commits": 39,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 5,
+          "commits": 6,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "chore: regenerate L0 docs + daily digest [skip ci]",
             "feat(docs): republish docs/html/ binary assets (images/css/js) automatically",
             "chore: regenerate L0 docs + daily digest [skip ci]",
@@ -26,8 +58,18 @@
         },
         {
           "name": "riff",
-          "commits": 23,
+          "commits": 33,
           "messages": [
+            "feat(llm-policy): judge-the-judge as a 10% spot-check — powerful judge reads the flow text",
+            "feat(llm-policy): spot-audit process — mechanical guard + Qwen×Gemini judge-the-judge fleet",
+            "fix(llm-policy): bench mislabeled UNTESTED states as FAIL + add transcript persistence",
+            "Merge PR2: group tier (GoalSegment.llm) + 4-tier cascade + load gate",
+            "fix(llm-policy): PR2 Codex review — blank segment llm: coerces to inherit, not 'None'",
+            "feat(llm-policy): PR2 — the group tier (GoalSegment.llm) + cascade + load gate",
+            "Merge PR1: per-state LLM routing into the primary turn (off by default)",
+            "fix(llm-policy): PR1 Codex review — 3 P2 fixes for functional + measurable routing",
+            "feat(llm-policy): flow_llm_map — record which LLM is in which state + grouping + components",
+            "feat(llm-policy): PR1 — wire per-state routing into the primary turn (off by default)",
             "fix(llm-policy): apply Antigravity (Gemini 3.1) review — 3rd independent pass",
             "docs(llm-policy): apply Gemini-CLI review findings",
             "docs(llm-policy): Effective LLM Policy — stakeholder page + spec + proof harness (#llm-policy)",
@@ -54,7 +96,7 @@
           ]
         }
       ],
-      "commit_sig": "31fcc31c32460218"
+      "commit_sig": "63b61f50831ea8c1"
     },
     {
       "date": "2026-06-22",
@@ -3634,14 +3676,15 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Riff Hardens Core Primitives with Doc-as-Spec and Automated Sweep Gates",
-      "summary": "The Riff framework completes a comprehensive audit of core modules like collect, choice, and book-appointment, enforcing strict invariants through new YAML scenario suites and automated sweep scripts. This effort standardizes documentation into a spec-driven template, fixes critical state management bugs, and upgrades the underlying Gemini model to 2.5-flash.",
+      "headline": "Hardening AI Primitives: Audit Scripts, Flow Graphs, and Booking Logic",
+      "summary": "This update introduces a systematic 'doc-as-spec' audit framework with automated sweep scripts to validate invariants across core AI modules like booking and data collection. It also refines the Riff flow-graph visualization with a three-column layout and improves calendar provider phrasing for better user experience.",
       "takeaways": [
-        "Adopt the 'doc-as-spec' pattern by defining explicit Invariants and Failure modes in module docs, then validating them with dedicated YAML scenario files and Python invariant tests.",
-        "Implement reusable 'sweep' scripts as CI gates to automatically execute hundreds of edge-case scenarios across parameterized modules before merging.",
-        "Use parameterized YAML flows with variable substitution to create reusable module templates that defend against common state errors like stale slots or invalid final statuses."
+        "Adopt the 'doc-as-spec' pattern by defining explicit Invariants and Failure Modes in markdown, then enforcing them via dedicated YAML scenario files and Python invariant tests.",
+        "Reuse the `sweep_*.py` gate scripts to automatically validate module compliance against defined behavior classes before merging changes.",
+        "Implement the three-column spine layout with SVG-overlay edges for complex flow visualizations to reduce label noise and prevent sibling overlap.",
+        "Apply day-relative phrasing logic (e.g., 'today', 'this coming X') in calendar providers to prevent user confusion loops during slot selection."
       ],
-      "total_commits": 109,
+      "total_commits": 89,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3660,7 +3703,7 @@
         },
         {
           "name": "riff",
-          "commits": 106,
+          "commits": 86,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3747,31 +3790,11 @@
             "flow(tutorial_collect): resolve B-XXX placeholder to B-001 (stale-slot-on-reentry)",
             "docs(memory): sprint-185-collect-harden capstone",
             "docs(backlog): file collect-sweep findings as backlog items",
-            "feat(scripts): add sweep_collect.py (gate)",
-            "test(primitives): author collect.yaml (24 scenarios across 6 behavior classes)",
-            "flow(tutorial_collect): multi-slot + validator paths; fictional business_profile",
-            "test(primitives): add test_collect_invariants.py (I-1 fill guard, I-2 lookahead, I-3 validator-aware guard)",
-            "docs(collect): rewrite 03-collect.md to doc-as-spec template (3 Invariants, 4 Failure modes)",
-            "docs(memory): sprint-184-choice-harden capstone",
-            "docs(backlog): file choice-sweep findings as backlog items",
-            "feat(scripts): add sweep_choice.py (gate)",
-            "test(primitives): author choice.yaml (22 scenarios across 6 behavior classes)",
-            "flow(tutorial_choice): use final_status: booked/not_booked (was yes_chosen/no_chosen, outside FinalStatus Literal)",
-            "flow(tutorial_choice): exercise off-list retry path; fictional business_profile",
-            "test(primitives): add test_choice_invariants.py (I-1 path validate, I-2 guard register, I-3 escalation required) + B-001 backlog",
-            "docs(choice): rewrite 02-choice.md to doc-as-spec template (3 Invariants, 4 Failure modes)",
-            "docs(memory): sprint-183-announce-harden capstone",
-            "docs(backlog): file announce-sweep findings as backlog items",
-            "feat(scripts): add sweep_announce.py (gate)",
-            "test(primitives): author announce.yaml (18 scenarios across 6 behavior classes)",
-            "flow(tutorial_announce): fictional business_profile + minimal chained audio path",
-            "test(primitives): add test_announce_invariants.py (loader rejects bad play_audio shapes)",
-            "docs(announce): rewrite 01-announce.md to doc-as-spec template (3 Invariants, 3 Failure modes)",
-            "fix(tutorial_announce): drop trailing junk text from play_audio narration"
+            "feat(scripts): add sweep_collect.py (gate)"
           ]
         }
       ],
-      "commit_sig": "ea2b94fe7d675804"
+      "commit_sig": "bbac4ef66deb569f"
     },
     {
       "date": "2026-05-01",
