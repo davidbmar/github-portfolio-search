@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-24T10:20:43.012252Z",
+  "generated_at": "2026-06-24T14:39:29.777817Z",
   "count": 137,
   "projects": [
     {
@@ -1245,24 +1245,24 @@
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "tech": [
         "Python",
-        "FastAPI",
-        "SQLite-vec",
-        "Sentence Transformers",
         "HTML",
         "JavaScript",
-        "AWS S3",
+        "SQLite-vec",
+        "FastAPI",
+        "sentence-transformers",
+        "AWS Lambda",
+        "S3",
         "CloudFront"
       ],
       "reuse_tags": [
         "portfolio-management",
         "code-search",
-        "developer-tools",
-        "ai-assistant",
-        "knowledge-base"
+        "ai-agent-tools",
+        "developer-productivity"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-23T21:08:37Z"
+      "pushed_at": "2026-06-24T10:21:53Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2113,26 +2113,27 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "pytest",
-        "FastAPI",
-        "WebSockets"
+        "JSONL",
+        "Git",
+        "Pytest"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "yaml-workflows",
-        "deterministic-ai",
-        "python-framework"
+        "fsm",
+        "llm-orchestration",
+        "guardrails",
+        "state-machine",
+        "python",
+        "yaml-config"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-24T08:34:01Z"
+      "pushed_at": "2026-06-24T14:01:40Z"
     },
     {
       "slug": "riot",

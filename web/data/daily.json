@@ -1,22 +1,30 @@
 {
-  "generated_at": "2026-06-24T10:21:51.755408Z",
+  "generated_at": "2026-06-24T14:40:57.013802Z",
   "count": 148,
   "days": [
     {
       "date": "2026-06-24",
-      "headline": "Implementing Env-Gated LLM Routing and A/B Evidence Collection",
-      "summary": "This update introduces environment-gated A/B testing for question collection gates and establishes a certified LLM routing policy with persistent audit artifacts. It also refines scanner logic to reduce false positives and records lint findings into a quality database for evidence-based evaluation.",
+      "headline": "Riff Implements LLM Policy Routing Wins and Judge-the-Judge Artifacts",
+      "summary": "The Riff project introduces a Codex-CLI judge backend with env-gated triggers to persist evaluation reports and enable certified routing wins. It also corrects scanner false positives via improved gating logic and records lint-finding A/B evidence for quality tracking.",
       "takeaways": [
-        "Implement environment-gated feature flags with default OFF states to safely run A/B experiments on user interaction flows.",
-        "Persist 'judge-the-judge' reports as detached artifacts to enable auditable, certified routing decisions in LLM policies.",
-        "Reduce scanner false positives by adding mock-conversation tests that pin real-vs-false-positive scenarios for stale ask detection."
+        "Implement an env-gated 'judge-the-judge' trigger that persists detached evaluation reports as reusable artifacts for audit trails.",
+        "Reduce scanner false positives by adding a 'collect-complete' gate and pinning real-vs-false-positive scenarios with mock conversation tests.",
+        "Record A/B evidence from lint findings directly into a quality database to support data-driven policy adjustments."
       ],
-      "total_commits": 10,
+      "total_commits": 12,
       "repos": [
         {
-          "name": "riff",
-          "commits": 10,
+          "name": "github-portfolio-search",
+          "commits": 1,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 11,
+          "messages": [
+            "docs(html): judge-the-judge & measurement-discipline page + routing misdiagnosis correction",
             "Revert \"experiment(turn): env-gated require_question collect-gate (default OFF) + A/B evidence\"",
             "experiment(turn): env-gated require_question collect-gate (default OFF) + A/B evidence",
             "feat(eval): record lint-finding A/B evidence into quality.db (lint_findings table)",
@@ -30,7 +38,7 @@
           ]
         }
       ],
-      "commit_sig": "d2ce02156011e718"
+      "commit_sig": "fee5eba8e376daa2"
     },
     {
       "date": "2026-06-23",
@@ -3676,15 +3684,14 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Hardening AI Primitives: Audit Scripts, Flow Graphs, and Booking Logic",
-      "summary": "This update introduces a systematic 'doc-as-spec' audit framework with automated sweep scripts to validate invariants across core AI modules like booking and data collection. It also refines the Riff flow-graph visualization with a three-column layout and improves calendar provider phrasing for better user experience.",
+      "headline": "Hardened AI Primitives with Invariant Testing and Redesigned Booking Flow",
+      "summary": "Refactored core AI modules (record, run-program, reason) using a doc-as-spec approach with invariant-based testing suites to eliminate edge-case defects. Simultaneously redesigned the booking appointment flow with improved calendar phrasing, state guards, and a cleaner three-column UI layout.",
       "takeaways": [
-        "Adopt the 'doc-as-spec' pattern by defining explicit Invariants and Failure Modes in markdown, then enforcing them via dedicated YAML scenario files and Python invariant tests.",
-        "Reuse the `sweep_*.py` gate scripts to automatically validate module compliance against defined behavior classes before merging changes.",
-        "Implement the three-column spine layout with SVG-overlay edges for complex flow visualizations to reduce label noise and prevent sibling overlap.",
-        "Apply day-relative phrasing logic (e.g., 'today', 'this coming X') in calendar providers to prevent user confusion loops during slot selection."
+        "Adopt the 'doc-as-spec' pattern by defining module invariants and failure modes in Markdown before writing code, then enforce them with dedicated YAML scenario files and Python invariant tests.",
+        "Reuse the `sweep_*.py` gate scripts to automatically validate new flows against established behavioral classes, ensuring regression safety across parameterized modules.",
+        "Implement robust calendar interactions by leading time offers with day-relative phrasing (e.g., 'today', 'this coming Monday') and using JSON Schema-valid types to prevent silent validation rejections."
       ],
-      "total_commits": 89,
+      "total_commits": 88,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3703,7 +3710,7 @@
         },
         {
           "name": "riff",
-          "commits": 86,
+          "commits": 85,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3789,12 +3796,11 @@
             "docs(backlog): file end/B-005 (loader does not validate final_status against FinalStatus Literal)",
             "flow(tutorial_collect): resolve B-XXX placeholder to B-001 (stale-slot-on-reentry)",
             "docs(memory): sprint-185-collect-harden capstone",
-            "docs(backlog): file collect-sweep findings as backlog items",
-            "feat(scripts): add sweep_collect.py (gate)"
+            "docs(backlog): file collect-sweep findings as backlog items"
           ]
         }
       ],
-      "commit_sig": "bbac4ef66deb569f"
+      "commit_sig": "c567942bdeb80b10"
     },
     {
       "date": "2026-05-01",

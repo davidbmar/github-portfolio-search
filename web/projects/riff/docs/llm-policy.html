@@ -100,6 +100,19 @@
   <h1 class="title">Effective LLM Policy</h1>
   <p class="lede">One conversation does not need one model. RIFF is a finite-state machine, so the natural unit of model choice is the <strong>state</strong> — route a greeting, a slot read-back, and a booking-confirmation to the model each one actually needs.</p>
 
+  <div class="callout bad">
+    <strong>Validation update (2026-06-24): the first routing win was a MISDIAGNOSIS</strong>
+    The mechanism (PR1 + PR2) is built and sound. But the first per-state assignment we shipped —
+    <code>await_confirmation → qwen</code>, because gemini "FAILED" that state — did not survive
+    scrutiny. The cert FAIL is <strong>run-to-run-variable flow-rule / scanner artifacts</strong>
+    (a slot-less reprompt + a stale-ask the scanner over-flagged), <em>not</em> a model-quality gap.
+    The transcript mislabeled the stumble to the wrong state; qwen only "passed" via a cleaner collect
+    path. <strong>Routing was the wrong fix for this state.</strong> How we caught it — a panel of
+    independent judges, a deterministic guard, and repeat-N — is its own page:
+    <a class="x" href="judge-the-judge.html">Judge-the-Judge &amp; discipline</a>.
+    The framework stands; the <em>assignment</em> needs evidence, not intuition.
+  </div>
+
   <p>Today every turn in a call runs on one model picked per session. But a flow's states are
   not equally hard. A greeting is deterministic. A simple slot grab is easy. A booking
   confirmation, where a wrong &ldquo;yes&rdquo; books the wrong appointment, is where you want your

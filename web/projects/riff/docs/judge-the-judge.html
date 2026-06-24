@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF — Judge-the-Judge & Measurement Discipline</title>
+<style>
+  :root{
+    --ink:#1a1c20; --mut:#5c6470; --line:#e3e6ea; --bg:#fcfcfd; --card:#fff;
+    --accent:#2f6df0; --accent-soft:#eaf1ff; --good:#1f9d55; --warn:#b8860b; --bad:#c0392b;
+    --code-bg:#1d2127; --code-ink:#e6e8eb;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;gap:0;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;
+    height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.here{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;padding-top:8px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;
+    overflow-x:auto;font-size:13px;line-height:1.55;margin:16px 0;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  td code{font-size:12.5px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);
+    padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  figure.fig{margin:26px 0 30px;}
+  figure.fig svg{display:block;width:100%;height:auto;border:1px solid var(--line);
+    border-radius:8px;background:#fff;box-shadow:0 10px 28px rgba(31,53,98,.08);}
+  figure.fig figcaption{margin-top:9px;color:var(--mut);font-size:13.5px;line-height:1.45;}
+  .pill{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;
+    background:#eef0f3;color:var(--mut);padding:2px 8px;border-radius:20px;margin-right:6px;}
+  .pill.new{background:var(--good);color:#fff;}
+  a.x{color:var(--accent);}
+  .layer{border:1px solid var(--line);border-radius:10px;padding:6px 20px;margin:14px 0;background:#fff;}
+  .layer .lvl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-top:12px;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <a href="goap-selector.html">GOAP-lite selector</a>
+  <div class="grp">Design (proposed)</div>
+  <a href="llm-policy.html">Effective LLM Policy</a>
+  <a href="judge-the-judge.html" class="here">Judge-the-Judge &amp; discipline</a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <a href="transcript-audit.html">Transcript audit</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="shift-left-acceptance.html">Shift-left acceptance</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <p><span class="pill new">New</span><span class="pill">2026-06-24</span></p>
+  <h1 class="title">Judge-the-Judge &amp; Measurement Discipline</h1>
+  <p class="lede">Never trust a verdict you can't cross-check. A panel of independent judges, a deterministic guard underneath, and repeat-N before any claim — because a single run lies, and the eval tooling keeps attributing failures to the wrong cause.</p>
+
+  <p>Every layer of the RIFF evaluator produces a <em>verdict</em>: the per-state cert says PASS/FAIL,
+  the LLM judge scores humanness, a transcript scanner flags a defect. This page is about the
+  uncomfortable thing we learned: <strong>those verdicts are wrong often enough that you must audit
+  them</strong> — and the failure is almost always the same shape, a verdict <em>attributed to the
+  wrong cause</em>.</p>
+
+  <div class="callout bad">
+    <strong>Four times in one session, the same disease</strong>
+    A per-state routing "win" (a model gap that was really a flow-rule bug) → a transcript
+    <em>mislabeling</em> a stumble to the wrong state → a scanner conflating two different
+    situations under one code → a single-run A/B that pointed the <em>opposite</em> direction from
+    the truth. Same root cause every time: <strong>the signal was at the per-turn runtime level, and
+    the tooling read it one level too coarse.</strong>
+  </div>
+
+  <h2>Layer 1 — the mechanical guard (free, deterministic)</h2>
+  <p>Before any LLM, cross-check every recorded verdict against the actual transcript. The bug that
+  started this: the bench reported <code>gemini FAIL</code> on 5 states that were actually
+  <strong>untested</strong> — the caller front-loaded every slot, so those states never ran, and the
+  code collapsed <code>untested</code> into <code>FAIL</code>.</p>
+  <p>The guard recomputes state-visit counts straight from the transcript turns and flags any recorded
+  status that disagrees — <code>untested-but-visited</code>, or <code>pass/fail-but-never-visited</code>.
+  It runs automatically at the end of every bench run. Tool: <code>scripts/audit_bench.py</code>.</p>
+  <div class="callout">
+    <strong>It caught its own bug first</strong>
+    The audit's first run flagged 3 "mismatches" — which turned out to be the <em>audit tool's</em>
+    own keying bug (records key by <code>agent:model</code>, transcripts by the short model). The guard
+    has to be auditable too; that recursion is the point.
+  </div>
+
+  <h2>Layer 2 — judge-the-judge, a fleet of independent judges</h2>
+  <p>After an LLM-as-judge run, re-judge a random <strong>~10% sample</strong> of conversations with a
+  <strong>different</strong> model than produced the score. A judge from another lineage breaks
+  correlated bias; the disagreement rate is the trust signal.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 720 230" role="img" aria-label="Judge-the-judge fleet: random model times random flow, reads flow text, adjudicates the recorded verdict">
+      <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2f6df0"/></marker></defs>
+      <g font-family="sans-serif">
+        <rect x="24" y="86" width="150" height="58" rx="10" fill="#f4f6f9" stroke="#e3e6ea"/>
+        <text x="99" y="110" text-anchor="middle" font-size="13" font-weight="700">recorded verdict</text>
+        <text x="99" y="128" text-anchor="middle" font-size="11" fill="#5c6470">e.g. correctness=10</text>
+
+        <rect x="232" y="40" width="170" height="150" rx="10" fill="#eaf1ff" stroke="#2f6df0"/>
+        <text x="317" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#2f6df0">audit agent</text>
+        <text x="317" y="84" text-anchor="middle" font-size="11.5" fill="#5c6470">random judge model:</text>
+        <text x="317" y="102" text-anchor="middle" font-size="11.5" fill="#1a1c20">Gemini · Qwen · Codex/GPT</text>
+        <text x="317" y="124" text-anchor="middle" font-size="11.5" fill="#5c6470">× random flow</text>
+        <text x="317" y="146" text-anchor="middle" font-size="11.5" fill="#5c6470">+ the FLOW'S actual text</text>
+        <text x="317" y="170" text-anchor="middle" font-size="11.5" fill="#5c6470">reads the transcript</text>
+
+        <rect x="460" y="40" width="110" height="58" rx="10" fill="#eafaf0" stroke="#1f9d55"/>
+        <text x="515" y="64" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1f9d55">AGREE</text>
+        <text x="515" y="82" text-anchor="middle" font-size="11" fill="#5c6470">verdict holds</text>
+
+        <rect x="460" y="132" width="110" height="58" rx="10" fill="#fdecea" stroke="#c0392b"/>
+        <text x="515" y="156" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c0392b">DISAGREE</text>
+        <text x="515" y="174" text-anchor="middle" font-size="11" fill="#5c6470">human reviews</text>
+
+        <rect x="600" y="86" width="96" height="58" rx="10" fill="#fff" stroke="#e3e6ea"/>
+        <text x="648" y="110" text-anchor="middle" font-size="12.5" font-weight="700">human</text>
+        <text x="648" y="128" text-anchor="middle" font-size="11" fill="#5c6470">final arbiter</text>
+
+        <line x1="174" y1="115" x2="230" y2="115" stroke="#2f6df0" stroke-width="2" marker-end="url(#ar)"/>
+        <line x1="402" y1="80" x2="458" y2="70" stroke="#1f9d55" stroke-width="2" marker-end="url(#ar)"/>
+        <line x1="402" y1="150" x2="458" y2="160" stroke="#c0392b" stroke-width="2" marker-end="url(#ar)"/>
+        <line x1="570" y1="161" x2="598" y2="130" stroke="#c0392b" stroke-width="2" marker-end="url(#ar)"/>
+      </g>
+    </svg>
+    <figcaption>The fleet: agents = a randomly selected judge model (Gemini / Qwen / Codex CLI) crossed with a randomly selected flow, each reading the flow's actual definition. It <strong>flags</strong> disagreements for a human; it never overturns a score itself.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <strong>The panel corrected the panel</strong>
+    On one conversation, a powerful judge (<code>gemini-2.5-pro</code>) with the flow text
+    <em>disagreed</em> with <code>correctness=10</code> — but it was a false positive (the slot it said
+    was missing had been correctly inferred). <strong>Codex/GPT agreed, the deterministic metric agreed,
+    and the human ruled it fine.</strong> A single powerful judge can be wrong; that's why the
+    audit is a panel, not a new authority. Run it as a separate process:
+    <code>RIFF_JUDGE_AUDIT_RATE=0.10</code>.
+  </div>
+
+  <h2>The scanner that over-flagged 60% — and the gate that fixed it</h2>
+  <p>The deterministic <code>p4-stale-ask</code> scanner appeared <strong>324×</strong> historically.
+  Live tracing showed it conflated two different things under one code:</p>
+  <table>
+    <tr><th>Situation</th><th>Example</th><th>Verdict</th></tr>
+    <tr><td>Re-asks an <em>already-filled</em> slot</td><td>pizza: "How many?" when <code>quantity=2</code></td><td><strong>real defect</strong></td></tr>
+    <tr><td>Asks for an <em>unfilled</em> slot, doesn't echo others</td><td>dog_grooming: re-asks an invalid phone</td><td><strong>false positive</strong></td></tr>
+  </table>
+  <p>The fix is a <strong>collect-complete gate</strong>: flag only when no required slot is still
+  missing. Data source, best-first: per-turn <code>missing_required_slots</code> telemetry (stamped by
+  the eval driver) → load the flow and compute it → legacy fallback (never go blind). Live A/B across
+  flows: <strong>p4-stale-ask 7 → 3 — 57% were false positives</strong>, every real defect kept.</p>
+
+  <h2>The discipline: repeat-N, because one run lies</h2>
+  <p>RIFF eval is judge-noise-dominated (σ ≈ 1.5 pts single-run). A candidate fix for the remaining
+  real defects looked like a win on one A/B (<code>6 → 5</code>). Repeat-N told the truth:</p>
+  <pre><code>OFF: [2, 4, 3, 2]  mean 2.75
+ON:  [4, 4, 4, 2]  mean 3.50      <span class="c"># the "fix" is WORSE</span>
+per-run: ON beat OFF in 0/4 pairs   <span class="c"># single-run 6->5 was noise pointing the wrong way</span></code></pre>
+  <p>So the candidate was <strong>refuted and reverted</strong>. The rule: never flip a default on
+  single-run signal; <code>--repeat N</code> (≥5) before any claim. See
+  <a class="x" href="methodology.html">Methodology &amp; lessons</a> for the noise floor.</p>
+
+  <h2>Evidence lives in the database</h2>
+  <p>The eval DB tracked <code>runs / scores / aspect_scores / state_scores</code> but had no home for
+  lint metrics. A <code>lint_findings</code> table now records the before/after for scanner changes, so
+  "better than before" is a query, not a memory:</p>
+  <pre><code>SELECT sum(count_legacy), sum(count_gated) FROM lint_findings WHERE code='p4-stale-ask';
+-- 7 -> 3   (57% of p4 flags were false positives)</code></pre>
+
+  <footer>
+    Tools: <code>scripts/audit_bench.py</code> (mechanical guard + judge-the-judge fleet),
+    <code>riff/flow_eval/turn_invariants.py</code> (the gated scanner), <code>scripts/record_lint_evidence.py</code>
+    (DB evidence). Audit data: <code>docs/flow-eval/stale-ask-audit/</code>. Builds on the
+    <a class="x" href="index.html">RIFF evaluation system</a>, the
+    <a class="x" href="judges.html">judge roster</a>, and the
+    <a class="x" href="transcript-audit.html">transcript audit</a>.
+  </footer>
+</main>
+</div>
+</body>
+</html>
