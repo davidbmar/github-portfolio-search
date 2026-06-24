@@ -27,6 +27,9 @@ on:
       limit:
         description: "Cap number of repos (blank = all)"
         required: false
+      only:
+        description: "Regenerate ONLY this repo slug (e.g. riff). Forces a rebuild of just that repo and skips the daily digest. Overrides force/stale/limit."
+        required: false
       deploy:
         description: "Deploy to davidbmar.com after generating"
         type: boolean
@@ -65,11 +68,20 @@ jobs:
           IN_FORCE: ${{ inputs.force }}
           IN_STALE: ${{ inputs.stale }}
           IN_LIMIT: ${{ inputs.limit }}
+          IN_ONLY: ${{ inputs.only }}
         run: |
           set -euo pipefail
           FLAGS=""
           if [ "$EVENT_NAME" = "schedule" ]; then
             FLAGS="--stale"   # scheduled runs only touch repos checked in since their doc
+          elif [ -n "$IN_ONLY" ]; then
+            # Single-repo path: validate the slug (GitHub repo names are limited to
+            # [A-Za-z0-9._-]) so it can't inject shell, then force-rebuild just it.
+            # --force is required because --only alone skips repos with an existing record.
+            case "$IN_ONLY" in
+              *[!A-Za-z0-9._-]*) echo "only must be a repo slug ([A-Za-z0-9._-])" >&2; exit 1 ;;
+              *) FLAGS="--only $IN_ONLY --force" ;;
+            esac
           else
             [ "$IN_FORCE" = "true" ] && FLAGS="$FLAGS --force"
             [ "$IN_STALE" = "true" ] && FLAGS="$FLAGS --stale"
@@ -84,6 +96,9 @@ jobs:
           ghps gen-docs $FLAGS
 
       - name: Generate daily digest
+        # Skipped on single-repo (only) runs — the digest is site-wide, unrelated to
+        # publishing one repo's docs, and is the step most prone to transient API flakes.
+        if: ${{ inputs.only == '' }}
         # Cached by per-day commit signature: only new/changed days call the LLM,
         # so this is cheap nightly. Uses cloud Qwen (CI can't run local MLX/codex).
         env:
