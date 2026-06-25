@@ -1,29 +1,52 @@
 {
-  "generated_at": "2026-06-24T14:40:57.013802Z",
+  "generated_at": "2026-06-25T10:17:35.207114Z",
   "count": 148,
   "days": [
     {
       "date": "2026-06-24",
-      "headline": "Riff Implements LLM Policy Routing Wins and Judge-the-Judge Artifacts",
-      "summary": "The Riff project introduces a Codex-CLI judge backend with env-gated triggers to persist evaluation reports and enable certified routing wins. It also corrects scanner false positives via improved gating logic and records lint-finding A/B evidence for quality tracking.",
+      "headline": "Shipped LLM Cost Optimization Phases 0-3 and Declarative Read-Back Contracts",
+      "summary": "Implemented a multi-phase LLM policy framework achieving an 85% cost reduction using qwen-flash, backed by a new declarative read-back contract and per-turn evaluation records. The system includes robust self-auditing, false-positive reduction in stale-ask detection, and CI enhancements for single-repo documentation publishing.",
       "takeaways": [
-        "Implement an env-gated 'judge-the-judge' trigger that persists detached evaluation reports as reusable artifacts for audit trails.",
-        "Reduce scanner false positives by adding a 'collect-complete' gate and pinning real-vs-false-positive scenarios with mock conversation tests.",
-        "Record A/B evidence from lint findings directly into a quality database to support data-driven policy adjustments."
+        "Implement opt-in declarative read-back contracts to parallelize validation tracks and ensure state consistency during conversational flows.",
+        "Adopt per-turn record threading (tokens/state) in evaluation benches to enable granular 'judge-the-judge' auditing and evidence persistence.",
+        "Use env-gated A/B testing gates with lint-finding databases to distinguish real routing wins from misdiagnosed telemetry artifacts."
       ],
-      "total_commits": 12,
+      "total_commits": 35,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 1,
+          "commits": 3,
           "messages": [
+            "feat(ci): add 'only' input to gen-docs for single-repo publish",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
         },
         {
           "name": "riff",
-          "commits": 11,
+          "commits": 32,
           "messages": [
+            "fix(web): advance flow-graph highlight on click-to-talk turns + ignore generated eval artifacts",
+            "docs(llm-policy): Phase 2.5 RESOLVED — cost win is cascade/HTTP-path-only (structural)",
+            "docs(llm-policy): parallel read-back track — opt-in contract mechanism shipped",
+            "feat(flow-eval): opt-in declarative read-back contract (parallel track)",
+            "docs(llm-policy): Phase 3 shipped behind the flag — DoD met in text-mode",
+            "feat(flow-eval): ship the Phase-2 validated cost assignment (behind the flag)",
+            "test(flow-eval): fix stale routing test + lock Phase 3 candidate contract",
+            "docs(llm-policy): Phase 2 VALIDATED — qwen-flash holds quality at -85% cost",
+            "fix(flow-eval): self-audit stops crying wolf on non-certifiable states",
+            "docs(llm-policy): Phase 2 — strong cost candidate found, NOT yet validated",
+            "fix(flow-eval): price_turn raises for unregistered models (Phase 2 cost-model)",
+            "docs(llm-policy): Phase 1 Part B coverage finding + exit-criterion reframe",
+            "fix(flow-eval): cert coverage attributes visits by from_state (PR3 payoff)",
+            "docs(llm-policy): mark Phase 1 Part A (--repeat exposure + cost normalization) landed",
+            "feat(flow-eval): Phase 1A — expose --repeat N through cert + policy bench",
+            "fix(flow-eval): preserve turn_rows through the acceptance capture path (PR3 e2e)",
+            "docs(html): llm-policy page — Phase 0 PR3 per-turn record shipped & validated",
+            "docs(llm-policy): mark Phase 0 (PR3 per-turn record) DONE with live evidence",
+            "feat(flow-eval): PR3 per-turn record — thread tokens/state to the bench (Phase 0)",
+            "docs: LLM-policy roadmap to a validated win (Codex-reviewed)",
+            "revert(flow): remove the misdiagnosed await_confirmation→qwen routing assignment",
             "docs(html): judge-the-judge & measurement-discipline page + routing misdiagnosis correction",
             "Revert \"experiment(turn): env-gated require_question collect-gate (default OFF) + A/B evidence\"",
             "experiment(turn): env-gated require_question collect-gate (default OFF) + A/B evidence",
@@ -38,7 +61,7 @@
           ]
         }
       ],
-      "commit_sig": "fee5eba8e376daa2"
+      "commit_sig": "8d2b4749b282d631"
     },
     {
       "date": "2026-06-23",
@@ -3684,14 +3707,14 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Hardened AI Primitives with Invariant Testing and Redesigned Booking Flow",
-      "summary": "Refactored core AI modules (record, run-program, reason) using a doc-as-spec approach with invariant-based testing suites to eliminate edge-case defects. Simultaneously redesigned the booking appointment flow with improved calendar phrasing, state guards, and a cleaner three-column UI layout.",
+      "headline": "Refined Flow Graph Layout, Hardened Booking Primitives, and Updated Gemini Models",
+      "summary": "This update overhauls the flow graph visualization with a three-column spine layout and improved UX controls, while rigorously hardening booking and record-keeping primitives through extensive invariant testing. It also standardizes Gemini adapter defaults to version 2.5-flash and refines calendar phrasing for better user clarity.",
       "takeaways": [
-        "Adopt the 'doc-as-spec' pattern by defining module invariants and failure modes in Markdown before writing code, then enforce them with dedicated YAML scenario files and Python invariant tests.",
-        "Reuse the `sweep_*.py` gate scripts to automatically validate new flows against established behavioral classes, ensuring regression safety across parameterized modules.",
-        "Implement robust calendar interactions by leading time offers with day-relative phrasing (e.g., 'today', 'this coming Monday') and using JSON Schema-valid types to prevent silent validation rejections."
+        "Implement a three-column spine layout with SVG-overlay edges and explicit zoom controls to eliminate node overlap and improve navigation in complex flow graphs.",
+        "Adopt a 'doc-as-spec' template for parameterized modules, defining strict invariants and failure modes alongside YAML scenario files to automate primitive auditing.",
+        "Use environment-suffixed FIFO queue ARNs in webhook consumers to ensure isolated and ordered message processing across different deployment stages."
       ],
-      "total_commits": 88,
+      "total_commits": 67,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3710,7 +3733,7 @@
         },
         {
           "name": "riff",
-          "commits": 85,
+          "commits": 64,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3775,32 +3798,11 @@
             "test(primitives): author run_program.yaml (20 scenarios across 6 behavior classes)",
             "flow(tutorial_confirm_then_run_program): use final_status: booked (was off-Literal; 8th defect of this class)",
             "flow(tutorial_run_program): insert Confirm gate, fix final_status Literal, demonstrate safe pattern",
-            "test(primitives): add test_run_program_invariants.py (4 test_iN_* tests; safety gate strict mode)",
-            "docs(run-program): rewrite 05-run-program.md to doc-as-spec template (4 Invariants, 5 Failure modes)",
-            "docs(memory): sprint-187-reason-harden capstone",
-            "docs(backlog): file reason-sweep findings as backlog items",
-            "feat(scripts): add sweep_reason.py (gate)",
-            "test(primitives): author reason.yaml (20 scenarios across 6 behavior classes)",
-            "flow(tutorial_reason): fix final_status (not in Literal) + expand architect_notes for I-3/I-4",
-            "test(primitives): add test_reason_invariants.py (4 test_iN_* tests)",
-            "docs(reason): rewrite 08-reason.md to doc-as-spec template (4 Invariants, 4 Failure modes)",
-            "docs(memory): sprint-186-verify-caller-harden capstone + module audit",
-            "docs(backlog): file verify-caller-sweep findings as backlog items",
-            "feat(scripts): add sweep_verify_caller.py (gate)",
-            "test(primitives): author verify_caller.yaml (24 scenarios across 6 behavior classes)",
-            "flow(tutorial_verify_caller): replace off-Literal final_status `caller_verified` with `transferred` (B-005 class)",
-            "test(primitives): add test_verify_caller_invariants.py (5 test_iN_* mirroring 09-verify-caller.md) + extend conftest with _isolated_provider_env",
-            "docs(verify-caller): rewrite 09-verify-caller.md to doc-as-spec template (5 Invariants, 5 Failure modes)",
-            "test(primitives): add test_module_parameterization.py (verify_caller_v1 PASSES; scheduling_v1 documented as anti-example)",
-            "test(collect): document I-3 customer_phone vs caller_phone gotcha (collect/B-004 reference)",
-            "docs(backlog): file end/B-005 (loader does not validate final_status against FinalStatus Literal)",
-            "flow(tutorial_collect): resolve B-XXX placeholder to B-001 (stale-slot-on-reentry)",
-            "docs(memory): sprint-185-collect-harden capstone",
-            "docs(backlog): file collect-sweep findings as backlog items"
+            "test(primitives): add test_run_program_invariants.py (4 test_iN_* tests; safety gate strict mode)"
           ]
         }
       ],
-      "commit_sig": "c567942bdeb80b10"
+      "commit_sig": "b95feca724ea7cfa"
     },
     {
       "date": "2026-05-01",

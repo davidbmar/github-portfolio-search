@@ -96,7 +96,7 @@
   <a href="methodology.html">Methodology &amp; lessons</a>
 </nav>
 <main>
-  <p><span class="pill new">New</span><span class="pill">2026-06-23</span> <span class="status">Proposed design — not yet wired into the live turn</span></p>
+  <p><span class="pill new">New</span><span class="pill">2026-06-24</span> <span class="status">Design proposed; measurement keystone (Phase 0 / PR3) now shipped &amp; validated</span></p>
   <h1 class="title">Effective LLM Policy</h1>
   <p class="lede">One conversation does not need one model. RIFF is a finite-state machine, so the natural unit of model choice is the <strong>state</strong> — route a greeting, a slot read-back, and a booking-confirmation to the model each one actually needs.</p>
 
@@ -111,6 +111,21 @@
     independent judges, a deterministic guard, and repeat-N — is its own page:
     <a class="x" href="judge-the-judge.html">Judge-the-Judge &amp; discipline</a>.
     The framework stands; the <em>assignment</em> needs evidence, not intuition.
+  </div>
+
+  <div class="callout good">
+    <strong>Phase 0 shipped (2026-06-24, commit db7d3b2): the bench can finally measure cost.</strong>
+    The roadmap's keystone — a real <strong>per-turn record</strong> — is built and validated. Until now
+    the policy bench's cost &amp; latency columns were always <code>0</code>: token counts were dropped
+    when <code>TurnResult</code> was built, and the bench read the integer turn <em>count</em> as if it
+    were per-turn rows. Now <code>TurnResult</code> carries <code>input_tokens</code>/<code>output_tokens</code>,
+    and each conversation records <code>turn_rows</code> — one row per agent turn with
+    <code>{state_id (the state the model ran in, not its destination), effective_model, in_tokens,
+    out_tokens, latency_ms}</code>. <strong>Validated live on <code>gemini-2.5-flash</code></strong>
+    (coffee flow): per-turn tokens non-zero, correct from-state attribution, model recorded — evidence
+    persisted to <code>quality.db</code> (<code>phase0_turn_evidence</code>). Additive only; codex-approved;
+    5 new tests, 203 existing pass. <strong>Next:</strong> Phase 1 — repeat-N measurement + a withholding
+    persona so <code>ask</code> states are actually exercised, then a flow-level cost target.
   </div>
 
   <p>Today every turn in a call runs on one model picked per session. But a flow's states are
