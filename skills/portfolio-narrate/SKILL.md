@@ -14,7 +14,7 @@ Generate theme-grouped, code-grounded applied tutorials from merged PRs.
 2. Ensure the venv + DashScope env are present:
    `test -d .venv && grep -q DASHSCOPE_API_KEY .env && echo ok`
 3. Run the narrator over the repos of interest (default: all recently-pushed):
-   `.venv/bin/python -m ghps narrate --owner davidbmar --repos riff,github-portfolio-search --out web/learn --state web/data/narrate`
+   `.venv/bin/ghps narrate --owner davidbmar --repos riff,github-portfolio-search --out web/learn --state web/data/narrate`
 4. Report the printed summary (PRs processed, themes matured, pages written).
 5. Preview a page locally: open `web/learn/index.html`.
 6. To publish, deploy `web/` via the existing pipeline (`make deploy` or the gen-docs workflow). Do NOT hand-edit generated pages.
