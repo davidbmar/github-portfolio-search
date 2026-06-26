@@ -34,6 +34,27 @@ def test_run_end_to_end(tmp_path, monkeypatch):
     assert any("index.html" in p for p in out["pages"])
 
 
+def test_run_skips_theme_with_unrecoverable_prose(tmp_path):
+    store = Store(tmp_path / "state")
+    prs = [{"number": n, "merged_at": f"2026-06-2{n}T00:00:00Z", "title": "t",
+            "body": "", "merge_commit_sha": f"s{n}", "labels": ["feat"]} for n in (1, 2, 3)]
+    class _BadTutorialClient(_Client):
+        def complete_json(self, system, user):
+            if "APPLIED TUTORIAL" in system:
+                return {"summary": "only"}  # never complete -> exhausts retries
+            return super().complete_json(system, user)
+    def fake_files(owner, repo, n):
+        return [{"path": "src/a.py", "status": "modified", "adds": 5, "dels": 0, "patch": "d"},
+                {"path": "tests/test_a.py", "status": "added", "adds": 9, "dels": 0, "patch": "a"}]
+    def fake_scan(owner, repo, st, **kw):
+        for p in prs: p["repo"] = repo
+        return prs
+    out = run("o", ["riff"], store, _BadTutorialClient(), _Embedder(), tmp_path / "learn",
+              model="m", fetch_files=fake_files, scan_fn=fake_scan)
+    assert out["themes_failed"] >= 1
+    assert out["themes_published"] == 0
+
+
 def test_published_theme_not_rerendered_on_second_run(tmp_path):
     store = Store(tmp_path / "state")
     prs = [{"number": n, "merged_at": f"2026-06-2{n}T00:00:00Z", "title": "t",

@@ -398,7 +398,8 @@ def narrate(owner, repos, out_dir, state_dir, provider, model):
     summary = pipeline.run(owner, repo_list, Store(state_dir), client, embedder,
                            out_dir, model=eff_model)
     click.echo(f"narrate: {summary['prs']} PRs, "
-               f"{summary['themes_matured']} themes matured, "
+               f"{summary.get('themes_published', summary['themes_matured'])} themes published, "
+               f"{summary.get('themes_failed', 0)} failed, "
                f"{len(summary['pages'])} pages written")
 
 

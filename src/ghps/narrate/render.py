@@ -16,7 +16,7 @@ TUTORIAL_SYSTEM = (
 _PROSE_KEYS = ("summary", "narrative", "principles", "patterns", "applied_examples", "pitfalls")
 
 
-def write_tutorial_prose(theme: dict, prs: list[dict], client, *, model: str) -> dict:
+def write_tutorial_prose(theme: dict, prs: list[dict], client, *, model: str, retries: int = 2) -> dict:
     member_keys = set(theme.get("pr_numbers", []))
     members = [p for p in prs if f"{p['repo']}#{p['pr_number']}" in member_keys]
     facts = "\n".join(
@@ -24,13 +24,17 @@ def write_tutorial_prose(theme: dict, prs: list[dict], client, *, model: str) ->
         f"pattern: {p.get('reusable_pattern')}" for p in members
     )
     user = f"Theme: {theme.get('title','')}\nRepos: {', '.join(theme.get('repos', []))}\nPR facts:\n{facts}"
-    llm = client.complete_json(TUTORIAL_SYSTEM, user)
-    for k in _PROSE_KEYS:
-        if k not in llm:
-            raise NarrateValidationError(f"tutorial missing field: {k}")
-        theme[k] = llm[k]
-    theme["model"] = model
-    return theme
+    last_missing = None
+    for _ in range(retries):
+        llm = client.complete_json(TUTORIAL_SYSTEM, user)
+        missing = [k for k in _PROSE_KEYS if k not in llm]
+        if not missing:
+            for k in _PROSE_KEYS:
+                theme[k] = llm[k]
+            theme["model"] = model
+            return theme
+        last_missing = missing
+    raise NarrateValidationError(f"tutorial missing fields: {last_missing}")
 
 
 def _ul(items) -> str:

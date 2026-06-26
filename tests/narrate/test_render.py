@@ -51,3 +51,16 @@ def test_render_escapes_list_items():
                             "applied_examples": [], "pitfalls": []})
     page = render_learn_html(t)
     assert "<script>p</script>" not in page and "&lt;script&gt;p&lt;/script&gt;" in page
+
+
+def test_write_tutorial_prose_retries_then_succeeds():
+    class _FlakyClient:
+        def __init__(self): self.n = 0
+        def complete_json(self, system, user):
+            self.n += 1
+            if self.n == 1:
+                return {"summary": "S"}  # missing fields on first try
+            return {"summary": "S", "narrative": "N", "principles": ["p"],
+                    "patterns": ["pat"], "applied_examples": ["ex"], "pitfalls": ["pit"]}
+    t = write_tutorial_prose(_theme(), [], _FlakyClient(), model="m")
+    assert t["narrative"] == "N"

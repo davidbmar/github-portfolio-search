@@ -6,6 +6,7 @@ from .mature import apply_lifecycle
 from .reduce import build_pr_record
 from .render import write_learn_pages, write_tutorial_prose
 from .scan import scan_repo
+from .schema import NarrateValidationError
 
 
 def run(owner, repos, store, client, embedder, out_dir, *, model,
@@ -23,10 +24,16 @@ def run(owner, repos, store, client, embedder, out_dir, *, model,
 
     matured = apply_lifecycle(store)
     to_publish = [t for t in matured if t.get("status") == "mature"]
+    failed = 0
     for theme in to_publish:
-        write_tutorial_prose(theme, store.all_prs(), client, model=model)
+        try:
+            write_tutorial_prose(theme, store.all_prs(), client, model=model)
+        except NarrateValidationError:
+            failed += 1
+            continue                      # leave status 'mature'; retry next run
         theme["status"] = "published"
         store.put_theme(theme)
     published = [t for t in store.all_themes() if t.get("status") == "published"]
     pages = write_learn_pages(published, out_dir) if published else []
-    return {"prs": pr_count, "themes_matured": len(to_publish), "pages": pages}
+    return {"prs": pr_count, "themes_published": len(to_publish) - failed,
+            "themes_matured": len(to_publish), "pages": pages, "themes_failed": failed}
