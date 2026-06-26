@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import re
 from pathlib import Path
 
 from .schema import NarrateValidationError
@@ -56,10 +57,13 @@ def write_learn_pages(themes: list[dict], out_dir: str | Path) -> list[str]:
     written = []
     cards = []
     for t in themes:
-        p = out / f"{t['slug']}.html"
+        slug = t["slug"]
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", slug):
+            raise NarrateValidationError(f"unsafe slug: {slug!r}")
+        p = out / f"{slug}.html"
         p.write_text(render_learn_html(t))
         written.append(str(p))
-        cards.append(f'<li><a href="{t["slug"]}.html">{html.escape(t.get("title",""))}</a> '
+        cards.append(f'<li><a href="{html.escape(slug)}.html">{html.escape(t.get("title",""))}</a> '
                      f'— {html.escape(t.get("summary",""))}</li>')
     idx = out / "index.html"
     idx.write_text(f"<!doctype html><html><head><meta charset='utf-8'><title>Learn</title></head>"

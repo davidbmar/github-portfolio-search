@@ -1,5 +1,7 @@
+import pytest
 from pathlib import Path
 from ghps.narrate.render import write_tutorial_prose, render_learn_html, write_learn_pages
+from ghps.narrate.schema import NarrateValidationError
 
 
 class _Client:
@@ -21,8 +23,8 @@ def test_write_tutorial_prose_fills_fields():
 def test_render_escapes_html():
     t = _theme(); t.update({"summary": "S", "narrative": "<script>x</script>",
                             "principles": [], "patterns": [], "applied_examples": [], "pitfalls": []})
-    html = render_learn_html(t)
-    assert "<script>x</script>" not in html and "&lt;script&gt;" in html
+    page = render_learn_html(t)
+    assert "<script>x</script>" not in page and "&lt;script&gt;" in page
 
 
 def test_write_learn_pages_creates_index(tmp_path):
@@ -31,3 +33,21 @@ def test_write_learn_pages_creates_index(tmp_path):
     paths = write_learn_pages([t], tmp_path)
     assert (Path(tmp_path) / "llm-judge-routing.html").exists()
     assert (Path(tmp_path) / "index.html").exists()
+
+
+class _PartialClient:
+    def complete_json(self, system, user):
+        return {"summary": "S"}
+
+
+def test_write_tutorial_prose_raises_on_missing_field():
+    with pytest.raises(NarrateValidationError):
+        write_tutorial_prose(_theme(), [], _PartialClient(), model="m")
+
+
+def test_render_escapes_list_items():
+    t = _theme(); t.update({"summary": "S", "narrative": "N",
+                            "principles": ["<script>p</script>"], "patterns": [],
+                            "applied_examples": [], "pitfalls": []})
+    page = render_learn_html(t)
+    assert "<script>p</script>" not in page and "&lt;script&gt;p&lt;/script&gt;" in page
