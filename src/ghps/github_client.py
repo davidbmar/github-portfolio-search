@@ -453,3 +453,66 @@ def fetch_open_prs(owner: str, repo: str) -> list[dict[str, Any]]:
         page += 1
 
     return prs
+
+
+def fetch_merged_prs(owner: str, repo: str, since: str | None = None) -> list[dict[str, Any]]:
+    """Merged PRs for owner/repo, ascending by merged_at; only newer than `since`."""
+    session = _session()
+    out: list[dict[str, Any]] = []
+    page = 1
+    while True:
+        resp = session.get(
+            f"{API_BASE}/repos/{owner}/{repo}/pulls",
+            params={"state": "closed", "sort": "updated", "direction": "desc",
+                    "per_page": 100, "page": page},
+        )
+        resp.raise_for_status()
+        batch = resp.json()
+        if not batch:
+            break
+        for pr in batch:
+            if not pr.get("merged_at"):
+                continue
+            if since and pr["merged_at"] <= since:
+                continue
+            out.append({
+                "number": pr["number"],
+                "title": pr.get("title", ""),
+                "body": pr.get("body") or "",
+                "merged_at": pr["merged_at"],
+                "merge_commit_sha": pr.get("merge_commit_sha"),
+                "labels": [l["name"] for l in pr.get("labels", [])],
+            })
+        if len(batch) < 100:
+            break
+        page += 1
+    out.sort(key=lambda p: p["merged_at"])
+    return out
+
+
+def fetch_pr_files(owner: str, repo: str, pr_number: int) -> list[dict[str, Any]]:
+    """Changed files for a PR: [{path, status, adds, dels, patch}]."""
+    session = _session()
+    out: list[dict[str, Any]] = []
+    page = 1
+    while True:
+        resp = session.get(
+            f"{API_BASE}/repos/{owner}/{repo}/pulls/{pr_number}/files",
+            params={"per_page": 100, "page": page},
+        )
+        resp.raise_for_status()
+        batch = resp.json()
+        if not batch:
+            break
+        for f in batch:
+            out.append({
+                "path": f.get("filename", ""),
+                "status": f.get("status", ""),
+                "adds": f.get("additions", 0),
+                "dels": f.get("deletions", 0),
+                "patch": f.get("patch", ""),
+            })
+        if len(batch) < 100:
+            break
+        page += 1
+    return out
