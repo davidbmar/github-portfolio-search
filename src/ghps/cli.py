@@ -380,6 +380,40 @@ def daily_cmd(owner, since, engine, token, no_cache):
     click.echo(click.style(f"Daily digest done: {len(days)} days.", fg="green", bold=True))
 
 
+@main.command(name="narrate")
+@click.option("--owner", default="davidbmar", help="GitHub owner/org.")
+@click.option("--repos", required=True, help="Comma-separated repo slugs.")
+@click.option("--out", "out_dir", default="web/learn", help="Output dir for /learn pages.")
+@click.option("--state", "state_dir", default="web/data/narrate", help="State dir.")
+@click.option("--provider", default=None, help="LLM provider (dashscope|anthropic).")
+@click.option("--model", default=None, help="Override model id.")
+def narrate(owner, repos, out_dir, state_dir, provider, model):
+    """Generate theme-grouped applied tutorials from merged PRs."""
+    from .narrate import pipeline
+    from .narrate.store import Store
+    repo_list = [r.strip() for r in repos.split(",") if r.strip()]
+    client = _narrate_client(provider, model)
+    embedder = _narrate_embedder()
+    eff_model = model or os.environ.get("DASHSCOPE_MODEL", "qwen-plus")
+    summary = pipeline.run(owner, repo_list, Store(state_dir), client, embedder,
+                           out_dir, model=eff_model)
+    click.echo(f"narrate: {summary['prs']} PRs, "
+               f"{summary['themes_matured']} themes matured, "
+               f"{len(summary['pages'])} pages written")
+
+
+def _narrate_client(provider, model):
+    from .docsgen.llm_client import DashScopeClient, AnthropicClient
+    if provider == "anthropic":
+        return AnthropicClient()
+    return DashScopeClient()
+
+
+def _narrate_embedder():
+    from .embeddings import EmbeddingPipeline
+    return EmbeddingPipeline()
+
+
 @main.command(name="find-docs")
 @click.argument("query")
 @click.option("--feed", default="web/data/projects.json", help="Path to the L0 docs feed.")
