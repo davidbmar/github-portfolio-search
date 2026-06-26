@@ -10,6 +10,15 @@ def test_narrate_client_uses_get_client(monkeypatch):
     assert cli._narrate_client("dashscope", "qwen-plus") is sentinel
 
 
+def test_narrate_client_honors_model_override(monkeypatch):
+    import ghps.docsgen.llm_client as llm
+    monkeypatch.setattr(llm, "get_client", lambda provider=None: object())
+    monkeypatch.delenv("DASHSCOPE_MODEL", raising=False)
+    cli._narrate_client("dashscope", "qwen-custom-7")
+    import os
+    assert os.environ["DASHSCOPE_MODEL"] == "qwen-custom-7"
+
+
 def test_narrate_invokes_pipeline(monkeypatch, tmp_path):
     captured = {}
 

@@ -55,6 +55,29 @@ def test_run_skips_theme_with_unrecoverable_prose(tmp_path):
     assert out["themes_published"] == 0
 
 
+def test_cursor_freezes_on_failed_pr(tmp_path):
+    store = Store(tmp_path / "state")
+    prs = [{"number": n, "merged_at": f"2026-06-2{n}T00:00:00Z", "title": "t",
+            "body": "", "merge_commit_sha": f"s{n}", "labels": ["feat"]} for n in (1, 2, 3)]
+    for p in prs: p["repo"] = "riff"
+    def fake_files(owner, repo, n):
+        return [{"path": "src/a.py", "status": "modified", "adds": 5, "dels": 0, "patch": "d"}]
+    def scan_once(owner, repo, st, **kw):
+        return [p for p in prs if st.get_pr("riff", p["number"]) is None]
+    # _Flaky always returns incomplete facts for PR #2 (both retries), so build_pr_record raises.
+    # PR #1 and PR #3 succeed via the base _Client; cursor must freeze at PR #1's merged_at.
+    class _Flaky(_Client):
+        def complete_json(self, system, user):
+            if "REUSABLE facts" in system and "PR #2:" in user:
+                return {"problem": "p"}  # missing required keys -> NarrateValidationError after retries
+            return super().complete_json(system, user)
+    out = run("o", ["riff"], store, _Flaky(), _Embedder(), tmp_path / "learn",
+              model="m", fetch_files=fake_files, scan_fn=scan_once)
+    assert out["pr_failed"] >= 1
+    # cursor must NOT have advanced past the failed PR (#2); it must sit at #1's merged_at
+    assert store.read_cursor("riff") == "2026-06-21T00:00:00Z"
+
+
 def test_published_theme_not_rerendered_on_second_run(tmp_path):
     store = Store(tmp_path / "state")
     prs = [{"number": n, "merged_at": f"2026-06-2{n}T00:00:00Z", "title": "t",

@@ -82,7 +82,9 @@ def classify_pr(rec, vec, store, client, *, model, reclassify=False) -> dict:
         if action == "attach" and not allow_attach:
             action = "create"
         if action == "attach":
-            theme_id = ask.get("theme_id") or (cands[0][0]["theme_id"] if cands else None)
+            cand_ids = {t["theme_id"] for t, _ in cands}
+            tid = ask.get("theme_id")
+            theme_id = tid if tid in cand_ids else (cands[0][0]["theme_id"] if cands else None)
             if not theme_id:
                 action = "create"
         if action == "create":

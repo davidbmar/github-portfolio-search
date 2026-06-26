@@ -405,6 +405,9 @@ def narrate(owner, repos, out_dir, state_dir, provider, model):
 
 def _narrate_client(provider, model):
     from .docsgen.llm_client import get_client
+    if model:
+        prov = (provider or os.environ.get("LLM_PROVIDER", "dashscope")).lower()
+        os.environ["ANTHROPIC_MODEL" if prov == "anthropic" else "DASHSCOPE_MODEL"] = model
     return get_client(provider)
 
 

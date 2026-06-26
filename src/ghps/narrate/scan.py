@@ -17,13 +17,4 @@ def scan_repo(owner: str, repo: str, store: Store, *, overlap_days: int = 3, fet
     cursor = store.read_cursor(repo)
     since = _shift(cursor, overlap_days)
     candidates = fetch(owner, repo, since=since)
-    new: list[dict] = []
-    max_merged = cursor
-    for pr in candidates:
-        max_merged = pr["merged_at"] if (max_merged is None or pr["merged_at"] > max_merged) else max_merged
-        if store.get_pr(repo, pr["number"]) is not None:
-            continue
-        new.append(pr)
-    if max_merged:
-        store.write_cursor(repo, max_merged)
-    return new
+    return [pr for pr in candidates if store.get_pr(repo, pr["number"]) is None]

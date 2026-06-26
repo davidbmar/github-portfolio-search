@@ -40,3 +40,12 @@ def test_unknown_llm_action_falls_back_to_ignore(tmp_path):
     assert d["theme_id"] is None
     assert store.all_themes() == []                 # nothing created
     assert store.ledger_decision("riff", 9) is not None  # ledger entry written
+
+def test_attach_with_bogus_theme_id_falls_back_to_candidate(tmp_path):
+    store = Store(tmp_path)
+    store.put_theme({"theme_id": "t1", "slug": "s", "title": "x",
+                     "embedding": [1.0, 0.0], "pr_numbers": [], "repos": []})
+    # pr vec at cosine ~0.70 to [1,0] -> mid-confidence band, LLM consulted
+    d = classify_pr(_pr(), [0.70, 0.714], store,
+                    _Client({"action": "attach", "theme_id": "does-not-exist"}), model="m")
+    assert d["action"] == "attach" and d["theme_id"] == "t1"   # fell back to the real candidate, no crash
