@@ -1,6 +1,13 @@
 from click.testing import CliRunner
 from ghps import cli
 from ghps.narrate import pipeline
+import ghps.docsgen.llm_client as llm_client_mod
+
+
+def test_narrate_client_uses_get_client(monkeypatch):
+    sentinel = object()
+    monkeypatch.setattr(llm_client_mod, "get_client", lambda provider=None: sentinel)
+    assert cli._narrate_client("dashscope", "qwen-plus") is sentinel
 
 
 def test_narrate_invokes_pipeline(monkeypatch, tmp_path):

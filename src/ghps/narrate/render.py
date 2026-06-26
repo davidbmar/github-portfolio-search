@@ -17,7 +17,8 @@ _PROSE_KEYS = ("summary", "narrative", "principles", "patterns", "applied_exampl
 
 
 def write_tutorial_prose(theme: dict, prs: list[dict], client, *, model: str) -> dict:
-    members = [p for p in prs if p["pr_number"] in theme.get("pr_numbers", [])]
+    member_keys = set(theme.get("pr_numbers", []))
+    members = [p for p in prs if f"{p['repo']}#{p['pr_number']}" in member_keys]
     facts = "\n".join(
         f"- PR#{p['pr_number']}: {p.get('problem','')} | approach: {p.get('approach','')} | "
         f"pattern: {p.get('reusable_pattern')}" for p in members

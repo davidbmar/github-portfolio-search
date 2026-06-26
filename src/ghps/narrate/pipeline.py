@@ -22,8 +22,11 @@ def run(owner, repos, store, client, embedder, out_dir, *, model,
             classify_pr(rec, vec, store, client, model=model)
 
     matured = apply_lifecycle(store)
-    for theme in matured:
+    to_publish = [t for t in matured if t.get("status") == "mature"]
+    for theme in to_publish:
         write_tutorial_prose(theme, store.all_prs(), client, model=model)
+        theme["status"] = "published"
         store.put_theme(theme)
-    pages = write_learn_pages(matured, out_dir) if matured else []
-    return {"prs": pr_count, "themes_matured": len(matured), "pages": pages}
+    published = [t for t in store.all_themes() if t.get("status") == "published"]
+    pages = write_learn_pages(published, out_dir) if published else []
+    return {"prs": pr_count, "themes_matured": len(to_publish), "pages": pages}

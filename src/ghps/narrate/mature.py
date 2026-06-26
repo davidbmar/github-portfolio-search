@@ -4,7 +4,8 @@ from .store import Store
 
 
 def score_theme(theme: dict, prs: list[dict]) -> tuple[int, str]:
-    members = [p for p in prs if p["pr_number"] in theme.get("pr_numbers", [])]
+    member_keys = set(theme.get("pr_numbers", []))
+    members = [p for p in prs if f"{p['repo']}#{p['pr_number']}" in member_keys]
     reasons, score = [], 0
     pr_pts = min(len(members) * 2, 6)
     score += pr_pts; reasons.append(f"{len(members)} PRs (+{pr_pts})")

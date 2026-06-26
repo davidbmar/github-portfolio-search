@@ -50,11 +50,12 @@ def _new_theme_id(store: Store) -> str:
 
 def _attach(store: Store, theme_id: str, rec: dict) -> None:
     t = store.get_theme(theme_id)
-    if rec["pr_number"] not in t["pr_numbers"]:
-        t["pr_numbers"].append(rec["pr_number"])
+    key = f"{rec['repo']}#{rec['pr_number']}"
+    if key not in t["pr_numbers"]:
+        t["pr_numbers"].append(key)
     if rec["repo"] not in t["repos"]:
         t["repos"].append(rec["repo"])
-    t["last_activity_at"] = rec["merged_at"] if "merged_at" in rec else t.get("last_activity_at")
+    t["last_activity_at"] = rec.get("merged_at", t.get("last_activity_at"))
     store.put_theme(t)
 
 

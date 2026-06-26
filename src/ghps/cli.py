@@ -403,10 +403,8 @@ def narrate(owner, repos, out_dir, state_dir, provider, model):
 
 
 def _narrate_client(provider, model):
-    from .docsgen.llm_client import DashScopeClient, AnthropicClient
-    if provider == "anthropic":
-        return AnthropicClient()
-    return DashScopeClient()
+    from .docsgen.llm_client import get_client
+    return get_client(provider)
 
 
 def _narrate_embedder():

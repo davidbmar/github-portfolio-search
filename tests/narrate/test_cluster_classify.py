@@ -15,7 +15,7 @@ def test_high_cosine_attaches_without_llm(tmp_path):
                      "embedding": [1.0, 0.0], "pr_numbers": [], "repos": []})
     d = classify_pr(_pr(), [1.0, 0.0], store, _Client({}), model="m")
     assert d["action"] == "attach" and d["theme_id"] == "t1"
-    assert 1 in store.get_theme("t1")["pr_numbers"]
+    assert "riff#1" in store.get_theme("t1")["pr_numbers"]
 
 def test_no_themes_creates_with_immutable_slug(tmp_path):
     store = Store(tmp_path)
