@@ -685,7 +685,23 @@ def _daily_card(day: dict) -> str:
     )
 
 
-def render_daily_page(days: list[dict]) -> str:
+def _deep_dives_section(learn_index) -> str:
+    """Links to published Learn tutorials (themes), shown atop the daily feed.
+    learn_index is a list of {slug, title, summary} or None/empty."""
+    if not learn_index:
+        return ""
+    items = "".join(
+        f'<li><a href="/learn/{html.escape(str(t.get("slug","")))}.html">'
+        f'{html.escape(str(t.get("title","")))}</a>'
+        f'<span class="dd-sum">{html.escape(str(t.get("summary","")))}</span></li>'
+        for t in learn_index
+    )
+    return ('<section class="deep-dives"><h2>Deep dives</h2>'
+            '<p class="dd-intro">In-depth applied tutorials, grouped by theme.</p>'
+            f'<ul class="dd-list">{items}</ul></section>')
+
+
+def render_daily_page(days: list[dict], learn_index=None) -> str:
     """Render the daily-digest feed (``/daily/index.html`` + flat ``daily.html``).
 
     *days* are digest records (newest first) from ``web/data/daily.json``.
@@ -727,7 +743,14 @@ def render_daily_page(days: list[dict]) -> str:
                      opacity: .9; }
   .repo-commits li { margin: .12rem 0; }
   .muted { opacity: .6; }
-  code { font-family: ui-monospace, monospace; }"""
+  code { font-family: ui-monospace, monospace; }
+  .deep-dives { border: 1px solid #2563eb44; border-radius: 12px; padding: 1rem 1.2rem; margin: 1.2rem 0; background: #2563eb0a; }
+  .deep-dives h2 { margin: 0 0 .2rem; font-size: 1.05rem; }
+  .dd-intro { margin: 0 0 .6rem; font-size: .85rem; opacity: .7; }
+  .dd-list { list-style: none; margin: 0; padding: 0; }
+  .dd-list li { margin: .4rem 0; }
+  .dd-list a { font-weight: 600; color: #2563eb; text-decoration: none; }
+  .dd-sum { display: block; font-size: .85rem; opacity: .75; }"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -746,6 +769,7 @@ def render_daily_page(days: list[dict]) -> str:
   <h1>Daily</h1>
   <p class="sub">A headline digest of what changed across the portfolio, by day.</p>
 </header>
+{_deep_dives_section(learn_index)}
 {body}
 </body>
 </html>

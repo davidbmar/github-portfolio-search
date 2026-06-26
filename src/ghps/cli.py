@@ -373,7 +373,14 @@ def daily_cmd(owner, since, engine, token, no_cache):
     path = daily_mod.write_daily(days, "web/data/daily.json")
     click.echo(f"  wrote {path} ({len(days)} days)")
 
-    daily_html = render.render_daily_page(days)
+    learn_index = None
+    _li_path = _Path("web/data/learn-index.json")
+    if _li_path.exists():
+        try:
+            learn_index = json.loads(_li_path.read_text())
+        except (ValueError, OSError):
+            learn_index = None
+    daily_html = render.render_daily_page(days, learn_index=learn_index)
     _Path("web/daily").mkdir(parents=True, exist_ok=True)
     _Path("web/daily/index.html").write_text(daily_html, encoding="utf-8")
     _Path("web/daily.html").write_text(daily_html, encoding="utf-8")
@@ -397,6 +404,18 @@ def narrate(owner, repos, out_dir, state_dir, provider, model):
     eff_model = model or os.environ.get("DASHSCOPE_MODEL", "qwen-plus")
     summary = pipeline.run(owner, repo_list, Store(state_dir), client, embedder,
                            out_dir, model=eff_model)
+    from pathlib import Path as _P
+    pub = []
+    _tdir = _P(state_dir) / "theme_records"
+    if _tdir.exists():
+        for _f in sorted(_tdir.glob("*.json")):
+            _t = __import__("json").loads(_f.read_text())
+            if _t.get("status") == "published":
+                pub.append({"slug": _t["slug"], "title": _t.get("title", ""),
+                            "summary": _t.get("summary", "")})
+    _P("web/data").mkdir(parents=True, exist_ok=True)
+    _P("web/data/learn-index.json").write_text(
+        __import__("json").dumps(pub, indent=2, sort_keys=True), encoding="utf-8")
     click.echo(f"narrate: {summary['prs']} PRs, "
                f"{summary.get('themes_published', summary['themes_matured'])} themes published, "
                f"{summary.get('themes_failed', 0)} failed, "
