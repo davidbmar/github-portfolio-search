@@ -20,6 +20,28 @@ def test_write_tutorial_prose_fills_fields():
     assert t["summary"] == "S" and t["principles"] == ["p1"]
 
 
+def test_render_structured_dict_items_as_labelled_bullets():
+    # Qwen returns {name, description} for patterns and {scenario, application}
+    # for how-to-apply; render them as labelled bullets, not dict reprs.
+    t = _theme()
+    t.update({"summary": "S", "narrative": "N", "principles": [],
+              "patterns": [{"name": "Phased Pipeline", "description": "validate in stages"}],
+              "applied_examples": [{"scenario": "Rollback", "application": "flip the kill switch"}],
+              "pitfalls": []})
+    page = render_learn_html(t)
+    assert "<strong>Phased Pipeline</strong> — validate in stages" in page
+    assert "<strong>Rollback</strong> — flip the kill switch" in page
+    assert "{&#x27;" not in page and "{'" not in page   # no raw dict repr leaked
+
+
+def test_render_plain_string_items_still_work():
+    t = _theme()
+    t.update({"summary": "S", "narrative": "N", "principles": ["just a string"],
+              "patterns": [], "applied_examples": [], "pitfalls": []})
+    page = render_learn_html(t)
+    assert "<li>just a string</li>" in page
+
+
 def test_render_escapes_html():
     t = _theme(); t.update({"summary": "S", "narrative": "<script>x</script>",
                             "principles": [], "patterns": [], "applied_examples": [], "pitfalls": []})
