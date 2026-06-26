@@ -37,8 +37,27 @@ def write_tutorial_prose(theme: dict, prs: list[dict], client, *, model: str, re
     raise NarrateValidationError(f"tutorial missing fields: {last_missing}")
 
 
+_LABEL_KEYS = ("name", "scenario", "title", "pattern", "principle")
+_BODY_KEYS = ("description", "application", "detail", "body", "summary")
+
+
+def _li(item) -> str:
+    """Render one list item. Qwen sometimes returns structured objects
+    (e.g. {name, description} for patterns, {scenario, application} for
+    how-to-apply) instead of plain strings; render those as a labelled bullet
+    rather than dumping the dict repr."""
+    if isinstance(item, dict):
+        label = next((item[k] for k in _LABEL_KEYS if item.get(k)), None)
+        body = next((item[k] for k in _BODY_KEYS if item.get(k)), None)
+        if label and body:
+            return f"<li><strong>{html.escape(str(label))}</strong> — {html.escape(str(body))}</li>"
+        # Unrecognised dict shape: join its values rather than show {'k': 'v'}.
+        return f"<li>{html.escape(' — '.join(str(v) for v in item.values()))}</li>"
+    return f"<li>{html.escape(str(item))}</li>"
+
+
 def _ul(items) -> str:
-    return "<ul>" + "".join(f"<li>{html.escape(str(i))}</li>" for i in items) + "</ul>" if items else ""
+    return "<ul>" + "".join(_li(i) for i in items) + "</ul>" if items else ""
 
 
 def render_learn_html(theme: dict) -> str:
