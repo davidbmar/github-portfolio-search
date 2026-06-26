@@ -30,3 +30,27 @@ def test_validate_theme_record_rejects_bad_status():
 
 def test_theme_states_constant():
     assert THEME_STATES == ("candidate", "mature", "published", "archived")
+
+def test_validate_pr_record_allows_empty_arrays():
+    # a pure-refactor PR: no apis/tests/components/risks changed -> still valid
+    rec = {"pr_number": 6, "repo": "riff", "merged_at": "2026-06-10T00:00:00Z",
+           "title": "refactor internals", "problem": "p", "approach": "a",
+           "components": [], "apis_changed": [], "tests_changed": [],
+           "reusable_pattern": False, "risks": [], "files": [{"path": "a.py"}]}
+    validate_pr_record(rec)  # must NOT raise
+
+def test_validate_pr_record_rejects_empty_scalar():
+    rec = {"pr_number": 6, "repo": "riff", "merged_at": "2026-06-10T00:00:00Z",
+           "title": "", "problem": "p", "approach": "a",
+           "components": [], "apis_changed": [], "tests_changed": [],
+           "reusable_pattern": False, "risks": [], "files": [{"path": "a.py"}]}
+    with pytest.raises(NarrateValidationError):
+        validate_pr_record(rec)
+
+def test_validate_pr_record_rejects_missing_array_key():
+    rec = {"pr_number": 6, "repo": "riff", "merged_at": "2026-06-10T00:00:00Z",
+           "title": "t", "problem": "p", "approach": "a",
+           "components": [], "tests_changed": [], "reusable_pattern": False,
+           "risks": [], "files": [{"path": "a.py"}]}  # apis_changed KEY missing
+    with pytest.raises(NarrateValidationError):
+        validate_pr_record(rec)

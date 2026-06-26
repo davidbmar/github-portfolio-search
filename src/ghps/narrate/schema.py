@@ -6,11 +6,13 @@ import re
 
 THEME_STATES = ("candidate", "mature", "published", "archived")
 
-PR_REQUIRED = (
-    "pr_number", "repo", "merged_at", "title",
-    "problem", "approach", "components", "apis_changed",
-    "tests_changed", "reusable_pattern", "risks", "files",
-)
+# Scalar fields that must be present AND non-empty.
+PR_REQUIRED_NONEMPTY = ("pr_number", "repo", "merged_at", "title", "problem", "approach", "files")
+# Fields that must be PRESENT but may legitimately be empty (a PR may change no
+# APIs / no tests / have no notable risks). reusable_pattern is a bool (may be False).
+PR_REQUIRED_PRESENT = ("components", "apis_changed", "tests_changed", "reusable_pattern", "risks")
+# Back-compat union (some callers/tests import PR_REQUIRED).
+PR_REQUIRED = PR_REQUIRED_NONEMPTY + PR_REQUIRED_PRESENT
 THEME_REQUIRED = (
     "theme_id", "slug", "title", "status", "repos", "pr_numbers",
     "summary", "narrative",
@@ -42,7 +44,12 @@ def _require(d: dict, keys: tuple[str, ...]) -> None:
 
 
 def validate_pr_record(d: dict) -> None:
-    _require(d, PR_REQUIRED)
+    for k in PR_REQUIRED_NONEMPTY:
+        if k not in d or d[k] in (None, "", [], {}):
+            raise NarrateValidationError(f"missing/empty required field: {k}")
+    for k in PR_REQUIRED_PRESENT:
+        if k not in d:
+            raise NarrateValidationError(f"missing required field: {k}")
 
 
 def validate_theme_record(d: dict) -> None:
