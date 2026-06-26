@@ -22,3 +22,13 @@ def test_manifest_includes_all_with_lang():
     files = [{"path": "a.py", "status": "modified", "adds": 1, "dels": 0, "patch": ""}]
     m = manifest(files)
     assert m[0]["lang"] == "python"
+
+def test_select_evidence_is_deterministic_on_ties():
+    # two non-test, non-iface files, same bucket, same churn -> must order by path
+    files = [
+        {"path": "src/zeta.py", "status": "modified", "adds": 3, "dels": 2, "patch": "z"},
+        {"path": "src/alpha.py", "status": "modified", "adds": 3, "dels": 2, "patch": "a"},
+    ]
+    forward = [e["path"] for e in select_evidence(files)]
+    reverse = [e["path"] for e in select_evidence(list(reversed(files)))]
+    assert forward == reverse == ["src/alpha.py", "src/zeta.py"]

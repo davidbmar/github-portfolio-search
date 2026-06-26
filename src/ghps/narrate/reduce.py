@@ -42,7 +42,8 @@ def select_evidence(files: list[dict], *, max_files: int = 6, max_patch_chars: i
 
     def rank(f):
         return (0 if _is_test(f["path"]) else 1 if _is_public_iface(f["path"]) else 2,
-                -(f.get("adds", 0) + f.get("dels", 0)))
+                -(f.get("adds", 0) + f.get("dels", 0)),
+                f["path"])
 
     signal.sort(key=rank)
     out = []
