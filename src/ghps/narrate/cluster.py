@@ -76,6 +76,8 @@ def classify_pr(rec, vec, store, client, *, model, reclassify=False) -> dict:
             f"{[(t['theme_id'], t.get('title','')) for t, _ in cands] if allow_attach else '(none eligible)'}",
         )
         action = ask.get("action", "ignore")
+        if action not in ("attach", "create", "ignore"):
+            action = "ignore"
         if action == "attach" and not allow_attach:
             action = "create"
         if action == "attach":

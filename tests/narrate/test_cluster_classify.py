@@ -31,3 +31,12 @@ def test_ledger_idempotent(tmp_path):
     d2 = classify_pr(_pr(7), [0.1, 0.9], store, c, model="m")
     assert d1["theme_id"] == d2["theme_id"]
     assert len([t for t in store.all_themes()]) == 1   # not duplicated
+
+def test_unknown_llm_action_falls_back_to_ignore(tmp_path):
+    store = Store(tmp_path)
+    # low cosine path with no themes -> goes to LLM; LLM returns a bogus action
+    d = classify_pr(_pr(9), [0.1, 0.9], store, _Client({"action": "defer"}), model="m")
+    assert d["action"] == "ignore"
+    assert d["theme_id"] is None
+    assert store.all_themes() == []                 # nothing created
+    assert store.ledger_decision("riff", 9) is not None  # ledger entry written
