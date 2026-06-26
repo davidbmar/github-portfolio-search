@@ -1,7 +1,48 @@
 {
-  "generated_at": "2026-06-25T10:17:35.207114Z",
-  "count": 148,
+  "generated_at": "2026-06-26T10:23:39.383768Z",
+  "count": 150,
   "days": [
+    {
+      "date": "2026-06-26",
+      "headline": "Riff: Streamline Verification Flows and Enhance CI Pre-Push Gates",
+      "summary": "The pre-push gate now supports evaluating complex verification flows, while the scheduling sub-flow was consolidated to use verified phone numbers. These changes remove redundant confirmation steps and improve CI reliability for complex logic.",
+      "takeaways": [
+        "Extend CI pre-push gates to evaluate complex verification flows by updating the evaluation logic to handle nested or multi-step processes.",
+        "Consolidate redundant scheduling sub-flows into a single verified phone path to reduce user friction and simplify state management."
+      ],
+      "total_commits": 2,
+      "repos": [
+        {
+          "name": "riff",
+          "commits": 2,
+          "messages": [
+            "fix(ci_eval): make the pre-push gate able to evaluate verification + complex flows",
+            "fix(property_trouble_ticket): remove cloned scheduling sub-flow, collapse double-confirm, consolidate to verified phone"
+          ]
+        }
+      ],
+      "commit_sig": "06fb877953dc48b7"
+    },
+    {
+      "date": "2026-06-25",
+      "headline": "Automated Documentation Regeneration for GitHub Portfolio Search",
+      "summary": "This update triggers the regeneration of L0 documentation and daily digest outputs for the github-portfolio-search project. The change is marked as a chore with CI skipping, indicating a maintenance task rather than a feature addition.",
+      "takeaways": [
+        "Implement automated documentation regeneration scripts to keep L0 docs synchronized with code changes without manual intervention.",
+        "Use [skip ci] tags for non-code maintenance tasks like doc generation to optimize pipeline resources and reduce build times."
+      ],
+      "total_commits": 1,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        }
+      ],
+      "commit_sig": "f2320c9127d7894d"
+    },
     {
       "date": "2026-06-24",
       "headline": "Shipped LLM Cost Optimization Phases 0-3 and Declarative Read-Back Contracts",
@@ -3707,14 +3748,14 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Refined Flow Graph Layout, Hardened Booking Primitives, and Updated Gemini Models",
-      "summary": "This update overhauls the flow graph visualization with a three-column spine layout and improved UX controls, while rigorously hardening booking and record-keeping primitives through extensive invariant testing. It also standardizes Gemini adapter defaults to version 2.5-flash and refines calendar phrasing for better user clarity.",
+      "headline": "Riff Flow Graph Overhaul, Appointment Module Redesign, and Primitive Audit Hardening",
+      "summary": "Major UI improvements to the Riff flow graph include a three-column spine layout with SVG overlays and auto-panning, while the appointment booking module was redesigned to drop triage layers and enforce strict state invariants. Concurrently, comprehensive sweep scripts and test suites were added for record, run-program, and booking primitives to close out multiple sprint phases.",
       "takeaways": [
-        "Implement a three-column spine layout with SVG-overlay edges and explicit zoom controls to eliminate node overlap and improve navigation in complex flow graphs.",
-        "Adopt a 'doc-as-spec' template for parameterized modules, defining strict invariants and failure modes alongside YAML scenario files to automate primitive auditing.",
-        "Use environment-suffixed FIFO queue ARNs in webhook consumers to ensure isolated and ordered message processing across different deployment stages."
+        "Implement a three-column spine layout with SVG-overlay edges and explicit zoom controls to prevent sibling node overlap in complex flow graphs.",
+        "Adopt parameterized YAML modules with defined invariants and failure modes to create reusable, testable state machines for scheduling and data recording.",
+        "Use automated sweep scripts as CI gates to validate primitive behaviors against extensive scenario sets before merging changes."
       ],
-      "total_commits": 67,
+      "total_commits": 65,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3733,7 +3774,7 @@
         },
         {
           "name": "riff",
-          "commits": 64,
+          "commits": 62,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3796,13 +3837,11 @@
             "docs(backlog): file run-program-sweep findings as backlog items",
             "feat(scripts): add sweep_run_program.py (gate)",
             "test(primitives): author run_program.yaml (20 scenarios across 6 behavior classes)",
-            "flow(tutorial_confirm_then_run_program): use final_status: booked (was off-Literal; 8th defect of this class)",
-            "flow(tutorial_run_program): insert Confirm gate, fix final_status Literal, demonstrate safe pattern",
-            "test(primitives): add test_run_program_invariants.py (4 test_iN_* tests; safety gate strict mode)"
+            "flow(tutorial_confirm_then_run_program): use final_status: booked (was off-Literal; 8th defect of this class)"
           ]
         }
       ],
-      "commit_sig": "b95feca724ea7cfa"
+      "commit_sig": "8ce8a893fc4bd9f3"
     },
     {
       "date": "2026-05-01",

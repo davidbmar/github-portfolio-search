@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-25T10:16:05.424904Z",
+  "generated_at": "2026-06-26T10:22:04.417771Z",
   "count": 137,
   "projects": [
     {
@@ -1250,19 +1250,19 @@
         "FastAPI",
         "SQLite-vec",
         "sentence-transformers",
-        "AWS S3",
-        "CloudFront",
-        "Lambda"
+        "AWS Lambda",
+        "S3",
+        "CloudFront"
       ],
       "reuse_tags": [
-        "semantic-search",
-        "github-indexer",
+        "search-engine",
         "portfolio-tool",
-        "ai-discovery"
+        "code-discovery",
+        "ai-assistant-integration"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-24T14:48:01Z"
+      "pushed_at": "2026-06-25T10:17:36Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2118,24 +2118,22 @@
         "Python",
         "YAML",
         "Mermaid",
+        "JSONL",
         "Pytest",
         "FastAPI",
-        "WebSockets",
-        "Git"
+        "WebSockets"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm",
-        "llm-orchestration",
-        "deterministic",
-        "python",
-        "yaml-config",
-        "guardrails",
-        "slot-filling"
+        "fsm-orchestration",
+        "llm-guardrails",
+        "python-platform",
+        "yaml-configuration",
+        "deterministic-workflow"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-24T23:49:09Z"
+      "pushed_at": "2026-06-26T06:22:07Z"
     },
     {
       "slug": "riot",
