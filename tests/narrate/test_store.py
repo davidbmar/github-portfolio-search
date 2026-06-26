@@ -26,3 +26,4 @@ def test_theme_roundtrip(tmp_path):
     s = Store(tmp_path)
     s.put_theme({"theme_id": "t1", "slug": "a"})
     assert s.get_theme("t1")["slug"] == "a"
+    assert len(s.all_themes()) == 1

@@ -15,7 +15,7 @@ class Store:
 
     def _write_json(self, path: Path, obj) -> None:
         tmp = path.with_suffix(path.suffix + ".tmp")
-        tmp.write_text(json.dumps(obj, indent=2, sort_keys=True))
+        tmp.write_text(json.dumps(obj, indent=2, sort_keys=True), encoding="utf-8")
         os.replace(tmp, path)
 
     def read_cursor(self, repo: str) -> str | None:
@@ -29,7 +29,8 @@ class Store:
         self._write_json(self._cursor, data)
 
     def _pr_path(self, repo: str, pr_number: int) -> Path:
-        return self.root / "pr_records" / f"{repo}__{pr_number}.json"
+        safe_repo = repo.replace("/", "__")
+        return self.root / "pr_records" / f"{safe_repo}__{pr_number}.json"
 
     def put_pr(self, rec: dict) -> None:
         self._write_json(self._pr_path(rec["repo"], rec["pr_number"]), rec)
@@ -42,7 +43,8 @@ class Store:
         return [json.loads(p.read_text()) for p in sorted((self.root / "pr_records").glob("*.json"))]
 
     def put_theme(self, rec: dict) -> None:
-        self._write_json(self.root / "theme_records" / f"{rec['theme_id']}.json", rec)
+        safe_theme_id = rec['theme_id'].replace("/", "__")
+        self._write_json(self.root / "theme_records" / f"{safe_theme_id}.json", rec)
 
     def get_theme(self, theme_id: str) -> dict | None:
         p = self.root / "theme_records" / f"{theme_id}.json"
