@@ -1,11 +1,58 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>Weather Integration and Global Preferences — Learn</title></head><body>
-<main><h1>Weather Integration and Global Preferences</h1>
-<p class="summary">This tutorial details the implementation of a stateful, identity-agnostic weather integration within the &#x27;riff&#x27; voice application. It addresses the challenge of persisting user preferences (specifically home city) across sessions without relying on authenticated caller IDs, utilizing a local JSON-backed preference store and a self-contained Open-Meteo API flow.</p>
-<section><h2>What was built &amp; why</h2><p>The development team identified a gap in the &#x27;riff&#x27; recording application: the weather feature was marked as &#x27;in-flight&#x27; because it lacked both a data source and a mechanism to remember user context. Without a persistent user identity (such as a logged-in account or phone number), the system could not recall a user&#x27;s preferred location between calls. To resolve this, we engineered a self-contained weather module that decouples data fetching from business logic. We introduced a lightweight, global JSON-backed preference store to save and retrieve the &#x27;home city&#x27; locally. The workflow was defined in a YAML configuration where the city-saving action is strictly gated within the &#x27;ask&#x27; state, ensuring that preferences are only updated after explicit user interaction. This approach allows the application to provide personalized weather updates immediately upon subsequent interactions, even for anonymous users.</p></section>
-<section><h2>Principles</h2><ul><li>Statelessness vs. Local Persistence: When global identity is unavailable, use local, file-based storage to maintain session continuity for non-sensitive preferences.</li><li>Dependency Injection for Testability: Decouple external API calls (fetchers) from tool logic to allow for easy mocking and unit testing without hitting live endpoints.</li><li>Safety-First State Mutations: Restrict write operations (like saving preferences) to specific conversational states (e.g., &#x27;ask&#x27;) to prevent accidental data overwrites during passive listening phases.</li></ul></section>
-<section><h2>Patterns</h2><ul><li>JSON-Backed Preference Store: A simple, file-system based key-value store for persisting user settings across process restarts or sessions.</li><li>Injectable Fetcher Pattern: Abstracting HTTP clients behind interfaces to enable deterministic testing of business logic.</li><li>Self-Contained Flow Module: Encapsulating all related logic (API tools, preference handling, flow definition) into a single domain module to reduce coupling.</li></ul></section>
-<section><h2>How to apply</h2><ul><li>Implementing a &#x27;favorite song&#x27; feature in a music bot where the user&#x27;s choice is saved to a local JSON file after they explicitly confirm it in a dialogue turn.</li><li>Building a news briefing skill that remembers a user&#x27;s selected topics (e.g., &#x27;tech&#x27;, &#x27;sports&#x27;) across daily calls without requiring account creation.</li><li>Creating a configurable timer assistant where default durations are stored locally and updated only when the user explicitly says &#x27;set default to 10 minutes&#x27;.</li></ul></section>
-<section><h2>Pitfalls</h2><ul><li>Race Conditions in File I/O: Writing to a shared JSON file from concurrent processes can lead to data corruption; ensure atomic writes or file locking mechanisms are in place.</li><li>Privacy Leakage: Storing PII (Personally Identifiable Information) in a global, unencrypted JSON store is a security risk; limit persistence to non-sensitive preferences like city names or units.</li><li>Over-Reliance on Implicit Context: Assuming a saved preference applies to all contexts may lead to errors; always allow users to override saved defaults with explicit commands in the current session.</li></ul></section>
-<footer>Repos: riff</footer>
-</main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather Integration and Global Preferences · Learn · davidbmar.com</title>
+<meta name="description" content="This tutorial details the implementation of a stateful, identity-agnostic weather integration within the &#x27;riff&#x27; voice application. It addresses the challenge of">
+<style>
+
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  a { color: #2563eb; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: .72rem;
+             font-weight: 700; color: #2563eb; margin: 0 0 .4rem; }
+  h1 { margin: 0 0 .35rem; line-height: 1.15; font-size: 2rem; }
+  .lede { font-size: 1.18rem; line-height: 1.5; opacity: .9; margin: .2rem 0 .7rem; }
+  .repo-chips { margin: .3rem 0 0; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 999px;
+         padding: .12rem .62rem; margin: .14rem .18rem 0 0; font-size: .8rem;
+         text-decoration: none; }
+  .toc { border: 1px solid #8884; border-radius: 12px; padding: .65rem 1rem;
+         margin: 1.5rem 0; font-size: .9rem; }
+  .toc b { display: block; text-transform: uppercase; letter-spacing: .07em;
+           font-size: .68rem; opacity: .55; margin-bottom: .35rem; }
+  .toc a { display: inline-block; margin: 0 1rem .15rem 0; }
+  section.learn { margin: 2.1rem 0; }
+  section.learn > h2 { font-size: 1.3rem; border-bottom: 1px solid #8883;
+                       padding-bottom: .3rem; margin: 0 0 .8rem; }
+  .narrative { font-size: 1.03rem; }
+  ul.bullets { padding-left: 1.15rem; margin: .4rem 0; }
+  ul.bullets li { margin: .4rem 0; }
+  ul.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+  ul.cards li.card { border-left: 4px solid #2563eb; background: #eef3ff;
+                     color: #1a1f29; border-radius: 0 10px 10px 0; padding: .65rem 1rem; }
+  .card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #1a1f29; }
+  .card p { margin: 0; color: #1a1f29; }
+  footer.prov { margin-top: 2.6rem; border-top: 1px solid #8883; padding-top: .8rem;
+                font-size: .82rem; opacity: .6; }
+
+  .site-bar { display: flex; gap: 1.1rem; align-items: center; padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; font-size: .9rem; }
+  .site-bar a { color: #2563eb; text-decoration: none; }
+  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }
+</style>
+</head>
+<body>
+<nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/#/clusters">Clusters</a></nav>
+<header>
+  <p class="eyebrow">Deep dive</p>
+  <h1>Weather Integration and Global Preferences</h1>
+  <p class="lede">This tutorial details the implementation of a stateful, identity-agnostic weather integration within the &#x27;riff&#x27; voice application. It addresses the challenge of persisting user preferences (specifically home city) across sessions without relying on authenticated caller IDs, utilizing a local JSON-backed preference store and a self-contained Open-Meteo API flow.</p>
+  <div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div>
+</header>
+<nav class="toc"><b>On this page</b><a href="#why">Why</a><a href="#principles">Principles</a><a href="#patterns">Patterns</a><a href="#apply">How to apply</a><a href="#pitfalls">Pitfalls</a></nav>
+<section class="learn" id="why"><h2>What was built &amp; why</h2><p class="narrative">The development team identified a gap in the &#x27;riff&#x27; recording application: the weather feature was marked as &#x27;in-flight&#x27; because it lacked both a data source and a mechanism to remember user context. Without a persistent user identity (such as a logged-in account or phone number), the system could not recall a user&#x27;s preferred location between calls. To resolve this, we engineered a self-contained weather module that decouples data fetching from business logic. We introduced a lightweight, global JSON-backed preference store to save and retrieve the &#x27;home city&#x27; locally. The workflow was defined in a YAML configuration where the city-saving action is strictly gated within the &#x27;ask&#x27; state, ensuring that preferences are only updated after explicit user interaction. This approach allows the application to provide personalized weather updates immediately upon subsequent interactions, even for anonymous users.</p></section><section class="learn" id="principles"><h2>Principles</h2><ul class="bullets"><li>Statelessness vs. Local Persistence: When global identity is unavailable, use local, file-based storage to maintain session continuity for non-sensitive preferences.</li><li>Dependency Injection for Testability: Decouple external API calls (fetchers) from tool logic to allow for easy mocking and unit testing without hitting live endpoints.</li><li>Safety-First State Mutations: Restrict write operations (like saving preferences) to specific conversational states (e.g., &#x27;ask&#x27;) to prevent accidental data overwrites during passive listening phases.</li></ul></section><section class="learn" id="patterns"><h2>Patterns</h2><ul class="cards"><li class="card"><p>JSON-Backed Preference Store: A simple, file-system based key-value store for persisting user settings across process restarts or sessions.</p></li><li class="card"><p>Injectable Fetcher Pattern: Abstracting HTTP clients behind interfaces to enable deterministic testing of business logic.</p></li><li class="card"><p>Self-Contained Flow Module: Encapsulating all related logic (API tools, preference handling, flow definition) into a single domain module to reduce coupling.</p></li></ul></section><section class="learn" id="apply"><h2>How to apply</h2><ul class="cards"><li class="card"><p>Implementing a &#x27;favorite song&#x27; feature in a music bot where the user&#x27;s choice is saved to a local JSON file after they explicitly confirm it in a dialogue turn.</p></li><li class="card"><p>Building a news briefing skill that remembers a user&#x27;s selected topics (e.g., &#x27;tech&#x27;, &#x27;sports&#x27;) across daily calls without requiring account creation.</p></li><li class="card"><p>Creating a configurable timer assistant where default durations are stored locally and updated only when the user explicitly says &#x27;set default to 10 minutes&#x27;.</p></li></ul></section><section class="learn" id="pitfalls"><h2>Pitfalls</h2><ul class="bullets"><li>Race Conditions in File I/O: Writing to a shared JSON file from concurrent processes can lead to data corruption; ensure atomic writes or file locking mechanisms are in place.</li><li>Privacy Leakage: Storing PII (Personally Identifiable Information) in a global, unencrypted JSON store is a security risk; limit persistence to non-sensitive preferences like city names or units.</li><li>Over-Reliance on Implicit Context: Assuming a saved preference applies to all contexts may lead to errors; always allow users to override saved defaults with explicit commands in the current session.</li></ul></section>
+<footer class="prov">Generated from 1 PR across riff · model qwen3.7-plus · <a href="/daily/">← Back to Daily</a></footer>
+</body>
+</html>

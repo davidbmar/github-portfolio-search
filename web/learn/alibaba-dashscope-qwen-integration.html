@@ -1,11 +1,58 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>Alibaba DashScope/Qwen Integration — Learn</title></head><body>
-<main><h1>Alibaba DashScope/Qwen Integration</h1>
-<p class="summary">This tutorial details the architectural shift in the &#x27;riff&#x27; project from Anthropic Haiku to Alibaba DashScope (Qwen) for default utterance generation. It demonstrates how to implement a vendor-agnostic LLM client using standard library tools to minimize dependency bloat, while maintaining backward compatibility with existing providers through a unified Persona interface.</p>
-<section><h2>What was built &amp; why</h2><p>The &#x27;riff&#x27; application originally relied on Anthropic’s Haiku model for generating default user utterances within its caller-persona simulation. To diversify infrastructure and leverage Alibaba’s Qwen models via DashScope, the system required a migration that did not disrupt existing workflows. The solution involved decoupling the LLM interaction layer from specific SDKs. Instead of importing heavy third-party libraries, a lightweight `AlibabaUtteranceClient` was built using Python’s native `urllib`. This client communicates with DashScope’s OpenAI-compatible endpoint, allowing the system to swap providers seamlessly. The `Persona` class was updated to prioritize this new client by default, while retaining the Anthropic client as a fallback, ensuring zero downtime during the transition.</p></section>
-<section><h2>Principles</h2><ul><li>Dependency Minimalism: Prefer standard library modules (like urllib) over heavy SDKs when interacting with standardized APIs (OpenAI-compatible) to reduce supply chain risk and installation footprint.</li><li>Configuration Hierarchy: Implement a robust credential loading strategy that prioritizes environment variables for runtime flexibility while falling back to labeled config files for local development.</li><li>Interface Stability: Maintain existing class contracts (e.g., the `Persona` class) when swapping underlying implementations to ensure downstream consumers remain unaffected.</li></ul></section>
-<section><h2>Patterns</h2><ul><li>Adapter Pattern: Creating a specific client (`AlibabaUtteranceClient`) that conforms to the expected interface of the broader system, abstracting away the specifics of the DashScope API.</li><li>Strategy Pattern: Allowing the `Persona` class to switch between different utterance generation strategies (Anthropic vs. Alibaba) without altering its core logic.</li><li>Environment-First Configuration: Using a parser that checks environment variables before reading static config files to support secure, dynamic deployment contexts.</li></ul></section>
-<section><h2>How to apply</h2><ul><li>Integrating other OpenAI-compatible endpoints (e.g., Azure OpenAI, local Llama.cpp servers) by creating similar lightweight clients using `urllib` or `httpx` without adding new SDK dependencies.</li><li>Implementing a multi-cloud LLM fallback mechanism where the application attempts Alibaba DashScope first, then retries with Anthropic if latency thresholds are exceeded.</li><li>Securing API keys in CI/CD pipelines by injecting DashScope credentials via environment variables rather than committing labeled config files to version control.</li></ul></section>
-<section><h2>Pitfalls</h2><ul><li>Ignoring SSL Verification: When using raw `urllib`, ensure proper SSL context handling to prevent man-in-the-middle attacks, which higher-level SDKs often handle automatically.</li><li>Hardcoded Endpoints: Avoid hardcoding the DashScope URL; instead, make it configurable to accommodate future region changes or private VPC endpoints.</li><li>Error Mapping Discrepancies: Alibaba’s error codes may differ from Anthropic’s. Ensure the new client translates upstream errors into the application’s standard exception types to prevent unhandled crashes in the `Persona` class.</li></ul></section>
-<footer>Repos: riff</footer>
-</main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alibaba DashScope/Qwen Integration · Learn · davidbmar.com</title>
+<meta name="description" content="This tutorial details the architectural shift in the &#x27;riff&#x27; project from Anthropic Haiku to Alibaba DashScope (Qwen) for default utterance generation. It demons">
+<style>
+
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  a { color: #2563eb; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: .72rem;
+             font-weight: 700; color: #2563eb; margin: 0 0 .4rem; }
+  h1 { margin: 0 0 .35rem; line-height: 1.15; font-size: 2rem; }
+  .lede { font-size: 1.18rem; line-height: 1.5; opacity: .9; margin: .2rem 0 .7rem; }
+  .repo-chips { margin: .3rem 0 0; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 999px;
+         padding: .12rem .62rem; margin: .14rem .18rem 0 0; font-size: .8rem;
+         text-decoration: none; }
+  .toc { border: 1px solid #8884; border-radius: 12px; padding: .65rem 1rem;
+         margin: 1.5rem 0; font-size: .9rem; }
+  .toc b { display: block; text-transform: uppercase; letter-spacing: .07em;
+           font-size: .68rem; opacity: .55; margin-bottom: .35rem; }
+  .toc a { display: inline-block; margin: 0 1rem .15rem 0; }
+  section.learn { margin: 2.1rem 0; }
+  section.learn > h2 { font-size: 1.3rem; border-bottom: 1px solid #8883;
+                       padding-bottom: .3rem; margin: 0 0 .8rem; }
+  .narrative { font-size: 1.03rem; }
+  ul.bullets { padding-left: 1.15rem; margin: .4rem 0; }
+  ul.bullets li { margin: .4rem 0; }
+  ul.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+  ul.cards li.card { border-left: 4px solid #2563eb; background: #eef3ff;
+                     color: #1a1f29; border-radius: 0 10px 10px 0; padding: .65rem 1rem; }
+  .card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #1a1f29; }
+  .card p { margin: 0; color: #1a1f29; }
+  footer.prov { margin-top: 2.6rem; border-top: 1px solid #8883; padding-top: .8rem;
+                font-size: .82rem; opacity: .6; }
+
+  .site-bar { display: flex; gap: 1.1rem; align-items: center; padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; font-size: .9rem; }
+  .site-bar a { color: #2563eb; text-decoration: none; }
+  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }
+</style>
+</head>
+<body>
+<nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/#/clusters">Clusters</a></nav>
+<header>
+  <p class="eyebrow">Deep dive</p>
+  <h1>Alibaba DashScope/Qwen Integration</h1>
+  <p class="lede">This tutorial details the architectural shift in the &#x27;riff&#x27; project from Anthropic Haiku to Alibaba DashScope (Qwen) for default utterance generation. It demonstrates how to implement a vendor-agnostic LLM client using standard library tools to minimize dependency bloat, while maintaining backward compatibility with existing providers through a unified Persona interface.</p>
+  <div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div>
+</header>
+<nav class="toc"><b>On this page</b><a href="#why">Why</a><a href="#principles">Principles</a><a href="#patterns">Patterns</a><a href="#apply">How to apply</a><a href="#pitfalls">Pitfalls</a></nav>
+<section class="learn" id="why"><h2>What was built &amp; why</h2><p class="narrative">The &#x27;riff&#x27; application originally relied on Anthropic’s Haiku model for generating default user utterances within its caller-persona simulation. To diversify infrastructure and leverage Alibaba’s Qwen models via DashScope, the system required a migration that did not disrupt existing workflows. The solution involved decoupling the LLM interaction layer from specific SDKs. Instead of importing heavy third-party libraries, a lightweight `AlibabaUtteranceClient` was built using Python’s native `urllib`. This client communicates with DashScope’s OpenAI-compatible endpoint, allowing the system to swap providers seamlessly. The `Persona` class was updated to prioritize this new client by default, while retaining the Anthropic client as a fallback, ensuring zero downtime during the transition.</p></section><section class="learn" id="principles"><h2>Principles</h2><ul class="bullets"><li>Dependency Minimalism: Prefer standard library modules (like urllib) over heavy SDKs when interacting with standardized APIs (OpenAI-compatible) to reduce supply chain risk and installation footprint.</li><li>Configuration Hierarchy: Implement a robust credential loading strategy that prioritizes environment variables for runtime flexibility while falling back to labeled config files for local development.</li><li>Interface Stability: Maintain existing class contracts (e.g., the `Persona` class) when swapping underlying implementations to ensure downstream consumers remain unaffected.</li></ul></section><section class="learn" id="patterns"><h2>Patterns</h2><ul class="cards"><li class="card"><p>Adapter Pattern: Creating a specific client (`AlibabaUtteranceClient`) that conforms to the expected interface of the broader system, abstracting away the specifics of the DashScope API.</p></li><li class="card"><p>Strategy Pattern: Allowing the `Persona` class to switch between different utterance generation strategies (Anthropic vs. Alibaba) without altering its core logic.</p></li><li class="card"><p>Environment-First Configuration: Using a parser that checks environment variables before reading static config files to support secure, dynamic deployment contexts.</p></li></ul></section><section class="learn" id="apply"><h2>How to apply</h2><ul class="cards"><li class="card"><p>Integrating other OpenAI-compatible endpoints (e.g., Azure OpenAI, local Llama.cpp servers) by creating similar lightweight clients using `urllib` or `httpx` without adding new SDK dependencies.</p></li><li class="card"><p>Implementing a multi-cloud LLM fallback mechanism where the application attempts Alibaba DashScope first, then retries with Anthropic if latency thresholds are exceeded.</p></li><li class="card"><p>Securing API keys in CI/CD pipelines by injecting DashScope credentials via environment variables rather than committing labeled config files to version control.</p></li></ul></section><section class="learn" id="pitfalls"><h2>Pitfalls</h2><ul class="bullets"><li>Ignoring SSL Verification: When using raw `urllib`, ensure proper SSL context handling to prevent man-in-the-middle attacks, which higher-level SDKs often handle automatically.</li><li>Hardcoded Endpoints: Avoid hardcoding the DashScope URL; instead, make it configurable to accommodate future region changes or private VPC endpoints.</li><li>Error Mapping Discrepancies: Alibaba’s error codes may differ from Anthropic’s. Ensure the new client translates upstream errors into the application’s standard exception types to prevent unhandled crashes in the `Persona` class.</li></ul></section>
+<footer class="prov">Generated from 1 PR across riff · model qwen3.7-plus · <a href="/daily/">← Back to Daily</a></footer>
+</body>
+</html>

@@ -1,1 +1,59 @@
-<!doctype html><html><head><meta charset='utf-8'><title>Learn</title></head><body><h1>Learn</h1><ul><li><a href="weather-integration-and-global-preferences.html">Weather Integration and Global Preferences</a> — This tutorial details the implementation of a stateful, identity-agnostic weather integration within the &#x27;riff&#x27; voice application. It addresses the challenge of persisting user preferences (specifically home city) across sessions without relying on authenticated caller IDs, utilizing a local JSON-backed preference store and a self-contained Open-Meteo API flow.</li><li><a href="grounding-integrity-gate.html">Grounding Integrity Gate</a> — This tutorial details the implementation of a &#x27;Grounding Integrity Gate&#x27; within the Riff codebase, addressing critical production failures caused by non-deterministic conversational flows and rigid telephony routing. By introducing a phased validation pipeline (Static through OTA) backed by a kill switch, and decoupling phone routing via a JSON-backed preference store, the system achieves deterministic state management and granular per-number flow assignment.</li><li><a href="web-audio-gated-flows-and-flow-picker.html">Web Audio-Gated Flows and Flow Picker</a> — This tutorial addresses the challenge of testing audio-gated conversational flows in text-only environments. It details how to decouple flow logic from audio playback dependencies by simulating engine events and filtering configuration artifacts, enabling robust text-mode debugging for voice-first applications.</li><li><a href="alibaba-dashscope-qwen-integration.html">Alibaba DashScope/Qwen Integration</a> — This tutorial details the architectural shift in the &#x27;riff&#x27; project from Anthropic Haiku to Alibaba DashScope (Qwen) for default utterance generation. It demonstrates how to implement a vendor-agnostic LLM client using standard library tools to minimize dependency bloat, while maintaining backward compatibility with existing providers through a unified Persona interface.</li><li><a href="flow-evaluation.html">Flow Evaluation</a> — This tutorial outlines a Test-Driven Development (TDD) framework for evaluating autonomous agent flows. By leveraging LLM-driven personas to simulate human interactions and a separate judge model to score outcomes, developers can systematically grade task success, quality, and robustness. The approach distinguishes between infrastructure failures and logical flow errors, supporting both offline stubbed testing and live execution modes.</li></ul></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learn · davidbmar.com</title>
+<meta name="description" content="Applied, code-grounded deep dives generated from merged pull requests.">
+<style>
+
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  a { color: #2563eb; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: .72rem;
+             font-weight: 700; color: #2563eb; margin: 0 0 .4rem; }
+  h1 { margin: 0 0 .35rem; line-height: 1.15; font-size: 2rem; }
+  .lede { font-size: 1.18rem; line-height: 1.5; opacity: .9; margin: .2rem 0 .7rem; }
+  .repo-chips { margin: .3rem 0 0; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 999px;
+         padding: .12rem .62rem; margin: .14rem .18rem 0 0; font-size: .8rem;
+         text-decoration: none; }
+  .toc { border: 1px solid #8884; border-radius: 12px; padding: .65rem 1rem;
+         margin: 1.5rem 0; font-size: .9rem; }
+  .toc b { display: block; text-transform: uppercase; letter-spacing: .07em;
+           font-size: .68rem; opacity: .55; margin-bottom: .35rem; }
+  .toc a { display: inline-block; margin: 0 1rem .15rem 0; }
+  section.learn { margin: 2.1rem 0; }
+  section.learn > h2 { font-size: 1.3rem; border-bottom: 1px solid #8883;
+                       padding-bottom: .3rem; margin: 0 0 .8rem; }
+  .narrative { font-size: 1.03rem; }
+  ul.bullets { padding-left: 1.15rem; margin: .4rem 0; }
+  ul.bullets li { margin: .4rem 0; }
+  ul.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+  ul.cards li.card { border-left: 4px solid #2563eb; background: #eef3ff;
+                     color: #1a1f29; border-radius: 0 10px 10px 0; padding: .65rem 1rem; }
+  .card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #1a1f29; }
+  .card p { margin: 0; color: #1a1f29; }
+  footer.prov { margin-top: 2.6rem; border-top: 1px solid #8883; padding-top: .8rem;
+                font-size: .82rem; opacity: .6; }
+
+  ul.idx-grid { list-style: none; padding: 0; margin: 1.6rem 0; display: grid; gap: 1rem; }
+  li.idx-card { border: 1px solid #8884; border-radius: 12px; padding: 1rem 1.2rem; }
+  a.idx-title { font-weight: 700; font-size: 1.12rem; text-decoration: none; }
+  .idx-sum { margin: .4rem 0 .55rem; opacity: .82; }
+  .site-bar { display: flex; gap: 1.1rem; align-items: center; padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; font-size: .9rem; }
+  .site-bar a { color: #2563eb; text-decoration: none; }
+  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }
+</style>
+</head>
+<body>
+<nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/#/clusters">Clusters</a></nav>
+<header>
+  <p class="eyebrow">Learn</p>
+  <h1>Applied deep dives</h1>
+  <p class="lede">In-depth, code-grounded tutorials generated from merged pull requests, grouped by theme.</p>
+</header>
+<ul class="idx-grid"><li class="idx-card"><a class="idx-title" href="weather-integration-and-global-preferences.html">Weather Integration and Global Preferences</a><p class="idx-sum">This tutorial details the implementation of a stateful, identity-agnostic weather integration within the &#x27;riff&#x27; voice application. It addresses the challenge of persisting user preferences (specifically home city) across sessions without relying on authenticated caller IDs, utilizing a local JSON-backed preference store and a self-contained Open-Meteo API flow.</p><div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div></li><li class="idx-card"><a class="idx-title" href="grounding-integrity-gate.html">Grounding Integrity Gate</a><p class="idx-sum">This tutorial details the implementation of a &#x27;Grounding Integrity Gate&#x27; within the Riff codebase, addressing critical production failures caused by non-deterministic conversational flows and rigid telephony routing. By introducing a phased validation pipeline (Static through OTA) backed by a kill switch, and decoupling phone routing via a JSON-backed preference store, the system achieves deterministic state management and granular per-number flow assignment.</p><div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div></li><li class="idx-card"><a class="idx-title" href="web-audio-gated-flows-and-flow-picker.html">Web Audio-Gated Flows and Flow Picker</a><p class="idx-sum">This tutorial addresses the challenge of testing audio-gated conversational flows in text-only environments. It details how to decouple flow logic from audio playback dependencies by simulating engine events and filtering configuration artifacts, enabling robust text-mode debugging for voice-first applications.</p><div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div></li><li class="idx-card"><a class="idx-title" href="alibaba-dashscope-qwen-integration.html">Alibaba DashScope/Qwen Integration</a><p class="idx-sum">This tutorial details the architectural shift in the &#x27;riff&#x27; project from Anthropic Haiku to Alibaba DashScope (Qwen) for default utterance generation. It demonstrates how to implement a vendor-agnostic LLM client using standard library tools to minimize dependency bloat, while maintaining backward compatibility with existing providers through a unified Persona interface.</p><div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div></li><li class="idx-card"><a class="idx-title" href="flow-evaluation.html">Flow Evaluation</a><p class="idx-sum">This tutorial outlines a Test-Driven Development (TDD) framework for evaluating autonomous agent flows. By leveraging LLM-driven personas to simulate human interactions and a separate judge model to score outcomes, developers can systematically grade task success, quality, and robustness. The approach distinguishes between infrastructure failures and logical flow errors, supporting both offline stubbed testing and live execution modes.</p><div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div></li></ul>
+</body>
+</html>

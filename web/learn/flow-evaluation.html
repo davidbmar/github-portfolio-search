@@ -1,11 +1,58 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>Flow Evaluation — Learn</title></head><body>
-<main><h1>Flow Evaluation</h1>
-<p class="summary">This tutorial outlines a Test-Driven Development (TDD) framework for evaluating autonomous agent flows. By leveraging LLM-driven personas to simulate human interactions and a separate judge model to score outcomes, developers can systematically grade task success, quality, and robustness. The approach distinguishes between infrastructure failures and logical flow errors, supporting both offline stubbed testing and live execution modes.</p>
-<section><h2>What was built &amp; why</h2><p>Building reliable autonomous agents requires more than just writing prompt chains; it demands a rigorous evaluation strategy that mirrors real-world usage. In this work, we addressed the challenge of validating complex agent flows by implementing a TDD-driven evaluation framework. Instead of relying solely on manual inspection or unit tests for individual components, we introduced &#x27;Qwen personas&#x27;—LLM-driven actors that simulate specific user behaviors and intents. These personas engage in conversations with the agent under test, while a separate &#x27;judge&#x27; model analyzes the interaction to assign scores for task success, response quality, and robustness. Crucially, the system generates detailed report cards that help engineers distinguish between transient infrastructure errors (like API timeouts) and fundamental flaws in the agent&#x27;s logic or prompt design. The framework supports static linting for flow definitions and offers flexibility through two execution modes: offline mode with stubbed responses for rapid iteration, and live mode using real LLMs for final validation.</p></section>
-<section><h2>Principles</h2><ul><li>Test-Driven Development for Agents: Define expected behaviors and success criteria before building or modifying agent flows.</li><li>Separation of Concerns in Evaluation: Distinctly separate the actor (persona), the subject (agent), and the evaluator (judge) to prevent bias and ensure objective scoring.</li><li>Error Taxonomy: Clearly differentiate between infrastructure-level failures (network, API limits) and application-level logic failures (poor reasoning, hallucination) to streamline debugging.</li><li>Hybrid Execution Strategies: Support both offline (stubbed/mocked) and live (real LLM) modes to balance development speed with production fidelity.</li></ul></section>
-<section><h2>Patterns</h2><ul><li>Persona-Driven Simulation: Use LLMs to generate diverse, realistic user inputs based on defined personas rather than static test fixtures.</li><li>LLM-as-a-Judge: Employ a separate, high-capability model to evaluate the quality and correctness of interactions based on predefined rubrics.</li><li>Static Flow Linting: Apply static analysis tools to validate the structure and syntax of agent flow definitions before runtime execution.</li><li>Report Card Generation: Automate the creation of structured evaluation reports that highlight specific metrics like success rate, latency, and error types.</li></ul></section>
-<section><h2>How to apply</h2><ul><li>Customer Support Bot Testing: Create personas representing &#x27;frustrated customer,&#x27; &#x27;technical user,&#x27; and &#x27;novice&#x27; to test a support agent&#x27;s ability to handle varying levels of complexity and tone.</li><li>Regression Testing for Prompt Changes: Before deploying a new system prompt, run the full suite of persona interactions in offline mode to ensure no existing capabilities are broken.</li><li>Robustness Stress Testing: Use personas designed to provide ambiguous or adversarial inputs to evaluate how well the agent maintains context and recovers from errors.</li><li>CI/CD Integration: Integrate the evaluation framework into the deployment pipeline, blocking merges if the &#x27;judge&#x27; scores fall below a defined threshold for task success.</li></ul></section>
-<section><h2>Pitfalls</h2><ul><li>Judge Bias: The evaluating LLM may have inherent biases or inconsistencies; mitigate this by using consistent prompting and potentially averaging scores from multiple judge instances.</li><li>Cost of Live Evaluation: Running full evaluations with real LLMs can be expensive; rely heavily on offline/stubbed modes for daily development and reserve live modes for pre-release checks.</li><li>Overfitting to Personas: If personas are too narrow, the agent may perform well in tests but fail with real users; ensure persona diversity covers edge cases and unexpected user behaviors.</li><li>Ignoring Infrastructure Noise: Failing to properly distinguish infrastructure errors from logic failures can lead to wasted time debugging prompts when the issue is actually network-related.</li></ul></section>
-<footer>Repos: riff</footer>
-</main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow Evaluation · Learn · davidbmar.com</title>
+<meta name="description" content="This tutorial outlines a Test-Driven Development (TDD) framework for evaluating autonomous agent flows. By leveraging LLM-driven personas to simulate human inte">
+<style>
+
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  a { color: #2563eb; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: .72rem;
+             font-weight: 700; color: #2563eb; margin: 0 0 .4rem; }
+  h1 { margin: 0 0 .35rem; line-height: 1.15; font-size: 2rem; }
+  .lede { font-size: 1.18rem; line-height: 1.5; opacity: .9; margin: .2rem 0 .7rem; }
+  .repo-chips { margin: .3rem 0 0; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 999px;
+         padding: .12rem .62rem; margin: .14rem .18rem 0 0; font-size: .8rem;
+         text-decoration: none; }
+  .toc { border: 1px solid #8884; border-radius: 12px; padding: .65rem 1rem;
+         margin: 1.5rem 0; font-size: .9rem; }
+  .toc b { display: block; text-transform: uppercase; letter-spacing: .07em;
+           font-size: .68rem; opacity: .55; margin-bottom: .35rem; }
+  .toc a { display: inline-block; margin: 0 1rem .15rem 0; }
+  section.learn { margin: 2.1rem 0; }
+  section.learn > h2 { font-size: 1.3rem; border-bottom: 1px solid #8883;
+                       padding-bottom: .3rem; margin: 0 0 .8rem; }
+  .narrative { font-size: 1.03rem; }
+  ul.bullets { padding-left: 1.15rem; margin: .4rem 0; }
+  ul.bullets li { margin: .4rem 0; }
+  ul.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+  ul.cards li.card { border-left: 4px solid #2563eb; background: #eef3ff;
+                     color: #1a1f29; border-radius: 0 10px 10px 0; padding: .65rem 1rem; }
+  .card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #1a1f29; }
+  .card p { margin: 0; color: #1a1f29; }
+  footer.prov { margin-top: 2.6rem; border-top: 1px solid #8883; padding-top: .8rem;
+                font-size: .82rem; opacity: .6; }
+
+  .site-bar { display: flex; gap: 1.1rem; align-items: center; padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; font-size: .9rem; }
+  .site-bar a { color: #2563eb; text-decoration: none; }
+  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }
+</style>
+</head>
+<body>
+<nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/#/clusters">Clusters</a></nav>
+<header>
+  <p class="eyebrow">Deep dive</p>
+  <h1>Flow Evaluation</h1>
+  <p class="lede">This tutorial outlines a Test-Driven Development (TDD) framework for evaluating autonomous agent flows. By leveraging LLM-driven personas to simulate human interactions and a separate judge model to score outcomes, developers can systematically grade task success, quality, and robustness. The approach distinguishes between infrastructure failures and logical flow errors, supporting both offline stubbed testing and live execution modes.</p>
+  <div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div>
+</header>
+<nav class="toc"><b>On this page</b><a href="#why">Why</a><a href="#principles">Principles</a><a href="#patterns">Patterns</a><a href="#apply">How to apply</a><a href="#pitfalls">Pitfalls</a></nav>
+<section class="learn" id="why"><h2>What was built &amp; why</h2><p class="narrative">Building reliable autonomous agents requires more than just writing prompt chains; it demands a rigorous evaluation strategy that mirrors real-world usage. In this work, we addressed the challenge of validating complex agent flows by implementing a TDD-driven evaluation framework. Instead of relying solely on manual inspection or unit tests for individual components, we introduced &#x27;Qwen personas&#x27;—LLM-driven actors that simulate specific user behaviors and intents. These personas engage in conversations with the agent under test, while a separate &#x27;judge&#x27; model analyzes the interaction to assign scores for task success, response quality, and robustness. Crucially, the system generates detailed report cards that help engineers distinguish between transient infrastructure errors (like API timeouts) and fundamental flaws in the agent&#x27;s logic or prompt design. The framework supports static linting for flow definitions and offers flexibility through two execution modes: offline mode with stubbed responses for rapid iteration, and live mode using real LLMs for final validation.</p></section><section class="learn" id="principles"><h2>Principles</h2><ul class="bullets"><li>Test-Driven Development for Agents: Define expected behaviors and success criteria before building or modifying agent flows.</li><li>Separation of Concerns in Evaluation: Distinctly separate the actor (persona), the subject (agent), and the evaluator (judge) to prevent bias and ensure objective scoring.</li><li>Error Taxonomy: Clearly differentiate between infrastructure-level failures (network, API limits) and application-level logic failures (poor reasoning, hallucination) to streamline debugging.</li><li>Hybrid Execution Strategies: Support both offline (stubbed/mocked) and live (real LLM) modes to balance development speed with production fidelity.</li></ul></section><section class="learn" id="patterns"><h2>Patterns</h2><ul class="cards"><li class="card"><p>Persona-Driven Simulation: Use LLMs to generate diverse, realistic user inputs based on defined personas rather than static test fixtures.</p></li><li class="card"><p>LLM-as-a-Judge: Employ a separate, high-capability model to evaluate the quality and correctness of interactions based on predefined rubrics.</p></li><li class="card"><p>Static Flow Linting: Apply static analysis tools to validate the structure and syntax of agent flow definitions before runtime execution.</p></li><li class="card"><p>Report Card Generation: Automate the creation of structured evaluation reports that highlight specific metrics like success rate, latency, and error types.</p></li></ul></section><section class="learn" id="apply"><h2>How to apply</h2><ul class="cards"><li class="card"><p>Customer Support Bot Testing: Create personas representing &#x27;frustrated customer,&#x27; &#x27;technical user,&#x27; and &#x27;novice&#x27; to test a support agent&#x27;s ability to handle varying levels of complexity and tone.</p></li><li class="card"><p>Regression Testing for Prompt Changes: Before deploying a new system prompt, run the full suite of persona interactions in offline mode to ensure no existing capabilities are broken.</p></li><li class="card"><p>Robustness Stress Testing: Use personas designed to provide ambiguous or adversarial inputs to evaluate how well the agent maintains context and recovers from errors.</p></li><li class="card"><p>CI/CD Integration: Integrate the evaluation framework into the deployment pipeline, blocking merges if the &#x27;judge&#x27; scores fall below a defined threshold for task success.</p></li></ul></section><section class="learn" id="pitfalls"><h2>Pitfalls</h2><ul class="bullets"><li>Judge Bias: The evaluating LLM may have inherent biases or inconsistencies; mitigate this by using consistent prompting and potentially averaging scores from multiple judge instances.</li><li>Cost of Live Evaluation: Running full evaluations with real LLMs can be expensive; rely heavily on offline/stubbed modes for daily development and reserve live modes for pre-release checks.</li><li>Overfitting to Personas: If personas are too narrow, the agent may perform well in tests but fail with real users; ensure persona diversity covers edge cases and unexpected user behaviors.</li><li>Ignoring Infrastructure Noise: Failing to properly distinguish infrastructure errors from logic failures can lead to wasted time debugging prompts when the issue is actually network-related.</li></ul></section>
+<footer class="prov">Generated from 1 PR across riff · model qwen3.7-plus · <a href="/daily/">← Back to Daily</a></footer>
+</body>
+</html>
