@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-26T10:22:04.331913Z",
+  "generated_at": "2026-06-27T09:28:31.357146Z",
   "count": 137,
   "projects": [
     {
@@ -4326,35 +4326,35 @@
     {
       "title": "GitHub Portfolio Search",
       "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
-      "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a semantic search interface via CLI, REST API, and static web UI. It enables developers to find reusable code patterns across their own portfolio.",
-      "how_its_built": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web UI is a static HTML/JS application consuming JSON data exported by the CLI. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing.",
-      "how_to_apply": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI/MCP server to search your codebase.",
-      "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\n# Edit .env to add GITHUB_TOKEN\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
+      "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It enables developers to find reusable code patterns and architectures across their own portfolio.",
+      "how_its_built": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the client-side web UI. Deployment uses AWS S3, CloudFront, and Lambda functions for OAuth and logging.",
+      "how_to_apply": "Clone the repo, configure a GitHub Personal Access Token, index your repositories using the CLI, and serve the web UI or deploy to AWS. AI agents can connect via the MCP server to search your codebase programmatically.",
+      "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
       "features": [
-        "Semantic search using embeddings and TF-IDF weighting",
+        "Client-side semantic search using TF-IDF and embeddings",
+        "Automated repository indexing and README extraction",
         "Faceted filtering by language, tech stack, and stars",
-        "Auto-generated capability clusters for repo grouping",
         "MCP server integration for AI agent access",
-        "Static web UI with shareable URLs and collections",
-        "Automated weekly reindexing via GitHub Actions"
+        "Auto-generated capability clusters and related repos",
+        "Static web UI deployable to S3/CloudFront"
       ],
-      "diagram_architecture": "flowchart TD\n    User[User Browser]\n    WebUI[Static Web UI]\n    API[FastAPI Server]\n    Indexer[Indexing Pipeline]\n    DB[(SQLite-vec Index)]\n    GitHub[GitHub API]\n    Lambda[AWS Lambda OAuth]\n    S3[S3 Bucket]\n    User --> WebUI\n    WebUI --> API\n    WebUI --> S3\n    API --> DB\n    Indexer --> GitHub\n    Indexer --> DB\n    Lambda --> GitHub\n    User --> Lambda",
-      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant WebUI\n    participant API\n    participant DB\n    participant GitHub\n    User->>WebUI: Enter search query\n    WebUI->>API: GET /search?q=query\n    API->>DB: Query embeddings and TF-IDF\n    DB-->>API: Return ranked results\n    API-->>WebUI: JSON results\n    WebUI-->>User: Display repos and snippets\n    User->>WebUI: Click repo detail\n    WebUI->>API: GET /repo/slug\n    API->>DB: Fetch repo record\n    DB-->>API: Return full record\n    API-->>WebUI: JSON record\n    WebUI-->>User: Show README and details",
+      "diagram_architecture": "flowchart TD\n    User[User Browser]\n    WebUI[Static Web UI]\n    API[FastAPI Server]\n    Indexer[Indexing Pipeline]\n    GitHub[GitHub API]\n    DB[SQLite Vector DB]\n    MCP[MCP Server]\n    Agent[AI Agent]\n    User --> WebUI\n    WebUI --> API\n    API --> DB\n    Indexer --> GitHub\n    Indexer --> DB\n    MCP --> DB\n    Agent --> MCP",
+      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant WebUI\n    participant API\n    participant DB\n    User->>WebUI: Enter search query\n    WebUI->>API: GET /search?q=query\n    API->>DB: Query vector index\n    DB-->>API: Return matching repos\n    API-->>WebUI: JSON results\n    WebUI-->>User: Display results",
       "capabilities": [
-        "Semantic Search",
-        "Vector Indexing",
-        "REST API",
-        "Static Site Generation",
-        "OAuth Authentication",
-        "MCP Server"
+        "Semantic search",
+        "Repository indexing",
+        "Embedding generation",
+        "MCP server support",
+        "Static site deployment",
+        "OAuth authentication"
       ],
       "components": [
-        "CLI Tool",
         "Indexing Pipeline",
-        "FastAPI Server",
+        "FastAPI Backend",
         "Static Web UI",
-        "AWS Lambda Functions",
-        "GitHub Actions Workflow"
+        "MCP Server",
+        "Lambda Functions",
+        "CloudFront Distribution"
       ],
       "tech": [
         "Python",
@@ -4362,34 +4362,36 @@
         "JavaScript",
         "FastAPI",
         "SQLite-vec",
-        "sentence-transformers",
-        "AWS Lambda",
-        "S3",
-        "CloudFront"
+        "AWS S3",
+        "AWS Lambda"
       ],
       "depends_on": [
-        "GitHub Personal Access Token",
-        "Python 3.9+",
-        "AWS CLI"
+        "sentence-transformers",
+        "sqlite-vec",
+        "fastapi",
+        "boto3",
+        "requests"
       ],
       "integrates_with": [
         "GitHub API",
         "Google OAuth",
-        "Claude Code MCP",
+        "Claude Code",
+        "AWS CloudFront",
         "Telegram Bot API"
       ],
       "patterns": [
-        "Semantic Search",
+        "Vector Search",
         "Static Site Generation",
-        "Serverless Backend",
+        "Serverless Functions",
         "Progressive Disclosure",
-        "Vector Database"
+        "Client-Side Filtering"
       ],
       "reuse_tags": [
-        "search-engine",
-        "portfolio-tool",
-        "code-discovery",
-        "ai-assistant-integration"
+        "semantic-search",
+        "github-tools",
+        "portfolio-manager",
+        "ai-agent-integration",
+        "static-web-app"
       ],
       "slug": "github-portfolio-search",
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
@@ -4398,10 +4400,10 @@
       "thin": false,
       "todos": [],
       "screenshot_url": "",
-      "generated_at": "2026-06-26T10:21:24.408596Z",
-      "source_commit": "82bebcd",
+      "generated_at": "2026-06-27T09:27:56.831288Z",
+      "source_commit": "8120d4c",
       "model": "qwen3.7-plus",
-      "pushed_at": "2026-06-25T10:17:36Z",
+      "pushed_at": "2026-06-27T01:57:08Z",
       "docs": []
     },
     {
@@ -7453,75 +7455,75 @@
     {
       "title": "Riff",
       "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
-      "what_it_is": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business in plain text, automatically generating a voice flow that handles tasks like scheduling, ordering, and intake while preventing LLM hallucinations through deterministic guardrails and slot validation.",
-      "how_its_built": "The system is built in Python using a modular architecture where the LLM handles conversational nuance ('riffs') and a state manager enforces business logic ('keeps the beat'). Core components include a YAML-based flow loader, a pure-function state manager, deterministic guardrails, and adapters for STT/TTS and LLM providers (Gemini, Gemma, Claude). It uses an event bus for internal communication and JSONL for turn logging.",
-      "how_to_apply": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail scenarios (coffee, pizza). It is suitable for developers who need reliable, hallucination-free voice interactions without manually coding complex state machines. The platform supports local development with open-source models or cloud deployment with proprietary APIs.",
+      "what_it_is": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows developers to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using pure functions for guardrails, slot validation, and state transitions, preventing LLM hallucinations while maintaining conversational fluidity.",
+      "how_its_built": "The core architecture separates the 'riffing' LLM layer from the 'beat-keeping' FSM layer. Incoming speech is converted to text via STT, then processed by `run_turn()`, which consults a `StateManager` enforcing a declared YAML graph. Guardrails (8 layers of pure functions) validate inputs before they reach the LLM or state transition logic. The system supports multiple LLM adapters (Gemini, Gemma, Claude) and includes deterministic fallbacks for slot extraction. Observability is built-in via JSONL logging and silent-failure tracking.",
+      "how_to_apply": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. Define your business logic in a YAML flow file or generate one via the API using a natural language description. Integrate the generated agent into your telephony stack via the provided web server or MCP interface. It is ideal for scenarios requiring high reliability and structured data collection (slots) where pure LLM agents might drift or hallucinate.",
       "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server",
       "features": [
         "Generates voice agent flows from plain English business descriptions",
-        "Enforces deterministic state transitions via YAML-defined FSMs",
-        "Prevents LLM hallucinations with pure-function guardrails and validators",
+        "Enforces strict state transitions and slot validation via YAML-defined FSMs",
+        "Deterministic guardrails and pure function validators prevent LLM hallucinations",
         "Supports multiple LLM backends including Gemini, Gemma, and Claude",
-        "Includes 11 pre-built flows for common service and retail scenarios",
-        "Provides real-time web UI for monitoring and inspecting active sessions"
+        "Built-in A/B testing harness using observable metrics without live LLM judges",
+        "Real-time web UI for monitoring active sessions and FSM states"
       ],
-      "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[STT]\n    STT --> RunTurn[run_turn]\n    RunTurn --> Guardrails[Guardrails]\n    RunTurn --> LLMCall[LLM Call]\n    RunTurn --> StateManager[State Manager]\n    Guardrails --> RunTurn\n    LLMCall --> RunTurn\n    StateManager --> RunTurn\n    RunTurn --> TurnResult[TurnResult]\n    TurnResult --> SlotExtractor[Slot Extractor]\n    TurnResult --> EvalFramework[Eval Framework]\n    TurnResult --> TurnLogger[Turn Logger]\n    TurnResult --> TTS[TTS]\n    TTS --> Caller",
-      "diagram_sequence": "sequenceDiagram\n    participant User as Caller\n    participant STT as STT Service\n    participant Server as riff Web Server\n    participant FSM as State Manager\n    participant LLM as LLM Provider\n    participant TTS as TTS Service\n    User->>STT: Speaks utterance\n    STT->>Server: Sends text transcript\n    Server->>FSM: Get current state context\n    FSM->>Server: Return state definition\n    Server->>LLM: Send prompt with context\n    LLM->>Server: Return generated response\n    Server->>FSM: Validate transition and slots\n    FSM->>Server: Confirm valid transition\n    Server->>TTS: Synthesize speech\n    TTS->>User: Plays audio response",
+      "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[STT Service]\n    STT --> RunTurn[run_turn Pipeline]\n    RunTurn --> Guardrails[Guardrails Pure Fns]\n    RunTurn --> LLMCall[LLM Adapter]\n    RunTurn --> StateManager[State Manager FSM]\n    Guardrails --> SlotExtractor[Slot Extractor]\n    LLMCall --> TurnResult[Turn Result]\n    StateManager --> TurnResult\n    SlotExtractor --> TurnResult\n    TurnResult --> TTS[TTS Service]\n    TTS --> Caller\n    TurnResult --> Logger[Turn Logger JSONL]",
+      "diagram_sequence": "sequenceDiagram\n    participant User as Caller\n    participant STT as STT Service\n    participant Server as riff Web Server\n    participant FSM as State Manager\n    participant LLM as LLM Adapter\n    participant TTS as TTS Service\n    User->>STT: Speaks utterance\n    STT->>Server: Sends transcribed text\n    Server->>FSM: Get current state context\n    FSM->>Server: Return state definition\n    Server->>LLM: Generate response with constraints\n    LLM->>Server: Return proposed action/text\n    Server->>FSM: Validate transition and slots\n    FSM->>Server: Confirm valid transition\n    Server->>TTS: Synthesize audio response\n    TTS->>User: Plays audio response",
       "capabilities": [
-        "Plain English to Voice Flow Generation",
-        "Deterministic State Machine Enforcement",
-        "Multi-Provider LLM Integration",
-        "Real-time Session Inspection",
-        "A/B Testing Harness",
-        "Silent Failure Observability"
+        "Natural language flow generation",
+        "Deterministic state management",
+        "Multi-LLM adapter support",
+        "Real-time session monitoring",
+        "A/B testing framework",
+        "MCP server integration"
       ],
       "components": [
-        "Flow Loader",
-        "State Manager",
-        "Guardrails Engine",
-        "Session Store",
-        "Web Server",
-        "Event Bus",
-        "Slot Extractor",
-        "Turn Logger"
+        "web_server",
+        "state_manager",
+        "run_turn pipeline",
+        "guardrails engine",
+        "slot_extractor",
+        "adapters",
+        "session_store",
+        "event_bus"
       ],
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
         "JSONL",
-        "Pytest",
-        "FastAPI",
-        "WebSockets"
+        "WebSockets",
+        "HTTP API"
       ],
       "depends_on": [
-        "Google Gemini API",
-        "Gemma Local Model",
-        "Claude API",
-        "STT Service",
-        "TTS Service"
+        "pytest",
+        "mcp",
+        "google-generativeai",
+        "anthropic",
+        "pydantic"
       ],
       "integrates_with": [
-        "Model Context Protocol MCP",
-        "Browser Web UI",
-        "Local File System",
-        "Git Version Control"
+        "Google Gemini",
+        "Google Gemma",
+        "Anthropic Claude",
+        "MCP Clients",
+        "Telephony STT/TTS"
       ],
       "patterns": [
-        "LLM Riffs FSM Beats",
+        "Finite State Machine",
         "Pure Function Guardrails",
-        "Event Bus Cancellation",
-        "LRU Cache Bounding",
-        "Silent Failure Tracking",
-        "Observable Metric Scoring"
+        "Adapter Pattern",
+        "Event Bus",
+        "LRU Cache",
+        "Silent Failure Tracking"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "python-platform",
-        "yaml-configuration",
-        "deterministic-workflow"
+        "fsm",
+        "llm-orchestration",
+        "python",
+        "deterministic-ai",
+        "customer-service"
       ],
       "slug": "riff",
       "repo_url": "https://github.com/davidbmar/riff",
@@ -7567,10 +7569,10 @@
         }
       ],
       "screenshot_url": "",
-      "generated_at": "2026-06-26T10:22:03.048255Z",
-      "source_commit": "95586db",
+      "generated_at": "2026-06-27T09:28:30.568417Z",
+      "source_commit": "be85143",
       "model": "qwen3.7-plus",
-      "pushed_at": "2026-06-26T06:22:07Z",
+      "pushed_at": "2026-06-27T08:48:23Z",
       "docs": [
         {
           "path": "docs/html/archetypes.html",

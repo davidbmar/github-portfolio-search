@@ -1,17 +1,90 @@
 {
-  "generated_at": "2026-06-26T10:23:39.383768Z",
-  "count": 150,
+  "generated_at": "2026-06-27T09:29:47.133942Z",
+  "count": 151,
   "days": [
     {
-      "date": "2026-06-26",
-      "headline": "Riff: Streamline Verification Flows and Enhance CI Pre-Push Gates",
-      "summary": "The pre-push gate now supports evaluating complex verification flows, while the scheduling sub-flow was consolidated to use verified phone numbers. These changes remove redundant confirmation steps and improve CI reliability for complex logic.",
+      "date": "2026-06-27",
+      "headline": "Stabilize Riff Agent Loops and Unify Portfolio Design System",
+      "summary": "Resolved critical oscillation bugs in the CEO command center and implemented robust rate-limit handling for agent evaluations. Simultaneously, aligned the GitHub portfolio search interface with the main design system for visual consistency.",
       "takeaways": [
-        "Extend CI pre-push gates to evaluate complex verification flows by updating the evaluation logic to handle nested or multi-step processes.",
-        "Consolidate redundant scheduling sub-flows into a single verified phone path to reduce user friction and simplify state management."
+        "Implement retry logic treating HTTP 403/429 as transient errors to enable automatic failover in agent workflows.",
+        "Prevent intent-dispatch oscillation loops by adding explicit guards in state-machine based agent controllers.",
+        "Enforce tool-call execution on specific steps using linter guards to ensure deterministic behavior in tool-only phases.",
+        "Reuse existing design tokens to rapidly align subsidiary project UIs, such as portfolio search pages, with a primary brand system."
       ],
-      "total_commits": 2,
+      "total_commits": 9,
       "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 2,
+          "messages": [
+            "Merge pull request #6 from davidbmar/feat/narrate-render-and-link",
+            "feat(narrate): redesign Learn pages to match the davidbmar.com design system"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 7,
+          "messages": [
+            "docs(flow-eval): iter7 convergence confirmed; slow loop to hourly",
+            "docs(flow-eval): iter6 inflection — no-judge track converged + API self-throttled",
+            "fix(ceo_command_center): stop dispatch_intent<->dispatch_send oscillation",
+            "docs(flow-eval): iter4 convergence checkpoint + ceo oscillation root cause",
+            "fix(eval): retry rate-limit 403/429 on agent AND persona calls + held-out flow",
+            "fix(apartment_viewing): force tool calls on tool-only steps + linter guard",
+            "fix(eval): treat rate-limit 403/429 as transient so failover engages"
+          ]
+        }
+      ],
+      "commit_sig": "e8ac46ee8f8637c3"
+    },
+    {
+      "date": "2026-06-26",
+      "headline": "Automated Portfolio Narration Pipeline with LLM Fact Extraction",
+      "summary": "This update introduces an end-to-end pipeline that scans merged GitHub PRs, extracts technical facts using Qwen3.7, and generates structured tutorial content. It features a resilient CLI tool with MiniLM-based theme retrieval, deterministic evidence selection, and automated publishing to a daily digest feed.",
+      "takeaways": [
+        "Implement a PR-grounded narration pipeline by scanning merged commits, extracting facts via LLM (e.g., Qwen3.7), and validating them into structured PRRecords for automated tutorial generation.",
+        "Use MiniLM cosine similarity to retrieve relevant themes for content classification, ensuring deterministic output through path tiebreakers and immutable slug ledgers.",
+        "Build resilient batch processing with loss-safe cursors, overlap windows for PR scanning, and retry logic to handle API failures during large-scale repository analysis."
+      ],
+      "total_commits": 32,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 30,
+          "messages": [
+            "Merge pull request #5 from davidbmar/feat/narrate-render-and-link",
+            "build(narrate): publish riff Learn tutorials + link from /daily",
+            "feat(narrate): link Learn deep-dives from the /daily feed",
+            "fix(narrate): render structured pattern/how-to-apply items as labelled bullets",
+            "Merge pull request #4 from davidbmar/feat/portfolio-narrate",
+            "fix(narrate): codex review - loss-safe cursor, honor --model, validate classifier theme_id",
+            "fix(narrate): retry tutorial generation + per-theme batch resilience",
+            "fix(narrate): allow legitimately-empty arrays in PRRecord validation",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "fix(narrate): real LLM client factory, repo-scoped membership, publish-once guard",
+            "fix(narrate): skill uses ghps console script, not python -m ghps",
+            "feat(narrate): portfolio-narrate Claude Code skill wrapper",
+            "feat(narrate): ghps narrate CLI command",
+            "feat(narrate): end-to-end pipeline orchestration (scan->render)",
+            "fix(narrate): defensive slug guard + escaped href + validation/escaping tests",
+            "feat(narrate): tutorial prose generation + escaped /learn/ HTML pages",
+            "feat(narrate): maturity scoring + candidate->mature lifecycle",
+            "fix(narrate): coerce unknown LLM classify action to ignore (no NameError)",
+            "feat(narrate): attach|create|ignore classifier with immutable slug + ledger",
+            "feat(narrate): MiniLM cosine retrieval for theme candidates",
+            "feat(narrate): LLM fact extraction into validated PRRecord (Qwen3.7)",
+            "fix(narrate): deterministic evidence ordering via path tiebreaker",
+            "feat(narrate): deterministic diff filter + evidence selection",
+            "feat(narrate): merged_at-cursor PR scan with overlap window + seen-skip",
+            "feat(narrate): GitHub merged-PR and PR-files fetchers",
+            "fix(narrate): sanitize path keys, utf-8 writes, all_themes assertion",
+            "feat(narrate): repo-local state store (cursor, records, membership ledger)",
+            "feat(narrate): PRRecord/ThemeRecord schemas, validators, content hashing",
+            "docs: add portfolio-narrate implementation plan (13 TDD tasks, v1)",
+            "docs: add portfolio-narrate design spec (PR-grounded applied tutorials)"
+          ]
+        },
         {
           "name": "riff",
           "commits": 2,
@@ -21,7 +94,7 @@
           ]
         }
       ],
-      "commit_sig": "06fb877953dc48b7"
+      "commit_sig": "d5c25395a40da28e"
     },
     {
       "date": "2026-06-25",
@@ -3748,14 +3821,14 @@
     },
     {
       "date": "2026-05-02",
-      "headline": "Riff Flow Graph Overhaul, Appointment Module Redesign, and Primitive Audit Hardening",
-      "summary": "Major UI improvements to the Riff flow graph include a three-column spine layout with SVG overlays and auto-panning, while the appointment booking module was redesigned to drop triage layers and enforce strict state invariants. Concurrently, comprehensive sweep scripts and test suites were added for record, run-program, and booking primitives to close out multiple sprint phases.",
+      "headline": "Riff Flow Graph Overhaul, Appointment Module, and Record Primitive Hardening",
+      "summary": "Major updates include a three-column SVG flow graph with auto-panning, a redesigned book-appointment module with strict state guards, and comprehensive invariant testing for record primitives. These changes improve UI clarity, scheduling reliability, and system robustness through rigorous audit scripts and updated Gemini adapters.",
       "takeaways": [
-        "Implement a three-column spine layout with SVG-overlay edges and explicit zoom controls to prevent sibling node overlap in complex flow graphs.",
-        "Adopt parameterized YAML modules with defined invariants and failure modes to create reusable, testable state machines for scheduling and data recording.",
-        "Use automated sweep scripts as CI gates to validate primitive behaviors against extensive scenario sets before merging changes."
+        "Reuse the three-column spine layout with SVG-overlay edges and auto-panning logic to build complex, readable flow visualizations that prevent sibling node overlap.",
+        "Adopt the parameterized book_appointment_v1 module pattern, utilizing JSON Schema-valid types and explicit state guards (like rejecting side-effects in confirm states) to ensure reliable scheduling flows.",
+        "Implement the sweep_record.py and sweep_book_appointment.py audit scripts alongside invariant tests (e.g., verbatim prompt adherence) to systematically validate primitive behaviors and catch edge cases early."
       ],
-      "total_commits": 65,
+      "total_commits": 58,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3774,7 +3847,7 @@
         },
         {
           "name": "riff",
-          "commits": 62,
+          "commits": 55,
           "messages": [
             "fix live scheduling demo latency",
             "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
@@ -3830,18 +3903,11 @@
             "feat(state-manager): register 6 guards for book_appointment_v1",
             "feat(modules): add book_appointment_v1.yaml (parameterized via [[VAR]]; 9 states, 3 slot vars)",
             "feat(cal-provider): write _tentative_event_id at CONFIRMING; clear at DONE (I-3 enables on-session-end cleanup)",
-            "feat(turn-controller): reject side-effect tool calls from speech_act:confirm states (I-2)",
-            "feat(loader): require business_tz when flow uses schedule_event (defends B-105)",
-            "docs(backlog): update end/B-005 to reflect 8 instances (was 4) and bump priority to High",
-            "docs(memory): sprint-188-run-program-harden capstone + backlog (T-BB49 surfaced)",
-            "docs(backlog): file run-program-sweep findings as backlog items",
-            "feat(scripts): add sweep_run_program.py (gate)",
-            "test(primitives): author run_program.yaml (20 scenarios across 6 behavior classes)",
-            "flow(tutorial_confirm_then_run_program): use final_status: booked (was off-Literal; 8th defect of this class)"
+            "feat(turn-controller): reject side-effect tool calls from speech_act:confirm states (I-2)"
           ]
         }
       ],
-      "commit_sig": "8ce8a893fc4bd9f3"
+      "commit_sig": "bd2b923e3c4959e3"
     },
     {
       "date": "2026-05-01",
