@@ -1,11 +1,58 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>Web Audio-Gated Flows and Flow Picker — Learn</title></head><body>
-<main><h1>Web Audio-Gated Flows and Flow Picker</h1>
-<p class="summary">This tutorial addresses the challenge of testing audio-gated conversational flows in text-only environments. It details how to decouple flow logic from audio playback dependencies by simulating engine events and filtering configuration artifacts, enabling robust text-mode debugging for voice-first applications.</p>
-<section><h2>What was built &amp; why</h2><p>In voice-first architectures, conversational flows often rely on specific audio lifecycle events (like &#x27;audio_done&#x27;) to trigger state transitions or tool executions. When developers attempt to test these flows in a text-based interface (such as a chat HTML client), the system stalls because the audio engine is inactive, and the expected events never fire. Furthermore, configuration partials used for internal routing can clutter the user-facing flow selection UI, causing errors if selected directly. To resolve this, we implemented a server-side mechanism that mimics the live voice engine&#x27;s behavior during text interactions. This approach automatically fires completion events for static states and executes read-only actions, ensuring the conversation progresses naturally without actual audio playback. Simultaneously, we refined the API endpoints to hide internal configuration files from the user interface, streamlining the developer experience.</p></section>
-<section><h2>Principles</h2><ul><li>Decouple State Logic from Media Playback: Conversational state machines should not hard-depend on physical audio output events for logical progression.</li><li>Environment Parity in Testing: Text-mode interfaces should simulate the side effects of voice-mode engines to ensure consistent flow behavior across channels.</li><li>Separation of Concerns in Configuration: Internal routing configurations must be distinct from user-selectable flow definitions to prevent UI errors and confusion.</li></ul></section>
-<section><h2>Patterns</h2><ul><li><strong>Event Simulation Shim</strong> — Injecting synthetic events (e.g., &#x27;audio_done&#x27;) into the state machine when the primary trigger (audio playback) is absent, allowing the logic to proceed as if the media had completed.</li><li><strong>Configuration Filtering</strong> — Using naming conventions (e.g., underscore prefixes) to distinguish internal system files from user-facing resources, and filtering them out at the API boundary.</li></ul></section>
-<section><h2>How to apply</h2><ul><li>Implement a &#x27;_advance_text_autostates&#x27; handler in your web server that detects when a flow is running in text mode and automatically triggers the next state transition after an API response, bypassing the need for audio completion signals.</li><li>Update your &#x27;/api/flows&#x27; endpoint to exclude files starting with &#x27;_&#x27; (such as &#x27;_routing.json&#x27;) from the dropdown list presented to users, preventing selection of non-executable configuration partials.</li><li>Ensure that read-only &#x27;act&#x27; tools are executed automatically after each API turn in text mode, mirroring the behavior of the live voice engine to maintain functional parity during debugging.</li></ul></section>
-<section><h2>Pitfalls</h2><ul><li>Stalling on Missing Events: Failing to simulate &#x27;audio_done&#x27; in text mode will cause the state machine to wait indefinitely, making the application appear unresponsive.</li><li>Exposing Internal Configs: Allowing users to select configuration partials (like &#x27;_routing&#x27;) as active flows will result in runtime errors and a broken user experience.</li><li>Inconsistent Tool Execution: If read-only tools are not triggered automatically in text mode, the conversation context may fail to update correctly, leading to inaccurate subsequent responses.</li></ul></section>
-<footer>Repos: riff</footer>
-</main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web Audio-Gated Flows and Flow Picker · Learn · davidbmar.com</title>
+<meta name="description" content="This tutorial addresses the challenge of testing audio-gated conversational flows in text-only environments. It details how to decouple flow logic from audio pl">
+<style>
+
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  a { color: #2563eb; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: .72rem;
+             font-weight: 700; color: #2563eb; margin: 0 0 .4rem; }
+  h1 { margin: 0 0 .35rem; line-height: 1.15; font-size: 2rem; }
+  .lede { font-size: 1.18rem; line-height: 1.5; opacity: .9; margin: .2rem 0 .7rem; }
+  .repo-chips { margin: .3rem 0 0; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 999px;
+         padding: .12rem .62rem; margin: .14rem .18rem 0 0; font-size: .8rem;
+         text-decoration: none; }
+  .toc { border: 1px solid #8884; border-radius: 12px; padding: .65rem 1rem;
+         margin: 1.5rem 0; font-size: .9rem; }
+  .toc b { display: block; text-transform: uppercase; letter-spacing: .07em;
+           font-size: .68rem; opacity: .55; margin-bottom: .35rem; }
+  .toc a { display: inline-block; margin: 0 1rem .15rem 0; }
+  section.learn { margin: 2.1rem 0; }
+  section.learn > h2 { font-size: 1.3rem; border-bottom: 1px solid #8883;
+                       padding-bottom: .3rem; margin: 0 0 .8rem; }
+  .narrative { font-size: 1.03rem; }
+  ul.bullets { padding-left: 1.15rem; margin: .4rem 0; }
+  ul.bullets li { margin: .4rem 0; }
+  ul.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+  ul.cards li.card { border-left: 4px solid #2563eb; background: #eef3ff;
+                     color: #1a1f29; border-radius: 0 10px 10px 0; padding: .65rem 1rem; }
+  .card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #1a1f29; }
+  .card p { margin: 0; color: #1a1f29; }
+  footer.prov { margin-top: 2.6rem; border-top: 1px solid #8883; padding-top: .8rem;
+                font-size: .82rem; opacity: .6; }
+
+  .site-bar { display: flex; gap: 1.1rem; align-items: center; padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; font-size: .9rem; }
+  .site-bar a { color: #2563eb; text-decoration: none; }
+  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }
+</style>
+</head>
+<body>
+<nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/#/clusters">Clusters</a></nav>
+<header>
+  <p class="eyebrow">Deep dive</p>
+  <h1>Web Audio-Gated Flows and Flow Picker</h1>
+  <p class="lede">This tutorial addresses the challenge of testing audio-gated conversational flows in text-only environments. It details how to decouple flow logic from audio playback dependencies by simulating engine events and filtering configuration artifacts, enabling robust text-mode debugging for voice-first applications.</p>
+  <div class="repo-chips"><a class="tag" href="/projects/riff.html">riff</a></div>
+</header>
+<nav class="toc"><b>On this page</b><a href="#why">Why</a><a href="#principles">Principles</a><a href="#patterns">Patterns</a><a href="#apply">How to apply</a><a href="#pitfalls">Pitfalls</a></nav>
+<section class="learn" id="why"><h2>What was built &amp; why</h2><p class="narrative">In voice-first architectures, conversational flows often rely on specific audio lifecycle events (like &#x27;audio_done&#x27;) to trigger state transitions or tool executions. When developers attempt to test these flows in a text-based interface (such as a chat HTML client), the system stalls because the audio engine is inactive, and the expected events never fire. Furthermore, configuration partials used for internal routing can clutter the user-facing flow selection UI, causing errors if selected directly. To resolve this, we implemented a server-side mechanism that mimics the live voice engine&#x27;s behavior during text interactions. This approach automatically fires completion events for static states and executes read-only actions, ensuring the conversation progresses naturally without actual audio playback. Simultaneously, we refined the API endpoints to hide internal configuration files from the user interface, streamlining the developer experience.</p></section><section class="learn" id="principles"><h2>Principles</h2><ul class="bullets"><li>Decouple State Logic from Media Playback: Conversational state machines should not hard-depend on physical audio output events for logical progression.</li><li>Environment Parity in Testing: Text-mode interfaces should simulate the side effects of voice-mode engines to ensure consistent flow behavior across channels.</li><li>Separation of Concerns in Configuration: Internal routing configurations must be distinct from user-selectable flow definitions to prevent UI errors and confusion.</li></ul></section><section class="learn" id="patterns"><h2>Patterns</h2><ul class="cards"><li class="card"><h3>Event Simulation Shim</h3><p>Injecting synthetic events (e.g., &#x27;audio_done&#x27;) into the state machine when the primary trigger (audio playback) is absent, allowing the logic to proceed as if the media had completed.</p></li><li class="card"><h3>Configuration Filtering</h3><p>Using naming conventions (e.g., underscore prefixes) to distinguish internal system files from user-facing resources, and filtering them out at the API boundary.</p></li></ul></section><section class="learn" id="apply"><h2>How to apply</h2><ul class="cards"><li class="card"><p>Implement a &#x27;_advance_text_autostates&#x27; handler in your web server that detects when a flow is running in text mode and automatically triggers the next state transition after an API response, bypassing the need for audio completion signals.</p></li><li class="card"><p>Update your &#x27;/api/flows&#x27; endpoint to exclude files starting with &#x27;_&#x27; (such as &#x27;_routing.json&#x27;) from the dropdown list presented to users, preventing selection of non-executable configuration partials.</p></li><li class="card"><p>Ensure that read-only &#x27;act&#x27; tools are executed automatically after each API turn in text mode, mirroring the behavior of the live voice engine to maintain functional parity during debugging.</p></li></ul></section><section class="learn" id="pitfalls"><h2>Pitfalls</h2><ul class="bullets"><li>Stalling on Missing Events: Failing to simulate &#x27;audio_done&#x27; in text mode will cause the state machine to wait indefinitely, making the application appear unresponsive.</li><li>Exposing Internal Configs: Allowing users to select configuration partials (like &#x27;_routing&#x27;) as active flows will result in runtime errors and a broken user experience.</li><li>Inconsistent Tool Execution: If read-only tools are not triggered automatically in text mode, the conversation context may fail to update correctly, leading to inaccurate subsequent responses.</li></ul></section>
+<footer class="prov">Generated from 1 PR across riff · model qwen3.7-plus · <a href="/daily/">← Back to Daily</a></footer>
+</body>
+</html>

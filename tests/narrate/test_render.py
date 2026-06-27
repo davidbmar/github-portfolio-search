@@ -20,18 +20,28 @@ def test_write_tutorial_prose_fills_fields():
     assert t["summary"] == "S" and t["principles"] == ["p1"]
 
 
-def test_render_structured_dict_items_as_labelled_bullets():
+def test_render_structured_dict_items_as_cards():
     # Qwen returns {name, description} for patterns and {scenario, application}
-    # for how-to-apply; render them as labelled bullets, not dict reprs.
+    # for how-to-apply; render them as labelled cards, not dict reprs.
     t = _theme()
     t.update({"summary": "S", "narrative": "N", "principles": [],
               "patterns": [{"name": "Phased Pipeline", "description": "validate in stages"}],
               "applied_examples": [{"scenario": "Rollback", "application": "flip the kill switch"}],
               "pitfalls": []})
     page = render_learn_html(t)
-    assert "<strong>Phased Pipeline</strong> — validate in stages" in page
-    assert "<strong>Rollback</strong> — flip the kill switch" in page
+    assert '<li class="card"><h3>Phased Pipeline</h3><p>validate in stages</p></li>' in page
+    assert '<li class="card"><h3>Rollback</h3><p>flip the kill switch</p></li>' in page
     assert "{&#x27;" not in page and "{'" not in page   # no raw dict repr leaked
+
+
+def test_render_uses_site_chrome():
+    t = _theme()
+    t.update({"summary": "S", "narrative": "N", "principles": [],
+              "patterns": [], "applied_examples": [], "pitfalls": []})
+    page = render_learn_html(t)
+    assert 'class="site-bar"' in page            # shared nav
+    assert 'davidbmar.com' in page               # brand
+    assert 'color-scheme: light dark' in page    # dark-mode aware like the rest of the site
 
 
 def test_render_plain_string_items_still_work():
