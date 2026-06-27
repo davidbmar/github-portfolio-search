@@ -8,11 +8,21 @@ from ..docsgen.render import _SITE_NAV, _SITE_NAV_CSS
 from .schema import NarrateValidationError
 
 TUTORIAL_SYSTEM = (
-    "You are writing an APPLIED TUTORIAL (think a readable AWS applied-architecture blog) "
-    "about a body of related work, for a developer who wants to learn the principles and reuse them. "
-    "Output ONE JSON object: summary (string), narrative (string: what was built and why, no raw code "
-    "dumps), principles (array), patterns (array), applied_examples (array: concrete ways to apply this), "
-    "pitfalls (array). Ground everything in the provided PR facts. No marketing. JSON only."
+    "You are a staff engineer writing a short, punchy applied tutorial for another developer "
+    "who is skimming. Lead with the takeaway, then the detail. "
+    "Output ONE JSON object with these keys: "
+    "summary (1-2 sentences: the takeaway in plain words -- what a reader can now do), "
+    "narrative (3-5 sentences: name the ACTUAL thing that broke or was missing first, "
+    "then what was built and why it works -- no raw code dumps), "
+    "principles (array of short, reusable rules), patterns (array), "
+    "applied_examples (array: concrete ways to apply this), pitfalls (array). "
+    "VOICE: write like a sharp colleague, not a brochure. Address the reader as 'you'. "
+    "Use active voice and concrete subject-verb-object sentences; keep most sentences under 20 words. "
+    "Name the specific components, files, and failures from the PR facts -- never abstract them away. "
+    "BANNED: marketing adjectives (robust, seamless, powerful, comprehensive, granular, cutting-edge); "
+    "noun-stacked abstractions like 'deterministic state management' or 'highly configurable architecture'; "
+    "and textbook openers like 'In complex systems...'. Prefer the plain verb to the abstract noun. "
+    "Ground every claim in the provided PR facts. Do not invent. No marketing. JSON only."
 )
 _PROSE_KEYS = ("summary", "narrative", "principles", "patterns", "applied_examples", "pitfalls")
 
@@ -22,7 +32,9 @@ def write_tutorial_prose(theme: dict, prs: list[dict], client, *, model: str, re
     members = [p for p in prs if f"{p['repo']}#{p['pr_number']}" in member_keys]
     facts = "\n".join(
         f"- PR#{p['pr_number']}: {p.get('problem','')} | approach: {p.get('approach','')} | "
-        f"pattern: {p.get('reusable_pattern')}" for p in members
+        f"components: {', '.join(p.get('components', []))} | "
+        f"risks: {', '.join(p.get('risks', []))} | "
+        f"reusable_pattern: {p.get('reusable_pattern')}" for p in members
     )
     user = f"Theme: {theme.get('title','')}\nRepos: {', '.join(theme.get('repos', []))}\nPR facts:\n{facts}"
     last_missing = None
