@@ -1,27 +1,27 @@
 [
   {
     "slug": "weather-integration-and-global-preferences",
-    "summary": "This tutorial details the implementation of a stateful, identity-agnostic weather integration within the 'riff' voice application. It addresses the challenge of persisting user preferences (specifically home city) across sessions without relying on authenticated caller IDs, utilizing a local JSON-backed preference store and a self-contained Open-Meteo API flow.",
+    "summary": "You can now persist user preferences like 'home_city' across sessions and safely fetch weather data. The flow engine handles missing state by prompting the user before calling external APIs.",
     "title": "Weather Integration and Global Preferences"
   },
   {
     "slug": "grounding-integrity-gate",
-    "summary": "This tutorial details the implementation of a 'Grounding Integrity Gate' within the Riff codebase, addressing critical production failures caused by non-deterministic conversational flows and rigid telephony routing. By introducing a phased validation pipeline (Static through OTA) backed by a kill switch, and decoupling phone routing via a JSON-backed preference store, the system achieves deterministic state management and granular per-number flow assignment.",
+    "summary": "You now enforce deterministic flow grounding via the Grounding Integrity Gate and route calls by number-specific context. You validate flows across L1-L4 levels using the centralized JsonMaintenanceRequestStore.",
     "title": "Grounding Integrity Gate"
   },
   {
     "slug": "web-audio-gated-flows-and-flow-picker",
-    "summary": "This tutorial addresses the challenge of testing audio-gated conversational flows in text-only environments. It details how to decouple flow logic from audio playback dependencies by simulating engine events and filtering configuration artifacts, enabling robust text-mode debugging for voice-first applications.",
-    "title": "Web Audio-Gated Flows and Flow Picker"
+    "summary": "You unblock text-mode flows by simulating audio completion for read-only steps and hiding invalid config partials from the picker.",
+    "title": "Audio-gated flows and flow picker improvements"
   },
   {
     "slug": "alibaba-dashscope-qwen-integration",
-    "summary": "This tutorial details the architectural shift in the 'riff' project from Anthropic Haiku to Alibaba DashScope (Qwen) for default utterance generation. It demonstrates how to implement a vendor-agnostic LLM client using standard library tools to minimize dependency bloat, while maintaining backward compatibility with existing providers through a unified Persona interface.",
+    "summary": "You swap the default utterance generator from Anthropic Haiku to Alibaba Qwen using a lightweight HTTP client. This cuts costs and dependencies while preserving Anthropic as a fallback option.",
     "title": "Alibaba DashScope/Qwen Integration"
   },
   {
     "slug": "flow-evaluation",
-    "summary": "This tutorial outlines a Test-Driven Development (TDD) framework for evaluating autonomous agent flows. By leveraging LLM-driven personas to simulate human interactions and a separate judge model to score outcomes, developers can systematically grade task success, quality, and robustness. The approach distinguishes between infrastructure failures and logical flow errors, supporting both offline stubbed testing and live execution modes.",
+    "summary": "You can now automate agent flow grading using a persona-driven driver and an LLM judge. This setup replaces manual checks with consistent, scored reports for success and quality.",
     "title": "Flow Evaluation"
   }
 ]

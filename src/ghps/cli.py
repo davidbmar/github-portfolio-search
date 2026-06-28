@@ -392,9 +392,11 @@ def daily_cmd(owner, since, engine, token, no_cache):
 @click.option("--repos", required=True, help="Comma-separated repo slugs.")
 @click.option("--out", "out_dir", default="web/learn", help="Output dir for /learn pages.")
 @click.option("--state", "state_dir", default="web/data/narrate", help="State dir.")
+@click.option("--slug-registry", "slug_registry", default="web/data/learn-slugs.json",
+              help="Committed slug registry that keeps Learn URLs stable across cold rebuilds.")
 @click.option("--provider", default=None, help="LLM provider (dashscope|anthropic).")
 @click.option("--model", default=None, help="Override model id.")
-def narrate(owner, repos, out_dir, state_dir, provider, model):
+def narrate(owner, repos, out_dir, state_dir, slug_registry, provider, model):
     """Generate theme-grouped applied tutorials from merged PRs."""
     from .narrate import pipeline
     from .narrate.store import Store
@@ -403,7 +405,7 @@ def narrate(owner, repos, out_dir, state_dir, provider, model):
     embedder = _narrate_embedder()
     eff_model = model or os.environ.get("DASHSCOPE_MODEL", "qwen-plus")
     summary = pipeline.run(owner, repo_list, Store(state_dir), client, embedder,
-                           out_dir, model=eff_model)
+                           out_dir, model=eff_model, slug_registry_path=slug_registry)
     from pathlib import Path as _P
     pub = []
     _tdir = _P(state_dir) / "theme_records"
