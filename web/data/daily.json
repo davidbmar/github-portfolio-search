@@ -1,31 +1,117 @@
 {
-  "generated_at": "2026-06-27T09:29:47.133942Z",
-  "count": 151,
+  "generated_at": "2026-06-28T09:59:04.965261Z",
+  "count": 152,
   "days": [
     {
-      "date": "2026-06-27",
-      "headline": "Stabilize Riff Agent Loops and Unify Portfolio Design System",
-      "summary": "Resolved critical oscillation bugs in the CEO command center and implemented robust rate-limit handling for agent evaluations. Simultaneously, aligned the GitHub portfolio search interface with the main design system for visual consistency.",
+      "date": "2026-06-28",
+      "headline": "Build a Deterministic Voice AI Testing Harness with Synthetic Callers",
+      "summary": "This update introduces a generic, event-driven synthetic caller harness that drives voice flows to completion, enabling deterministic regression testing and coverage of edge cases like confirmation gates. It also implements a two-layer nightly audio review cycle and fixes critical VAD and state-management bugs to improve live call reliability.",
       "takeaways": [
-        "Implement retry logic treating HTTP 403/429 as transient errors to enable automatic failover in agent workflows.",
-        "Prevent intent-dispatch oscillation loops by adding explicit guards in state-machine based agent controllers.",
-        "Enforce tool-call execution on specific steps using linter guards to ensure deterministic behavior in tool-only phases.",
-        "Reuse existing design tokens to rapidly align subsidiary project UIs, such as portfolio search pages, with a primary brand system."
+        "Implement an event-driven synthetic caller (voice_case.py) that drives any voice flow to a terminal state, allowing you to automate end-to-end testing of complex conversational paths without manual intervention.",
+        "Adopt a 'shift-left' linter strategy by flagging logical errors like 'announce-booked-without-booking' in CI, preventing invalid states from reaching production and reducing debugging time.",
+        "Wire a two-layer nightly audio review cycle using remote Whisper APIs with local fallbacks to automatically populate a quality database, creating a measurable feedback loop for voice model performance.",
+        "Fix VAD tuning and state transitions to handle short inputs like 'yes' without excessive pauses, ensuring natural conversation flow and preventing stalls during confirmation gates."
       ],
-      "total_commits": 9,
+      "total_commits": 42,
       "repos": [
         {
           "name": "github-portfolio-search",
           "commits": 2,
           "messages": [
+            "Merge pull request #7 from davidbmar/feat/narrate-render-and-link",
+            "feat(narrate): pin Learn slugs across cold rebuilds + regen pages in new voice"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 40,
+          "messages": [
+            "docs: file B-322 — property_trouble_ticket scores correctness 0.0 in ci_eval (pre-existing)",
+            "fix(verify)+lint: bump property_trouble_ticket to 3 verification attempts + flag max_attempts:1 (B-318 #3)",
+            "fix(verify): reject non-digit 'yes' as a verification code without burning the attempt (B-318)",
+            "test(linter): baseline gate freezes the 3 known fake-bookers; NEW ones fail CI (step 5)",
+            "feat(linter): flag announce-booked-without-booking (shift-left, step 5)",
+            "docs(B-321): post-fix measurement — clarify raised terse 25%->44%; residual is the VAD layer",
+            "fix(voice_dream): backfill clarify_fired at end of run (upsert races turns.jsonl flush)",
+            "feat(voice): capture clarify_fired metric so the B-303/B-321 fix's impact is measurable",
+            "fix(live): clarify re-prompt on an unresolved confirm gate (B-303/B-321) instead of silence",
+            "test+docs(voice): prove confirm-gate logic is correct; root-cause B-303/B-321 to B-313 nudge suppression",
+            "feat(voice): voice_learnings.py (repeatable step-3 report) + file B-321 (terse-caller failure)",
+            "test(cal-provider): clear boot probe's availability call in _boot_adapter",
+            "test(cal-provider): update boot_check tests for the by-ID booking-target probe",
+            "fix(cal-provider): boot_check verifies the BOOKING TARGET by ID, not just list_calendars",
+            "docs(voice): document cal-provider tool-scoping fix + the sweet_things_bakery validation flow",
+            "feat(flows): sweet_things_bakery — new sellable flow validating all 3 session fixes (step 6)",
+            "fix(providers): scope cal-provider tools to flows that declare them (stops the schedule_event leak)",
+            "test(voice): document the provider-tool leak (pizza gets schedule_event) as a guard",
+            "fix(voice_case): converse waits for playback_end before replying (B-303 root cause = B-300)",
+            "docs(voice): document the audio-simulation system + file B-303 (await_confirmation stall)",
+            "fix(voice_case): send static_done so the harness can drive the 28 static-greeting flows",
+            "feat(voice): caller PERSONAS + timing variance + voice_dream.py (randomized fuzzer)",
+            "feat(voice): voice_sim_all.py — run converse sims across ALL flows -> quality.db + coverage",
+            "feat(voice_case): generic LLM-caller 'converse' mode — drives ANY flow to terminal with audio",
+            "fix(voice_case): trailing silence unblocks Tier-2 — real audio runs now complete end-to-end",
+            "test(voice): close the two biggest coverage gaps — direct-confirm pattern + ALL closes",
+            "docs(review): create voice-quality playbook methodology page and update markdown playbook",
+            "feat(flows): after_hours_answering — sellable example + B-319/B-320 regression fixture (part 6)",
+            "fix(live): suppress re-narration when caller speaks after a terminal close (B-320)",
+            "test(voice): guard the greeting-doesn't-auto-advance case (B-051) the B-319 fix preserved",
+            "test(voice): deterministic confirm-gate simulation across ALL flows (Tier 1) + file B-320",
+            "fix(live): advance read_back/confirm states on the agent's own emission (B-319)",
+            "docs: Voice-Quality Playbook — detect -> reproduce -> shift-left -> fix -> document",
+            "feat(test): voice_case.py — event-driven synthetic-caller harness for the live audio path",
+            "docs(backlog): B-319 — live read_back confirmation stall (response_emitted not fired on live turn_complete)",
+            "feat(record): timestamp-preserving audio + roadmap the verification 'yes' bug (B-318)",
+            "feat(review): wire AUDIO review into the nightly cycle (remote M1 Whisper + local fallback)",
+            "docs(review): create call-review methodology page and link from index",
+            "feat(review): schedule the two-layer call-review cycle at 01:30 + fold into quality.db + skill",
+            "fix(live): tune VAD so short answers ('yes') don't get a ~9s pause"
+          ]
+        }
+      ],
+      "commit_sig": "b3eb4421c2dcabdc"
+    },
+    {
+      "date": "2026-06-27",
+      "headline": "Riff Stabilizes Call Recording and Fixes Agent Dispatch Oscillation",
+      "summary": "The Riff project resolved critical bugs in session recording logic and agent dispatch loops while implementing cascading record policies. Concurrently, the portfolio search tool updated its tutorial narrative and aligned Learn pages with a unified design system.",
+      "takeaways": [
+        "Implement cascading audio record overrides (overall to state level) using normalized YAML boolean parsing to ensure PII blackout rules execute correctly.",
+        "Prevent agent dispatch oscillation by adding end-to-end reproduction guards and treating rate-limit errors (403/429) as transient failures to trigger failover.",
+        "Key audio recorders by session_id rather than global state to prevent finalized recordings from being clobbered during session resumption."
+      ],
+      "total_commits": 27,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 4,
+          "messages": [
+            "feat(narrate): rewrite Learn tutorial voice to be punchy and concrete",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "Merge pull request #6 from davidbmar/feat/narrate-render-and-link",
             "feat(narrate): redesign Learn pages to match the davidbmar.com design system"
           ]
         },
         {
           "name": "riff",
-          "commits": 7,
+          "commits": 23,
           "messages": [
+            "feat(debug): compare_call_transcription — Whisper (caller truth) vs Gemini, on a timeline",
+            "fix(record): session resumption clobbered the finalized recording — key recorder by session_id",
+            "docs(record): iter2 status — YAML-bool fix + PII blackout shipped; feature built+tested",
+            "fix(record-policy): YAML parses on/off as booleans — normalize so record:off actually blacks out",
+            "feat(record): wire CallSessionRecorder into the live transport (per-state gated)",
+            "feat(record-policy): cascading call-audio record override (overall->flow->group->state)",
+            "chore(deps): bump undici 7.25.0 -> 7.28.0 in flow-editor (fixes 7 Dependabot alerts)",
+            "docs: document scaffold exclusion + require_question runtime recovery",
+            "docs(flow-eval): log the directed reproduce-first session (3 bugs + 1 follow-up)",
+            "fix(turn): suppress the spurious bare reprompt when the turn advanced past collection",
+            "fix(flow-eval): exclude single-turn scaffolds from the headline quality aggregate",
+            "fix(rules,turn): make require_question_unenforced reflect what the caller heard",
+            "test(ceo): end-to-end repro guards the dispatch oscillation fix",
+            "docs(flow-eval): iter10 — robotic-repetition has no clean lever; recommend pausing the loop",
+            "docs(flow-eval): iter9 — pet_store judged fix attempt reverted (regressed) + humanness-fix learnings",
+            "fix(pizza,coffee,coffee_split): accurate pickup/delivery close + held-out deli_counter",
             "docs(flow-eval): iter7 convergence confirmed; slow loop to hourly",
             "docs(flow-eval): iter6 inflection — no-judge track converged + API self-throttled",
             "fix(ceo_command_center): stop dispatch_intent<->dispatch_send oscillation",
@@ -36,7 +122,7 @@
           ]
         }
       ],
-      "commit_sig": "e8ac46ee8f8637c3"
+      "commit_sig": "244f0f49ef0f13c3"
     },
     {
       "date": "2026-06-26",
@@ -3743,15 +3829,14 @@
     },
     {
       "date": "2026-05-03",
-      "headline": "Dynamic Briefing Loops and Reusable UFO Portal Foundations",
-      "summary": "The intelligence briefing toolkit gained a gap-driven dynamic query loop with diagnoser, query crafting, budgeted collection, telemetry, CLI and daily-runner dispatch, project opt-ins, and regression tests. The day also hardened extraction/state handling, instrumented Riff’s flow graph UI, and spun up UFOBriefing by pruning and rebranding an inherited political portal.",
+      "headline": "Dynamic Query Loops and Gap-Driven Intelligence Collection",
+      "summary": "Implemented a gap-driven dynamic query loop with configurable budgets and telemetry to automate intelligence gathering, while refactoring state management to use canonical JSON signals. Concurrently launched the UFOBriefing portal by cloning and stripping political-specific routes from an existing codebase.",
       "takeaways": [
-        "Build adaptive collection around explicit gaps: diagnose surname, pattern, and freshness deficits, craft deduped queries with timeouts, and stop loops on defined termination rules.",
-        "Make automation reusable with metadata-gated dynamic collection, targeted project runs, per-run telemetry JSON, and a canonical signals.json state file.",
-        "Harden scrapers by skipping known auth-walled or paywalled domains early and falling back to URL or HTML dates when extraction fails.",
-        "Reuse product shells deliberately: clone a proven portal, delete inherited routes/scripts, and rebrand manifest, not-found, and landing page for the new domain."
+        "Reuse the GapDiagnoser pattern to identify information deficits across specific axes (surname, pattern, freshness) and generate targeted search queries with timeout and deduplication logic.",
+        "Adopt the DynamicCollector's four-path termination strategy and env-tunable wall-clock budget to build resilient, cost-controlled data ingestion pipelines with per-run telemetry.",
+        "Apply the 'clone-and-strip' scaffolding technique by inheriting a full-stack application structure and systematically deleting domain-specific routes and components to rapidly bootstrap new verticals."
       ],
-      "total_commits": 45,
+      "total_commits": 44,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3806,29 +3891,28 @@
         },
         {
           "name": "riff",
-          "commits": 6,
+          "commits": 5,
           "messages": [
             "ui(voice): swap FLOW GRAPH and CALL DIALOG positions",
             "docs: session recap — FLOW GRAPH /loop, 8 iterations, 9.4/10",
             "feat(flow-graph): kind tag on the box border + bigger boxes + smaller font",
             "feat(flow-graph): write-only metrics-sink endpoint + client wiring",
-            "feat(flow-graph): progressive disclosure + persisted session metrics",
-            "feat(flow-graph): vertical fan-out for >3 spine siblings + render/click instrumentation"
+            "feat(flow-graph): progressive disclosure + persisted session metrics"
           ]
         }
       ],
-      "commit_sig": "00db8f7b535cbad7"
+      "commit_sig": "f0c129495d93b42d"
     },
     {
       "date": "2026-05-02",
-      "headline": "Riff Flow Graph Overhaul, Appointment Module, and Record Primitive Hardening",
-      "summary": "Major updates include a three-column SVG flow graph with auto-panning, a redesigned book-appointment module with strict state guards, and comprehensive invariant testing for record primitives. These changes improve UI clarity, scheduling reliability, and system robustness through rigorous audit scripts and updated Gemini adapters.",
+      "headline": "Bypass AI Planners and Scale Webhooks with FIFO Queues",
+      "summary": "Enhanced webhook consumers to support environment-specific FIFO queues while adding a query override feature to bypass planning logic in the intelligence toolkit. These updates improve infrastructure scalability and enable direct, deterministic data collection for testing or urgent queries.",
       "takeaways": [
-        "Reuse the three-column spine layout with SVG-overlay edges and auto-panning logic to build complex, readable flow visualizations that prevent sibling node overlap.",
-        "Adopt the parameterized book_appointment_v1 module pattern, utilizing JSON Schema-valid types and explicit state guards (like rejecting side-effects in confirm states) to ensure reliable scheduling flows.",
-        "Implement the sweep_record.py and sweep_book_appointment.py audit scripts alongside invariant tests (e.g., verbatim prompt adherence) to systematically validate primitive behaviors and catch edge cases early."
+        "Extend webhook consumers to resolve environment-suffixed FIFO queue ARNs for scalable, ordered message processing across stages.",
+        "Implement a query_override keyword argument in collection pipelines to bypass AI planners for direct, deterministic data retrieval.",
+        "Add comprehensive test coverage for query override states (None, list, empty) to ensure robust pipeline behavior during edge cases."
       ],
-      "total_commits": 58,
+      "total_commits": 3,
       "repos": [
         {
           "name": "everyone-ai",
@@ -3844,70 +3928,9 @@
             "test(pipeline): cover query_override (None / list / empty)",
             "feat(pipeline): add query_override kwarg to collect() to bypass planner"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 55,
-          "messages": [
-            "fix live scheduling demo latency",
-            "fix(flow-graph): width-cap + word-wrap kills sibling overlap across all flows",
-            "fix(flow-graph): explicit zoom controls + gentler wheel + don't pan on first paint",
-            "feat(flow-graph): auto-pan to active state + label-noise reduction",
-            "fix(flow-graph): width-aware sibling spread + cyan active state",
-            "fix(flow-graph): right column = pure back-loop bridges, not back-edge targets",
-            "feat(flow-graph): three-column spine layout with SVG-overlay edges and zoom",
-            "fix(scheduling): lead with day on both offer prompt AND locked_choice retry message",
-            "fix(cal-provider): _offering_line leads with day once for same-day slots",
-            "fix(cal-provider): day-relative offer phrasing — today / this coming X / weekday + date",
-            "fix(cal-provider): _offered_slot_phrase always leads with weekday (defends \"what day?\" loop)",
-            "fix(validators): drop strict HH:MM check on 'preferred_time' (silently rejected '2pm'/'afternoon')",
-            "feat(book-appointment): redesign module — drop triage layer, add FETCH_OFFER, mirror filled_slots",
-            "fix(adapters/gemini): GeminiAdapter __init__ default → gemini-2.5-flash (missed in 007488e)",
-            "fix(adapters): default Gemini model to 2.5-flash everywhere (2.0-flash retired)",
-            "fix(flows): retire gemini-2.0-flash → gemini-2.5-flash across 13 tutorial flows",
-            "fix(cal-provider): _reground_line + _mirror handle DONE+offered_slots (no-confirmation)",
-            "docs(backlog): mark web/B-001 RESOLVED (commit 81c746b)",
-            "fix(web/css): scope fsm.css 'main' grid to .fsm-layout class (closes web/B-001)",
-            "docs(backlog): file web/B-001 (fsm.css main selector leak) + web/F-001 (landing follow-ups)",
-            "design(landing): Steve Jobs pass — kill SaaS card slop, promote Generate to hero",
-            "chore(audio): regenerate static-audio cache for tutorial_announce + tutorial_book_appointment greeting text changes",
-            "fix(web/nav): dark-mode CSS for top-nav (was white-on-white)",
-            "fix(web/nav): convert Docs <button> to <a> for cross-browser visibility",
-            "fix+tooling: 3 more final_status defects + reusable static audit script",
-            "docs(backlog): file book-appointment/B-006 (OFFER state structural gap; prompt-driven workaround in 75651a7)",
-            "fix(book-appointment): wire _scheduling_search_strategy + un-blank OFFER entry",
-            "fix(book-appointment): use JSON Schema-valid types in slot_types (date/phone -> string)",
-            "docs: add test plan for primitives-harden (10/10 audit ladder)",
-            "fix(announce,docs): add 2 edge scenarios to reach AC3.1 ≥20 + replace stale 'audit pending' note",
-            "docs(record): clarify I-3 wording — non-None not non-empty (links to F-4 by-design)",
-            "test(record): fix drop_mid_message expected_end_state (verbatim contract advances on non-empty)",
-            "test(record): replace stale pre-sweep speculation in scenarios header (Tier C, no seam reproduction)",
-            "docs(backlog): update end/B-005 to reflect 9th instance (record + Phase 6 closure)",
-            "docs(memory): sprint-190-record-harden capstone (closes 10/10 primitive audit ladder)",
-            "docs(backlog): file record-sweep findings as backlog items",
-            "feat(scripts): add sweep_record.py (gate)",
-            "test(primitives): author record.yaml (20 scenarios across 6 behavior classes)",
-            "flow(tutorial_record): tighten verbatim prompt; fictional business_profile",
-            "test(primitives): add test_record_invariants.py (I-1 no validator, I-2 verbatim prompt, I-3 first-write fires)",
-            "docs(record): rewrite 07-record.md to doc-as-spec template (3 Invariants, 4 Failure modes; preserves \"pattern not primitive\" disclaimer)",
-            "fix(cal-provider): clear _last_booking_error_kind on DONE (avoid stale guard collision after retry)",
-            "fix(book-appointment): wire propose_booking ToolSpec + populate _scheduling_offered_speakable",
-            "docs(memory): sprint-189-book-appointment-build capstone + Phase 5 closure",
-            "docs(backlog): file book_appointment-sweep findings as backlog items",
-            "feat(scripts): add sweep_book_appointment.py (gate; 30 scenarios; AC6.4)",
-            "test(primitives): author book_appointment.yaml (30 scenarios; 2 fabrication-attempt + 2 same-slot-race)",
-            "test(primitives): add test_book_appointment_invariants.py (I-1..I-5; I-3/I-4 xfailed pending hermetic wiring) + 2 backlog items",
-            "docs(book-appointment): add 10-book-appointment.md (5 Invariants, 6 Failure modes; defends B-181/144/105) + add to PARAMETERIZED_MODULES",
-            "flow(tutorial_book_appointment): fictional Sunny Side Tutoring microcosm; imports book_appointment_v1",
-            "feat(cal-provider): write _booked_event_id (DONE) and _last_booking_error_kind (ERROR) for book_appointment_v1 guards",
-            "feat(state-manager): register 6 guards for book_appointment_v1",
-            "feat(modules): add book_appointment_v1.yaml (parameterized via [[VAR]]; 9 states, 3 slot vars)",
-            "feat(cal-provider): write _tentative_event_id at CONFIRMING; clear at DONE (I-3 enables on-session-end cleanup)",
-            "feat(turn-controller): reject side-effect tool calls from speech_act:confirm states (I-2)"
-          ]
         }
       ],
-      "commit_sig": "bd2b923e3c4959e3"
+      "commit_sig": "850761202fec2a5b"
     },
     {
       "date": "2026-05-01",

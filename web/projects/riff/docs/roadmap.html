@@ -122,6 +122,8 @@
     <li><b>Usage metering → billing</b><span>Per-tenant call-minute accounting; wire Stripe. Can't bill hours you can't count.</span></li>
     <li><b>Concurrency / load shedding</b><span>Decide behavior past the call ceiling (currently hardcoded at 5): queue, busy, or scale.</span></li>
     <li><b>CI gate</b><span>Run the ~4,800-test suite on every PR so "tests pass" is enforced, not assumed.</span></li>
+    <li><b>Live confirmation-gate stall — FIXED (B-319)</b><span>On live calls the FSM does not advance out of <code>read_back</code> after the agent reads the order back (the <code>response_emitted</code> transition is not evaluated on the live <code>turn_complete</code>), so the caller's confirming "yes" lands in a state that can't confirm and the call sits silent ~50s. Fire <code>response_emitted</code> after the agent's live turn.</span></li>
+    <li><b>Fix phone verification turn-taking (B-318)</b><span>On real calls the agent submits the caller's confirmation "yes" as the SMS code (it sends the text and verifies in the same turn, never waiting for the digits) and allows only one attempt — so verification reliably fails. Validate the code before submitting, separate the turns, raise max attempts. The "yes" issue.</span></li>
   </ol>
 
   <h2><span class="chip p2">P2</span> Scale &amp; polish — after first customers</h2>
