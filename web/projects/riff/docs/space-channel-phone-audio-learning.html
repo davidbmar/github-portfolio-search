@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Space Channel Phone Audio Learning — 2026-06-29 · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-06-29-space-channel-phone-audio-learning.md</span>
+<a class="raw" href="/docs/docs/codex/2026-06-29-space-channel-phone-audio-learning.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Space Channel Phone Audio Learning — 2026-06-29</h1>
+<p><strong>Audience:</strong> RIFF operators and engineers debugging real Telnyx calls.
+<strong>Short version:</strong> if the browser/local audio sounds clean but the phone sounds choppy, do not
+start by swapping TTS engines. First prove or rule out the outbound phone media clock.</p>
+<h2 id="what-happened">What Happened</h2>
+<p>The Space Channel flow sounded clean in the browser, but over the phone the voice became
+&quot;worbly&quot; and choppy after a while. The call could also appear to hang up before a logical
+completion point. At first this looked like a Piper/TTS or robot-voice problem.</p>
+<p>It was not primarily a voice-generation problem.</p>
+<p>The source audio was clean. The phone artifact was caused by the Telnyx outbound media path:
+chunk size, pacing drift, and doing codec/base64 work inside the paced send loop.</p>
+<h2 id="symptom-pattern">Symptom Pattern</h2>
+<p>This is the signature to remember:</p>
+<ul>
+<li>Browser/local playback sounds clear.</li>
+<li>Pre-rendered WAVs sound clear when played outside the phone path.</li>
+<li>Phone audio starts clear, then degrades after a longer phrase or later in a static chain.</li>
+<li>The issue affects static and generated speech similarly once enough audio is sent.</li>
+<li>Changing voices or TTS engines does not reliably fix it.</li>
+</ul>
+<p>That pattern points at the carrier media stream, not the TTS model.</p>
+<h2 id="diagnosis-path">Diagnosis Path</h2>
+<p>The useful sequence was:</p>
+<ol>
+<li>Build a diagnostic flow with three versions of the same line:
+<ul>
+<li>Version 1: pre-recorded static audio.</li>
+<li>Version 2: call-time generated speech played in sentence chunks.</li>
+<li>Version 3: call-time generated speech fully buffered, then played.</li>
+</ul>
+</li>
+<li>Route the Telnyx number to that diagnostic flow.</li>
+<li>Compare human handset reports against local artifacts:
+<ul>
+<li><code>audio_agent.wav</code>: RIFF's generated/source agent audio.</li>
+<li><code>audio_agent_played.wav</code>: final outbound audio reconstructed from the Telnyx media payload path.</li>
+</ul>
+</li>
+<li>Run:</li>
+</ol>
+<pre><code class="language-bash">./scripts/analyze_phone_audio.py --flow space_channel_audio_test --transcribe
+</code></pre>
+<ol start="5">
+<li>Check for:
+<ul>
+<li>clipping,</li>
+<li>long dropout/silence runs,</li>
+<li>level drift,</li>
+<li>transcript failure,</li>
+<li>source-vs-played artifact mismatch.</li>
+</ul>
+</li>
+</ol>
+<p>The successful verification call was:</p>
+<p><code>data/sessions/v3:wpd6lpl01hKmhVjgi0Ki0l1VV2bBiPhPfeyqQLuhZklZ8XR7Rw4PdA/</code></p>
+<p>It completed in <code>53.3s</code>, reached state <code>done</code>, and produced:</p>
+<ul>
+<li><code>audio.wav</code></li>
+<li><code>audio_caller.wav</code></li>
+<li><code>audio_agent.wav</code></li>
+<li><code>audio_agent_played.wav</code></li>
+<li><code>session_manifest.json</code></li>
+</ul>
+<p>Both <code>audio_agent.wav</code> and <code>audio_agent_played.wav</code> were stable, unclipped, and transcribed
+end to end. The operator also confirmed Version 1, Version 2, and Version 3 all sounded clear
+over the handset.</p>
+<h2 id="root-cause">Root Cause</h2>
+<p>The root cause was outbound phone media timing, not Piper.</p>
+<p>The old path could accumulate timing error because each chunk was encoded and sent inside the
+same paced loop. Send overhead and codec/base64 work could move the next send later than intended.
+Over a long enough response, that created phone-side jitter/choppiness even when the source WAV
+was clean.</p>
+<h2 id="fixes-that-mattered">Fixes That Mattered</h2>
+<p>The working combination is:</p>
+<ol>
+<li>
+<p><strong>20 ms Telnyx chunks</strong></p>
+<ul>
+<li>Conventional telephony frame cadence.</li>
+<li>Avoids relying on larger buffered frames behaving well through every leg.</li>
+</ul>
+</li>
+<li>
+<p><strong>Absolute-deadline pacing</strong></p>
+<ul>
+<li>Each chunk is scheduled against an absolute playback clock.</li>
+<li>Per-send overhead no longer accumulates as drift.</li>
+</ul>
+</li>
+<li>
+<p><strong>Pre-encoded Telnyx media before the send loop</strong></p>
+<ul>
+<li>μ-law/base64 payloads are built before the paced send starts.</li>
+<li>The send loop mostly timestamps, records, sends, and sleeps.</li>
+</ul>
+</li>
+<li>
+<p><strong>Played-audio artifact capture</strong></p>
+<ul>
+<li><code>audio_agent_played.wav</code> records the outbound media representation after the phone codec path.</li>
+<li>This gives future investigators a source-vs-played comparison instead of guessing.</li>
+</ul>
+</li>
+</ol>
+<h2 id="why-pregeneration-helped-but-was-not-the-whole-fix">Why Pregeneration Helped, But Was Not the Whole Fix</h2>
+<p>Pre-generating audio removes TTS latency and reduces runtime variability. It is still useful.
+But it does not by itself fix a bad phone media clock.</p>
+<p>In this incident, pre-recorded Version 1 also degraded before the pacing fixes. That proved
+the problem was downstream from TTS. Once the Telnyx send path was fixed, all three versions
+were clear:</p>
+<ul>
+<li>static pre-recorded audio,</li>
+<li>sentence-streamed generated audio,</li>
+<li>fully buffered generated audio.</li>
+</ul>
+<p>The lesson is:</p>
+<blockquote>
+<p>Pre-generate known content to reduce latency and make responses deterministic, but still send it
+through a phone-safe paced media loop.</p>
+</blockquote>
+<h2 id="when-to-pre-generate-instead-of-using-live-gemini-speech">When To Pre-Generate Instead Of Using Live/Gemini Speech</h2>
+<p>Use pre-generated or pre-buffered audio when the content is predictable, branded, or operationally
+important.</p>
+<p>Good candidates:</p>
+<ul>
+<li>greetings,</li>
+<li>capability lists,</li>
+<li>launch summaries,</li>
+<li>&quot;how may I help you&quot; lines,</li>
+<li>repeated Space Channel summaries,</li>
+<li>error/hold/computing messages,</li>
+<li>menus and confirmations,</li>
+<li>known artifacts from the Space Channel site.</li>
+</ul>
+<p>Keep live/Gemini-generated speech for:</p>
+<ul>
+<li>caller-specific answers,</li>
+<li>open-ended Q&amp;A,</li>
+<li>dynamic tool results,</li>
+<li>unexpected caller intents,</li>
+<li>personalized synthesis of new information.</li>
+</ul>
+<p>The best Space Channel production pattern is likely <strong>static-first, live-second</strong>:</p>
+<ol>
+<li>RIFF owns deterministic <code>play_audio</code> states for known lines.</li>
+<li>Common Space Channel artifacts are pre-generated into phone-safe assets.</li>
+<li>Dynamic answers are generated as text, then either:
+<ul>
+<li>fully buffered before playback, or</li>
+<li>sentence-buffered with a short computing sound while waiting.</li>
+</ul>
+</li>
+<li>All audio, static or dynamic, uses the same Telnyx-safe pacing path.</li>
+</ol>
+<h2 id="recommended-architecture-for-space-channel">Recommended Architecture For Space Channel</h2>
+<h3 id="1-build-a-static-audio-library">1. Build a Static Audio Library</h3>
+<p>Generate and version reusable phone prompts:</p>
+<ul>
+<li>greeting,</li>
+<li>&quot;Space Channel operations&quot; identity line,</li>
+<li>capabilities,</li>
+<li>launch command summary,</li>
+<li>bug intake summary,</li>
+<li>solar weather summary,</li>
+<li>UFO files summary,</li>
+<li>space news/radio handoff,</li>
+<li>&quot;computing&quot; / &quot;stand by&quot; sound.</li>
+</ul>
+<p>Store these as manifest-backed assets, not one-off files.</p>
+<h3 id="2-use-full-buffer-for-longer-dynamic-turns">2. Use Full-Buffer For Longer Dynamic Turns</h3>
+<p>For longer Gemini-generated responses, prefer:</p>
+<ol>
+<li>Generate the complete text.</li>
+<li>Synthesize the full sentence/turn.</li>
+<li>Start playback only when enough audio is ready.</li>
+<li>Use a short pre-canned &quot;computing&quot; tone if generation takes long enough to feel silent.</li>
+</ol>
+<p>This avoids mid-sentence starvation. It also makes the call easier to review because every spoken
+turn has a complete artifact.</p>
+<h3 id="3-keep-sentence-streaming-only-where-it-is-actually-needed">3. Keep Sentence Streaming Only Where It Is Actually Needed</h3>
+<p>Sentence streaming is useful for fast first audio, but it is more sensitive to runtime jitter.
+For Space Channel, a slightly longer buffer is acceptable if it keeps the voice clean.</p>
+<p>Use sentence streaming for short back-and-forth. Use full-buffer for:</p>
+<ul>
+<li>capability explanations,</li>
+<li>summaries,</li>
+<li>long tool results,</li>
+<li>anything with multiple clauses.</li>
+</ul>
+<h3 id="4-phone-safe-asset-build">4. Phone-Safe Asset Build</h3>
+<p>For future hardening, generate phone assets in the exact form the carrier path wants:</p>
+<ul>
+<li>normalize loudness before μ-law,</li>
+<li>phone-band-limit before encoding,</li>
+<li>optionally cache 8 kHz μ-law payload chunks,</li>
+<li>keep a 16 kHz WAV review artifact,</li>
+<li>preserve the <code>audio_agent_played.wav</code> debug path.</li>
+</ul>
+<h2 id="evidence-commands">Evidence Commands</h2>
+<p>Use these when investigating a new phone-audio report:</p>
+<pre><code class="language-bash">find data/sessions -maxdepth 2 -type f -name session_manifest.json -print0 |
+  xargs -0 ls -t | head
+
+./scripts/analyze_phone_audio.py --flow space_channel_audio_test --transcribe
+
+jq -r '{session_id, flow_id, finalized, duration_sec, artifacts}' \
+  data/sessions/&lt;session-id&gt;/session_manifest.json
+</code></pre>
+<p>If <code>audio_agent.wav</code> is clean but <code>audio_agent_played.wav</code> is bad, inspect codec/chunking.
+If both are clean but the handset is bad, suspect carrier/network/handset path beyond RIFF.
+If <code>audio_agent.wav</code> itself is bad, inspect TTS/rendering.</p>
+<h2 id="do-not-overfit-the-wrong-variable">Do Not Overfit The Wrong Variable</h2>
+<p>Avoid this trap:</p>
+<blockquote>
+<p>&quot;The phone voice sounds bad, so the TTS engine is bad.&quot;</p>
+</blockquote>
+<p>That is only true if the local/generated source artifact is also bad.</p>
+<p>The better question order is:</p>
+<ol>
+<li>Is the authored/generated source WAV clean?</li>
+<li>Is the played/encoded debug WAV clean?</li>
+<li>Did the handset sound clean?</li>
+<li>Did the call complete at a logical terminal state?</li>
+</ol>
+<p>Only then decide whether to change TTS, prompt content, buffering, carrier chunking, or hangup logic.</p>
+<h2 id="current-status">Current Status</h2>
+<p>As of the successful 2026-06-29 Space Channel test:</p>
+<ul>
+<li>all three diagnostic versions sounded clear to the handset operator,</li>
+<li>the diagnostic flow completed normally,</li>
+<li><code>audio_agent.wav</code> and <code>audio_agent_played.wav</code> were stable and unclipped,</li>
+<li>Whisper transcribed both artifacts end to end,</li>
+<li>the likely fix is the Telnyx outbound path:
+<ul>
+<li>20 ms chunks,</li>
+<li>absolute-deadline pacing,</li>
+<li>pre-encoded media before paced send.</li>
+</ul>
+</li>
+</ul>
+<h2 id="follow-ups">Follow-Ups</h2>
+<ul>
+<li>Build a Space Channel static audio library from site artifacts.</li>
+<li>Add a production policy knob for Space Channel dynamic speech:
+<ul>
+<li><code>static_audio</code> for known lines,</li>
+<li><code>droid_full_buffer</code> for long generated answers,</li>
+<li>sentence streaming only for short replies.</li>
+</ul>
+</li>
+<li>Improve <code>scripts/analyze_phone_audio.py</code> source-vs-played comparison so it aligns streams with
+send-time padding before reporting correlation.</li>
+<li>Consider caching phone-ready μ-law chunks for known static audio.</li>
+<li>Keep <code>audio_agent_played.wav</code> in the session manifest for real-call review.</li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#what-happened">What Happened</a></li><li class="toc-h2"><a href="#symptom-pattern">Symptom Pattern</a></li><li class="toc-h2"><a href="#diagnosis-path">Diagnosis Path</a></li><li class="toc-h2"><a href="#root-cause">Root Cause</a></li><li class="toc-h2"><a href="#fixes-that-mattered">Fixes That Mattered</a></li><li class="toc-h2"><a href="#why-pregeneration-helped-but-was-not-the-whole-fix">Why Pregeneration Helped, But Was Not the Whole Fix</a></li><li class="toc-h2"><a href="#when-to-pre-generate-instead-of-using-live-gemini-speech">When To Pre-Generate Instead Of Using Live/Gemini Speech</a></li><li class="toc-h2"><a href="#recommended-architecture-for-space-channel">Recommended Architecture For Space Channel</a></li><li class="toc-h3"><a href="#1-build-a-static-audio-library">1. Build a Static Audio Library</a></li><li class="toc-h3"><a href="#2-use-full-buffer-for-longer-dynamic-turns">2. Use Full-Buffer For Longer Dynamic Turns</a></li><li class="toc-h3"><a href="#3-keep-sentence-streaming-only-where-it-is-actually-needed">3. Keep Sentence Streaming Only Where It Is Actually Needed</a></li><li class="toc-h3"><a href="#4-phone-safe-asset-build">4. Phone-Safe Asset Build</a></li><li class="toc-h2"><a href="#evidence-commands">Evidence Commands</a></li><li class="toc-h2"><a href="#do-not-overfit-the-wrong-variable">Do Not Overfit The Wrong Variable</a></li><li class="toc-h2"><a href="#current-status">Current Status</a></li><li class="toc-h2"><a href="#follow-ups">Follow-Ups</a></li></ul></aside>
+</div>
+</body>
+</html>

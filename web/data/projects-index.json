@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-28T09:57:52.571594Z",
+  "generated_at": "2026-06-29T11:59:50.872283Z",
   "count": 137,
   "projects": [
     {
@@ -858,28 +858,28 @@
     },
     {
       "slug": "cal-provider",
-      "title": "cal-provider",
-      "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server.",
+      "title": "Cal Provider",
+      "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server and admin UI.",
       "tech": [
         "Python",
         "Asyncio",
         "Google Calendar API",
-        "CalDAV Protocol",
-        "Model Context Protocol (MCP)",
-        "Web Framework (for Admin UI)"
+        "CalDAV",
+        "MCP",
+        "Web UI"
       ],
       "reuse_tags": [
-        "calendar-integration",
-        "async-python",
-        "mcp-server",
+        "calendar",
+        "scheduling",
         "google-calendar",
         "caldav",
-        "scheduling",
-        "ai-agent-tool"
+        "mcp",
+        "async-python",
+        "admin-ui"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/cal-provider",
-      "pushed_at": null
+      "pushed_at": "2026-06-29T00:07:03Z"
     },
     {
       "slug": "character-iris-kade-noir-cyberpunk-ai-browser-native-rag-llm-tts-stt",
@@ -1133,24 +1133,24 @@
       "title": "Everyone Ai",
       "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
       "tech": [
+        "JavaScript",
         "Node.js",
         "Express",
         "Kubernetes",
-        "k3s",
         "Helm",
         "Traefik",
         "Vanilla JS"
       ],
       "reuse_tags": [
         "ai-workspace",
-        "kubernetes-platform",
-        "developer-portal",
+        "kubernetes-portal",
         "claude-code",
+        "dev-environment",
         "self-hosted"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/everyone-ai",
-      "pushed_at": "2026-06-22T23:42:03Z"
+      "pushed_at": "2026-06-29T10:04:27Z"
     },
     {
       "slug": "exampleLoops",
@@ -1256,14 +1256,14 @@
       ],
       "reuse_tags": [
         "semantic-search",
-        "github-indexer",
-        "mcp-server",
-        "portfolio-tool",
+        "github-tools",
+        "ai-agents",
+        "portfolio-management",
         "code-discovery"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-28T02:52:41Z"
+      "pushed_at": "2026-06-28T09:59:06Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2114,29 +2114,26 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "Pytest",
-        "FastAPI",
-        "Gemma",
-        "Gemini",
-        "Claude"
+        "JSONL",
+        "WebSockets",
+        "REST API"
       ],
       "reuse_tags": [
         "voice-agent",
+        "fsm",
         "llm-orchestration",
-        "state-machine",
-        "guardrails",
         "python",
         "yaml-config",
-        "observability"
+        "deterministic-ai"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-28T09:30:20Z"
+      "pushed_at": "2026-06-29T06:11:52Z"
     },
     {
       "slug": "riot",

@@ -1,31 +1,113 @@
 {
-  "generated_at": "2026-06-28T09:59:04.965261Z",
-  "count": 152,
+  "generated_at": "2026-06-29T12:01:15.416536Z",
+  "count": 153,
   "days": [
     {
-      "date": "2026-06-28",
-      "headline": "Build a Deterministic Voice AI Testing Harness with Synthetic Callers",
-      "summary": "This update introduces a generic, event-driven synthetic caller harness that drives voice flows to completion, enabling deterministic regression testing and coverage of edge cases like confirmation gates. It also implements a two-layer nightly audio review cycle and fixes critical VAD and state-management bugs to improve live call reliability.",
+      "date": "2026-06-29",
+      "headline": "Robust Telnyx Audio Pipeline and Booking Logic Fixes",
+      "summary": "Enhanced the Riff platform with pre-encoded, paced Telnyx audio delivery and diagnostic tools for Space Channel phone interactions. Concurrently resolved critical booking title clobbering and CI evaluation deadlocks to improve system reliability.",
       "takeaways": [
-        "Implement an event-driven synthetic caller (voice_case.py) that drives any voice flow to a terminal state, allowing you to automate end-to-end testing of complex conversational paths without manual intervention.",
-        "Adopt a 'shift-left' linter strategy by flagging logical errors like 'announce-booked-without-booking' in CI, preventing invalid states from reaching production and reducing debugging time.",
-        "Wire a two-layer nightly audio review cycle using remote Whisper APIs with local fallbacks to automatically populate a quality database, creating a measurable feedback loop for voice model performance.",
-        "Fix VAD tuning and state transitions to handle short inputs like 'yes' without excessive pauses, ensuring natural conversation flow and preventing stalls during confirmation gates."
+        "Implement pre-encoding and absolute deadline pacing for Telnyx media to ensure consistent audio playback latency.",
+        "Reuse the added audio artifact analyzer and static diagnostic chains to debug live phone prompt issues without impacting production boot times.",
+        "Apply the fix for blank slot title clobbering to prevent data loss in calendar booking providers."
       ],
-      "total_commits": 42,
+      "total_commits": 14,
       "repos": [
         {
-          "name": "github-portfolio-search",
-          "commits": 2,
+          "name": "cal-provider",
+          "commits": 1,
           "messages": [
+            "Merge: empty-title booking fix (blank slot no longer clobbers title)"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 13,
+          "messages": [
+            "Build Space Channel phone content refresh",
+            "Pre-encode Telnyx media before paced send",
+            "Add phone audio artifact analyzer",
+            "Capture Telnyx played agent audio",
+            "Pace Telnyx audio on absolute deadlines",
+            "Keep diagnostic static chain off Live boot",
+            "Add Space Channel audio path diagnostic",
+            "Suppress Space Channel live prompt audio",
+            "Disable Space Channel processing tone",
+            "Make Space Channel droid voice phone safe",
+            "Pre-render Space Channel phone prompts",
+            "Add Space Channel network ops flow",
+            "fix(austin_plumbing): blocked-days deadlock + make ci_eval gate reliable"
+          ]
+        }
+      ],
+      "commit_sig": "682d9850e443c008"
+    },
+    {
+      "date": "2026-06-28",
+      "headline": "Voice AI: Semantic WER Metrics, Synthetic Caller Harness, and Cal-Provider Fixes",
+      "summary": "This update introduces a semantic Word Error Rate metric to distinguish hallucinations from mishears, alongside a synthetic caller harness for end-to-end audio flow testing. It also resolves critical cal-provider tool scoping leaks and implements verified migration recipes for scheduling flows.",
+      "takeaways": [
+        "Implement semantic WER by splitting errors into mishears, hallucinations, and drops to accurately bound empty-reference scores at 1.0 instead of infinity.",
+        "Reuse the event-driven synthetic caller harness (voice_case.py) to drive any voice flow to terminal state with audio, enabling deterministic confirm-gate simulation across all sessions.",
+        "Apply the verified B-302 migration recipe to swap scheduling flows safely, ensuring input_transcription.finished bits propagate correctly to prevent early-dispatch failures.",
+        "Scope provider tools strictly to declaring flows to prevent leakage (e.g., stopping schedule_event access in unrelated contexts) and verify booking targets by ID during boot checks."
+      ],
+      "total_commits": 78,
+      "repos": [
+        {
+          "name": "cal-provider",
+          "commits": 1,
+          "messages": [
+            "fix(fsm): blank slot value no longer clobbers a filled booking title"
+          ]
+        },
+        {
+          "name": "github-portfolio-search",
+          "commits": 3,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "Merge pull request #7 from davidbmar/feat/narrate-render-and-link",
             "feat(narrate): pin Learn slugs across cold rebuilds + regen pages in new voice"
           ]
         },
         {
           "name": "riff",
-          "commits": 40,
+          "commits": 74,
           "messages": [
+            "feat(scheduling): offer-slot matcher fix + no-answer escape pattern (+ audit)",
+            "Add trades phone-to-web product concepts",
+            "feat(debug): audio↔FSM call review, recording guarantee, booking-flow generator gate",
+            "docs: record caller_truth resolution of the hallucination/Whisper confound in the playbook",
+            "feat(voice): persist caller_truth ground truth - resolves the hallucination/Whisper confound",
+            "feat(voice): mishear_breakdown - split errors into mis-hears/hallucinations/drops (part-3, TDD)",
+            "fix(wer): bound empty-reference WER to 1.0 (hallucination), not inf - keeps aggregates valid",
+            "docs: full-corpus semantic_wer confirmation - 117 sessions, sem~=raw, terse worst (B-321)",
+            "fix(linter): collect-state-no-reprompt false-positive on locked_choice states (shift-left accuracy)",
+            "docs(html): bring the cohesive doc current - measurement layer + B-302 resolution + skyline",
+            "feat(flows): skyline_apartments - EXECUTES the B-302 migration (apartment viewing on book_appointment_v1)",
+            "docs(B-302): VERIFIED migration recipe for path (c) - how to swap scheduling flows to book_appointment_v1",
+            "docs(B-321): word-level characterization - mis-hears are DROPPED words (VAD), not wrong words",
+            "feat(voice)+fix(docs): semantic_wer metric in the DB + CORRECT the 'WER is formatting' claim",
+            "feat(voice): voice_mishears.py - semantic mis-hear analyzer (part-3 word-level, TDD)",
+            "docs(B-302): BLOCKER - Gemini doesn't populate input_transcription.finished; early-dispatch fix blocked",
+            "feat(live): propagate input_transcription.finished bit (B-302 fix prerequisite, TDD)",
+            "docs(B-302): exact fix point - early-dispatch returns False on no_match -> muted turn -> late retry",
+            "docs(B-302): PROVEN mechanism via live capture - first-utterance no_match then retry (~9s)",
+            "feat(hygiene): verify_shipped_fixes.sh - manifest check that fixes are in HEAD, not just the worktree",
+            "fix(verify): restore B-318 fixes lost from HEAD during B-322 file-juggling",
+            "feat(voice): voice_scenarios.py - named scenario registry (part-1 scenarios as DATA)",
+            "docs(B-300): quantify via the barge-in scenario — graded latency cost, not a hard drop",
+            "test+docs(B-302): classification works (guard added); the live delay is dispatch-timing not the classifier",
+            "docs(B-302): deepest root cause — triage choice can't classify 'day AND time' cleanly",
+            "docs(B-302): refine — scheduling locked-choice is SLOW/flaky (~50s), not fully broken",
+            "docs(B-302): corpus quantifies it — top cause of scheduling_v1 flow failures (apartment 0/4)",
+            "docs: serene_mobile_massage live-validated — real cal-provider booking via the audio path",
+            "docs(html): bring voice-quality.html current — cal-provider, full fix ledger, open decisions",
+            "feat(flows): serene_mobile_massage — REAL cal-provider booking (sellable example, fixes fake-booker class)",
+            "docs(B-322): final — gate residual is eval-design (skeptical persona escalates verification flow)",
+            "docs(B-322): RESOLVED — property_trouble_ticket is correct (10.0); the 0.0 was eval infra",
+            "fix(ci_eval): clear telemetry export URLs during the gate eval (B-322 #2)",
+            "fix(eval): mock tutorial_send_verification_text so verify flows clear verification (B-322 #1)",
             "docs: file B-322 — property_trouble_ticket scores correctness 0.0 in ci_eval (pre-existing)",
             "fix(verify)+lint: bump property_trouble_ticket to 3 verification attempts + flag max_attempts:1 (B-318 #3)",
             "fix(verify): reject non-digit 'yes' as a verification code without burning the attempt (B-318)",
@@ -69,7 +151,7 @@
           ]
         }
       ],
-      "commit_sig": "b3eb4421c2dcabdc"
+      "commit_sig": "678a4d65cb02e93f"
     },
     {
       "date": "2026-06-27",
@@ -3746,15 +3828,14 @@
     },
     {
       "date": "2026-05-04",
-      "headline": "Portable Call Review Stack and Briefing Surfaces Land",
-      "summary": "RIFF added a call-review pipeline spanning session manifests, sidecar Whisper truth, session indexes, raw artifact endpoints, and post-call audio playback, with tests for URL decoding, traversal blocking, manifests, dedupe, sorting, and empty states. The briefing projects advanced reuse-oriented planning and surfaces: intelligence-briefing-toolkit bridged signals.json into graph.json and documented domain-aware gap diagnosis, while UFOBriefing shipped home stats, /wire, /signals, and deployment infrastructure.",
+      "headline": "UFOBriefing v0.2 UI Launch and Graph Signal Bridging",
+      "summary": "The UFOBriefing project deployed its v0.2 interface featuring chronological ledgers and signal statistics, while the intelligence toolkit established a bridge between raw signals and graph data structures. Infrastructure for domain-specific deployment was provisioned alongside detailed design plans for future gap diagnosis features.",
       "takeaways": [
-        "Use append-only sidecars for ground-truth annotations so turns.jsonl stays immutable while analyzers merge truth fields at read time.",
-        "Package call artifacts with a manifest, sha256 metadata, and raw-file routes guarded by URL decoding and traversal tests for reusable review UIs.",
-        "Build post-call UX from the same session index: list sessions, handle empty states, show CT timestamps, and gate full-call audio on manifest probes.",
-        "Expose briefing data as reusable surfaces: bridge signals into graph JSON, then add stats, chronological wire, and pipeline-stat pages on deployed infrastructure."
+        "Implement a chronological ledger endpoint to visualize time-series data streams, as demonstrated in the /wire feature.",
+        "Bridge flat signal JSON files into graph-compatible structures to enable downstream traversal and analysis.",
+        "Provision isolated S3 and CloudFront stacks to support multi-tenant or domain-specific application deployments."
       ],
-      "total_commits": 50,
+      "total_commits": 8,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3775,68 +3856,20 @@
             "docs(backlog): add F-049 graph-traversal personas + F-050 portal chat widgets",
             "feat(graph): bridge signals.json into graph.json (Path A)"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 42,
-          "messages": [
-            "docs: add test plan for call-review prod-finish",
-            "chore: address final review minors (test isolation + RIFF_LOGS_DIR backlog)",
-            "feat(post-call-ui): full-call audio player in detail view, gated on manifest probe",
-            "feat(post-call-ui): add #audio-player-row markup + CSS to detail view",
-            "test(phone): cover /api/sessions/<sid>/<file> + URL-decode + traversal + manifest",
-            "feat(phone): /api/sessions/<sid>/<file> serves raw artifacts (audio + manifest)",
-            "test(phone): cover URL-decode round-trip + path-traversal blocks for /api/post_call/<sid>",
-            "fix(phone): URL-decode session id before sanitize in /api/post_call/<sid>/<file>",
-            "test(phone): assert /api/post_call returns merged session-first shape",
-            "feat(phone): /api/post_call uses _list_call_sessions; honors RIFF_SESSIONS_DIR",
-            "docs: add call-review prod-finish design + implementation plan",
-            "feat(scheduling): min_advance_minutes filter for offer prefetch",
-            "fix(10dlc): public landing page at / so Telnyx reviewers can find ToS",
-            "docs: add test plan for call-review P0",
-            "fix: address final cross-phase code review issues",
-            "chore: remove redundant inline patch import (Phase 3 final cleanup)",
-            "fix: Phase 3 cycle 2 - address regression and missing tests",
-            "fix: Phase 3 code review feedback (9 issues)",
-            "feat(post-call-ui): inline audio per row + empty state + CT timestamps",
-            "test(web): cover /api/sessions endpoint + URL-decode round-trip",
-            "fix(post-call): URL-decode session id before sanitize",
-            "feat(web): /api/sessions/<sid>/<file> serves raw artifacts (audio + manifest)",
-            "test(post-call): cover index dedupe + sort + empty state",
-            "feat(post-call): list all call sessions, not just generated reports",
-            "fix: address Phase 2 code review findings (6 issues)",
-            "test(phone): verify both bench dir AND data/sessions populated on phone call",
-            "feat(phone): write data/sessions/<call_id>/ alongside bench dir via CallSessionRecorder",
-            "feat(audio): CallSessionRecorder writes data/sessions/<sid>/ + manifest",
-            "test(audio): cover session_manifest schema + write + partial manifest",
-            "feat(audio): session_manifest module — dataclass schema + sha256 + writer",
-            "fix: address code review feedback for Phase 1",
-            "fix(post-call-analyze): merge whisper truth from sidecar instead of expecting it in turns.jsonl",
-            "test(whisper-groundtruth): assert turns.jsonl unchanged + sidecar shape",
-            "refactor(whisper-groundtruth): write to sidecar, stop mutating turns.jsonl",
-            "test(whisper-truth): cover sidecar append-only + merge + malformed-row handling",
-            "feat(whisper-truth): add sidecar writer + merge reader for turn truth fields",
-            "docs(impl-plan): call-review P0 — turns.jsonl halt + SessionRecorder + index UI",
-            "fix(deps): bump vite 5→6.4.2, vitest 2→3.2.4 — close 2 dependabot alerts",
-            "wip: telnyx 10DLC + MCP server + nightly review + run inspector + verify-caller",
-            "wip: structured calendar review flow + scheduling triage + voice UI",
-            "docs: revise call-review plan absorbing 8 review findings",
-            "docs: add call-review design plan"
-          ]
         }
       ],
-      "commit_sig": "962e133fd93fde3a"
+      "commit_sig": "6f007096c272e460"
     },
     {
       "date": "2026-05-03",
       "headline": "Dynamic Query Loops and Gap-Driven Intelligence Collection",
-      "summary": "Implemented a gap-driven dynamic query loop with configurable budgets and telemetry to automate intelligence gathering, while refactoring state management to use canonical JSON signals. Concurrently launched the UFOBriefing portal by cloning and stripping political-specific routes from an existing codebase.",
+      "summary": "Implemented a gap-driven dynamic query loop with configurable termination conditions and telemetry to automate intelligence gathering. Refactored state management to use canonical JSON files while launching a rebranded UFO briefing portal.",
       "takeaways": [
-        "Reuse the GapDiagnoser pattern to identify information deficits across specific axes (surname, pattern, freshness) and generate targeted search queries with timeout and deduplication logic.",
-        "Adopt the DynamicCollector's four-path termination strategy and env-tunable wall-clock budget to build resilient, cost-controlled data ingestion pipelines with per-run telemetry.",
-        "Apply the 'clone-and-strip' scaffolding technique by inheriting a full-stack application structure and systematically deleting domain-specific routes and components to rapidly bootstrap new verticals."
+        "Reuse the GapDiagnoser module to craft targeted search queries based on identified data deficits across surname, pattern, and freshness axes.",
+        "Adopt the DynamicCollector pattern which features four distinct termination paths, env-tunable wall-clock budgets, and per-run telemetry logging.",
+        "Implement robust extraction fallbacks by skipping known paywalled domains early and using URL-date parsing when HTML extraction fails."
       ],
-      "total_commits": 44,
+      "total_commits": 39,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3888,20 +3921,9 @@
             "feat(gap-diagnoser): implement diagnose() across surname/pattern/fresh axes",
             "feat(gap-diagnoser): add Gap dataclass + GapDiagnoser skeleton"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 5,
-          "messages": [
-            "ui(voice): swap FLOW GRAPH and CALL DIALOG positions",
-            "docs: session recap — FLOW GRAPH /loop, 8 iterations, 9.4/10",
-            "feat(flow-graph): kind tag on the box border + bigger boxes + smaller font",
-            "feat(flow-graph): write-only metrics-sink endpoint + client wiring",
-            "feat(flow-graph): progressive disclosure + persisted session metrics"
-          ]
         }
       ],
-      "commit_sig": "f0c129495d93b42d"
+      "commit_sig": "9594db402be5722e"
     },
     {
       "date": "2026-05-02",
