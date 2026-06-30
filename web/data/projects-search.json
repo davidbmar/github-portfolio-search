@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T19:26:01.259896Z",
+  "generated_at": "2026-06-30T21:09:42.042476Z",
   "count": 137,
   "entries": [
     {
@@ -4006,15 +4006,13 @@
         "yaml",
         "mermaid",
         "pytest",
-        "gemma",
-        "gemini flash",
-        "mcp",
+        "fastapi",
+        "websockets",
         "voice-agent",
         "fsm",
         "llm-orchestration",
         "guardrails",
-        "slot-filling",
-        "python-framework"
+        "yaml-config"
       ],
       "chunks": [
         {
@@ -4027,19 +4025,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A Python framework for building voice agents where an LLM handles natural language generation while a declared YAML state graph enforces business logic, slot validation, and transition guardrails. It separates the 'riff' (LLM creativity) from the 'beat' (FSM determinism) to prevent hallucinations in phone conversations."
+          "text": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows developers to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using pure functions for guardrails, slot validation, and state transitions, preventing LLM hallucinations while maintaining conversational fluidity."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend using a pure-function architecture for guardrails, state management, and slot extraction. The core loop processes speech-to-text input through an LLM adapter and a state manager, producing text-to-speech output. It supports local models like Gemma or cloud APIs like Gemini Flash, with a web server for UI and API access."
+          "text": "The core engine uses a `run_turn` pipeline where speech-to-text input passes through eight layers of deterministic guardrails before reaching the LLM. The LLM output is validated against a YAML-defined state graph by a `state_manager` that enforces transitions and slot requirements. Key components include `SessionContext` for mutable state, `Flow` and `StateDef` for graph definitions, and adapters for various LLM providers (Gemini, Gemma, Claude). The system is designed with observability in mind, featuring silent failure tracking, LRU caching, and an A/B testing harness based on observable metrics rather than subjective LLM judging."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype customer service voice agents for scheduling, ordering, or intake. Describe the business logic in English to auto-generate the flow YAML, then refine states and transitions. Integrate via HTTP API for flow generation or conversation handling, or use the MCP server for reusable agent blocks."
+          "text": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. Define your business logic in a YAML flow file or generate one via the API by describing your service. Integrate the generated agent into your telephony stack via the provided web server or MCP server. The platform is suitable for developers who need the flexibility of LLMs for conversation but require the determinism of code for critical business logic like appointment booking or order taking."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions and slot validation via YAML-defined FSMs Prevents LLM hallucinations with multi-layer guardrails and pure function validators Supports local LLMs like Gemma and cloud APIs like Gemini Flash Includes 11 pre-built flows for retail and service industries Provides real-time web UI for monitoring live FSM states and conversations"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions using YAML-defined FSMs Prevents LLM hallucinations with multi-layer pure function guardrails Includes 11 pre-built flows for services like plumbing, tutoring, and retail Provides real-time web UI for monitoring active voice sessions Supports local models (Gemma) and cloud APIs (Gemini, Claude)"
         }
       ]
     },

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Voice + Render-Mode Capability Hierarchy · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-06-30-voice-capability-hierarchy.md</span>
+<a class="raw" href="/docs/docs/codex/2026-06-30-voice-capability-hierarchy.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Voice + Render-Mode Capability Hierarchy</h1>
+<p><strong>Date:</strong> 2026-06-30
+<strong>Status:</strong> Proposal (design before build).
+<strong>Related:</strong> <a href="../flow-eval/LLM-POLICY.md?format=html">LLM-POLICY.md</a> (the existing cascade this mirrors),
+<a href="2026-06-30-preflow-architecture.md?format=html">preflow-architecture</a>.</p>
+<h2 id="implementation-status-resume-here">Implementation status — RESUME HERE</h2>
+<p><strong>Branch:</strong> <code>voice-capability-hierarchy</code> (off <code>main</code>). <strong>Pushed?</strong> local-only so far.</p>
+<p><strong>Done (committed):</strong></p>
+<ul>
+<li><code>eb7aed7</code> — <strong>P0.1</strong>: <code>style</code> is part of the static-audio cache identity.
+<code>text_hash</code>/<code>lookup</code>/<code>lookup_by_text</code>/<code>status_for_state</code>/<code>write_entry</code> take an
+optional <code>style</code> (empty = identical legacy hash). <code>StaticAudioSpec.style</code>
+threads to the synth → <code>synthesize_opening_with_gemini_live(system_instruction=)</code>.
+<code>voice_model_for_play_audio</code> honors a real Gemini voice name (<code>GEMINI_VOICES</code>).
+Tests in <code>tests/static_audio/test_manifest.py</code> + <code>test_generator.py</code>.</li>
+<li><code>8f66dea</code> — this design rendered to <code>docs/html/voice-capability-hierarchy.html</code>
+<ul>
+<li>linked in <code>docs/html/index.html</code> nav.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Next (do in order):</strong></p>
+<ul>
+<li><strong>P0.2 — flow-level voice+style config.</strong> Add a <code>FlowVoiceConfig</code>
+(<code>default: str</code>, <code>style: str</code>) to <code>riff/types.py</code> parallel to <code>FlowLlmConfig</code>;
+parse a <code>voice:</code> flow block in <code>riff/loader.py</code> (mirror <code>_parse_flow_llm</code> ~L527);
+add a resolver <code>resolve_play_audio_voice(flow, play_audio) -&gt; (voice, model, style)</code> that returns the state voice (or flow default) + flow style. Thread it
+through <strong>both</strong> the preflow path (<code>static_audio/generator.collect_static_specs</code>
+~L64) <strong>and</strong> the phone lookups
+(<code>phone/telnyx_transport._static_audio_pcm24_for_current_state</code> ~L1241, and the
+<code>lookup_by_text</code> call for data-resolved states) so the phone finds the <em>styled</em>
+WAV. Defer web_server/browser/MCP metadata surfaces.</li>
+<li><strong>P0.3 — Space Channel → Umbriel British (RISKY, isolated).</strong> Set the flow voice
+to Umbriel + British style; migrate the <code>droid_full_buffer</code> states to
+<code>static_audio</code>; handle the <code>_droid_voice_id</code> blast radius
+(<code>telnyx_transport.py:777,1644</code> — removing the droid voice un-suppresses Gemini
+<code>audio_out</code> for every non-suppressed state); update the droid-coupled tests
+(<code>tests/phone/test_telnyx_transport.py</code> ~431,656; <code>test_space_channel_flow.py:45</code>);
+re-render via the preflow; <strong>operator calls the line to confirm British Umbriel
+before merge.</strong> Do NOT touch <code>flows/space_channel_audio_test.yaml</code> (droid test fixture).</li>
+</ul>
+<p><strong>Honor the Codex review findings below</strong> (per-state live voice is impossible;
+ad-lib = non-<code>play_audio</code> state; capability lives on StateDef/GoalSegment; use a
+generic cascade helper, not the LLM resolver).</p>
+<hr />
+<h2 id="the-idea-from-the-operator">The idea (from the operator)</h2>
+<blockquote>
+<p>&quot;the capabilities should be able to use the LLM at a level of overall, by flow
+or by group or by state — this would give us a hierarchy.&quot;
+&quot;prerender the voice in the preflow … but also have an option to go to
+gemini-live in a state … so we could test adlib-type workings.&quot;</p>
+</blockquote>
+<p>RIFF already has this hierarchy for the <strong>LLM</strong> (<code>state → group → flow → global</code>
+cascade; <code>FlowLlmConfig.classes</code> + <code>default_class</code>; per-state <code>llm:</code>; <code>inherit</code>
+walks up). This proposal makes <strong>voice</strong> and <strong>render-mode</strong> first-class citizens
+of the <em>same</em> cascade.</p>
+<h2 id="two-new-per-state-capabilities">Two new per-state capabilities</h2>
+<h3 id="1-voice-name-style-resolved-via-the-cascade">1. Voice (name + style), resolved via the cascade</h3>
+<p>A voice is <strong>a Gemini voice name + an optional style/accent instruction</strong>:</p>
+<pre><code class="language-yaml">voice:
+  default: anchor
+  classes:
+    anchor:     { name: Umbriel, style: &quot;Polished British RP news anchor, warm and clear&quot; }
+    gatekeeper: { name: Charon,  style: &quot;Deep, formal station-ops voice&quot; }
+states:
+  some_state:
+    play_audio:
+      voice: gatekeeper      # class name, explicit voice, or &quot;inherit&quot; → group → flow → global
+</code></pre>
+<p>Resolution = <code>state → group → flow.voice.default → global</code>, most-specific wins —
+identical shape to the LLM resolver. The <strong>style</strong> maps to the TTS
+<code>system_instruction</code> (that plumbing already landed in <code>openings.py</code>).</p>
+<h3 id="2-render-mode-prerendered-vs-live-ad-lib">2. Render mode: prerendered vs live (ad-lib)</h3>
+<p>Per state, where does the audio come from:</p>
+<ul>
+<li><strong><code>prerendered</code></strong> (default): the preflow rendered a WAV with the resolved
+voice; the phone serves it from the static-audio cache (the voice-agnostic
+<code>_static_audio_pcm24_for_current_state</code> path). Fast, deterministic.</li>
+<li><strong><code>live</code></strong>: route the state to the <strong>Gemini Live</strong> session for real-time
+generation in the resolved voice — for ad-lib / dynamic states. Higher latency,
+but improvisational.</li>
+</ul>
+<p>This is the dial that lets a flow mix scripted briefs (prerendered) with ad-lib
+turns (live), per state.</p>
+<h2 id="why-this-is-now-tractable-foundation-already-in-place">Why this is now tractable (foundation already in place)</h2>
+<ul>
+<li><code>static_audio.manifest.voice_model_for_play_audio</code> now <strong>honors a real Gemini
+voice name</strong> (e.g. <code>Umbriel</code>) instead of forcing Achernar — so a state can pick
+its voice and the manifest keys it correctly.</li>
+<li><code>openings.synthesize_opening_with_gemini_live</code> now accepts a
+<strong><code>system_instruction</code></strong> — the &quot;style/accent&quot; channel.</li>
+<li>The phone transport <strong>already has a voice-agnostic prerendered path</strong>
+(<code>_static_audio_pcm24_for_current_state</code>, telnyx_transport.py:1223): it loads
+the cached WAV by resolved voice and emits PCM. Gemini WAVs play on the phone
+exactly like droid WAVs — same artifact. The only thing that diverts a state
+away from it today is <code>render_mode: droid_full_buffer</code>.</li>
+</ul>
+<h2 id="implementation-plan-opt-in-existing-flows-unchanged">Implementation plan (opt-in; existing flows unchanged)</h2>
+<p>The default voice/mode stays exactly as today, so droid flows and all current
+tests are unaffected. A flow opts in by adding a <code>voice:</code> block.</p>
+<ol>
+<li><strong>Types + loader</strong> — add <code>FlowVoiceConfig</code> (<code>default</code>, <code>classes: {name, style}</code>)
+parallel to <code>FlowLlmConfig</code>; parse a <code>voice:</code> flow block and per-state
+<code>play_audio.voice</code> / <code>render_mode: live</code>.</li>
+<li><strong>Resolver</strong> — <code>resolve_voice(flow, state_id)</code> and <code>resolve_render_mode(...)</code>
+reusing the LLM cascade walk (state → group → flow → global).</li>
+<li><strong>Preflow</strong> — render each prerendered state with its resolved voice + style
+(replace the hardcoded space_channel synth with cascade resolution).</li>
+<li><strong>Transport</strong> — for <code>render_mode: live</code>, set the Live session's voice +
+system_instruction to the resolved voice/style for that state instead of
+playing a prerendered WAV.</li>
+<li><strong>Adopt in Space Channel</strong> — delete the droid voice, set
+<code>voice.default: anchor</code> (Umbriel + British). Migrate <code>droid_full_buffer</code>
+states to the prerendered static path. Update the droid-coupled tests.</li>
+<li><strong>Verify on a real call</strong> — the operator dials the line and confirms British
+Umbriel plays (prerendered) and any <code>live</code> state ad-libs.</li>
+</ol>
+<h2 id="codex-plan-review-2026-06-30-revise-design-reshaped">Codex plan review (2026-06-30) → REVISE; design reshaped</h2>
+<p>A pre-build Codex review found 9 substantive issues. The feasible design after
+folding them in:</p>
+<ul>
+<li><strong>Voice per state applies to PRE-RENDERED audio only.</strong> Each static WAV can be
+a different Gemini voice (the phone looks it up by <code>voice_model_for_play_audio</code>
+→ manifest). This part stands.</li>
+<li><strong>Live audio has ONE voice per call, not per state.</strong> The Gemini Live session
+is created once with an immutable voice + <code>system_instruction</code>
+(<code>live/policy.py</code>, <code>live_client.py:227</code>). So: a flow picks a single <strong>live
+voice</strong> (call-level, set at session setup); you cannot swap the live voice
+mid-call. Drop &quot;per-state live voice.&quot;</li>
+<li><strong>&quot;Ad-lib&quot; is a normal dialog state, not a <code>render_mode</code> on <code>play_audio</code>.</strong>
+<code>play_audio</code> states are classified static and the model is suppressed
+(<code>live/session.py:437,747</code>); the loader only allows
+<code>static_audio|droid_sentence_stream|droid_full_buffer</code> (<code>loader.py:655</code>). To
+test ad-lib, author a normal (non-<code>play_audio</code>) dialog state — it already runs
+on the live session. It needs a <code>response_emitted</code> transition or it stalls
+(<code>live/session.py:1525</code>). So &quot;ad-lib per state&quot; = <em>don't mark it <code>play_audio</code></em>,
+not a new render mode.</li>
+<li><strong>Style must be part of the static-audio cache identity.</strong> Add a <code>style</code>
+(system_instruction) field to <code>StaticAudioSpec</code> and include it in the manifest
+hash (<code>manifest.py:67</code> is <code>text|voice|model</code> today), and pass it through
+<code>generate()</code> → <code>synthesize_opening_with_gemini_live(system_instruction=...)</code>.
+Otherwise changing &quot;British RP&quot; never re-renders.</li>
+<li><strong>Use a <em>generic</em> cascade helper, not the LLM resolver.</strong> <code>resolve_model_name</code>
+is model-specific (<code>adapters/__init__.py:74</code>). Extract a shared
+<code>resolve_capability(state→group→flow→global, inherit)</code> walk; voice/llm each
+supply their own class table + validation.</li>
+<li><strong>Capability fields belong on <code>StateDef</code>/<code>GoalSegment</code></strong>, with flow + global
+defaults and a load-time validation gate (unknown voice, bad alias, every
+state resolves) — mirroring the LLM policy's boot-time gate.</li>
+<li><strong>Thread the resolver through every surface</strong> that calls
+<code>voice_model_for_play_audio</code> today: phone playback (<code>telnyx_transport.py:1241</code>),
+preflow (<code>generator.py:64</code>), web/phone server metadata
+(<code>web_server.py:439</code>, <code>phone/server.py:735</code>), browser Live state
+(<code>live/transport.py:671</code>), and MCP state export. Plus tests.</li>
+<li><strong>Space Channel droid removal is its own risky step.</strong> The <code>_droid_voice_id</code>
+gate (<code>telnyx_transport.py:777,1644</code>) changes audio behavior for <em>every</em>
+non-suppressed state, not just <code>droid_full_buffer</code>. Do it isolated, with test
+updates and a real-call check.</li>
+</ul>
+<h3 id="revised-decomposed-plan">Revised, decomposed plan</h3>
+<ul>
+<li><strong>Phase 0 (small, shippable): Space Channel → prerendered Umbriel British,
+flow-level voice.</strong> Add <code>style</code> to the static-audio spec+hash; set the flow's
+static voice to Umbriel + British style; migrate <code>droid_full_buffer</code> → static;
+handle the droid-removal blast radius + update tests; preflow re-renders;
+verify on a real call. No cascade yet — one voice for the flow.</li>
+<li><strong>Phase 1: generic cascade helper + <code>voice:</code> block</strong> (flow/group/state, with
+the load-time gate), threaded through the surfaces above.</li>
+<li><strong>Phase 2: ad-lib dialog states</strong> — document the &quot;non-<code>play_audio</code> state +
+<code>response_emitted</code>&quot; pattern and a single call-level live voice; no per-state
+live voice.</li>
+</ul>
+<h2 id="open-design-question">Open design question</h2>
+<p>Keep <code>voice:</code> and <code>llm:</code> as <strong>parallel</strong> flow blocks (each with its own
+classes/cascade), or unify into one <code>capabilities:</code> block with <code>llm</code> / <code>voice</code> /
+<code>mode</code> sub-keys sharing a single resolver? Parallel is less refactor; unified is
+cleaner long-term. Recommend <strong>parallel now, unify later</strong> if a third capability
+appears.</p>
+<h2 id="risk-discipline">Risk / discipline</h2>
+<ul>
+<li>Strictly <strong>opt-in</strong> — no behavior change unless a flow adds <code>voice:</code>.</li>
+<li>The Space Channel migration is the riskiest part (droid coupling in the phone
+transport + tests); do it as its own reviewed step with a real-call check.</li>
+<li>Per house convention, this plan should get a Codex review before the build.</li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#implementation-status-resume-here">Implementation status — RESUME HERE</a></li><li class="toc-h2"><a href="#the-idea-from-the-operator">The idea (from the operator)</a></li><li class="toc-h2"><a href="#two-new-per-state-capabilities">Two new per-state capabilities</a></li><li class="toc-h3"><a href="#1-voice-name-style-resolved-via-the-cascade">1. Voice (name + style), resolved via the cascade</a></li><li class="toc-h3"><a href="#2-render-mode-prerendered-vs-live-ad-lib">2. Render mode: prerendered vs live (ad-lib)</a></li><li class="toc-h2"><a href="#why-this-is-now-tractable-foundation-already-in-place">Why this is now tractable (foundation already in place)</a></li><li class="toc-h2"><a href="#implementation-plan-opt-in-existing-flows-unchanged">Implementation plan (opt-in; existing flows unchanged)</a></li><li class="toc-h2"><a href="#codex-plan-review-2026-06-30-revise-design-reshaped">Codex plan review (2026-06-30) → REVISE; design reshaped</a></li><li class="toc-h3"><a href="#revised-decomposed-plan">Revised, decomposed plan</a></li><li class="toc-h2"><a href="#open-design-question">Open design question</a></li><li class="toc-h2"><a href="#risk-discipline">Risk / discipline</a></li></ul></aside>
+</div>
+</body>
+</html>
