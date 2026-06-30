@@ -1,18 +1,25 @@
 {
-  "generated_at": "2026-06-30T10:36:49.147430Z",
+  "generated_at": "2026-06-30T19:27:00.139505Z",
   "count": 154,
   "days": [
     {
       "date": "2026-06-30",
-      "headline": "Riff: Space Channel Briefing Pipeline with Cached Subflows",
-      "summary": "Implemented a modular briefing system for Space Channel that connects content briefings and exports static phone audio transcripts. The architecture leverages preflight subflows and caching to optimize performance and ensure reliable data delivery.",
+      "headline": "Riff Integrates Space Channel Briefings with Static Audio Exports",
+      "summary": "The Riff project now connects Space Channel content briefings and tightens news logic while enabling static phone audio transcript exports. Developers can leverage the new subflow architecture and preflow caching to optimize similar voice-driven content pipelines.",
       "takeaways": [
-        "Implement preflow caching for subflows to reduce latency in repeated content generation tasks.",
-        "Use static export mechanisms for audio transcripts to decouple processing from real-time delivery.",
-        "Structure complex workflows into testable preflight subflows to isolate logic and improve reliability."
+        "Implement preflow caching for subflows to reduce latency in multi-step voice interactions.",
+        "Export static audio transcripts to decouple content generation from real-time playback constraints.",
+        "Use modular subflows to isolate and test specific briefing components like Space Channel news."
       ],
-      "total_commits": 5,
+      "total_commits": 6,
       "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
         {
           "name": "riff",
           "commits": 5,
@@ -25,7 +32,7 @@
           ]
         }
       ],
-      "commit_sig": "19628691c57db62b"
+      "commit_sig": "f1a238ec6fb3f1dc"
     },
     {
       "date": "2026-06-29",
