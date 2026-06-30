@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T11:59:50.875236Z",
+  "generated_at": "2026-06-30T10:35:04.309367Z",
   "count": 137,
   "entries": [
     {
@@ -404,20 +404,20 @@
     {
       "repo": "Browser-Text-to-Speech-TTS-Realtime",
       "title": "Browser Text To Speech TTS Realtime",
-      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX models.",
       "keywords": [
         "typescript",
-        "react",
+        "react 18",
         "vite",
         "webassembly",
         "onnx runtime",
         "tailwind css",
-        "shadcn ui",
+        "tanstack query",
         "tts",
         "onnx",
+        "react-hook",
         "client-side-ai",
-        "offline-first",
-        "privacy-focused"
+        "privacy-first"
       ],
       "chunks": [
         {
@@ -426,23 +426,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX."
+          "text": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX models."
         },
         {
           "source": "what_it_is",
-          "text": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It utilizes VITS neural TTS models compiled to WebAssembly via ONNX Runtime, enabling streaming audio playback, multi-core parallel processing, and offline capability without server costs or API keys."
+          "text": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It leverages WebAssembly and ONNX Runtime to execute VITS neural TTS models locally, eliminating server costs and privacy concerns. The system supports streaming playback, where audio begins playing as soon as the first sentence is generated, while subsequent sentences are processed in parallel using WebAssembly threads."
         },
         {
           "source": "how_its_built",
-          "text": "The application is built with React 18, TypeScript, and Vite. It leverages the @diffusionstudio/vits-web library for model inference. The UI is styled with Tailwind CSS and shadcn/ui components. State management for TTS operations is handled by a custom useTTS hook that interfaces with a TTSEngine class, which manages sentence splitting, chunk generation, and audio playback synchronization."
+          "text": "The application is built with React 18 and TypeScript, bundled via Vite. It uses the @diffusionstudio/vits-web library for model inference, which compiles VITS models to WebAssembly. State management is handled by custom React hooks (useTTS) and TanStack Query. The UI is styled with Tailwind CSS and shadcn/ui components. Multi-threading is enabled via Cross-Origin Opener/Embedder Policies (COOP/COEP) to allow WebAssembly workers to accelerate generation."
         },
         {
           "source": "how_to_apply",
-          "text": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via hook options. Use the returned speak, stop, pause, and resume methods to control playback. Monitor state variables like isReady, isPlaying, and progress to update UI elements dynamically."
+          "text": "Integrate the useTTS hook into any React component to add voice capabilities. Configure the voice ID, speed, and volume via options. The hook manages model downloading, caching in IndexedDB, and audio playback state. It is suitable for accessibility tools, interactive storytelling, or any web application requiring natural-sounding speech without backend dependencies."
         },
         {
           "source": "features",
-          "text": "100% client-side processing with no server dependencies Streaming playback allowing audio to start before full generation Multi-core WebAssembly threads for parallel sentence processing Eight built-in natural voices across English, German, French, and Spanish Offline support via browser IndexedDB caching of voice models Privacy-first architecture ensuring no data leaves the local machine"
+          "text": "100% client-side processing with no server API calls Streaming playback with parallel sentence generation Multi-core acceleration via WebAssembly threads Offline support with IndexedDB model caching Eight built-in natural voices across four languages Privacy-first architecture keeping data local"
         }
       ]
     },
@@ -2107,18 +2107,19 @@
       "title": "Everyone Ai",
       "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
       "keywords": [
-        "javascript",
         "node.js",
         "express",
         "kubernetes",
+        "k3s",
         "helm",
         "traefik",
+        "code-server",
         "vanilla js",
         "ai-workspace",
-        "kubernetes-portal",
+        "k3s-bootstrap",
+        "developer-portal",
         "claude-code",
-        "dev-environment",
-        "self-hosted"
+        "self-hosted-ide"
       ],
       "chunks": [
         {
@@ -2131,19 +2132,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A portal that allows team members to launch pre-configured VS Code workspaces backed by Claude Code in seconds. It manages the lifecycle of workspace pods on a k3s cluster, provides an app catalog for templates, and exposes persistent HTTPS endpoints for deployed targets."
+          "text": "A web portal and CLI tool that allows teams to provision isolated VS Code workspaces backed by Claude Code on a shared k3s cluster. It manages the lifecycle of workspace pods, handles ingress routing via Traefik, and provides an app catalog for pre-configured development templates."
         },
         {
           "source": "how_its_built",
-          "text": "Node.js Express backend serving a vanilla JS SPA frontend. Uses the Kubernetes JavaScript client to manage workspace and target pods on a k3s cluster. Traefik handles ingress routing. Deployment is managed via Helm charts and an 'afterburner' CLI tool for bootstrapping infrastructure."
+          "text": "The system consists of a Node.js Express server acting as the portal API and frontend host, communicating with a k3s Kubernetes cluster via the official k8s client. Workspaces are deployed as individual pods running code-server. An accompanying CLI ('afterburner') handles cluster bootstrapping via SSH and Helm chart deployment."
         },
         {
           "source": "how_to_apply",
-          "text": "Operators use the afterburner CLI to bootstrap a Linux VM with k3s and deploy the portal via Helm. End users connect via VPN, access the portal URL, select a template from the App Catalog, and launch a workspace to get a browser-based VS Code instance with Claude Code ready in the terminal."
+          "text": "Operators use the 'afterburner' CLI to bootstrap a Linux VM into a k3s node and deploy the portal via Helm. End-users connect via VPN, access the portal URL, select a template from the App Catalog, and launch a browser-based VS Code instance with Claude Code pre-installed."
         },
         {
           "source": "features",
-          "text": "Launch Claude Code VS Code workspaces in under 30 seconds App Catalog with pre-configured templates (Python, Node.js, HR Agent) Deploy running apps as persistent HTTPS endpoints (Targets) Team-wide usage monitoring and fleet overview Zero-config setup for users via VPN and browser access"
+          "text": "One-click launch of Claude Code VS Code workspaces Interactive CLI for k3s cluster bootstrapping and Helm deployment App Catalog with pre-configured templates (Python, Node.js, HR Agent) Real-time workspace provisioning status via Server-Sent Events Team-based isolation and usage monitoring dashboard Automated Traefik IngressRoute creation for workspace access"
         }
       ]
     },
@@ -2333,10 +2334,10 @@
         "s3",
         "cloudfront",
         "semantic-search",
-        "github-tools",
-        "ai-agents",
-        "portfolio-management",
-        "code-discovery"
+        "github-indexer",
+        "mcp-server",
+        "vector-database",
+        "personal-portfolio"
       ],
       "chunks": [
         {
@@ -2349,19 +2350,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server to find reusable code patterns across a user's portfolio."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server to find code patterns and reusable components across a user's portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON exports. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing."
+          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON data exported by the CLI. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repo, configure a GitHub token, index your repositories using the CLI, and serve the web UI or integrate the MCP server into AI agents like Claude Code for context-aware code discovery."
+          "text": "Clone the repo, install dependencies, configure a GitHub token, index your repos using the CLI, and serve the web UI or integrate the MCP server into AI agents like Claude Code."
         },
         {
           "source": "features",
-          "text": "Client-side semantic search using TF-IDF and embedding vectors Auto-clustering of repositories into capability categories MCP server integration for AI agent code discovery Faceted filtering by language, tech stack, and stars Automated weekly reindexing via GitHub Actions Exportable search results and embeddable web widget"
+          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-clustering of repositories into capability categories MCP server integration for AI agent access Static web UI with faceted filtering and autocomplete Automated weekly reindexing via GitHub Actions Exportable search results and shareable URLs"
         }
       ]
     },
@@ -3999,19 +4000,20 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
         "mermaid",
         "jsonl",
         "websockets",
-        "rest api",
+        "http api",
         "voice-agent",
         "fsm",
         "llm-orchestration",
-        "yaml-config",
-        "deterministic-ai"
+        "deterministic-validation",
+        "python-platform",
+        "yaml-configuration"
       ],
       "chunks": [
         {
@@ -4020,23 +4022,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "riff is a voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for workflow enforcement. It allows developers to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using the LLM only for language generation while relying on pure functions and state graphs for slot validation, transition logic, and guardrails."
+          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, or intake. The system ensures reliability by using pure functions for guardrails, slot validation, and state transitions, preventing LLM hallucinations while maintaining conversational fluidity."
         },
         {
           "source": "how_its_built",
-          "text": "The core engine is built in Python, utilizing a hybrid architecture where an LLM adapter (supporting Gemini, Gemma, or Claude) drives conversation content, while a deterministic StateManager enforces the business logic defined in YAML flows. Key components include a Speech-to-Text input pipeline, a turn execution engine (run_turn), and a Text-to-Speech output pipeline. The system employs strict guardrails, deterministic slot extraction fallbacks, and a JSONL-based logging system for observability. It includes a built-in web server for real-time inspection and testing."
+          "text": "The core engine uses a `run_turn` pipeline where speech input is processed through Speech-to-Text, passed to an LLM adapter (Gemini, Gemma, Claude), and then validated by a deterministic `state_manager`. The state manager enforces a YAML-defined graph, extracting slots and evaluating guards via pure functions. Output is synthesized via Text-to-Speech. The architecture separates the probabilistic LLM layer from the deterministic control layer, using an event bus for internal communication and JSONL for logging."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses without hard-coding conversation trees. Define your business logic in a YAML flow file or generate one via the API using a natural language description. Integrate the agent into phone systems via the provided web interface or API endpoints. Leverage the A/B testing harness to validate agent performance against observable metrics like slot completion rates and turn counts before going live."
+          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail scenarios (coffee, pizza). It is suitable for developers who need robust voice interfaces that must adhere to strict business logic without complex manual coding of state machines. It can be integrated into existing telephony systems via its web server API or exposed to MCP clients for broader agent interoperability."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions using YAML-defined finite state machines Prevents LLM hallucination through pure-function guardrails and slot validators Includes 11 pre-built flows for retail and service industries Provides real-time web UI for inspecting live FSM states and conversation logs Supports A/B testing with observable metrics without requiring live LLM judges"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces strict state transitions and slot validation via YAML-defined FSMs Deterministic guardrails and pure-function validators prevent LLM hallucinations Supports multiple LLM backends including Gemini, Gemma, and Claude Includes 11 pre-built flows for common service and retail scenarios Real-time web UI for monitoring active sessions and FSM states"
         }
       ]
     },

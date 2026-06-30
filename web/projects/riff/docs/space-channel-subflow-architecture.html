@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Space Channel Subflow Architecture - RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover,nav.side a.active{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  nav.side a .badge-new{margin-left:5px;padding:0 6px;font-size:9.5px;display:inline-block;letter-spacing:.04em;text-transform:uppercase;background:var(--good);color:#fff;border-radius:20px;vertical-align:middle;font-weight:700;}
+  main{flex:1 1 auto;max-width:900px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;padding-top:8px;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  a.x{color:var(--accent);}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0;}
+  .tile{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 13px;min-height:112px;}
+  .tile .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  .tile .t{font-weight:650;margin:3px 0 5px;line-height:1.25;}
+  .tile p{font-size:13.5px;margin:0;color:var(--mut);line-height:1.42;}
+  .badge{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;background:#eef0f3;color:var(--mut);padding:2px 8px;border-radius:20px;margin-right:6px;}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <a href="goap-selector.html">GOAP-lite selector</a>
+  <div class="grp">Design (proposed)</div>
+  <a href="llm-policy.html">Effective LLM Policy</a>
+  <a href="judge-the-judge.html">Judge-the-Judge &amp; discipline</a>
+  <a href="space-channel-subflow-architecture.html" class="active">Space Channel subflows<span class="badge-new">New</span></a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <a href="transcript-audit.html">Transcript audit</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="shift-left-acceptance.html">Shift-left acceptance</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <a href="call-review.html">Call quality &amp; reviews</a>
+  <a href="post-call-dream-loop.html">Post-call dream loop</a>
+  <a href="call-timeline-mock.html">Call timeline mock</a>
+  <a href="voice-quality.html">Voice Quality Playbook</a>
+  <a href="space-channel-phone-audio-learning.html">Space Channel phone audio</a>
+  <a href="space-channel-content-refresh-design.html">Space Channel content refresh</a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Design &rsaquo; Space Channel subflows</div>
+  <h1 class="title">Space Channel Subflow Architecture</h1>
+  <p class="lede">A skills-style design for keeping the Space Channel phone agent small, discoverable, and testable as the public Space Channel catalog grows.</p>
+
+  <div class="callout good">
+    <strong>The organizing rule</strong>
+    The parent flow owns the caller relationship. Parent-scoped subflows own bounded jobs. RIFF imports those modules at flow-load time and still runs one flat, declared FSM.
+  </div>
+
+  <h2>Why change it</h2>
+  <p>The latest phone call sounded clearer and the measured tool waits were short. The remaining risk was routing hygiene: after the static menu, the durable <code>route</code> slot can still be <code>suggestions</code> while the caller is giving a fresh intent such as solar weather.</p>
+  <p>That is a structural problem. The current guards read the old route slot before they inspect the newest user text. A better router needs a single-use <code>route_candidate</code>: propose, dispatch, clear.</p>
+
+  <h2>Shape</h2>
+  <pre><code>flows/
+  space_channel_network_ops.yaml
+  subflows/
+    space_channel_network_ops/
+      manifest.yaml
+      launch_status.yaml
+      content_briefing.yaml
+      bug_intake.yaml
+      menu_choice.yaml
+      console_not_ready.yaml</code></pre>
+
+  <div class="grid">
+    <div class="tile"><div class="k">Parent</div><div class="t">Shell</div><p>Greeting, identity, global policy, high-level dispatch, fallback, and call closure.</p></div>
+    <div class="tile"><div class="k">Scoped</div><div class="t">Subflows</div><p>Space Channel jobs: launches, content briefing, bug intake, menu repair, not-ready consoles.</p></div>
+    <div class="tile"><div class="k">Viewer</div><div class="t">Provenance</div><p>Subflow chips and inspector rows keep imported state ownership visible.</p></div>
+  </div>
+
+  <h2>Implemented Runtime</h2>
+  <p>The parent YAML now keeps only <code>greeting</code> and <code>triage</code>. Everything else is stitched in through <code>imports:</code>.</p>
+  <pre><code>imports:
+  - subflows/space_channel_network_ops/menu_choice
+  - subflows/space_channel_network_ops/launch_status
+  - subflows/space_channel_network_ops/content_briefing
+  - subflows/space_channel_network_ops/console_not_ready
+  - subflows/space_channel_network_ops/bug_intake</code></pre>
+  <p>Each module declares a <code>subflow:</code> header. The loader copies that header to every imported state as <code>subflow_id</code>, <code>subflow_title</code>, and <code>subflow_source</code>. State IDs stay unchanged, so logs and replays still align with the previous graph.</p>
+
+  <h2>Viewer Contract</h2>
+  <p>The state-flow viewer still receives one graph, but imported states now show an ownership chip and the inspector includes a <code>Subflow</code> row.</p>
+  <pre><code>{
+  "id": "fetch_launches",
+  "subflow_id": "launch_status",
+  "subflow_title": "Launch Status",
+  "subflow_source": "flows/subflows/space_channel_network_ops/launch_status.yaml"
+}</code></pre>
+  <p>The same fields are published through <code>/api/flows/&lt;id&gt;</code>, <code>/api/flows/&lt;id&gt;/states</code>, and path-explorer <code>graph.json</code>. This keeps UI screenshots, timeline logs, and offline graph exports reconcilable.</p>
+
+  <h2>Manifest Cards</h2>
+  <p>The router should inspect small cards first, not entire YAML graphs.</p>
+  <pre><code>cards:
+  - id: launch_status
+    triggers: [launch, rocket, countdown, mission]
+    data_sources:
+      - https://www.spacechannel.com/data/launches.json
+    outputs: [space_launch_summary, space_launch_count]
+    terminal: true
+    first_audio_state: report_launches_audio
+    module_path: flows/subflows/space_channel_network_ops/launch_status.yaml
+
+  - id: content_briefing
+    triggers: [solar weather, space news, ufo, uap, radio, what is on]
+    data_sources:
+      - https://www.spacechannel.com/
+    outputs: [space_content_topic, space_content_summary]
+    terminal: true
+    first_audio_state: report_space_content_audio
+    module_path: flows/subflows/space_channel_network_ops/content_briefing.yaml</code></pre>
+
+  <h2>Route Contract</h2>
+  <p>This is the next router cleanup. The shipped modules still use <code>route</code>, with targeted safeguards: fresh launch/content requests can override a stale <code>bug_report</code> route, and bug-report language about live briefings no longer becomes a content briefing unless the caller explicitly asks for one. The follow-up is a single-use dispatch signal.</p>
+  <pre><code>route_candidate: solar_weather
+route_confidence: high
+active_subflow: content_briefing
+parent_return_state: triage
+last_committed_route: solar_weather</code></pre>
+  <p>Dispatch guards should read <code>route_candidate</code>, commit <code>active_subflow</code>, write <code>last_committed_route</code>, then clear <code>route_candidate</code>. Clearing at state entry is too late if a guard can fire before entry hooks run.</p>
+
+  <h2>Preflow Cache</h2>
+  <p>The Space Channel flow now has a preflow job that runs before callers arrive. It refreshes the homepage-derived content snapshot, refreshes Launch Command JSON, builds the launch/content/static audio text set, warms <code>web/assets/static_audio/</code>, and writes <code>data/space_channel/preflow_manifest.json</code>.</p>
+  <pre><code>.venv/bin/python -m riff.space_channel_preflow \
+  --flow space_channel_network_ops</code></pre>
+  <p>Runtime then reads fresh preflow launches before falling back to live fetch, rebuilds old content snapshots through schema <code>space_channel_content_v3</code>, and checks static audio by fully rendered text before doing call-time droid synthesis. The v3 snapshot keeps the homepage widget catalog plus optional phone-safe payloads for recent space headlines, NOAA SWPC space weather, Space Channel UFO files, and the Space Channel DSN snapshot.</p>
+  <pre><code>tmpdir=$(mktemp -d /tmp/riff-space-preflow.XXXXXX)
+.venv/bin/python -m riff.space_channel_preflow \
+  --flow space_channel_network_ops \
+  --content-cache "$tmpdir/content.json" \
+  --launch-cache "$tmpdir/launches.json" \
+  --manifest "$tmpdir/preflow.json" \
+  --static-audio-base "$tmpdir/static_audio" \
+  --no-audio</code></pre>
+  <p>A verified dry run on 2026-06-30 found 7 content topics, 3 launch records, and 13 planned audio items.</p>
+
+  <h2>Space Channel Data</h2>
+  <p>Research on 2026-06-29 used the public <a class="x" href="https://www.spacechannel.com/">Space Channel homepage</a>, <a class="x" href="https://www.spacechannel.com/data/launches.json">Launch Command JSON</a>, <a class="x" href="https://www.spacechannel.com/data/ufo-cases.json">UFO cases</a>, <a class="x" href="https://www.spacechannel.com/data/ufo-wire.json">UFO wire</a>, <a class="x" href="https://www.spacechannel.com/data/dsn-snapshot.json">DSN snapshot</a>, Spaceflight News API headlines, and NOAA SWPC space-weather products.</p>
+  <table>
+    <tr><th>Family</th><th>Examples from Space Channel</th><th>Subflow</th></tr>
+    <tr><td>Launches</td><td>Launch Command, Upcoming Launches</td><td><code>launch_status</code></td></tr>
+    <tr><td>Briefings</td><td>Daily Briefing, Solar Operations, Cosmic Weather, Webb Observatory, ISS Operations, Mars Operations</td><td><code>content_briefing</code></td></tr>
+    <tr><td>UFO/UAP</td><td>Anomaly Division, Intelligence Feed</td><td><code>content_briefing</code></td></tr>
+    <tr><td>Audio/status</td><td>Music, Deep Space Network, Sky Monitor, Orbital Traffic</td><td><code>content_briefing</code></td></tr>
+    <tr><td>Catalog summaries</td><td>NetTrek, Object Atlas, Mission Supply, Sector Analysis, Exoplanet Catalog</td><td><code>content_briefing</code></td></tr>
+  </table>
+  <p>The launch feed returned 20 launch records in the sampled fetch. The first records included SpaceX Sirius SXM-11, a South Korean ADD solid-fuel demo flight, Pegasus XL Swift Boost, Rocket Lab's Electron iQPS launch, and Long March 4C.</p>
+
+  <h2>Customer Flow View</h2>
+  <p>For a Space Channel customer review, start the RIFF web server:</p>
+  <pre><code>.venv/bin/python3 -m riff.web_server</code></pre>
+  <p>Then open <code>http://127.0.0.1:8765/voice.html?flow=space_channel_network_ops</code>. The customer sees one state graph with subflow chips for <code>Menu Choice</code>, <code>Launch Status</code>, <code>Content Briefing</code>, <code>Console Not Ready</code>, and <code>Bug Intake</code>. Clicking a node shows the state metadata, required tool, slots, and imported source file.</p>
+  <p>Raw metadata is available at <code>/api/flows/space_channel_network_ops</code> and <code>/api/flows/space_channel_network_ops/states</code>. Topic-specific choices such as <code>space_news</code>, <code>solar_weather</code>, <code>ufo_files</code>, <code>radio</code>, <code>deep_space_network</code>, and <code>mission_ops</code> are data-backed branches inside <code>content_briefing</code>; logs expose the selected <code>space_content_topic</code> slot.</p>
+
+  <h2>Branch Count</h2>
+  <p>Do not create 21 top-level routes. Collapse the catalog into about seven branch families:</p>
+  <p><span class="badge">launch_status</span><span class="badge">content_briefing</span><span class="badge">bug_intake</span><span class="badge">menu_choice</span><span class="badge">console_not_ready</span><span class="badge">fallback_repair</span><span class="badge">global_handoff</span></p>
+
+  <h2>A/B/C Plan</h2>
+  <table>
+    <tr><th>Arm</th><th>Change</th><th>What it tests</th></tr>
+    <tr><td>Original</td><td>Current flat flow and sticky <code>route</code></td><td>Baseline behavior</td></tr>
+    <tr><td>A</td><td>Current flow plus <code>route_candidate</code></td><td>Smallest stale-route fix</td></tr>
+    <tr><td>B</td><td>Parent shell plus scoped subflows</td><td>Scalability and ownership</td></tr>
+    <tr><td>C</td><td>Direct topic router for capability questions</td><td>Shorter menu and fewer static turns</td></tr>
+  </table>
+
+  <h2>Simulator Gate</h2>
+  <p>Before any OTA call, run the in-process simulator tests and a fast flow-eval smoke:</p>
+  <pre><code>.venv/bin/pytest tests/test_space_channel_content.py \
+  tests/test_space_channel_tools.py \
+  tests/test_space_channel_flow.py \
+  tests/test_space_channel_subflows.py -q
+
+.venv/bin/pytest \
+  tests/test_space_channel_preflow.py \
+  tests/static_audio/test_manifest.py \
+  tests/test_live_session.py::test_required_tool_act_transition_short_circuits_to_static_report \
+  tests/phone/test_telnyx_transport.py::test_space_channel_launch_phone_sim_short_circuits_and_blocks_stale_audio -q
+
+.venv/bin/python -m riff.flow_eval \
+  --flows space_channel_network_ops \
+  --personas cooperative,terse \
+  --repeat 1 \
+  --no-judge \
+  --json</code></pre>
+  <p>The minimum scenario pack is direct launches, direct solar weather, capabilities then solar weather, capabilities then bug report, mixed launch plus discrepancy, repeated capabilities, unknown widget, and partial ASR such as "weather".</p>
+
+  <h2>Status</h2>
+  <div class="callout good">
+    <strong>Implemented</strong>
+    Parent-scoped subflows, viewer/API provenance, required-tool short-circuiting, Space Channel preflow JSON/audio cache warming, rendered-text static-audio lookup, and mixed-intent route safeguards are in place.
+  </div>
+  <p>Verification evidence: 59 focused tests passed for Space Channel subflows, preflow, static audio, and phone short-circuit behavior. Preflow dry run succeeded against temporary paths. LLM-as-judge runs completed without eval errors and trace lint stayed clean: 0 double beats, 0 collect loops, 0 stale asks, and 0 raw repr leaks.</p>
+  <div class="callout warn">
+    <strong>Remaining design gap</strong>
+    Multi-intent calls still need a parent follow-up or intent queue. Current subflows pick one branch and close, so a caller asking to log a bug and also hear launch/weather information can lose the second intent.
+  </div>
+
+  <div class="callout warn">
+    <strong>Review note</strong>
+    Claude reviewed the design and flagged three risks: incomplete guard migration, slot namespace collisions, and cold subflow load latency. The implementation avoids call-time load latency by stitching modules at flow load. Antigravity's <code>agentapi</code> was present but blocked because no active <code>ANTIGRAVITY_LS_ADDRESS</code> was available; a command-line <code>codex exec -o</code> docs pass was used as the CLI fallback.
+  </div>
+
+  <footer>Companion Markdown: <code>docs/codex/2026-06-29-space-channel-subflow-architecture.md</code>.</footer>
+</main>
+</div>
+</body>
+</html>

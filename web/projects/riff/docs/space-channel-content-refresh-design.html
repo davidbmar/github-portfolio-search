@@ -206,6 +206,27 @@ The phone path became clear only when outbound Telnyx media was sent as:</p>
 uses full-buffer droid synthesis plus the same paced sender. This avoids the
 sentence-by-sentence choppiness that appeared when generation and sending were
 too tightly coupled.</p>
+<h2 id="latency-learning">Latency Learning</h2>
+<p>The 2026-06-29 phone export showed a separate problem from audio quality. After
+the caller asked for UFO files, <code>user_transcription</code> and <code>update_slots</code> landed
+within milliseconds, but the phone did not start the RIFF-owned content audio
+until about 11.9 seconds later. The intervening audio was Gemini Live output
+that the phone path suppressed because Space Channel owns those states.</p>
+<p>The applied mitigation has three layers:</p>
+<ul>
+<li>The classifier prompts now explicitly say nothing after <code>update_slots</code>; RIFF
+will play the next phone-safe audio state.</li>
+<li>Space Channel opts into a bounded <code>phone_processing_tone</code>, a short droid
+compute chirp that starts after a 700 ms wait and loops until real agent audio
+starts or the max wait expires.</li>
+<li>Static audio transitions into blank terminal states no longer send a Live
+policy-change prompt, so Gemini does not improvise an extra goodbye after the
+authored Space Channel line has completed.</li>
+</ul>
+<p>The deeper follow-up is to fast-forward RIFF-owned <code>act</code> and <code>static</code> chains
+immediately after a deterministic tool result instead of waiting for Gemini's
+suppressed turn to complete. That would remove the wait; the processing tone is
+the caller-facing fallback while that broader handoff is designed.</p>
 <h2 id="next-data-connectors">Next Data Connectors</h2>
 <p>The V1 cache provides current dashboard presence/status and launch data. The
 next connectors should deepen the summaries without changing the phone flow:</p>
@@ -235,7 +256,7 @@ next connectors should deepen the summaries without changing the phone flow:</p>
 </code></pre>
 
 </main>
-<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#goal">Goal</a></li><li class="toc-h2"><a href="#current-implementation">Current Implementation</a></li><li class="toc-h2"><a href="#data-sources">Data Sources</a></li><li class="toc-h2"><a href="#phone-flow">Phone Flow</a></li><li class="toc-h2"><a href="#audio-learning-applied">Audio Learning Applied</a></li><li class="toc-h2"><a href="#next-data-connectors">Next Data Connectors</a></li><li class="toc-h2"><a href="#verification">Verification</a></li></ul></aside>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#goal">Goal</a></li><li class="toc-h2"><a href="#current-implementation">Current Implementation</a></li><li class="toc-h2"><a href="#data-sources">Data Sources</a></li><li class="toc-h2"><a href="#phone-flow">Phone Flow</a></li><li class="toc-h2"><a href="#audio-learning-applied">Audio Learning Applied</a></li><li class="toc-h2"><a href="#latency-learning">Latency Learning</a></li><li class="toc-h2"><a href="#next-data-connectors">Next Data Connectors</a></li><li class="toc-h2"><a href="#verification">Verification</a></li></ul></aside>
 </div>
 </body>
 </html>

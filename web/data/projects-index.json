@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T11:59:50.872283Z",
+  "generated_at": "2026-06-30T10:35:04.306335Z",
   "count": 137,
   "projects": [
     {
@@ -226,28 +226,27 @@
     {
       "slug": "Browser-Text-to-Speech-TTS-Realtime",
       "title": "Browser Text To Speech TTS Realtime",
-      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX models.",
       "tech": [
         "TypeScript",
-        "React",
+        "React 18",
         "Vite",
         "WebAssembly",
         "ONNX Runtime",
         "Tailwind CSS",
-        "shadcn ui"
+        "TanStack Query"
       ],
       "reuse_tags": [
         "tts",
         "webassembly",
         "onnx",
-        "react",
+        "react-hook",
         "client-side-ai",
-        "offline-first",
-        "privacy-focused"
+        "privacy-first"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime",
-      "pushed_at": "2026-06-23T01:21:49Z"
+      "pushed_at": "2026-06-29T19:44:28Z"
     },
     {
       "slug": "COE-overview",
@@ -1133,24 +1132,25 @@
       "title": "Everyone Ai",
       "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
       "tech": [
-        "JavaScript",
         "Node.js",
         "Express",
         "Kubernetes",
+        "k3s",
         "Helm",
         "Traefik",
+        "code-server",
         "Vanilla JS"
       ],
       "reuse_tags": [
         "ai-workspace",
-        "kubernetes-portal",
+        "k3s-bootstrap",
+        "developer-portal",
         "claude-code",
-        "dev-environment",
-        "self-hosted"
+        "self-hosted-ide"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/everyone-ai",
-      "pushed_at": "2026-06-29T10:04:27Z"
+      "pushed_at": "2026-06-30T06:16:11Z"
     },
     {
       "slug": "exampleLoops",
@@ -1256,14 +1256,14 @@
       ],
       "reuse_tags": [
         "semantic-search",
-        "github-tools",
-        "ai-agents",
-        "portfolio-management",
-        "code-discovery"
+        "github-indexer",
+        "mcp-server",
+        "vector-database",
+        "personal-portfolio"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-28T09:59:06Z"
+      "pushed_at": "2026-06-29T12:01:16Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2114,26 +2114,26 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
         "JSONL",
         "WebSockets",
-        "REST API"
+        "HTTP API"
       ],
       "reuse_tags": [
         "voice-agent",
         "fsm",
         "llm-orchestration",
-        "python",
-        "yaml-config",
-        "deterministic-ai"
+        "deterministic-validation",
+        "python-platform",
+        "yaml-configuration"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-29T06:11:52Z"
+      "pushed_at": "2026-06-30T06:06:04Z"
     },
     {
       "slug": "riot",

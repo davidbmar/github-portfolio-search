@@ -1,17 +1,42 @@
 {
-  "generated_at": "2026-06-29T12:01:15.416536Z",
-  "count": 153,
+  "generated_at": "2026-06-30T10:36:49.147430Z",
+  "count": 154,
   "days": [
     {
-      "date": "2026-06-29",
-      "headline": "Robust Telnyx Audio Pipeline and Booking Logic Fixes",
-      "summary": "Enhanced the Riff platform with pre-encoded, paced Telnyx audio delivery and diagnostic tools for Space Channel phone interactions. Concurrently resolved critical booking title clobbering and CI evaluation deadlocks to improve system reliability.",
+      "date": "2026-06-30",
+      "headline": "Riff: Space Channel Briefing Pipeline with Cached Subflows",
+      "summary": "Implemented a modular briefing system for Space Channel that connects content briefings and exports static phone audio transcripts. The architecture leverages preflight subflows and caching to optimize performance and ensure reliable data delivery.",
       "takeaways": [
-        "Implement pre-encoding and absolute deadline pacing for Telnyx media to ensure consistent audio playback latency.",
-        "Reuse the added audio artifact analyzer and static diagnostic chains to debug live phone prompt issues without impacting production boot times.",
-        "Apply the fix for blank slot title clobbering to prevent data loss in calendar booking providers."
+        "Implement preflow caching for subflows to reduce latency in repeated content generation tasks.",
+        "Use static export mechanisms for audio transcripts to decouple processing from real-time delivery.",
+        "Structure complex workflows into testable preflight subflows to isolate logic and improve reliability."
       ],
-      "total_commits": 14,
+      "total_commits": 5,
+      "repos": [
+        {
+          "name": "riff",
+          "commits": 5,
+          "messages": [
+            "Tighten Space Channel news briefing",
+            "Export static phone audio transcripts",
+            "Test Space Channel preflight subflows",
+            "Connect Space Channel content briefings",
+            "Add Space Channel subflows and preflow cache"
+          ]
+        }
+      ],
+      "commit_sig": "19628691c57db62b"
+    },
+    {
+      "date": "2026-06-29",
+      "headline": "Stabilizing Riff Phone Timelines and Space Channel Audio Processing",
+      "summary": "This update focuses on stabilizing call timeline synchronization, improving audio pacing for Telnyx integrations, and refining the Space Channel phone processing architecture. It also includes critical fixes for booking title clobbering and CI evaluation reliability.",
+      "takeaways": [
+        "Implement absolute deadline pacing for VoIP media streams to prevent jitter and ensure synchronized audio playback.",
+        "Use pre-encoded and pre-rendered prompts to reduce latency and improve speech pacing in real-time phone interactions.",
+        "Apply deterministic mocking and waveform energy alignment to stabilize call timeline replay and debugging workflows."
+      ],
+      "total_commits": 30,
       "repos": [
         {
           "name": "cal-provider",
@@ -21,9 +46,31 @@
           ]
         },
         {
-          "name": "riff",
-          "commits": 13,
+          "name": "github-portfolio-search",
+          "commits": 1,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 28,
+          "messages": [
+            "Document Space Channel subflow architecture",
+            "Condense call timeline signal matrix",
+            "Align phone timeline clocks and record media jitter",
+            "Stabilize phone timeline publishing",
+            "Add post-call dream loop artifacts",
+            "Short-circuit static phone transitions",
+            "Publish call timeline after Space Channel calls",
+            "Refresh call timeline report",
+            "Show live caller audio level in phone observer",
+            "Improve phone processing tone",
+            "Add call waveform energy alignment",
+            "Improve call timeline replay UI",
+            "Add deterministic call timeline mock",
+            "Add Space Channel phone processing tone",
+            "Improve Space Channel phone speech pacing",
             "Build Space Channel phone content refresh",
             "Pre-encode Telnyx media before paced send",
             "Add phone audio artifact analyzer",
@@ -40,7 +87,7 @@
           ]
         }
       ],
-      "commit_sig": "682d9850e443c008"
+      "commit_sig": "5062a6b32e08e02f"
     },
     {
       "date": "2026-06-28",
@@ -3572,15 +3619,14 @@
     },
     {
       "date": "2026-05-07",
-      "headline": "Iran-Intel Goes Public While Riff Builds Voice Evaluation Harness",
-      "summary": "Iran-Intel was bootstrapped from prior briefing infrastructure into a public, password-gated CloudFront site with persona panels, clickable citations, TLDRs, disclosures, and multi-voice audio. Riff advanced a Tier-B voice-agent evaluation stack with Dockerized Gemini Live tests, scripted dialogs, assertions, safety gates, failure classification, mitigation dispatch, reports, and latency tracking.",
+      "headline": "Build Multi-Persona AI Debate Panels with RAG and Audio Synthesis",
+      "summary": "This update delivers a full-stack intelligence briefing toolkit featuring a 9-persona debate engine, adversarial testing, and multi-voice audio generation. It integrates strict citation tracking, persona-specific RAG layers, and automated deployment pipelines for secure, transparent AI analysis.",
       "takeaways": [
-        "Retargeted an existing briefing app into Iran-Intel by adding investigation/preset stubs, stripping stale UFO references, and sourcing homepage tiers/categories from graph_config; reuse this pattern to clone a briefing product across domains without hard-coded leftovers.",
-        "Built an evidence-backed panel UX with 9 personas, per-debate pages, TLDR cards/callouts, clickable ev_N citations, a /panel ToC, and multi-voice audio; apply the same structure for reusable multi-agent analysis pages.",
-        "Added trust and deployment guardrails: seed-mode and AI-extraction disclosures, polished empty states, password-gated CloudFront launch, deploy.sh content checks, and propagation waits.",
-        "Built a reusable Riff Tier-B eval harness around voice agents: Docker Gemini Live audio round-trips, scripted multi-turn dialogs, verdict.json assertions, fake calendar provider, safety gates, failure-mode classification, mitigation summaries, HTML reports, and latency tracking."
+        "Implement a 'split personality' RAG architecture by defining distinct persona dataclasses (e.g., regime, civil society) to generate diverse, conflicting viewpoints from a single corpus.",
+        "Reuse the adversarial testing framework (B-121) and seed-mode diagnostics to validate model reliability and prevent cold-start failures in CLI-based data collection pipelines.",
+        "Apply the multi-voice audio synthesis pipeline (--max-voices flag) combined with clickable citation rendering to create engaging, verifiable audio debates for end-users."
       ],
-      "total_commits": 85,
+      "total_commits": 77,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3640,7 +3686,7 @@
         },
         {
           "name": "riff",
-          "commits": 21,
+          "commits": 13,
           "messages": [
             "fix(mcp): bootstrap .env in MCP server entry point",
             "feat(tier-b): S-016 — F-307 close, per-turn latency tracking",
@@ -3654,15 +3700,7 @@
             "test(tier-b): S-008 — Docker re-validation of S-005/6/7 stack + B-310 filed",
             "feat(tier-b): S-007 — Codex-guided safety gate + fake cal-provider",
             "feat(tier-b): S-006 — F-310 foundation (cal-provider boot + booking.json) + B-309 fix",
-            "fix(tier-b): S-005 — _TeeClient unblocks B-308 timeout race",
-            "feat(tier-b): S-004 — Docker validation of driver + assertion layer",
-            "feat(tier-b): S-003 — assertion layer + verdict.json (F-308 SHIPPED)",
-            "feat(tier-b): S-002 — driver wires GeminiLiveSession + real Gemini end-to-end",
-            "feat(tier-b-poc): S-001 — multi-turn scripted dialog",
-            "docs(codex): handoff + sprint log for autonomous build loop",
-            "fix(tier-b-poc): switch to gTTS + add session_resumption — Docker now works",
-            "feat(tier-b-poc): Gemini Live 3.1 audio round-trip in Docker",
-            "feat(scenarios): Tier A v1 scenario runner — observer hook + ML-fallback gates + frozen time"
+            "fix(tier-b): S-005 — _TeeClient unblocks B-308 timeout race"
           ]
         },
         {
@@ -3692,19 +3730,18 @@
           ]
         }
       ],
-      "commit_sig": "99ed1222b3c0df6b"
+      "commit_sig": "3b43f7f24dacc537"
     },
     {
       "date": "2026-05-06",
-      "headline": "Cleaner Extraction, Fresher Briefings, and Safer Scheduling",
-      "summary": "The day focused on hardening the intelligence briefing pipeline with better claim extraction, dedup handling, freshness ranking, and a default daily-publish path to MLX. Riff also tightened scheduling flows with templated recap lines, corrected slot-booking arguments, and safer phone startup, while UFOBriefing made summary text the main click target.",
+      "headline": "Fix Qwen3.5 Extraction, Optimize Serper Freshness, and Refine Publishing Logic",
+      "summary": "This update resolves critical claim extraction failures in Qwen3.5-4B by enforcing line-protocol and deduplication while adjusting Serper search recency to daily for better paywall avoidance. It also stabilizes the publishing pipeline by defaulting to MLX after validation and improves UI accessibility in UFOBriefing.",
       "takeaways": [
-        "Use env-var bypasses and line-protocol/no-think extraction modes to make LLM claim extraction easier to debug and less prone to template-echo failures.",
-        "Rank search freshness by defaulting recency from week to day, then pair it with planner-independent freshness queries for paywall-avoidance workflows.",
-        "Make scheduling actions pass canonical selected-slot args consistently, and boot phone providers before accepting calls to avoid runtime edge cases.",
-        "Turn recap copy into templated entry lines so scheduling read-backs can be reused and revised without changing core flow code."
+        "Implement robust LLM claim extraction by combining line-protocol formatting, no-think modes, and prompt-level deduplication to prevent template-echo failures.",
+        "Configure search APIs like Serper with daily recency windows instead of weekly to prioritize fresh, accessible content and avoid paywalled older articles.",
+        "Gate automated publishing behind supervised validation steps to ensure model flips or updates do not degrade output quality before going live."
       ],
-      "total_commits": 14,
+      "total_commits": 8,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3725,33 +3762,20 @@
             "Planner-independent freshness queries + middle-dot title parsing",
             "Default Serper recency: week → day (paywall-avoidance via freshness ranking)"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 6,
-          "messages": [
-            "docs: backlog from 2026-05-06 verification + booking-commit followup",
-            "feat(recap): templated entry.line for scheduling_read_back (Phase B-content)",
-            "fix(scheduling): canonical-full args in maybe_book_selected_slot (v3)",
-            "docs: rev 7 of recap design plan (post-codex review-6)",
-            "fix(scheduling): use selection arg in maybe_book_selected_slot",
-            "fix(phone): boot providers before accepting calls"
-          ]
         }
       ],
-      "commit_sig": "3c38d5eaeddc8870"
+      "commit_sig": "a08cbd7f16f042c3"
     },
     {
       "date": "2026-05-05",
-      "headline": "Briefing Pipelines Get Domain-Neutral Gap Axes and Voice Fixes",
-      "summary": "The main build generalized intelligence-briefing-toolkit’s gap diagnoser with typed gap axes, a rule registry, domain presets, CLI commands, governor migrations, docs, and regression tests for cross-domain isolation. The day also consolidated daily/nightly briefing schedules around local early-morning windows, set MLX’s default model to Qwen3.5-4B, fixed UFO pipeline analysis, improved Riff phone/live flow behavior, and cleaned RAG sprint/auth artifacts.",
+      "headline": "Qwen3.5 Integration and Domain-Isolated Gap Diagnosis Pipeline",
+      "summary": "The intelligence-briefing-toolkit upgraded to Qwen3.5-4B and implemented a domain-isolated gap diagnosis engine with strict cross-domain leakage prevention. Daily update pipelines were automated via launchd scheduling, supported by comprehensive audit documentation and regression tests.",
       "takeaways": [
-        "Model domain-specific diagnosis as typed axes plus a rule registry so new domains can reuse the same gap engine without prompt leakage.",
-        "Ship operator-facing CLI commands and reference docs alongside refactors, making new abstractions reusable without reading internals.",
-        "Consolidate scheduled pipeline glue into explicit local-time windows and verify every nightly path includes required steps like analysis.",
-        "For realtime voice flows, tune transport behavior directly: remove Telnyx quiet_mode, shorten half-duplex tail latency, and conditionally suppress after early dispatch."
+        "Implement domain isolation by replacing political prompt templates with neutral topic anchors and enforcing cross-domain tests to prevent UAP/political leakage.",
+        "Build a rule-based diagnosis engine using a RULE_REGISTRY dispatcher and typed AxisSpec/Gap structures for modular, extensible gap analysis.",
+        "Automate nightly ML pipelines by wiring daily-update glue code and scheduling execution in low-traffic windows (2-7 AM) using launchd."
       ],
-      "total_commits": 46,
+      "total_commits": 40,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3805,18 +3829,6 @@
           ]
         },
         {
-          "name": "riff",
-          "commits": 6,
-          "messages": [
-            "fix(phone): drop quiet_mode on Telnyx so state-pushes reach Gemini",
-            "fix: half-duplex tail 500→200ms for phone + flow-graph happy-path layout",
-            "fix(flow-canonical): address codex review of Process A migration plan",
-            "docs: add implementation plan for flow canonical migration (Process A)",
-            "fix(live): conditional suppression after early dispatch — unblocks silence bug",
-            "feat(flow-canonical): visual convention for speak/route states + ⚠ for conflated"
-          ]
-        },
-        {
           "name": "tool-RAG-for-split-personalities",
           "commits": 1,
           "messages": [
@@ -3824,7 +3836,7 @@
           ]
         }
       ],
-      "commit_sig": "3a98aa5ec5b5b40c"
+      "commit_sig": "9c3ecec21edf39c5"
     },
     {
       "date": "2026-05-04",
