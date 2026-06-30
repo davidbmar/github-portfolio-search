@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Ten Space Channel droid voice presets with local Piper synthesis and droid DSP/vocoder effects.">
+<link rel="canonical" href="https://davidbmar.com/droid/space-channel-voices/">
+<title>Space Channel Droid Voice Presets</title>
+<style>
+:root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#e6edf3;--muted:#9aa4af;--blue:#58a6ff}
+*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;line-height:1.45;color:var(--text);background:var(--bg)}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}.site-bar{display:flex;align-items:center;gap:10px;padding:16px 24px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{color:var(--text);font-weight:700;margin-right:auto}.site-bar a:not(.brand){color:var(--muted);font-size:14px;padding:6px 10px;border-radius:8px}.site-bar a.active,.site-bar a:not(.brand):hover{color:var(--text);background:#21262d;text-decoration:none}
+main{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:28px 0 56px}h1{font-size:30px;margin:0 0 8px}h2{font-size:18px;margin:26px 0 8px}
+.meta{font-size:13px;color:var(--muted)}.toolbar{position:sticky;top:0;background:var(--bg);padding:12px 0;border-bottom:1px solid var(--line);margin:0 0 18px;z-index:2}
+select{font:inherit;padding:7px 9px;border:1px solid #58606a;border-radius:6px;background:var(--panel);color:var(--text);min-width:260px}
+.line{border-top:1px solid var(--line);padding-top:12px;margin-top:18px}.row{display:grid;grid-template-columns:210px minmax(300px,1fr) 210px;gap:8px 14px;align-items:center;padding:10px 0;border-top:1px solid #252b33}
+.head{font-size:12px;text-transform:uppercase;color:var(--muted);font-weight:700;border-top:0}.voice{font-weight:700}.voice small{display:block;font-weight:500;color:var(--muted);margin-top:2px}
+audio{width:100%}code{background:#21262d;border:1px solid var(--line);border-radius:5px;padding:1px 5px}.note{margin-top:6px;color:var(--muted);font-size:13px}
+details{font-size:13px;color:var(--muted)}summary{cursor:pointer;color:var(--text)}
+@media(max-width:820px){.site-bar{padding:12px 16px}.row{grid-template-columns:1fr}.head{display:none}select{width:100%;min-width:0}}
+</style>
+</head>
+<body>
+<nav class="site-bar" aria-label="Site">
+<a class="brand" href="/">davidbmar.com</a>
+<a class="active" href="/droid/">Droid</a>
+<a href="/#/search">Search</a>
+<a href="/projects/">Projects</a>
+<a href="/daily/">Daily</a>
+<a href="/#/clusters">Clusters</a>
+</nav>
+<main>
+<h1>Space Channel Droid Voice Presets</h1>
+<p class="meta">Generated locally with Piper plus droid DSP/vocoder effects. Timings are synthesis plus processing before playback.</p>
+<div class="toolbar"><label for="voiceSelect">Voice </label><select id="voiceSelect">
+<option value="all">All voices</option>
+<option value="retirement_party_mvp">Retirement Party MVP</option>
+<option value="mvp_shop_less_crunch">Shop Droid Less Crunch</option>
+<option value="euro_protocol_gold">Euro Protocol Gold</option>
+<option value="jabba_shop_attendant">Jabba Shop Attendant</option>
+<option value="space_ops_switchboard">Space Ops Switchboard</option>
+<option value="uap_archive_vocoder">UAP Archive Vocoder</option>
+<option value="r2_gatekeeper">R2 Gatekeeper</option>
+<option value="launch_control_unit">Launch Control Unit</option>
+<option value="deep_space_radio">Deep Space Radio</option>
+<option value="bug_intake_clerk">Bug Intake Clerk</option>
+</select></div>
+<section class="line">
+<h2>Line 1</h2>
+<p>Thank you for calling Space Channel network operations. How may I help you?</p>
+<div class="row head"><div>Voice</div><div>Listen</div><div>Timing</div></div>
+<div class="row" data-voice="retirement_party_mvp">
+<div class="voice"><code>retirement_party_mvp</code><small>Retirement Party MVP</small><details><summary>genesis</summary><div>Chad&#x27;s favorite direction: a_dsp character, but closer to a clean protocol droid than a crunchy robot.</div><div class="note">Default candidate for Space Channel network operations.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-retirement_party_mvp.wav"></audio></div>
+<div class="meta">0.6022s pre-playback, 4.272s audio</div>
+</div>
+<div class="row" data-voice="mvp_shop_less_crunch">
+<div class="voice"><code>mvp_shop_less_crunch</code><small>Shop Droid Less Crunch</small><details><summary>genesis</summary><div>a_dsp with the digital crunch removed, keeping only the droid-shop metal and hollow body.</div><div class="note">Friendly service droid, still obviously synthetic.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-mvp_shop_less_crunch.wav"></audio></div>
+<div class="meta">0.5687s pre-playback, 4.331s audio</div>
+</div>
+<div class="row" data-voice="euro_protocol_gold">
+<div class="voice"><code>euro_protocol_gold</code><small>Euro Protocol Gold</small><details><summary>genesis</summary><div>Protocol-droid read: British base voice, light metallic sheen, almost no grit.</div><div class="note">Polished concierge answers and scripted greetings.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-euro_protocol_gold.wav"></audio></div>
+<div class="meta">0.5401s pre-playback, 4.76s audio</div>
+</div>
+<div class="row" data-voice="jabba_shop_attendant">
+<div class="voice"><code>jabba_shop_attendant</code><small>Jabba Shop Attendant</small><details><summary>genesis</summary><div>Palace service droid: hollow and theatrical, with raspy resonance instead of digital crush.</div><div class="note">Characterful intake and handoff prompts.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-jabba_shop_attendant.wav"></audio></div>
+<div class="meta">0.5411s pre-playback, 3.936s audio</div>
+</div>
+<div class="row" data-voice="space_ops_switchboard">
+<div class="voice"><code>space_ops_switchboard</code><small>Space Ops Switchboard</small><details><summary>genesis</summary><div>Call-center droid: clear first, metallic second.</div><div class="note">The opening line and suggestion flow.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-space_ops_switchboard.wav"></audio></div>
+<div class="meta">0.5481s pre-playback, 3.855s audio</div>
+</div>
+<div class="row" data-voice="uap_archive_vocoder">
+<div class="voice"><code>uap_archive_vocoder</code><small>UAP Archive Vocoder</small><details><summary>genesis</summary><div>Smooth vocoder-forward archive voice: synthetic carrier, no digital bit-crush.</div><div class="note">UFO files, anomaly reports, and classified-flavored reads.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-uap_archive_vocoder.wav"></audio></div>
+<div class="meta">0.5917s pre-playback, 4.714s audio</div>
+</div>
+<div class="row" data-voice="r2_gatekeeper">
+<div class="voice"><code>r2_gatekeeper</code><small>R2 Gatekeeper</small><details><summary>genesis</summary><div>Astromech-adjacent gatekeeper translated into speech: synthetic but smooth and intelligible.</div><div class="note">Short responses, confirmations, and routing prompts.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-r2_gatekeeper.wav"></audio></div>
+<div class="meta">0.5715s pre-playback, 4.679s audio</div>
+</div>
+<div class="row" data-voice="launch_control_unit">
+<div class="voice"><code>launch_control_unit</code><small>Launch Control Unit</small><details><summary>genesis</summary><div>Crisp operations voice with a controlled machine edge.</div><div class="note">Launch windows, status, timings, numbers, and confirmations.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-launch_control_unit.wav"></audio></div>
+<div class="meta">0.5483s pre-playback, 4.098s audio</div>
+</div>
+<div class="row" data-voice="deep_space_radio">
+<div class="voice"><code>deep_space_radio</code><small>Deep Space Radio</small><details><summary>genesis</summary><div>Warm lower carrier and wider combing for a distant relay-station feel.</div><div class="note">Deep Space Radio and longform ambience.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-deep_space_radio.wav"></audio></div>
+<div class="meta">0.5492s pre-playback, 3.646s audio</div>
+</div>
+<div class="row" data-voice="bug_intake_clerk">
+<div class="voice"><code>bug_intake_clerk</code><small>Bug Intake Clerk</small><details><summary>genesis</summary><div>Sharper, slightly urgent droid clerk for problem reports without making speech harsh.</div><div class="note">Bug intake, ticket creation, and customer-report narration.</div></details></div>
+<div><audio controls preload="metadata" src="01-thank-you-for-calling-space-channel-networ-bug_intake_clerk.wav"></audio></div>
+<div class="meta">0.6343s pre-playback, 4.075s audio</div>
+</div>
+</section>
+<section class="line">
+<h2>Line 2</h2>
+<p>If you are unsure what to ask, may I make some suggestions?</p>
+<div class="row head"><div>Voice</div><div>Listen</div><div>Timing</div></div>
+<div class="row" data-voice="retirement_party_mvp">
+<div class="voice"><code>retirement_party_mvp</code><small>Retirement Party MVP</small><details><summary>genesis</summary><div>Chad&#x27;s favorite direction: a_dsp character, but closer to a clean protocol droid than a crunchy robot.</div><div class="note">Default candidate for Space Channel network operations.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-retirement_party_mvp.wav"></audio></div>
+<div class="meta">0.5831s pre-playback, 3.599s audio</div>
+</div>
+<div class="row" data-voice="mvp_shop_less_crunch">
+<div class="voice"><code>mvp_shop_less_crunch</code><small>Shop Droid Less Crunch</small><details><summary>genesis</summary><div>a_dsp with the digital crunch removed, keeping only the droid-shop metal and hollow body.</div><div class="note">Friendly service droid, still obviously synthetic.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-mvp_shop_less_crunch.wav"></audio></div>
+<div class="meta">0.5565s pre-playback, 3.959s audio</div>
+</div>
+<div class="row" data-voice="euro_protocol_gold">
+<div class="voice"><code>euro_protocol_gold</code><small>Euro Protocol Gold</small><details><summary>genesis</summary><div>Protocol-droid read: British base voice, light metallic sheen, almost no grit.</div><div class="note">Polished concierge answers and scripted greetings.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-euro_protocol_gold.wav"></audio></div>
+<div class="meta">0.5134s pre-playback, 3.715s audio</div>
+</div>
+<div class="row" data-voice="jabba_shop_attendant">
+<div class="voice"><code>jabba_shop_attendant</code><small>Jabba Shop Attendant</small><details><summary>genesis</summary><div>Palace service droid: hollow and theatrical, with raspy resonance instead of digital crush.</div><div class="note">Characterful intake and handoff prompts.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-jabba_shop_attendant.wav"></audio></div>
+<div class="meta">0.5309s pre-playback, 3.657s audio</div>
+</div>
+<div class="row" data-voice="space_ops_switchboard">
+<div class="voice"><code>space_ops_switchboard</code><small>Space Ops Switchboard</small><details><summary>genesis</summary><div>Call-center droid: clear first, metallic second.</div><div class="note">The opening line and suggestion flow.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-space_ops_switchboard.wav"></audio></div>
+<div class="meta">0.5543s pre-playback, 3.796s audio</div>
+</div>
+<div class="row" data-voice="uap_archive_vocoder">
+<div class="voice"><code>uap_archive_vocoder</code><small>UAP Archive Vocoder</small><details><summary>genesis</summary><div>Smooth vocoder-forward archive voice: synthetic carrier, no digital bit-crush.</div><div class="note">UFO files, anomaly reports, and classified-flavored reads.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-uap_archive_vocoder.wav"></audio></div>
+<div class="meta">0.5482s pre-playback, 3.553s audio</div>
+</div>
+<div class="row" data-voice="r2_gatekeeper">
+<div class="voice"><code>r2_gatekeeper</code><small>R2 Gatekeeper</small><details><summary>genesis</summary><div>Astromech-adjacent gatekeeper translated into speech: synthetic but smooth and intelligible.</div><div class="note">Short responses, confirmations, and routing prompts.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-r2_gatekeeper.wav"></audio></div>
+<div class="meta">0.5218s pre-playback, 3.437s audio</div>
+</div>
+<div class="row" data-voice="launch_control_unit">
+<div class="voice"><code>launch_control_unit</code><small>Launch Control Unit</small><details><summary>genesis</summary><div>Crisp operations voice with a controlled machine edge.</div><div class="note">Launch windows, status, timings, numbers, and confirmations.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-launch_control_unit.wav"></audio></div>
+<div class="meta">0.5157s pre-playback, 3.007s audio</div>
+</div>
+<div class="row" data-voice="deep_space_radio">
+<div class="voice"><code>deep_space_radio</code><small>Deep Space Radio</small><details><summary>genesis</summary><div>Warm lower carrier and wider combing for a distant relay-station feel.</div><div class="note">Deep Space Radio and longform ambience.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-deep_space_radio.wav"></audio></div>
+<div class="meta">0.5016s pre-playback, 2.81s audio</div>
+</div>
+<div class="row" data-voice="bug_intake_clerk">
+<div class="voice"><code>bug_intake_clerk</code><small>Bug Intake Clerk</small><details><summary>genesis</summary><div>Sharper, slightly urgent droid clerk for problem reports without making speech harsh.</div><div class="note">Bug intake, ticket creation, and customer-report narration.</div></details></div>
+<div><audio controls preload="metadata" src="02-if-you-are-unsure-what-to-ask-may-i-make-s-bug_intake_clerk.wav"></audio></div>
+<div class="meta">0.5869s pre-playback, 3.506s audio</div>
+</div>
+</section>
+<section class="line">
+<h2>Line 3</h2>
+<p>Ask me about solar weather, upcoming launches, the UFO files, or the latest news in space.</p>
+<div class="row head"><div>Voice</div><div>Listen</div><div>Timing</div></div>
+<div class="row" data-voice="retirement_party_mvp">
+<div class="voice"><code>retirement_party_mvp</code><small>Retirement Party MVP</small><details><summary>genesis</summary><div>Chad&#x27;s favorite direction: a_dsp character, but closer to a clean protocol droid than a crunchy robot.</div><div class="note">Default candidate for Space Channel network operations.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-retirement_party_mvp.wav"></audio></div>
+<div class="meta">0.6905s pre-playback, 6.188s audio</div>
+</div>
+<div class="row" data-voice="mvp_shop_less_crunch">
+<div class="voice"><code>mvp_shop_less_crunch</code><small>Shop Droid Less Crunch</small><details><summary>genesis</summary><div>a_dsp with the digital crunch removed, keeping only the droid-shop metal and hollow body.</div><div class="note">Friendly service droid, still obviously synthetic.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-mvp_shop_less_crunch.wav"></audio></div>
+<div class="meta">0.6037s pre-playback, 6.351s audio</div>
+</div>
+<div class="row" data-voice="euro_protocol_gold">
+<div class="voice"><code>euro_protocol_gold</code><small>Euro Protocol Gold</small><details><summary>genesis</summary><div>Protocol-droid read: British base voice, light metallic sheen, almost no grit.</div><div class="note">Polished concierge answers and scripted greetings.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-euro_protocol_gold.wav"></audio></div>
+<div class="meta">0.5597s pre-playback, 6.734s audio</div>
+</div>
+<div class="row" data-voice="jabba_shop_attendant">
+<div class="voice"><code>jabba_shop_attendant</code><small>Jabba Shop Attendant</small><details><summary>genesis</summary><div>Palace service droid: hollow and theatrical, with raspy resonance instead of digital crush.</div><div class="note">Characterful intake and handoff prompts.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-jabba_shop_attendant.wav"></audio></div>
+<div class="meta">0.6268s pre-playback, 6.293s audio</div>
+</div>
+<div class="row" data-voice="space_ops_switchboard">
+<div class="voice"><code>space_ops_switchboard</code><small>Space Ops Switchboard</small><details><summary>genesis</summary><div>Call-center droid: clear first, metallic second.</div><div class="note">The opening line and suggestion flow.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-space_ops_switchboard.wav"></audio></div>
+<div class="meta">0.6196s pre-playback, 6.246s audio</div>
+</div>
+<div class="row" data-voice="uap_archive_vocoder">
+<div class="voice"><code>uap_archive_vocoder</code><small>UAP Archive Vocoder</small><details><summary>genesis</summary><div>Smooth vocoder-forward archive voice: synthetic carrier, no digital bit-crush.</div><div class="note">UFO files, anomaly reports, and classified-flavored reads.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-uap_archive_vocoder.wav"></audio></div>
+<div class="meta">0.644s pre-playback, 6.629s audio</div>
+</div>
+<div class="row" data-voice="r2_gatekeeper">
+<div class="voice"><code>r2_gatekeeper</code><small>R2 Gatekeeper</small><details><summary>genesis</summary><div>Astromech-adjacent gatekeeper translated into speech: synthetic but smooth and intelligible.</div><div class="note">Short responses, confirmations, and routing prompts.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-r2_gatekeeper.wav"></audio></div>
+<div class="meta">0.6132s pre-playback, 6.258s audio</div>
+</div>
+<div class="row" data-voice="launch_control_unit">
+<div class="voice"><code>launch_control_unit</code><small>Launch Control Unit</small><details><summary>genesis</summary><div>Crisp operations voice with a controlled machine edge.</div><div class="note">Launch windows, status, timings, numbers, and confirmations.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-launch_control_unit.wav"></audio></div>
+<div class="meta">0.627s pre-playback, 5.677s audio</div>
+</div>
+<div class="row" data-voice="deep_space_radio">
+<div class="voice"><code>deep_space_radio</code><small>Deep Space Radio</small><details><summary>genesis</summary><div>Warm lower carrier and wider combing for a distant relay-station feel.</div><div class="note">Deep Space Radio and longform ambience.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-deep_space_radio.wav"></audio></div>
+<div class="meta">0.5802s pre-playback, 4.772s audio</div>
+</div>
+<div class="row" data-voice="bug_intake_clerk">
+<div class="voice"><code>bug_intake_clerk</code><small>Bug Intake Clerk</small><details><summary>genesis</summary><div>Sharper, slightly urgent droid clerk for problem reports without making speech harsh.</div><div class="note">Bug intake, ticket creation, and customer-report narration.</div></details></div>
+<div><audio controls preload="metadata" src="03-ask-me-about-solar-weather-upcoming-launch-bug_intake_clerk.wav"></audio></div>
+<div class="meta">0.6614s pre-playback, 6.014s audio</div>
+</div>
+</section>
+<section class="line">
+<h2>Line 4</h2>
+<p>If you are reporting a problem, tell me what the bug is and I will get it fixed and report back immediately.</p>
+<div class="row head"><div>Voice</div><div>Listen</div><div>Timing</div></div>
+<div class="row" data-voice="retirement_party_mvp">
+<div class="voice"><code>retirement_party_mvp</code><small>Retirement Party MVP</small><details><summary>genesis</summary><div>Chad&#x27;s favorite direction: a_dsp character, but closer to a clean protocol droid than a crunchy robot.</div><div class="note">Default candidate for Space Channel network operations.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-retirement_party_mvp.wav"></audio></div>
+<div class="meta">0.6535s pre-playback, 5.642s audio</div>
+</div>
+<div class="row" data-voice="mvp_shop_less_crunch">
+<div class="voice"><code>mvp_shop_less_crunch</code><small>Shop Droid Less Crunch</small><details><summary>genesis</summary><div>a_dsp with the digital crunch removed, keeping only the droid-shop metal and hollow body.</div><div class="note">Friendly service droid, still obviously synthetic.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-mvp_shop_less_crunch.wav"></audio></div>
+<div class="meta">0.5848s pre-playback, 5.503s audio</div>
+</div>
+<div class="row" data-voice="euro_protocol_gold">
+<div class="voice"><code>euro_protocol_gold</code><small>Euro Protocol Gold</small><details><summary>genesis</summary><div>Protocol-droid read: British base voice, light metallic sheen, almost no grit.</div><div class="note">Polished concierge answers and scripted greetings.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-euro_protocol_gold.wav"></audio></div>
+<div class="meta">0.5515s pre-playback, 6.142s audio</div>
+</div>
+<div class="row" data-voice="jabba_shop_attendant">
+<div class="voice"><code>jabba_shop_attendant</code><small>Jabba Shop Attendant</small><details><summary>genesis</summary><div>Palace service droid: hollow and theatrical, with raspy resonance instead of digital crush.</div><div class="note">Characterful intake and handoff prompts.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-jabba_shop_attendant.wav"></audio></div>
+<div class="meta">0.6731s pre-playback, 6.409s audio</div>
+</div>
+<div class="row" data-voice="space_ops_switchboard">
+<div class="voice"><code>space_ops_switchboard</code><small>Space Ops Switchboard</small><details><summary>genesis</summary><div>Call-center droid: clear first, metallic second.</div><div class="note">The opening line and suggestion flow.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-space_ops_switchboard.wav"></audio></div>
+<div class="meta">0.6069s pre-playback, 5.433s audio</div>
+</div>
+<div class="row" data-voice="uap_archive_vocoder">
+<div class="voice"><code>uap_archive_vocoder</code><small>UAP Archive Vocoder</small><details><summary>genesis</summary><div>Smooth vocoder-forward archive voice: synthetic carrier, no digital bit-crush.</div><div class="note">UFO files, anomaly reports, and classified-flavored reads.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-uap_archive_vocoder.wav"></audio></div>
+<div class="meta">0.6416s pre-playback, 6.06s audio</div>
+</div>
+<div class="row" data-voice="r2_gatekeeper">
+<div class="voice"><code>r2_gatekeeper</code><small>R2 Gatekeeper</small><details><summary>genesis</summary><div>Astromech-adjacent gatekeeper translated into speech: synthetic but smooth and intelligible.</div><div class="note">Short responses, confirmations, and routing prompts.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-r2_gatekeeper.wav"></audio></div>
+<div class="meta">0.6417s pre-playback, 6.153s audio</div>
+</div>
+<div class="row" data-voice="launch_control_unit">
+<div class="voice"><code>launch_control_unit</code><small>Launch Control Unit</small><details><summary>genesis</summary><div>Crisp operations voice with a controlled machine edge.</div><div class="note">Launch windows, status, timings, numbers, and confirmations.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-launch_control_unit.wav"></audio></div>
+<div class="meta">0.5978s pre-playback, 5.166s audio</div>
+</div>
+<div class="row" data-voice="deep_space_radio">
+<div class="voice"><code>deep_space_radio</code><small>Deep Space Radio</small><details><summary>genesis</summary><div>Warm lower carrier and wider combing for a distant relay-station feel.</div><div class="note">Deep Space Radio and longform ambience.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-deep_space_radio.wav"></audio></div>
+<div class="meta">0.5925s pre-playback, 4.563s audio</div>
+</div>
+<div class="row" data-voice="bug_intake_clerk">
+<div class="voice"><code>bug_intake_clerk</code><small>Bug Intake Clerk</small><details><summary>genesis</summary><div>Sharper, slightly urgent droid clerk for problem reports without making speech harsh.</div><div class="note">Bug intake, ticket creation, and customer-report narration.</div></details></div>
+<div><audio controls preload="metadata" src="04-if-you-are-reporting-a-problem-tell-me-wha-bug_intake_clerk.wav"></audio></div>
+<div class="meta">0.6512s pre-playback, 5.399s audio</div>
+</div>
+</section>
+<section class="line">
+<h2>Line 5</h2>
+<p>I do not experience fear, but I recognize the urgency of your request.</p>
+<div class="row head"><div>Voice</div><div>Listen</div><div>Timing</div></div>
+<div class="row" data-voice="retirement_party_mvp">
+<div class="voice"><code>retirement_party_mvp</code><small>Retirement Party MVP</small><details><summary>genesis</summary><div>Chad&#x27;s favorite direction: a_dsp character, but closer to a clean protocol droid than a crunchy robot.</div><div class="note">Default candidate for Space Channel network operations.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-retirement_party_mvp.wav"></audio></div>
+<div class="meta">0.6589s pre-playback, 4.934s audio</div>
+</div>
+<div class="row" data-voice="mvp_shop_less_crunch">
+<div class="voice"><code>mvp_shop_less_crunch</code><small>Shop Droid Less Crunch</small><details><summary>genesis</summary><div>a_dsp with the digital crunch removed, keeping only the droid-shop metal and hollow body.</div><div class="note">Friendly service droid, still obviously synthetic.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-mvp_shop_less_crunch.wav"></audio></div>
+<div class="meta">0.5778s pre-playback, 4.795s audio</div>
+</div>
+<div class="row" data-voice="euro_protocol_gold">
+<div class="voice"><code>euro_protocol_gold</code><small>Euro Protocol Gold</small><details><summary>genesis</summary><div>Protocol-droid read: British base voice, light metallic sheen, almost no grit.</div><div class="note">Polished concierge answers and scripted greetings.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-euro_protocol_gold.wav"></audio></div>
+<div class="meta">0.5463s pre-playback, 5.085s audio</div>
+</div>
+<div class="row" data-voice="jabba_shop_attendant">
+<div class="voice"><code>jabba_shop_attendant</code><small>Jabba Shop Attendant</small><details><summary>genesis</summary><div>Palace service droid: hollow and theatrical, with raspy resonance instead of digital crush.</div><div class="note">Characterful intake and handoff prompts.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-jabba_shop_attendant.wav"></audio></div>
+<div class="meta">0.5689s pre-playback, 4.238s audio</div>
+</div>
+<div class="row" data-voice="space_ops_switchboard">
+<div class="voice"><code>space_ops_switchboard</code><small>Space Ops Switchboard</small><details><summary>genesis</summary><div>Call-center droid: clear first, metallic second.</div><div class="note">The opening line and suggestion flow.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-space_ops_switchboard.wav"></audio></div>
+<div class="meta">0.565s pre-playback, 4.423s audio</div>
+</div>
+<div class="row" data-voice="uap_archive_vocoder">
+<div class="voice"><code>uap_archive_vocoder</code><small>UAP Archive Vocoder</small><details><summary>genesis</summary><div>Smooth vocoder-forward archive voice: synthetic carrier, no digital bit-crush.</div><div class="note">UFO files, anomaly reports, and classified-flavored reads.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-uap_archive_vocoder.wav"></audio></div>
+<div class="meta">0.6094s pre-playback, 4.923s audio</div>
+</div>
+<div class="row" data-voice="r2_gatekeeper">
+<div class="voice"><code>r2_gatekeeper</code><small>R2 Gatekeeper</small><details><summary>genesis</summary><div>Astromech-adjacent gatekeeper translated into speech: synthetic but smooth and intelligible.</div><div class="note">Short responses, confirmations, and routing prompts.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-r2_gatekeeper.wav"></audio></div>
+<div class="meta">0.623s pre-playback, 4.621s audio</div>
+</div>
+<div class="row" data-voice="launch_control_unit">
+<div class="voice"><code>launch_control_unit</code><small>Launch Control Unit</small><details><summary>genesis</summary><div>Crisp operations voice with a controlled machine edge.</div><div class="note">Launch windows, status, timings, numbers, and confirmations.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-launch_control_unit.wav"></audio></div>
+<div class="meta">0.5596s pre-playback, 4.145s audio</div>
+</div>
+<div class="row" data-voice="deep_space_radio">
+<div class="voice"><code>deep_space_radio</code><small>Deep Space Radio</small><details><summary>genesis</summary><div>Warm lower carrier and wider combing for a distant relay-station feel.</div><div class="note">Deep Space Radio and longform ambience.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-deep_space_radio.wav"></audio></div>
+<div class="meta">0.5326s pre-playback, 3.437s audio</div>
+</div>
+<div class="row" data-voice="bug_intake_clerk">
+<div class="voice"><code>bug_intake_clerk</code><small>Bug Intake Clerk</small><details><summary>genesis</summary><div>Sharper, slightly urgent droid clerk for problem reports without making speech harsh.</div><div class="note">Bug intake, ticket creation, and customer-report narration.</div></details></div>
+<div><audio controls preload="metadata" src="05-i-do-not-experience-fear-but-i-recognize-t-bug_intake_clerk.wav"></audio></div>
+<div class="meta">0.6096s pre-playback, 4.284s audio</div>
+</div>
+</section>
+</main>
+<script>
+const select=document.getElementById('voiceSelect');
+const rows=[...document.querySelectorAll('[data-voice]')];
+function applyFilter(){const value=select.value;rows.forEach(row=>{row.hidden=value!=='all'&&row.dataset.voice!==value;});}
+select.addEventListener('change',applyFilter);applyFilter();
+</script>
+</body>
+</html>
