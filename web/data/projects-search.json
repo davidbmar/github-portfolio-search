@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T21:09:42.042476Z",
+  "generated_at": "2026-07-01T10:41:19.292005Z",
   "count": 137,
   "entries": [
     {
@@ -2331,13 +2331,14 @@
         "sqlite-vec",
         "sentence transformers",
         "aws s3",
-        "aws cloudfront",
         "aws lambda",
-        "semantic-search",
-        "github-indexer",
+        "cloudfront",
+        "search-engine",
         "portfolio-tool",
-        "ai-agent-ready",
-        "static-web-ui"
+        "code-discovery",
+        "ai-agent-integration",
+        "static-site",
+        "aws-deployment"
       ],
       "chunks": [
         {
@@ -2350,19 +2351,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It enables developers to find reusable code patterns and architectures across their own portfolio."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the client-side web UI. Deployment uses AWS S3, CloudFront, and Lambda for OAuth and logging. GitHub Actions automate weekly reindexing."
+          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the client-side web UI. Deployment uses AWS S3, CloudFront, and Lambda functions for OAuth and logging."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI. Deploy to AWS for production use or embed the widget in other sites."
+          "text": "Use it to quickly locate specific implementation patterns, boilerplate, or documentation within your own historical projects without manually browsing repositories. Integrate it with AI agents via MCP to provide context-aware code retrieval."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-clustering of repositories into capability categories CLI, Web UI, and MCP server interfaces for AI agents Faceted filtering by language, tech stack, and stars Automated weekly reindexing via GitHub Actions Embeddable widget and shareable search URLs"
+          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-generated capability clusters and related repo recommendations Client-side web UI with faceted filtering and autocomplete MCP server integration for AI agent access Automated weekly reindexing via GitHub Actions Exportable search results and shareable URLs"
         }
       ]
     },

@@ -1,29 +1,43 @@
 {
-  "generated_at": "2026-06-30T19:27:00.139505Z",
+  "generated_at": "2026-07-01T10:42:33.130781Z",
   "count": 154,
   "days": [
     {
       "date": "2026-06-30",
-      "headline": "Riff Integrates Space Channel Briefings with Static Audio Exports",
-      "summary": "The Riff project now connects Space Channel content briefings and tightens news logic while enabling static phone audio transcript exports. Developers can leverage the new subflow architecture and preflow caching to optimize similar voice-driven content pipelines.",
+      "headline": "Riff Voice Engine Adds Flow-Level Config and Space Channel Briefing System",
+      "summary": "The Riff project implemented flow-level voice and style configuration threaded to phone interfaces, while establishing a robust Space Channel briefing system with preflow caching and fail-closed reads. Documentation was expanded to cover capability hierarchies, audio leak diagnostics, and the new Preflow Pattern architecture.",
       "takeaways": [
-        "Implement preflow caching for subflows to reduce latency in multi-step voice interactions.",
-        "Export static audio transcripts to decouple content generation from real-time playback constraints.",
-        "Use modular subflows to isolate and test specific briefing components like Space Channel news."
+        "Implement flow-level voice and style configuration by threading static-audio cache identity with style parameters to phone endpoints for dynamic personalization.",
+        "Adopt the Preflow Pattern architecture to manage subflows and cache content briefings, ensuring efficient data retrieval with defined TTLs and cron-based refreshes.",
+        "Design fail-closed reading mechanisms that parse full body content rather than label fragments to improve reliability in news briefing pipelines."
       ],
-      "total_commits": 6,
+      "total_commits": 20,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 1,
+          "commits": 3,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
         },
         {
           "name": "riff",
-          "commits": 5,
+          "commits": 17,
           "messages": [
+            "voice P0.3: document the sim-proven terminal live-audio leak (Phase 2 needed)",
+            "voice P0.3: Space Channel migrated droid -> prerendered Umbriel British",
+            "voice P0.2: flow-level voice+style config, resolved + threaded to phone",
+            "voice: add resume guide to the capability-hierarchy doc",
+            "voice docs: render capability-hierarchy design to docs/html",
+            "voice P0.1: style is part of the static-audio cache identity",
+            "docs: add Preflow Pattern architecture doc (md + html)",
+            "Space Channel: fail-closed reads body, not a label fragment",
+            "Space Channel: caller-friendly launch read (Central time, clean names)",
+            "Space Channel: 12-hour briefed-refresh cron + 14h TTL",
+            "Space Channel: richer, differentiated mission-ops and DSN briefs",
+            "Space Channel: anchor-style 3-headline briefs per subflow",
             "Tighten Space Channel news briefing",
             "Export static phone audio transcripts",
             "Test Space Channel preflight subflows",
@@ -32,7 +46,7 @@
           ]
         }
       ],
-      "commit_sig": "f1a238ec6fb3f1dc"
+      "commit_sig": "a34e7436d0758827"
     },
     {
       "date": "2026-06-29",
@@ -3627,13 +3641,14 @@
     {
       "date": "2026-05-07",
       "headline": "Build Multi-Persona AI Debate Panels with RAG and Audio Synthesis",
-      "summary": "This update delivers a full-stack intelligence briefing toolkit featuring a 9-persona debate engine, adversarial testing, and multi-voice audio generation. It integrates strict citation tracking, persona-specific RAG layers, and automated deployment pipelines for secure, transparent AI analysis.",
+      "summary": "This update delivers a complete multi-persona debate system featuring nine distinct AI voices, automated transcript generation, and multi-voice audio synthesis. It includes robust data ingestion pipelines, adversarial testing frameworks, and a public-facing web interface with citation tracking and password-gated deployment.",
       "takeaways": [
         "Implement a 'split personality' RAG architecture by defining distinct persona dataclasses (e.g., regime, civil society) to generate diverse, conflicting viewpoints from a single corpus.",
-        "Reuse the adversarial testing framework (B-121) and seed-mode diagnostics to validate model reliability and prevent cold-start failures in CLI-based data collection pipelines.",
-        "Apply the multi-voice audio synthesis pipeline (--max-voices flag) combined with clickable citation rendering to create engaging, verifiable audio debates for end-users."
+        "Reuse the panel runner logic to automate multi-agent debates, generating structured transcripts and TL;DRs that can be rendered into clickable citation cards on the frontend.",
+        "Apply the adversarial testing suite to validate corpus balance and model behavior before enabling auto-collection modes, ensuring reliable output in production environments.",
+        "Integrate multi-voice audio generation flags to convert text-based debate outputs into immersive audio experiences, enhancing user engagement for complex analytical topics."
       ],
-      "total_commits": 77,
+      "total_commits": 65,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3693,21 +3708,9 @@
         },
         {
           "name": "riff",
-          "commits": 13,
+          "commits": 1,
           "messages": [
-            "fix(mcp): bootstrap .env in MCP server entry point",
-            "feat(tier-b): S-016 — F-307 close, per-turn latency tracking",
-            "fix(tier-b-poc): S-015 — B-307 close, poc.py transcript paths use basenames",
-            "feat(tier-b): S-014 — self-contained HTML report rendering",
-            "test(tier-b): S-013 — inter-sprint validation of S-010/11/12 stack",
-            "feat(tier-b): S-012 — CLI mitigation summary on failures",
-            "feat(tier-b): S-011 — mitigation-agent dispatcher (FAMA stage 2)",
-            "feat(tier-b): S-010 — FAMA failure-mode classifier (foundation)",
-            "feat(tier-b): S-009 — B-310 fix + F-310 fake-mode E2E ACHIEVED",
-            "test(tier-b): S-008 — Docker re-validation of S-005/6/7 stack + B-310 filed",
-            "feat(tier-b): S-007 — Codex-guided safety gate + fake cal-provider",
-            "feat(tier-b): S-006 — F-310 foundation (cal-provider boot + booking.json) + B-309 fix",
-            "fix(tier-b): S-005 — _TeeClient unblocks B-308 timeout race"
+            "fix(mcp): bootstrap .env in MCP server entry point"
           ]
         },
         {
@@ -3737,7 +3740,7 @@
           ]
         }
       ],
-      "commit_sig": "3b43f7f24dacc537"
+      "commit_sig": "be58c3d688ffac38"
     },
     {
       "date": "2026-05-06",
