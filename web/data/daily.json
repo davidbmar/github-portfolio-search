@@ -1,17 +1,183 @@
 {
-  "generated_at": "2026-07-01T10:42:33.130781Z",
-  "count": 154,
+  "generated_at": "2026-07-02T10:02:11.083087Z",
+  "count": 156,
   "days": [
     {
-      "date": "2026-06-30",
-      "headline": "Riff Voice Engine Adds Flow-Level Config and Space Channel Briefing System",
-      "summary": "The Riff project implemented flow-level voice and style configuration threaded to phone interfaces, while establishing a robust Space Channel briefing system with preflow caching and fail-closed reads. Documentation was expanded to cover capability hierarchies, audio leak diagnostics, and the new Preflow Pattern architecture.",
+      "date": "2026-07-02",
+      "headline": "Hardened Remote Control Protocol and Live Companion Tracing",
+      "summary": "Implemented a strongly-typed remote control layer with deterministic scheduling tests and A2/A4 security proofs. Added real-time companion tracing with strict call isolation and PII-scrubbed WebSocket feeds for live session monitoring.",
       "takeaways": [
-        "Implement flow-level voice and style configuration by threading static-audio cache identity with style parameters to phone endpoints for dynamic personalization.",
-        "Adopt the Preflow Pattern architecture to manage subflows and cache content briefings, ensuring efficient data retrieval with defined TTLs and cron-based refreshes.",
-        "Design fail-closed reading mechanisms that parse full body content rather than label fragments to improve reliability in news briefing pipelines."
+        "Reuse the deterministic calendar simulator and ~120 permutation tests to validate complex scheduling recovery arcs.",
+        "Adopt the strong-typing schema enforcement (runtime enum checks, unified type rejection) to prevent conflicting declarations in data layers.",
+        "Implement the public per-call trace WebSocket pattern to provide PII-scrubbed, real-time state updates for live user sessions."
       ],
-      "total_commits": 20,
+      "total_commits": 43,
+      "repos": [
+        {
+          "name": "riff",
+          "commits": 43,
+          "messages": [
+            "docs: Fable 5 session review index (single entry point for the morning)",
+            "docs(scheduler): record the whole-repo aggregate integration check",
+            "test(scheduler): cover the propose-other-days recovery→book arc",
+            "test(scheduler): deterministic calendar simulator + ~120 permutation tests",
+            "test(remote-control): add two mutation-verified shadow regression guards",
+            "live/session: wire InputEvent+InputArbiter into the phone path (SHADOW, flag-off)",
+            "control_event: harden the §1.1 wire gate per codex review",
+            "docs: preserve the gated-goal design handoffs (scheduler + quality-contract) in git",
+            "control_event (Step 3 wire layer, remote-control §1.1/§1.2): parse+validate inbound frames",
+            "docs: control-layer status report for Fable 5 (InputEvent+Arbiter+Capability), indexed",
+            "capability: harden per codex review — lock (one-pending/one-grant), nonce, no stale frame",
+            "docs: record capability §3.1 (A4 proven) in the remote-control build status",
+            "capability (Step 5, remote-control §3.1): device-pairing channel-bind — A4 proven",
+            "input-arbiter: harden per codex review — monotonic epoch, thread-safety, real A2 proof",
+            "docs: record arbitration (A2 proven) in the remote-control build status",
+            "input-arbiter (Step 2/3, remote-control §1.3): first-valid-wins epoch arbitration + A2 race",
+            "input-event: harden per codex review — None-coercion, coverage floor, decision-trace parity",
+            "docs: index the strong-typing quality report + record Step 1/2 impl status",
+            "input-event (Step 2, remote-control §1.3/I8): one router for dtmf/voice/tap — byte-identical",
+            "docs+test: strong-typing quality report for Fable 5 + 53-case adversarial suite",
+            "slot-typing: implement date (extraction + IMPLEMENTED_TYPES) — completes date strong typing",
+            "docs: apply Fable 5 rulings — OD-R6 device-pairing channel-bind + OD-R7 reask",
+            "docs: record codex design findings as OD-R6 (channel-bind nonce) + OD-R7 (L0-11)",
+            "slot-typing: enforce enum membership at runtime (codex review #3)",
+            "slot-typing: enforce unified type: at runtime + reject conflicting decls (codex review)",
+            "slot-typing (schema 0.2, remote-control §2.2): strong typing + riffc L0-10",
+            "docs: add remote-control design v0 (Fable 5) — control events + surface schema",
+            "companion: follow along on EVERY transition, not just static hops (live fix)",
+            "test: end-to-end companion integration through the REAL transport",
+            "companion: address codex multi-call review — never evict a live call; scope admin-replay clear",
+            "companion: prerender sent/failed audio (Umbriel British voice)",
+            "companion: link becomes the final receipt after the call ends",
+            "companion: multi-call keying — concurrent callers each see only their own call",
+            "companion: strict call-id scoping — a blank ?call= is not a wildcard (codex #2/#4)",
+            "companion: public per-call §6 trace WebSocket (/ws/companion) — live push",
+            "companion: wire §6 trace to the live engine bus + public PII-projected trail feed",
+            "companion: public mobile live page + PII-scrubbed per-call state poll",
+            "companion (slice 3): wire the 'text'/'text link' command into Space Channel",
+            "companion (slice 1): send-link module — SMS the caller a per-call live link",
+            "test: golden riffc regression — lock census/shape/L0-findings on 3 anchor flows",
+            "evidence: consolidated per-permutation report (§6 trace + real-audio transcript)",
+            "corridor: follow/pin resume-pill (build step 4)",
+            "fix(web): barge-in pre-roll (no more 'say it twice') + lower threshold"
+          ]
+        }
+      ],
+      "commit_sig": "e4da49203aeacf4d"
+    },
+    {
+      "date": "2026-07-01",
+      "headline": "Deterministic Voice Hub: Zero-Latency Routing and Offline Flow Simulation",
+      "summary": "Replaced LLM-dependent routing with a deterministic state machine to eliminate post-utterance delays and prevent session crashes. Introduced an offline IVR Flow Studio for visualizing, testing, and validating all 32 call permutations without live telephony infrastructure.",
+      "takeaways": [
+        "Implement deterministic voice routing by locking choices to specific states and triggering routes on user transcription alone, removing the need for turn completion waits.",
+        "Pre-render static audio assets (like goodbyes) and use latest-WAV fallbacks to eliminate call-time synthesis latency and prevent silence during dynamic state transitions.",
+        "Build an offline flow simulator that renders YAML state diagrams into interactive trees, allowing developers to validate reachability and audio paths via automated permutation tests."
+      ],
+      "total_commits": 76,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 75,
+          "messages": [
+            "feat(web): barge-in — speak over the menu/briefing to interrupt it",
+            "fix(web): loop-back stalled at the re-announced menu — browser blocked the replay",
+            "docs: console/corridor/sim tooling guide (how to run + review) + index",
+            "refactor+test: extract _maybe_push_static_audio from the s2b pump + regression test",
+            "fix(web): NameError crash killed the session pump on every static-audio push",
+            "corridor: L2 overview — hub layout, gold trail, return rail, orphan tray, Z toggle",
+            "codex cleanup: fix trace null-token, sim collect-skip + audio source, DTMF check",
+            "corridor: data-driven — replays real per-permutation §6 sim traces",
+            "sim: §6 trace emitter per Space Channel permutation (OD-M5) + tests",
+            "console: L1 corridor mockup — past|now|next projection around a cursor (build step 2)",
+            "riffc: classify every speech_act — rigorous sweep found greet/act/inform/repair gaps",
+            "docs: companion-channel design v0 + render all 5 Console/Artifact docs to docs/html",
+            "riffc: emit {shape, edges, order} for the corridor layout + §6 trace fixture",
+            "docs: save Fable 5 corridor flow-map design v0 + Claude build plan",
+            "trace: the §6 event emitter — the universal call record (schema §9 step 1, part 1)",
+            "console: 'Walk the flow' — level-by-level drill-down tree explorer",
+            "console: operator console mockup — route-table + keypad + shared trace panel",
+            "riffc v0: pre-flow compiler, validation-only (schema §9 step 2)",
+            "docs: save Call-Plan Artifact & Trace Schema v0 (Fable 5 design) as design of record",
+            "docs: ground-truth flow fact sheet for the v0 artifact schema",
+            "docs: architecture questions for Fable 5 — deterministic flows, FSM UI, pre/flow/post",
+            "web: fix subflow loop-back stall — push static audio on arrival, dedupe by asset",
+            "flow map: ▶▶ Run all determinism view + hand-pan on the map",
+            "space channel: loop every subflow back to the MAIN MENU (re-announced)",
+            "voice: make the routing hub fully deterministic — locked_choice 1-8, no LLM",
+            "test: prove early voice route fires on user_transcription alone (no turn_complete)",
+            "voice: restore prior slot values (not blind-delete) on the required-tool peek revert",
+            "voice: eliminate the post-utterance delay — route deterministically at the hub",
+            "fix: latest-WAV fallback for ANY dynamic state (fixes launches silence) + all-options sim",
+            "fix(web voice): resolve flow voice+style (Umbriel), not default Achernar",
+            "fix(web voice): content briefing plays latest topic WAV (mirror phone fix)",
+            "fix(phone): the REAL live bug — trigger playback on voice transitions + play latest topic WAV",
+            "prerender the goodbye (sign_off) WAV — plays instantly, no call-time synth",
+            "plan model: goodbye is real now (sign_off), not 'planned'",
+            "goodbye: wire space_route_goodbye into triage (fix codex no-op finding)",
+            "feat(flow): goodbye exit — say 'goodbye'/'bye' or press 9 to sign off",
+            "direct-dial: defer required-tool routes to the menu (fix codex dead-air finding)",
+            "direct-dial: restrict router detection to dialogue states (no act/static/terminal)",
+            "feat(phone): welcome direct-dial — keypad digit at the routing hub jumps to the option",
+            "fix audio_harness content resolution (stale-helper, direct routing)",
+            "fix offline generators broken by direct routing (codex stale-helpers finding)",
+            "phone: graceful content-unavailable fallback (closes the console_not_ready regression)",
+            "plan model: drop the phantom fetch_space_content hop (codex finding)",
+            "fix(flow): route content picks DIRECTLY to the briefing — kill the Gemini improvise hop",
+            "map: offline click-through simulation (IVR Flow Studio sim mode)",
+            "refactor slice: per-route guards (Track A) + generalize map flow_id (Track B)",
+            "static_audio: add lookup_latest_by_state (prefetch design primitive)",
+            "plan: lock in prefetch/Design-1 — eliminate call-time fetch states",
+            "map: collapsible elements + descriptive state panel",
+            "map+test: reachability validation in the page + two-path acceptance test",
+            "add plan view alongside the YAML map view",
+            "map: render the real YAML state diagram (not a hand-built model)",
+            "call map: scope Play audio to this flow (fix welcome 'modular sandbox' WAV)",
+            "call map: bigger panel + independent Tree/Text zoom",
+            "flow: briefings loop back to the locked-choice hub instead of hanging up",
+            "call map: horizontal/vertical switcher, fit+zoom, per-state audio playback",
+            "call map: welcome is the hub — direct-dial options, menu is optional help",
+            "ui: Space Channel call map — LL-NN logical tree + text-it-plays pane",
+            "call-tree: show 8 menu options as branch nodes with expected text",
+            "security(call-tree): drop admin token from URLs + kill innerHTML XSS sinks",
+            "debug: live call-tree page — gold-lit current state + 'WAV never played' flag",
+            "fix(phone): menu path stranded caller on fetch_space_content -> Gemini improvised",
+            "dashboard: offline Space Channel flow viewer — tree + every path + briefing text, no call needed",
+            "test: PHONE-PATH harness — drives the real transport audio decision + Whispers the actual PCM",
+            "fix: re-enable menu-path briefing fetch, NON-BLOCKING (freshness-guarded, content-only)",
+            "revert: ensure-fetch ran a blocking (network) fetch on the async loop -> Gemini session cancel/reconnect LOOP",
+            "quality: shorten the menu 42->26 words (~19s -> ~11s) + align tests to reframed DSN/radio text",
+            "quality: reframe deflecting Mission-ops + Radio briefings (LLM-judged 3->9, 4->9)",
+            "fix: menu/DTMF path skipped the briefing fetch -> empty slot -> wrong/leaked audio",
+            "harness+fix: Whisper-audio quality harness (grades what the caller HEARS) + reframe deflecting DSN briefing",
+            "fix: THE space-content-summary leak — a poisoned WAV of the unresolved template",
+            "test: Space Channel route matrix — 32 (option x input-method) permutations -> quality.db + coverage report",
+            "audit: drive the real menu-press path (press 1-8) instead of routing from triage",
+            "fix: DTMF transition to a static state now plays audio immediately (kills the ~15s pause + terminal leak)",
+            "fix: numbered menu auto-routed to content on stale route (press 1 landed on content, not launches)"
+          ]
+        }
+      ],
+      "commit_sig": "cef6311d48ecf6f3"
+    },
+    {
+      "date": "2026-06-30",
+      "headline": "Riff Voice: DTMF Barge-in, Space Channel Menu, and Audio Leak Fixes",
+      "summary": "Implemented interactive voice features including DTMF barge-in and numbered menu routing for the Space Channel, while migrating to prerendered Umbriel British voices. Resolved critical audio slot leaks and established a static-audio cache identity system with comprehensive preflow architecture documentation.",
+      "takeaways": [
+        "Implement DTMF barge-in to allow callers to interrupt prerendered WAVs by speaking, improving interactive voice response latency.",
+        "Use style attributes as part of the static-audio cache identity to ensure consistent voice rendering across flow levels.",
+        "Adopt a fail-closed strategy for reading dynamic content bodies to prevent undeliverable routes in voice menus.",
+        "Reference the new Preflow Pattern architecture docs to structure capability hierarchies and manage live-audio threading."
+      ],
+      "total_commits": 25,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -24,8 +190,13 @@
         },
         {
           "name": "riff",
-          "commits": 17,
+          "commits": 22,
           "messages": [
+            "voice: numbered Space Channel menu — press or say 1-8 to route (locked_choice + DTMF barge-in)",
+            "voice: call-time Umbriel fallback on stale/missing dynamic WAV (fixes the slot leak)",
+            "voice: Space Channel route audit — enumerate every menu option, catch undeliverable routes",
+            "voice: barge-in — let the caller interrupt a prerendered WAV by speaking over it",
+            "voice P1: wire the call-level live voice to the flow voice (Umbriel + British)",
             "voice P0.3: document the sim-proven terminal live-audio leak (Phase 2 needed)",
             "voice P0.3: Space Channel migrated droid -> prerendered Umbriel British",
             "voice P0.2: flow-level voice+style config, resolved + threaded to phone",
@@ -46,7 +217,7 @@
           ]
         }
       ],
-      "commit_sig": "a34e7436d0758827"
+      "commit_sig": "f71f95314f9a603d"
     },
     {
       "date": "2026-06-29",
@@ -3256,15 +3427,15 @@
     },
     {
       "date": "2026-05-10",
-      "headline": "Voice FSM Harness, Switchboard Portal, and Scheduling Fixes Land",
-      "summary": "Riff dominated the day with a full voice-agent FSM variation harness, spanning path exploration, deterministic scenario generation, multi-level execution, fault injection, verdicts, promotion ledgers, coverage reports, and service-side artifact export. Supporting work added Switchboard’s live multi-agent portal, tightened scheduling/calendar recovery flows, and fixed an IBT temporary uvicorn scheduler bug.",
+      "headline": "Riff Launches FSM Ladder Testing, Fault Injection, and Switchboard v1",
+      "summary": "The Riff framework introduces a multi-level FSM testing ladder with fault injection capabilities and an append-only promotion ledger for cross-batch trajectory reconstruction. Concurrently, Switchboard v1 launches as a multi-agent coordination channel featuring a live portal for real-time agent monitoring and alerting.",
       "takeaways": [
-        "Built reusable FSM test plumbing: export flow graphs and paths, generate deterministic scenario YAML from behavior families, and record canonical bundles for later review.",
-        "Added a Level 1-3 voice-agent ladder, so teams can start with scripted Persona/FakeLiveClient runs, then graduate to Gemini Live and service-side air-call artifacts.",
-        "Layered in fault injection, structured verdicts, promotion ledgers, and coverage regression reporting to make scenario batches comparable across runs.",
-        "Shipped operator tooling patterns: live agent rosters, terminal find alerts, auto agent identity inference, calendar cleanup helpers, and scheduler-disable safeguards for temporary servers."
+        "Implement the 'FSM Ladder' pattern to test voice agents across stubbed (Level 1), synthetic (Level 2), and live (Level 3) environments using a shared adapter interface.",
+        "Reuse the stateful FaultInjector module to inject canonical failure shapes into tool calls, enabling robust regression testing for agent resilience.",
+        "Adopt the append-only promotion ledger to track scenario trajectories across batches, allowing for precise selection and reconstruction of test states.",
+        "Integrate Switchboard v1's live portal and terminal alerts to monitor multi-agent coordination channels and visualize agent roster status in real-time."
       ],
-      "total_commits": 121,
+      "total_commits": 80,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3276,7 +3447,7 @@
         },
         {
           "name": "riff",
-          "commits": 102,
+          "commits": 61,
           "messages": [
             "tools(switchboard): allow auto agent identity inference",
             "Add FSM ladder report tool",
@@ -3338,48 +3509,7 @@
             "fault_injection: canonical failure shapes per (tool, mode)",
             "fix: persona_fsm_state captured + dedupe initial state_trace record",
             "test: add Level 1 adapter integration tests (C8)",
-            "test: add real assertions for terminal_unreached + tool_not_called signals (C7)",
-            "test: xfail two tests pending Codex architectural decision",
-            "fix: Address 5 independent Phase 3 issues",
-            "scenario_generator: diagonal round-robin so first N scenarios span N paths",
-            "Fix AC3 test hygiene: restore original thresholds, add monkeypatch, isolate batch-id",
-            "Add ScriptedScenarioStubClient to improve Level 1 adapter coverage",
-            "docs: Update AC3.1 test comments explaining coverage limitations",
-            "fix: Critical Phase 3 issues - restructure Level1Adapter for proper FSM traversal",
-            "scenarios: AC3.1/AC3.2/AC3.3 acceptance tests on Level 1 batch",
-            "tools: run_fsm_variants --level 1 orchestrator + batch summary/promotion ledger",
-            "coverage: aggregate per-scenario bundles into batch coverage.{json,md}",
-            "scenarios: Level 1 adapter drives Persona x FakeLiveClient and emits canonical bundle",
-            "scenarios: tool-call synthesis helper for Level 1 (caller utterance + state -> scripted tool calls)",
-            "verdict: end-of-conversation Sonnet judge with structured JSON output and AC3.4 discrimination",
-            "verdict: per-turn rule signals (menu reloop, refilled slot, capitulation evidence, etc.)",
-            "scenarios: canonical bundle records + BundleWriter (turns/tool_calls/state_trace/transcript JSONL + verdict.json)",
-            "fix: Phase 2 cycle 2 — 5 issues addressed",
-            "Fix scenario_generator cross-product iteration to properly round-robin families",
-            "Fix template and test issues: repeats_answer emits two consecutive repeat entries, correction uses distinct slot values with __corrected suffix, test_invalid_fact actually tests validation",
-            "Fix FSM critical issues: properly track locked-choice regressions across non-locked turns, improve menu matching with semantic analysis, add agent_terminal flag for goodbye transition, fix TurnPair backfill with dataclasses.replace, enforce capitulation test assertions",
-            "scenario_generator: AC2.4 error on flow with no terminal states",
-            "tools: scenario_generator CLI emits deterministic scenario YAMLs from paths.json",
-            "scenarios: behavior family templates (9 families: cooperative/vague/correction/ambiguous/out_of_set/asks_human/early_goodbye/over_informative/repeats_answer)",
-            "scenarios: typed Scenario schema + load_scenario for generated cases",
-            "caller_persona: AC2.3 replay test on air-20260509-144003 (FSM trajectory + capitulation utterance)",
-            "caller_persona: Persona integrator + Anthropic Haiku utterance client",
-            "caller_persona: AC2.1 FSM transition tests at documented thresholds",
-            "caller_persona: types + dual-FSM core (transition rules, no LLM)",
-            "fix: restore cap/warning test coverage and remove dead variables",
-            "path_explorer: fix cycle 2 issues (Critical-A, Important-A, Minor-A)",
-            "test: add loader error pinning, summary line check, and improvements",
-            "test: add comprehensive path validation and splice cap tests",
-            "fix: emit all states in graph.json, not just reachable ones",
-            "fix: correct spliced path generation and ensure determinism",
-            "path_explorer: AC1 acceptance tests on austin_plumbing + locked-choice flows + broken fixtures",
-            "tools: add flow_path_explorer CLI",
-            "path_explorer: write graph.json, paths.json, report.md",
-            "path_explorer: detect dead ends, unreachable nodes, cycles",
-            "path_explorer: enumerate bounded simple paths and classify happy/failure/loop",
-            "path_explorer: build FlowGraph from Flow with state and transition attrs",
-            "deps: add networkx>=3.0 for flow_path_explorer",
-            "Write FSM variation harness implementation plan"
+            "test: add real assertions for terminal_unreached + tool_not_called signals (C7)"
           ]
         },
         {
@@ -3406,19 +3536,18 @@
           ]
         }
       ],
-      "commit_sig": "032acb863c1eeea2"
+      "commit_sig": "d561256542399b21"
     },
     {
       "date": "2026-05-09",
-      "headline": "Voice Harnesses and UFO Extraction Pipelines Land Together",
-      "summary": "The day split between hardening a UFO intelligence pipeline and building a reusable real-time voice QA harness. Commits added sample-first LLM extraction, manifest-backed collector regressions, Codex-reviewed plans, Gemini Live caller simulation, audit/export/preflight tooling, and scheduling flow fixes.",
+      "headline": "Build LLM Entity Extraction and Codex-Reviewed Sprint Planning",
+      "summary": "Implemented sample-first LLM entity extraction with robust JSON parsing and source tiering, while establishing a codex-driven planning workflow for sprint diagnostics. The update includes interactive launch scripts, regression tests for signal floors, and a split design documentation site.",
       "takeaways": [
-        "Built sample-first LLM entity extraction with updated _parse_llm_json contracts, source-tier reuse, and summary/source-type tests; reuse this pattern when changing extractor prompts or model output shapes.",
-        "Hardened collector manifests with accurate log counts, always-run V1 fallback, source_url dedup regression, and a signals.json floor; apply manifest-backed assertions to catch pipeline drift.",
-        "Shipped a Gemini Live air-call harness with service controller, Caller Mac conductor, URL session/flow IDs, VAD-gated turn waits, and persona .env auto-load; adapt the split controller/conductor setup for voice-agent QA.",
-        "Added audit, export, preflight, acceptance, handoff, timing metrics, and FSM variation harness docs; reuse the verdict-and-bundle flow to make test runs reviewable."
+        "Implement sample-first LLM extraction by building a parser that validates `_parse_llm_json` contracts and aggregates source types for confidence scoring.",
+        "Adopt a 'Codex review' workflow where plain-English TL;DRs and decision artifacts (like Route 1 confirm-and-skip) are committed before code implementation to validate sprint plans.",
+        "Use interactive shell scripts for phase cutover launches and enforce `.venv` usage in pipeline scripts to ensure consistent local development environments."
       ],
-      "total_commits": 85,
+      "total_commits": 53,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3483,60 +3612,27 @@
         },
         {
           "name": "riff",
-          "commits": 36,
+          "commits": 4,
           "messages": [
             "fix(scheduling): F-359 follow-up commit #2a — break the empty-prefetch loop",
             "feat(flow): F-359 follow-up commit #1 — lifecycle metadata grammar",
             "backlog: B-317 — build_tools tests stale after propose_booking shipped",
-            "feat(scheduling): F-359 — caller-confirmation marker on calendar events",
-            "Write FSM variation harness design plan v2",
-            "Add FSM variation harness design",
-            "Gate persona speech on addressed prompts",
-            "Clarify caller computer room recording artifacts",
-            "Mute persona mic during Live speech",
-            "Add Gemini Live multi-turn voice harnesses",
-            "feat(harness): audit emits baseline timing metrics on every verdict",
-            "feat(harness): seal flow_id in session_manifest + B-316 backlog",
-            "fix(harness): A4_service_advanced — flow-agnostic predicate",
-            "backlog: B-315 — directive-nudge already_asked gate is too strict",
-            "docs(harness): tools/README — refresh for shipped audit/AC/handoff",
-            "feat(harness): thread flow_id audit→handoff (iter 7 follow-up)",
-            "feat(harness): air_call_repair_handoff — close the A9 gap",
-            "feat(harness): air_call_acceptance_check — Codex P2-7 mechanical Day-1",
-            "fix(scheduling): B-314 — dedup speakable + choice-set by start-time",
-            "fix(live): B-313 v2 — gate directive nudge on caller_spoke + already_asked",
-            "feat(harness): controller /preflight real — Codex P2-6 audio device check",
-            "feat(harness): air_call_audit — Step 4 verdict generator",
-            "feat(harness): controller /export real — Step 3 service-side bundle",
-            "chore: ignore runs/ — air-call harness per-run artifacts",
-            "fix(harness): persona prompt — reframe scenario lines as facts, not a script",
-            "fix(harness): persona stays subscribed across turns (B-057 outer-loop)",
-            "feat(harness): persona auto-loads .env so GEMINI_API_KEY isn't required in shell",
-            "feat(harness): air-call Gemini Live persona — option C, replaces canned WAVs",
-            "fix(harness): wait for agent speech BEFORE every caller turn (incl. greeting)",
-            "feat(harness): VAD-gated inter-turn wait — talk-over stopgap",
-            "fix(harness): controller waits for URL-driven flow_id to apply before /start returns",
-            "feat(harness): air-call Caller Mac conductor — Step 2",
-            "feat(harness): air-call Service Mac controller — Step 1",
-            "feat(voice): air-call hooks — ?session_id= URL param + micFramesRecv counter",
-            "fix(phone): CSP allows ws://localhost for sidecar + B-312 verify-caller pre-send",
-            "docs: visual review batch (F-346 → F-358) + designs HTML bundle"
+            "feat(scheduling): F-359 — caller-confirmation marker on calendar events"
           ]
         }
       ],
-      "commit_sig": "2150a5fb88987a1b"
+      "commit_sig": "c3af5f2e177c0e57"
     },
     {
       "date": "2026-05-08",
-      "headline": "PURSUE Editorial Pipeline and Riff UI Hardening",
-      "summary": "May 8 focused on turning PURSUE from research backlog into published editorial surfaces while documenting the collector’s gaps and evidence flow. In parallel, Riff got a long hygiene pass across accessibility, metadata, shared UI primitives, workspace tokens, and regression scripts.",
+      "headline": "UFOBriefing Launches PURSUE Archive with Self-Hosted Gallery and Editorial Layout",
+      "summary": "The UFOBriefing platform introduced a dedicated PURSUE archive featuring self-hosted images, a National Geographic-style layout, and consistent editorial branding across all sections. Concurrently, the intelligence toolkit refined its evidence collection mechanisms while the search index added support for custom seed directories and S3 URL returns.",
       "takeaways": [
-        "Built the PURSUE path from IBT collector/evidence records into UFOBriefing plans, build scripts, archive pages, nav, and image-rich rendering; reuse by keeping ingest notes, review docs, media metadata, and public pages in one traceable flow.",
-        "Hardened Riff’s workspace UI with shared palette, button, select, scrollbar, anchor, selection, font, and empty-state primitives; reuse as a migration checklist for tokenizing older pages incrementally.",
-        "Added practical web hygiene in Riff: h1s, landmarks, aria labels, lang, charset, viewport, theme-color, color-scheme, referrer policy, noindex, favicon routing, and Playwright tour coverage.",
-        "Updated the ADR memory index to accept a custom seedsDir and return a working S3 URL; reuse by parameterizing seed input and surfacing deployable output links."
+        "Implement a single-flowing editorial layout by threading image_url, caption, and credit metadata through build scripts for conditional rendering.",
+        "Self-host static assets like release images to ensure gallery stability and remove external dependencies from the content pipeline.",
+        "Extend search index utilities to accept custom seed directories and return working S3 URLs for flexible asset management."
       ],
-      "total_commits": 67,
+      "total_commits": 18,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3574,61 +3670,6 @@
           ]
         },
         {
-          "name": "riff",
-          "commits": 49,
-          "messages": [
-            "fix: S-065 it48 — favicon.svg route + F-346 file (FIRST Playwright tour)",
-            "chore: S-064 it47 — Check 14 producer-side token presence",
-            "fix(a11y): S-063 it46 — nav aria-label + Check 13",
-            "chore: S-062 it45 — script ergonomics (--help + count summary)",
-            "fix(a11y): S-061 it44 — h1 on monitor/flow-studio/editor + Check 12",
-            "chore: S-060 it43 — Check 11 html lang attribute",
-            "chore: S-059 it42 — charset utf-8 monitor + Check 10",
-            "chore: S-058 it41 — Check 8 (viewport) + Check 9 (theme-color/color-scheme)",
-            "fix(a11y): S-057 it40 — main landmark on voice/monitor/editor + Check 7",
-            "chore: S-056 it39 — refine hygiene script comment-context filter",
-            "chore: S-055 it38 — workspace hygiene regression script",
-            "docs: S-054 it37 — CHANGELOG v5.4 release entry for 36-iter UI polish",
-            "docs: S-053 it36 — write web/README.md workspace design system doc",
-            "fix(ui): S-052 it35 — drop dead Inter from fsm.css + entry-audio.html",
-            "fix(ui): S-051 it34 — body font baseline + drop dead Inter from .ops-shell",
-            "fix(ui): S-050 it33 — workspace button:disabled baseline",
-            "fix(ui): S-049 it32 — workspace ::selection primitive",
-            "fix(ui): S-048 it31 — F-342 close, workspace anchor color primitive",
-            "fix(ui): S-047 it30 — F-341 close, workspace scrollbar primitive",
-            "fix(ui): S-046 it29 — F-340 close, workspace <select> primitive",
-            "fix(security): S-045 it28 — robots noindex + referrer policy on 10 pages",
-            "feat(ui): S-044 it27 — theme-color + color-scheme meta on 10 pages",
-            "feat(ui): S-043 it26 — workspace favicon (10 pages branded)",
-            "fix(a11y): S-042 it25 — F-339 close, workspace prefers-reduced-motion",
-            "docs: S-041 it24 — file F-338 script defer migration audit",
-            "fix(ui): S-040 it23 — title pattern, viewport meta, charset; file F-337",
-            "fix(a11y): S-039 it22 — F-335 close, minimum-viable aria on 6 pages",
-            "fix(a11y): S-038 it21 — F-334 :focus-visible, F-336 aria-label, file F-335",
-            "fix(ui): S-037 it19 — ops.html chrome aliases workspace tokens; file F-333",
-            "docs: S-036 it18 — file F-332, autonomous loop has converged",
-            "fix(ui): S-035 it17 — link ops-shell.css from eval/agent/fsm",
-            "fix(ui): S-034 it16 — F-331 close, .riff-btn workspace primitive",
-            "fix(ui): S-033 it15 — extend F-324 to monitor/editor/agent + voice.html residuals; file F-331",
-            "fix(ui): S-032 it14 — F-324 batches 2+3, voice + choice-health tokenized",
-            "fix(ui): S-031 it13 — F-324 batch 1, voice.html status hex tokenized",
-            "fix(ui): S-030 it12 — F-330 close, eval.html status hex migrated",
-            "fix(ui): S-029 it11 — F-327 close, F-320 to monitor, F-330 filed",
-            "fix(ui): S-028 it10 — F-329 + F-326 close, lift :empty::before to shell",
-            "fix(ui): S-027 it9 — F-325 close + F-326/327/328/329 filed",
-            "fix(ui): S-026 it8 — F-320 close, workspace palette unification",
-            "fix(ui): S-025 it7 — F-321 close + F-320/F-322/F-323 filed",
-            "fix(ui): S-024 it6 — F-319 close (phase 1), calm empty states",
-            "fix(ui): S-023 it5 — F-318 close, panel-header concern palette",
-            "fix(flow-graph): S-022 it4 — F-314 close, dim non-active edges",
-            "fix(flow-graph): S-021 it3 — F-313 close, strip common state prefix",
-            "fix(ui): S-020 it2 — F-316 close, Title Case for nav tabs",
-            "feat(tier-b): S-019 — turn budget + hangup + LLM-as-a-judge",
-            "fix(ui): S-018 it1 — F-315 subtitle dedup + 4 Jobs/Ive backlog items",
-            "fix(flow-graph): S-017 — clean vertical spine for austin_plumbing"
-          ]
-        },
-        {
           "name": "traceable-searchable-adr-memory-index",
           "commits": 1,
           "messages": [
@@ -3636,19 +3677,19 @@
           ]
         }
       ],
-      "commit_sig": "181cb3c1b657abc7"
+      "commit_sig": "7ec4ffa793e3d152"
     },
     {
       "date": "2026-05-07",
-      "headline": "Build Multi-Persona AI Debate Panels with RAG and Audio Synthesis",
-      "summary": "This update delivers a complete multi-persona debate system featuring nine distinct AI voices, automated transcript generation, and multi-voice audio synthesis. It includes robust data ingestion pipelines, adversarial testing frameworks, and a public-facing web interface with citation tracking and password-gated deployment.",
+      "headline": "Build Multi-Persona AI Debate Panels with RAG and Automated Audio",
+      "summary": "This project implements a scalable framework for generating multi-perspective intelligence briefings using persona-specific RAG agents, automated debate synthesis, and multi-voice audio output. It includes robust data ingestion pipelines, adversarial testing suites, and a public-facing web interface with citation tracking and AI disclosure features.",
       "takeaways": [
-        "Implement a 'split personality' RAG architecture by defining distinct persona dataclasses (e.g., regime, civil society) to generate diverse, conflicting viewpoints from a single corpus.",
-        "Reuse the panel runner logic to automate multi-agent debates, generating structured transcripts and TL;DRs that can be rendered into clickable citation cards on the frontend.",
-        "Apply the adversarial testing suite to validate corpus balance and model behavior before enabling auto-collection modes, ensuring reliable output in production environments.",
-        "Integrate multi-voice audio generation flags to convert text-based debate outputs into immersive audio experiences, enhancing user engagement for complex analytical topics."
+        "Implement a 'split personality' RAG architecture by defining distinct persona dataclasses (e.g., regime, civil society) that load domain-specific evidence to simulate structured debates.",
+        "Automate multi-voice audio generation for debate transcripts using configurable flags like --max-voices, enabling accessible consumption of complex multi-agent interactions.",
+        "Enforce data integrity in AI outputs by integrating clickable citation rendering and strict ev_N prompting to trace claims back to source documents.",
+        "Deploy secure, password-gated previews on CloudFront with automated content checks and propagation waits to ensure safe staging of sensitive intelligence products."
       ],
-      "total_commits": 65,
+      "total_commits": 64,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3707,13 +3748,6 @@
           ]
         },
         {
-          "name": "riff",
-          "commits": 1,
-          "messages": [
-            "fix(mcp): bootstrap .env in MCP server entry point"
-          ]
-        },
-        {
           "name": "tool-RAG-for-split-personalities",
           "commits": 20,
           "messages": [
@@ -3740,7 +3774,7 @@
           ]
         }
       ],
-      "commit_sig": "be58c3d688ffac38"
+      "commit_sig": "9201744423ac7147"
     },
     {
       "date": "2026-05-06",

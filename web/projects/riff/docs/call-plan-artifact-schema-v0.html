@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF — Call-Plan Artifact &amp; Trace Schema, v0 · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">call-plan-artifact-schema-v0.md</span>
+<a class="raw" href="/docs/docs/call-plan-artifact-schema-v0.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF — Call-Plan Artifact &amp; Trace Schema, v0</h1>
+<p><strong>Status:</strong> draft for review — open decisions marked <code>OD-n</code>
+<strong>Date:</strong> 2026-07-01
+<strong>Author:</strong> Fable 5 (design), reviewed by Claude Opus 4.8 + David
+<strong>Audience:</strong> implementing Claude (Opus 4.8) + David
+<strong>Depends on:</strong> the compiler reframe agreed 2026-07-01 (pre-flow = build, flow = artifact execution, post-flow = eval + canary; promotion = deploy)
+<strong>Pinned against two flows by design:</strong> <code>space_channel_network_ops</code> (zero Do holes, Choose-heavy) and <code>austin_plumbing</code> (Do-heavy, Collect-heavy — the product shape)
+<strong>Companion docs:</strong> <code>docs/fable5-deterministic-flow-questions.md</code> (the questions that produced this), <code>docs/schema-ground-truth-flows.md</code> (node-census fact sheet — Collect, not Do, carries the booking vertical; pin against three shapes)</p>
+<hr />
+<h2 id="1-purpose-and-scope">1. Purpose and scope</h2>
+<p>This spec pins the two contracts everything else references:</p>
+<ol>
+<li><strong>The compiled call-plan artifact</strong> — the immutable output of the pre-flow compiler (<code>riffc</code>). The runtime executes <em>only</em> this; it never reads flow YAML. The console renders it. Promotion machinery versions it.</li>
+<li><strong>The trace event schema</strong> — the universal record of what happened. Emitted by the FSM engine (never by transports), consumed identically by the live console, all three sim tiers (L0/L1/L2), and the dreaming loop.</li>
+</ol>
+<p><strong>In scope:</strong> phone/booking-shaped flows (deterministic skeleton + typed holes). Space Channel, austin_plumbing, apartment_scheduler, dental_clinic, etc.
+<strong>Out of scope:</strong> the research web agent. It shares the <strong>trace schema only</strong> (§6) — its runtime is not artifact-shaped and must not be forced into this model.</p>
+<p>Source flows stay YAML (human-authored). The compiled artifact is emitted as JSON, immutable, content-addressed. Examples below are shown in YAML for readability; the on-disk artifact is the JSON equivalent. (<code>OD-1</code>: confirm JSON for compiled form; recommendation is yes — no anchors/merge keys in an artifact, and it keeps runtime parsing trivial.)</p>
+<hr />
+<h2 id="2-design-invariants-the-schema-encodes">2. Design invariants the schema encodes</h2>
+<p>These are the rules from the review, restated as properties the schema makes structural rather than disciplinary:</p>
+<ul>
+<li><strong>I1 — The FSM owns all clocks.</strong> Every node carries a bounded clock (asset duration + watchdog grace, choose timeout, collect max-turn, do deadline). No node can wait indefinitely on a model, a browser, or a network.</li>
+<li><strong>I2 — The model never touches routing.</strong> Choose resolves via DTMF or constrained grammar; the LLM fallback classifier returns <code>route | null</code> under a hard budget — never audio, never the mic.</li>
+<li><strong>I3 — Do is a typed hole with the mic closed.</strong> The only runtime nondeterminism is a tool's return value. Everything around it (hold beat, deadline, result frames, failure route) is compiled.</li>
+<li><strong>I4 — Two failure domains.</strong> A compile error blocks <em>promotion</em> of the artifact (CI). A runtime missing-asset degrades <em>locally</em> to a compiled degraded beat. The degraded assets themselves are mandatory, validated members of every artifact.</li>
+<li><strong>I5 — Transports are dumb renderers.</strong> They implement <code>play(asset) → completion</code> and relay input events. Audio intents, advance-on-done, watchdogs, and trace emission all live in the engine.</li>
+<li><strong>I6 — Parameterized states unfold at compile time.</strong> One source state (<code>report_space_content_audio</code>) compiles to N manifest entries (<code>briefing.launches</code>, <code>briefing.ufo</code>, …). The caller view renders the unfolded entries; the engineer view may fold them back with a ×N badge. This is the resolution of T8: the <em>source</em> is honest to the FSM, the <em>artifact</em> is honest to the caller.</li>
+</ul>
+<hr />
+<h2 id="3-artifact-schema">3. Artifact schema</h2>
+<h3 id="3-1-top-level">3.1 Top level</h3>
+<pre><code class="language-yaml">artifact:
+  schema_version: &quot;0.1&quot;
+  artifact_id: &quot;austin_plumbing@2026-07-01T18:22Z#a41f9c&quot;   # flow_id @ built_at # short source hash
+  flow_id: austin_plumbing
+  tenant_id: cust_atx_plumbing_001        # tenancy unit: one artifact per tenant per flow
+  source:
+    flow_yaml_sha256: &quot;9c1e…&quot;
+    includes: [&quot;flows/subflows/austin_plumbing/*.yaml&quot;]
+    compiler: &quot;riffc 0.1.0&quot;
+  built_at: &quot;2026-07-01T18:22:04Z&quot;
+  status: candidate            # candidate | canary | promoted | retired
+  eval:                        # promotion machinery metadata
+    l2_replay_run: null        # id of the replay-eval run that gated this artifact
+    canary:
+      fraction: 0.0
+      baseline: null           # artifact_id of the incumbent
+      gates: [reprompt_rate, misroute_rate, time_to_route_p95, hangup_before_menu_rate]
+  entry: greeting
+  defaults:
+    voice: umbriel_rp
+    style: warm_professional
+    watchdog_grace_ms: 1500    # audio watchdog = asset.duration_ms + this
+    silence_alarm_ms: 2000     # trace stall_detected threshold
+    choose_timeout_ms: 7000
+  degraded:                    # I4 — mandatory, build fails if absent or unrendered
+    unavailable: asset:degraded_unavailable    # &quot;that option isn't available right now&quot;
+    error:       asset:degraded_error          # &quot;something went wrong on our end&quot;
+    handoff:     asset:degraded_handoff        # &quot;let me take your number and have someone call you&quot;
+  models:   { … }              # §3.3
+  assets:   { … }              # §3.2
+  nodes:    { … }              # §3.4
+</code></pre>
+<p>Notes:</p>
+<ul>
+<li><code>artifact_id</code> is the deploy unit and the canary unit. Experiments never mix into a promoted artifact; a canary is a <em>fraction of calls routed to a different artifact_id</em>.</li>
+<li><code>tenant_id</code> makes the artifact the white-label unit: the customer-facing console view is a projection of this file with engineer-only fields elided.</li>
+</ul>
+<h3 id="3-2-asset-record">3.2 Asset record</h3>
+<p>Every WAV the caller can ever hear is an entry here. Nodes reference assets by semantic id; the manifest pins the exact content hash (<code>OD-2</code>: nodes use semantic ids, manifest resolves to hashes at build — this replaces <code>lookup_latest_by_state</code>, whose &quot;latest&quot; resolution now happens in the compiler, once, not per call).</p>
+<pre><code class="language-yaml">assets:
+  greeting:
+    sha256: &quot;b31a…&quot;
+    uri: &quot;static/austin_plumbing/greeting.b31a.wav&quot;
+    duration_ms: 4800
+    voice: umbriel_rp
+    style: warm_professional
+    text_sha256: &quot;77e0…&quot;
+    text_ref: &quot;scripts/austin_plumbing/greeting.txt&quot;   # resolved text, never a template (10ea83db class = compile error)
+    rendered_at: &quot;2026-07-01T18:20:11Z&quot;
+    cadence: static                     # static | {refresh: 15m, max_honest_age: 45m}
+    spoken_timestamp: false             # true for volatile content: the audio discloses its own as-of time
+
+  briefing.launches:                    # unfolded from parameterized source state (I6)
+    sha256: &quot;04dd…&quot;
+    uri: &quot;static/space_channel/briefing.launches.04dd.wav&quot;
+    duration_ms: 24500
+    cadence: {refresh: 15m, max_honest_age: 45m}
+    spoken_timestamp: true              # &quot;as of nine this morning, the Falcon launch is still go&quot;
+</code></pre>
+<p>Compile rule: an asset whose <code>rendered_at</code> age exceeds <code>max_honest_age</code> at build time <strong>fails the build</strong>; one that exceeds it at <em>runtime</em> triggers <code>degraded.unavailable</code> locally plus a <code>degraded</code> trace event, and flips its freshness dot in the console (I4).</p>
+<h3 id="3-3-models-block">3.3 Models block</h3>
+<p>Pinned at build. In a deterministic flow this is small by construction — Collect states and the fallback classifier only.</p>
+<pre><code class="language-yaml">models:
+  collect_primary:
+    provider: gemini
+    model: gemini-2.5-flash-live       # pinned; changing it = new artifact
+    role: collect                       # may own the turn, bounded by node max_turn_ms
+  fallback_classifier:
+    provider: anthropic
+    model: claude-haiku-4-5
+    role: classifier                    # text in → route|null out; budget enforced by node
+    max_tokens: 8
+  slot_tts:
+    provider: piper
+    voice: umbriel_rp                   # OD-3: voice continuity — call-time slot TTS must be
+    role: slot_tts                      # perceptually continuous with prerendered Umbriel
+</code></pre>
+<h3 id="3-4-node-types">3.4 Node types</h3>
+<p>Five types, matching the console vocabulary: <code>say ▭</code>, <code>choose ◇</code>, <code>collect ▱</code>, <code>do ⬒</code>, <code>end ⬤</code>.</p>
+<h4>say</h4>
+<pre><code class="language-yaml">nodes:
+  greeting:
+    type: say
+    asset: asset:greeting
+    barge_in: true
+    dtmf_shortcut: main_menu          # digits during play resolve against this choose node (welcome direct-dial)
+    on_done: {goto: main_menu}
+    on_missing_asset: degraded.unavailable    # runtime-local fallback (I4); reaching this at build = fail
+</code></pre>
+<p>Engine behavior (not per-node config): on <code>state_enter</code>, push <code>play(asset)</code> immediately — the 0485ac08 class of bug (&quot;DTMF transition must play audio immediately&quot;) is engine behavior, not YAML discipline. Watchdog fires at <code>duration_ms + watchdog_grace_ms</code> and advances with <code>audio_done{source: watchdog}</code> — a missed browser ack can no longer strand the caller (Q11, closed).</p>
+<h4>choose</h4>
+<pre><code class="language-yaml">  main_menu:
+    type: choose
+    grammar:
+      recognizer: constrained          # constrained decode on the parallel server-side recognizer
+      tokens:
+        - {token: launches,  dtmf: &quot;1&quot;, aliases: [launches, rocket launches, launch schedule], goto: briefing.launches}
+        - {token: news,      dtmf: &quot;2&quot;, aliases: [space news, news],                            goto: briefing.news}
+        # … 3–7 …
+        - {token: bug,       dtmf: &quot;8&quot;, aliases: [report a bug, bug, problem],                  goto: collect_bug}
+        - {token: goodbye,   dtmf: &quot;9&quot;, aliases: [goodbye, bye, hang up],                       goto: sign_off}
+        - {token: options,               aliases: [options, menu, help, what are my choices],   goto: menu_announce}
+      reject:                           # the escape hatch — constrained decode MUST NOT force babble onto a token
+        method: likelihood_ratio        # OD-4: constrained-vs-open score ratio, or explicit garbage model
+        garbage_token: true
+    thresholds:
+      route: 0.85                       # ≥ route silently
+      confirm: 0.55                     # [confirm, route) → one-word confirm; below → no_match ladder
+    confirm:
+      asset_pattern: asset:confirm.{token}    # prerendered per-token confirms — validated at build
+      yes: {dtmf: &quot;1&quot;, aliases: [yes, yeah, right, correct]}
+      no:  {dtmf: &quot;2&quot;, aliases: [no, nope]}
+    fallback:                           # third rung only (I2)
+      model: model:fallback_classifier
+      budget_ms: 800
+      on_null_or_timeout: no_match
+    no_match:
+      reprompt: asset:menu_short
+      after_attempts: 2
+      then: {goto: menu_announce}       # full menu; a booking flow would go to degraded.handoff instead
+    timeout_ms: 7000
+    on_timeout: no_match
+</code></pre>
+<p>The open-vocab Gemini transcript is <strong>telemetry only</strong> — it appears in the trace (<code>heard_open</code>) for debugging and dreaming, never in the routing decision.</p>
+<h4>collect</h4>
+<pre><code class="language-yaml">  collect_job:
+    type: collect
+    model: model:collect_primary
+    prompt_ref: &quot;prompts/austin_plumbing/collect_job@sha256:31ab…&quot;
+    slots: [job_type, urgency, callback_number]
+    max_turn_ms: 20000                  # I1: the one place the model may own a turn — bounded
+    max_turns: 4
+    barge_in: true
+    on_complete: {goto: check_calendar}
+    on_timeout:  {goto: degraded.handoff}
+    speculative: [check_calendar]       # OD-5: engine MAY start the named Do's fetch during collect,
+                                        # discarding the result if routing diverges (latency win for booking)
+</code></pre>
+<h4>do — the typed hole (I3)</h4>
+<pre><code class="language-yaml">  check_calendar:
+    type: do
+    tool: &quot;tool:google_calendar.find_slots@v2&quot;
+    mic: closed                         # not configurable — the compiler rejects any other value
+    hold: asset:hold_checking           # &quot;one moment while I check the calendar&quot; — plays immediately
+    deadline_ms: 6000
+    args_from: {slots: [job_type, urgency]}
+    result:
+      kind: enum_or_freeform
+      enum_frames:                      # enumerable outcomes → prerendered variants
+        slot_offered.morning:  asset:offer.morning
+        slot_offered.afternoon: asset:offer.afternoon
+        slot_offered.evening:  asset:offer.evening
+        no_slots:              asset:no_slots_week
+      freeform_frame:                   # only genuinely free-form values touch call-time TTS
+        template: &quot;The earliest opening is {slot_human}.&quot;
+        tts: model:slot_tts
+    on_success:  {goto: confirm_slot}
+    on_failure:  {goto: degraded.handoff}     # always lands on a prerendered say
+    on_deadline: {goto: degraded.handoff}
+</code></pre>
+<p>The model never sees the tool (I3): <code>args_from</code> maps FSM slots to tool args; the result re-enters as data and the FSM picks the frame. If the hold beat finishes before the tool returns, the engine loops a compiled filler beat or brief silence up to <code>deadline_ms</code> — never re-opens the mic.</p>
+<h4>end</h4>
+<pre><code class="language-yaml">  sign_off:
+    type: end
+    asset: asset:goodbye
+    disposition: completed              # completed | abandoned | handoff
+</code></pre>
+<hr />
+<h2 id="4-example-a-space-channel-excerpt">4. Example A — <code>space_channel</code> (excerpt)</h2>
+<p>Demonstrates: Choose-heavy, zero Do, parameterized unfolding (I6), volatile-content cadence.</p>
+<pre><code class="language-yaml">artifact:
+  artifact_id: &quot;space_channel@2026-07-01T17:05Z#c7e2d1&quot;
+  flow_id: space_channel_network_ops
+  tenant_id: internal_demo
+  entry: greeting
+  degraded: {unavailable: asset:degraded_unavailable, error: asset:degraded_error, handoff: asset:degraded_handoff}
+  assets:
+    greeting:            {duration_ms: 5000,  cadence: static}
+    briefing.launches:   {duration_ms: 24500, cadence: {refresh: 15m, max_honest_age: 45m}, spoken_timestamp: true}
+    briefing.news:       {duration_ms: 22100, cadence: {refresh: 6h,  max_honest_age: 24h}, spoken_timestamp: true}
+    briefing.ufo:        {duration_ms: 26300, cadence: {refresh: 24h, max_honest_age: 72h}}
+    # … wx, missions, network, radiation; confirm.{token} × 10; menu_short; menu_full; goodbye; degraded_* …
+  nodes:
+    greeting:      {type: say, asset: asset:greeting, dtmf_shortcut: main_menu, on_done: {goto: main_menu}}
+    main_menu:     {type: choose, …}         # as §3.4; tokens 1–9 + options
+    briefing.launches: {type: say, asset: asset:briefing.launches, barge_in: true, on_done: {goto: menu_reannounce}}
+    # briefing.news … briefing.radiation — six compiled entries from ONE source state (I6)
+    collect_bug:   {type: collect, model: model:collect_primary, slots: [description], on_complete: {goto: menu_reannounce}}
+    menu_reannounce: {type: say, asset: asset:menu_short, on_done: {goto: main_menu}}
+    sign_off:      {type: end, asset: asset:goodbye, disposition: completed}
+</code></pre>
+<p>What changed vs. today: <code>report_space_content_audio</code> no longer exists at runtime — the compiler unfolded it, so state-id-keyed dedup, slot-fill leakage, and &quot;which topic am I?&quot; (T8) are gone by construction. Launch data is just a 15-minute-cadence asset; the &quot;volatile, never fetch on loop&quot; special case is deleted.</p>
+<h2 id="5-example-b-austin-plumbing-excerpt">5. Example B — <code>austin_plumbing</code> (excerpt)</h2>
+<p>Demonstrates: Collect-heavy, mid-call Do, speculative prefetch, handoff-shaped no-match.</p>
+<pre><code class="language-yaml">artifact:
+  artifact_id: &quot;austin_plumbing@2026-07-01T18:22Z#a41f9c&quot;
+  tenant_id: cust_atx_plumbing_001
+  entry: greeting
+  nodes:
+    greeting:     {type: say, asset: asset:greeting, on_done: {goto: intent}}
+    intent:
+      type: choose
+      grammar:
+        tokens:
+          - {token: book,      dtmf: &quot;1&quot;, aliases: [book, appointment, schedule, need a plumber], goto: collect_job}
+          - {token: emergency, dtmf: &quot;2&quot;, aliases: [emergency, burst pipe, flooding, leak],        goto: emergency_say}
+          - {token: hours,     dtmf: &quot;3&quot;, aliases: [hours, open, pricing, cost],                   goto: say_hours_pricing}
+          - {token: human,     dtmf: &quot;0&quot;, aliases: [person, human, operator, talk to someone],     goto: degraded.handoff}
+      no_match: {reprompt: asset:intent_reprompt, after_attempts: 2, then: {goto: degraded.handoff}}
+    collect_job:    {type: collect, …, speculative: [check_calendar], on_complete: {goto: check_calendar}}
+    check_calendar: {type: do, …}            # as §3.4
+    confirm_slot:
+      type: choose
+      grammar:
+        tokens:
+          - {token: yes, dtmf: &quot;1&quot;, aliases: [yes, yeah, that works, book it], goto: book_it}
+          - {token: no,  dtmf: &quot;2&quot;, aliases: [no, different time, later],      goto: check_calendar_next}
+    book_it:      {type: do, tool: &quot;tool:google_calendar.schedule_event@v2&quot;, hold: asset:hold_booking,
+                   result: {kind: enum_or_freeform, enum_frames: {booked: asset:booked_confirm}},
+                   on_success: {goto: sign_off}, on_failure: {goto: degraded.handoff}}
+    sign_off:     {type: end, asset: asset:goodbye_booked, disposition: completed}
+</code></pre>
+<p>Note the asymmetry with Space Channel that the schema must carry, per-tenant: a content line's no-match ends at the full menu; a <em>business</em> line's no-match ends at handoff (take a number, text the owner) — losing a plumber's call is losing revenue. Same schema, different <code>no_match.then</code>.</p>
+<hr />
+<h2 id="6-trace-event-schema">6. Trace event schema</h2>
+<p><strong>The universal contract.</strong> Emitted by the engine on the existing <code>riff/events.py</code> bus, keyed by <code>call_id</code>; transports and consoles subscribe — nothing transport-specific in the events themselves (I5). Live calls, L1 fault-injection sims, and L2 replays all emit this identically; the research web agent adopts <em>this section only</em>.</p>
+<p>JSON Lines. Envelope on every event:</p>
+<pre><code class="language-json">{&quot;v&quot;:&quot;0.1&quot;,&quot;call_id&quot;:&quot;c_9f21&quot;,&quot;artifact&quot;:&quot;austin_plumbing@2026-07-01T18:22Z#a41f9c&quot;,
+ &quot;seq&quot;:14,&quot;t_ms&quot;:8140,&quot;type&quot;:&quot;route_decision&quot;, &quot;...&quot;: &quot;…&quot;}
+</code></pre>
+<p><code>seq</code> is a per-call monotonic integer (total order — event-ordering bugs were the whole T6 class, so ordering is explicit, never inferred from timestamps). <code>t_ms</code> is milliseconds since <code>call_start</code>.</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>payload</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>call_start</code></td>
+<td><code>transport: telnyx|web|sim_l1|replay_l2</code>, <code>from_e164?</code>, <code>entry</code></td>
+<td>transport is a <em>label</em> here, nowhere else</td>
+</tr>
+<tr>
+<td><code>state_enter</code></td>
+<td><code>node</code>, <code>node_type</code>, <code>params?</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>audio_pushed</code></td>
+<td><code>node</code>, <code>asset</code>, <code>sha256</code>, <code>duration_ms</code></td>
+<td>engine pushed the intent</td>
+</tr>
+<tr>
+<td><code>audio_done</code></td>
+<td><code>node</code>, <code>asset</code>, <code>source: client|watchdog</code></td>
+<td><code>watchdog</code> = the browser/leg never acked; this is the Q11 stall, now visible and non-fatal</td>
+</tr>
+<tr>
+<td><code>barge_in</code></td>
+<td><code>node</code>, <code>at_ms_into_audio</code>, <code>via: dtmf|voice</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>route_decision</code></td>
+<td><code>node</code>, <code>via: dtmf|grammar|confirm|fallback</code>, <code>heard_constrained?</code>, <code>heard_open?</code>, <code>confidence?</code>, <code>token|null</code>, <code>decision: route|confirm|reprompt|fallback_invoked|reject</code>, <code>goto?</code>, <code>latency_ms</code></td>
+<td><code>heard_open</code> is Gemini's transcript, telemetry only; <code>heard_constrained</code> is what routed</td>
+</tr>
+<tr>
+<td><code>collect_turn</code></td>
+<td><code>node</code>, <code>turn</code>, <code>transcript_ref</code>, <code>slots_delta</code>, <code>model</code>, <code>latency_ms</code></td>
+<td>transcripts by ref, not inline (PII)</td>
+</tr>
+<tr>
+<td><code>tool_start</code></td>
+<td><code>node</code>, <code>tool</code>, <code>args_ref</code>, <code>deadline_ms</code>, <code>speculative: bool</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>tool_result</code></td>
+<td><code>node</code>, <code>status: ok|error|deadline</code>, <code>latency_ms</code>, <code>result_kind</code>, <code>frame?</code>, <code>discarded: bool</code></td>
+<td><code>discarded</code> = speculative fetch not used</td>
+</tr>
+<tr>
+<td><code>degraded</code></td>
+<td><code>node</code>, <code>reason: missing_asset|stale_asset|tool_failure|tool_deadline</code>, <code>served: asset</code></td>
+<td>every I4 local fallback is loud</td>
+</tr>
+<tr>
+<td><code>stall_detected</code></td>
+<td><code>node</code>, <code>silence_ms</code>, <code>hypothesis</code></td>
+<td>fired by the engine's silence alarm; the console's red row</td>
+</tr>
+<tr>
+<td><code>call_end</code></td>
+<td><code>disposition</code>, <code>duration_ms</code>, <code>states_visited</code>, <code>reprompts</code>, <code>fallback_invocations</code></td>
+<td>the roll-up canary metrics read from</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sample-trace-plumbing-call-with-a-do-and-a-watchdog-save">Sample trace — plumbing call with a Do and a watchdog save</h3>
+<pre><code>{&quot;seq&quot;:1, &quot;t_ms&quot;:0,     &quot;type&quot;:&quot;call_start&quot;,    &quot;transport&quot;:&quot;telnyx&quot;,&quot;entry&quot;:&quot;greeting&quot;}
+{&quot;seq&quot;:2, &quot;t_ms&quot;:10,    &quot;type&quot;:&quot;state_enter&quot;,   &quot;node&quot;:&quot;greeting&quot;,&quot;node_type&quot;:&quot;say&quot;}
+{&quot;seq&quot;:3, &quot;t_ms&quot;:22,    &quot;type&quot;:&quot;audio_pushed&quot;,  &quot;node&quot;:&quot;greeting&quot;,&quot;asset&quot;:&quot;greeting&quot;,&quot;duration_ms&quot;:4800}
+{&quot;seq&quot;:4, &quot;t_ms&quot;:3100,  &quot;type&quot;:&quot;barge_in&quot;,      &quot;node&quot;:&quot;greeting&quot;,&quot;at_ms_into_audio&quot;:3078,&quot;via&quot;:&quot;voice&quot;}
+{&quot;seq&quot;:5, &quot;t_ms&quot;:3110,  &quot;type&quot;:&quot;state_enter&quot;,   &quot;node&quot;:&quot;intent&quot;,&quot;node_type&quot;:&quot;choose&quot;}
+{&quot;seq&quot;:6, &quot;t_ms&quot;:4450,  &quot;type&quot;:&quot;route_decision&quot;,&quot;node&quot;:&quot;intent&quot;,&quot;via&quot;:&quot;grammar&quot;,&quot;heard_constrained&quot;:&quot;book&quot;,&quot;heard_open&quot;:&quot;yeah I need to book somebody&quot;,&quot;confidence&quot;:0.91,&quot;token&quot;:&quot;book&quot;,&quot;decision&quot;:&quot;route&quot;,&quot;goto&quot;:&quot;collect_job&quot;,&quot;latency_ms&quot;:180}
+{&quot;seq&quot;:7, &quot;t_ms&quot;:4460,  &quot;type&quot;:&quot;state_enter&quot;,   &quot;node&quot;:&quot;collect_job&quot;,&quot;node_type&quot;:&quot;collect&quot;}
+{&quot;seq&quot;:8, &quot;t_ms&quot;:4470,  &quot;type&quot;:&quot;tool_start&quot;,    &quot;node&quot;:&quot;check_calendar&quot;,&quot;tool&quot;:&quot;google_calendar.find_slots@v2&quot;,&quot;speculative&quot;:true,&quot;deadline_ms&quot;:6000}
+{&quot;seq&quot;:9, &quot;t_ms&quot;:9900,  &quot;type&quot;:&quot;collect_turn&quot;,  &quot;node&quot;:&quot;collect_job&quot;,&quot;turn&quot;:1,&quot;slots_delta&quot;:{&quot;job_type&quot;:&quot;water_heater&quot;,&quot;urgency&quot;:&quot;this_week&quot;},&quot;model&quot;:&quot;gemini-2.5-flash-live&quot;,&quot;latency_ms&quot;:1400}
+{&quot;seq&quot;:10,&quot;t_ms&quot;:10200, &quot;type&quot;:&quot;tool_result&quot;,   &quot;node&quot;:&quot;check_calendar&quot;,&quot;status&quot;:&quot;ok&quot;,&quot;latency_ms&quot;:730,&quot;result_kind&quot;:&quot;enum&quot;,&quot;frame&quot;:&quot;slot_offered.morning&quot;,&quot;discarded&quot;:false}
+{&quot;seq&quot;:11,&quot;t_ms&quot;:10210, &quot;type&quot;:&quot;state_enter&quot;,   &quot;node&quot;:&quot;check_calendar&quot;,&quot;node_type&quot;:&quot;do&quot;}
+{&quot;seq&quot;:12,&quot;t_ms&quot;:10230, &quot;type&quot;:&quot;audio_pushed&quot;,  &quot;node&quot;:&quot;check_calendar&quot;,&quot;asset&quot;:&quot;offer.morning&quot;,&quot;duration_ms&quot;:6200}
+{&quot;seq&quot;:13,&quot;t_ms&quot;:17950, &quot;type&quot;:&quot;audio_done&quot;,    &quot;node&quot;:&quot;check_calendar&quot;,&quot;asset&quot;:&quot;offer.morning&quot;,&quot;source&quot;:&quot;watchdog&quot;}
+{&quot;seq&quot;:14,&quot;t_ms&quot;:17960, &quot;type&quot;:&quot;state_enter&quot;,   &quot;node&quot;:&quot;confirm_slot&quot;,&quot;node_type&quot;:&quot;choose&quot;}
+</code></pre>
+<p>Row 13 is the ee7872db/loop-back-stall class of bug, converted from &quot;caller stranded, read the logs&quot; to &quot;one amber row, call proceeds.&quot;</p>
+<hr />
+<h2 id="7-compile-time-validation-the-l0-suite">7. Compile-time validation (the L0 suite)</h2>
+<p><code>riffc</code> fails the build (blocks promotion — never kills a running artifact, I4) if any of:</p>
+<ol>
+<li>Any <code>goto</code> targets a nonexistent node; any node unreachable from <code>entry</code>; no reachable <code>end</code>.</li>
+<li>Any <code>say</code>/<code>end</code>/hold/confirm/reprompt/frame asset missing from the manifest, unrendered on disk, hash-mismatched, or older than its <code>max_honest_age</code>.</li>
+<li>Any asset text containing an unresolved <code>{{…}}</code> template (the 10ea83db class).</li>
+<li><code>degraded.*</code> assets absent or unrendered (the fallback that can 404 is the same bug one level down).</li>
+<li>Any <code>choose</code> token lacking a <code>dtmf</code> or alias set; duplicate DTMF digits; any <code>confirm.asset_pattern</code> expansion missing; thresholds not <code>0 &lt; confirm &lt; route ≤ 1</code>; no <code>reject</code> block.</li>
+<li>Any <code>do</code> with <code>mic != closed</code>, no <code>deadline_ms</code>, no <code>hold</code>, or an <code>on_failure</code>/<code>on_deadline</code> that doesn't land on a <code>say</code>/<code>end</code>.</li>
+<li>Any <code>collect</code> without a pinned model, <code>max_turn_ms</code>, or <code>max_turns</code>.</li>
+<li>Any node without a derivable bounded clock (I1) — e.g., a <code>say</code> referencing an asset with no <code>duration_ms</code>.</li>
+<li>Loop-back edges that re-enter a <code>choose</code> without an announce <code>say</code> on the path (the re-announced-menu rule).</li>
+</ol>
+<p>This list <em>is</em> the pre-flow validation tier; L1 (fault-injection event-loop sim) and L2 (trace replay) are separate specs but consume §6 unchanged.</p>
+<hr />
+<h2 id="8-open-decisions">8. Open decisions</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>recommendation / notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OD-1</td>
+<td>Compiled artifact format</td>
+<td>JSON, immutable, content-addressed; source stays YAML. Confirm no runtime YAML parsing.</td>
+</tr>
+<tr>
+<td>OD-2</td>
+<td>Asset addressing</td>
+<td>Semantic id in nodes, exact sha256 pinned in manifest at build. Retires <code>lookup_latest_by_state</code> from the call path (keep it as a compiler helper).</td>
+</tr>
+<tr>
+<td>OD-3</td>
+<td>Slot-TTS voice continuity</td>
+<td>Call-time Piper must be perceptually continuous with prerendered Umbriel. If it isn't, restructure freeform frames so the TTS fragment is short and sandwiched between prerendered frames. Needs a listening test.</td>
+</tr>
+<tr>
+<td>OD-4</td>
+<td>Grammar mechanism + reject scoring</td>
+<td>mlx-whisper: true constrained decode (logit masking) vs. <code>initial_prompt</code>/hotword biasing. If only biasing is available, the likelihood-ratio reject becomes mandatory, not optional. Empirical: tune <code>route</code>/<code>confirm</code> thresholds on recorded triage audio (the &quot;network→work&quot; call is test case #1).</td>
+</tr>
+<tr>
+<td>OD-5</td>
+<td>Speculative Do</td>
+<td>Ship in schema now, engine may ignore in v0. Rule: speculative results are used only if the FSM arrives at that Do with unchanged args; otherwise <code>discarded: true</code>.</td>
+</tr>
+<tr>
+<td>OD-6</td>
+<td>Trace transport &amp; auth</td>
+<td>One WS topic per <code>call_id</code> off the engine bus; short-lived signed URLs for external observers (the texted-link observer, later supervisor barge-in). Design the addressing now, build nothing yet.</td>
+</tr>
+<tr>
+<td>OD-7</td>
+<td>Node library / multi-tenant reuse</td>
+<td>Booking flows will share 80% shape. Likely a source-level template (&quot;booking-flow blueprint&quot;) the compiler instantiates per tenant — keep out of v0 artifact schema, revisit after two real tenant flows exist.</td>
+</tr>
+<tr>
+<td>OD-8</td>
+<td>PII in traces</td>
+<td><code>transcript_ref</code>/<code>args_ref</code> point into a separate store with its own retention; trace stream itself stays PII-light so observer links are safe to share. Matters for the sellable product (and your HIPAA instincts apply even though RIFF isn't covered).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-handoff-notes-for-the-implementing-claude">9. Handoff notes for the implementing Claude</h2>
+<p>Suggested order, each step shippable alone:</p>
+<ol>
+<li><strong>Emit the trace from the engine bus</strong> (<code>riff/events.py</code> → §6 events, per-call topic). Both transports and the map subscribe. This is the Q10/Q11 &quot;one contract&quot; fix and unblocks the console regardless of compiler progress.</li>
+<li><strong>Write <code>riffc</code> v0 as validation-only</strong>: read the existing flow YAML + static-audio dir, emit the manifest JSON + the §7 L0 report. Don't change the runtime yet — just make the compile errors visible. (It will immediately flag real issues; that's the point.)</li>
+<li><strong>Constrain <code>choice_stt.py</code></strong> (OD-4) and emit <code>route_decision</code> with both <code>heard_constrained</code> and <code>heard_open</code>. Confirm the tee on the Telnyx leg.</li>
+<li><strong>Switch the runtime to execute the artifact</strong> (assets by pinned hash, watchdog advance, engine-pushed audio intents). Retire <code>lookup_latest_by_state</code> from the hot path.</li>
+<li><strong>Do-node runtime</strong> against <code>austin_plumbing</code> (hold beat, deadline, enum frames), then speculative prefetch (OD-5) as a follow-up.</li>
+</ol>
+<p>The console mockup (next artifact after this) renders: the §5 plumbing manifest as keypad + route-table detail, and the §6 sample trace in the trace panel — hand-written JSON first, no live wiring.</p>
+<hr />
+<h2 id="implementation-status-running-log">Implementation status (running log)</h2>
+<ul>
+<li>2026-07-01 — schema v0 saved as design of record. Agreed sequencing tweak: do §9 step 2 (<code>riffc</code> validation-only, zero runtime risk) <strong>before</strong> step 1 (trace bus, touches live path). Committed + pushed to <code>main</code> @ <code>d1a258c2</code> as a clean revert point before any code lands.</li>
+<li>2026-07-01 — <strong>§9 step 2 landed: <code>riffc</code> v0 (validation-only)</strong> in <code>riff/riffc.py</code> (+ <code>tests/test_riffc*.py</code>, 17 tests). Classifies every state into the five node types (both anchor flows classify cleanly, 0 unknowns) and runs the L0 checks (§7). <code>python -m riff.riffc &lt;flow.yaml&gt;</code>. Zero runtime effect. What it immediately surfaced against the real flows:
+<ul>
+<li><strong>space_channel:</strong> PASS, 0 errors, 15 warns. 9 orphaned states (<code>fetch_launches</code>, <code>fetch_space_content</code>, <code>console_not_ready*</code>, <code>launch_trouble*</code>, <code>report_launches</code>, <code>space_content_done</code>, <code>bug_captured</code>) — the legacy states the deterministic redesign routed <em>around</em>, now provably dead → cleanup candidates. <code>report_space_content_audio</code> correctly <strong>unfolds to 6 prerendered topic briefings (I6)</strong>.</li>
+<li><strong>austin_plumbing:</strong> PASS, 0 errors, 35 warns. <strong>13 unpinned Collect states</strong> — concrete proof that Collect (not Do) carries the booking vertical + the LLM cost surface. <code>scheduling_offer_slots</code>/<code>propose_other_days</code> are <strong>dynamic-choice</strong> states (choices from a calendar-result slot) = the Do-result enum-frame pattern. ~11 orphaned <code>scheduling_*</code> states (legacy). Only <code>greeting</code> prerendered (the &quot;prerender is Space-Channel-only&quot; fact, made concrete).</li>
+<li>Both flows flag: no <code>degraded.*</code> fallback assets (I4 gap), no <code>choose.reject</code> path (constrained-ASR gap), unpinned Collect/Do artifact fields.</li>
+<li><strong>Calibration learned from real flows:</strong> the 10ea83db error is <em>a prerendered WAV whose text still contains <code>{{</code></em> — NOT a live-TTS template Say (Gemini resolves that live). And a <code>choices_slot</code> choose is <em>dynamic</em>, not broken. Both severities corrected. This is the Say <code>prerendered|live-tts</code> discriminator gap the ground-truth fact sheet predicted.</li>
+<li><strong>Next:</strong> §9 step 1 (trace from the engine bus) or the console mockup rendering these node/finding results.</li>
+</ul>
+</li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-purpose-and-scope">1. Purpose and scope</a></li><li class="toc-h2"><a href="#2-design-invariants-the-schema-encodes">2. Design invariants the schema encodes</a></li><li class="toc-h2"><a href="#3-artifact-schema">3. Artifact schema</a></li><li class="toc-h3"><a href="#3-1-top-level">3.1 Top level</a></li><li class="toc-h3"><a href="#3-2-asset-record">3.2 Asset record</a></li><li class="toc-h3"><a href="#3-3-models-block">3.3 Models block</a></li><li class="toc-h3"><a href="#3-4-node-types">3.4 Node types</a></li><li class="toc-h2"><a href="#4-example-a-space-channel-excerpt">4. Example A — space_channel (excerpt)</a></li><li class="toc-h2"><a href="#5-example-b-austin-plumbing-excerpt">5. Example B — austin_plumbing (excerpt)</a></li><li class="toc-h2"><a href="#6-trace-event-schema">6. Trace event schema</a></li><li class="toc-h3"><a href="#sample-trace-plumbing-call-with-a-do-and-a-watchdog-save">Sample trace — plumbing call with a Do and a watchdog save</a></li><li class="toc-h2"><a href="#7-compile-time-validation-the-l0-suite">7. Compile-time validation (the L0 suite)</a></li><li class="toc-h2"><a href="#8-open-decisions">8. Open decisions</a></li><li class="toc-h2"><a href="#9-handoff-notes-for-the-implementing-claude">9. Handoff notes for the implementing Claude</a></li><li class="toc-h2"><a href="#implementation-status-running-log">Implementation status (running log)</a></li></ul></aside>
+</div>
+</body>
+</html>

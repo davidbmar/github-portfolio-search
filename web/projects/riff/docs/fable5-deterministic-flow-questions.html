@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF — Deterministic Voice Flows: Architecture Questions for Fable 5 · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">fable5-deterministic-flow-questions.md</span>
+<a class="raw" href="/docs/docs/fable5-deterministic-flow-questions.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF — Deterministic Voice Flows: Architecture Questions for Fable 5</h1>
+<p><strong>Author:</strong> Claude (Opus 4.8) with David Mar
+<strong>Date:</strong> 2026-07-01
+<strong>Audience:</strong> Fable 5 (design/architecture review)
+<strong>Scope:</strong> the last two days of work (2026-06-29 → 07-01) on the RIFF &quot;Space Channel&quot; phone flow — a numbered voice menu (press or say 1–8) that must route <strong>deterministically</strong> and play <strong>prerecorded</strong> audio.</p>
+<hr />
+<h2 id="0-why-this-doc">0. Why this doc</h2>
+<p>We spent two days turning a Gemini-driven concierge into a deterministic IVR. It mostly works — but the same <em>classes</em> of bug keep recurring, and we keep re-litigating the same design questions. What we ultimately want:</p>
+<ol>
+<li>A better way to <strong>represent all the fixed menu choices (1–8)</strong> — and a UI a human can <strong>trace and debug</strong> during a live call. (The graph renders routing <em>topology</em>, not the caller-facing menu, so the 8 options are invisible where it matters.)</li>
+<li>An <strong>avenue for experimentation</strong> that doesn't destabilize the deterministic core.</li>
+<li><strong>Cost optimization across different LLMs at minimal latency.</strong></li>
+</ol>
+<p>Our thesis for how all three fall out of one architecture — <strong>pre-flow → flow → post-flow (&quot;dreaming&quot;), unified by simulation</strong> — is in §1.5. We want Fable 5's help pressure-testing that thesis and the concrete UI strawman (§3.5), not just the next patch. Questions are in §4; §1–§3 give you the context.</p>
+<hr />
+<h2 id="1-the-system-in-60-seconds">1. The system in 60 seconds</h2>
+<p><strong>RIFF</strong> is a phone-call AI agent. A call is driven by a <strong>finite state machine</strong> (FSM) defined in YAML (<code>flows/*.yaml</code>): states, transitions, guards. The <strong>language layer</strong> is <strong>Gemini Live</strong> (streaming speech-in / speech-out).</p>
+<p>Two transports share the FSM but have <strong>separate audio handling</strong>:</p>
+<ul>
+<li><strong><code>TelnyxTransport</code></strong> — real phone (<code>:8767</code>), PCMU over a Telnyx media WebSocket.</li>
+<li><strong><code>LiveTransport</code></strong> — browser voice page (<code>:8765</code>, <code>voice.html</code>), PCM over a WebSocket.</li>
+</ul>
+<p>Key mechanisms built over these two days:</p>
+<ul>
+<li><strong>Prerendered static audio</strong> (the &quot;preflow&quot;): during a prefetch window we render WAVs for each state/topic to disk, keyed by <code>text_hash(text|voice|model|style)</code>. At call time we play the WAV — <strong>no call-time TTS</strong>. (<code>4f7037ec</code>, <code>af7587ce</code>, <code>a4df792b</code>)</li>
+<li><strong><code>lookup_latest_by_state(flow_id, state_id)</code></strong> — the primitive that returns the <em>newest</em> prerendered WAV for a state regardless of text hash, so playback is robust to content drift. (<code>30924486</code>)</li>
+<li><strong><code>locked_choice</code></strong> — a deterministic state: it maps keypad digits (by visible order, 1..9) <strong>and</strong> spoken aliases (&quot;space weather&quot;, &quot;launches&quot;) to a <code>route</code> slot, with <strong>no LLM in the loop</strong>. DTMF and voice both resolve here. (<code>6777bc52</code>)</li>
+<li><strong>Voice capability hierarchy</strong> — one flow-level voice (Umbriel, British RP) that every prerendered state inherits; <code>style</code> is part of the cache hash. (<code>e50dae07</code>, <code>525853f4</code>)</li>
+<li><strong>Flow map / IVR Flow Studio</strong> (<code>web/space-channel-map.html</code>) — renders the real YAML as a graph, highlights the live state gold via the observer WebSocket, and can simulate paths offline. (<code>9a539db5</code>, <code>f5edf099</code>, <code>8bb182c8</code>, <code>18dc932b</code>)</li>
+</ul>
+<p>The flow's shape today:</p>
+<pre><code>greeting (&quot;How may I help you?&quot;)
+  └─&gt; triage        [locked_choice: 1..8 + 9/goodbye + &quot;options&quot;]   ← NO LLM
+        ├─ 1 launches       → report_launches_audio        (prerendered)
+        ├─ 2..7 content     → report_space_content_audio    (prerendered, per topic)
+        ├─ 8 bug            → collect_bug → (loop back)
+        ├─ 9 / &quot;goodbye&quot;    → sign_off (terminal)
+        └─ unrecognized/&quot;options&quot; → suggestions_announce → suggestions (full menu)
+  every subflow ──audio_done──&gt; back to the MAIN MENU (re-announced)
+</code></pre>
+<hr />
+<h2 id="1-5-the-thesis-pre-flow-flow-post-flow-dream-unified-by-simulation">1.5 The thesis: <strong>pre-flow → flow → post-flow (dream)</strong>, unified by simulation</h2>
+<p>The real organizing idea (David's framing) is a three-phase lifecycle. Almost every fix in §2 is really &quot;we put work in the wrong phase.&quot; Getting the phases right is the architecture.</p>
+<pre><code>      PRE-FLOW  ───────────▶   FLOW   ───────────▶   POST-FLOW (&quot;dreaming&quot;)
+   prepare, deterministically   execute, min latency   review · experiment · optimize
+   ─ fetch all content          ─ fixed menus: NO LLM   ─ replay the trace
+   ─ render every WAV           ─ prerendered audio      ─ simulate alternatives
+   ─ warm caches / STT          ─ LLM only at the edges  ─ try cheaper/faster LLMs
+   ─ pick per-state LLM         ─ deterministic routing  ─ measure cost/latency/quality
+        │                              │                        │
+        └──────────  SIMULATION is the connective tissue  ──────┘
+             (same simulator validates pre-flow, debugs flow, drives the dream)
+</code></pre>
+<p><strong>Pre-flow — everything expensive or slow happens here, OFF the call.</strong> Fetch content, render all WAVs, warm the choice-STT, and <em>decide which LLM each state will use</em>. The output is a fully-prepared, mostly-deterministic call plan. (The blocking-fetch reconnect-loop scar, <code>643369b1</code>, is exactly a pre-flow job that leaked into flow.)</p>
+<p><strong>Flow — the live call, latency-minimal by construction.</strong> Fixed menu choices resolve with <strong>no LLM</strong> (deterministic, instant — that's the whole point of <code>locked_choice</code>). Prerendered audio plays immediately. The LLM touches the call <strong>only at declared edges</strong> (free-text collect; no-match fallback), and there it runs the <em>cheapest model that meets quality</em>. Latency is spent only where a model is genuinely unavoidable.</p>
+<p><strong>Post-flow (&quot;dreaming&quot;) — where experimentation lives.</strong> After the call, replay the recorded trace and <strong>simulate variations</strong>: different wording, different LLMs (cost/latency/quality trade-offs), different routing thresholds, new menu options. This is the answer to the tension the user named — <strong>(a) fixed choices</strong> stay deterministic in <em>flow</em>, while <strong>(b) the avenue for experimentation</strong> lives in <em>post-flow</em>, so trying things never destabilizes the live deterministic core. Wins get promoted back into pre-flow/flow. We already have much of the substrate: <code>quality.db</code>, LLM judges, the all-options harness (<code>scripts/space_channel_all_options_sim.py</code>), per-state model cert, and an &quot;Effective LLM Policy&quot; inheritance cascade (state→group→flow→global) that isn't fully wired to the primary turn yet.</p>
+<p><strong>The three things we want this to deliver</strong> (David's words): (a) a better way to represent <strong>all the fixed menu choices</strong>; (b) an <strong>avenue for experimentation</strong>; (c) <strong>cost optimization across different LLMs at minimal latency</strong>. The claim is that all three fall out of getting pre-flow / flow / post-flow right, with simulation as the shared engine — <em>not</em> out of another one-off patch.</p>
+<h2 id="2-what-we-built-in-two-days-grounded-in-commits">2. What we built in two days (grounded in commits)</h2>
+<p>A compressed timeline of the <em>fixes</em>, because the pattern of fixes is itself the subject:</p>
+<p><strong>Content &amp; voice foundation (06-29 → 06-30 midday)</strong></p>
+<ul>
+<li>Subflows + preflow cache; anchor-style 3-headline briefs; migrate the local &quot;droid&quot; voice to prerendered Umbriel British. (<code>4f7037ec</code> … <code>525853f4</code>)</li>
+<li><code>P0.1</code>: <strong><code>style</code> must be part of the static-audio cache identity</strong> or lookups miss the styled WAV. (<code>eb7aed76</code>)</li>
+</ul>
+<p><strong>The &quot;Gemini improvises the menu&quot; bug (06-30 evening)</strong></p>
+<ul>
+<li>Pressing 2 (UFO files) landed the caller on <code>fetch_space_content</code> — a <code>required_tool</code> <strong>act</strong> state that hands the mic to Gemini, which then <em>improvised the same generic list for every option</em>. Fix: <strong>route content picks DIRECTLY to the prerecorded briefing, skipping the act state.</strong> (<code>c0e6bd17</code>, <code>b80b1182</code>, <code>dc3eac22</code>)</li>
+<li><code>10ea83db</code>: <strong>&quot;the space-content-summary leak&quot;</strong> — a poisoned WAV rendered from the <em>unresolved template</em> <code>{{slots.space_content_summary}}</code>, so the caller literally heard &quot;space content summary.&quot;</li>
+</ul>
+<p><strong>The deterministic menu (06-30 evening)</strong></p>
+<ul>
+<li>Numbered menu: press or say 1–8 (<code>locked_choice</code> + DTMF + barge-in). (<code>6777bc52</code>)</li>
+<li>Stale-route bug: <code>route='suggestions'</code> from triage auto-advanced past the menu (press 1 landed on content, not launches). (<code>55382578</code>)</li>
+<li><strong>DTMF transition to a static state must play audio immediately</strong> — otherwise ~15s pause + terminal leak. (<code>0485ac08</code>)</li>
+</ul>
+<p><strong>The blocking-fetch trap (06-30 night) — a scar we still route around</strong></p>
+<ul>
+<li>We tried to fill an empty briefing slot with an on-entry fetch. It ran a <strong>blocking network fetch on the async loop → Gemini session cancel/reconnect LOOP.</strong> Reverted. (<code>643369b1</code>)</li>
+<li>Re-added <strong>non-blocking, freshness-guarded, content-only.</strong> The <strong>launch fetch is explicitly left OFF the loop</strong> (volatile 1h cache). (<code>1c455098</code>)</li>
+</ul>
+<p><strong>Prefetch / Design-1 (07-01 early)</strong></p>
+<ul>
+<li>Lock in &quot;get all data in the prefetch period, not realtime&quot;; <code>lookup_latest_by_state</code>. (<code>a4df792b</code>, <code>30924486</code>)</li>
+</ul>
+<p><strong>Welcome direct-dial + goodbye (07-01 early)</strong></p>
+<ul>
+<li>Press a digit at the <em>welcome</em> to jump straight to an option; defer required-tool routes to avoid dead-air; wire <code>goodbye</code> (say it or press 9). (<code>1288caf2</code>, <code>9811fc59</code>, <code>7ed865df</code>, <code>22a2b1e6</code>)</li>
+</ul>
+<p><strong>The web transport lagging the phone (07-01 morning) — the divergence tax</strong></p>
+<ul>
+<li>&quot;The REAL live bug&quot;: trigger playback on <strong>voice</strong> transitions (recv-pump only fired for tool_call). (<code>54082fed</code>)</li>
+<li>Web content briefing must play the latest topic WAV — <strong>&quot;mirror phone fix.&quot;</strong> (<code>c5075eca</code>)</li>
+<li>Web voice resolved <strong>Achernar</strong> (bare default) instead of <strong>Umbriel</strong> (flow voice) → silence. (<code>7de088c3</code>)</li>
+</ul>
+<p><strong>Fully deterministic hub + loop-back (07-01 midday) — this session</strong></p>
+<ul>
+<li>The 46-second delay: at <code>triage</code> (a Gemini <code>ask</code> state) the FSM waited for <code>turn_complete</code>, and Gemini held the turn open ~46s. <strong>Convert <code>triage</code> to a <code>locked_choice</code></strong> — route on the transcription, no LLM. (<code>1e9a6c47</code>, <code>080a835d</code>)</li>
+<li>Launches → prerendered audio directly (skip the volatile fetch). (<code>080a835d</code>)</li>
+<li>Loop every subflow back to the re-announced main menu. (<code>adc959fd</code>)</li>
+<li><strong>Web loop-back stall</strong>: a briefing reached by early dispatch never got its <code>play_audio</code> pushed to the browser (and the browser de-duped by state-id, so <code>report_space_content_audio</code> only ever played its <em>first</em> topic). Fix: push static audio on arrival at any static state; de-dupe by asset URL. (<code>ee7872db</code>)</li>
+</ul>
+<hr />
+<h2 id="3-the-recurring-tensions-the-patterns-that-keep-biting">3. The recurring tensions (the patterns that keep biting)</h2>
+<p>These are the through-lines. Each is a place where a <em>design decision</em> would stop a <em>class</em> of bugs.</p>
+<p><strong>T1 — Determinism vs. the microphone.</strong> The router is perfectly deterministic <em>once it has clean input</em>. But the input is Gemini's ASR, which misheard <strong>&quot;network&quot; → &quot;work&quot;</strong> on a live call — so the router correctly refused to guess, and the caller hit a slow no-match reprompt. DTMF is immune; speech is not.</p>
+<p><strong>T2 — The 8 options are invisible in the graph.</strong> Six of the eight (2–7) route to the <em>same</em> <code>report_space_content_audio</code> state, so the map collapses them into one edge. The caller-facing menu (1–8) lives <em>inside</em> the <code>locked_choice</code> node. The operator can't see &quot;what does 4 do&quot; at a glance.</p>
+<p><strong>T3 — Two transports, every fix landed twice.</strong> Phone and web share the FSM but not the audio path. The commit log literally contains &quot;mirror phone fix&quot; and &quot;the REAL live bug&quot; — the same defect rediscovered on the other transport.</p>
+<p><strong>T4 — Routing tied to the model's turn boundary.</strong> The FSM advanced on <code>turn_complete</code>; Gemini decides when that fires (VAD), so routing inherited a 13–46s tail. <code>locked_choice</code> early-dispatch sidesteps it, but only for states we've explicitly made deterministic.</p>
+<p><strong>T5 — Fresh vs. non-blocking.</strong> Prerendered audio is fast and safe but can be stale; a realtime fetch is fresh but blocked the async loop and crashed the Gemini socket. We now hard-code &quot;launches never fetches on the loop.&quot; That's a rule, not an architecture.</p>
+<p><strong>T6 — Offline-green, live-broken.</strong> Our FSM sims and the all-options harness were green while live calls stalled — because the bugs live in the <em>live timing</em> (recv-pump order, transport push, ASR partials, turn boundaries), which the sims don't model. Every real fix this session came from reading a <strong>live call log</strong>, not a test.</p>
+<p><strong>T7 — Act/tool states in the conversational path are an anti-pattern.</strong> Every time the FSM lands on a <code>required_tool</code> state that hands the mic to Gemini, Gemini improvises. Our fix is always the same: route <em>around</em> it to prerecorded audio. But we keep re-introducing the shape.</p>
+<p><strong>T8 — One state, many contents, revisited.</strong> <code>report_space_content_audio</code> is a single state reused for 6 topics and re-entered on every loop-back. That reuse broke state-id-keyed dedup and slot-fill assumptions. Is &quot;one reusable state&quot; even the right model?</p>
+<hr />
+<h2 id="3-5-the-visualization-we-keep-circling-the-real-ask">3.5 The visualization we keep circling (the real ask)</h2>
+<p>We have rebuilt the FSM view ~6 times in two days (<code>ff1321a4</code> → <code>87b70982</code> → <code>9a539db5</code> → <code>f5edf099</code> → <code>e394e345</code> → <code>18dc932b</code>) and still don't have the thing we want: <strong>a simple picture of the states that a human can trace and debug during a live Space Channel call.</strong> Below is a strawman. <strong>Please tear it apart</strong> — the goal is to stop re-litigating this.</p>
+<h3 id="principle-1-one-node-per-thing-the-caller-experiences-not-per-yaml-state">Principle 1 — one node per thing the caller <em>experiences</em>, not per YAML state</h3>
+<p>The YAML has plumbing states (<code>suggestions_announce</code> + <code>suggestions</code> are an announce <strong>atom</strong> and a locked-choice <strong>atom</strong> that together are <em>one</em> thing: &quot;the menu&quot;). Draw the <strong>molecule</strong>, not the atoms. Click to expand into atoms only when debugging. Target vocabulary — five node shapes, nothing else:</p>
+<table>
+<thead>
+<tr>
+<th>shape</th>
+<th>meaning</th>
+<th>Space Channel example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>▭ <strong>Say</strong></td>
+<td>plays a prerecorded WAV, then auto-advances</td>
+<td>greeting, every briefing, goodbye</td>
+</tr>
+<tr>
+<td>◇ <strong>Choose</strong></td>
+<td>deterministic router: press/say → route (no LLM)</td>
+<td>triage hub, the numbered menu</td>
+</tr>
+<tr>
+<td>▱ <strong>Collect</strong></td>
+<td>gathers free text via the LLM</td>
+<td>bug description</td>
+</tr>
+<tr>
+<td>⬒ <strong>Do</strong></td>
+<td>a tool/fetch (should be out-of-band; flag if on the mic)</td>
+<td>(none, by design)</td>
+</tr>
+<tr>
+<td>⬤ <strong>End</strong></td>
+<td>terminal</td>
+<td>sign_off</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principle-2-two-synced-views-one-source-of-truth-the-yaml">Principle 2 — two synced views, one source of truth (the YAML)</h3>
+<ul>
+<li><strong>Caller view</strong> = a keypad. 1–8 laid out as buttons; each shows its label + the first line of audio it plays + a freshness dot (🟢 prerendered fresh / 🟡 stale / 🔴 missing → will stall). This is the &quot;what does 4 do&quot; view.</li>
+<li><strong>Engineer view</strong> = the state graph (the molecules above), current state lit <strong>gold</strong>, back-edges (loop-backs) dashed.</li>
+<li>Selecting a keypad button highlights its path in the graph, and vice-versa. Neither is authored by hand — both are projections of the same flow YAML.</li>
+</ul>
+<h3 id="principle-3-trace-amp-debug-are-first-class-live">Principle 3 — trace &amp; debug are first-class, live</h3>
+<pre><code>┌───────────────────────────────────────────────────────────────────────────┐
+│  Space Channel · ● LIVE call  ·  turn 3  ·  ⏱ last route 0.3s               │
+├──────────────────────────┬────────────────────────────────────────────────┤
+│  CALLER VIEW (keypad)     │   ENGINEER VIEW (states)                        │
+│                           │                                                 │
+│  ┌───┐┌───┐┌───┐┌───┐     │     ▭ greeting                                  │
+│  │ 1 ││ 2 ││ 3 ││ 4 │     │        │ audio_done                            │
+│  │Lau││New││Wx ││UFO│🟢    │     ◇ triage ●gold  ← &quot;missions&quot; → mission_ops │
+│  └───┘└───┘└───┘└───┘     │        ├─1→ ▭ launches   🟢                     │
+│  ┌───┐┌───┐┌───┐┌───┐     │        ├─2..7→ ▭ briefing (per topic) 🟢        │
+│  │ 5 ││ 6 ││ 7 ││ 8 │     │        ├─8→ ▱ bug                              │
+│  │Mis││Net││Rad││Bug│     │        └─9→ ⬤ goodbye                          │
+│  └───┘└───┘└───┘└───┘     │        ▭ briefing ─┈loop┈─▶ ◇ menu             │
+│   press or say · 9=bye    │                                                 │
+├──────────────────────────┴────────────────────────────────────────────────┤
+│  TRACE (why we are here)                              [▶ step] [⏸] [⟲ sim] │
+│  0.0s  ▭ greeting          played greeting.wav (5.0s)                       │
+│  6.2s  ◇ triage            heard &quot;capabilities&quot; → matched alias → OPTIONS   │
+│  8.1s  ◇ menu              heard &quot;missions&quot;     → matched alias=mission ✓   │
+│  8.1s  ▭ briefing[mission] ▶ playing mission_ops.wav (24.5s)   🟢 pushed    │
+│  ⚠ 33s ▭ briefing          WAV ended, no audio_done from browser → STALL?   │
+└───────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<p>The trace panel is the debugger: every row is <strong>what the caller did → how the router decided → what played</strong>, with timing. A red row is a <em>diagnosis</em> (&quot;state went active but its WAV never played — Gemini is improvising&quot; already exists in <code>8bb182c8</code>; &quot;WAV ended, no audio_done → stall&quot; is the bug we hit today). The same view runs on <strong>live</strong> (observer WebSocket) and <strong>offline sim</strong> (step through paths with no call), so you debug the identical picture whether or not you're on a call.</p>
+<h3 id="what-s-unresolved-about-the-strawman">What's unresolved about the strawman</h3>
+<ul>
+<li>Live highlighting only works when the map and the call are on the <strong>same server</strong> (the map is on <code>:8767</code>, but the browser voice call is on <code>:8765</code>, so today it can't follow a web call). Where should the &quot;call state&quot; stream live so <em>any</em> viewer can trace <em>any</em> call?</li>
+<li>The molecule/atom collapse is hand-wavy: what's the <em>rule</em> for which YAML states merge into one node?</li>
+<li>Is a node-graph even the right primary surface, or is the <strong>keypad + trace table</strong> enough and the graph is decoration?</li>
+</ul>
+<h2 id="4-questions-for-fable-5">4. Questions for Fable 5</h2>
+<p>Please engage with the <em>architecture</em>. Where you'd change the model, say what you'd replace it with and what breaks. Concrete counter-designs welcome.</p>
+<h3 id="a-a-better-view-of-1-8-visualization-mental-model">A. A better view of 1–8 (visualization + mental model)</h3>
+<p><strong>Q1.</strong> Our graph draws <em>routing destinations</em>, so 2–7 collapse into one &quot;Content Briefing&quot; edge and the caller-facing menu (1–8) is hidden inside the <code>locked_choice</code> node (T2). What's the right visual model for a menu where <strong>N caller choices fan into M destinations</strong>? Options we've considered: (a) label each edge with its digit set; (b) render 8 &quot;choice chips&quot; as first-class nodes that <em>alias</em> into the destination states; (c) a dual view — a &quot;caller view&quot; (1–8 as a keypad) and an &quot;engineer view&quot; (state topology) that stay in sync. Which — and why? Is there a canonical representation for IVR/menu graphs we should adopt rather than invent?</p>
+<p><strong>Q2.</strong> We want an operator to answer &quot;what happens when I press 4?&quot; in one glance, <em>including</em> the audio it will play and whether that audio is prerendered/fresh/stale. What belongs on the node vs. the edge vs. a side panel? Is a graph even the right primary artifact, or is a <strong>table (option × input-method × destination × audio-state × freshness)</strong> the better operator surface, with the graph as secondary?</p>
+<p><strong>Q3.</strong> The same state (<code>report_space_content_audio</code>) appears once in the graph but means six different briefings (T8). Should a reused, content-parameterized state be drawn as <strong>one node</strong> (honest to the FSM) or <strong>six</strong> (honest to the caller)? What's the principle for when to unfold a parameterized state in a diagram?</p>
+<h3 id="b-determinism-vs-natural-language-asr-t1">B. Determinism vs. natural language / ASR (T1)</h3>
+<p><strong>Q4.</strong> Deterministic routing depends on clean tokens, but ASR mishears (&quot;network&quot;→&quot;work&quot;). Where should robustness live? (a) Enrich aliases with known ASR confusions (whack-a-mole); (b) fuzzy/phonetic match inside <code>locked_choice</code> (risk: false matches route the caller wrong — arguably worse than a reprompt); (c) a small, dedicated, <strong>constrained</strong> speech recognizer that only has to distinguish 8 known options (grammar-constrained ASR) instead of open-vocab Gemini; (d) confirm-on-low-confidence. What's the right default, and how do you set the confidence threshold so you neither mis-route nor nag?</p>
+<p><strong>Q5.</strong> When nothing matches, the reprompt is slow (it still waits for the model's turn boundary — T4). Is &quot;deterministic router + LLM only as a <strong>no-match fallback classifier</strong>&quot; the right escalation ladder? If so, how do we keep the fallback from re-introducing the latency and improvisation we just removed — does the fallback return <em>only a route</em> (never audio), and never touch the mic?</p>
+<p><strong>Q6.</strong> Should the design bias callers toward <strong>DTMF</strong> (immune to ASR) without feeling like a 1990s phone tree — e.g. &quot;press or say,&quot; barge-in, and voice as a fast-path over a reliable keypad substrate? Where's the line between &quot;deterministic and reliable&quot; and &quot;robotic&quot;?</p>
+<h3 id="c-holding-the-flow-together-routing-conversation">C. Holding the flow together (routing + conversation)</h3>
+<p><strong>Q7.</strong> Today routing advanced on Gemini's <code>turn_complete</code> (T4); we bypass it with <code>locked_choice</code> early-dispatch on the <em>transcription</em>. Is there a cleaner invariant: <strong>routing must never depend on the language model's turn boundary</strong> — the FSM owns turns, the model is a stateless &quot;utterance → intent/text&quot; function? What would we lose (barge-in nuance? backchannel?) by enforcing that?</p>
+<p><strong>Q8.</strong> T7: act/<code>required_tool</code> states in the conversational path invite the model to improvise; our fix is always &quot;route around them to prerecorded audio.&quot; Should <strong>all</strong> tool calls / data fetches be <strong>out-of-band</strong> (done in the preflow or a background worker, never a conversational state the caller can land on)? If a tool genuinely must run mid-call, what's the pattern that keeps the mic away from the model?</p>
+<p><strong>Q9.</strong> T5: how do we get <em>fresh-enough</em> content without call-time blocking? Is <strong>serve-stale-while-revalidate</strong> (play the prerendered WAV instantly, kick a background refresh for next time) the right default for <em>all</em> dynamic content — including the volatile launch data we currently refuse to fetch on the loop? What freshness SLA is honest to state on a phone call?</p>
+<h3 id="d-two-transports-one-contract-t3">D. Two transports, one contract (T3)</h3>
+<p><strong>Q10.</strong> Phone and web share the FSM but not the audio path, so fixes land twice (&quot;mirror phone fix&quot;). What's the right seam? A single <strong>&quot;audio intent&quot;</strong> the FSM emits (<code>play(state, resolved_wav, voice)</code>) that each transport merely renders? A shared &quot;static-audio playback + advance-on-done&quot; module both transports call? How do we make it <em>impossible</em> to fix a playback bug on one transport and not the other?</p>
+<p><strong>Q11.</strong> The web path only advances a static state when the <strong>browser</strong> signals &quot;audio done&quot;; the phone path uses its own recv-pump. This asymmetry caused the loop-back stall. Should &quot;the WAV finished, advance the FSM&quot; be a <strong>transport-agnostic contract</strong> with a server-side timeout fallback so a missed client signal can't strand the caller?</p>
+<h3 id="e-testing-that-catches-live-bugs-t6">E. Testing that catches live bugs (T6)</h3>
+<p><strong>Q12.</strong> Every real fix this session came from a <strong>live call log</strong>, not a test; our FSM sims were green while calls stalled. What's the minimum-fidelity simulation that would have caught these — one that models ASR partials, <code>turn_complete</code> timing, transport push order, and the browser's play/ack round-trip? Is it worth building a &quot;live-faithful&quot; harness, or is the honest answer &quot;instrument production heavily and read logs&quot; (we added visible <code>static-audio pushed/SKIP</code> logging for exactly this)?</p>
+<p><strong>Q13.</strong> Meta-question: given T1–T8, if you were redesigning this from scratch as a <strong>deterministic, prerecorded, voice+DTMF IVR with an LLM strictly at the edges</strong>, what would the core abstractions be? Where <em>exactly</em> is the LLM allowed to touch the call, and what's the contract at that boundary?</p>
+<hr />
+<h3 id="f-pre-flow-flow-post-flow-experimentation-and-cost-at-minimal-latency-1-5">F. Pre-flow / flow / post-flow, experimentation, and cost-at-minimal-latency (§1.5)</h3>
+<p><strong>Q14.</strong> Is <strong>pre-flow → flow → post-flow(dream)</strong> the right top-level decomposition, with the invariant <em>&quot;if it's slow, expensive, or non-deterministic, it belongs in pre-flow or post-flow — never in flow&quot;</em>? Where does that invariant break (e.g., genuinely live data like &quot;is this launch still go?&quot;), and what's the escape hatch that doesn't reintroduce the mic-to-model improvisation and blocking-fetch traps?</p>
+<p><strong>Q15.</strong> We want <strong>(a) fixed deterministic menus</strong> <em>and</em> <strong>(b) an avenue for experimentation</strong> in one system. Is the clean split &quot;flow is fixed/deterministic; experimentation lives in post-flow simulation and is <em>promoted</em> into flow only after it beats the baseline&quot;? How do we represent a menu that is <em>mostly</em> fixed but has one experimental branch, in both the model and the UI, without the experiment leaking latency or nondeterminism into the fixed paths? Is there a notion of a &quot;shadow&quot; / candidate branch that runs only in simulation against recorded calls?</p>
+<p><strong>Q16.</strong> <strong>Cost via different LLMs at minimal latency.</strong> We have a per-state LLM policy (inheritance cascade state→group→flow→global) but eval is noise-dominated (judge σ≈1.5 on a 1–10 scale), so sub-point quality deltas are unreliable. How should per-state model selection be <em>decided in pre-flow</em> and <em>validated in post-flow</em> so we pick the cheapest/fastest model that holds quality — given the noise floor? What's the right objective function over {cost, latency, quality, humanness}, and how do you keep it honest when quality is barely measurable?</p>
+<p><strong>Q17.</strong> <strong>&quot;Dreaming&quot; as a loop.</strong> Should post-flow be <em>automated</em> (the system proposes variations — reword this WAV, swap this model, add this alias — simulates them against recorded/synthetic calls, and surfaces ranked wins) or <em>operator-driven</em> (a human explores in the UI)? If automated, what stops it from overfitting to the eval judges (we've been burned: two &quot;signals&quot; turned out to be measurement artifacts)? What's the human-in-the-loop checkpoint before a dream is promoted to flow?</p>
+<p><strong>Q18.</strong> <strong>One simulator, three phases.</strong> Simulation must validate pre-flow (does every option deliver fresh audio?), debug flow (step a path, see why it routed), and drive post-flow dreaming (what-if). But our sims were green while live calls stalled (T6). What fidelity does the <em>shared</em> simulator need — and can the same engine honestly serve all three phases, or do pre/flow/post need different simulators with a shared trace format?</p>
+<h2 id="5-what-quot-good-quot-looks-like">5. What &quot;good&quot; looks like</h2>
+<p>We'd consider this solved when:</p>
+<ul>
+<li>An operator sees <strong>1–8</strong> and what each does (audio + freshness) without reading YAML, and can <strong>trace/debug</strong> any live or simulated call in that same view.</li>
+<li>A caller can <strong>press or say</strong> any option and get the right prerecorded briefing <strong>instantly</strong>, with a graceful, fast path when ASR fails.</li>
+<li>Work sits in the <strong>right phase</strong>: nothing slow/expensive/nondeterministic runs <em>in flow</em>; experimentation and LLM-cost tuning happen in <strong>post-flow (dream) + simulation</strong> and are promoted only when they beat the baseline.</li>
+<li>A playback/loop-back bug can only be fixed <strong>once</strong> (one transport contract), and we stop rediscovering the same class of bug on the other transport / the next state.</li>
+</ul>
+<p>Fire away — counter-designs and &quot;you're framing this wrong&quot; answers are the most useful.</p>
+<pre><code>
+*Appendix: key files — `flows/space_channel_network_ops.yaml` (+ `flows/subflows/space_channel_network_ops/*`), `riff/live/session.py` (locked_choice early-dispatch), `riff/live/transport.py` (web audio push), `riff/phone/telnyx_transport.py` (phone audio), `riff/static_audio/` (prerender + `lookup_latest_by_state`), `web/space-channel-map.html` (flow map), `scripts/space_channel_all_options_sim.py` (all-options harness).*
+</code></pre>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#0-why-this-doc">0. Why this doc</a></li><li class="toc-h2"><a href="#1-the-system-in-60-seconds">1. The system in 60 seconds</a></li><li class="toc-h2"><a href="#1-5-the-thesis-pre-flow-flow-post-flow-dream-unified-by-simulation">1.5 The thesis: pre-flow → flow → post-flow (dream), unified by simulation</a></li><li class="toc-h2"><a href="#2-what-we-built-in-two-days-grounded-in-commits">2. What we built in two days (grounded in commits)</a></li><li class="toc-h2"><a href="#3-the-recurring-tensions-the-patterns-that-keep-biting">3. The recurring tensions (the patterns that keep biting)</a></li><li class="toc-h2"><a href="#3-5-the-visualization-we-keep-circling-the-real-ask">3.5 The visualization we keep circling (the real ask)</a></li><li class="toc-h3"><a href="#principle-1-one-node-per-thing-the-caller-experiences-not-per-yaml-state">Principle 1 — one node per thing the caller experiences, not per YAML state</a></li><li class="toc-h3"><a href="#principle-2-two-synced-views-one-source-of-truth-the-yaml">Principle 2 — two synced views, one source of truth (the YAML)</a></li><li class="toc-h3"><a href="#principle-3-trace-amp-debug-are-first-class-live">Principle 3 — trace &amp;amp; debug are first-class, live</a></li><li class="toc-h3"><a href="#what-s-unresolved-about-the-strawman">What&#x27;s unresolved about the strawman</a></li><li class="toc-h2"><a href="#4-questions-for-fable-5">4. Questions for Fable 5</a></li><li class="toc-h3"><a href="#a-a-better-view-of-1-8-visualization-mental-model">A. A better view of 1–8 (visualization + mental model)</a></li><li class="toc-h3"><a href="#b-determinism-vs-natural-language-asr-t1">B. Determinism vs. natural language / ASR (T1)</a></li><li class="toc-h3"><a href="#c-holding-the-flow-together-routing-conversation">C. Holding the flow together (routing + conversation)</a></li><li class="toc-h3"><a href="#d-two-transports-one-contract-t3">D. Two transports, one contract (T3)</a></li><li class="toc-h3"><a href="#e-testing-that-catches-live-bugs-t6">E. Testing that catches live bugs (T6)</a></li><li class="toc-h3"><a href="#f-pre-flow-flow-post-flow-experimentation-and-cost-at-minimal-latency-1-5">F. Pre-flow / flow / post-flow, experimentation, and cost-at-minimal-latency (§1.5)</a></li><li class="toc-h2"><a href="#5-what-quot-good-quot-looks-like">5. What &amp;quot;good&amp;quot; looks like</a></li></ul></aside>
+</div>
+</body>
+</html>

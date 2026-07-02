@@ -1,0 +1,78 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>Space Channel — flow dashboard</title>
+<style>
+ body{font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#0f1115;color:#e6e8ec}
+ header{padding:20px 28px;background:#161a22;border-bottom:1px solid #262c38}
+ h1{margin:0;font-size:20px} .sub{color:#8b94a7;font-size:13px;margin-top:4px}
+ .wrap{display:grid;grid-template-columns:1fr 360px;gap:0}
+ main{padding:24px 28px} aside{padding:24px 20px;background:#12151c;border-left:1px solid #262c38;height:100vh;overflow:auto}
+ .top{background:#1a1f2b;border:1px solid #2a3140;border-radius:10px;padding:14px 16px;margin-bottom:8px}
+ .top .lbl{color:#7fd1ff;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+ .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:14px}
+ .card{background:#1a1f2b;border:1px solid #2a3140;border-radius:10px;padding:14px 16px}
+ .cardhead{font-weight:600;font-size:15px} .key{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;background:#2b6cff;border-radius:6px;color:#fff;margin-right:6px}
+ .badge{float:right;font-size:11px;padding:2px 8px;border-radius:10px;background:#243} .badge.warn{background:#4a2323;color:#ff9b9b}
+ .path{color:#8b94a7;font-size:12px;margin:8px 0;font-family:ui-monospace,monospace}
+ .brief{background:#0f1319;border:1px solid #232a36;border-radius:8px;padding:10px 12px;font-size:14px;color:#cfd6e4}
+ .grp h3{font-size:13px;color:#7fd1ff;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 6px}
+ aside ul{list-style:none;padding:0;margin:0} aside li{padding:4px 0;font-size:13px;border-bottom:1px solid #1c2230}
+ .type{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;margin-right:4px}
+ .t-menu{background:#2b6cff} .t-audio{background:#2c7a4b} .t-action{background:#7a5a2c} .t-end{background:#5a2c2c} .t-dialog{background:#3a3f4c}
+ .desc{color:#6b7486}
+</style></head><body>
+<header><h1>Space Channel — flow dashboard</h1>
+  <div class="sub">Every path, walked offline from the flow — no call, no server. Generated 2026-07-01T07:27:51+00:00</div></header>
+<div class="wrap"><main>
+  <div class="top"><div class="lbl">Greeting</div>Thank you for calling Space Channel network operations. How may I help you?</div>
+  <div class="top"><div class="lbl">Menu (say/press 1-8)</div>Press or say: 1 launches, 2 space news, 3 space weather, 4 U-F-O files, 5 missions, 6 network, 7 radio, or 8 to report a bug.</div>
+  <div class="cards">
+        <div class="card">
+          <div class="cardhead"><span class="key">1</span> Launches
+            <span class="badge ok">60 words</span></div>
+          <div class="path">greeting → triage → suggestions → suggestions</div>
+          <div class="brief">Launch Command quick scan: 5 upcoming missions. Next up: Rocket Lab Electron, The Grain Goddess Provides (iQPS Launch 7), targeting July 1 at 8:00 AM Central. Then Long March 4C, targeting July 1 at 6:45 PM Central. And SpaceX Falcon 9 Block 5, Starlink Group 17-46, targeting July 1 at 9:00 PM Central. That is the latest from Launch Command.</div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><span class="key">2</span> Space Channel news
+            <span class="badge ok">32 words</span></div>
+          <div class="path">greeting → triage → suggestions → suggestions</div>
+          <div class="brief">Space news briefing. Top headlines: NASA awards nearly $600 million in lunar lander missions from SpaceNews; NASA Awards More CLPS Contracts, May Send Mars Rover Engineering Model to the Moon from SpacePolicyOnline.com.</div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><span class="key">3</span> Space weather
+            <span class="badge ok">33 words</span></div>
+          <div class="path">greeting → triage → suggestions → suggestions</div>
+          <div class="brief">Space weather briefing from Solar Operations: Kp 3.7, unsettled; solar wind 430 kilometers per second; density 10.0 protons per cubic centimeter; B z 3.9 nanotesla; latest alert: WARNING: Geomagnetic K-index of 4 expected.</div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><span class="key">4</span> UFO files
+            <span class="badge ok">54 words</span></div>
+          <div class="path">greeting → triage → suggestions → suggestions</div>
+          <div class="brief">UFO files briefing: 53 wire items and 9 archive cases are visible on Space Channel. Latest wire: New UFO files offer no answers - but something is happening in the skies; Young, Colleagues Introduce New Legislation To Declassify Government Records. Archive includes Kenneth Arnold, Mount Rainier, June 1947, Captain Thomas Mantell, Kentucky, January 1948.</div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><span class="key">5</span> Mission ops
+            <span class="badge ok">40 words</span></div>
+          <div class="path">greeting → triage → suggestions → suggestions</div>
+          <div class="brief">Mission operations briefing. Space Channel is actively following ISS Operations, Artemis Console, Lunar Tracking, Webb Observatory, plus 6 more — a busy stretch across crewed spaceflight, the Moon, Mars, and deep-space science, all live on the operations dashboard right now.</div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><span class="key">6</span> Network status
+            <span class="badge ok">48 words</span></div>
+          <div class="path">greeting → triage → suggestions → suggestions</div>
+          <div class="brief">Deep space network briefing is online. Active dashboard consoles include Deep Space Network and NetTrek. The antennas are quiet at the moment — no spacecraft are transmitting to Earth right now, which is normal between scheduled deep-space passes. The next contact window will light the dishes back up.</div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><span class="key">7</span> Radio
+            <span class="badge ok">35 words</span></div>
+          <div class="path">greeting → triage → suggestions → suggestions</div>
+          <div class="brief">Radio briefing. The Music console is live on Space Channel, streaming featured space and ambient tracks on the web player right now. Head to the Space Channel site to tune in to the full mix.</div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><span class="key">8</span> Report a bug
+            <span class="badge ok">11 words</span></div>
+          <div class="path">greeting → triage → suggestions → collect_bug</div>
+          <div class="brief">Please describe the Space Channel issue in one or two sentences.</div>
+        </div></div>
+</main><aside><h2 style="font-size:15px;margin:0 0 8px">States (18)</h2><div class="grp"><h3>Menu Choice</h3><ul><li><span class="type t-audio">audio</span> <b>suggestions_announce</b> <span class="desc">Pre-rendered numbered Space Channel menu. Press or say a number.</span></li><li><span class="type t-menu">menu</span> <b>suggestions</b> <span class="desc">Numbered menu — caller presses or says a number (1-8) to route.</span></li></ul></div><div class="grp"><h3>Launch Status</h3><ul><li><span class="type t-action">action</span> <b>fetch_launches</b> <span class="desc">Fetch upcoming launch data from Space Channel.</span></li><li><span class="type t-audio">audio</span> <b>report_launches_audio</b> <span class="desc">Phone-safe buffered launch report.</span></li><li><span class="type t-end">end</span> <b>report_launches</b> <span class="desc">Legacy terminal (retained for compatibility; no longer entered — the launch repo</span></li><li><span class="type t-audio">audio</span> <b>launch_trouble_announce</b> <span class="desc">Pre-rendered Launch Command failure message.</span></li><li><span class="type t-end">end</span> <b>launch_trouble</b> <span class="desc">Terminal state after pre-rendered Launch Command failure message.</span></li></ul></div><div class="grp"><h3>Content Briefing</h3><ul><li><span class="type t-action">action</span> <b>fetch_space_content</b> <span class="desc">Fetch the refreshed Space Channel dashboard briefing.</span></li><li><span class="type t-audio">audio</span> <b>report_space_content_audio</b> <span class="desc">Phone-safe buffered Space Channel dashboard/topic briefing.</span></li><li><span class="type t-end">end</span> <b>space_content_done</b> <span class="desc">Legacy terminal (retained for compatibility; no longer entered — the briefing no</span></li></ul></div><div class="grp"><h3>Console Not Ready</h3><ul><li><span class="type t-audio">audio</span> <b>console_not_ready_announce</b> <span class="desc">Pre-rendered future-console not-ready message.</span></li><li><span class="type t-end">end</span> <b>console_not_ready</b> <span class="desc">Terminal state after pre-rendered future-console message.</span></li></ul></div><div class="grp"><h3>Bug Intake</h3><ul><li><span class="type t-audio">audio</span> <b>collect_bug_prompt</b> <span class="desc">Pre-rendered prompt for Space Channel bug intake.</span></li><li><span class="type t-dialog">dialog</span> <b>collect_bug</b> <span class="desc">Listen for a Space Channel bug or support report.</span></li><li><span class="type t-audio">audio</span> <b>bug_captured_audio</b> <span class="desc">Phone-safe buffered bug-captured acknowledgement.</span></li><li><span class="type t-end">end</span> <b>bug_captured</b> <span class="desc">Close after capturing the bug text.</span></li></ul></div><div class="grp"><h3>main</h3><ul><li><span class="type t-audio">audio</span> <b>greeting</b> <span class="desc">Droid opener for Space Channel network operations.</span></li><li><span class="type t-dialog">dialog</span> <b>triage</b> <span class="desc">Classify the caller&#x27;s requested Space Channel path.</span></li></ul></div></aside></div>
+</body></html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF — Companion Channel Design, v0 (texted live link) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">companion-channel-design-v0.md</span>
+<a class="raw" href="/docs/docs/companion-channel-design-v0.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF — Companion Channel Design, v0 (texted live link)</h1>
+<p><strong>Status:</strong> design handoff for the implementing Claude — open decisions marked <code>OD-Cn</code>
+<strong>Date:</strong> 2026-07-01
+<strong>Author:</strong> Fable 5 (design)
+<strong>Depends on:</strong> <code>docs/call-plan-artifact-schema-v0.md</code> (trace §6, OD-6/OD-8) and <code>docs/console-flow-map-design-v0.md</code> (L1 corridor, <code>&lt;KeypadChips&gt;</code>, OD-M3)
+<strong>Supersedes:</strong> OD-M3 (&quot;mobile observer — build nothing yet&quot;) is promoted to a first-class channel by this doc. OD-6 (trace addressing/auth) is now a prerequisite, specified in §4.</p>
+<hr />
+<h2 id="0-what-this-is">0. What this is</h2>
+<p>During a phone call, RIFF texts the caller a short-lived link. Opening it shows a live, caller-framed view of the call that advances in real time as the call does: the current step, the menu as tappable chips, slots filling in during collection, calendar results as buttons, and a booking receipt at the end. Voice remains the primary channel; the page is a synchronized companion, not a replacement.</p>
+<p>Two personas, one infrastructure:</p>
+<table>
+<thead>
+<tr>
+<th>role</th>
+<th>sees</th>
+<th>can do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>caller</strong></td>
+<td>caller-framed L1 (white-label vocabulary)</td>
+<td>follow along; <strong>tap = input</strong> (day one)</td>
+</tr>
+<tr>
+<td><strong>observer</strong></td>
+<td>engineer L1 corridor (read-only)</td>
+<td>follow along only</td>
+</tr>
+</tbody>
+</table>
+<p>Both are the per-call trace topic rendered by the L1-only mobile view already specified — the difference is the render mode and the token's role.</p>
+<h2 id="1-why-this-is-architecturally-cheap-here">1. Why this is architecturally cheap here</h2>
+<p>Everything the page needs already exists in the two contracts: the <strong>artifact</strong> carries the menu (tokens, labels, order), every asset's <code>duration_ms</code> and script <code>text_ref</code>, and the Do outcome frames; the <strong>trace</strong> carries the cursor and every decision. The companion page is a third consumer of the same stream the console and the sims consume — no new data model, no per-page backend logic. The additions are: a link service (mint/validate tokens), an SMS send, one input path, and four trace event types.</p>
+<h2 id="2-caller-view-rendering-by-node-type">2. Caller-view rendering by node type</h2>
+<p>The page is a single mobile column: header (business name, live dot), current step card, action area. It reuses <code>&lt;KeypadChips&gt;</code> — this is the component's third consumer (console keypad, corridor next-zone, companion).</p>
+<ul>
+<li><strong>say</strong> — step title + the script text from <code>text_ref</code>, revealed with a progress bar animated locally from <code>duration_ms</code> (the trace says when audio started; the page needs no audio stream). This is also the accessibility story: the caller can <em>read</em> the briefing.</li>
+<li><strong>choose</strong> — the menu as tap chips in DTMF order, exactly the keypad. Taps route from day one (§5); the &quot;press or say&quot; hint remains since voice/DTMF stay first-class.</li>
+<li><strong>collect</strong> — the slot checklist filling live from <code>collect_turn</code> events (&quot;Water heater ✓ · This week ✓ · Callback number …&quot;). This is the trust moment: the caller sees they were understood. No typed input in v0 (<code>OD-C5</code>).</li>
+<li><strong>do</strong> — spinner + hold text (&quot;checking the calendar…&quot;), then the outcome: enum frames render as buttons (three slot options as tap targets — the companion's highest-value tap), freeform frames as text.</li>
+<li><strong>end</strong> — the receipt (§6).</li>
+</ul>
+<p>Sync note: the trace leads the audio (state enters before its WAV finishes). The page must render the <em>playing</em> state with progress, never jump ahead of what the caller is hearing — the cursor is &quot;current step,&quot; not &quot;next step.&quot;</p>
+<h2 id="3-sending-the-link">3. Sending the link</h2>
+<ul>
+<li><strong>Trigger (<code>OD-C1</code>, default: offer-in-flow):</strong> a compiled offer on the hub choose — &quot;I can text you a link to follow along — press star.&quot; Star (or &quot;text me&quot;) fires the send and plays a prerendered confirm (&quot;sent — check your messages&quot;), then returns to the menu. Auto-send-on-answer exists as tenant config, default off (consent posture: someone who pressed star asked for the text; someone who merely called did not).</li>
+<li><strong>Transport:</strong> Telnyx Messaging API, sent from the same number the caller dialed (recognition + reply-ability). Texting is already operational on the Telnyx account — no registration lead time; the send is just a new call site.</li>
+<li><strong>Message:</strong> <code>{tenant display name}: follow your call live → https://r.iff/c/{token}</code> — short, branded, no marketing content (keeps the 10DLC campaign class simple).</li>
+<li><strong>Artifact delta:</strong> a per-flow <code>companion</code> block: <code>{enabled, trigger: offer|auto, offer_on: [node_ids], sms_template_ref, receipt: {…}}</code>. The offer's confirm audio is a compiled asset like any other (L0-validated).</li>
+</ul>
+<h2 id="4-links-tokens-and-the-stream-specifies-od-6">4. Links, tokens, and the stream (specifies OD-6)</h2>
+<ul>
+<li><strong>Token:</strong> HMAC-signed, encoding <code>{call_id, role: caller|observer, exp, nonce}</code>. Minted by a link service; the natural home in this stack is a Cloudflare Worker + KV (token → call routing), same pattern as the calendar OAuth worker.</li>
+<li><strong>One URL, whole lifecycle:</strong> the texted link never changes, and it always points at the Worker. <strong>Live phase:</strong> the Worker serves the real-time view (WS subscription to the trace stream) — S3 is never involved while the call is live. <strong>After <code>call_end</code>:</strong> the engine renders the receipt (§6) as static HTML to S3 under an unguessable key; the Worker thereafter 302-redirects the same texted URL to that object. Observer-role links die at <code>call_end + 5 min</code> regardless.</li>
+<li><strong>Expiry (decided):</strong> S3 lifecycle rule deletes receipt objects at <strong>30 days</strong>; the Worker's token→key KV mapping carries a matching 30-day TTL, so an expired link renders a clean &quot;expired&quot; page from the Worker rather than a raw S3 404. Interaction on the receipt is links only (<code>.ics</code>, <code>tel:</code>, future reschedule → a Worker endpoint) — taps are FSM input and exist only during the live phase.</li>
+<li><strong>Session pinning (<code>OD-C2</code>, default on):</strong> the first device to open a token binds it (cookie/nonce); subsequent opens are rejected. A leaked SMS link then can't be watched by a third party. Cost: the caller can't move devices mid-call — acceptable.</li>
+<li><strong>Stream:</strong> WebSocket subscription to the per-call trace topic on the engine bus, gated by the token. The stream is already PII-light by construction (OD-8: transcripts and tool args by ref) — the companion page never receives refs it can't resolve; the caller view resolves only <code>text_ref</code>s of assets in its own call's artifact.</li>
+<li><strong>Role filtering at the engine, not the client:</strong> caller-role subscriptions receive a filtered event set (no L0 findings, no <code>heard_open</code>, no confidences). Never ship engineer telemetry to the caller's browser and hide it with CSS.</li>
+</ul>
+<h2 id="5-taps-as-input-ships-in-the-first-caller-release">5. Taps as input (ships in the first caller release)</h2>
+<p>A tap on a chip is a third deterministic input source, arbitrated exactly like DTMF vs. voice in <code>locked_choice</code> — first valid input wins, later inputs for the same decision are dropped.</p>
+<ul>
+<li><strong>Path:</strong> tap → WS message <code>{token, node, token_id, client_seq}</code> → engine validates (role=caller, call live, cursor at that choose/do, token_id in its grammar) → injected as an input event → FSM routes.</li>
+<li><strong>Trace:</strong> <code>route_decision</code> gains <code>via: web_tap</code> in its enum. A tap during audio is a barge-in (<code>barge_in via: web_tap</code>).</li>
+<li><strong>Staleness guard:</strong> the tap carries the node it was rendered against; if the cursor has moved, the engine drops it and the page re-renders — no routing on a stale screen.</li>
+<li><strong>Why this matters beyond convenience:</strong> for any caller who opens the link, tap input is ASR-immune — T1 vanishes for that population. And Do enum frames (slot offers) as buttons is the single best UX in the booking vertical: three buttons beat a read-aloud list every time.</li>
+</ul>
+<h2 id="6-the-receipt-post-call-second-act">6. The receipt (post-call second act)</h2>
+<p>For booking flows, <code>call_end</code> with <code>disposition: completed</code> freezes the companion into a durable receipt served at the <em>same URL</em> (§4): appointment time and address, what was booked, add-to-calendar (<code>.ics</code>), tenant contact, and a reschedule affordance (<code>OD-C4</code>: reschedule = call-back link in v0; a web reschedule flow is a later product). Receipt content is drawn from the trace's slot fills and <code>tool_result</code> — no new data. For the sellable product this receipt is the most visible artifact the tenant's customers ever see; it carries the tenant's branding (white-label render mode from OD-M2).</p>
+<p><strong>Storage (decided).</strong> Unguessable random S3 key + lifecycle rule deleting at 30 days. The two phases split cleanly by capability: the <strong>live phase must terminate at the Worker</strong> (only it can hold the WebSocket, validate tokens, and accept tap input — S3 is static and can do none of this); the <strong>receipt phase is pure static hosting</strong>, which is exactly what S3 is for. At <code>call_end</code> the engine renders the final receipt HTML (from the trace's slot fills and <code>tool_result</code>), writes it to <code>s3://…/receipts/{256-bit-random}.html</code>, and stores the token→key mapping in Worker KV with a 30-day TTL matching the lifecycle rule. The unguessable key <em>is</em> the auth for the receipt (session pinning applies to the live phase only — a receipt is deliberately shareable with a spouse or office manager, so keep its PII to what a booking confirmation needs). Presigned URLs are explicitly not used: no realtime, hard 7-day SigV4 cap, and no need — deletion enforces expiry.</p>
+<h2 id="7-trace-schema-delta-amends-6-of-the-schema-spec">7. Trace schema delta (amends §6 of the schema spec)</h2>
+<p>Four event types, plus one enum extension:</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>payload</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>companion_link_sent</code></td>
+<td><code>role</code>, <code>channel: sms</code>, <code>to_ref</code>, <code>trigger: offer|auto</code></td>
+<td><code>to_ref</code>, never the raw number (OD-8)</td>
+</tr>
+<tr>
+<td><code>companion_opened</code></td>
+<td><code>role</code>, <code>pinned: bool</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>companion_closed</code></td>
+<td><code>role</code>, <code>reason: expired|call_end|error</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>companion_input_rejected</code></td>
+<td><code>reason: stale|role|invalid</code></td>
+<td>the staleness guard, visible</td>
+</tr>
+<tr>
+<td><em>(extension)</em></td>
+<td><code>route_decision.via</code> and <code>barge_in.via</code> gain <code>web_tap</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-build-order">8. Build order</h2>
+<p>Rides on trace-on-engine-bus (schema handoff step 1). Interactive ships in the first caller release — taps are not a later phase.</p>
+<ol>
+<li><strong>P0 — plumbing:</strong> per-call trace topic over WS with token gating + role filtering (this also completes the console's live wiring and OD-6 — one job, three consumers).</li>
+<li><strong>P1 — the caller release, interactive:</strong> link service (Worker + KV), SMS send via the in-flow offer, caller-framed page (say/choose/collect/do/end renderings, §2) <strong>with taps live</strong> (§5: input path, arbitration, staleness guard), observer role reusing the corridor. Demo: Space Channel for follow-along, austin_plumbing for tap-to-choose slots.</li>
+<li><strong>P2 — receipt:</strong> same-URL freeze at <code>call_end</code>, per-tenant TTL, <code>.ics</code>, tenant branding.</li>
+</ol>
+<p>Acceptance:</p>
+<ul>
+<li><strong>A1:</strong> On a live Space Channel phone call, press star → SMS arrives → open link → the page shows the current step and advances within ~1s of each state change, with say-progress matching what the ear hears.</li>
+<li><strong>A2:</strong> A second device opening the same link is rejected (pinning), and an observer-role link for the same call shows the engineer corridor read-only.</li>
+<li><strong>A3:</strong> On austin_plumbing, tapping a slot button routes the call — trace shows <code>route_decision via=web_tap</code> — and a tap raced against a spoken answer resolves to exactly one route.</li>
+<li><strong>A4 (P2):</strong> A completed booking's texted link, opened days later, 302s to the S3 receipt with a working <code>.ics</code>; opened after the 30-day lifecycle deletion, it renders the Worker's expired page (never a raw S3 404). The URL is the one from the original SMS.</li>
+</ul>
+<h2 id="9-open-decisions">9. Open decisions</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>default in v0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OD-C1</td>
+<td>Send trigger</td>
+<td>Offer-in-flow (press star); auto-send is tenant config, off.</td>
+</tr>
+<tr>
+<td>OD-C2</td>
+<td>Session pinning</td>
+<td>On. Revisit if device-switching complaints appear.</td>
+</tr>
+<tr>
+<td>OD-C3</td>
+<td>Web-only calls</td>
+<td>The companion page running <em>without</em> a phone leg (pure web session) is the existing LiveTransport story, not this doc — but the page and voice.html will converge eventually. Explicitly out of scope for v0.</td>
+</tr>
+<tr>
+<td>OD-C4</td>
+<td>Reschedule from receipt</td>
+<td>Call-back link only; web reschedule flow is a separate product decision.</td>
+</tr>
+<tr>
+<td>OD-C5</td>
+<td>Typed input into Collect from the page</td>
+<td>Deferred — it's a fourth input source with real design weight (free text racing voice). Schema unaffected today.</td>
+</tr>
+<tr>
+<td>OD-C6</td>
+<td>SSE fallback</td>
+<td>WS only in v0; add SSE if real-world networks demand it.</td>
+</tr>
+<tr>
+<td>OD-C7</td>
+<td>Receipt storage</td>
+<td><strong>Decided:</strong> unguessable random S3 key + 30-day lifecycle rule; Worker 302-redirects the texted URL post-call; KV mapping with matching 30-day TTL for a clean expired page. Live phase never touches S3.</td>
+</tr>
+</tbody>
+</table>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#0-what-this-is">0. What this is</a></li><li class="toc-h2"><a href="#1-why-this-is-architecturally-cheap-here">1. Why this is architecturally cheap here</a></li><li class="toc-h2"><a href="#2-caller-view-rendering-by-node-type">2. Caller-view rendering by node type</a></li><li class="toc-h2"><a href="#3-sending-the-link">3. Sending the link</a></li><li class="toc-h2"><a href="#4-links-tokens-and-the-stream-specifies-od-6">4. Links, tokens, and the stream (specifies OD-6)</a></li><li class="toc-h2"><a href="#5-taps-as-input-ships-in-the-first-caller-release">5. Taps as input (ships in the first caller release)</a></li><li class="toc-h2"><a href="#6-the-receipt-post-call-second-act">6. The receipt (post-call second act)</a></li><li class="toc-h2"><a href="#7-trace-schema-delta-amends-6-of-the-schema-spec">7. Trace schema delta (amends §6 of the schema spec)</a></li><li class="toc-h2"><a href="#8-build-order">8. Build order</a></li><li class="toc-h2"><a href="#9-open-decisions">9. Open decisions</a></li></ul></aside>
+</div>
+</body>
+</html>

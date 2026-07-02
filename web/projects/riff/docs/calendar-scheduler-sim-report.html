@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Calendar/Scheduler Simulator — Report &amp; Findings · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">calendar-scheduler-sim-report.md</span>
+<a class="raw" href="/docs/docs/flow-eval/calendar-scheduler-sim-report.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Calendar/Scheduler Simulator — Report &amp; Findings</h1>
+<p><strong>Date:</strong> 2026-07-02
+<strong>Audience:</strong> Fable 5 (morning review)
+<strong>What:</strong> a deterministic simulator + ~120 permutation tests over the RIFF
+calendar/scheduler <strong>offer→book loop</strong> (<code>scheduling_v1</code>, as defined in
+<code>flows/austin_plumbing.yaml</code>), and the real bug the simulator caught.</p>
+<hr />
+<h2 id="1-why-this-exists">1. Why this exists</h2>
+<p>The existing deterministic sim harness (<code>tests/test_sim_harness.py</code>) <em>deliberately
+excludes</em> the scheduling flows — &quot;they use tool calls.&quot; So the calendar path — the
+most valuable, highest-risk booking logic — had <strong>no deterministic
+permutation coverage</strong>; it was only exercised by the flaky, LLM-driven eval. This
+work closes that gap.</p>
+<h2 id="2-the-simulator-tests-scheduler-sim-py">2. The simulator (<code>tests/scheduler_sim.py</code>)</h2>
+<ul>
+<li><strong><code>FakeCalendar</code></strong> — a scriptable fake <code>schedule_event</code> backend. It mirrors the
+exact session slots the real <code>cal_provider</code> adapter mirrors, because the FSM
+guards read those slots (codex-verified contract):
+<code>_booked_event_id</code> (booking_confirmed), <code>_last_booking_error_kind==&quot;slot_conflict&quot;</code>
+(slot_busy) / other (booking_failed), empty <code>offered</code> → <code>_scheduling_offered_count==0</code>
+(no_openings), and the engine-written selected-slot trio (selected_slot_ready).
+It generates offers <strong>on whatever date the engine probes</strong>, so it is immune to
+which clock the runtime uses.</li>
+<li><strong><code>SchedulerSim</code></strong> — a no-LLM driver: loads the real production flow, enters
+<code>scheduling_triage</code>, and drives each turn through <code>run_turn</code> →
+<code>maybe_handle_locked_choice_turn</code> → the real offer engine
+(<code>maybe_prefetch_offer_slots</code> / <code>maybe_book_selected_slot</code>). <strong>Every turn asserts
+<code>adapter.calls == []</code></strong> — proving the deterministic path was exercised and the
+LLM was never touched. Fresh session per case; the fake is the only calendar.</li>
+</ul>
+<p>Driver + contract were <strong>codex-reviewed and APPROVED</strong> before implementation.</p>
+<h2 id="3-coverage-128-permutation-cases-122-pass-3-xfail-3-skip">3. Coverage — 128 permutation cases (122 pass, 3 xfail, 3 skip)</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>What it proves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Triage routing</td>
+<td>soonest / concrete-time → offer_slots; specific day → day_picker</td>
+</tr>
+<tr>
+<td>Offer presentation</td>
+<td>ordinal ↔ slot across 1–5 offer sets; 3-offer cap + speakable</td>
+</tr>
+<tr>
+<td>Happy book</td>
+<td>soonest → pick → confirm → <strong>booked</strong> (event_id), across times × picks × durations × event_ids</td>
+</tr>
+<tr>
+<td>Confirm-deny</td>
+<td>denial returns to triage and never books</td>
+</tr>
+<tr>
+<td>Different-time</td>
+<td>clears the selection, returns to triage</td>
+</tr>
+<tr>
+<td>No-openings</td>
+<td>empty availability → propose_other_days with alternative-day choices</td>
+</tr>
+<tr>
+<td><strong>Propose→recovery→book</strong></td>
+<td>soonest full → pick an alternative day that HAS room → offer_slots → <strong>booked</strong> (+ deny variant; never fabricates before an alt day is picked)</td>
+</tr>
+<tr>
+<td>Booking failure</td>
+<td>terminal failure escalates, never fabricates a booking</td>
+</tr>
+<tr>
+<td>Bug-hunt invariants</td>
+<td>empty event_id never confirms; no double-book; no-match holds the menu</td>
+</tr>
+<tr>
+<td>Conflict re-offer</td>
+<td><strong>see finding B-CAL-1 below</strong> (xfail(strict))</td>
+</tr>
+</tbody>
+</table>
+<p>All deterministic (no LLM), fast (~6s), non-flaky.</p>
+<h2 id="4-finding-b-cal-1-the-bug-the-simulator-caught">4. Finding B-CAL-1 — the bug the simulator caught</h2>
+<p><strong>Deterministic-path slot-conflict retry does not re-offer.</strong> On the
+<code>run_turn</code>/cascade path, a same-slot race at the booking <em>write</em> does <strong>not</strong> run
+<code>prepare_slot_conflict_retry</code>: the required-tool dispatch performs the
+book+confirm and leaves <code>_scheduling_state == &quot;ERROR&quot;</code> (∉ <code>PRE_BOOK_STATES</code>), so
+<code>maybe_book_selected_slot</code> skips at <code>scheduling_offer.py:360-388</code> <strong>before</strong> its own
+conflict cleanup at <code>scheduling_offer.py:529-533</code>. The stale selection survives,
+<code>scheduling_selected_slot_ready</code> re-fires, and the caller is bounced back to
+<code>scheduling_confirm_slot_hold</code> on the <strong>same dead slot</strong> (verified: 3× then
+escalate) instead of being offered fresh times.</p>
+<ul>
+<li><strong>Blast radius:</strong> the deterministic / cascade path (text, sim). The <strong>live voice
+path is unaffected</strong> — it cleans up separately in <code>session.py:2124/2248</code>.</li>
+<li><strong>Severity:</strong> bounded (it escalates, never loops forever, never fabricates a
+booking — proven by <code>test_slot_conflict_is_bounded_and_never_fabricates_booking</code>),
+but poor recovery UX on the cascade path.</li>
+<li><strong>Status:</strong> captured as two <code>xfail(strict)</code> tests asserting the <em>correct</em>
+behavior (re-offer fresh slots). <code>strict=True</code> means they flip to a hard
+failure the moment the gap is fixed — so the fix can't land without removing
+the marker. Fix deferred to operator review because it touches booking code
+shared by the live + cascade paths (double-handling risk with <code>session.py:2124</code>).</li>
+</ul>
+<p><strong>Fix decision (deliberate): keep <code>xfail(strict)</code>, defer the fix to operator +
+codex review.</strong> The correct patch is a conflict-cleanup at the top of
+<code>maybe_book_selected_slot</code> (when it is entered with <code>_last_booking_error_kind == &quot;slot_conflict&quot;</code> and no <code>_booked_event_id</code>, run <code>prepare_slot_conflict_retry</code> +
+<code>walk_transitions</code> + re-prefetch — mirroring the existing cleanup at 529-533).
+The reason it is NOT applied autonomously: that function is shared by the live
+and cascade paths, and the live session already runs its own
+<code>prepare_slot_conflict_retry</code> at <code>session.py:2124/2248</code>, so a naive early-cleanup
+risks double-handling (a double <code>walk_transitions</code>) on the live path. Landing it
+safely needs the live-path ordering validated against the full live-session +
+scheduling suites — an operator-reviewed change, not a 3am blind edit to core
+booking code. codex reproduced the bug during review; its patch recommendation
+timed out, so the fix is queued with full repro rather than guessed.</p>
+<h2 id="4b-aggregate-integration-check-whole-repo">4b. Aggregate integration check (whole-repo)</h2>
+<p>Final full-suite run on <code>main</code> with all five of the session's commits integrated:
+<strong>7,605 passed / 109 failed / 186 xfailed / 30 skipped / 5 errors</strong> (7:33). Versus
+the pre-work baseline (<code>42dd6850</code>: 7,467 passed / 110 failed / 183 xfailed), the
+net effect of everything landed this session is <strong>+138 passing, −1 failing</strong> (a
+flaky audio-pacing timing test), <strong>+3 xfailed</strong> (the B-CAL-1 strict guards).
+<strong>None of the new test files appear in the failure set</strong>; every remaining
+failure/error is pre-existing (unrelated modules: editor_preview, live_models,
+complex_flows, sim_harness, dashscope, ops_shell, and pre-existing scheduling
+flow-schema drift). Per-slice isolation was also run for the shadow work
+(zero new failures attributable). Method note: run with <code>-p no:faulthandler</code> —
+a rare native-lib (torch/sentencepiece) transient can otherwise dump on an
+unrelated test; re-runs are clean.</p>
+<h2 id="5-one-line-status">5. One-line status</h2>
+<p>The calendar path now has deterministic permutation coverage it never had; 116
+cases pass, and the simulator earned its keep on day one by catching a real
+conflict-retry gap the LLM eval would have masked.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-why-this-exists">1. Why this exists</a></li><li class="toc-h2"><a href="#2-the-simulator-tests-scheduler-sim-py">2. The simulator (tests/scheduler_sim.py)</a></li><li class="toc-h2"><a href="#3-coverage-128-permutation-cases-122-pass-3-xfail-3-skip">3. Coverage — 128 permutation cases (122 pass, 3 xfail, 3 skip)</a></li><li class="toc-h2"><a href="#4-finding-b-cal-1-the-bug-the-simulator-caught">4. Finding B-CAL-1 — the bug the simulator caught</a></li><li class="toc-h2"><a href="#4b-aggregate-integration-check-whole-repo">4b. Aggregate integration check (whole-repo)</a></li><li class="toc-h2"><a href="#5-one-line-status">5. One-line status</a></li></ul></aside>
+</div>
+</body>
+</html>

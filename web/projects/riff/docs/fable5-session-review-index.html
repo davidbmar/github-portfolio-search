@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fable 5 Review — Session Index (2026-07-02) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">fable5-session-review-index.md</span>
+<a class="raw" href="/docs/docs/flow-eval/fable5-session-review-index.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Fable 5 Review — Session Index (2026-07-02)</h1>
+<p>One entry point for the morning review. Everything below is on <code>main</code>, tested,
+and codex-reviewed. Open the linked HTML reports for detail.</p>
+<hr />
+<h2 id="what-shipped-six-commits-on-main">What shipped (six commits on <code>main</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Commit</th>
+<th>Work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>42dd6850</code></td>
+<td><code>control_event</code> §1.1 wire gate hardened (fail-closed envelope validation + per-client dedupe)</td>
+</tr>
+<tr>
+<td><code>46b2b03d</code></td>
+<td>Remote-control <strong>transport-swap shadow slice</strong> — live decision-epoch + <code>InputArbiter</code> comparison, flag-off, byte-identical</td>
+</tr>
+<tr>
+<td><code>025fd753</code></td>
+<td>Two <strong>mutation-verified</strong> shadow regression guards</td>
+</tr>
+<tr>
+<td><code>b503b348</code></td>
+<td><strong>Deterministic calendar/scheduler simulator</strong> + tests + finding B-CAL-1</td>
+</tr>
+<tr>
+<td><code>e9dce83b</code></td>
+<td>propose→recovery→book coverage (calendar suite → 122 tests)</td>
+</tr>
+<tr>
+<td><code>f0d3e5e1</code></td>
+<td>Whole-repo aggregate integration check</td>
+</tr>
+</tbody>
+</table>
+<h2 id="headline-results">Headline results</h2>
+<ul>
+<li><strong>Aggregate:</strong> 7,605 passed / 109 failed / 186 xfailed / 5 errors. Net effect
+of the whole session vs the pre-work baseline (<code>42dd6850</code>): <strong>+138 passing,
+−1 failing, +3 xfailed.</strong> No new test file is in the failure set; every
+remaining failure is pre-existing.</li>
+<li><strong>Remote-control shadow slice:</strong> zero production risk (flag off → arbiter not
+even imported; proven byte-identical by a per-slice isolation diff across
+7,500+ tests). The risky refactor is done <em>before</em> the live call so
+regressions are attributable.</li>
+<li><strong>Calendar simulator:</strong> 122 deterministic permutation tests over the offer→book
+loop — a path the existing sim harness deliberately skipped. Caught a real bug
+on day one (B-CAL-1).</li>
+</ul>
+<h2 id="the-two-reports-to-open">The two reports to open</h2>
+<ol>
+<li><strong><code>remote-control-transport-swap-quality-report.html</code></strong> — the shadow slice:
+three review-and-harden cycles, all findings + fixes, the isolation method
+(including the worktree/editable-install trap I caught and corrected),
+mutation-checked guards, known limitations.
+Companion: <strong><code>remote-control-transport-swap-handoff.html</code></strong> — the turnkey
+live-call sequence.</li>
+<li><strong><code>calendar-scheduler-sim-report.html</code></strong> — the calendar simulator, its
+coverage matrix, and finding B-CAL-1 with the recommended fix.</li>
+</ol>
+<h2 id="two-findings-handed-off-full-repro-recommended-fix-not-blind-fixed">Two findings handed off (full repro + recommended fix; NOT blind-fixed)</h2>
+<ul>
+<li><strong>Transport-swap live validation</strong> — flip <code>RIFF_INPUT_ARBITER=1</code> on a real OTA
+call, watch shadow agreement, add audio-start stamping (required before A2 can
+be claimed), then make the arbiter authoritative. Needs the operator + a live
+call.</li>
+<li><strong>B-CAL-1</strong> — on the deterministic <code>run_turn</code>/cascade path a slot-conflict at
+the booking write skips <code>prepare_slot_conflict_retry</code>, so the caller
+re-confirms the same dead slot ~3× then escalates instead of getting fresh
+offers. <strong>Live voice path is unaffected</strong> (session.py:2124). Bounded — never
+fabricates a booking (asserted). Captured as <code>xfail(strict)</code> guards; fix needs
+operator+codex review (shared live+cascade booking code → double-handling risk).</li>
+</ul>
+<h2 id="scope-discipline">Scope discipline</h2>
+<p>Gated goals — scheduler #20 (&quot;offers are quotes&quot; redesign) and quality-contract
+#21 — were <strong>not started</strong>. The parallel surface-emission WIP was not touched.
+codex was used as the review proxy throughout (one approved plan + several diff
+reviews); <code>agy</code> was not run headless.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#what-shipped-six-commits-on-main">What shipped (six commits on main)</a></li><li class="toc-h2"><a href="#headline-results">Headline results</a></li><li class="toc-h2"><a href="#the-two-reports-to-open">The two reports to open</a></li><li class="toc-h2"><a href="#two-findings-handed-off-full-repro-recommended-fix-not-blind-fixed">Two findings handed off (full repro + recommended fix; NOT blind-fixed)</a></li><li class="toc-h2"><a href="#scope-discipline">Scope discipline</a></li></ul></aside>
+</div>
+</body>
+</html>
