@@ -158,7 +158,7 @@ which clock the runtime uses.</li>
 LLM was never touched. Fresh session per case; the fake is the only calendar.</li>
 </ul>
 <p>Driver + contract were <strong>codex-reviewed and APPROVED</strong> before implementation.</p>
-<h2 id="3-coverage-128-permutation-cases-122-pass-3-xfail-3-skip">3. Coverage — 128 permutation cases (122 pass, 3 xfail, 3 skip)</h2>
+<h2 id="3-coverage-133-permutation-cases-130-pass-0-xfail-3-skip">3. Coverage — 133 permutation cases (130 pass, 0 xfail, 3 skip)</h2>
 <table>
 <thead>
 <tr>
@@ -205,65 +205,120 @@ LLM was never touched. Fresh session per case; the fake is the only calendar.</l
 </tr>
 <tr>
 <td>Conflict re-offer</td>
-<td><strong>see finding B-CAL-1 below</strong> (xfail(strict))</td>
+<td><strong>B-CAL-1 (caught → fixed):</strong> a same-slot race re-offers fresh slots → re-pick → <strong>booked</strong>; persistent conflict never fabricates a booking</td>
 </tr>
 </tbody>
 </table>
-<p>All deterministic (no LLM), fast (~6s), non-flaky.</p>
-<h2 id="4-finding-b-cal-1-the-bug-the-simulator-caught">4. Finding B-CAL-1 — the bug the simulator caught</h2>
-<p><strong>Deterministic-path slot-conflict retry does not re-offer.</strong> On the
-<code>run_turn</code>/cascade path, a same-slot race at the booking <em>write</em> does <strong>not</strong> run
-<code>prepare_slot_conflict_retry</code>: the required-tool dispatch performs the
-book+confirm and leaves <code>_scheduling_state == &quot;ERROR&quot;</code> (∉ <code>PRE_BOOK_STATES</code>), so
-<code>maybe_book_selected_slot</code> skips at <code>scheduling_offer.py:360-388</code> <strong>before</strong> its own
-conflict cleanup at <code>scheduling_offer.py:529-533</code>. The stale selection survives,
-<code>scheduling_selected_slot_ready</code> re-fires, and the caller is bounced back to
-<code>scheduling_confirm_slot_hold</code> on the <strong>same dead slot</strong> (verified: 3× then
-escalate) instead of being offered fresh times.</p>
+<p>All deterministic (no LLM), fast (~6s). <strong>Determinism note (found + fixed):</strong> an
+early re-run exposed wall-clock flakiness — a same-day 08:00 offer falls inside
+the runtime's min-advance cutoff and is filtered when the suite runs at 06:xx,
+shifting the ordinal→slot mapping. The initial &quot;clock-immune&quot; design covered the
+probe <em>date</em> but not min-advance filtering of <em>today's</em> early slots. Fixed at the
+root: <code>FakeCalendar</code> returns no slots for the earliest probed date, so every offer
+lands on a future day past min-advance — verified stable across repeated runs at
+different times. (This is why re-running tests at different times of day matters.)</p>
+<h2 id="4-finding-b-cal-1-caught-by-the-simulator-then-fixed-and-validated">4. Finding B-CAL-1 — caught by the simulator, then FIXED and validated</h2>
+<p><strong>The bug.</strong> On the <code>run_turn</code>/cascade path, a same-slot race at the booking
+<em>write</em> left the dead selection set. The required-tool dispatch books, then its
+post-book walk chains <code>book_selected_slot → slot_busy → offer_slots</code>, where
+<code>scheduling_selected_slot_ready</code> (the selection is still set at that instant)
+immediately re-fires and routes back to <code>scheduling_confirm_slot_hold</code> on the
+<strong>same conflicting slot</strong> (~3× then escalate) instead of offering fresh times. The
+<strong>live voice path was unaffected</strong> (it cleans up separately in <code>session.py:2124</code>);
+the bug was bounded — it never fabricated a booking.</p>
+<p><strong>Root-causing it took two reverted attempts.</strong> Cleanups placed in
+<code>locked_choice.py::maybe_handle_locked_choice_turn</code> (end-of-function, then after
+<code>dispatch_required_tools</code>) both still landed at <code>confirm_slot_hold</code> — proving the
+retry loop happens <em>inside <code>dispatch_required_tools</code>' own post-book walk</em>, so any
+downstream cleanup is too late. That localized the fix to the exact spot.</p>
+<p><strong>The fix</strong> (<code>riff/live_turn_controller.py</code>, in <code>dispatch_required_tools</code>):</p>
+<ol>
+<li><em>Before</em> the post-book walk — if <code>_last_booking_error_kind == &quot;slot_conflict&quot;</code>
+and nothing is booked, run <code>prepare_slot_conflict_retry</code> to clear the dead
+selection, so <code>slot_busy</code> lands the caller on <code>offer_slots</code> for a fresh pick.</li>
+<li><em>After</em> the walk — once routed to an offer state with no selection, clear the
+lingering <code>slot_conflict</code> so it can't clobber the caller's next selection on the
+rebook.
+Scoped to an unbooked <code>slot_conflict</code> (non-booking required tools unaffected); a
+no-op on the live path, which had already cleared the selection.</li>
+</ol>
+<p><strong>Validated (fix + prove no regression):</strong></p>
 <ul>
-<li><strong>Blast radius:</strong> the deterministic / cascade path (text, sim). The <strong>live voice
-path is unaffected</strong> — it cleans up separately in <code>session.py:2124/2248</code>.</li>
-<li><strong>Severity:</strong> bounded (it escalates, never loops forever, never fabricates a
-booking — proven by <code>test_slot_conflict_is_bounded_and_never_fabricates_booking</code>),
-but poor recovery UX on the cascade path.</li>
-<li><strong>Status:</strong> captured as two <code>xfail(strict)</code> tests asserting the <em>correct</em>
-behavior (re-offer fresh slots). <code>strict=True</code> means they flip to a hard
-failure the moment the gap is fixed — so the fix can't land without removing
-the marker. Fix deferred to operator review because it touches booking code
-shared by the live + cascade paths (double-handling risk with <code>session.py:2124</code>).</li>
+<li>Calendar sim <strong>125 green</strong>: conflict → <code>offer_slots</code> → re-pick → <strong>booked</strong>;
+persistent conflict re-offers and never fabricates; happy path intact. The two
+former <code>xfail(strict)</code> guards now pass; markers removed.</li>
+<li>Targeted scheduling+live suites: <strong>identical pre-existing failures with and
+without the fix</strong> (zero new) — proven by a clean-<code>HEAD</code> diff.</li>
+<li>Full suite: <strong>109 failed (same count as baseline), +15 passing.</strong> The only delta
+failure was a flaky telnyx audio-synth test unrelated to scheduling (passes on
+re-run). codex's stale-<code>_scheduling_offered_count</code> concern was checked and is
+unreachable in the conflict path (a conflict implies offers existed, so
+count &gt; 0 and <code>no_openings_for_day</code> cannot fire).</li>
 </ul>
-<p><strong>Fix decision (deliberate): keep <code>xfail(strict)</code>, defer the fix to operator +
-codex review.</strong> The correct patch is a conflict-cleanup at the top of
-<code>maybe_book_selected_slot</code> (when it is entered with <code>_last_booking_error_kind == &quot;slot_conflict&quot;</code> and no <code>_booked_event_id</code>, run <code>prepare_slot_conflict_retry</code> +
-<code>walk_transitions</code> + re-prefetch — mirroring the existing cleanup at 529-533).
-The reason it is NOT applied autonomously: that function is shared by the live
-and cascade paths, and the live session already runs its own
-<code>prepare_slot_conflict_retry</code> at <code>session.py:2124/2248</code>, so a naive early-cleanup
-risks double-handling (a double <code>walk_transitions</code>) on the live path. Landing it
-safely needs the live-path ordering validated against the full live-session +
-scheduling suites — an operator-reviewed change, not a 3am blind edit to core
-booking code. codex reproduced the bug during review; its patch recommendation
-timed out, so the fix is queued with full repro rather than guessed.</p>
+<p>This is the arc that matters for the review: the deterministic simulator <strong>caught a
+real latent bug the LLM eval would have masked, and the same harness then validated
+its fix</strong> — with a full-suite regression diff, not vibes.</p>
+<h3 id="4a-b-cal-2-a-second-bug-found-by-edge-hunting-off-the-fix">4a. B-CAL-2 — a second bug, found by edge-hunting off the fix</h3>
+<p>Probing conflict/failure edge combinations after the B-CAL-1 fix surfaced a
+follow-on: <strong>two consecutive same-slot races left the caller unable to book.</strong>
+After the first conflict, the <code>_required_tool_fired</code> latch routes the <em>second</em>
+conflict's booking through <code>maybe_book_selected_slot</code> (not <code>dispatch_required_tools</code>,
+which the B-CAL-1 fix cleared). That path re-offered fresh slots but left the
+<code>slot_conflict</code> error lingering, and it then clobbered the caller's next selection
+on the eventual rebook (booking never completed). Fix: the same cleanup one level
+over — clear the stale error after the conflict has re-offered (codex-reviewed
+<strong>SAFE</strong>; re-checks the current error value per codex's hardening nit). Validated
+the same way: sim <strong>126 green</strong> (<code>test_repeated_conflicts_then_success_books</code>),
+targeted scheduling+live zero-new, full suite <strong>108 failed / 7622 passed</strong> (zero
+new vs the B-CAL-1 baseline). Two real conflict-recovery bugs, both caught and
+fixed by the same harness.</p>
 <h2 id="4b-aggregate-integration-check-whole-repo">4b. Aggregate integration check (whole-repo)</h2>
-<p>Final full-suite run on <code>main</code> with all five of the session's commits integrated:
-<strong>7,605 passed / 109 failed / 186 xfailed / 30 skipped / 5 errors</strong> (7:33). Versus
+<p>Full-suite run on <code>main</code> <strong>with both B-CAL fixes + all new tests integrated</strong>:
+<strong>7,622 passed / 108 failed / 183 xfailed / 30 skipped / 5 errors</strong> (8:00). Versus
 the pre-work baseline (<code>42dd6850</code>: 7,467 passed / 110 failed / 183 xfailed), the
-net effect of everything landed this session is <strong>+138 passing, −1 failing</strong> (a
-flaky audio-pacing timing test), <strong>+3 xfailed</strong> (the B-CAL-1 strict guards).
-<strong>None of the new test files appear in the failure set</strong>; every remaining
-failure/error is pre-existing (unrelated modules: editor_preview, live_models,
-complex_flows, sim_harness, dashscope, ops_shell, and pre-existing scheduling
-flow-schema drift). Per-slice isolation was also run for the shadow work
-(zero new failures attributable). Method note: run with <code>-p no:faulthandler</code> —
-a rare native-lib (torch/sentencepiece) transient can otherwise dump on an
-unrelated test; re-runs are clean.</p>
+net effect of everything landed this session is <strong>+155 passing, −2 failing</strong>, and
+crucially <strong>zero new failures introduced</strong> — every remaining failure/error is
+pre-existing (unrelated modules: editor_preview, live_models, complex_flows,
+sim_harness, dashscope, ops_shell, and pre-existing scheduling flow-schema drift),
+confirmed by clean-<code>HEAD</code> regression diffs on each source change. The two B-CAL
+fixes were each validated by a targeted scheduling+live diff <strong>and</strong> a full-suite
+diff before landing; the shadow slice by a per-slice isolation diff. Method note:
+run with <code>-p no:faulthandler</code> — a rare native-lib (torch/sentencepiece) transient
+can otherwise dump on an unrelated test; re-runs are clean.</p>
+<h2 id="4c-scope-boundary-what-the-sim-does-not-cover-and-why">4c. Scope boundary (what the sim does NOT cover, and why)</h2>
+<p>The simulator covers the <strong>deterministic locked-choice offer→book loop</strong> end to
+end. It deliberately does <strong>not</strong> cover three scheduling states, and this is a
+property of the flow, not a missing test:</p>
+<ul>
+<li><code>scheduling_day_picker</code> / <code>scheduling_time_picker</code> — <code>collect</code> states that need
+LLM slot extraction to resolve a spoken day/time.</li>
+<li><code>scheduling_read_back</code> — a confirmation gate that is <strong>not</strong> a locked_choice, so
+its yes/no is resolved by the model, not the deterministic resolver.</li>
+<li><code>scheduling_collect_contact</code> — free-text contact collection (LLM).</li>
+</ul>
+<p>Driving these via <code>run_turn</code> with an empty <code>FakeAdapter</code> exhausts the adapter
+(the LLM would be called) — which is exactly why <code>test_sim_harness.py</code> also
+excludes scheduling collect states. Verified empirically. These paths belong to
+the LLM-in-the-loop eval, not a deterministic simulator; forcing them here would
+produce fragile tests. The offer engine, guards, transitions, and booking
+handshake — the high-risk logic — are fully covered deterministically.</p>
+<p><strong>The other booking module (<code>book_appointment_v1</code>, used by serene_mobile_massage
+/ skyline_apartments / tutorial_book_appointment) was investigated and is out of
+deterministic scope by design.</strong> Its <code>offer_slots</code> is a <strong>collect</strong> state (LLM
+slot-extraction), not a <code>locked_choice</code>, so <code>run_turn</code> can't drive the pick — and,
+structurally, the B-CAL bug class does not apply to it: B-CAL-1/2 were specific to
+the <code>locked_choice</code> <strong>auto-advance re-fire</strong> (a stale <code>scheduling_selected_slot_ready</code>
+bouncing the caller back to confirm). <code>book_appointment_v1</code>'s collect-based
+<code>offer_slots</code> has no such auto-advance guard, so a same-slot race there simply
+routes <code>slot_busy → fetch_offer</code> and waits for a fresh (LLM-driven) pick. Its
+booking-race behavior is therefore eval territory, not a deterministic-sim gap.</p>
 <h2 id="5-one-line-status">5. One-line status</h2>
 <p>The calendar path now has deterministic permutation coverage it never had; 116
 cases pass, and the simulator earned its keep on day one by catching a real
 conflict-retry gap the LLM eval would have masked.</p>
 
 </main>
-<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-why-this-exists">1. Why this exists</a></li><li class="toc-h2"><a href="#2-the-simulator-tests-scheduler-sim-py">2. The simulator (tests/scheduler_sim.py)</a></li><li class="toc-h2"><a href="#3-coverage-128-permutation-cases-122-pass-3-xfail-3-skip">3. Coverage — 128 permutation cases (122 pass, 3 xfail, 3 skip)</a></li><li class="toc-h2"><a href="#4-finding-b-cal-1-the-bug-the-simulator-caught">4. Finding B-CAL-1 — the bug the simulator caught</a></li><li class="toc-h2"><a href="#4b-aggregate-integration-check-whole-repo">4b. Aggregate integration check (whole-repo)</a></li><li class="toc-h2"><a href="#5-one-line-status">5. One-line status</a></li></ul></aside>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-why-this-exists">1. Why this exists</a></li><li class="toc-h2"><a href="#2-the-simulator-tests-scheduler-sim-py">2. The simulator (tests/scheduler_sim.py)</a></li><li class="toc-h2"><a href="#3-coverage-133-permutation-cases-130-pass-0-xfail-3-skip">3. Coverage — 133 permutation cases (130 pass, 0 xfail, 3 skip)</a></li><li class="toc-h2"><a href="#4-finding-b-cal-1-caught-by-the-simulator-then-fixed-and-validated">4. Finding B-CAL-1 — caught by the simulator, then FIXED and validated</a></li><li class="toc-h3"><a href="#4a-b-cal-2-a-second-bug-found-by-edge-hunting-off-the-fix">4a. B-CAL-2 — a second bug, found by edge-hunting off the fix</a></li><li class="toc-h2"><a href="#4b-aggregate-integration-check-whole-repo">4b. Aggregate integration check (whole-repo)</a></li><li class="toc-h2"><a href="#4c-scope-boundary-what-the-sim-does-not-cover-and-why">4c. Scope boundary (what the sim does NOT cover, and why)</a></li><li class="toc-h2"><a href="#5-one-line-status">5. One-line status</a></li></ul></aside>
 </div>
 </body>
 </html>

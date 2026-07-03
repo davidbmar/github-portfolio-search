@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Companion Surface Design, v0 — the caller&#x27;s second screen · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">companion-surface-design-v0.md</span>
+<a class="raw" href="/docs/docs/companion-surface-design-v0.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Companion Surface Design, v0 — the caller's second screen</h1>
+<p><strong>Status:</strong> design handoff for the implementing Claude — open decisions marked <code>OD-CSn</code>
+<strong>Date:</strong> 2026-07-02
+<strong>Responds to:</strong> <code>2026-07-02-companion-surface-fable5-brief.md</code>; supersedes the bespoke Space Channel page as the caller-facing target
+<strong>Depends on:</strong> companion-channel-design (link/token/receipt), remote-control-design (InputEvent, arbiter, surface schema, capability tiers), scheduler-design (offers as quotes), quality-contract (RunRecords), flow-blueprint-shift-left (skeleton-provided correction routes)
+<strong>Two invariants carried throughout:</strong> the call is always voice-complete (I7), and every web action is just another deterministic input to the same router (I8/R6).</p>
+<hr />
+<h2 id="1-product-principle-and-use-cases">1. Product principle and use cases</h2>
+<p><strong>Principle:</strong> the page is a live sign board plus a shared memory. It renders exactly what the compiled artifact says the current station offers (never inventing controls — R4), and it externalizes what RIFF believes so the caller can catch errors before they become bookings. Its core loop is bidirectional reflection:</p>
+<ul>
+<li><strong>Say it, see it.</strong> A spoken answer appears as a fact chip within ~1s of the <code>collect_turn</code> event.</li>
+<li><strong>Tap it, hear it.</strong> A tap routes through the shared arbiter; the FSM's next spoken state is the acknowledgment. The screen and the ear always agree on where the call is.</li>
+</ul>
+<p>Use cases A–F from the brief are adopted verbatim as the scope: menu mirror, offers-as-buttons, visible facts, form assist, progress/outcome, receipt.</p>
+<h2 id="2-current-state-assessment">2. Current-state assessment</h2>
+<p>The foundation is real and tested: InputEvent normalization + <code>InputArbiter</code> (first-valid-wins, stale/locked/invalid drops), the flag-gated <code>companion_control</code> WS path with dedupe and per-call scoping, <code>riffc</code> surface emission with L0-10/11/12, public scoped endpoints, and endpoint/control test suites. The gaps are exactly the brief's list: <code>_companion_spec_provider</code> returns <code>None</code> (control frames drop cleanly but never route), the page is Space Channel-bespoke with a hardcoded label map, no generic surface renderer, no tap send path, no forms, no trust panel, no offer rendering. Assessment: <strong>this is a wiring-and-renderer project, not an architecture project</strong> — the design below adds no new engine concepts, only the caller-facing contract and its rendering rules.</p>
+<h2 id="3-caller-page-information-architecture">3. Caller page information architecture</h2>
+<p>Three fixed bands, one mobile column, one-handed (R13):</p>
+<pre><code>┌──────────────────────────────┐
+│ ① IDENTITY   Bella's · ● live │   tenant name/logo · status dot
+├──────────────────────────────┤
+│ ② NOW (dominant)              │   the active surface card —
+│    renders §4 by surface kind │   the ONLY primary-action zone
+├──────────────────────────────┤
+│ ③ WHAT WE HAVE                │   trust panel: fact chips
+│    ✓ Problem: water heater    │   (confirmed / heard / pending)
+│    ◌ Address: 114 Red River…  │   chips carry a &quot;fix&quot; affordance
+│    · Callback: pending        │
+└──────────────────────────────┘
+</code></pre>
+<p>Rules: exactly one primary-action zone (the NOW card); the facts band never contains primary actions except per-chip &quot;fix&quot;; transient alerts (stale tap, reconnecting) render as a slim banner between ① and ②, never as modals; at <code>call_end</code> the receipt replaces the whole column. Buttons ≥48px targets, ≥16px body text, 4.5:1 contrast, DTMF order preserved, <code>aria-live=&quot;polite&quot;</code> on the NOW card, motion respects <code>prefers-reduced-motion</code>.</p>
+<p><strong>Fact states (answers Q2/Q3, encodes R8):</strong></p>
+<ul>
+<li><strong>heard</strong> (outline chip): the extractor produced it this turn (<code>collect_turn.slots_delta</code>); provisional by design.</li>
+<li><strong>confirmed</strong> (solid chip, check): survived a read-back confirm or was consumed by a committed action.</li>
+<li><strong>pending</strong> (ghost row): declared in the flow, not yet collected.
+No raw transcript on the caller page in v0 (OD-CS1 adopted); no confidences, no ASR fragments, no engineer telemetry — server-side filtering per R7, §6.</li>
+</ul>
+<h2 id="4-screen-designs-by-surface-kind">4. Screen designs by surface kind</h2>
+<ul>
+<li><strong>media (say):</strong> current script line (from asset <code>text</code>), local progress bar animated from <code>duration_ms</code> + <code>started_at_seq</code>. No controls in v0 (&quot;repeat&quot; is a later token). Taps on visible menu remnants during audio are legal — a tap during play is a <code>barge_in {via: web_tap}</code>.</li>
+<li><strong>menu (choose):</strong> one button per control, DTMF order. <strong>Label = words; a small keycap badge shows the digit</strong> ([1] Launches) so &quot;press 2 for news&quot; and the second button are visibly the same thing (answers Q5 — cross-modal coherence beats prettier labels). &gt;6 controls: top 5 + &quot;More options&quot; expander. Tapped button → pending spinner state; card advances only on the next <code>surface_state</code> (server truth, §9).</li>
+<li><strong>form (collect):</strong> widgets from slot types (phone→tel, date/time→native, enum→chips, text/address→field); slot checklist mirrors the facts band; a single Submit emits one atomic <code>submit</code>. The voice path stays live — fields fill from speech in real time (<code>slots_delta</code> populates the form), and the caller can finish either way; first completion wins per the arbiter. Voice fallback on timeout is the flow's existing behavior, untouched (R9/I7).</li>
+<li><strong>progress (do):</strong> hold text from the compiled hold asset + spinner + elapsed; <strong>never tool args or internals</strong> (R7, OD-CS7). Deadline breach renders whatever the flow's failure route renders — the screen has no failure UI of its own.</li>
+<li><strong>choice (do outcome / confirm):</strong> outcome frames or offers as buttons. <strong>Offer card contract (answers Q6):</strong> ordinal badge matching the spoken option number (1/2/3), weekday + date, start time large, duration/arrival-window secondary, business timezone shown compactly (&quot;2:30 PM CT&quot;); tap sends <code>{type: &quot;tap&quot;, payload: {node, token: offer_id}}</code> — the offer_id <em>is</em> the token (R10/I9). A &quot;none of these work&quot; control is rendered iff the flow's grammar has that token.</li>
+<li><strong>receipt (end):</strong> per companion-channel §6 — appointment, service, address, callback, tenant contact, <code>.ics</code>; PII limited to what a confirmation needs; shareable by design (pinning is live-phase only).</li>
+<li><strong>challenge (commit):</strong> the OD-R6 protocol verbatim — 4-digit code rendered on this session only, &quot;enter it on your phone keypad,&quot; 30s countdown, two attempts. v0 flows mark nothing commit-tier (OD-R1 stands; see §12).</li>
+<li><strong>alert:</strong> stale tap → &quot;That screen was out of date — use the current options below&quot; + refreshed card; WS drop → &quot;Still connected by phone&quot; banner + silent retry; expired → expired page; second device → &quot;This link is open on another device.&quot;</li>
+</ul>
+<h2 id="5-control-event-and-active-surface-contract">5. Control-event and active-surface contract</h2>
+<p>Adopt the brief's frames with these deltas:</p>
+<p><strong><code>surface_state</code> (server→client), the single rendering input:</strong></p>
+<ul>
+<li><code>caller_context</code> → renamed <strong><code>facts</code></strong>, shaped <code>{confirmed: {...}, heard: {...}, pending: [...]}</code> to carry the three-state model.</li>
+<li>Add <code>alert: {kind, text} | null</code> (server-driven alert band) and <code>receipt_url</code> on ended.</li>
+<li><code>audio {asset_id, text, duration_ms, started_at_seq}</code> as specced — the read-along contract (§7).</li>
+<li>Emitted on every <code>state_enter</code>, every <code>slots_delta</code>, and every fact-state transition; idempotent (client renders latest, keyed by <code>decision_epoch</code>).</li>
+</ul>
+<p><strong>Client→server:</strong> <code>tap</code> and <code>submit</code> exactly as the brief's frames (client_seq, decision_epoch, node — R5). New third type: <strong><code>fix {slot}</code></strong> — the correction request (§9). No <code>text</code> type in v0 (OD-R3 stands).</p>
+<p><strong>Routing:</strong> all three land in the existing <code>companion_control</code> seam → <code>InputEvent</code> → the shared <code>InputArbiter</code> (build item: the live session must share one arbiter across voice/DTMF/tap — brief §10 item 5 — and <code>_companion_spec_provider</code> must return the active node's locked-choice spec, item 4). Nothing new; the seam exists and is tested.</p>
+<h2 id="6-privacy-pii-token-role-session-pinning">6. Privacy, PII, token, role, session pinning</h2>
+<p>All inherited and restated as the checklist the implementation is tested against: server-side projection only (R7 — the caller stream never contains confidences, <code>heard_open</code>, tool args, or other calls' data); slot visibility is declarative — slot_types gains <code>caller_visible: bool</code> (default true) and <code>caller_display</code> formatting hints (phone formatting etc.), and the facts projection consumes them; tokens/roles/pinning per companion-channel §4 (pinning live-phase only; receipt shareable with minimal PII); wrong <code>?call=</code> yields nothing (existing test stands); observer role gets the engineer stream, never this page.</p>
+<h2 id="7-audio-read-along-contract-answers-q14">7. Audio / read-along contract (answers Q14)</h2>
+<p>Pre-rendered assets are the timing spine (R12): menus, holds, confirms, read-backs, link-sent/failed, and safety prompts ship as compiled assets with <code>text</code> + <code>duration_ms</code>; the page renders the text and animates progress locally from <code>started_at_seq</code> — no audio streaming to the page, ever. Slot-TTS fragments render as the template text with bound values. <strong>The page never advances the NOW card ahead of the server frame</strong> (R3): trace may know the next state, but <code>surface_state</code> for epoch N+1 is withheld until the engine commits the transition — the existing say-watchdog already bounds that. Progress bars are cosmetic; epochs are truth.</p>
+<h2 id="8-scheduler-offer-rendering-contract">8. Scheduler-offer rendering contract</h2>
+<p>Covered in §4-choice, plus: offers arrive in <code>surface_state</code> already shaped by the Do's <code>tool_result</code> (offer_ids + display fields — the page computes nothing about time); a tap that loses the re-validation race (offer taken mid-decision) is <em>not</em> an error surface — the flow's compiled <code>offer_invalid → re-offer</code> route (blueprint L0-16) drives the next <code>surface_state</code>, and the page just renders it; a caller volunteering a different time does it by voice in v0 — the screen offers no freeform time entry (R10; revisit with <code>text</code> events).</p>
+<h2 id="9-error-stale-input-and-correction-behavior">9. Error, stale-input, and correction behavior</h2>
+<ul>
+<li><strong>Stale/locked/invalid/duplicate:</strong> dropped server-side by the arbiter (<code>input_dropped</code>), surfaced client-side per §4-alert. Buttons disable the instant a new epoch's <code>surface_state</code> arrives, shrinking the stale window to network latency.</li>
+<li><strong>Pending-not-optimistic (ruling):</strong> a tapped control shows a pending state; the card advances only on the server frame. Keeps screen/audio synchronized, makes stale handling coherent, and the ~300ms pending read is &quot;the call heard you.&quot;</li>
+<li><strong>Correction path (answers Q4), three tiers:</strong>
+<ol>
+<li><strong>v0 always:</strong> read-back confirm states — decline routes to re-collect (exists today).</li>
+<li><strong>v0 when active:</strong> while a collect state owns a slot, <code>submit</code> overwrites it (typed slots only, OD-CS3).</li>
+<li><strong>Blueprint-provided:</strong> the <code>fix {slot}</code> event routes iff the flow compiled a <code>fix_{slot}</code> route — the booking blueprint skeleton ships these, so random-access correction arrives fleet-wide via blueprint certification, not per-flow work. A <code>fix</code> on a flow without the route → <code>input_dropped {reason: invalid}</code> + alert &quot;You can correct that at the confirmation step.&quot; The screen never teleports the call; the FSM owns flow.</li>
+</ol>
+</li>
+</ul>
+<h2 id="10-build-order-for-the-implementing-claude">10. Build order for the implementing Claude</h2>
+<p>Adopt the brief's §10 sequence with two re-orderings and the reasons: <strong>(4) live spec provider and (5) shared arbiter move ahead of (3) tap send</strong> — taps without a routing spec drop silently and prove nothing; wire the seam, then the buttons. And <strong>(1) active surface provider</strong> should emit the <code>facts</code> three-state shape from day one, even before the trust panel renders it, so RunRecords capture fact transitions from the first live test. Resulting order: surface provider → generic renderer (media/menu first) → spec provider + shared arbiter → tap path → submit + forms → trust panel → offers → receipt swap-in → fix routes (blueprint-gated) → evidence hardening.</p>
+<h2 id="11-acceptance-tests-and-runrecord-evidence">11. Acceptance tests and RunRecord evidence</h2>
+<p>The brief's §11 list is adopted in full. Additions binding it to the Quality Contract: every acceptance run emits a RunRecord whose evidence includes rendered-surface ids + epochs (server-logged at emission, so &quot;what the page showed&quot; is provable without trusting the client), all <code>input_dropped</code> events with reasons, audio <code>started_at_seq</code>/duration vs. <code>audio_done</code> deltas (read-along sync evidence), and fact-state transition events. <strong>Parity evidence (answers Q15):</strong> L1 gains a <em>companion persona</em> — a scripted tap driver alongside the voice/DTMF personas — and parity means: same scenario driven by voice vs. taps yields identical route sequences, identical terminal, identical booked <code>offer_id</code>; the parity comparison is a Layer-1 invariant (INV: modality parity), so a divergence is a hard fail with class <code>transport</code> or <code>flow_logic</code>, not a judgment call.</p>
+<h2 id="12-open-decisions-with-defaults">12. Open decisions with defaults</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OD-CS1</td>
+<td>Raw transcript</td>
+<td>Off in v0; script text + facts only. Revisit only with a privacy design.</td>
+</tr>
+<tr>
+<td>OD-CS2</td>
+<td>Link trigger</td>
+<td>Offer-in-flow; add <em>contextual</em> offers at high-value states (entering address collect, offer presentation: &quot;I can text you a link so you can see these times&quot;) as compiled blueprint states. Auto-send stays tenant-config, off.</td>
+</tr>
+<tr>
+<td>OD-CS3</td>
+<td>Typed input</td>
+<td>Typed submit for typed slots only; voice fallback mandatory (unchanged).</td>
+</tr>
+<tr>
+<td>OD-CS4</td>
+<td>Second device</td>
+<td>Pin live; receipt shareable with minimal PII (unchanged).</td>
+</tr>
+<tr>
+<td>OD-CS5</td>
+<td>Branding</td>
+<td>Theme tokens only {name, logo, color pair, contact}; <strong>compile-time contrast check on the tenant color pair</strong> (an inaccessible theme is an L0 error, not a support ticket). No renderer forks.</td>
+</tr>
+<tr>
+<td>OD-CS6</td>
+<td>Commit challenge</td>
+<td><strong>Amended to match OD-R1:</strong> v1 booking confirms are tap-tier (read-back + explicit yes is the safety); challenge activates with cancel/reschedule/payment. The flip is a one-line artifact change (<code>surface.tier: commit</code>), designed and tested now, dormant.</td>
+</tr>
+<tr>
+<td>OD-CS7</td>
+<td>Tool status</td>
+<td>Caller-safe progress only (unchanged).</td>
+</tr>
+<tr>
+<td>OD-CS8</td>
+<td>Web-only calls</td>
+<td>Out of v0 (unchanged).</td>
+</tr>
+<tr>
+<td>OD-CS9</td>
+<td>Correction scope</td>
+<td>Tiers 1–2 in v0; tier 3 (<code>fix_{slot}</code>) ships with the booking blueprint, not per-flow.</td>
+</tr>
+<tr>
+<td>OD-CS10</td>
+<td>Tap during audio</td>
+<td>Allowed = barge-in (<code>barge_in {via: web_tap}</code>), consistent with DTMF barge-in.</td>
+</tr>
+<tr>
+<td>OD-CS11</td>
+<td>Optimistic rendering</td>
+<td>Never advance the card client-side; pending state only.</td>
+</tr>
+</tbody>
+</table>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-product-principle-and-use-cases">1. Product principle and use cases</a></li><li class="toc-h2"><a href="#2-current-state-assessment">2. Current-state assessment</a></li><li class="toc-h2"><a href="#3-caller-page-information-architecture">3. Caller page information architecture</a></li><li class="toc-h2"><a href="#4-screen-designs-by-surface-kind">4. Screen designs by surface kind</a></li><li class="toc-h2"><a href="#5-control-event-and-active-surface-contract">5. Control-event and active-surface contract</a></li><li class="toc-h2"><a href="#6-privacy-pii-token-role-session-pinning">6. Privacy, PII, token, role, session pinning</a></li><li class="toc-h2"><a href="#7-audio-read-along-contract-answers-q14">7. Audio / read-along contract (answers Q14)</a></li><li class="toc-h2"><a href="#8-scheduler-offer-rendering-contract">8. Scheduler-offer rendering contract</a></li><li class="toc-h2"><a href="#9-error-stale-input-and-correction-behavior">9. Error, stale-input, and correction behavior</a></li><li class="toc-h2"><a href="#10-build-order-for-the-implementing-claude">10. Build order for the implementing Claude</a></li><li class="toc-h2"><a href="#11-acceptance-tests-and-runrecord-evidence">11. Acceptance tests and RunRecord evidence</a></li><li class="toc-h2"><a href="#12-open-decisions-with-defaults">12. Open decisions with defaults</a></li></ul></aside>
+</div>
+</body>
+</html>

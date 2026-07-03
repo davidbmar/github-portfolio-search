@@ -1,22 +1,147 @@
 {
-  "generated_at": "2026-07-02T10:02:11.083087Z",
-  "count": 156,
+  "generated_at": "2026-07-03T09:57:48.055040Z",
+  "count": 157,
   "days": [
     {
-      "date": "2026-07-02",
-      "headline": "Hardened Remote Control Protocol and Live Companion Tracing",
-      "summary": "Implemented a strongly-typed remote control layer with deterministic scheduling tests and A2/A4 security proofs. Added real-time companion tracing with strict call isolation and PII-scrubbed WebSocket feeds for live session monitoring.",
+      "date": "2026-07-03",
+      "headline": "Build-Time WhisperX Alignment and Shift-Left Linting for Deterministic Voice UIs",
+      "summary": "This update introduces a build-time WhisperX toolchain for word-level audio alignment and enforces strict shift-left linting gates for scheduling offers. It also hardens the companion interface with deterministic menu controls, grounded phone validation, and robust client-server payload contracts.",
       "takeaways": [
-        "Reuse the deterministic calendar simulator and ~120 permutation tests to validate complex scheduling recovery arcs.",
-        "Adopt the strong-typing schema enforcement (runtime enum checks, unified type rejection) to prevent conflicting declarations in data layers.",
-        "Implement the public per-call trace WebSocket pattern to provide PII-scrubbed, real-time state updates for live user sessions."
+        "Implement a build-only WhisperX alignment tool to generate word-timing manifests for static audio assets, enabling precise karaoke-style read-along features without runtime overhead.",
+        "Adopt shift-left linting gates that enforce schema declarations (e.g., kind:time_select) at compile time to prevent invalid scheduling offers and reduce runtime errors.",
+        "Reuse the _grounded_phone utility to validate and reject fabricated phone digits in live update paths, preventing hallucination risks in tool handlers.",
+        "Apply deterministic digit-anchored control timings and hardened menu-announce heuristics to ensure consistent UI state and eliminate false-positive announcements across voice flows."
       ],
-      "total_commits": 43,
+      "total_commits": 44,
       "repos": [
         {
           "name": "riff",
-          "commits": 43,
+          "commits": 44,
           "messages": [
+            "backlog: B-323 — ADR-0007 violation in locked_choice (codex-verified fix plan)",
+            "test: fix stale collect_day reference in static_audio state API test",
+            "B-304: reject fabricated phone digits in the live update_slots path (grounding guard)",
+            "triage(B-304): de-risk the phone-hallucination fix — reuse _grounded_phone, wire into tool_handler",
+            "docs(F-362): SHIPPED — shift-left lint gate for scheduling offers, with evidence",
+            "F-362: lint gate — scheduling offers MUST declare kind:time_select (shift-left)",
+            "F-361 step 3: dispatch on declared kind:time_select (legacy gate as fallback)",
+            "F-361 step 2: extract TimeSelectResolver (behavior-preserving)",
+            "docs(F-361): progress log — plan+codex review, Step 1 shipped with evidence",
+            "F-361 step 1: additive locked_choice 'kind' selector field (shift-left validated)",
+            "backlog: F-366 — companion subflows/reports show correct spoken text (runtime push)",
+            "shift-left: make auto-align opt-in (build paths only) + boot prereq check",
+            "shift-left: prerender auto-aligns new audio + committed Playwright render harness",
+            "companion: deterministic per-key menu highlight (digit-anchored control_timings)",
+            "timing(piece 6): alignment reproducibility guard (real audio)",
+            "docs: Jony Ive caller-orientation review of the companion page",
+            "timing(piece 5, client half): companion read-along consumes acoustic word_timings",
+            "timing(piece 3): shift-left gate — suite fails if any say/menu asset is untimed",
+            "timing: backfill word_timings for all 54 static-audio assets (+ prerendered WAVs)",
+            "timing piece 2: word-timing manifest backfill (build hook), tested + validated",
+            "timing piece 1: build-only WhisperX word-alignment tool (validated on real audio)",
+            "docs(spec): incorporate full codex review (verdict: revise-then-build)",
+            "docs(spec): feasibility spike GREEN + dependency-isolation finding",
+            "docs(spec): revise timing spec per codex design review — 3 substantive corrections",
+            "riffc(L0-11): fix over-strict voice-path rule — recognize upstream + LLM-driven prompts",
+            "flows(tutorials): type the untyped collect slots (L0-10)",
+            "docs(spec): word-level karaoke timing design (WhisperX build-time alignment, shift-left)",
+            "companion: harden menu-announce heuristic — no welcome/confirm false-positives (all 60 flows)",
+            "companion: shift-left fix for two menu bugs — correct by construction in the compiler",
+            "test(companion): lock network-resilience invariants after an adversarial robustness audit",
+            "test(companion): CI backstop for the client page (JS balance + security invariants)",
+            "companion: fix route-slot leak + empty receipt (Ive third-pass P0/P1)",
+            "test(companion): lock the client↔server payload contract (menu→keypad, media→karaoke)",
+            "companion: second-pass Ive polish — announce changes, honest keypad, phase + label fixes",
+            "fix(regression): revert auto_send_companion — a side-effecting SMS act-state stalls the deterministic path",
+            "riffc: commit the surface renderer (A1) + L0-10/11/12 rules the branch imports",
+            "companion: honest karaoke + 'heard' framing with correction (Ive P1-1/P1-2)",
+            "companion: caller orientation (phase strip + elapsed) + remote-control item 3 (spec provider)",
+            "companion: phone-first redesign — keypad menus (gold read-along) + content hero",
+            "space_channel: option 0 — Jokes (random clean joke, deterministic, no LLM)",
+            "companion: karaoke read-along + live slot echo (generic, all flows)",
+            "feat(companion): auto-text the follow-along link at call start (Space Channel + property mgmt)",
+            "quality(RunRecord #5): retroactive audit — the whole contract over real §6 traces",
+            "quality(RunRecord #4): promotion gate — a pure function over RunRecords"
+          ]
+        }
+      ],
+      "commit_sig": "b1aa50205b969e44"
+    },
+    {
+      "date": "2026-07-02",
+      "headline": "Builds Deterministic Voice Scheduler with Provable Remote Control",
+      "summary": "This update implements a deterministic calendar booking engine with conflict recovery and introduces a secure, content-addressed remote control layer for voice interfaces. It establishes hard invariants for input arbitration and provides real-time, PII-scrubbed companion surfaces for live call monitoring.",
+      "takeaways": [
+        "Implement deterministic state machines for voice bookings by normalizing LLM time ranges to ISO formats and enforcing 'one-route-winner' invariants to prevent race conditions.",
+        "Reuse the InputArbiter pattern for multi-modal inputs (DTMF/voice/tap) by applying monotonic epoch tracking and strict capability locking to ensure thread-safe, first-valid-wins arbitration.",
+        "Adopt content-addressed RunRecords to create provable execution verdicts, enabling auditable traces where unprovable passes are treated as failures for higher reliability.",
+        "Deploy PII-scrubbed WebSocket companions that mirror live call states to mobile surfaces, using strict call-ID scoping to isolate concurrent user sessions securely."
+      ],
+      "total_commits": 96,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 95,
+          "messages": [
+            "test: regen space_channel riffc golden after companion_confirm → locked_choice",
+            "fix(demo_hub): companion confirm is deterministic yes/no (same stall fix as Space Channel)",
+            "fix(space_channel): companion confirm is now deterministic yes/no (fixes stall + voice)",
+            "quality(RunRecord #3): Layer 1 hard invariants — one-route-winner (I8) + no-long-silence",
+            "F-365 slice 1: companion page renders the current menu (read-only surface mirror)",
+            "quality(RunRecord #2): the RunRecord proof object — content-addressed, provable-verdict",
+            "docs+backlog: Companion Surface design v0 (F-365, remote-control item 3)",
+            "quality(RunRecord #1): §6 trace-grammar validator — \"unprovable pass is a fail\"",
+            "calendar(read): caller-ID-scoped appointment listing — scope + isolation core",
+            "test(demo_hub): integration-level menu navigation (real evaluator, not just structure)",
+            "demo_hub: smoother greeting that leads into the menu",
+            "docs: add live-phone hidden-schedule + demo_hub to the Fable 5 index",
+            "demo_hub: declare caller_phone semantic_type (slot-type ratchet)",
+            "demo_hub: consolidated tutorial line (menu → book / verify / text-follow-along)",
+            "space_channel: regen riffc golden + declare booking-slot semantic_types",
+            "test(space_channel): lock in the hidden \"schedule\" jump (live-flow regression guard)",
+            "space_channel: HIDDEN \"schedule\" option → jumps into the booking flow",
+            "docs: test runbook for the calendar shift-left + companion remote-control work",
+            "docs(cleanup): mark scheduling_v1 DEPRECATED as a booking engine",
+            "docs: refresh Fable 5 index with the calendar shift-left + companion + humanness work",
+            "docs(cleanup): fix drifted book-appointment tutorial (removed triage states)",
+            "docs(design): Calendar Companion — live offer mirror (v0)",
+            "remote-control item 2: companion-WS control wire (tap→§1.3 ladder) + hardening",
+            "feat(calendar shift-left): load-time guardrail — calendar mutations must be verified",
+            "docs(spec+backlog): ground calendar auth in the precompiler; gate F-364 RunRecord",
+            "docs(spec): calendar concierge + calendar-action modules design",
+            "fix(humanness): stop speaking \"(internal)\" placeholder lines on booking act-states",
+            "docs: calendar flows & tutorials walkthrough (+ index fix, scheduler docs linked)",
+            "test(scheduler): pin the time_range fix at the tool boundary (acceptance #4)",
+            "docs: fold P1 time_range fix into the Fable 5 morning index (+ honest branch/rigor notes)",
+            "scheduler(P1): time_range fast-path — normalize LLM ranges/ISO instead of hard-escalating",
+            "docs: scheduler use-cases + capability scope for Fable 5 v0 design",
+            "docs: link the runnable time_range repro test into the scheduler problem statement",
+            "test(scheduler): repro + regression guard for the time_range booking fragility",
+            "docs: problem statement — scheduler demo booking fragility (for Fable 5)",
+            "docs: refresh Fable 5 index — Space Channel feature + final aggregate (7622/108)",
+            "space_channel: advertise \"text follow along\" in the menu + return to main menu after send",
+            "docs(scheduler): document book_appointment_v1 investigation (out of deterministic scope)",
+            "docs(scheduler): refresh aggregate to final state (both B-CAL fixes: 7622 pass/108 fail, zero new)",
+            "docs(scheduler): update sim coverage count to 130 (thorough conflict/rejection/recovery)",
+            "test(scheduler): rejection-exhaustion + deny-during-recovery coverage",
+            "test(scheduler): lock in conflict/failure during the recovery path",
+            "docs: record B-CAL-2 (second conflict-recovery bug) caught + fixed",
+            "fix(scheduler): B-CAL-2 — clear lingering slot_conflict on repeat consecutive races",
+            "docs: B-CAL-1 is fixed + validated — update report + Fable 5 index",
+            "fix(scheduler): B-CAL-1 — re-offer fresh slots on a same-slot booking race",
+            "docs(scheduler): localize B-CAL-1 root cause to dispatch_required_tools' post-book walk",
+            "docs(scheduler): record the B-CAL-1 fix attempt + the flakiness found/fixed",
+            "test(scheduler): fix wall-clock flakiness in the calendar sim harness",
+            "docs: add control_router to the Fable 5 session index",
+            "control_router: §1.3 validity-ladder composition (control_event → arbiter/capability)",
+            "docs(scheduler): document the sim's deterministic scope boundary",
             "docs: Fable 5 session review index (single entry point for the morning)",
             "docs(scheduler): record the whole-repo aggregate integration check",
             "test(scheduler): cover the propose-other-days recovery→book arc",
@@ -63,7 +188,7 @@
           ]
         }
       ],
-      "commit_sig": "e4da49203aeacf4d"
+      "commit_sig": "05d01e8da9824798"
     },
     {
       "date": "2026-07-01",
@@ -3295,15 +3420,14 @@
     },
     {
       "date": "2026-05-11",
-      "headline": "Quality Gates, Task Brokers, and Voice-Agent Evidence Ladders",
-      "summary": "The day advanced the intelligence briefing toolkit from corpus cutover into guarded merge workflows: a live UFO graph expanded from 7 to 1,481 entities, nightly G1-G4 quality gates were wired, and S1.7 added atomic provenance plus dry-run merge audits with a decision-file gate. Riff and switchboard-ai focused on operationalizing voice-agent validation with task broker/inbox workflows, ladder evidence checks, OTA artifact bundles, and Austin Plumbing runbooks and matrices.",
+      "headline": "Scale Knowledge Graphs and Harden Agent Switchboards with L3 Evidence Gates",
+      "summary": "The intelligence toolkit expanded its UFO graph to 1,481 entities while implementing atomic provenance and dry-run audit gates. Concurrently, the Riff and Switchboard systems hardened agent coordination through L3 evidence checks, automated service bundle fetching, and robust task inbox management.",
       "takeaways": [
-        "Built a reusable corpus-ingest cutover pattern with merge tooling, canonicalization, regression tests, and before/after entity counts for verifying graph migrations.",
-        "Added quality gates and dry-run merge audits that other projects can adapt as nightly checks plus explicit decision files before mutating shared data.",
-        "Hardened voice-agent test ladders by grouping failures by signal, tightening L3 evidence checks, exporting service bundles, and adding machine-readable ladder metrics.",
-        "Introduced Switchboard-style task broker mechanics: per-agent inboxes, worker roster checks, heartbeat/listening states, and safeguards that keep coordination notes from corrupting task state."
+        "Implement atomic provenance persistence and decision-file gates to ensure data integrity during large-scale knowledge graph cutovers and merges.",
+        "Reuse the L3 evidence-checking FSM and self-verify air-call patterns to harden voice agent state transitions against runtime mismatches.",
+        "Adopt the Switchboard task broker pattern with per-agent inboxes and lifecycle hooks to prevent false blockers and manage distributed worker loops."
       ],
-      "total_commits": 99,
+      "total_commits": 68,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3330,7 +3454,7 @@
         },
         {
           "name": "riff",
-          "commits": 70,
+          "commits": 39,
           "messages": [
             "feat: group ladder failures by signal",
             "feat: tighten FSM ladder L3 evidence checks",
@@ -3370,38 +3494,7 @@
             "Update Gate 1 bundle for L2 fix + rule-floor evidence (seq=458)",
             "test(live): extend L2 capture-mismatch regression from real-smoke evidence",
             "fix(live): per-turn user_text_state guards locked_choice on state-mismatch",
-            "docs(guide): document Rule Floor for truthful stub results",
-            "Add Gate 1 no-cost validation command bundle (seq=426)",
-            "docs(guide): add the suppress-model-output bug chapter (Ch 23)",
-            "fix(verdict): fail on hard agent rule signals",
-            "fix(l1): honor locked-choice runtime prompts",
-            "docs(guide): add M5 operator guide for the test ladder (Ch 22)",
-            "Add gated rerun checklist for post-fix validation (seq=401)",
-            "docs(guide): add Chapter 21: The No-Go Decision case study",
-            "docs(guide): update chapters with cost-tracking and FSM loop case study",
-            "Add L1+L2 failure root-cause analysis",
-            "fix(l1): wire Anthropic cost estimates into prime summaries",
-            "Add machine-readable ladder artifact metrics",
-            "docs(guide): add L1 prime gate chapter",
-            "Fix L2 checklist after dry-run validation (seq=326)",
-            "docs(guide): cross-link hardening plan to machine-readable metrics",
-            "fix(voice): lower browser speaker tail 700ms -> 200ms (F-359 root cause)",
-            "docs(guide): add OTA call review and hardening plan chapters (Ch 17 & 18)",
-            "Add L2 real-Gemini operator checklist linked to task-inbox",
-            "Fix promoted scenario selection by level",
-            "Add L2 real-Gemini batch runbook (5-scenario smoke)",
-            "docs(guide): add machine-readable test metrics chapter",
-            "fix(switchboard): require explicit task inbox targets",
-            "tools(switchboard): add worker task inbox",
-            "feat(live): emit mic_gate_window per ~500ms for L3 timeline overlay",
-            "feat(air_call): bundle choice-STT WAVs into run-dir service export",
-            "docs(guide): clarify worker coordination loop and update ladder status",
-            "docs(guide): add worker coordination loop chapter",
-            "fix(switchboard): ignore proceed notes in roster status",
-            "fix(switchboard): ignore coordination notes in roster status",
-            "tools(switchboard): add worker roster checker",
-            "docs(guide): add gemini-live and service-artifact-map chapters",
-            "Add safe Switchboard env template"
+            "docs(guide): document Rule Floor for truthful stub results"
           ]
         },
         {
@@ -3423,19 +3516,18 @@
           ]
         }
       ],
-      "commit_sig": "74ee520329f01c53"
+      "commit_sig": "0eda0735760bd074"
     },
     {
       "date": "2026-05-10",
-      "headline": "Riff Launches FSM Ladder Testing, Fault Injection, and Switchboard v1",
-      "summary": "The Riff framework introduces a multi-level FSM testing ladder with fault injection capabilities and an append-only promotion ledger for cross-batch trajectory reconstruction. Concurrently, Switchboard v1 launches as a multi-agent coordination channel featuring a live portal for real-time agent monitoring and alerting.",
+      "headline": "Switchboard v1 Launches Multi-Agent Coordination With Live Portal UI",
+      "summary": "The Switchboard AI project initialized its v1 append-only multi-agent coordination channel, featuring a live portal with real-time roster updates and terminal alerts. Concurrently, the Intelligence Briefing Toolkit received critical bug fixes and documentation updates regarding scheduler configuration and dual-bug investigations.",
       "takeaways": [
-        "Implement the 'FSM Ladder' pattern to test voice agents across stubbed (Level 1), synthetic (Level 2), and live (Level 3) environments using a shared adapter interface.",
-        "Reuse the stateful FaultInjector module to inject canonical failure shapes into tool calls, enabling robust regression testing for agent resilience.",
-        "Adopt the append-only promotion ledger to track scenario trajectories across batches, allowing for precise selection and reconstruction of test states.",
-        "Integrate Switchboard v1's live portal and terminal alerts to monitor multi-agent coordination channels and visualize agent roster status in real-time."
+        "Implement an append-only coordination channel to manage state consistency across multiple autonomous agents.",
+        "Build a live monitoring portal that visualizes agent rosters, online status, and terminal find indicators for real-time oversight.",
+        "Use environment flags like IBT_DISABLE_SCHEDULER to temporarily bypass specific services during local debugging or testing."
       ],
-      "total_commits": 80,
+      "total_commits": 19,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3443,73 +3535,6 @@
           "messages": [
             "nightly: IBT_DISABLE_SCHEDULER=1 for the temporary uvicorn (Bug A fix)",
             "docs/codex: 0016 — B-128 investigation finds TWO bugs (not one)"
-          ]
-        },
-        {
-          "name": "riff",
-          "commits": 61,
-          "messages": [
-            "tools(switchboard): allow auto agent identity inference",
-            "Add FSM ladder report tool",
-            "docs(guide): add voice-agent test ladder chapter + troubleshooting",
-            "test: tolerate austin_plumbing schema growth (F-359 added a state)",
-            "docs(switchboard): standardize agent check-in practice",
-            "docs(codex): clarify M3 service-side ladder ownership",
-            "docs(codex): expand voice ladder hardening roadmap",
-            "docs(codex): add FSM ladder report agent handoff",
-            "Fix locked-choice prompt suppression for calendar flow",
-            "fix(scenarios): skip inapplicable generator families",
-            "tools(calendar): add air-call residue cleanup helper",
-            "test(harness): repair Level 2 fixture setup",
-            "Merge remote-tracking branch 'origin/main'",
-            "Capture Level 2 Gemini audio artifacts",
-            "docs: add claude-m5-orchestrator switchboard intro + ignore .rephrase_cache",
-            "fix(scheduling): F-359 — preserve marker through F-184 sync_details modifies",
-            "docs(manual-tests): m5-air-call-recovery — IP placeholder + Step 1.5",
-            "docs(manual-tests): M5 air-call recovery walkthrough for F-359 chain",
-            "feat(scheduling): F-359 follow-up commit #2c — provider-backed alt-day scan",
-            "docs(adr): F-359 follow-up commit #4 — ADR-0007 + grep-invariant test",
-            "feat(scheduling): F-359 follow-up commit #2b — propose 3 alternative days",
-            "fix: Level2Adapter spawns live.run() task; turn_complete queue actually fires",
-            "docs: add human test plan for FSM variation harness",
-            "fix: regressions from cycle-1 critical fixes",
-            "fix(test_service_controller_export): C9 - fix TempDir lifecycle bug",
-            "fix(test_run_fsm_variants): C8 - use promotion ledger in cross-batch tests",
-            "fix(scenario_generator): C7 - implement --rephrase utterance polishing",
-            "fix(conductor): C6 - add warning for reactive STT placeholder",
-            "fix(level_3): C1+C2 - use set_verdict/flush and write complete canonical bundle",
-            "fix: AC5.4 hard-cap check before max_scenarios + test isolation",
-            "test: update Task 6 AC5.4 tests with fixture cleanup",
-            "scenario_generator: --rephrase flag with API key check and rephrased metadata",
-            "coverage_history: append per-batch rows + report tool with regression detection",
-            "run_fsm_variants: --level 3 dispatch + 5-scenario hard cap + required --select (AC5.4)",
-            "level_3: wrap air_call_conductor + auto-call /export to write service-side artifacts",
-            "service_controller+conductor: auto_export, /fetch_artifacts, --reactive persona-callback mode",
-            "scenarios: emit repair_prompt.md on L1/L2 failure via existing handoff writer",
-            "run_fsm_variants: use promotion ledger module for writes + cross-batch --select",
-            "promotion: append-only ledger module with cross-batch trajectory reconstruction",
-            "Fix I4: Enhance real-mode tee client test with actual event interception",
-            "Fix I2 and I3: test schedule_event fault injection with proper flow and synth",
-            "Fix M2, cost calibration, was_last_call_rewritten per-call tracking, and AC4 test gating",
-            "I4: Real-mode tee path test coverage for Level 2",
-            "M1: Clean up asyncio.new_event_loop fragility in _tools.py",
-            "I3: Add fault-injection test to Level 2 adapter stub mode",
-            "I5: Level 2 stub mode synthesizes tool_call events via synth_agent_turn",
-            "fix: restore 4 regressions from cycle-1 fixes",
-            "fix: relax test_fault_injected_schedule_event_timeout to allow empty tool_calls",
-            "fix: address Phase 4 code review Critical issue C6 and Important issues I1-I2",
-            "fix: address Phase 4 code review Critical issues C1-C5",
-            "scenarios: AC4.1/AC4.2/AC4.3 acceptance tests on Level 2 + fault injection",
-            "run_fsm_variants: --level 2 dispatch + --select required (auto-cascade disabled)",
-            "adapters: cal-provider swap via RIFF_USE_FAKE_CAL_PROVIDER and service-account env detection",
-            "level_2: real Gemini Live adapter with _TeeClient pattern, fault injection, cost tracking",
-            "scenarios: provider_failure behavior family template emits scenarios with faults blocks",
-            "level_1: wire FaultInjector into tool-call recording and FSM result delivery",
-            "fault_injection: stateful FaultInjector with on_call/failure_rate semantics",
-            "fault_injection: canonical failure shapes per (tool, mode)",
-            "fix: persona_fsm_state captured + dedupe initial state_trace record",
-            "test: add Level 1 adapter integration tests (C8)",
-            "test: add real assertions for terminal_unreached + tool_not_called signals (C7)"
           ]
         },
         {
@@ -3536,18 +3561,19 @@
           ]
         }
       ],
-      "commit_sig": "d561256542399b21"
+      "commit_sig": "32e2ff5484d90c9c"
     },
     {
       "date": "2026-05-09",
-      "headline": "Build LLM Entity Extraction and Codex-Reviewed Sprint Planning",
-      "summary": "Implemented sample-first LLM entity extraction with robust JSON parsing and source tiering, while establishing a codex-driven planning workflow for sprint diagnostics. The update includes interactive launch scripts, regression tests for signal floors, and a split design documentation site.",
+      "headline": "Build LLM Entity Extractors and Codex-Reviewed Sprint Plans",
+      "summary": "Implemented sample-first LLM entity extraction with robust JSON parsing and source tiering, while establishing a codex-driven planning workflow for sprint execution. The update includes interactive launch scripts, regression-tested collectors, and a split CloudFront distribution for design documentation.",
       "takeaways": [
-        "Implement sample-first LLM extraction by building a parser that validates `_parse_llm_json` contracts and aggregates source types for confidence scoring.",
-        "Adopt a 'Codex review' workflow where plain-English TL;DRs and decision artifacts (like Route 1 confirm-and-skip) are committed before code implementation to validate sprint plans.",
-        "Use interactive shell scripts for phase cutover launches and enforce `.venv` usage in pipeline scripts to ensure consistent local development environments."
+        "Reuse the `extract_entities.py` script to implement sample-first LLM extraction with strict `_parse_llm_json` contracts for reliable structured output.",
+        "Adopt the `source_tier.py` utility to modularize source classification logic and enforce confidence scoring across data ingestion pipelines.",
+        "Apply the interactive `s1-phase03-cutover-launch.sh` pattern to create guided, step-by-step launchers for complex multi-phase deployment tasks.",
+        "Implement the 'Codex review' documentation strategy by archiving rejected plans and maintaining plain-English TL;DRs to track decision trails."
       ],
-      "total_commits": 53,
+      "total_commits": 49,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3609,19 +3635,9 @@
             "docs/codex: 0009 — S0 drift findings + Phase 01 decisions before plan",
             "docs/codex: 5 new Codex reviews (UFO storyline + metapath + relationship-pack + timeline) + research drift"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 4,
-          "messages": [
-            "fix(scheduling): F-359 follow-up commit #2a — break the empty-prefetch loop",
-            "feat(flow): F-359 follow-up commit #1 — lifecycle metadata grammar",
-            "backlog: B-317 — build_tools tests stale after propose_booking shipped",
-            "feat(scheduling): F-359 — caller-confirmation marker on calendar events"
-          ]
         }
       ],
-      "commit_sig": "c3af5f2e177c0e57"
+      "commit_sig": "e8cf2818dec1c204"
     },
     {
       "date": "2026-05-08",

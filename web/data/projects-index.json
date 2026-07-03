@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T10:00:15.295802Z",
+  "generated_at": "2026-07-03T09:56:02.822177Z",
   "count": 137,
   "projects": [
     {
@@ -1247,25 +1247,23 @@
         "Python",
         "HTML",
         "JavaScript",
+        "SQLite",
         "FastAPI",
-        "SQLite-vec",
         "sentence-transformers",
-        "AWS S3",
-        "AWS CloudFront",
         "AWS Lambda",
-        "GitHub Actions"
+        "S3",
+        "CloudFront"
       ],
       "reuse_tags": [
         "semantic-search",
-        "github-indexer",
-        "portfolio-tool",
-        "ai-discovery",
-        "mcp-server",
+        "github-tools",
+        "portfolio-manager",
+        "ai-integration",
         "static-web-app"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-01T10:42:34Z"
+      "pushed_at": "2026-07-02T10:02:13Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2116,25 +2114,28 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
+        "FastAPI",
+        "Pytest",
         "Mermaid",
-        "JSONL",
-        "pytest",
-        "Git"
+        "Gemma",
+        "Gemini",
+        "MCP"
       ],
       "reuse_tags": [
         "voice-agent",
         "fsm",
         "llm-orchestration",
-        "python",
-        "deterministic-ai"
+        "deterministic-ai",
+        "python-framework",
+        "telephony"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-02T09:20:44Z"
+      "pushed_at": "2026-07-03T09:29:13Z"
     },
     {
       "slug": "riot",
@@ -2415,25 +2416,26 @@
     {
       "slug": "supertokens-s3-example",
       "title": "SuperTokens S3 Example",
-      "one_liner": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2.",
+      "one_liner": "Reference implementation of a Go backend with SuperTokens passwordless authentication and Dockerized infrastructure on AWS EC2.",
       "tech": [
         "Go",
-        "SuperTokens",
+        "Shell",
         "Docker",
         "PostgreSQL",
-        "AWS EC2",
-        "Shell"
+        "SuperTokens",
+        "AWS EC2"
       ],
       "reuse_tags": [
         "authentication",
-        "go",
+        "golang",
+        "supertokens",
         "docker",
         "aws",
-        "supertokens"
+        "infrastructure-as-code"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/supertokens-s3-example",
-      "pushed_at": null
+      "pushed_at": "2026-07-02T10:34:07Z"
     },
     {
       "slug": "supertokens_nodejs",

@@ -94,11 +94,20 @@
   <a href="space-channel-evidence.html">Permutation evidence (step by step)<span class="badge-new">New</span></a>
   <a href="console-and-sim-tooling.html">Console &amp; sim tooling (how to run)<span class="badge-new">New</span></a>
   <a href="call-plan-artifact-schema-v0.html">Call-plan artifact &amp; trace schema<span class="badge-new">New</span></a>
+  <a href="quality-contract-runrecord-proposal.html">RunRecord quality proposal<span class="badge-new">New</span></a>
+  <a href="quality-contract-runrecord-design.html">RunRecord quality design<span class="badge-new">New</span></a>
   <a href="console-flow-map-design-v0.html">Console flow-map (corridor)<span class="badge-new">New</span></a>
   <a href="companion-channel-design-v0.html">Companion channel (texted link)<span class="badge-new">New</span></a>
   <a href="remote-control-design-v0.html">Remote control (control events + surface)<span class="badge-new">New</span></a>
+  <a href="companion-surface-fable5-brief.html">Companion surface brief<span class="badge-new">New</span></a>
+  <a href="companion-surface-design-v0.html">Companion surface design v0<span class="badge-new">New</span></a>
   <a href="strong-typing-quality-report.html">Strong typing — quality report<span class="badge-new">New</span></a>
   <a href="remote-control-control-layer-status.html">Remote control — control-layer status<span class="badge-new">New</span></a>
+  <a href="calendar-flows-and-tutorials.html">Calendar flows &amp; tutorials (walkthrough)<span class="badge-new">New</span></a>
+  <a href="calendar-companion-live-offer-design-v0.html">Calendar companion — live offer mirror<span class="badge-new">New</span></a>
+  <a href="scheduler-use-cases-and-capability-scope.html">Scheduler use cases &amp; scope<span class="badge-new">New</span></a>
+  <a href="scheduler-demo-problem-statement.html">Scheduler problem statement<span class="badge-new">New</span></a>
+  <a href="calendar-scheduler-sim-report.html">Calendar simulator report<span class="badge-new">New</span></a>
   <a href="fable5-deterministic-flow-questions.html">Deterministic-flow questions<span class="badge-new">New</span></a>
   <a href="schema-ground-truth-flows.html">Schema ground-truth (flows)<span class="badge-new">New</span></a>
   <div class="grp">Measurement</div>
@@ -210,9 +219,13 @@
 
   <h2>Read this in order</h2>
   <div class="grid2">
+    <a href="quality-contract-runrecord-proposal.html"><div class="card"><h3>RunRecord quality proposal<span class="badge-new">New</span><span class="badge-date">2026-07-02</span></h3><p>Plain-language proposal for why RIFF needs a proof object for every sim, replay, staff call, and OTA call. Includes sample RunRecords, trace snippets, evidence paths, and pre-rendered audio expectations.</p></div></a>
+    <a href="quality-contract-runrecord-design.html"><div class="card"><h3>RunRecord quality design<span class="badge-new">New</span><span class="badge-date">2026-07-02</span></h3><p>Design handoff for Claude: trace grammar, tier ladder, invariant layers, promotion.yaml, fault scripts, static-audio asset evidence, and the queue-ready implementation plan.</p></div></a>
+    <a href="companion-surface-fable5-brief.html"><div class="card"><h3>Companion surface Fable 5 brief<span class="badge-new">New</span><span class="badge-date">2026-07-02</span></h3><p>Code-grounded brief for a phone web page that follows the FSM, mirrors menu options as buttons, shows caller-safe facts like phone/address/booking data, and routes taps through the same deterministic input path as voice and keypad.</p></div></a>
     <a href="judge-the-judge.html"><div class="card"><h3>Judge-the-Judge &amp; discipline<span class="badge-new">New</span><span class="badge-date">2026-06-24</span></h3><p>Never trust a verdict you can't cross-check. The judge panel (Gemini/Qwen/Codex), the deterministic guard, the scanner that over-flagged 60%, and why repeat-N beats one run.</p></div></a>
     <a href="llm-policy.html"><div class="card"><h3>Effective LLM Policy<span class="badge-date">2026-06-23</span></h3><p>Route the right model per state (inheritance + override). The four cases, the proof harness, the drift risk. <strong>Note:</strong> the first routing assignment was a misdiagnosis — see the validation update.</p></div></a>
     <a href="space-channel-subflow-architecture.html"><div class="card"><h3>Space Channel subflows<span class="badge-new">New</span><span class="badge-date">2026-06-29</span></h3><p>A skills-style parent/subflow design for Space Channel: lazy manifest discovery, route_candidate dispatch, public Space Channel data cards, and simulator gates before OTA tests.</p></div></a>
+    <a href="calendar-flows-and-tutorials.html"><div class="card"><h3>Calendar flows &amp; tutorials<span class="badge-new">New</span><span class="badge-date">2026-07-02</span></h3><p>The whole calendar story for a newcomer: the two booking engines (and the dead-air tradeoff), the full use-case catalog, a tour of every calendar flow, and a state-by-state walkthrough of the booking tutorial with its five safety invariants.</p></div></a>
     <a href="goal-hierarchy-design.html"><div class="card"><h3>Goal-Hierarchy design</h3><p>The flagship spec: flow &rarr; group &rarr; state, each with a goal and a metric. Start here.</p></div></a>
     <a href="eval-matrix.html"><div class="card"><h3>The evaluation matrix</h3><p>Tier-3 flow scorecard. Computed aspects + judged humanness, crossed by agent.</p></div></a>
     <a href="per-state-metrics.html"><div class="card"><h3>Per-state metrics</h3><p>Tier-1 root cause. How the event stream becomes progress / stall / dwell.</p></div></a>

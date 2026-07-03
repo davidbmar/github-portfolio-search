@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T10:00:15.299083Z",
+  "generated_at": "2026-07-03T09:56:02.825591Z",
   "count": 137,
   "entries": [
     {
@@ -2327,18 +2327,16 @@
         "python",
         "html",
         "javascript",
+        "sqlite",
         "fastapi",
-        "sqlite-vec",
         "sentence-transformers",
-        "aws s3",
-        "aws cloudfront",
         "aws lambda",
-        "github actions",
+        "s3",
+        "cloudfront",
         "semantic-search",
-        "github-indexer",
-        "portfolio-tool",
-        "ai-discovery",
-        "mcp-server",
+        "github-tools",
+        "portfolio-manager",
+        "ai-integration",
         "static-web-app"
       ],
       "chunks": [
@@ -2352,19 +2350,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, REST API, and static web UI. It enables developers to find reusable code patterns and architectures across their own portfolio using natural language queries."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec) and FastAPI for the REST API. The web frontend is static HTML/JS served from S3/CloudFront. AWS Lambda functions handle OAuth and logging. GitHub Actions automate weekly reindexing."
+          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON exports. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI. Deploy to AWS S3/CloudFront for production use. Integrate with AI agents via the MCP server."
+          "text": "Use the CLI to index your repos, then search via command line or deploy the static web UI to S3/CloudFront. Integrate with AI agents via the MCP server to allow them to query your codebase contextually."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Faceted filtering by language, tech stack, and star count Auto-generated capability clusters and related repo suggestions CLI, REST API, and static web UI interfaces MCP server integration for AI agent access Automated weekly reindexing via GitHub Actions"
+          "text": "Semantic search using embeddings and TF-IDF weighting Auto-clustering of repositories into capability categories MCP server integration for AI agent access Static web UI with faceted filtering and autocomplete Automated weekly reindexing via GitHub Actions Exportable search results and shareable URLs"
         }
       ]
     },
@@ -4002,18 +4000,22 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
-        "mermaid",
-        "jsonl",
+        "fastapi",
         "pytest",
-        "git",
+        "mermaid",
+        "gemma",
+        "gemini",
+        "mcp",
         "voice-agent",
         "fsm",
         "llm-orchestration",
-        "deterministic-ai"
+        "deterministic-ai",
+        "python-framework",
+        "telephony"
       ],
       "chunks": [
         {
@@ -4022,7 +4024,7 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
@@ -4030,15 +4032,15 @@
         },
         {
           "source": "how_its_built",
-          "text": "The core engine uses a `run_turn` pipeline where speech-to-text input is processed through deterministic guardrails, an LLM adapter (Gemini/Gemma/Claude), and a state manager. The state manager enforces transitions based on a YAML-defined graph. Slot extraction uses deterministic fallbacks, and the system logs every turn as JSONL. The architecture separates the 'riffing' LLM layer from the 'beat-keeping' FSM layer, ensuring that critical business logic remains deterministic even if the LLM output varies."
+          "text": "The core engine uses a `run_turn` pipeline where Speech-to-Text input passes through multi-layer guardrails before reaching the LLM. The LLM output is processed by a deterministic `state_manager` that validates transitions against a YAML-defined graph. Slot extraction uses deterministic fallbacks, and all non-LLM components are pure functions. The platform includes a web server for real-time inspection, an A/B testing harness based on observable metrics, and supports multiple LLM backends including local Gemma and cloud-based Gemini."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to build customer service voice bots for specific verticals like plumbing, dental clinics, or retail. Define your business logic in a YAML flow file or generate one via the API. Integrate with telephony providers by connecting the STT/TTS interfaces. Use the built-in A/B testing harness to validate agent performance against observable metrics like slot completion rate and turn count without needing expensive LLM judges."
+          "text": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. Define your business logic in a YAML flow file or generate one via the API using a natural language description. Integrate the generated agent into your telephony stack via the provided web server or MCP interface. Leverage the deterministic state machine to ensure critical data slots (name, address, time) are always captured correctly, while the LLM handles the nuance of conversation."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions using YAML-defined FSMs Prevents hallucinations via pure-function guardrails and slot validators Includes 11 pre-built flows for services like plumbing, dental, and retail Provides an A/B testing harness with observable metric scoring Supports local LLMs (Gemma) and cloud APIs (Gemini, Claude)"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces strict workflow compliance using YAML-defined Finite State Machines Deterministic guardrails and slot validation prevent LLM hallucinations Real-time web inspector for monitoring live FSM states and conversation turns Built-in A/B testing harness using observable metrics without LLM judges Supports local LLMs like Gemma and cloud providers like Gemini Flash"
         }
       ]
     },
@@ -4568,16 +4570,18 @@
     {
       "repo": "supertokens-s3-example",
       "title": "SuperTokens S3 Example",
-      "one_liner": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2.",
+      "one_liner": "Reference implementation of a Go backend with SuperTokens passwordless authentication and Dockerized infrastructure on AWS EC2.",
       "keywords": [
         "go",
-        "supertokens",
+        "shell",
         "docker",
         "postgresql",
+        "supertokens",
         "aws ec2",
-        "shell",
         "authentication",
-        "aws"
+        "golang",
+        "aws",
+        "infrastructure-as-code"
       ],
       "chunks": [
         {
@@ -4586,23 +4590,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2."
+          "text": "Reference implementation of a Go backend with SuperTokens passwordless authentication and Dockerized infrastructure on AWS EC2."
         },
         {
           "source": "what_it_is",
-          "text": "This project demonstrates how to integrate SuperTokens passwordless authentication into a Go backend service. It includes infrastructure scripts to deploy SuperTokens Core and PostgreSQL via Docker on an AWS EC2 instance, along with a Go server that handles magic link generation and session verification. The architecture is designed for cloud deployment with security considerations for internal service communication."
+          "text": "A demonstration project that integrates the SuperTokens Golang SDK for passwordless (magic link) authentication with a Go HTTP server. It includes infrastructure scripts to deploy PostgreSQL and the SuperTokens core via Docker on an Ubuntu EC2 instance, providing a complete stack for testing session-based auth flows."
         },
         {
           "source": "how_its_built",
-          "text": "The system uses a Shell script to orchestrate Docker containers for the database and auth core. The application logic is written in Go, utilizing the `supertokens-golang` SDK for auth flows and `gorilla/mux` for HTTP routing. Configuration is managed via environment variables loaded from a `.env` file."
+          "text": "The system uses a Shell script to orchestrate Docker containers for PostgreSQL and the SuperTokens core. The application logic is written in Go, using the gorilla/mux router and the official supertokens-golang library. Configuration is managed via environment variables loaded through godotenv."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this repository as a template for setting up secure, passwordless login for Go-based microservices. It provides a ready-to-use Docker setup for the authentication backend and example code for integrating session handling into your API endpoints."
+          "text": "Use this repository as a template for setting up secure, session-based authentication in Go microservices. It demonstrates how to isolate identity management in Docker containers while keeping the application stateless and connected via internal networks."
         },
         {
           "source": "features",
-          "text": "Automated Docker setup for SuperTokens Core and PostgreSQL Passwordless authentication via magic links Go backend integration with session management Basic frontend test harness for login flows Security best practices for internal network isolation"
+          "text": "Passwordless authentication via magic links using SuperTokens Automated Docker deployment for PostgreSQL and SuperTokens core Go backend integration with session handling and API routing Basic HTML frontend for testing login and verification flows Configuration management via environment variables and .env files"
         }
       ]
     },
