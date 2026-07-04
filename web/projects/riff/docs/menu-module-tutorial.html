@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Menu Module, Every Business — RIFF tutorial</title>
+<style>
+:root { --bg:#05060f; --panel:#0c0f1f; --edge:#232848; --ink:#e8eaf6; --dim:#9aa3c7;
+        --gold:#f5c542; --glow:#6f7bff; }
+body { background:var(--bg); color:var(--ink); font:16px/1.65 -apple-system,'Segoe UI',sans-serif;
+       margin:0; padding:2rem 1rem 6rem; }
+main { max-width:820px; margin:0 auto; }
+h1 { color:var(--gold); font-size:2rem; line-height:1.2; }
+h2 { color:var(--glow); margin-top:2.2em; border-bottom:1px solid var(--edge); padding-bottom:.3em; }
+h3 { color:var(--ink); margin-top:1.6em; }
+em { color:var(--dim); }
+code { background:var(--panel); border:1px solid var(--edge); border-radius:4px;
+       padding:.08em .35em; font-size:.92em; color:var(--gold); }
+pre { background:var(--panel); border:1px solid var(--edge); border-radius:10px;
+      padding:1rem; overflow-x:auto; }
+pre code { background:none; border:none; padding:0; color:#c8d0f0; }
+blockquote { border-left:4px solid var(--gold); background:var(--panel); margin:1.2em 0;
+             padding:.7em 1em; border-radius:0 8px 8px 0; color:var(--dim); }
+ul { padding-left:1.4em; }
+a { color:var(--glow); }
+</style></head><body><main>
+<h1>One Menu Module, Every Business</h1>
+<p><em>Co-written by Gemini (narrative + ideation) and Claude/Codex (technical verification), 2026-07-04. Design: docs/menu-module-v1-design.md.</em></p>
+<p>Hey there! Welcome to your first deep dive into how we build real, production-grade voice applications. If you&#x27;ve ever called a business, you&#x27;ve used a phone menu (an &quot;IVR&quot;). You&#x27;ve probably also noticed they can be... a mixed bag. Some are slow, some don&#x27;t let you interrupt, and they all look and feel different.</p>
+<p>We had the same problem. Our engineers were building custom menus for every new client—a locksmith, a law firm, a futuristic space network. It was slow and inconsistent.</p>
+<p>So, we built one, universal menu module. A single, reusable system that can power the phone menu for <em>any</em> business, just by feeding it a simple configuration file.</p>
+<p>This tutorial will walk you through how it works. By the end, you&#x27;ll add a brand new feature to a live phone menu yourself, using the exact same process our own developers use.</p>
+<h2>1. The Foundation: What We&#x27;re Building On</h2>
+<p>Before we built the new module, we already had some powerful tools in our toolbox. Think of these as the Lego bricks we had lying around.</p>
+<ul>
+<li><strong>Barge-In:</strong> Our system can already detect when you start talking or press a key, even while a pre-recorded message is playing. It immediately stops the playback and listens to you. This is crucial for making a menu feel responsive and not waste your time.</li>
+<li><strong>A &quot;Companion&quot; Web Page:</strong> Many of our voice calls have a matching web page that shows you information in real-time. This page could already display a keypad.</li>
+<li><strong>Word Timings:</strong> When we create audio, our build process can figure out the exact millisecond each word is spoken. This is how we can, for example, highlight a word on the companion page at the precise moment you hear it.</li>
+<li><strong>The Pack Compiler:</strong> We have a tool that takes a simple blueprint file (written in a format called YAML) and &quot;compiles&quot; it into a fully-featured, complex voice application. This is the factory; the YAML is the blueprint.</li>
+</ul>
+<p>These were great parts, but they weren&#x27;t working together to create a perfect, reusable menu.</p>
+<h2>2. The Problem: The Annoying Little Things</h2>
+<p>So, what was wrong? Why did we need a dedicated &quot;Menu Module&quot;?</p>
+<ul>
+<li> <strong>Inconsistent Voices:</strong> The menu prompt (&quot;Press 1 for sales...&quot;) was often spoken by a generic, robotic text-to-speech voice, while the actual content was read by our cool, professional voice actor. It was jarring.</li>
+<li> <strong>No Visual Sync:</strong> Because the menu prompt wasn&#x27;t pre-recorded with our special tools, we didn&#x27;t have word timings for it. That meant the companion web page couldn&#x27;t do the cool &quot;gold sweep&quot; highlight across the buttons as it read the options.</li>
+<li> <strong>Styling Chaos:</strong> Every menu&#x27;s web page had its own, hand-written styles. Changing a color meant hunting through dozens of files.</li>
+<li> <strong>Tapping Didn&#x27;t Work:</strong> Tapping a button on the companion page was just for show. It didn&#x27;t actually <em>do</em> anything in the phone call.</li>
+</ul>
+<p>We needed to fix this. We needed one system that guaranteed a great voice, perfect visual sync, and consistent styling for every single menu, every single time.</p>
+<h2>3. The Solution: A Menu in a Box</h2>
+<p>The Menu Module solves all these problems by being clever and consistent. It&#x27;s not about writing new code for every menu; it&#x27;s about describing the menu in a simple data file.</p>
+<h3>The Blueprint: A YAML &quot;Pack&quot;</h3>
+<p>Everything about a business&#x27;s phone menu is defined in one file, called a <strong>Business Pack</strong>. It&#x27;s a YAML file, which is just a simple, human-readable way to organize data.</p>
+<p>Here&#x27;s a look at the pack for the Space Channel Network Operations line.</p>
+<pre><code>
+# packs/space_channel_widgets.pack.yaml
+
+schema_version: riff_business_pack_v0
+business:
+  id: space_channel_widgets
+  name: Space Channel Network Operations
+  # ... and other business details
+system_prompt: You are Operations Droid SC-1... # Instructions for the AI
+capabilities:
+- id: launch_command
+  kind: content
+  label: Launch Command
+  aliases:
+  - &#x27;1&#x27;
+  - one
+  - launch
+  dtmf: &#x27;1&#x27;
+  text: Five launches on the board...
+  prerender: true
+- id: iss_operations
+  kind: content
+  label: ISS Operations
+  aliases:
+  - &#x27;2&#x27;
+  - two
+  - iss
+  dtmf: &#x27;2&#x27;
+  text: Station nominal with seven crew aboard.
+  prerender: true
+# ... more capabilities ...
+menu:
+  greeting_line: This is Operations Droid SC-1 with Space Channel network operations.
+  prompt: Say 1 for launch command, 2 for iss operations, 3 for webb observatory, 4 for daily
+    briefing, 5 for intelligence feed. You can also say text link to
+    follow along, or report a bug.
+  prerender: true
+# ... other settings ...
+</code></pre>
+<p>Let&#x27;s break down the important parts:</p>
+<ul>
+<li><code>business</code>: Basic info about the company.</li>
+<li><code>capabilities</code>: These are the &quot;things the menu can do.&quot; Each one is a block.</li>
+<li><code>id</code>: A unique code name for this capability.</li>
+<li><code>kind: content</code>: This means it just reads some text.</li>
+<li><code>label</code>: The official, human-friendly name (e.g., &quot;Launch Command&quot;).</li>
+<li><code>aliases</code>: All the different things a user can say to trigger this, like &quot;one&quot; or &quot;launch schedule.&quot;</li>
+<li><code>dtmf: &#x27;1&#x27;</code>: The key you can press on your phone&#x27;s keypad. DTMF are the beeps your phone makes.</li>
+<li><code>text</code>: The actual content that gets read to the caller.</li>
+<li><code>prerender: true</code>: This is key! It tells our system to pre-record this audio in our professional voice actor&#x27;s voice, complete with word timings.</li>
+<li><code>menu</code>: This defines the main menu prompt itself. The <code>prompt</code> text is what gets read aloud to the caller, listing their options.</li>
+</ul>
+<h3>One Style to Rule Them All</h3>
+<p>To fix the styling chaos, all menus now use a single CSS stylesheet. A business can change its branding by just changing a few &quot;theme tokens&quot; (which are just CSS variables).</p>
+<p>For example, the highlight color for the companion page is defined in one place:</p>
+<pre><code>
+/* web/assets/menu-theme.css */
+
+:root {
+  --menu-highlight: var(--gold, #f5c542);
+  /* ... other theme tokens for background, fonts, etc. */
+}
+</code></pre>
+<p>Every menu companion page imports this file. Want to change the highlight to blue for a new client? You change one line of code.</p>
+<h2>4. Your Turn: Add a &quot;Joke of the Day&quot;</h2>
+<p>Time to get your hands dirty. We&#x27;re going to add a new option to the Space Channel menu: a &quot;Joke of the Day&quot; on key 6. This is <em>exactly</em> how the feature was shipped for real.</p>
+<blockquote><strong>Honesty note:</strong> the Space Channel pack is <em>generated</em> by an importer from a live data feed, and the 12-hour refresh will overwrite hand edits — the real joke-of-the-day shipped by editing the importer (<code>riff/business_pack/importers/space_channel_widgets.py</code>). The exercise below is exactly right for <strong>hand-authored</strong> packs like <code>packs/pet_shop.pack.yaml</code>; for generated packs, make the same change in the importer instead.</blockquote>
+<h3>Step 1: Open the Pack File</h3>
+<p>Open the business pack file located at <code>packs/space_channel_widgets.pack.yaml</code>.</p>
+<h3>Step 2: Add the New Capability</h3>
+<p>Scroll down to the <code>capabilities:</code> list. At the very end of the list, add a new block for our joke. Make sure the indentation matches the other items perfectly (YAML is picky about spaces!).</p>
+<pre><code>
+# Add this block to the end of the capabilities list
+
+- id: joke_of_the_day
+  kind: content
+  label: Joke of the day
+  aliases:
+  - joke
+  - jokes
+  - joke of the day
+  - tell me a joke
+  - make me laugh
+  - funny
+  dtmf: &#x27;6&#x27;
+  text: Are you as bored as I am — that sentence still makes sense if you say it backwards.
+  prerender: true
+</code></pre>
+<p>You&#x27;ve just defined everything the system needs to know about this new option: what to call it, how to trigger it (by voice or keypad), and what to say.</p>
+<h3>Step 3: Update the Menu Prompt</h3>
+<p>Now, we need to tell the caller that this new option exists. Find the <code>menu:</code> section and edit the <code>prompt:</code> line to include &quot;6 for joke of the day.&quot;</p>
+<pre><code>
+# Find this section and edit the prompt line
+
+menu:
+  greeting_line: This is Operations Droid SC-1 with Space Channel network operations.
+  prompt: Say 1 for launch command, 2 for iss operations, 3 for webb observatory, 4 for daily
+    briefing, 5 for intelligence feed, 6 for joke of the day. You can also say text link to
+    follow along, or report a bug.
+</code></pre>
+<h3>Step 4: Compile!</h3>
+<p>Save the file. Now for the magic. Go to your terminal and run the pack compiler. This command tells the system to read your blueprint and build a new, updated version of the voice application, including pre-rendering all the new audio.</p>
+<pre><code>
+python -m riff.business_pack compile packs/space_channel_widgets.pack.yaml
+</code></pre>
+<p>You&#x27;ll see a bunch of output as it works — the compiler refuses to write anything until your flow passes <strong>three validation gates</strong> (the loader, ~35 lint rules, and the riffc pre-flow compiler), so a broken menu never reaches a caller. When it&#x27;s done, the new menu is live on the next call. That&#x27;s it! You&#x27;ve just shipped a new feature.</p>
+<h2>5. Prove It: Test Your Work</h2>
+<p>A true developer always tests their code. Here&#x27;s how to validate every aspect of the menu module.</p>
+<p>Grab your phone and call the Space Channel number. Have the companion web page open on your computer.</p>
+<ul>
+<li> <strong>Test the Keypad (DTMF):</strong> When the menu starts, press <code>6</code>. The system should immediately play the joke. This proves the <code>dtmf: &#x27;6&#x27;</code> worked.</li>
+<li> <strong>Test the Voice Command (Aliases):</strong> Call back. When the menu starts, say &quot;tell me a joke.&quot; The system should recognize your phrase and play the joke. This proves the <code>aliases</code> worked.</li>
+<li> <strong>Test Barge-In:</strong> Call back again. This time, as soon as the droid starts speaking the prompt (&quot;Say 1 for launch command...&quot;), interrupt it by pressing <code>6</code> on your keypad. It should cut the prompt off instantly and play the joke.</li>
+<li> <strong>Test the Visuals:</strong> While you do all of the above, watch the companion page.</li>
+<li>You should see the options listed with keys 1 through 6.</li>
+<li>As the droid reads the menu, you should see a <strong>gold sweep</strong> highlight each button at the exact moment its number is spoken.</li>
+<li>When you barge in by pressing a key, watch the gold sweep freeze in place.</li>
+<li>(Phase A) Tap a key on the page — you&#x27;ll see a &quot;signal sent&quot; acknowledgment. The tap is a signal with an audit trail today; making it drive the call is the operator-gated Phase B.</li>
+</ul>
+<p>You&#x27;ve just successfully validated the entire system.</p>
+<h2>6. The &quot;Why&quot;: Smart Decisions for a Great Experience</h2>
+<p>You might be wondering about some of the details. Why do it this way?</p>
+<ul>
+<li><strong>Why does the prompt put the digit first (&quot;Press 1 — Launch Command&quot;) instead of &quot;For Launch Command, press 1&quot;?</strong></li>
+<p>    Because of how the gold sweep is computed. Key N&#x27;s highlight window runs from the moment digit N is spoken until digit N+1 is spoken (<code>menu_control_timings</code> in <code>riff/surface.py</code>). Digit-first means each key is lit exactly while its own description is being read. Goal-first would leave key 1 lit while the voice describes option 2 — a systematically late sweep.</p>
+</ul>
+<ul>
+<li><strong>How does the menu stay up-to-date with new data?</strong></li>
+<p>    The <code>space_channel_widgets.pack.yaml</code> file isn&#x27;t edited by a human every day. It&#x27;s actually generated automatically from a data source. We have a script that runs on a schedule to fetch the latest info and rebuild the pack. This is done with a &quot;cron job,&quot; which is just a way to tell a server &quot;run this command at this time.&quot;</p>
+</ul>
+<p>    ```bash</p>
+<p>    # This script runs on a 12-hour cron schedule</p>
+<p>    scripts/refresh-space-widgets.sh</p>
+<p>    ```</p>
+<p>    This script fetches new data, regenerates the YAML file, and runs the compiler, ensuring the menu content (like launch schedules) is never stale.</p>
+<ul>
+<li><strong>Why use one big audio file for the prompt?</strong></li>
+<p>    We could have stitched together separate audio clips (&quot;Say 1,&quot; &quot;for launch command,&quot; etc.). But pre-rendering the <em>entire prompt</em> as a single file gives the voice actor total control over the pacing and intonation, making it sound far more professional and polished.</p>
+</ul>
+<h3>Congratulations!</h3>
+<p>You&#x27;ve just seen how a simple, data-driven approach can create powerful, consistent, and high-quality user experiences. You took a blueprint (the YAML pack), added a new component (the joke capability), and used the factory (the compiler) to produce a finished product. This &quot;one menu module&quot; pattern saves us thousands of hours and ensures every client gets our best work, every time.</p>
+</main></body></html>

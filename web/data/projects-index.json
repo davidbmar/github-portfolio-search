@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-03T09:56:02.822177Z",
+  "generated_at": "2026-07-04T09:21:17.102366Z",
   "count": 137,
   "projects": [
     {
@@ -1247,23 +1247,23 @@
         "Python",
         "HTML",
         "JavaScript",
-        "SQLite",
         "FastAPI",
+        "SQLite-vec",
         "sentence-transformers",
-        "AWS Lambda",
-        "S3",
-        "CloudFront"
+        "AWS S3",
+        "CloudFront",
+        "Lambda"
       ],
       "reuse_tags": [
+        "portfolio-management",
+        "code-search",
         "semantic-search",
-        "github-tools",
-        "portfolio-manager",
-        "ai-integration",
-        "static-web-app"
+        "developer-tools",
+        "knowledge-base"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-02T10:02:13Z"
+      "pushed_at": "2026-07-03T09:57:49Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2114,28 +2114,27 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
-        "FastAPI",
-        "Pytest",
         "Mermaid",
-        "Gemma",
-        "Gemini",
-        "MCP"
+        "pytest",
+        "JSONL",
+        "WebSockets",
+        "LRU Cache"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm",
-        "llm-orchestration",
+        "fsm-orchestration",
+        "llm-guardrails",
+        "business-automation",
         "deterministic-ai",
-        "python-framework",
-        "telephony"
+        "python-platform"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-03T09:29:13Z"
+      "pushed_at": "2026-07-04T08:03:37Z"
     },
     {
       "slug": "riot",

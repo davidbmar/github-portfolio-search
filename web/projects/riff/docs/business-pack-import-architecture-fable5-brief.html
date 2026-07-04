@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF Business Pack Import Architecture Brief</title>
+<style>
+  :root{--ink:#1b1f24;--mut:#5e6975;--bg:#fbfcfd;--card:#fff;--line:#dfe5eb;--accent:#2563eb;--soft:#edf4ff;--code:#17202a;--code-ink:#edf2f7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{display:flex;max-width:1180px;margin:0 auto}
+  nav{flex:0 0 250px;padding:30px 18px 60px;border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow:auto;font-size:14px}
+  nav h1{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+  nav a{display:block;color:var(--ink);text-decoration:none;padding:6px 8px;border-radius:6px}
+  nav a:hover{background:var(--soft);color:var(--accent)}
+  main{max-width:880px;padding:38px 42px 90px}
+  h1{font-size:32px;line-height:1.15;margin:0 0 8px}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 26px}
+  h2{font-size:23px;margin:38px 0 10px}
+  h3{font-size:18px;margin:25px 0 8px}
+  p{margin:12px 0}
+  ul,ol{padding-left:24px}
+  li{margin:6px 0}
+  code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;background:#eef2f7;border-radius:5px;padding:1px 5px;font-size:13px}
+  pre{background:var(--code);color:var(--code-ink);border-radius:8px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.5}
+  pre code{background:transparent;color:inherit;padding:0}
+  .pill{display:inline-block;border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 9px;color:var(--mut);font-size:12px;margin-right:8px}
+  .callout{border-left:4px solid var(--accent);background:var(--soft);padding:12px 16px;margin:18px 0;border-radius:0 8px 8px 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+  .card h3{margin-top:0}
+  footer{border-top:1px solid var(--line);margin-top:54px;padding-top:18px;color:var(--mut);font-size:13px}
+  @media(max-width:880px){.wrap{display:block}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}main{padding:24px 18px 64px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h1>Business Pack</h1>
+  <a href="index.html">Docs index</a>
+  <a href="#answer">Short answer</a>
+  <a href="#principle">Principle</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#schema">Pack shape</a>
+  <a href="#reject">Compiler checks</a>
+  <a href="#verticals">Verticals</a>
+  <a href="#fable">Fable ask</a>
+  <a href="#build">Build order</a>
+</nav>
+<main>
+<h1>RIFF Business Pack Import Architecture Brief</h1>
+<p class="lede">A design brief for shifting new business onboarding left: flexible importers, strict canonical packs, deterministic compiled runtime.</p>
+<p><span class="pill">Status: design brief</span><span class="pill">Date: 2026-07-03</span><span class="pill">Source: ~/src/riff</span></p>
+
+<section id="answer">
+<h2>Short Answer</h2>
+<p>RIFF should not let each company's JSON directly drive the live phone runtime. Add an intermediate canonical layer:</p>
+<pre><code>Company JSON / website / CRM export / AI-generated brief
+        -> importer / normalizer
+        -> RIFF Business Pack, versioned canonical schema
+        -> riffc compiler
+        -> deterministic call artifact
+        -> runtime</code></pre>
+<div class="callout"><strong>Working position:</strong> flexible importers -> strict Business Pack -> deterministic compiler -> boring runtime.</div>
+</section>
+
+<section id="principle">
+<h2>The Principle</h2>
+<p>The core source of truth should not be "a menu." The source of truth should be business capabilities. A menu is only one projection of capabilities. The same capability can appear in a voice menu, a companion page button, a dynamic returning-caller menu, an intake form, a scheduler action, or a post-call receipt.</p>
+</section>
+
+<section id="architecture">
+<h2>Recommended Architecture</h2>
+<pre><code>External source
+  - company JSON
+  - website
+  - CRM export
+  - NOC feed
+  - AI-generated business profile
+        |
+        v
+Importer / Adapter
+        |
+        v
+RIFF Business Pack
+        |
+        v
+riffc
+        |
+        v
+CallPlan Artifact
+        |
+        v
+Runtime</code></pre>
+<p>Do not rearchitect the live runtime. Keep the deterministic FSM, <code>riffc</code>, typed slots, locked choices, companion surfaces, scheduler <code>offer_id</code>s, preflow audio, and RunRecord gate. Rearchitect the authoring/import layer.</p>
+</section>
+
+<section id="schema">
+<h2>Business Pack Shape</h2>
+<pre><code>schema_version: riff_business_pack_v0
+
+business:
+  id: smith_legal
+  name: Smith Legal Group
+  timezone: America/Chicago
+  phone: "+15125550100"
+  industry: legal
+
+capabilities:
+  - id: schedule_consultation
+    kind: calendar_booking
+    label: Schedule a consultation
+    aliases: ["book", "appointment", "talk to lawyer"]
+
+  - id: start_intake
+    kind: intake_form
+    label: Start a new intake
+
+menus:
+  main_new_caller:
+    when: "caller.known == false"
+    items:
+      - capability: schedule_consultation
+        dtmf: "1"
+      - capability: start_intake
+        dtmf: "2"
+
+slots:
+  matter_type:
+    type: enum
+    options: [family, criminal, injury, housing, estate, business, other]
+    label: Legal issue
+    reask: What kind of legal issue is this about?
+
+scheduler:
+  services:
+    consultation:
+      duration_minutes: 30
+      slot_increment_minutes: 15
+      min_advance_minutes: 120</code></pre>
+</section>
+
+<section id="reject">
+<h2>What riffc Should Reject</h2>
+<ul>
+<li>Menu item points to a missing capability.</li>
+<li>Capability has no voice path.</li>
+<li>Collect slot has no type.</li>
+<li>Required collect slot has no <code>reask</code>.</li>
+<li>Companion form has no voice fallback.</li>
+<li>Booking capability has no scheduler policy.</li>
+<li>Scheduler action does not use <code>offer_id</code>.</li>
+<li>Legal flow lacks disclaimer.</li>
+<li>Emergency route has no handoff.</li>
+<li>Caller-memory menu has no safe fallback.</li>
+<li>PII field is exposed on the companion page without permission.</li>
+<li>Tool action has no timeout/failure path.</li>
+<li>No generated L1 scenario for a menu item.</li>
+</ul>
+</section>
+
+<section id="verticals">
+<h2>Vertical Examples</h2>
+<div class="grid">
+  <div class="card"><h3>Plumber</h3><p>Book service visit, emergency leak routing, issue description, existing request, address, urgency, shutoff status, callback number.</p></div>
+  <div class="card"><h3>Electrician</h3><p>Outage triage, inspection booking, emergency handoff, breaker status, sparks/smell/shock risk, panel access.</p></div>
+  <div class="card"><h3>Lawyer</h3><p>Schedule consultation, start intake, continue matter, leave message, conflict data, deadlines, disclaimers, no legal advice.</p></div>
+  <div class="card"><h3>Space Channel</h3><p>Map NOC feed categories into capabilities and content topics, then pre-render audio and companion surfaces.</p></div>
+</div>
+</section>
+
+<section id="fable">
+<h2>Fable 5 Ask</h2>
+<pre><code>RIFF Business Pack v0:
+A canonical intermediate schema for importing businesses into RIFF.
+
+It should support plumbers, electricians, lawyers, and content brands.
+It must compile into deterministic FSM artifacts, companion surfaces,
+scheduler policies, intake forms, pre-rendered audio, and tests.
+
+Core question:
+What is the smallest schema that is flexible enough for many businesses
+but strict enough that riffc can reject unsafe or incomplete flows before runtime?</code></pre>
+</section>
+
+<section id="build">
+<h2>Recommended Build Order</h2>
+<ol>
+<li>Write the Business Pack schema draft.</li>
+<li>Build a validator that only validates packs, not flows.</li>
+<li>Build a Space Channel importer: NOC JSON -> Business Pack.</li>
+<li>Build a lawyer intake sample pack by hand.</li>
+<li>Build a plumber/electrician sample pack by hand.</li>
+<li>Build pack-to-flow compiler for a small subset: menu, collect, message, schedule.</li>
+<li>Generate companion surfaces from pack output.</li>
+<li>Generate L1 scenarios from every menu item and required slot path.</li>
+<li>Run comparison: hand-authored flow vs pack-generated flow.</li>
+<li>Only then expand the schema.</li>
+</ol>
+</section>
+
+<footer>
+Markdown source: <code>docs/codex/2026-07-03-business-pack-import-architecture-fable5-brief.md</code>. This page is part of the RIFF user manual under <code>docs/html</code>.
+</footer>
+</main>
+</div>
+</body>
+</html>
+

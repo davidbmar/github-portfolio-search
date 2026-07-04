@@ -1,23 +1,132 @@
 {
-  "generated_at": "2026-07-03T09:57:48.055040Z",
-  "count": 157,
+  "generated_at": "2026-07-04T09:23:04.119211Z",
+  "count": 158,
   "days": [
     {
-      "date": "2026-07-03",
-      "headline": "Build-Time WhisperX Alignment and Shift-Left Linting for Deterministic Voice UIs",
-      "summary": "This update introduces a build-time WhisperX toolchain for word-level audio alignment and enforces strict shift-left linting gates for scheduling offers. It also hardens the companion interface with deterministic menu controls, grounded phone validation, and robust client-server payload contracts.",
+      "date": "2026-07-04",
+      "headline": "Fixing Event Loop Crashes and Building Reusable Menu Modules",
+      "summary": "Resolved critical concurrency bugs in SMS adapters and telemetry truncation while establishing a deterministic, reusable menu module framework. The work includes comprehensive documentation on root causes and a new pipeline for prerendered space widgets.",
       "takeaways": [
-        "Implement a build-only WhisperX alignment tool to generate word-timing manifests for static audio assets, enabling precise karaoke-style read-along features without runtime overhead.",
-        "Adopt shift-left linting gates that enforce schema declarations (e.g., kind:time_select) at compile time to prevent invalid scheduling offers and reduce runtime errors.",
-        "Reuse the _grounded_phone utility to validate and reject fabricated phone digits in live update paths, preventing hallucination risks in tool handlers.",
-        "Apply deterministic digit-anchored control timings and hardened menu-announce heuristics to ensure consistent UI state and eliminate false-positive announcements across voice flows."
+        "Reuse the deterministic menu module architecture that handles barge-in, tap signals, and live-anchor resync for voice applications.",
+        "Apply the documented fix for aiohttp ClientSession loop-binding to prevent 'Event loop is closed' errors in concurrent SMS agents.",
+        "Implement the fail-closed 12-hour refresh pipeline for importing and prerendering short-form audio widgets."
       ],
-      "total_commits": 44,
+      "total_commits": 35,
       "repos": [
         {
           "name": "riff",
-          "commits": 44,
+          "commits": 35,
           "messages": [
+            "fix(companion): survive stale cached modules — the beacon-caught freeze",
+            "fix(telemetry): client-log sink truncated call ids to 24 chars BEFORE validation — every beacon 404'd",
+            "telemetry(sms): deterministic carrier-delivery audit — accepted != delivered",
+            "feat(observability): versioned companion page + client highlight telemetry (codex-reviewed) + F-369 weakref loop fix (Opus agent's root cause)",
+            "docs(F-369): EXACT root cause — id()-reuse gap in the concurrent agent's 35-min-old SMS loop fix",
+            "telemetry(menu-module): spans-per-serve logging + suppression-aware call reviewer + hub→announce harness scenario",
+            "chore(menu-module): commit the sweep deploy-gate script + confirm-announce WAV + crickets-processed old-hub joke",
+            "fix(menu-module): framework silence at every compiled choice state + deterministic call reviewer",
+            "docs(F-369): deep root cause — aiohttp ClientSession loop-binding in the Telnyx adapter",
+            "docs(F-369): REOPEN P1 — real bug 'Event loop is closed', NOT rate-limit (my earlier resolve was wrong)",
+            "fix(menu-module+sms): model never opens the call (two-voices double menu) + SMS survives multi-call loops",
+            "fix(menu-module): SILENT hub (Gemini re-read+improvised the menu — live transcript) + one-command build + fresh-menu proof",
+            "fix(menu-module): tap acceptance unblocked (epoch bridge, codex-consulted) + mid-join sweep anchor, deterministically proven",
+            "fix(menu-module): three live bugs fixed at the SHARED layers + every-pack contract gate (codex pair session)",
+            "fix(menu-module): kill the double menu read + measured sweep timing; new riff_cafe menu born from the pipeline",
+            "fix(menu-module): every menu return replays the word-timed announce — live trace showed calls live at the hub (no sweep)",
+            "feat(menu-module): deterministic sweep gates + live-anchor resync + tap now DRIVES the call (Phase B-lite)",
+            "docs(F-369): RESOLVED — spaced call succeeded, the ~50% was Telnyx rate-limiting (test artifact)",
+            "feat(menu-module): Phase A slice 2 — reusable web module, theme sheet, barge-in freeze, tap signal (codex-implemented, guided)",
+            "feat(menu-module): Phase A slice 1 — announce+hub pair, digit-first sweep-ready menus, live barge_in trace (codex-implemented, guided)",
+            "docs(menu-module): 'One menu module, every business' tutorial — gemini/claude-codex co-write (md + html)",
+            "docs(menu-module): fold gemini co-design decisions + codex feasibility corrections into v1 design",
+            "feat(space): joke of the day on both lines — date-indexed from the shared pool, punchline pause + synthesized crickets",
+            "feat(F-369 step 1): log the auto-send error reason — make failures self-diagnosing",
+            "docs(F-369): correct the diagnosis by code inspection — ~50%, likely rate-limit test artifact",
+            "docs(F-369): auto-send fails INTERMITTENTLY — caught live by the delivery telemetry",
+            "fix(business-pack): fold codex+gemini review rounds — kill dead-end act states, honest v0 topology",
+            "docs(business-pack): document v0.1 units (prerendered content, companion_link) + 12h refresh pipeline",
+            "feat(space-widgets): 12h refresh pipeline — importer→compile→prerender, fail-closed",
+            "test(space-widgets): all-options deterministic FSM sim — DTMF+voice routing, return-to-menu clears, companion send contract",
+            "feat(space-widgets): prerender Umbriel short-form audio — 8 states",
+            "feat(business-pack): widget-menu units + Space Channel widgets importer (TDD)",
+            "feat(auto-send): log the SMS RESULT, not just dispatch (close the 'did it send?' gap)",
+            "fix(auto-send): idempotent send_companion_link — no double-SMS from auto + manual",
+            "test(whisper-rescue): lock the live 'UFO files' rescue scenario end-to-end"
+          ]
+        }
+      ],
+      "commit_sig": "04436ec44358f0c4"
+    },
+    {
+      "date": "2026-07-03",
+      "headline": "Shift-Left Validation, Deterministic Audio Sync, and Companion UI Overhaul",
+      "summary": "Implemented a robust 'shift-left' validation framework to catch schema and tool-reference errors at build time, alongside a deterministic audio-word alignment pipeline using WhisperX. Enhanced the companion interface with real-time karaoke read-along, auto-texting capabilities, and strict PII boundaries for improved user experience and security.",
+      "takeaways": [
+        "Implement build-time 'shift-left' gates (e.g., schema validators, phase-gate checks) to catch configuration drift and unknown tool references before deployment, ensuring deterministic runtime behavior.",
+        "Use WhisperX for offline, build-time word-level audio alignment to generate timing manifests, enabling precise client-side karaoke synchronization without relying on live LLM processing.",
+        "Adopt a parameterized guard system (e.g., slot_equals) and strict schema validation to enforce PII boundaries and prevent data hallucination in dynamic slot-filling flows."
+      ],
+      "total_commits": 93,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 92,
+          "messages": [
+            "docs(F-367): empirically prove the tool-ref fix needs scoping (not a loop-tail hack)",
+            "feat(legal): promote pack-generated legal_intake to live — deterministic menu front door",
+            "docs(F-367): shift-left gap #2 found LIVE — unknown TOOL refs not build-caught",
+            "feat(business-pack): Space Channel NOC importer — noc_briefing.json → pack (TDD)",
+            "feat(business-pack): v0 schema validator + pack→flow compiler + 3 verticals (TDD)",
+            "feat(guards): slot_equals:<slot>:<value> parameterized guard (TDD)",
+            "docs(business-pack): fold codex plan review (25 findings) into schema v0 — rev 2",
+            "feat(auto-send): wire non-blocking call-start auto-text + enable for space_channel",
+            "feat(auto-send): pure decision layer for call-start companion auto-text (TDD)",
+            "docs(business-pack): riff_business_pack_v0 schema draft — atomic units, slot_equals guard, validation ownership",
+            "docs(business-pack): import-architecture brief + Fable 5 design feedback; hand-built legal_intake sample flow (F-367 shift-left target)",
+            "docs(design): mark ship-unit step 1 (no_match telemetry) DONE — 599d93c8",
+            "feat(menu-matching step 1): structured no_match telemetry helper (TDD, safe foundation)",
+            "docs(design): add code-grounded implementation plan for the ship unit",
+            "docs(design): fold Fable 5 review (APPROVE-WITH-CHANGES) — 3 decisions resolved",
+            "docs(design): fold codex plan-review (REVISE) into menu-matching design",
+            "docs(design): fast deterministic menu matching — live-diagnosed, for codex+Fable 5 review",
+            "docs(F-368): deploy-cycle due diligence — internal flags need a declared source-of-truth",
+            "docs(spec 9d): de-risk the loader-validation fix — 62-flow scan proves only companion_display is unknown",
+            "docs(spec 9d): prerequisite — loader silently drops unknown state fields (read_along + phase-gate need schema support; unknown-field validation is itself a shift-left gap)",
+            "docs(F-367): shift-left coverage gap — LI2 phase-gate NOT build-enforced; add declarative phase_gate + riffc check",
+            "companion piece 2.5 (slice): karaoke syncs to the audio — attach acoustic timings via topic rsid",
+            "docs(F-367): shift-left test PROVEN — legal_intake builds clean; build caught guards + PII",
+            "observability: log [audio-played] (read side) — rsid, word_timings, text — to compare vs [companion] display",
+            "docs: finish companion design (codex REVISE folded in) + file F-367 legal-intake shift-left test",
+            "docs(spec): revise companion design — audio-sourced read-along + per-state flag (fixes live read!=display)",
+            "companion: watch-along telemetry — log the presented surface per state change",
+            "companion piece 1: shift-left PII boundary for the follow-along read-along",
+            "docs(spec): generic companion follow-along — two-tier (bearer/phone-verified), shift-left PII, auto-text",
+            "F-366: companion topic read-along shows the actual spoken text (declared public slots)",
+            "docs(B-311): mark FIXED (54b0519a, codex APPROVE) — mutation logging + drift visibility",
+            "B-311: surface the silent runtime-config-override footgun (log mutations + expose drift)",
+            "docs(B-319): mark CLOSED — fix (110e54e9) verified + comprehensively tested (128 passed)",
+            "docs(remote-control): note Step A voice-agreement is build-time pre-verified (683546c4)",
+            "test(remote-control): prove arbiter==legacy on VOICE menu selections at build time",
+            "docs(F-363): log H3 first rung SHIPPED (03e6ff20); full ladder remaining",
+            "F-363 H3 (first rung): progressive offer-recovery prompt on the 2nd no-match",
+            "docs(F-363): mark B-323 live-parity follow-up CLOSED (3f944b35, codex APPROVE)",
+            "B-323 live parity: live offer-exhaustion uses the declared edge, not a hardcoded commit (ADR-0007)",
+            "docs(F-363): log H2 SHIPPED (both paths) + file B-323 live-parity follow-up",
+            "F-363 H2: disambiguate bare affirmations against 2+ offered times (both paths)",
+            "test: drive current pizza cadence in stale-ask readback e2e (stale test, not a regression)",
+            "test: fix stale end_state assertion in property_trouble_ticket air scenario test",
+            "fix: resume-after-drop broken for modular scheduling flow (state rename not propagated)",
+            "fix: branch-aware has_unfilled — extractor no longer over-fires on pickup orders",
+            "test: fix stale assertions in scheduling_v1 blocked-days test (wording + restructure)",
+            "choice_compiler: deterministic entity tier — clock time -> time, relative-week -> day",
+            "B-323: fix ADR-0007 violation — locked_choice routes no-match escalation via declared edge",
             "backlog: B-323 — ADR-0007 violation in locked_choice (codex-verified fix plan)",
             "test: fix stale collect_day reference in static_audio state API test",
             "B-304: reject fabricated phone digits in the live update_slots path (grounding guard)",
@@ -65,7 +174,7 @@
           ]
         }
       ],
-      "commit_sig": "b1aa50205b969e44"
+      "commit_sig": "8bd829ef14a7b2b9"
     },
     {
       "date": "2026-07-02",
@@ -2816,19 +2925,18 @@
     },
     {
       "date": "2026-05-25",
-      "headline": "RIFF Gets Truth-Gated Live Speech Timing",
-      "summary": "RIFF added an AIR/realtime speech timing stack: bootstrap/control CLI, agent-router bridge, live dashboards, speaker swim lanes, audio editor timeline, and handoff metrics. It tightened measurement quality with Whisper-derived truth lanes, room-clock alignment, transcript validation, evidence bundles, and gates that block self-improvement when truth quality is weak.",
+      "headline": "Build Real-Time Speech Timing Dashboards with Audio Truth Lanes",
+      "summary": "This update introduces a live speech timing dashboard featuring M3 Whisper observer lanes and room audio activity truth sources. It synchronizes timing markers to the room audio clock, bundles evidence for metric accuracy, and visualizes data via speaker swim lanes.",
       "takeaways": [
-        "Built an AIR bootstrap/control path for reproducible realtime-agent environments, including M1 service startup, internal mode, macOS detach support, tailnet UI exposure, and an agent-router bridge.",
-        "Added source-of-truth speech timelines from room audio, live Whisper observer artifacts, distilled word timestamps, and synced playheads so debugging can anchor to captured audio instead of app events.",
-        "Shipped timing dashboards with swim lanes, hover transcripts, silence gaps, overlap causality, human review notes, and AI-readable logs as reusable patterns for inspecting voice-agent turns.",
-        "Introduced transcript validation, evidence bundles, truth-quality metrics, and flow/OTA audio harness gates to keep automated improvement tied to measurable signal quality."
+        "Implement 'truth lanes' by treating live observer artifacts and room audio activity as the primary source of truth for timing validation.",
+        "Synchronize timing markers and audio playheads to the room audio clock to ensure accurate alignment across distributed timelines.",
+        "Visualize complex speech interactions using speaker swim lanes and compressed timing graphs that expose spoken text on hover."
       ],
-      "total_commits": 65,
+      "total_commits": 49,
       "repos": [
         {
           "name": "riff",
-          "commits": 65,
+          "commits": 49,
           "messages": [
             "feat: add repeatable whisper metrics campaign",
             "feat: show world model agreement on timing page",
@@ -2878,39 +2986,22 @@
             "feat: add live speech timing dashboard",
             "feat: log live speech handoff timing metrics",
             "fix: start M1 AIR service in internal mode",
-            "fix: support macOS AIR bootstrap detach",
-            "fix: add AIR provider speech handoff signal",
-            "fix: add AIR state-sync settle delay",
-            "fix: avoid AIR state-sync greeting overlap",
-            "fix: make AIR trouble ticket phone line clearer",
-            "fix: add service-state synced AIR caller mode",
-            "fix: allow initial AIR no-speech tolerance",
-            "fix: restart RIFF during M1 AIR bootstrap",
-            "fix: harden RIFF AIR bootstrap startup",
-            "feat: add RIFF AIR bootstrap foundation",
-            "fix: align AIR property scenario with browser caller ID",
-            "feat: add AIR control CLI",
-            "feat: add RIFF AIR agent-router bridge",
-            "test: correct property trouble ticket L3 turn count",
-            "fix: remove empty maintenance action enum",
-            "test: add property trouble ticket L3 scenario",
-            "feat: add RIFF flow quality gates and OTA audio harness"
+            "fix: support macOS AIR bootstrap detach"
           ]
         }
       ],
-      "commit_sig": "894a735de0b4d12a"
+      "commit_sig": "407be8479c5195ae"
     },
     {
       "date": "2026-05-24",
-      "headline": "Visible Delegation Gets Refresh-Safe, Service Onboarding Sharpens",
-      "summary": "Agent Router gained visible delegation support while preserving router sessions through browser refreshes and ignoring prompt templates that should not count as visible delegation. Cal Provider’s setup wizard was recast around professional service businesses and clearer customer calendar setup, while Riff added stable phone host modes.",
+      "headline": "Agent Router Delegation Parity and Cal Provider Onboarding Overhaul",
+      "summary": "Enhanced agent-router with visible delegation capabilities and session persistence while refining cal-provider's onboarding flow for professional service businesses. These updates improve routing consistency and clarify calendar setup through targeted copy improvements.",
       "takeaways": [
-        "When adding visible delegation to an agent router, pair the feature with refresh-safe session preservation.",
-        "Filter prompt templates out of visible-delegation handling so routing state reflects real delegation paths.",
-        "Shape onboarding copy around the customer’s domain, as with service-business calendar setup.",
-        "Stabilize phone host modes to make voice/session behavior predictable across flows."
+        "Implement visible router delegation in agent systems to ensure prompt template parity and consistent behavior across delegation paths.",
+        "Preserve user sessions during browser refreshes in stateful routing applications to maintain continuity and reduce friction.",
+        "Refine onboarding wizards by applying focused narrative lenses (e.g., Bezos/Jobs) to tailor copy for specific business verticals like professional services."
       ],
-      "total_commits": 9,
+      "total_commits": 8,
       "repos": [
         {
           "name": "agent-router",
@@ -2931,16 +3022,9 @@
             "feat: clarify customer calendar onboarding",
             "feat: clarify calendar setup wizard"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 1,
-          "messages": [
-            "feat: support stable phone host modes"
-          ]
         }
       ],
-      "commit_sig": "835fcc4922c711b5"
+      "commit_sig": "28f2401d8cd2d2d3"
     },
     {
       "date": "2026-05-23",
@@ -3084,15 +3168,14 @@
     },
     {
       "date": "2026-05-16",
-      "headline": "Sites Control Panel, Deploy History, and Record Exports",
-      "summary": "May 16 focused on turning deployment visibility into reusable infrastructure: a typed sites registry, MCP dashboard, CLI commands, freshness checks, launchd refresh, and basic-auth setup landed in intelligence-briefing-toolkit. Related repos added JSONL deploy history logging, while riff hardened recording flows with postcall exports, keyword-based endings, and stricter LLM silence controls.",
+      "headline": "Build a Self-Healing Site Registry with Auto-Refresh and Health Checks",
+      "summary": "Implemented a comprehensive sites registry featuring a Master Control Panel dashboard, automated hourly refreshes via launchd, and a robust CLI doctor for verifying deployment health. The system introduces a seven-tier status priority engine and secure basic-auth provisioning to monitor content freshness across multiple intelligence briefing tools.",
       "takeaways": [
-        "Built a cross-repo sites registry with DeployConfig, HistoryEntry, SiteRecord, SiteStatus, 7-tier status derivation, and data freshness checks; reuse this pattern for deploy dashboards that track content age as well as deploy age.",
-        "Added operational surfaces: ibt sites list/show/doctor, clickable CloudFront dashboard links, hourly launchd auto-refresh, env-backed basic auth, and MCP infrastructure provisioning; adapt these as a lightweight control panel for static-site fleets.",
-        "Standardized deploy audit trails by appending .deploy-logs/history.jsonl on EXIT in iran-intel and UFOBriefing; reuse JSONL histories as a simple source for freshness, status, and rollback tooling.",
-        "Hardened riff call recording/export with postcall record bundles, public-slots webhook passthrough, caller keyword termination, dispatcher wiring, and LLM tool-call blocking; reuse the approach for safer voice capture workflows."
+        "Implement a 'doctor' CLI command that validates repo config, DNS, and history to surface content age rather than just deploy timestamps.",
+        "Use launchd plists to trigger hourly auto-refreshes of MCP dashboards, ensuring data stays current without manual intervention.",
+        "Adopt a seven-tier priority status engine with environment-overridable thresholds to derive site health from structured deploy logs."
       ],
-      "total_commits": 40,
+      "total_commits": 29,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3146,26 +3229,9 @@
             "chore(launchd): rename misnamed plist + actually install in launchd",
             "feat(deploy): append .deploy-logs/history.jsonl on EXIT"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 11,
-          "messages": [
-            "chore(static-audio): regenerate tutorial_record greeting + announce_summary",
-            "fix(record): block LLM tool calls, bypass echo filter, postcall safety-net",
-            "fix(record): UI gold-box, expand end phrases, force LLM silence",
-            "feat(tutorial_record): caller-driven end-of-recording via keyword detection",
-            "fix(postcall): wire dispatcher into live/browser transport",
-            "feat(postcall): export record bundles after calls",
-            "docs(handoff): brief for two-agent Record-export doc collaboration",
-            "feat(call_export): add public-slots passthrough to webhook payload",
-            "fix(tutorial_record): announce_summary readback + harden summarize prompt",
-            "feat(tutorial_record): rebuild Record building-block flow per spec §2",
-            "chore: checkpoint riff workspace"
-          ]
         }
       ],
-      "commit_sig": "d77e25f4d97e2d49"
+      "commit_sig": "4fab2e94a0d853ed"
     },
     {
       "date": "2026-05-15",
@@ -3353,15 +3419,14 @@
     },
     {
       "date": "2026-05-12",
-      "headline": "Disclosure Graphs, Scheduling Scenarios, and Switchboard Worker Sync",
-      "summary": "The portfolio advanced UFO disclosure tooling by refreshing project evidence, merging an S1.7 disclosure graph into the live UFO graph, deriving audit years from provenance, and adding graph and lead explorers. It also hardened Riff scheduling and air-call scenario coverage while tightening Switchboard worker coordination with sync contracts, dashboard state, and ownership safeguards.",
+      "headline": "Enhanced Disclosure Graphs and Switchboard Coordination Contracts",
+      "summary": "This update integrates refreshed evidence into the intelligence briefing toolkit and adds interactive disclosure graph explorers. It also stabilizes the Switchboard AI worker coordination by refining task ownership logic and syncing contracts.",
       "takeaways": [
-        "Build provenance-aware data refreshes: merge curated disclosure graphs into live graphs, derive audit metadata from provenance, then expose lead and graph explorers for research interfaces.",
-        "Codify call-flow edge cases as scenario YAMLs: add manifests, generated variations, Tier A regressions, and readiness docs so scheduling bugs can be replayed.",
-        "Bound conversational loops explicitly: handle vague first-slot deferrals and locked-choice scheduling offers with tests before deploying offer logic.",
-        "Protect multi-worker orchestration: document pickup contracts, add client sync expectations, improve dashboard state, and prevent targeted commands from stealing task ownership."
+        "Implement interactive graph explorers for complex data relationships, as seen in the new UFOBriefing disclosure lead and graph features.",
+        "Use provenance metadata to dynamically derive audit parameters, demonstrated by the fix for deriving audit years from disclosure sources.",
+        "Isolate project targets from worker boards to prevent command conflicts, a pattern applied in the Switchboard AI task ownership fixes."
       ],
-      "total_commits": 28,
+      "total_commits": 12,
       "repos": [
         {
           "name": "UFOBriefing",
@@ -3383,28 +3448,6 @@
           ]
         },
         {
-          "name": "riff",
-          "commits": 16,
-          "messages": [
-            "docs(l3): record Austin Plumbing timeout retry requirement",
-            "test(l3): add Austin Plumbing OTA scenario manifest",
-            "fix(scheduling_offer): T-CLAUDE-M3-OFFER-SLOT-VAGUE-20260512A — vague deferral aliases for first slot",
-            "fix: align worker checker with task broker",
-            "docs(codex): T-CLAUDE-M3-STORY-LADDER-SWEEP-20260512A — Austin Plumbing L1/L2 story sweep report",
-            "fix: strengthen air call story harness",
-            "test(scenarios): add 29 generated Austin Plumbing variation YAMLs",
-            "docs: update Switchboard URL references to current LAN IP",
-            "fix: recover air call browser context",
-            "docs: add Austin Plumbing L3 readiness summary (T-GEMINI-M3-L3-DOCS-098)",
-            "fix: explain switchboard watcher network failures",
-            "docs: clarify switchboard worker pickup contract",
-            "test(scenarios): T-CLAUDE-M3-AUSTIN-SCENARIOS-195434 — 3 Tier A regression cases closing 3/4 L2 gaps",
-            "docs(coverage): T-CLAUDE-M3-AUSTIN-COVERAGE-193957 — propose 5 L2 scenarios + scheduling_commit decision",
-            "fix: keep stub ladder runs off local ML fallbacks",
-            "feat: bound scheduling offer locked-choice loops"
-          ]
-        },
-        {
           "name": "switchboard-ai",
           "commits": 5,
           "messages": [
@@ -3416,18 +3459,18 @@
           ]
         }
       ],
-      "commit_sig": "739e752ff78d4b4d"
+      "commit_sig": "9f9cef356318c2f7"
     },
     {
       "date": "2026-05-11",
-      "headline": "Scale Knowledge Graphs and Harden Agent Switchboards with L3 Evidence Gates",
-      "summary": "The intelligence toolkit expanded its UFO graph to 1,481 entities while implementing atomic provenance and dry-run audit gates. Concurrently, the Riff and Switchboard systems hardened agent coordination through L3 evidence checks, automated service bundle fetching, and robust task inbox management.",
+      "headline": "Scale Knowledge Graph to 1,481 Entities and Stabilize Agent Task Broker",
+      "summary": "The intelligence toolkit executed a major data cutover expanding the UFO graph while implementing strict quality gates and provenance tracking. Concurrently, the switchboard system introduced per-agent task inboxes and a program state dashboard to improve coordination reliability.",
       "takeaways": [
-        "Implement atomic provenance persistence and decision-file gates to ensure data integrity during large-scale knowledge graph cutovers and merges.",
-        "Reuse the L3 evidence-checking FSM and self-verify air-call patterns to harden voice agent state transitions against runtime mismatches.",
-        "Adopt the Switchboard task broker pattern with per-agent inboxes and lifecycle hooks to prevent false blockers and manage distributed worker loops."
+        "Implement atomic provenance persistence and merge audit gates to ensure data integrity during large-scale knowledge graph cutovers.",
+        "Wire multi-stage quality checks (G1-G4) into nightly pipelines to automatically validate brief recency and content standards.",
+        "Adopt per-agent task inboxes with lifecycle management to prevent false blockers and preserve evidence during active follow-ups."
       ],
-      "total_commits": 68,
+      "total_commits": 29,
       "repos": [
         {
           "name": "intelligence-briefing-toolkit",
@@ -3453,51 +3496,6 @@
           ]
         },
         {
-          "name": "riff",
-          "commits": 39,
-          "messages": [
-            "feat: group ladder failures by signal",
-            "feat: tighten FSM ladder L3 evidence checks",
-            "fix: ignore broker events in worker roster check",
-            "fix: add RIFF Switchboard broker action helper",
-            "chore: use Switchboard task broker in worker loop",
-            "feat: self-verify air-call L3 runs",
-            "feat(M5 conductor): T-092 — auto-fetch service bundle from M3 after /stop",
-            "feat(tools): T-090 — extend air_call_acceptance_check with L3 bundle rows 5-8",
-            "fix: export complete air-call service bundle",
-            "Add Austin Plumbing evidence matrix",
-            "docs: add building-a-riff-flow-methodology",
-            "docs(stt): audit Whisper and choice-STT log paths and mapping",
-            "tools: route worker loop through switchboard inbox",
-            "docs(scheduling): T-080 — Austin Plumbing L1 case matrix + 6 seed tests",
-            "Add Austin Plumbing L3 OTA rehearsal plan (T-CLAUDE-M5-AUSTIN-L3-REHEARSAL-082)",
-            "Add L3 OTA artifact bundle contract (T-CLAUDE-M5-OTA-ARTIFACT-BUNDLE-075)",
-            "fix(scheduling): F-281d3/D2 — runtime negative constraints suppress L1+cascade",
-            "docs(ota): produce Austin Plumbing customer executive summary",
-            "docs(service): T-CLAUDE-M3-SERVICE-EXEC-SCAN-068B — daily service exec summary",
-            "Add customer/OTA executive summary (T-CLAUDE-M5-CUSTOMER-EXEC-SCAN-069B)",
-            "tools: prefer original switchboard assignment prompts",
-            "tools: generate execution prompts for switchboard tasks",
-            "docs(service): T-M3-SERVICE-ARTIFACT-CONTRACT-009 — minimum service artifact contract",
-            "tools: classify switchboard heartbeats as listening",
-            "docs: add agent switchboard lifecycle instructions",
-            "Add bug-handoff template (Gap 7 from M5 OTA gap checklist)",
-            "Add OTA preflight script (T-M5-OTA-PREFLIGHT-008)",
-            "docs: add voice agent hardening backlog",
-            "test(scheduling): align booking corpus with selected-slot guard",
-            "test(scheduling): add empty-offer recovery scenario",
-            "Add M5 OTA gap checklist (T-M5-OTA-GAP-FOLLOWUP-001)",
-            "test(scheduling): harden ladder harness",
-            "tools(switchboard): recover open task assignments",
-            "tools(switchboard): add standard worker loop",
-            "test(scheduling): guard selected slot confirmation",
-            "Update Gate 1 bundle for L2 fix + rule-floor evidence (seq=458)",
-            "test(live): extend L2 capture-mismatch regression from real-smoke evidence",
-            "fix(live): per-turn user_text_state guards locked_choice on state-mismatch",
-            "docs(guide): document Rule Floor for truthful stub results"
-          ]
-        },
-        {
           "name": "switchboard-ai",
           "commits": 12,
           "messages": [
@@ -3516,7 +3514,7 @@
           ]
         }
       ],
-      "commit_sig": "0eda0735760bd074"
+      "commit_sig": "03c1fb1ea5d977e4"
     },
     {
       "date": "2026-05-10",
