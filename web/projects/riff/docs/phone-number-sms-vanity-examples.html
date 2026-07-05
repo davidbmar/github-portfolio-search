@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phone Number SMS + Vanity Examples</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      color: #1f2933;
+      background: #fbfcfe;
+      font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { max-width: 980px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.2; }
+    p { margin: 10px 0; color: #4b5563; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #eef2f7;
+      border-radius: 5px;
+      padding: 1px 5px;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0 28px; background: #fff; }
+    th, td { border: 1px solid #d9e0ea; padding: 9px 10px; text-align: left; vertical-align: top; }
+    th { background: #f2f5f9; }
+    .note {
+      border-left: 4px solid #2f6df0;
+      background: #edf4ff;
+      padding: 12px 14px;
+      margin: 18px 0;
+      color: #23364d;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Phone Number SMS + Vanity Examples</h1>
+  <p>Verified against Telnyx on 2026-07-04. These are example/demo mappings, not a final production allocation.</p>
+  <p>All four numbers are active local US numbers on the same Telnyx voice connection
+    (<code>chattychapters-phone</code>) and the same enabled messaging profile
+    (<code>RIFF Verify Caller Debug</code>). The messaging profile is enabled and whitelisted for US destinations,
+    so each number is Telnyx-ready to send SMS.</p>
+  <p>No live outbound test SMS was sent; this is a Telnyx configuration-level verification.</p>
+  <div class="note">
+    Telnyx can send from each number, but RIFF's current SMS adapter sends from the single global
+    <code>TELNYX_FROM_NUMBER</code>. To make these examples fully branded in-product, add
+    per-dialed-number or per-flow SMS sender selection before calling the Telnyx SMS adapter.
+  </div>
+  <p>Vanity URLs below are proposed public aliases under <code>https://riff.chattychapters.com</code>.
+    They should redirect to the relevant landing, intake, or follow-along page when implemented;
+    this doc does not mean the redirects are live yet.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Spells / reads as</th>
+        <th>Proposed vanity URL</th>
+        <th>Example use</th>
+        <th>Telnyx SMS-ready</th>
+        <th>RIFF SMS sender today</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>+13215596277</code></td>
+        <td><code>321-559-MARS</code></td>
+        <td><code>https://riff.chattychapters.com/mars</code></td>
+        <td>Space Channel / MARS line</td>
+        <td>Yes</td>
+        <td>Capable, but RIFF still defaults to global <code>TELNYX_FROM_NUMBER</code></td>
+      </tr>
+      <tr>
+        <td><code>+15122777529</code></td>
+        <td><code>512-2777-LAW</code></td>
+        <td><code>https://riff.chattychapters.com/law</code></td>
+        <td>David Austin Law direct line</td>
+        <td>Yes</td>
+        <td>Capable, but RIFF still defaults to global <code>TELNYX_FROM_NUMBER</code></td>
+      </tr>
+      <tr>
+        <td><code>+15122777311</code></td>
+        <td>Weak vanity; <code>512-APP-7311</code> is the closest read (<code>277 = APP</code>)</td>
+        <td><code>https://riff.chattychapters.com/austin-services</code></td>
+        <td>David Austin Services main hub / current default sender</td>
+        <td>Yes</td>
+        <td>Yes, currently configured as the global sender</td>
+      </tr>
+      <tr>
+        <td><code>+15102160079</code></td>
+        <td>No clean vanity; useful because <code>510</code> reads as California/Bay Area</td>
+        <td><code>https://riff.chattychapters.com/property</code></td>
+        <td>Property management / trouble tickets</td>
+        <td>Yes</td>
+        <td>Capable, but RIFF still defaults to global <code>TELNYX_FROM_NUMBER</code></td>
+      </tr>
+    </tbody>
+  </table>
+  <h2>Recommended Example Map</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Example brand</th>
+        <th>Number</th>
+        <th>Vanity URL</th>
+        <th>Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Space Channel</td>
+        <td><code>+13215596277</code></td>
+        <td><code>https://riff.chattychapters.com/mars</code></td>
+        <td>Strong vanity: <code>321-559-MARS</code></td>
+      </tr>
+      <tr>
+        <td>David Austin Law</td>
+        <td><code>+15122777529</code></td>
+        <td><code>https://riff.chattychapters.com/law</code></td>
+        <td>Strong vanity: <code>512-2777-LAW</code></td>
+      </tr>
+      <tr>
+        <td>David Austin Services hub</td>
+        <td><code>+15122777311</code></td>
+        <td><code>https://riff.chattychapters.com/austin-services</code></td>
+        <td>Austin <code>512</code>, already the RIFF SMS default</td>
+      </tr>
+      <tr>
+        <td>Property management</td>
+        <td><code>+15102160079</code></td>
+        <td><code>https://riff.chattychapters.com/property</code></td>
+        <td><code>510</code> fits California/Bay Area property management better than Austin trades</td>
+      </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

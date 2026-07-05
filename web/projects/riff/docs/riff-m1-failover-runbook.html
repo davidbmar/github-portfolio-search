@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Runbook — RIFF Phone-Line Failover (Active-Active Phone Nodes) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container { max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem; }
+h1, h2, h3, h4 { color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem; line-height: 1.25; }
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code { background: var(--code-bg); color: #f0f0f5; padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.86em; }
+pre { background: var(--code-bg); padding: 0.85rem 1rem; border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent); }
+pre code { background: transparent; padding: 0; font-size: 0.86rem; line-height: 1.45; }
+blockquote { margin: 1rem 0; padding: 0.4rem 1rem; border-left: 3px solid var(--muted);
+  color: var(--muted); background: rgba(255,255,255,0.02); }
+table { border-collapse: collapse; margin: 1rem 0; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+th, td { padding: 0.45rem 0.85rem; border-bottom: 1px solid var(--border); text-align: left; }
+th { color: var(--accent); font-weight: 600; }
+tr:last-child td { border-bottom: none; }
+.status-live { display: inline-block; background: rgba(80,200,120,0.15); color: #6fdc96;
+  border: 1px solid rgba(80,200,120,0.4); border-radius: 4px; padding: 0.05rem 0.5rem;
+  font-size: 0.85em; font-weight: 600; }
+ol li, ul li { margin: 0.4rem 0; }
+</style>
+</head>
+<body>
+<div class="doc-container">
+
+<h1>RIFF Phone-Line Failover: Active-Active Phone Nodes (M3 + M1)</h1>
+
+<p><span class="status-live">LIVE as of 2026-07-04</span></p>
+
+<p>The phone line (<code>riff.chattychapters.com</code> / <code>phone.chattychapters.com</code>)
+is served by <strong>two machines at once</strong>: the M3 Pro (primary dev box) and the M1
+MacBook Pro. Both are self-healing: each recovers from a reboot (LaunchAgent
+<code>RunAtLoad</code>) and from a crash (a 120-second "ensure" loop restarts whatever is
+down). No human action needed.</p>
+
+<h2>TL;DR for operators</h2>
+
+<table>
+<tr><th>Question</th><th>Answer</th></tr>
+<tr><td>What failed over?</td><td>The live phone path only (Telnyx → <code>riff.chattychapters.com</code> → <code>riff.phone.server</code>).</td></tr>
+<tr><td>How?</td><td>Both machines run a <code>cloudflared</code> connector for the <strong>same</strong> <code>customer-bot</code> tunnel. Cloudflare's edge splits new calls between them and instantly stops using a dead connector.</td></tr>
+<tr><td>What if a machine reboots?</td><td>Its node restarts at login via LaunchAgent <code>com.riff.phone-node</code>; the other machine carries calls meanwhile. A call in progress on the dying machine drops — there is no mid-call handoff.</td></tr>
+<tr><td>What if the server crashes?</td><td>The ensure loop notices within 120s and restarts it.</td></tr>
+<tr><td>Where is the M1?</td><td><code>david@100.86.206.128</code> (Tailscale) — note the username is <code>david</code>, not <code>davidmar</code>.</td></tr>
+<tr><td>Is it proven?</td><td>Yes. With the M3's connector killed, public probes returned 200 and the companion WebSockets reconnected through the M1.</td></tr>
+<tr><td>Does SMS/bot traffic break?</td><td>Not while the M3 is up. The M1's connector proxies <code>sms.</code> and <code>bot.</code> hostnames back to the M3 over Tailscale. Those services are <strong>not</strong> redundant — M3 down = SMS down.</td></tr>
+</table>
+
+<h2>The phone-node role (repo-tracked)</h2>
+
+<p>Everything lives in the repo — both machines run the same code, updated by <code>git pull</code>:</p>
+
+<ul>
+<li><strong><code>scripts/phone-node-start.sh</code></strong> — starts <code>riff.phone.server</code> :8767
++ the <code>customer-bot</code> connector. <code>--ensure</code> starts only what's down (silent
+no-op when healthy — this is the watchdog pass). Plain invocation is a full restart and
+<strong>refuses to kill live calls</strong> (checks <code>/healthz</code> <code>active_calls</code>)
+unless given <code>--force</code>.</li>
+<li><strong><code>scripts/phone-node-install.sh</code></strong> — idempotent; writes + loads the
+LaunchAgent (<code>RunAtLoad</code> + <code>StartInterval=120</code> + <code>AbandonProcessGroup</code>).
+Re-run after changing the start script's path or the plist shape.</li>
+<li><strong><code>scripts/sync-m1-failover.sh</code></strong> — nightly anti-drift (M3 cron
+<code>15 4 * * *</code>): pulls main on the M1, rsyncs <code>cache/</code>, restarts the M1 node
+only if code changed.</li>
+</ul>
+
+<p>Connector config per machine: the script uses <code>~/.cloudflared/customer-bot.yml</code> if
+present (M1 — keeps its separate <code>recorder-riff</code> tunnel in <code>config.yml</code>
+untouched; also proxies <code>sms.</code>/<code>bot.</code> back to the M3), otherwise the default
+<code>~/.cloudflared/config.yml</code> (M3).</p>
+
+<p><code>RIFF_PHONE_NODE_WEB=1</code> in a node's <code>.env</code> (set on the <strong>M3
+only</strong>) makes the same script/watchdog also manage <code>riff.web_server</code> on :8765 —
+the browser voice-testing surface and the <code>sms.chattychapters.com</code> webhook target.
+Watchdog restarts run with <code>RIFF_CAL_SMOKE_TEST=0</code> so unattended restarts don't write
+calendar marker events.</p>
+
+<p>Logs on both machines: <code>/tmp/riff-phone-node/</code> (<code>phone-server.log</code>,
+<code>cloudflared.log</code>, <code>startup.log</code>, <code>launchagent.log</code>).</p>
+
+<h2>Health checks (run from the M3)</h2>
+
+<pre><code># Two connectors should be listed (one per machine)
+cloudflared tunnel info customer-bot
+
+# Local + peer node health (ok, flow, active calls)
+curl -s http://127.0.0.1:8767/healthz
+ssh david@100.86.206.128 'curl -s http://127.0.0.1:8767/healthz'
+
+# Public URL answers
+curl -s -o /dev/null -w "%{http_code}\n" https://riff.chattychapters.com/healthz</code></pre>
+
+<h2>Restart a node by hand</h2>
+
+<pre><code>scripts/phone-node-start.sh            # refuses if calls are active
+scripts/phone-node-start.sh --force    # drops active calls on THIS node only
+# or via launchd:
+launchctl kickstart -k gui/501/com.riff.phone-node</code></pre>
+
+<h2>Pin test calls to one machine (drain the other)</h2>
+
+<p>New code does <strong>not</strong> reach both machines at once: the machine you restart runs
+your build immediately; the other stays on last night's main until the 4:15am sync. Since
+Cloudflare may route a call to either node, drain the node you are NOT testing on:</p>
+
+<pre><code># from the M3, take the M1 out of the tunnel:
+ssh david@100.86.206.128 'cd ~/src/riff &amp;&amp; scripts/phone-node-start.sh --drain'
+# ...test on the M3 (all live calls now land here)...
+ssh david@100.86.206.128 'cd ~/src/riff &amp;&amp; scripts/phone-node-start.sh --undrain'</code></pre>
+
+<p>Drain kills only the connector — the drained node's server stays up for local testing.
+The ensure loop and full restarts respect the drain flag
+(<code>/tmp/riff-phone-node/DRAINED</code>), so it stays drained until you undrain it.</p>
+
+<h2>The panel node light</h2>
+
+<p><code>voice.html</code> shows a node chip above the version chip (bottom-right): green
+<code>2/2 nodes</code> when both machines serve the tunnel; amber on any of <code>1/2</code>
+(a node down), <code>· 1 drained</code>, or <code>⚠ builds differ between nodes</code>. Hover
+lists each node's build, drain state, and active calls. Backed by
+<code>/api/phone/nodes</code> (admin-gated), which probes each peer in
+<code>RIFF_PHONE_PEERS</code> via its public <code>/healthz</code> (now reporting
+<code>version</code> and <code>drained</code>). Poll interval 30s.</p>
+
+<h2>Hard-won gotchas (read before "improving" this setup)</h2>
+
+<ol>
+<li><strong>Never keep credentials in <code>~/Downloads</code> (or Desktop/Documents).</strong>
+macOS TCC blocks LaunchAgent file access to those folders by <em>hanging the
+<code>open()</code> syscall forever</em> — no error, no prompt. This bit <strong>both</strong>
+machines on the same day. The Google service-account JSON lives at <code>~/.config/riff/</code>
+on each machine. Symptom if it regresses: server log stops right after "registered
+cal_provider" and the process sits in <code>__open</code> (check with <code>sample &lt;pid&gt; 2</code>).</li>
+<li><strong>SSH and tmux sessions hide problem #1</strong> (they inherit disk access). Test
+boot-path changes with <code>launchctl kickstart</code>, not just a shell.</li>
+<li><strong>The plist needs <code>AbandonProcessGroup=true</code></strong> or launchd kills the
+nohup'd server/connector when the start script exits.</li>
+<li><strong>Cloudflare pins clients to a connector.</strong> Repeated curls from one place all
+hit one machine — that's normal. Any given call may land on either machine; the split is
+uneven, not 50/50. Each call is one WebSocket and lives entirely on whichever machine
+caught it.</li>
+<li><strong>The two <code>.env</code> files are a merge, not a copy.</strong> The M1 has keys the
+M3 doesn't (<code>TELNYX_APP_ID</code>, launch tokens, OAuth client pair) — preserved at the
+bottom of the M1's <code>.env</code>. Backup: <code>~/src/riff/.env.bak-20260704</code> (M1).</li>
+</ol>
+
+<h2>Known gaps / follow-ups</h2>
+
+<ul>
+<li><strong>SMS/bot are single-homed on the M3</strong> (<code>:8765</code> / <code>:1203</code>).
+Voice is redundant; SMS is not.</li>
+<li><strong>Call artifacts diverge</strong>: quality.db, call logs, and recordings metadata split
+across two machines (S3 audio is shared). Review tooling reads one machine at a time.</li>
+<li><strong>M3's cloudflared is old</strong> (2026.2.0 vs M1's 2026.5.2).</li>
+<li>The M1's old Python 3.14 venv is at <code>~/src/riff/.venv-old-py314</code>; the M3's original
+credential copy is still in <code>~/Downloads</code> (left in place in case other repos reference
+it). Clean both up when confident.</li>
+</ul>
+
+</div>
+</body>
+</html>

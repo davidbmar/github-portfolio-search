@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-04T09:21:17.102366Z",
-  "count": 137,
+  "generated_at": "2026-07-05T09:41:50.076734Z",
+  "count": 138,
   "projects": [
     {
       "slug": "2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -1081,6 +1081,26 @@
       "pushed_at": null
     },
     {
+      "slug": "domain-tree-intake-nouns-for-riff",
+      "title": "Domain Tree Intake Nouns for riff",
+      "one_liner": "A precursor library that validates domain-specific JSON trees and compiles them into flat capability dictionaries for the riff intake system.",
+      "tech": [
+        "Python",
+        "JSON",
+        "Argparse",
+        "Regular Expressions"
+      ],
+      "reuse_tags": [
+        "intake-forms",
+        "schema-compiler",
+        "llm-augmentation",
+        "business-logic"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/domain-tree-intake-nouns-for-riff",
+      "pushed_at": "2026-07-05T06:44:44Z"
+    },
+    {
       "slug": "easy-cognito-nginx-gateway-auth-",
       "title": "Easy Cognito Nginx Gateway Auth",
       "one_liner": "A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.",
@@ -1251,19 +1271,17 @@
         "SQLite-vec",
         "sentence-transformers",
         "AWS S3",
-        "CloudFront",
-        "Lambda"
+        "CloudFront"
       ],
       "reuse_tags": [
-        "portfolio-management",
-        "code-search",
         "semantic-search",
-        "developer-tools",
-        "knowledge-base"
+        "github-indexer",
+        "ai-agent-tool",
+        "static-web-app"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-03T09:57:49Z"
+      "pushed_at": "2026-07-04T09:23:05Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2114,27 +2132,28 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven conversational flows from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
         "pytest",
-        "JSONL",
-        "WebSockets",
-        "LRU Cache"
+        "FastAPI",
+        "Gemma",
+        "Gemini"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "business-automation",
-        "deterministic-ai",
-        "python-platform"
+        "fsm",
+        "llm-orchestration",
+        "guardrails",
+        "python",
+        "yaml-config",
+        "deterministic-ai"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-04T08:03:37Z"
+      "pushed_at": "2026-07-05T07:10:34Z"
     },
     {
       "slug": "riot",

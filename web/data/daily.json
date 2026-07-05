@@ -1,22 +1,153 @@
 {
-  "generated_at": "2026-07-04T09:23:04.119211Z",
-  "count": 158,
+  "generated_at": "2026-07-05T09:43:19.724325Z",
+  "count": 157,
   "days": [
     {
-      "date": "2026-07-04",
-      "headline": "Fixing Event Loop Crashes and Building Reusable Menu Modules",
-      "summary": "Resolved critical concurrency bugs in SMS adapters and telemetry truncation while establishing a deterministic, reusable menu module framework. The work includes comprehensive documentation on root causes and a new pipeline for prerendered space widgets.",
+      "date": "2026-07-05",
+      "headline": "Tree-Driven Intake System with LLM Generation and Four Verticals",
+      "summary": "Developed a domain-tree DSL with an LLM-powered generator and compiler to automate intake flows for plumbing, electrical, grooming, and legal verticals. Integrated this system into the Riff platform, achieving perfect simulation correctness while adding voice profile support and robust state management.",
       "takeaways": [
-        "Reuse the deterministic menu module architecture that handles barge-in, tap signals, and live-anchor resync for voice applications.",
-        "Apply the documented fix for aiohttp ClientSession loop-binding to prevent 'Event loop is closed' errors in concurrent SMS agents.",
-        "Implement the fail-closed 12-hour refresh pipeline for importing and prerendering short-form audio widgets."
+        "Build a tree DSL validator and compiler to transform structured domain definitions into executable intake capabilities, ensuring schema cohesion and alias resolution.",
+        "Implement a two-step LLM draft generator to bootstrap vertical-specific trees from utterance QA data, reducing manual configuration effort.",
+        "Reuse the phase-contract pattern (problem/triage/identity) to enforce consistent ordering in compiled fields across different business verticals.",
+        "Apply atomic spooling with backoff-poll replay threads to handle transient failures in voice-side API clients and ensure data integrity during intake sessions."
       ],
-      "total_commits": 35,
+      "total_commits": 57,
       "repos": [
         {
-          "name": "riff",
-          "commits": 35,
+          "name": "domain-tree-intake-nouns-for-riff",
+          "commits": 20,
           "messages": [
+            "fix: grooming size nouns need breed + bare-size aliases (sim-gate catch)",
+            "fix: electrical outlet_switch missing the bare 'outlet'/'switch' aliases (sim-gate catch)",
+            "docs: move pipeline html to docs/html, cross-link riff repo",
+            "docs: pipeline & operations guide (md + html)",
+            "fix: repair README mojibake from encoding bug",
+            "feat: phase contract — problem/triage/identity ordering encoded in every compiled field",
+            "feat: mark root choice field as router in compiled capability",
+            "chore: ignore playwright artifacts",
+            "feat: alias enrichment v2 from utterance QA + extractor guidance",
+            "feat: standalone tree builder page (Pass 2, Pre-Task C precursor)",
+            "fix: doc/schema cohesion + alias-collision lint (antigravity review)",
+            "feat: isolation ratchets, dist build, riff ingestion README",
+            "feat: four locked vertical trees — plumbing, electrical, dog grooming, immigration law (Pre-Task F)",
+            "docs(plan): task 5 content brief v2 — antigravity vertical research (aliases, corner cases, UPL boundaries)",
+            "feat: two-step LLM draft tree generator (Pre-Task B)",
+            "feat: tree->capability compiler, one emit path (Pre-Task D precursor)",
+            "feat: tree DSL validator with lint suite (Pre-Task A)",
+            "feat: scaffold, tree DSL v1 reference + JSON Schema",
+            "docs(plan): implementation plan v2 with codex review amendments",
+            "docs: tree-driven intake design v1"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 37,
+          "messages": [
+            "merge: origin/main (profile-intake cash-in) + sim-gate fixes — both importer features kept",
+            "feat(business_pack): all four intake flows pass the sim gate at correctness 10.0",
+            "feat(intake): profile intake for legal_intake + electrical_intake (shift-left cash-in #1)",
+            "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
+            "feat(intake): consented returning callers get a fresh companion link at connect",
+            "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
+            "feat(intake): flip open /intake.html to companion/menu on voice profile-save",
+            "chore(audio): refresh space channel greeting",
+            "chore(audio): add generated intake prompts",
+            "docs: cross-link tree-intake precursor repo",
+            "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
+            "fix(live): scope 0a5bec19 latency fix — kill-switch covers stash+replay, replay scoped to intake_*",
+            "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
+            "fix(live): resend skipped state context + early-advance intake ask states",
+            "feat(business_pack): phase-ordered stages from call QA — problem, triage, identity",
+            "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
+            "Merge remote-tracking branch 'origin/main' into feat/space-profile-intake-v1",
+            "docs(intake): reconcile space-profile-intake docs with as-built, add operator runbook",
+            "fix(intake): task-10 review fixes — verify-before-write ordering, identity upsert, secret redaction, locked-not-404",
+            "feat(phone): route California line +15102160079 to plumbing_intake",
+            "feat(business_pack): tree_intake importer — four verticals from domain-tree precursor",
+            "chore(intake): regenerate widgets flow provenance after consent-marker pack change",
+            "fix(intake): task-9 review fixes — explicit consent marker + voice-save regression test",
+            "test(intake): shift-left contract — second vertical is schema+copy only",
+            "fix(intake): task-8 review fixes — templated-greeting audio guard, gated identity lookup, phone-shape validation",
+            "feat(intake): hello-by-name for returning verified callers",
+            "fix(intake): task-7 review fixes — flush pending saves before submit, queue final-refresh updates for focused fields",
+            "feat(intake): schema-driven /intake.html with lock screen, live mirror, debounced rev-checked edits",
+            "fix(intake): task-6 review fixes — gate transcript stream on finished bit, bound backlog worker",
+            "feat(intake): stream caller transcript into intake session (both transports, non-blocking)",
+            "docs(phone): add vanity URLs to number map",
+            "fix(intake): task-5 review fixes — re-entry save relatch, second-visit update offer, verify-scratch clears, per-edge safety-gate exemptions",
+            "feat(intake): compiler-generated name/consent/verify/interests sequence with menu loop-back",
+            "fix(intake): harden save_field spool fallback, atomic 0600 spool perms, backoff-poll replay thread",
+            "docs(phone): add SMS vanity number examples",
+            "feat(intake): voice-side API client with spool + two-line verification SMS",
+            "fix(intake): gate store registration to M3 authority + bound rate-limit dict"
+          ]
+        }
+      ],
+      "commit_sig": "cfab22d8cf05771c"
+    },
+    {
+      "date": "2026-07-04",
+      "headline": "Riff: Vertical-Agnostic Intake, Self-Healing Phone Nodes, and Deterministic Menu Modules",
+      "summary": "This update introduces a schema-driven, vertical-agnostic profile intake system with verify-before-valuable gating and deploys self-healing active-active phone nodes with drain workflows. It also stabilizes voice interactions through deterministic menu modules, gapless barge-in fixes, and comprehensive telemetry for SMS and call timelines.",
+      "takeaways": [
+        "Implement a vertical-agnostic profile store using field revisions, identity tokens, and TTLs to support reusable intake flows across different commercial sectors.",
+        "Deploy self-healing active-active phone nodes with repo-tracked roles and drain modes to ensure high availability and seamless failover management.",
+        "Build deterministic voice menu modules that unify web taps, DTMF, and voice inputs into a single compiled contract, preventing silent drops and double-menu errors.",
+        "Enhance voice UX by buffering forwardable frames until connection for gapless barge-in and using telemetry to audit SMS delivery versus acceptance."
+      ],
+      "total_commits": 75,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 74,
+          "messages": [
+            "feat(intake): schema + session API with verify-before-valuable gating",
+            "feat(intake): vertical-agnostic profile store (field revs, identity, TTL tokens)",
+            "fix(voice): web live session speaks the flow voice (P0.3 web half)",
+            "docs(plan): space profile intake v1 implementation plan (10 tasks, shift-left)",
+            "docs(spec): intake rev 3 — shift-left contract for 4 commercial verticals",
+            "docs(spec): intake rev 2 — codex findings + verify-before-valuable rule + two-line SMS",
+            "docs(spec): Space Channel profile intake v1 + voice consistency design",
+            "feat(phone): show split node health indicator",
+            "fix(eval): score generated menu completion durably",
+            "feat(ops): phone-node watchdog also manages riff.web_server (RIFF_PHONE_NODE_WEB=1)",
+            "feat(intake): add Space Channel option zero profile flow",
+            "fix(panel): move nodes + version chips to bottom-left — Layout button covered them",
+            "docs(ops): drain workflow + panel node light; whisperx gap closed on M1",
+            "fix(phone): node light counts tunnel-serving nodes — drained nodes excluded",
+            "feat(phone): node-count light + drain mode for the failover pair",
+            "docs(ops): runbook covers repo-tracked phone-node role on both machines",
+            "feat(ops): repo-tracked phone-node role — self-healing active-active nodes",
+            "docs(ops): M1 active-active phone failover runbook",
+            "docs(intake): frame webpage modules for fable review",
+            "docs(intake): design progressive web intake",
+            "docs(widgets): tutorial honesty-note covers v0.1 (ladder depth + episode audio in the importer); ignore .context/ runtime scratch",
+            "content(widgets): 2026-07-04 feed refresh — standard-ladder briefings rendered + doc index",
+            "feat(widgets): importer v0.1 — spoken.standard ladder, real episode audio, karaoke stylesheet (codex-implemented)",
+            "feat(debug): add PageAgent routed-line targets",
+            "feat(debug): add experimental PageAgent lab",
+            "fix(barge-in): gapless pre-connect utterance — buffer ALL forwardable frames until Gemini connect",
+            "fix(barge-in): pre-connect barge utterance is stashed and delivered at Gemini connect",
+            "fix(barge-in): hear the caller — grace hysteresis, gated-audio flush to Gemini, calibration telemetry",
+            "test(menu): three-ingress parity generalized to ALL pack-compiled menus",
+            "feat(companion): text the follow-along link at ANSWER, not Gemini connect",
+            "fix(companion): tap barge-in parity — taps during the menu re-announce now select like DTMF (codex-implemented)",
+            "feat(debug): call_timeline.py — five-lane merged per-call timeline (EAR/FSM/FINGER/WIRE/SCREEN)",
+            "feat(companion): view-branch beacon + deterministic say-view browser check",
+            "fix(menu): 'locked' drop text — 'One at a time' not 'Already chosen' (operator read it as item-level state)",
+            "fix(companion): dead keypad after hangup + press-level beacons + human drop reasons",
+            "feat(telemetry): shift-left client contract on every served page + tap never silently drops",
+            "test(menu): three-ingress parity — web tap ≡ DTMF ≡ voice for every compiled menu option",
+            "docs(F-367): implementation plan for the tool-reference build check (shift-left gap #2)",
+            "docs(F-369): RESOLVED — fixed by 918fc956 (guard+catch-retry), verified live; corrected my own analysis twice",
             "fix(companion): survive stale cached modules — the beacon-caught freeze",
             "fix(telemetry): client-log sink truncated call ids to 24 chars BEFORE validation — every beacon 404'd",
             "telemetry(sms): deterministic carrier-delivery audit — accepted != delivered",
@@ -55,7 +186,7 @@
           ]
         }
       ],
-      "commit_sig": "04436ec44358f0c4"
+      "commit_sig": "f1652cabc95101b2"
     },
     {
       "date": "2026-07-03",
@@ -2804,15 +2935,15 @@
     },
     {
       "date": "2026-05-27",
-      "headline": "Agent Ops Dashboards and Flow Validation Land",
-      "summary": "agent-router added fleet operations surfaces: /exec briefings, a /status dashboard, mobile /m hosts/worker/voice/composer workflows, manager queue APIs, peer status, tailnet auto-discovery, peer gossip, role personas, and M3 utilization snapshots. riff advanced flow validation with state models, SHA-256 flow hashing, static/L1/L2/L3/L4 runners, run/run-status routes, metrics emitters, and docs/test coverage for integration and slot fallback behavior.",
+      "headline": "Agent Router Adds Mobile Voice Mode, Manager Queue, and M3 Utilization Tracking",
+      "summary": "The agent-router introduces a comprehensive mobile interface with voice dictation, a manager task queue, and real-time fleet status dashboards. It also implements granular M3 utilization snapshotting and defines organizational role personas to standardize operator workflows.",
       "takeaways": [
-        "Build operator-facing agent tools as paired UI and API layers: agent-router added /api/manager queue endpoints, a Queue pane, /status fleet dashboard, /exec briefing pages, and docs aligned to implementation.",
-        "Reuse the mobile control pattern: /m combined a persistent composer, host picker, spawn buttons, Hosts pane backed by /api/peers/status, worker-detail panel, and fullscreen dictation overlay.",
-        "Model validation as progressive levels: riff introduced ValidationState/LevelState plus static, L1, L2, stub L3/L4 runners and run-status endpoints.",
-        "Instrument validation output early: riff added metrics emitters for L1, L2 stub, and L2 real results, with SHA-256 flow hashing for stable identifiers."
+        "Implement a 'composer-first' mobile UX with a persistent bottom input bar and fullscreen voice dictation overlay for hands-free operation.",
+        "Build a manager-mode dashboard featuring a task queue pane and /api/manager endpoints to monitor and assign work across the fleet.",
+        "Bootstrap periodic M3 utilization snapshots by iterating through entry ranges to track resource consumption over time.",
+        "Standardize team operations by defining explicit org-chart role personas and documenting them in an operational playbook."
       ],
-      "total_commits": 67,
+      "total_commits": 46,
       "repos": [
         {
           "name": "agent-router",
@@ -2867,130 +2998,13 @@
         },
         {
           "name": "riff",
-          "commits": 22,
+          "commits": 1,
           "messages": [
-            "feat(flow_validation): emit L2 real metrics from variants",
-            "chore: docs and tools hardening from previous session",
-            "feat(validation): implement stub L3 and L4 runners",
-            "feat(flow_validation): emit L2 stub metrics from quality gate",
-            "feat(flow_validation): emit L1 metrics from quality gate",
-            "feat(flow_validation): add metrics emitter",
-            "docs(codex): add accumulated handoffs, plans, and design docs",
-            "docs(integration-tests): M3 HTTPS smoke + post-M3 federation recount",
-            "docs(codex): property_trouble_ticket L1+L2 stub+L2 real test run results",
-            "docs(integration-tests): EC2 HTTPS smoke + HTTP federation baseline",
-            "feat(flow_validation): Task 9 stub — run + run-status endpoints",
-            "feat(flow_validation): add L2 runners",
-            "feat(flow_validation): add L1 runner",
-            "feat(flow_validation): add static runner",
-            "fix(web_server): mount /api/flow-validation/ route handler",
-            "feat(flow_validation): GET /api/flow-validation/<flow_id> route (Task 3)",
-            "feat(flow_validation): hash_flow_file SHA-256 helper (Task 2)",
-            "feat(flow_validation): ValidationState + LevelState + derivations (Task 1)",
-            "fix(slots): extract caller name fallbacks",
-            "test: cover property caller name semantic ack",
-            "fix(slots): extract entry permission fallbacks",
-            "test: cover property entry permission semantic ack"
+            "feat(flow_validation): emit L2 real metrics from variants"
           ]
         }
       ],
-      "commit_sig": "924f526c233792fb"
-    },
-    {
-      "date": "2026-05-26",
-      "headline": "Observed Trouble Tickets Get Safer, More Measurable Runs",
-      "summary": "Riff added an observed property trouble ticket L3 run path, backed by absolute run-root handling and catalog-based issue category inference. The day also tightened user flow and observability by preventing premature SMS sends, serving live probe-room audio on the timing page, and exposing expected reality whisper metrics.",
-      "takeaways": [
-        "Build observed evaluation runs with stable absolute root paths so runtime artifacts resolve consistently across environments.",
-        "Infer issue categories from a catalog to reduce manual classification logic in trouble ticket workflows.",
-        "Gate manual phone collection before SMS dispatch to avoid contacting users too early.",
-        "Expose live audio and whisper metrics on timing/diagnostic pages so developers can debug probe behavior directly."
-      ],
-      "total_commits": 6,
-      "repos": [
-        {
-          "name": "riff",
-          "commits": 6,
-          "messages": [
-            "fix: keep manual phone collection from sending sms early",
-            "fix: infer trouble ticket issue category from catalog",
-            "fix: use absolute runs root for observed L3",
-            "feat: run observed property trouble ticket L3",
-            "fix: serve live probe room audio on timing page",
-            "feat: expose expected reality whisper metrics"
-          ]
-        }
-      ],
-      "commit_sig": "69365307195771a6"
-    },
-    {
-      "date": "2026-05-25",
-      "headline": "Build Real-Time Speech Timing Dashboards with Audio Truth Lanes",
-      "summary": "This update introduces a live speech timing dashboard featuring M3 Whisper observer lanes and room audio activity truth sources. It synchronizes timing markers to the room audio clock, bundles evidence for metric accuracy, and visualizes data via speaker swim lanes.",
-      "takeaways": [
-        "Implement 'truth lanes' by treating live observer artifacts and room audio activity as the primary source of truth for timing validation.",
-        "Synchronize timing markers and audio playheads to the room audio clock to ensure accurate alignment across distributed timelines.",
-        "Visualize complex speech interactions using speaker swim lanes and compressed timing graphs that expose spoken text on hover."
-      ],
-      "total_commits": 49,
-      "repos": [
-        {
-          "name": "riff",
-          "commits": 49,
-          "messages": [
-            "feat: add repeatable whisper metrics campaign",
-            "feat: show world model agreement on timing page",
-            "fix: keep requested observed-world session on timing page",
-            "fix: treat live observer artifacts as timing truth",
-            "feat: add M3 live Whisper observer lane",
-            "feat: add room audio activity truth lane",
-            "feat: bundle timing evidence for metric accuracy",
-            "feat: add remote playwright screenshot capture",
-            "feat: gate self improvement on truth quality",
-            "feat: expose truth quality metrics for speech timing",
-            "feat: add distilled whisper word timestamp evidence",
-            "feat: add fast deterministic whisper truth preview",
-            "feat: expose audio truth metrics for auto improvement",
-            "fix: sync timing markers to room audio clock",
-            "fix: clarify compressed timing callouts",
-            "feat: enrich timing hover overlays",
-            "feat: use single compressed timing graph",
-            "feat: show spoken text on timing hover",
-            "feat: compare caller playback with RIFF voice timing",
-            "fix: align audio validation with room clock",
-            "feat: validate audio transcript against timing graph",
-            "feat: sync audio playhead across timing timelines",
-            "feat: add human review notes to speech timing",
-            "feat: expose AI-readable speech timing log",
-            "fix: find audio truth artifacts across run roots",
-            "feat: add audio source-of-truth timeline",
-            "fix: suppress hidden RIFF audio and show silence gaps",
-            "fix: use wall clock spans for speech timing",
-            "chore: expose speaker busy time in AIR status",
-            "fix: show transcripts on timing hover and gate speaker busy",
-            "fix: measure RIFF voice duration from audio output",
-            "fix: show estimated speech overlap causality",
-            "fix: clarify speech timing labels",
-            "chore: label dashboard as speech timing",
-            "feat: annotate AIR timeline clips",
-            "fix: align property L3 verification expectation",
-            "fix: harden property L3 caller handoff",
-            "feat: make AIR dashboard true swim lanes",
-            "fix: accept spoken verification code words",
-            "fix: preserve AIR verification code override on boot",
-            "feat: add audio editor timeline to AIR dashboard",
-            "feat: show AIR timing as speaker swim lanes",
-            "fix: clarify AIR dashboard speaker perspective",
-            "docs: explain realtime AIR speech dashboard",
-            "fix: expose M1 RIFF web UI on AIR tailnet",
-            "feat: add live speech timing dashboard",
-            "feat: log live speech handoff timing metrics",
-            "fix: start M1 AIR service in internal mode",
-            "fix: support macOS AIR bootstrap detach"
-          ]
-        }
-      ],
-      "commit_sig": "407be8479c5195ae"
+      "commit_sig": "cebace3ff7608b61"
     },
     {
       "date": "2026-05-24",
