@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T09:41:50.076734Z",
+  "generated_at": "2026-07-06T11:30:14.515072Z",
   "count": 138,
   "projects": [
     {
@@ -1083,22 +1083,26 @@
     {
       "slug": "domain-tree-intake-nouns-for-riff",
       "title": "Domain Tree Intake Nouns for riff",
-      "one_liner": "A precursor library that validates domain-specific JSON trees and compiles them into flat capability dictionaries for the riff intake system.",
+      "one_liner": "A Python library that validates domain-specific JSON trees and compiles them into flat capability dictionaries for the riff intake system.",
       "tech": [
         "Python",
         "JSON",
+        "Standard Library",
         "Argparse",
-        "Regular Expressions"
+        "Pathlib",
+        "Regex"
       ],
       "reuse_tags": [
-        "intake-forms",
-        "schema-compiler",
-        "llm-augmentation",
-        "business-logic"
+        "intake-form-generator",
+        "json-tree-compiler",
+        "dsl-validator",
+        "llm-drafting-tool",
+        "schema-flattener",
+        "domain-modeling"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/domain-tree-intake-nouns-for-riff",
-      "pushed_at": "2026-07-05T06:44:44Z"
+      "pushed_at": "2026-07-05T22:43:11Z"
     },
     {
       "slug": "easy-cognito-nginx-gateway-auth-",
@@ -1150,7 +1154,7 @@
     {
       "slug": "everyone-ai",
       "title": "Everyone Ai",
-      "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
+      "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes",
       "tech": [
         "Node.js",
         "Express",
@@ -1158,19 +1162,18 @@
         "k3s",
         "Helm",
         "Traefik",
-        "code-server",
         "Vanilla JS"
       ],
       "reuse_tags": [
         "ai-workspace",
-        "k3s-bootstrap",
-        "developer-portal",
+        "kubernetes-operator",
+        "dev-environment",
         "claude-code",
-        "self-hosted-ide"
+        "self-hosted"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/everyone-ai",
-      "pushed_at": "2026-06-30T06:16:11Z"
+      "pushed_at": "2026-07-06T05:34:44Z"
     },
     {
       "slug": "exampleLoops",
@@ -1274,14 +1277,15 @@
         "CloudFront"
       ],
       "reuse_tags": [
-        "semantic-search",
-        "github-indexer",
-        "ai-agent-tool",
-        "static-web-app"
+        "search-engine",
+        "portfolio-tool",
+        "code-discovery",
+        "embedding-index",
+        "mcp-server"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-04T09:23:05Z"
+      "pushed_at": "2026-07-05T09:43:21Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2132,28 +2136,25 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven conversational flows from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
-        "Mermaid",
-        "pytest",
-        "FastAPI",
-        "Gemma",
-        "Gemini"
+        "Finite State Machines",
+        "Large Language Models",
+        "WebSockets",
+        "SQLite"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm",
-        "llm-orchestration",
-        "guardrails",
-        "python",
-        "yaml-config",
-        "deterministic-ai"
+        "fsm-orchestration",
+        "llm-guardrails",
+        "python-platform",
+        "conversation-design"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-05T07:10:34Z"
+      "pushed_at": "2026-07-06T10:19:59Z"
     },
     {
       "slug": "riot",

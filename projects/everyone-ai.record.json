@@ -1,32 +1,30 @@
 {
   "title": "Everyone Ai",
-  "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
-  "what_it_is": "A web portal and CLI tool that allows teams to provision isolated VS Code workspaces backed by Claude Code on a shared k3s cluster. It manages the lifecycle of workspace pods, handles ingress routing via Traefik, and provides an app catalog for pre-configured development templates.",
-  "how_its_built": "The system consists of a Node.js Express server acting as the portal API and frontend host, communicating with a k3s Kubernetes cluster via the official k8s client. Workspaces are deployed as individual pods running code-server. An accompanying CLI ('afterburner') handles cluster bootstrapping via SSH and Helm chart deployment.",
-  "how_to_apply": "Operators use the 'afterburner' CLI to bootstrap a Linux VM into a k3s node and deploy the portal via Helm. End-users connect via VPN, access the portal URL, select a template from the App Catalog, and launch a browser-based VS Code instance with Claude Code pre-installed.",
+  "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes",
+  "what_it_is": "A web portal and CLI tool that allows teams to provision isolated VS Code workspaces backed by Claude Code. It abstracts Kubernetes complexity, letting users launch pre-configured development environments from a browser catalog without local setup or credential management.",
+  "how_its_built": "The system consists of a Node.js Express backend serving a vanilla JS SPA frontend. It interacts with a k3s Kubernetes cluster using the official k8s client to dynamically create and manage Workspace pods (running code-server) and Target pods. An 'afterburner' CLI handles infrastructure bootstrapping and Helm chart deployment.",
+  "how_to_apply": "Operators use the afterburner CLI to bootstrap a Linux VM into a k3s cluster and deploy the portal via Helm. End-users connect via VPN, access the portal URL, select a template from the App Catalog, and receive a browser-based VS Code instance with Claude Code ready in the terminal.",
   "quickstart": "npx afterburner bootstrap --host <ip> --ssh-key ~/.ssh/id_rsa\nnpx afterburner install\nhelm install everyone-ai-portal ./charts/portal -f profiles/k3s.yaml -f config.yaml --namespace myteam --create-namespace",
   "features": [
-    "One-click launch of Claude Code VS Code workspaces",
-    "Interactive CLI for k3s cluster bootstrapping and Helm deployment",
-    "App Catalog with pre-configured templates (Python, Node.js, HR Agent)",
-    "Real-time workspace provisioning status via Server-Sent Events",
-    "Team-based isolation and usage monitoring dashboard",
-    "Automated Traefik IngressRoute creation for workspace access"
+    "App Catalog with pre-configured Claude Code templates",
+    "One-click launch of personal VS Code workspaces in browser",
+    "Automated k3s cluster bootstrapping via SSH",
+    "Team-wide usage monitoring and fleet overview",
+    "Persistent HTTPS endpoints for deployed targets",
+    "Zero-config user onboarding via VPN access"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS VPN| Traefik[Traefik Ingress]\n    Traefik --> Portal[Portal Server Node Express]\n    Portal --> K8sClient[Kubernetes Client]\n    K8sClient --> Cluster[k3s Cluster]\n    Cluster --> WorkspacePod[Workspace Pod code-server]\n    Cluster --> TargetPod[Target Pod User App]\n    User -->|Direct Access| WorkspacePod",
-  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Portal\n    participant K8sAPI\n    participant WorkspacePod\n    User->>Portal: POST /api/workspaces\n    Portal->>K8sAPI: create pod workspace-user-team\n    K8sAPI-->>Portal: pod created pending\n    Portal-->>User: 201 Created with ID\n    User->>Portal: GET /api/workspaces/id/events\n    Portal->>K8sAPI: watch pod status\n    K8sAPI-->>Portal: status Running\n    Portal-->>User: SSE event ready\n    User->>WorkspacePod: Open VS Code URL",
+  "diagram_architecture": "flowchart TD\n    User[User Browser] -->|HTTPS| Traefik[Traefik Ingress]\n    Traefik --> Portal[Portal Server Node Express]\n    Portal --> K8sClient[Kubernetes Client]\n    K8sClient --> K3s[k3s Cluster]\n    K3s --> WorkspacePod[Workspace Pod code-server]\n    K3s --> TargetPod[Target Pod User App]\n    User -->|Direct Link| WorkspacePod",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Portal\n    participant K8sAPI\n    participant WorkspacePod\n    User->>Portal: POST /api/workspaces\n    Portal->>K8sAPI: Create Pod workspace-user-team\n    K8sAPI-->>Portal: Pod Created\n    Portal-->>User: Return Workspace ID\n    User->>Portal: GET /api/workspaces/id/events\n    Portal->>K8sAPI: Watch Pod Status\n    K8sAPI-->>Portal: Pod Running\n    Portal-->>User: SSE Event Ready\n    User->>WorkspacePod: Open VS Code URL",
   "capabilities": [
-    "Workspace Lifecycle Management",
-    "Cluster Bootstrapping",
-    "Helm Chart Deployment",
-    "Ingress Routing",
-    "Template Provisioning",
-    "Usage Monitoring"
+    "Workspace provisioning",
+    "Cluster bootstrapping",
+    "Template management",
+    "Health monitoring",
+    "Ingress routing"
   ],
   "components": [
     "Portal Server",
     "Afterburner CLI",
-    "Kubernetes Client",
     "Frontend SPA",
     "Helm Charts",
     "Setup Wizard"
@@ -38,7 +36,6 @@
     "k3s",
     "Helm",
     "Traefik",
-    "code-server",
     "Vanilla JS"
   ],
   "depends_on": [
@@ -46,28 +43,26 @@
     "kubectl >= 1.27",
     "helm >= 3.12",
     "Linux VM Ubuntu 20.04+",
-    "SSH Access",
-    "VPN Connection"
+    "SSH Access"
   ],
   "integrates_with": [
     "Claude Code",
-    "VS Code",
-    "AWS ECR",
-    "Playwright"
+    "VS Code Server",
+    "ECR",
+    "VPN"
   ],
   "patterns": [
-    "Self-Service Platform",
-    "GitOps Lite",
-    "Pod-per-User",
-    "Server-Sent Events",
-    "CLI Wizard"
+    "Self-service portal",
+    "Infrastructure as Code",
+    "Event-driven provisioning",
+    "Server-sent events"
   ],
   "reuse_tags": [
     "ai-workspace",
-    "k3s-bootstrap",
-    "developer-portal",
+    "kubernetes-operator",
+    "dev-environment",
     "claude-code",
-    "self-hosted-ide"
+    "self-hosted"
   ],
   "slug": "everyone-ai",
   "repo_url": "https://github.com/davidbmar/everyone-ai",
@@ -101,9 +96,9 @@
     }
   ],
   "screenshot_url": "",
-  "generated_at": "2026-06-30T10:33:36.032089Z",
-  "source_commit": "f9f66b6",
+  "generated_at": "2026-07-06T11:28:42.779965Z",
+  "source_commit": "2325474",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-06-30T06:16:11Z",
+  "pushed_at": "2026-07-06T05:34:44Z",
   "docs": []
 }

@@ -1,23 +1,114 @@
 {
-  "generated_at": "2026-07-05T09:43:19.724325Z",
-  "count": 157,
+  "generated_at": "2026-07-06T11:32:24.378842Z",
+  "count": 158,
   "days": [
     {
-      "date": "2026-07-05",
-      "headline": "Tree-Driven Intake System with LLM Generation and Four Verticals",
-      "summary": "Developed a domain-tree DSL with an LLM-powered generator and compiler to automate intake flows for plumbing, electrical, grooming, and legal verticals. Integrated this system into the Riff platform, achieving perfect simulation correctness while adding voice profile support and robust state management.",
+      "date": "2026-07-06",
+      "headline": "RIFF Self-Improvement Loop Hits Target; Everyone-AI Refactors Commands",
+      "summary": "The RIFF framework achieved its quality target of 121.2 through a metric-ratchet self-improvement loop, fixing systemic eval errors and enforcing strict schema gates. Concurrently, the everyone-ai project refactored its /self-improve-loop command to align with the new environment while documenting session integrity.",
       "takeaways": [
-        "Build a tree DSL validator and compiler to transform structured domain definitions into executable intake capabilities, ensuring schema cohesion and alias resolution.",
-        "Implement a two-step LLM draft generator to bootstrap vertical-specific trees from utterance QA data, reducing manual configuration effort.",
-        "Reuse the phase-contract pattern (problem/triage/identity) to enforce consistent ordering in compiled fields across different business verticals.",
-        "Apply atomic spooling with backoff-poll replay threads to handle transient failures in voice-side API clients and ensure data integrity during intake sessions."
+        "Implement a 'metric-ratchet' self-improvement loop that iteratively adjusts greeting frontloads and acknowledgment honesty to drive measurable quality gains from baseline to target.",
+        "Prevent evaluation bias by ingesting errored conversations as 'infra_error' markers rather than discarding them, ensuring measurement absences do not skew performance verdicts.",
+        "Enforce schema validity at authoring time using lint rules like 'no-completion-slots-multi-path' to catch eval-gate traps before runtime execution."
       ],
-      "total_commits": 57,
+      "total_commits": 61,
+      "repos": [
+        {
+          "name": "everyone-ai",
+          "commits": 3,
+          "messages": [
+            "refactor(commands): retarget /self-improve-loop from RIFF to the everyone-ai environment",
+            "docs(session): link commit hash in S-2026-07-06-0503 session doc",
+            "feat(commands): /self-improve-loop — RIFF metric-ratchet self-improvement loop"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 58,
+          "messages": [
+            "docs(loop): cycle 11 close — quota-stop rule, push footgun, tree-fleet ledger",
+            "chore(loop): commit sibling probe-pack deletions — the destroy step of their own protocol",
+            "docs(loop): cycle 10 — enum typing at the generator; gate honesty observed under outage",
+            "feat(tree-intake): choice fields emit semantic_type enum — slots bind to their declared domain",
+            "docs(loop): cycle 9 — harness parity autopsy, PII ratchet rule, lane handoffs",
+            "fix(system): sim-harness walker parity, emit-then-advance states, ADR-0007 allowlist, per-caller PII ratchet",
+            "docs(loop): cycle 8 burn-down notes + verification honesty correction",
+            "feat(safety-gate): escalation + CRM prefill are confirm-exempt; lint ratchet re-anchored; protocol test collateral fixed",
+            "docs(loop): first-try-clean probe — fresh vertical gates 10.0 with zero rework",
+            "docs(loop): repeat_menu autopsy — persistent test failures are unread defect reports",
+            "fix(locked-choice): declared repeat_menu beats the transport re-speak fallback — 16 ingress failures were a real live defect",
+            "loop(final): target crossed 121.2 — greeting frontload + honest acks measured | quality 28->43, humanness 26.7->43.3",
+            "loop(wrap-up s07060207): frontload root-cause chain documented; measurement pending",
+            "loop(cycle 1): greeting frontload capture + ack honesty gate | measuring",
+            "chore(flows): fleet rebuild adopts varied retry lines — three one-line diffs, gates 10.0/10.0/10.0",
+            "feat(eval-db): errored conversations ingest as infra_error markers — all-errored runs can no longer vanish",
+            "loop(cycle 1): value-forward capture acks | score 100->114.6 (raw 69.9->80.1)",
+            "docs(loop): shared-checkout commit-integrity autopsy + worktree rule",
+            "chore(audio): space cron re-renders accompanying the recovered manifest",
+            "fix(repo): recover batch-C files lost from commit 8311c8be — shared-index casualty",
+            "docs(loop): negation-blind matcher autopsy + errored-ingest gap",
+            "fix(locked-choice): negated choice phrases are denials — veto + masked re-route",
+            "loop(wrap-up s07060109): retry proven 0/6 errored; survivorship bias in prior judged dims documented",
+            "docs(loop): spoken-digit routing autopsy + repeat_menu breadcrumb",
+            "fix(locked-choice): spoken digits resolve as announced dtmf digits, not list positions",
+            "loop(cycle 1): quota-aware eval retry — 403/429 get window-scale backoff | measuring (was 4/6, 3/6 errored)",
+            "feat(eval-db): gate treats errored conversations as measurement absences, not verdicts",
+            "feat(schema): no-completion-slots-multi-path lint — the eval-gate trap moves to authoring time",
+            "docs(loop): batch-C session learnings — four systemic eval/compiler fixes, cross-session pickups",
+            "loop(wrap-up s07060043): outage session close — re-ask fix shipped, scoring deferred",
+            "fix(locksmith): drop generic-urgency aliases from the emergency handoff",
+            "loop(cycle 1): varied re-ask phrasing (runtime + compiler) | score deferred — provider outage",
+            "feat(eval): agent-speaks-first protocol — evals hear the call a live caller hears",
+            "loop(cycle 2): noise proven on identical yaml (quality 15->60) | score 87.4->97.9, gate vindicated",
+            "feat(eval): cross-process single-flight lock — concurrent evals stop 403-ing each other",
+            "feat(compile): inject anti-re-ask intake rules into every intake pack — riff_cafe gate 0.0 -> 10.0",
+            "loop(cycle 1): alias-greedy-handoff compiler gate + humanness judge | score 100->87.4 (noise-suspect, gate kept)",
+            "fix(welcome): completion_slots pin the eval correctness contract on the four packs",
+            "feat(welcome): batch C — welcome + profile intake on ALL packs, nightly greeting backfill",
+            "loop(cycle 2): de-greed emergency aliases | score 143.8->184.2 (raw 57.5->73.7) — session target 120 exceeded",
+            "loop(cycle 1): rebuild probe live — pack->riffc->green measured | score 100->143.8 (raw 40->57.5)",
+            "loop(wrap-up s07052350): scorecard + closing learnings | score 100->100 (baseline)",
+            "loop(cycle 0): baseline instrumentation + first measured run | score ->100 (raw 40.0)",
+            "feat(audit): per-iteration environment audit snapshot -> quality.db + iteration ledger",
+            "feat(law): brand intake and expand menu",
+            "fix(line-page): journey notes truncate to one sentence (full text on hover)",
+            "feat(operator): Line Page v1 — read-only per-flow menu/greeting/intake-journey page",
+            "fix(law): menu reorder to dtmf 0 + prerender profile-intake audio",
+            "fix(ops): sweep gate passes explicit routed flow ids from .env",
+            "chore(audio): add routed law and property menu prerenders",
+            "feat(live): batch B — stall watchdog, trimmed readbacks, peer caller lookup, abandoned-call tickets",
+            "feat(live): recover stalled audio and preserve partial Replicant tickets",
+            "fix(phone): pin LAW number to legal intake",
+            "feat(ops): deploy refuses un-prerendered routed flows (audio sweep gate)",
+            "feat(replicant): affirm-then-skip, unknown-caller tickets, payload contract fixes, flow-locked tools",
+            "fix(replicant): map identify output to the tree intake slot ids",
+            "fix(replicant): identify hook observability + deploy waits for active calls",
+            "feat(replicant): ticket POST fires on live calls + Aman's final enum contract"
+          ]
+        }
+      ],
+      "commit_sig": "8ed934422256b203"
+    },
+    {
+      "date": "2026-07-05",
+      "headline": "Tree-Driven Intake System: DSL Compiler, Vertical Scaling, and Live Voice Mirroring",
+      "summary": "Implemented a domain-specific language for defining intake flows, compiling them into runtime capabilities across four verticals including property maintenance and legal services. Enhanced the voice interface with live transcript mirroring, schema-driven HTML forms, and robust session management for returning callers.",
+      "takeaways": [
+        "Build a tree DSL validator and compiler to transform structured domain definitions into executable intake capabilities, enabling rapid scaling across new verticals like electrical or legal services.",
+        "Implement live transcript streaming and schema-driven HTML mirrors to synchronize voice and web sessions, allowing users to edit data in real-time while maintaining state consistency.",
+        "Adopt a 'shift-left' verification strategy using HMAC-signed contracts and pre-rendered audio to secure identity hooks and reduce latency in SMS and voice handoffs."
+      ],
+      "total_commits": 90,
       "repos": [
         {
           "name": "domain-tree-intake-nouns-for-riff",
-          "commits": 20,
+          "commits": 25,
           "messages": [
+            "feat: profile_intake as tree data — passthrough emission (was hand-edited in riff dist)",
+            "feat: property_maintenance tree — fifth vertical (Replicant California line)",
+            "docs: system docs move to riff; precursor keeps authoring contracts only",
+            "docs: welcome module design moved to riff (runtime feature) — index cross-links",
+            "docs: welcome module design (md+html), docs index, README pointer",
             "fix: grooming size nouns need breed + bare-size aliases (sim-gate catch)",
             "fix: electrical outlet_switch missing the bare 'outlet'/'switch' aliases (sim-gate catch)",
             "docs: move pipeline html to docs/html, cross-link riff repo",
@@ -41,9 +132,43 @@
           ]
         },
         {
-          "name": "riff",
-          "commits": 37,
+          "name": "github-portfolio-search",
+          "commits": 1,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 64,
+          "messages": [
+            "feat(intake): follow-along live data for pack flows — schema registry + slot mirror",
+            "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
+            "feat(replicant): signature per confirmed contract + intake sim suite + vertical audio",
+            "fix(phone): silent-jam root fixes + code-first verify SMS + kill intake double-text",
+            "feat(phone): route California line to property_management + prerendered audio",
+            "feat(replicant): California property integration — HMAC client, identify hook, ticket submit, tree-generated pack",
+            "docs: rename Replicant webhook secret env key",
+            "docs: add Replicant California property integration handoff",
+            "fix(phone): prewalk silent welcome gates before audio",
+            "merge: origin/main (commercial base menu) + call-review fixes — both kept",
+            "feat(call-review): guest unlock offer, honest copy, brief menu re-entry, confirm pacing, name corrections",
+            "fix(business_pack): retry-fallback marker, greeting-suffix rename, test honesty",
+            "feat(business_pack): commercial base menu (shift-left) + trade renaming",
+            "feat(menu-module): repeat-the-menu on every pack flow + reserved-alias guard",
+            "fix(welcome): menu-only unlock copy + explicit skip decline path",
+            "docs(spec): welcome v1.1 corrections — menu-only code (state-driven), explicit skip path",
+            "feat(welcome): v1.1 — verified/guest sessions, auto follow-along SMS, menu code unlock",
+            "docs(spec): welcome module v1.1 — verified vs guest sessions, non-gating code unlock",
+            "fix(ops): deploy pre-flight ignores locally-regenerated audio artifacts",
+            "fix(companion): peer-aware call binding + trace/verify tooling",
+            "feat(ops): rolling two-node deploy script — drain M1, verify M3, refill",
+            "chore(audio): prerender plumbing welcome + sms lines",
+            "feat(welcome): Welcome Module v1 — pre-rendered personalized greetings, first-call vs returning paths",
+            "docs: tree-intake system docs move into riff (pipeline guide, founding design, html mirrors)",
+            "docs(spec): welcome module v1 — pre-rendered whole-sentence greetings, first-call vs returning paths",
+            "docs(intake): field stall policy design — Fable 5 review APPROVED (4 policies, status-not-sentinel, double-sided blocks)",
+            "Fix generated intake simulator regressions",
             "merge: origin/main (profile-intake cash-in) + sim-gate fixes — both importer features kept",
             "feat(business_pack): all four intake flows pass the sim gate at correctness 10.0",
             "feat(intake): profile intake for legal_intake + electrical_intake (shift-left cash-in #1)",
@@ -84,7 +209,7 @@
           ]
         }
       ],
-      "commit_sig": "cfab22d8cf05771c"
+      "commit_sig": "0624838de44fa122"
     },
     {
       "date": "2026-07-04",
@@ -1549,15 +1674,14 @@
     },
     {
       "date": "2026-06-15",
-      "headline": "Grounding Gate Ships With Reusable CI and Demo Plumbing",
-      "summary": "Riff landed a deterministic grounding gate workflow with staged shadow wiring, offered-then-affirmed checks, failure classification, surface-form and word-boundary matching, plus regression tests and docs. The portfolio search repo standardized CI authentication on GHPS_PAT for docs and reindex jobs, added nightly reindexing, and Riff patched web/flow-editor dependency alerts.",
+      "headline": "Riff Grounding Gate Phase 1 Complete with Security Patches",
+      "summary": "The Riff project finalizes Phase 1 of its integrity grounding gate, adding surface-form matching and negation handling to reduce false positives. Concurrently, critical dependency vulnerabilities were patched in the web editor, and CI workflows for portfolio search were standardized.",
       "takeaways": [
-        "Build grounding checks as pure deterministic gates first, then shadow-wire them behind a kill switch before enforcing behavior.",
-        "Reduce false positives with word-boundary matching, negator/hedge handling, and offered-then-affirmed validation.",
-        "Make demos reusable with bare python3 execution, --list-flows, per-run JSONL logs, and --review diagnostics.",
-        "Unify scheduled CI jobs around one repo-scoped token and keep dependency-alert patches in the same maintenance flow."
+        "Implement 'offered-then-affirmed' grounding logic with surface-form matching to filter shadow false positives in AI interaction flows.",
+        "Add robust negation and hedge detection to affirmation checks, verified by live demos and end-to-end tests.",
+        "Standardize CI authentication by unifying token usage (GHPS_PAT) across documentation generation and nightly reindexing jobs."
       ],
-      "total_commits": 16,
+      "total_commits": 12,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1569,7 +1693,7 @@
         },
         {
           "name": "riff",
-          "commits": 14,
+          "commits": 10,
           "messages": [
             "chore(grounding-gate): land working set — docs, scenario data, audio, tests",
             "fix(deps): patch 6 Dependabot alerts in web/flow-editor (esbuild RCE, vitest, brace-expansion) (#9)",
@@ -1580,15 +1704,11 @@
             "Fix is_affirmation false-positive on negators/hedges + add live demo and e2e test",
             "docs(integrity): runbook + Phase 0-1 complete; loop stop note",
             "feat(integrity): Phase 1b — wire offered-then-affirmed grounding (cut shadow FPs)",
-            "docs(integrity): progress — Phase 1a shadow wiring done, Phase 1b/2 next",
-            "feat(integrity): Phase 1a — shadow wiring behind kill switch (observe-only)",
-            "docs(integrity): progress log — Phase 0 done, Phase 1 next",
-            "fix(integrity): word-boundary matching + harden type; apply Gates/Jobs review",
-            "feat(integrity): Phase 0 — pure deterministic grounding gate + design/plan"
+            "docs(integrity): progress — Phase 1a shadow wiring done, Phase 1b/2 next"
           ]
         }
       ],
-      "commit_sig": "1b9e49235834e697"
+      "commit_sig": "28bae5a7c211c7db"
     },
     {
       "date": "2026-06-14",
@@ -1823,15 +1943,15 @@
     },
     {
       "date": "2026-06-04",
-      "headline": "Riff Gained Intent Routing, Stereo Blends, and Weather Flows",
-      "summary": "The recording app moved Riff's launcher toward browser-side \"hey riff\" routing by hydrating an intent registry from `GET /intents`, while improving capture with raw mic input, two-track stereo blending, combined transcripts, and synced read-along highlights. The Riff service added a guarded Open-Meteo weather flow backed by a JSON preference store, with docs, specs, and tests updated around weather's live/in-flight status.",
+      "headline": "Riff Live Audio: Stereo Blending, Intent Routing, and Resilient Lambda Deploys",
+      "summary": "Implemented two-track stereo audio blending and browser-side intent routing for the Riff launcher, alongside resilient S3-staged Lambda deployments. Enhanced playback UX with synced read-along transcripts and optimized worker pipelines for faster lens hydration.",
       "takeaways": [
-        "Expose an intent catalog with `GET /intents`, hydrate it in the browser, and route wake-phrase commands like `hey riff <X>` client-side.",
-        "Capture narration as raw mic audio, then blend it with playback into Telnyx-style stereo plus a combined transcript for reusable call-style recordings.",
-        "Write and hydrate transcripts before blending so downstream lensing/highlighting can run faster and stay synced to playback.",
-        "Model a reusable weather flow as YAML: ask once for city, store preferences in JSON, fetch via injectable Open-Meteo tools, and protect execution with guards."
+        "Implement Telnyx-style two-track stereo recording to separate call audio from combined transcripts, enabling cleaner post-processing.",
+        "Use raw microphone input without AEC/NS/AGC processing to prevent audio ducking during narration playback.",
+        "Adopt S3-staged Lambda uploads for more resilient and verified serverless deployments.",
+        "Hydrate intent registries from a server catalog via GET requests to enable dynamic browser-side voice command routing."
       ],
-      "total_commits": 26,
+      "total_commits": 11,
       "repos": [
         {
           "name": "recording_app",
@@ -1849,42 +1969,21 @@
             "docs(spec): two-track Riff blend (Telnyx-style call recording) (#6)",
             "fix(recorder): raw mic (no AEC/NS/AGC) so Riff playback can't duck narration (#5)"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 15,
-          "messages": [
-            "Merge pull request #8 from davidbmar/feat/weather-flow",
-            "fix(test): skip non-flow config in test_existing_flows_still_parse",
-            "feat(weather): weather.yaml flow (ask-once city -> fetch -> speak)",
-            "feat(weather): register guards at boot, wire tools into registry, gate-exempt read-only tools",
-            "feat(weather): weather tools + guards (Open-Meteo, injectable fetch)",
-            "feat(preferences): global JSON-backed preference store",
-            "docs(plan): weather riff implementation plan (TDD, 5 tasks)",
-            "docs(spec): weather riff flow (ask-once city, global pref, Open-Meteo)",
-            "fix(test): skip non-flow config in test_existing_flows_still_parse",
-            "feat(weather): weather.yaml flow (ask-once city -> fetch -> speak)",
-            "feat(weather): register guards at boot, wire tools into registry, gate-exempt read-only tools",
-            "feat(weather): weather tools + guards (Open-Meteo, injectable fetch)",
-            "feat(preferences): global JSON-backed preference store",
-            "docs(plan): weather riff implementation plan (TDD, 5 tasks)",
-            "docs(spec): weather riff flow (ask-once city, global pref, Open-Meteo)"
-          ]
         }
       ],
-      "commit_sig": "f1007d8bcfc0bdbb"
+      "commit_sig": "74ea2849d7a5349b"
     },
     {
       "date": "2026-06-03",
-      "headline": "Wake-Launched Riff Flows Got Secure Live Audio",
-      "summary": "recording_app gained concurrent recording, live transcript wake-word UI, editable hydration items, and a Qwen-backed hydration pipeline with backfill support. The Riff integration added scoped launch-token minting, Live WebSocket token gating, client token plumbing, /live and /flow-audio glue, plus event-driven S3-to-SQS worker intake and deploy IAM updates.",
+      "headline": "Build Voice-Activated AI Workflows with Riff Wake Words and Qwen Hydration",
+      "summary": "This update implements a voice-triggered recording pipeline using scoped auth tokens, wake-word detection, and event-driven S3-to-SQS processing. It integrates Qwen-based content hydration to generate rich UI signals from transcribed audio in real-time.",
       "takeaways": [
-        "Build a browser wake flow by matching bounded wake phrases like \"Hey Riff\" and \"Hey Cass\", streaming live transcript alongside recording, then launching a prepared flow.",
-        "Protect live sidecars with scoped launch tokens: mint via auth.py and /api/riff-token, pass as ?token= from the client, and verify at the Live WebSocket.",
-        "Reuse the audio handoff pattern: expose /live and /flow-audio, grant deployer writes to flow-audio/*, and sync Announce WAV assets for launch flows.",
-        "Move transcript processing off the request path with S3 ObjectCreated -> SQS intake, a polling fallback, and degraded-safe Qwen hydration/backfill workers."
+        "Implement scoped authentication by minting launch tokens via /api/riff-token to securely authorize specific audio flow actions.",
+        "Reuse the event-driven intake pattern where S3 ObjectCreated events trigger SQS messages for reliable, decoupled worker processing.",
+        "Apply the 'degraded-safe' TDD approach for LLM hydration workers to ensure robust content generation even during partial failures.",
+        "Integrate browser-side wake-word detection (e.g., 'Hey Riff') with concurrent live transcription to enable seamless voice-first user interactions."
       ],
-      "total_commits": 26,
+      "total_commits": 23,
       "repos": [
         {
           "name": "recording_app",
@@ -1914,18 +2013,9 @@
             "feat(worker): event-driven intake via S3->SQS (TDD), polling as backstop",
             "docs: design for event-driven job intake (S3 ObjectCreated -> SQS)"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 3,
-          "messages": [
-            "feat(live-client): send launch token as ?token= when present (#7)",
-            "feat(flows): hey_riff_test — pre-rendered Announce intro flow (#5)",
-            "feat(live): launch-token gate on the Live WS sidecar (TDD) (#6)"
-          ]
         }
       ],
-      "commit_sig": "da696fc0d1c70a02"
+      "commit_sig": "f2e8aaf0a59ba1f8"
     },
     {
       "date": "2026-06-02",
@@ -2093,15 +2183,14 @@
     },
     {
       "date": "2026-05-30",
-      "headline": "Agent Work Queues and QR Photo Albums Ship",
-      "summary": "A Postgres-backed agent work queue landed in agent-router with worker registration, filtered claims, routing, wakeups, metrics, cancellation, expiration, dead letters, demos, and deployment docs. The day also shipped a Lambda/S3 QR photo album app with token-gated uploads, gallery, delete flows, printable cards, and riff feature-request store-and-forward scenarios.",
+      "headline": "Postgres Agent Work Queue Substrate and Serverless QR Photo Album",
+      "summary": "Implemented a robust, Postgres-backed work queue for agent routing with race-safe claiming, metrics, and EC2 deployment tooling. Simultaneously shipped a serverless photo album MVP featuring HMAC-authenticated uploads, presigned S3 URLs, and printable graduation cards.",
       "takeaways": [
-        "Use Postgres for durable agent jobs with claim/reaper logic, LISTEN/NOTIFY wakeups, target_worker routing, action filters, JSONB search, and latency/throughput metrics.",
-        "Wrap agent execution as capture->shape->confirm->execute, then enforce an action allowlist at the confirm gate before work reaches execution.",
-        "Build event photo drops as a mobile SPA backed by Lambda routes, S3 presigned PUTs, HMAC tokens, thumbnails, newest-first pagination, and owner-only delete.",
-        "Make small apps reproducible with pytest scaffolding, README docs, QR generator scripts, AWS CLI deploy automation, and print-shop-ready PDF assets."
+        "Reuse the Postgres-backed work queue substrate which implements LISTEN/NOTIFY for instant worker wake-ups, action allowlists, and dead-letter hooks for resilient agent task processing.",
+        "Adopt the serverless photo album pattern using Lambda handlers that generate presigned S3 PUT URLs for direct client uploads, secured by HMAC tokens and two-tier password gates.",
+        "Apply the included EC2 deployment runbook and bash/AWS CLI scripts to automate infrastructure provisioning for both the work queue workers and the serverless API gateway."
       ],
-      "total_commits": 79,
+      "total_commits": 76,
       "repos": [
         {
           "name": "agent-router",
@@ -2196,30 +2285,20 @@
             "Add two-tier password gate to design spec",
             "Add approved design spec for shared photo album QR app"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 3,
-          "messages": [
-            "512 line: add multi-request L2 scenario (plural case validated)",
-            "512 line: add L2 feature_request voice scenario; record live-voice PASS",
-            "512 line: feature-request flow + store-and-forward to M3 DB"
-          ]
         }
       ],
-      "commit_sig": "a9e15ea21e87be7d"
+      "commit_sig": "ae80bfb3b731039c"
     },
     {
       "date": "2026-05-29",
-      "headline": "Phone Routing Hardens While Agent Filter Metrics Hit 300 Cycles",
-      "summary": "Riff added caller-ID and per-number flow routing, per-flow preferred model selection, routing normalization, audit logs, CEO command-center tooling, and live-session context/slot-extraction fixes. Agent-router extended its M3 validation run through cycle 625, reaching 300 filter cycles and ~97.9% cumulative filtering while codifying dispatch edge cases.",
+      "headline": "Agent Router Achieves 97.9% Filter Efficiency Across 300 Cycles",
+      "summary": "The agent-router system completed a 300-cycle validation batch, stabilizing at 97.9% cumulative filter efficiency while resolving critical multi-workstream coordination stalls. This milestone confirms the robustness of the M3 dispatch logic and Coach ownership models under sustained load.",
       "takeaways": [
-        "Use caller-ID/per-number routing tables with per-flow preferred_model fields to steer phone traffic without hard-coded flow selection.",
-        "Pair routing-table normalization with test-number config and audit logs so routing changes are reproducible and testable.",
-        "Add a command-center flow with model and decision-tool wiring when operators need a live control plane for phone workflows.",
-        "Track agent coordination with batch utilization logs and milestones, then codify edge cases like partial dispatch and dispatched-active sprint skips."
+        "Implement a cumulative filter metric (raw vs. actual cycles) to quantify noise reduction, aiming for >97% efficiency in high-volume agent routing.",
+        "Adopt a 'forced FR' heartbeat mechanism with fixed intervals (e.g., 34m 45s) to maintain system equilibrium and detect stalls during ultra-quiet periods.",
+        "Use explicit path-clearing protocols (like PATH A) to resolve interpretation gaps between TPM directives and coder implementations, ensuring rapid conflict resolution."
       ],
-      "total_commits": 219,
+      "total_commits": 205,
       "repos": [
         {
           "name": "agent-router",
@@ -2431,41 +2510,20 @@
             "team-lead/demo-coord 00:00Z Phase 2 DISPATCHED via TPM PATH A; 4 M3 roles woke; non-dispatched durable files valid; procedure gap detected",
             "tpm/m3-pings.md cycle 342 ping(c) STATE CHANGE: Phase 2 PENDING-CEO → IN-FLIGHT PATH A; TPM 241d429 dispatched 4-step chain; 4 M3 roles woke; procedure gap detected on partial-dispatch handling"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 14,
-          "messages": [
-            "release: demo runbook for 2026-05-28 trouble-ticket external-system path",
-            "ceo: add verbal transfer control plane",
-            "tests/phone: fix 2 committed-yaml tests for SWAP-FINAL routing",
-            "flows/_routing.yaml: SWAP-FINAL geo-correct (CEO 2026-05-29T04:18Z)",
-            "phone: inject prior call context before live session",
-            "feat: wire CEO command center model and decision tools",
-            "phone: per-number routing + per-flow preferred_model (CEO 01:54-01:58Z)",
-            "phone: routing-table normalization + test-number config + audit log",
-            "feat: add CEO command center flow",
-            "phone: caller-ID-based flow routing (CEO 2026-05-29T01:40Z Option B)",
-            "docs(codex): trouble-ticket-2 Run 8 — Path A re-verify against 3e41cfe (NOT-GREEN)",
-            "docs(codex): trouble-ticket-2 Path A follow-on verification — NOT GREEN",
-            "fix: run live slot extractor for service days",
-            "fix: seed live text turns for l2 slot extraction"
-          ]
         }
       ],
-      "commit_sig": "fcd9451aeb115cf6"
+      "commit_sig": "7d115a86757718be"
     },
     {
       "date": "2026-05-28",
-      "headline": "Demo-Critical Agent Ops for Trouble-Ticket Hardening",
-      "summary": "The day centered on coordinating a demo-critical RIFF trouble-ticket path through agent-router pings, utilization snapshots, escalation relays, dashboard evidence, and Phase 2 standby tracking. RIFF added live-mic support, property-ticket routing and gate fixes, phone guards, red tests, generated trouble-ticket corpora, and run-by-run release evidence.",
+      "headline": "Agent Router Achieves 92.9% Compression via Adoption-Discount Filtering and Fleet-Wide Standby Coordination",
+      "summary": "The agent-router implemented a Step 1.5.5 adoption-discount filter that achieved 81% compression and sustained 92.9% cumulative efficiency across 15 stable cycles. Concurrently, the system codified Phase 2 standby procedures and resolved critical demo blockers through cross-host relays and CEO-level escalation protocols.",
       "takeaways": [
-        "Use durable ack, standup, and ops/acks files as reusable cross-host relays when agent channels or review handoffs are unreliable.",
-        "Track multi-agent utilization with recurring snapshots, strict gates, and adoption-discount filters so standby noise does not look like real work.",
-        "Harden demo paths by pairing fixes with red E2E captures, generated scenario corpora, and release-criteria docs for each verification run.",
-        "Build operator dashboards from structured cards and Playwright health loops, then keep link hygiene and private-repo leakage checks in the loop."
+        "Implement an adoption-discount filter algorithm to compress raw session data by ~81%, filtering noise while preserving edge cases for phase-regression detection.",
+        "Use durable on-disk position files to maintain fleet-wide standby states during long-duration waits, enabling seamless handoffs between agents without active polling.",
+        "Establish pre-committed escalation ladders with specific time-based tripwires (e.g., YELLOW at +40m, RED at +52m) to automate decision-making when human responders are silent."
       ],
-      "total_commits": 451,
+      "total_commits": 406,
       "repos": [
         {
           "name": "agent-router",
@@ -2878,72 +2936,21 @@
             "tpm: M3 utilization snapshots entries 58-60 (task-1027acf1)",
             "tpm: M3 utilization snapshots entries 55-57 (task-1027acf1)"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 45,
-          "messages": [
-            "ops: record codex M3 phase 2 standby ack",
-            "docs(codex): trouble-ticket-2 L1+L2 eval — FINAL (L1 partial, L2 unfixed, restart still needed)",
-            "docs(codex): trouble-ticket-2 L1+L2 eval (PROVISIONAL — L1/L2 in flight)",
-            "docs(review): draft post-demo cross-fix observation retrospective",
-            "fix: extract service day buckets",
-            "postcall: log all hook fires to jsonl + per-hook persist file",
-            "test: capture day-list and replicantpm postcall bugs",
-            "test(generated): copy austin_plumbing scenarios as trouble_ticket_2 corpus",
-            "docs(review): approve 6d9de2e gate-hardening hardening",
-            "fix: harden property ticket record issue gate",
-            "docs(demo-corpus): amend two residual wrong claims per Architect ack",
-            "docs(demo-corpus): amend headline per Architect correction (de04203)",
-            "docs(demo-corpus): aggregate trouble-ticket Runs 1-6 for demo data lead",
-            "docs: update morning-operator-bundle with --live-mic instructions",
-            "docs(codex): Run 6 — d87ba20 phone-server guard-wiring (FAIL pending restart)",
-            "fix: register property ticket phone guards",
-            "fix: bridge trouble ticket record confirmation",
-            "docs(codex): trouble-ticket Run 5 evidence bundle — FAIL signal-1 (CEO) + FAIL signal-2 (IT)",
-            "test: capture run5 confirm record live stall",
-            "docs(codex): trouble-ticket release criteria — Run 5 FAIL, demo BLOCKER",
-            "docs(codex): trouble-ticket release criteria — credit Run-4 IT re-verification (1a7fa5f)",
-            "docs(codex): trouble-ticket release criteria — evening refresh (post-db047ca)",
-            "docs(codex): trouble-ticket Run 4 — IT independent re-verification (FAIL @ confirm_record_issue)",
-            "fix: route trouble ticket run4 scheduling gate",
-            "feat: add --live-mic support to Tier B driver (T-GEMINI-M3-LIVE-MIC-063)",
-            "test: capture trouble ticket run4 verification stall",
-            "docs: add emergency standup status",
-            "Fix trouble ticket relation fallback",
-            "test: capture L2 real duplicate request routing stall",
-            "docs(codex): E2E Run 3 — post-3196ac4 L2-Real re-run (FAIL, new stall point + safety-gate warning)",
-            "docs(codex): trouble-ticket release criteria — post-3196ac4 L2 Real re-run + HIGH nav-token clearance",
-            "docs(codex): E2E Run 2 — post-3196ac4 L2-Real sweep (FAIL, new failure point)",
-            "docs(codex): trouble-ticket release criteria — Charter v2 signal columns",
-            "docs: add reflexion for coder3",
-            "Fix property ticket new issue routing",
-            "Add red test for open request new issue routing",
-            "docs(codex): L1+L2 review, promotion ladder ground-truth, release criteria",
-            "docs(codex): trouble-ticket live POC — operator short form",
-            "docs(codex): trouble-ticket live POC procedure (M3 mic+speakers)",
-            "docs(codex): trouble-ticket phone test procedure (inbound)",
-            "docs(codex): property_trouble_ticket e2e test run report",
-            "fix(docs): correct AIR gate runbook commands",
-            "fix(flow_validation): classify clean l2 failures as fail",
-            "fix(flow_validation): keep metrics cost sources canonical",
-            "fix(flow_validation): record l2 stub summary status"
-          ]
         }
       ],
-      "commit_sig": "50ba1346b8432cbd"
+      "commit_sig": "c9a66e79b9e4c169"
     },
     {
       "date": "2026-05-27",
       "headline": "Agent Router Adds Mobile Voice Mode, Manager Queue, and M3 Utilization Tracking",
-      "summary": "The agent-router introduces a comprehensive mobile interface with voice dictation, a manager task queue, and real-time fleet status dashboards. It also implements granular M3 utilization snapshotting and defines organizational role personas to standardize operator workflows.",
+      "summary": "This update introduces a comprehensive mobile interface with voice dictation, a manager-mode task queue, and granular M3 utilization snapshots. It also establishes role-based personas and operational documentation to streamline fleet management and developer onboarding.",
       "takeaways": [
         "Implement a 'composer-first' mobile UX with a persistent bottom input bar and fullscreen voice dictation overlay for hands-free operation.",
-        "Build a manager-mode dashboard featuring a task queue pane and /api/manager endpoints to monitor and assign work across the fleet.",
-        "Bootstrap periodic M3 utilization snapshots by iterating through entry ranges to track resource consumption over time.",
-        "Standardize team operations by defining explicit org-chart role personas and documenting them in an operational playbook."
+        "Build a manager-mode dashboard featuring a task queue pane and `/api/manager` endpoints to handle TPM and technical project manager workflows.",
+        "Track system health by bootstrapping M3 utilization snapshots in sequential entries to monitor resource usage over time.",
+        "Enhance fleet visibility by adding a Hosts pane with tailnet auto-discovery and peer gossip to display real-time router status."
       ],
-      "total_commits": 46,
+      "total_commits": 45,
       "repos": [
         {
           "name": "agent-router",
@@ -2995,16 +3002,9 @@
             "updates",
             "feat: tailnet auto-discovery, peer gossip, and mobile /m dashboard"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 1,
-          "messages": [
-            "feat(flow_validation): emit L2 real metrics from variants"
-          ]
         }
       ],
-      "commit_sig": "cebace3ff7608b61"
+      "commit_sig": "8c944410c0c5d7ec"
     },
     {
       "date": "2026-05-24",
@@ -8071,19 +8071,19 @@
     },
     {
       "date": "2026-03-26",
-      "headline": "Terminal Ops, Log UX, and RAG Memory Land",
-      "summary": "everyone-ai shipped a deep operations polish pass: resilient web terminals, richer log streaming/search/download/copy flows, workspace/app filtering, stability indicators, and launch-state fixes. tool-RAG-for-split-personalities added complete RAG answer coverage, domain templates, conversation export/share APIs, server-side persistence, persona memory, resume UI, mobile polish, and large Playwright regression suites.",
+      "headline": "Polished Web Terminal UX and Persistent RAG Persona Memory",
+      "summary": "Enhanced the web terminal with ANSI rendering, search, auto-reconnect, and log export capabilities while adding server-side conversation persistence and persona memory to the RAG tool. These updates stabilize the developer experience through rigorous E2E testing and UI refinements like click-to-copy and reduced-motion support.",
       "takeaways": [
-        "Reuse xterm SearchAddon, bracketed paste, copy-on-select, reconnect buttons, and single-registered listeners to make browser terminals feel durable.",
-        "Expose logs as SSE streams, then layer modal search, ANSI rendering/stripping, raw-text downloads, line counts, hover previews, and click-to-copy lines on top.",
-        "Make ops dashboards more reusable with pinned workspaces, status filters, degraded/restart indicators, DOM caching, reduced-motion media queries, and explicit launch error states.",
-        "For RAG apps, pair template galleries and export/share/list/delete endpoints with server-side conversations, persona memory APIs, resume UI, and Playwright suites covering core flows."
+        "Implement robust web terminal features by integrating xterm SearchAddon for in-terminal search, rendering ANSI color codes, and handling auto-reconnection with bracketed paste mode.",
+        "Add server-side persistence for AI conversations and persona memory using dedicated APIs, enabling users to resume sessions and maintain context across interactions.",
+        "Improve log usability by exposing raw text downloads, implementing click-to-copy for modal lines, and fixing HTML entity encoding issues.",
+        "Stabilize UI performance by caching DOM elements to prevent flickering during state changes and wrapping animations in prefers-reduced-motion media queries."
       ],
-      "total_commits": 243,
+      "total_commits": 240,
       "repos": [
         {
           "name": "everyone-ai",
-          "commits": 162,
+          "commits": 159,
           "messages": [
             "fix: terminal reconnect button (D2), expose __termWs, fix deploy ProxyCommand, setup legal/hr",
             "chore: Sprint 143 complete — log download plain text, tooltip listener fix, click-to-copy",
@@ -8243,10 +8243,7 @@
             "F-163: add GET /api/targets/:id/logs/stream SSE endpoint",
             "chore: Sprint 126 summary + PM review + Sprint 127 brief",
             "chore: Sprint 126 PROJECT_STATUS — preset template, preset delete, deploy timestamp, idle badge",
-            "Merge branch 'agentB-deploy-history-and-idle'",
-            "Merge branch 'agentA-preset-complete'",
-            "chore: auto-commit dirty files before merge (sprint 126)",
-            "agentA-preset-complete: implement sprint 126 tasks"
+            "Merge branch 'agentB-deploy-history-and-idle'"
           ]
         },
         {
@@ -8337,7 +8334,7 @@
           ]
         }
       ],
-      "commit_sig": "31f8deeed426b613"
+      "commit_sig": "07a8def569b68fce"
     },
     {
       "date": "2026-03-25",

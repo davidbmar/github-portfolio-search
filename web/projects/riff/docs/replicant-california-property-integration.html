@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Replicant California Property Integration</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      color: #1f2933;
+      background: #fbfcfe;
+      font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { max-width: 980px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.2; }
+    h2 { margin-top: 30px; font-size: 20px; }
+    p { margin: 10px 0; color: #4b5563; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #eef2f7;
+      border-radius: 5px;
+      padding: 1px 5px;
+    }
+    blockquote {
+      border-left: 4px solid #2f6df0;
+      margin: 16px 0;
+      padding: 8px 16px;
+      background: #edf4ff;
+      color: #23364d;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; background: #fff; }
+    th, td { border: 1px solid #d9e0ea; padding: 9px 10px; text-align: left; vertical-align: top; }
+    th { background: #f2f5f9; }
+    ol, ul { padding-left: 22px; }
+    li { margin: 6px 0; }
+    .meta {
+      color: #4b5563;
+      background: #fff;
+      border: 1px solid #d9e0ea;
+      padding: 12px 14px;
+      margin: 16px 0 24px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Replicant California Property Integration</h1>
+  <div class="meta">
+    <p><strong>Date:</strong> 2026-07-05</p>
+    <p><strong>Status:</strong> Proposed integration accepted for implementation; local secret configured, code not wired yet.</p>
+    <p><strong>Scope:</strong> California property-management line, <code>+15102160079</code>, vanity URL <code>https://riff.chattychapters.com/property</code>.</p>
+  </div>
+
+  <h2>Response To Aman</h2>
+  <p>Suggested reply:</p>
+  <blockquote>
+    <p>Thanks. We will treat Twilio as a placeholder in the API notes and use our Telnyx voice gateway on the Riff side.</p>
+    <p>Our review approves the two-endpoint shape for the California property-management line. Riff will call <code>POST /riff/identify</code> at call start while the greeting plays, use a 2-second timeout, and continue as an unknown caller if Replicant is unavailable. At the end of intake, Riff will call <code>POST /riff/maintenance-tickets</code> with the same stable call id for idempotency and durable retries.</p>
+    <p>We have the HMAC secret installed locally as <code>Replicant_RIFF_WEBHOOK_SECRET</code>; we will keep it out of git and use it only for signed Replicant requests. The main API clarification we recommend before implementation is <code>permission_to_enter</code>: a boolean is too lossy for <code>no</code>, <code>conditional</code>, and <code>unknown</code>, so either make it an enum or preserve conditional access in <code>entry_notes</code>. SMS consent design looks correct: Riff should not promise text updates unless <code>sms_consent</code> is already true or the caller agrees to receive the opt-in text.</p>
+  </blockquote>
+
+  <h2>Local Configuration</h2>
+  <p><code>Replicant_RIFF_WEBHOOK_SECRET</code> has been added to the local <code>.env</code> file for the Replicant HMAC signing flow.</p>
+  <p>Do not commit the value. <code>.env</code> is ignored by git. Production deployment needs the same variable set on whichever node runs the California property flow.</p>
+  <p>The mixed-case spelling is intentional. Implementation code should read the exact <code>Replicant_RIFF_WEBHOOK_SECRET</code> key.</p>
+  <table>
+    <thead>
+      <tr><th>Variable</th><th>Use</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Replicant_RIFF_WEBHOOK_SECRET</code></td><td>New shared HMAC secret for Replicant <code>identify</code> and <code>maintenance-tickets</code> requests.</td></tr>
+      <tr><td><code>RIFF_DIALED_ROUTING_TABLE_JSON</code></td><td>Live override for mapping the California number to the intended flow.</td></tr>
+      <tr><td><code>RIFF_REPLICANTPM_VOICE_RESULTS_URL</code></td><td>Older post-call Replicant voice-results export. This is not the new two-endpoint ticket API.</td></tr>
+      <tr><td><code>RIFF_REPLICANTPM_TOKEN</code></td><td>Older bearer-style post-call export token. Do not confuse with HMAC signing.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Recommended Runtime Behavior</h2>
+  <p>At call start:</p>
+  <ol>
+    <li>Normalize <code>caller_phone</code> and <code>called_number</code> to E.164.</li>
+    <li>Fire <code>POST /riff/identify</code> while the greeting audio plays.</li>
+    <li>Sign the exact JSON request body with <code>Replicant_RIFF_WEBHOOK_SECRET</code>.</li>
+    <li>Budget 2 seconds.</li>
+    <li>Store organization, tenant, units, and SMS consent in session slots if matched.</li>
+  </ol>
+  <table>
+    <thead>
+      <tr><th>Identify result</th><th>Flow behavior</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Tenant with one active unit</td><td>Confirm the unit briefly, then collect issue details. Do not ask for name, phone, address, or unit from scratch.</td></tr>
+      <tr><td>Tenant with multiple units</td><td>Ask which property/unit has the issue, then store the selected <code>unit_id</code>.</td></tr>
+      <tr><td>No match, timeout, 5xx, or 404</td><td>Continue as an unknown caller and collect name, address, unit, and issue details verbally. Alert on 404 because that means the called number is not registered in Replicant.</td></tr>
+    </tbody>
+  </table>
+  <p>At intake completion:</p>
+  <ol>
+    <li>Build a <code>maintenance-tickets</code> payload from slots.</li>
+    <li>Use a stable carrier-neutral call id for the API field currently named <code>call_sid</code>.</li>
+    <li>Submit immediately if possible.</li>
+    <li>On timeout or 5xx, persist a durable retry job with the same call id for up to 24 hours.</li>
+    <li>On 4xx, do not retry; log and alert because that is a contract or payload bug.</li>
+  </ol>
+
+  <h2>Slot Mapping</h2>
+  <table>
+    <thead>
+      <tr><th>Riff slot/source</th><th>Replicant field</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>stable Telnyx/Riff call id</td><td><code>call_sid</code></td></tr>
+      <tr><td>identify response</td><td><code>organization_id</code>, <code>tenant_user_id</code>, <code>unit_id</code></td></tr>
+      <tr><td>inbound caller</td><td><code>caller_phone</code></td></tr>
+      <tr><td>unknown caller fallback</td><td><code>caller_name</code>, <code>stated_address</code></td></tr>
+      <tr><td>issue summary</td><td><code>title</code>, <code>description</code></td></tr>
+      <tr><td>issue category</td><td><code>category</code></td></tr>
+      <tr><td>urgency/severity slots</td><td><code>severity_hint</code></td></tr>
+      <tr><td>access permission</td><td><code>permission_to_enter</code>, <code>entry_notes</code></td></tr>
+      <tr><td>post-call artifact</td><td><code>transcript_url</code> when safe to expose</td></tr>
+      <tr><td>SMS consent question</td><td><code>request_sms_optin</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>SMS Consent Rule</h2>
+  <p>Replicant owns consent server-side.</p>
+  <p>If <code>identify</code> returns <code>sms_consent: true</code>, Riff may say the caller will receive text updates.</p>
+  <p>If <code>sms_consent: false</code>, Riff should ask whether the caller wants a text to opt in. Only set <code>request_sms_optin: true</code> when the caller agrees. Riff should not promise ongoing text updates before the opt-in is completed.</p>
+
+  <h2>Current Repo Gaps</h2>
+  <ol>
+    <li><code>riff/postcall/replicantpm_adapter.py</code> is the older post-call export to <code>/api/v1/ai/voice/results/</code>. It does not implement the new HMAC <code>identify</code> plus <code>maintenance-tickets</code> contract.</li>
+    <li><code>flows/property_trouble_ticket.yaml</code> currently performs its own caller verification and collects property/address/unit information. The Replicant version should skip those fields when <code>identify</code> returns a tenant and unit.</li>
+    <li><code>flows/_routing.yaml</code> currently maps <code>+15102160079</code> to <code>plumbing_intake</code> as a temporary domain-tree demo. Before a live Replicant test, route the California number to the property/Replicant flow through <code>RIFF_DIALED_ROUTING_TABLE_JSON</code> or by updating the routing table.</li>
+    <li>A durable retry queue is required for ticket POST failures. A best-effort post-call hook is not enough.</li>
+    <li>The API field name <code>call_sid</code> is Twilio-shaped. Since Riff uses Telnyx, implementation should treat it as a stable carrier-neutral call id unless Replicant renames it to <code>call_id</code>.</li>
+  </ol>
+
+  <h2>Implementation Checklist</h2>
+  <ul>
+    <li>Add a Replicant HMAC client with deterministic compact JSON body signing.</li>
+    <li>Add tests for signature generation and no secret logging.</li>
+    <li>Add a call-start identify hook with a 2-second timeout and fallback behavior.</li>
+    <li>Store identify result in session slots for flow branching.</li>
+    <li>Add multi-unit selection behavior.</li>
+    <li>Map property intake slots to the <code>maintenance-tickets</code> payload.</li>
+    <li>Add durable retry for timeout/5xx responses with the same call id.</li>
+    <li>Add 4xx alerting without retry.</li>
+    <li>Update California number routing for the live property flow.</li>
+    <li>Run simulator/L1 checks for matched tenant, multi-unit tenant, unknown caller, identify timeout, and ticket retry.</li>
+  </ul>
+</main>
+</body>
+</html>

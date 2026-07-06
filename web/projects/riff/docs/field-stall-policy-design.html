@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Field Stall Policy Design for Schema-Driven Intake · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-05-field-stall-policy-design-fable5.md</span>
+<a class="raw" href="/docs/docs/codex/2026-07-05-field-stall-policy-design-fable5.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Field Stall Policy Design for Schema-Driven Intake</h1>
+<p><strong>Status:</strong> design brief for Fable 5 review
+<strong>Date:</strong> 2026-07-05
+<strong>Related:</strong> <code>docs/codex/2026-07-04-progressive-web-intake-design.md</code>,
+<code>docs/space-profile-intake-runbook.md</code>,
+<code>tests/test_shift_left_contract.py</code>,
+<code>tests/test_flows_strict_safety_gate.py</code></p>
+<h2 id="short-answer">Short Answer</h2>
+<p>Yes: the shift-left move is to make every voice-collected intake field declare
+what should happen when the caller is silent, unclear, or stalls. That policy
+should live in the intake schema or Business Pack field definition, and the
+compiler should fail at build time if a field can silently fall through into a
+side effect without an explicit policy.</p>
+<p>This is flow/FSM behavior, not preflow behavior.</p>
+<ul>
+<li><strong>Preflow</strong> prepares facts, content, static audio, and assets before a call.</li>
+<li><strong>Flow/FSM</strong> decides what the live call does next.</li>
+<li><strong>Postcall/debug</strong> reconstructs what happened after the call.</li>
+</ul>
+<p>Field stall policy belongs to the <strong>Flow/FSM compiler</strong> and its build-time
+rules. Preflow may later consume the same schema to prepare prompts or static
+audio, but it should not decide runtime safety.</p>
+<h2 id="problem-this-solves">Problem This Solves</h2>
+<p>The latest Space Channel intake call proved the option <code>0</code> route worked:</p>
+<pre><code class="language-text">0 -&gt; name -&gt; SMS consent -&gt; verify code -&gt; interests -&gt; save -&gt; confirm -&gt; menu
+</code></pre>
+<p>The confusing part was not route recognition. The concern was structural:
+<code>space_channel_widgets</code> currently allows this generated edge:</p>
+<pre><code class="language-text">intake_interests_ask --stalled--&gt; intake_save
+</code></pre>
+<p>For Space Channel, that is low risk. Interests are optional preferences. If
+the caller gives no interests, saving name plus verified phone is still useful.</p>
+<p>For future commercial flows, the same pattern can be wrong:</p>
+<pre><code class="language-text">plumber issue ask --stalled--&gt; create job
+legal deadline ask --stalled--&gt; save case as complete
+electrical safety ask --stalled--&gt; schedule normal visit
+</code></pre>
+<p>The system should know, field by field, whether silence means &quot;skip it&quot;,
+&quot;mark unknown&quot;, &quot;retry&quot;, &quot;handoff&quot;, or &quot;block the next action&quot;.</p>
+<h2 id="design-goal">Design Goal</h2>
+<p>Make field-level silence behavior:</p>
+<ol>
+<li><strong>Explicit</strong> in the schema.</li>
+<li><strong>Compiled</strong> into deterministic FSM states and edges.</li>
+<li><strong>Validated</strong> at build time.</li>
+<li><strong>Visible</strong> in postcall/debug reports.</li>
+<li><strong>Reusable</strong> across Space Channel, law, plumbing, electrical, property
+management, and future flows.</li>
+</ol>
+<p>The goal is not to make every field required. The goal is to make every field's
+failure behavior intentional.</p>
+<h2 id="proposed-field-shape">Proposed Field Shape</h2>
+<p>Add a <code>voice</code> block to schema-driven intake fields:</p>
+<pre><code class="language-yaml">fields:
+  - id: issue
+    label: Issue
+    kind: textarea
+    slot: plumbing_issue
+    prompt: Tell me what is going on with the plumbing.
+    voice:
+      collect: true
+      stall_policy: mark_unknown
+      max_reprompts: 1
+      blocks:
+        - booking
+</code></pre>
+<p>For the existing code-side registry shape, the same structure can be represented
+as a Python dict:</p>
+<pre><code class="language-python">{
+    &quot;id&quot;: &quot;issue&quot;,
+    &quot;label&quot;: &quot;Issue&quot;,
+    &quot;kind&quot;: &quot;textarea&quot;,
+    &quot;slot&quot;: &quot;plumbing_issue&quot;,
+    &quot;prompt&quot;: &quot;Tell me what is going on with the plumbing.&quot;,
+    &quot;voice&quot;: {
+        &quot;collect&quot;: True,
+        &quot;stall_policy&quot;: &quot;mark_unknown&quot;,
+        &quot;max_reprompts&quot;: 1,
+        &quot;blocks&quot;: [&quot;booking&quot;],
+    },
+}
+</code></pre>
+<h2 id="stall-policies">Stall Policies</h2>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Meaning</th>
+<th>Compiled behavior</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>required</code></td>
+<td>Caller must answer before the flow can continue normally.</td>
+<td>Reprompt up to <code>max_reprompts</code>; if still missing, route to incomplete/handoff. No direct write/booking.</td>
+<td>Caller name, callback phone, service address for dispatch.</td>
+</tr>
+<tr>
+<td><code>skip_optional</code></td>
+<td>Field is nice to have. Blank is acceptable.</td>
+<td>On stall, set field status to <code>skipped</code>, continue, and include &quot;not provided&quot; in the summary.</td>
+<td>Space Channel interests, optional email, points enrollment.</td>
+</tr>
+<tr>
+<td><code>mark_unknown</code></td>
+<td>Field matters, but the call can continue if explicitly marked unknown.</td>
+<td>On stall, set field status to <code>unknown</code>, keep the stored value empty, continue, and read it back as unknown.</td>
+<td>Plumbing issue details, legal deadline if caller does not know, property access notes.</td>
+</tr>
+<tr>
+<td><code>web_only</code></td>
+<td>Do not ask for this field over voice.</td>
+<td>Field appears on the intake page only. No voice stall path.</td>
+<td>Email spelling, photos, documents, payment handoff, account setup.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="build-time-rules">Build-Time Rules</h2>
+<p>The compiler and tests should enforce these rules before a flow can ship:</p>
+<ol>
+<li>
+<p>Every schema-driven <code>intake_form.fields[]</code> entry with <code>slot</code> and <code>prompt</code>
+must declare <code>voice.stall_policy</code>, unless it is explicitly <code>web_only</code>.</p>
+</li>
+<li>
+<p><code>consent: true</code> fields are handled by the deterministic SMS consent gate and
+must not declare arbitrary stall behavior.</p>
+</li>
+<li>
+<p><code>identity: true</code> fields must explicitly declare <code>voice.stall_policy: required</code>; the compiler must not hide this behind a default.</p>
+</li>
+<li>
+<p>A <code>stalled</code> edge from an <code>ask</code> state into a side-effecting <code>act</code> state is
+illegal. The compiler records the field status first, then routes through a
+non-side-effect bridge before save/submit.</p>
+</li>
+<li>
+<p>For <code>required</code>, a missing field must block configured downstream actions
+such as <code>booking</code>, <code>dispatch</code>, <code>case_submit</code>, <code>payment</code>, or
+<code>profile_complete</code>.</p>
+</li>
+<li>
+<p>For <code>skip_optional</code> and <code>mark_unknown</code>, the generated readback must say what
+happened:</p>
+</li>
+</ol>
+<pre><code class="language-text">I have David, texting is allowed, interests not provided. Did I get that right?
+I have Dana, address 123 Main, issue unknown. Did I get that right?
+</code></pre>
+<ol start="7">
+<li>The postcall analyzer must display field policy outcomes:</li>
+</ol>
+<pre><code class="language-text">field=interests policy=skip_optional outcome=skipped source=stalled
+field=issue policy=mark_unknown outcome=unknown source=stalled
+field=opposing_party policy=required outcome=blocked source=stalled
+</code></pre>
+<h2 id="runtime-patterns">Runtime Patterns</h2>
+<h3 id="optional-preference">Optional Preference</h3>
+<p>Use when the answer improves personalization but does not affect safety,
+scheduling, or legal obligations.</p>
+<pre><code class="language-text">Ask: What space topics interest you?
+Caller: [silence]
+FSM: mark interests skipped
+FSM: save profile
+FSM: confirm: interests not provided
+</code></pre>
+<p>Schema:</p>
+<pre><code class="language-yaml">voice:
+  collect: true
+  stall_policy: skip_optional
+  max_reprompts: 0
+</code></pre>
+<h3 id="unknown-but-continue">Unknown But Continue</h3>
+<p>Use when the detail matters, but &quot;unknown&quot; is a valid operational value.</p>
+<pre><code class="language-text">Ask: What is going on with the plumbing?
+Caller: [silence]
+Agent: I did not catch the issue. I can mark it as unknown for now.
+FSM: set issue status=unknown
+FSM: store issue value as empty
+FSM: continue, but block auto-booking if configured
+</code></pre>
+<p>Schema:</p>
+<pre><code class="language-yaml">voice:
+  collect: true
+  stall_policy: mark_unknown
+  max_reprompts: 1
+  blocks: [booking]
+</code></pre>
+<h3 id="high-risk-incomplete">High-Risk Incomplete</h3>
+<p>Use when a missing answer changes whether RIFF is allowed to continue.</p>
+<pre><code class="language-text">Ask: Is there a court date or deadline?
+Caller: [silence]
+Agent: I do not want to miss an important deadline. I can text you the form or
+have someone follow up.
+FSM: mark intake incomplete
+FSM: no attorney scheduling or case submission yet
+</code></pre>
+<p>Schema:</p>
+<pre><code class="language-yaml">voice:
+  collect: true
+  stall_policy: required
+  max_reprompts: 1
+  blocks: [case_submit]
+  on_exhausted: handoff
+</code></pre>
+<h3 id="web-only">Web Only</h3>
+<p>Use when voice is a bad medium or the data should go through a secure handoff.</p>
+<pre><code class="language-text">Do not ask for email spelling, documents, card number, or password over voice.
+Text a verified link instead.
+</code></pre>
+<p>Schema:</p>
+<pre><code class="language-yaml">voice:
+  collect: false
+  stall_policy: web_only
+</code></pre>
+<h2 id="vertical-examples">Vertical Examples</h2>
+<h3 id="space-channel">Space Channel</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Policy</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>required</code></td>
+<td>Needed for greeting and profile identity.</td>
+</tr>
+<tr>
+<td><code>sms_consent</code></td>
+<td>consent gate</td>
+<td>Deterministic yes/no, not a normal field stall.</td>
+</tr>
+<tr>
+<td><code>interests</code></td>
+<td><code>skip_optional</code></td>
+<td>Useful for personalization, but blank is safe.</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td><code>web_only</code></td>
+<td>Hard to spell over the phone.</td>
+</tr>
+<tr>
+<td><code>points_opt_in</code></td>
+<td><code>web_only</code> or <code>skip_optional</code></td>
+<td>Optional relationship module.</td>
+</tr>
+</tbody>
+</table>
+<p>Recommended behavior: Space can keep saving a profile when interests are
+blank, but the confirm line should explicitly say &quot;interests not provided.&quot;</p>
+<h3 id="plumbing">Plumbing</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Policy</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>required</code></td>
+<td>Needed for follow-up.</td>
+</tr>
+<tr>
+<td><code>callback_phone</code></td>
+<td><code>required</code></td>
+<td>Needed if call drops.</td>
+</tr>
+<tr>
+<td><code>service_address</code></td>
+<td><code>required</code></td>
+<td>Required before dispatch.</td>
+</tr>
+<tr>
+<td><code>issue</code></td>
+<td><code>mark_unknown</code></td>
+<td>A ticket can start with unknown issue, but auto-booking may be blocked.</td>
+</tr>
+<tr>
+<td><code>active_leak</code></td>
+<td><code>required</code></td>
+<td>Safety/urgency risk; use <code>on_exhausted: handoff</code>.</td>
+</tr>
+<tr>
+<td><code>photos</code></td>
+<td><code>web_only</code></td>
+<td>Better through the link.</td>
+</tr>
+</tbody>
+</table>
+<p>Recommended behavior: if active leak is unclear, route to emergency/human or
+incomplete intake. Do not silently schedule a normal visit.</p>
+<h3 id="electrical">Electrical</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Policy</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>required</code></td>
+<td>Needed for follow-up.</td>
+</tr>
+<tr>
+<td><code>service_address</code></td>
+<td><code>required</code></td>
+<td>Required before dispatch.</td>
+</tr>
+<tr>
+<td><code>safety_symptoms</code></td>
+<td><code>required</code></td>
+<td>Sparks, burning smell, shock risk; use <code>on_exhausted: handoff</code>.</td>
+</tr>
+<tr>
+<td><code>issue_details</code></td>
+<td><code>mark_unknown</code></td>
+<td>Unknown is acceptable, but should be visible.</td>
+</tr>
+<tr>
+<td><code>panel_photo</code></td>
+<td><code>web_only</code></td>
+<td>Safer and clearer through the link.</td>
+</tr>
+</tbody>
+</table>
+<p>Recommended behavior: unclear safety triage should not become a normal booking.</p>
+<h3 id="law">Law</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Policy</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>required</code></td>
+<td>Needed for intake identity.</td>
+</tr>
+<tr>
+<td><code>callback_phone</code></td>
+<td><code>required</code></td>
+<td>Needed for follow-up.</td>
+</tr>
+<tr>
+<td><code>matter_type</code></td>
+<td><code>mark_unknown</code></td>
+<td>Caller may not know legal category.</td>
+</tr>
+<tr>
+<td><code>deadline</code></td>
+<td><code>mark_unknown</code> with warning</td>
+<td>Unknown can continue, but review should flag it.</td>
+</tr>
+<tr>
+<td><code>opposing_party</code></td>
+<td><code>required</code></td>
+<td>Conflict screening risk; use <code>on_exhausted: handoff</code>.</td>
+</tr>
+<tr>
+<td><code>documents</code></td>
+<td><code>web_only</code></td>
+<td>Secure upload through verified link.</td>
+</tr>
+</tbody>
+</table>
+<p>Recommended behavior: conflict-sensitive fields should block &quot;complete&quot; status
+until answered on web or reviewed by a human.</p>
+<h2 id="compiler-plan-after-approval">Compiler Plan After Approval</h2>
+<p>If Fable 5 approves the design, implement in this order:</p>
+<ol>
+<li>Extend <code>riff/business_pack/schema.py</code> to parse and validate <code>field.voice</code>.</li>
+<li>Add explicit <code>voice.stall_policy</code> entries to <code>riff/intake_schemas.py</code> and
+the fixture plumber pack.</li>
+<li>Update <code>riff/business_pack/compile.py</code> so schema-driven intake emits the
+correct stall subgraph per policy.</li>
+<li>Update <code>tests/test_shift_left_contract.py</code> to prove a second vertical cannot
+omit policies and that policy shapes compile generically.</li>
+<li>Update <code>tests/test_flows_strict_safety_gate.py</code> so the current
+<code>space_channel_widgets</code> edge exemption can be removed or reduced to an
+explicit field-policy proof.</li>
+<li>Regenerate generated flows.</li>
+<li>Update postcall review to include per-field policy outcomes.</li>
+<li>Run:</li>
+</ol>
+<pre><code class="language-bash">.venv/bin/python -m pytest tests/test_shift_left_contract.py tests/test_flows_strict_safety_gate.py tests/business_pack/test_widgets_importer.py tests/business_pack/test_widgets_flow_sim.py -q
+.venv/bin/python scripts/verify-menu-sweep.py space_channel_widgets
+.venv/bin/python scripts/post_call_analyze.py --skip-whisper &lt;recent-session-id&gt;
+</code></pre>
+<h2 id="review-questions-for-fable-5">Review Questions for Fable 5</h2>
+<ol>
+<li>
+<p>Are the five policy names right, or should <code>required</code> and
+<code>handoff_or_incomplete</code> be collapsed into one policy with different
+<code>blocks</code>?</p>
+</li>
+<li>
+<p>Should <code>identity: true</code> fields be allowed to rely on a compiler default, or
+should importers always materialize <code>voice.stall_policy: required</code>?</p>
+</li>
+<li>
+<p>Should <code>skip_optional</code> be allowed to save before confirm for low-risk
+profile fields, or should every stalled field route through a pre-save
+confirmation state?</p>
+</li>
+<li>
+<p>Is <code>mark_unknown</code> operationally safe for law and trades, provided the field
+can block booking/case submission?</p>
+</li>
+<li>
+<p>Should <code>blocks</code> be a free-form list in v0, or should the compiler validate
+it against a fixed enum such as <code>booking</code>, <code>dispatch</code>, <code>case_submit</code>,
+<code>payment</code>, and <code>profile_complete</code>?</p>
+</li>
+</ol>
+<h2 id="recommendation">Recommendation</h2>
+<p>Approve the design with one conservative rule:</p>
+<pre><code class="language-text">No new schema-driven intake field may introduce a stalled path to a write or
+booking unless its field policy explicitly declares the outcome and the compiled
+edge records that outcome.
+</code></pre>
+<p>That gives RIFF the right scaling property: new flows are mostly pack/schema
+work, but dangerous ambiguity fails before live calls.</p>
+<hr />
+<h2 id="fable-5-review-2026-07-05">Fable 5 Review (2026-07-05)</h2>
+<p><strong>Verdict: APPROVED</strong>, including the conservative closing rule verbatim. This
+design correctly converts the one-off <code>space_channel_widgets</code>
+<code>intake_interests_ask --stalled--&gt; intake_save</code> safety-gate exemption (a
+per-edge patch from the profile-intake build) into a declared, compiled,
+build-time-enforced property. The layering ruling is right: stall behavior is
+Flow/FSM compiler territory, not preflow. Answers to the five questions:</p>
+<ol>
+<li>
+<p><strong>Collapse to four policies.</strong> <code>required</code> and <code>handoff_or_incomplete</code>
+compile to near-identical subgraphs (reprompt → exhausted → incomplete/
+handoff → block actions); two names for one subgraph will drift. Keep
+<code>required</code> with <code>blocks: [...]</code> plus an <code>on_exhausted: handoff | incomplete</code>
+knob. Final set: <code>required</code>, <code>skip_optional</code>, <code>mark_unknown</code>, <code>web_only</code>.</p>
+</li>
+<li>
+<p><strong>Materialize, don't default.</strong> Importers must write
+<code>voice.stall_policy: required</code> onto <code>identity: true</code> fields explicitly; the
+compiler ERRORS on an identity field with no policy. Compiled packs stay
+self-describing — a compiler default hides policy from pack diffs and
+reviews.</p>
+</li>
+<li>
+<p><strong>Keep save-then-confirm for <code>skip_optional</code>.</strong> The save-before-confirm
+ordering is a deliberate intake-wide rule (callers must never hear a
+confirmation for unpersisted data). A stalled optional field saving before
+the readback is safe precisely because rule 6 forces the readback to say
+&quot;not provided&quot; and the correction loop can amend. Do not add a pre-save
+confirmation state — one full voice turn of latency for zero risk.</p>
+</li>
+<li>
+<p><strong><code>mark_unknown</code> is safe for law/trades ONLY with double-sided blocks.</strong>
+Add build rule 8: every action named in <code>blocks</code> must ALSO check field
+status server-side at tool dispatch (the booking/case_submit tool refuses
+when a blocking field is unknown/missing). Compiled-edge absence is one
+defense; tool-side verification is the one that survives future flow edits.</p>
+</li>
+<li>
+<p><strong>Fixed enum in v0.</strong> Free-form <code>blocks</code> strings fail silently — a typo'd
+block never matches an action and reads as safety that isn't there. Validate
+against <code>booking | dispatch | case_submit | payment | profile_complete</code>,
+one registry, compiler error lists valid values.</p>
+</li>
+</ol>
+<p><strong>Three sharpening notes:</strong></p>
+<ul>
+<li><strong>Drop <code>unknown_value</code> string fabrication.</strong> Writing the literal string
+<code>unknown</code> into the slot conflates data with status: the intake page renders
+&quot;unknown&quot; in an editable field, downstream consumers can't distinguish a
+caller who <em>said</em> &quot;unknown&quot; from a stall, and readbacks should derive from
+status anyway. Persist a per-field <strong>status</strong> (<code>answered | skipped | unknown | blocked</code>) alongside the value (intake_answers gains a status
+column) and leave the value empty on stall. Rule 6/7 then read from status.</li>
+<li><strong>Clarify counter interplay.</strong> <code>max_reprompts</code> governs the FIRST unanswered
+prompt; the existing interests &quot;anything else?&quot; loop caps (4 rounds,
+2-silence exit) govern continuation after a successful first answer. State
+this in the compiler docs or the two counters will get cross-wired.</li>
+<li><strong><code>web_only</code> implies <code>collect: false</code></strong> — make <code>stall_policy</code> authoritative
+and have the compiler validate consistency rather than trusting two fields
+to agree.</li>
+</ul>
+<p>Implementation order in &quot;Compiler Plan After Approval&quot; is right; step 5
+(removing the space_channel_widgets edge exemption in favor of a field-policy
+proof) is the payoff that retires the temporary exemption entirely.</p>
+<hr />
+<h2 id="implementation-note-2026-07-05">Implementation Note (2026-07-05)</h2>
+<p>Implemented after Fable 5 approval.</p>
+<p>What landed:</p>
+<ul>
+<li><code>riff/business_pack/schema.py</code> validates <code>field.voice.stall_policy</code> at build
+time. Policies are now the four approved values:
+<code>required</code>, <code>skip_optional</code>, <code>mark_unknown</code>, and <code>web_only</code>.</li>
+<li><code>blocks</code> is a fixed enum:
+<code>booking | dispatch | case_submit | payment | profile_complete</code>.</li>
+<li>Identity fields must explicitly declare <code>voice.stall_policy: required</code>;
+consent fields must not declare a voice stall policy.</li>
+<li><code>unknown_value</code> is rejected. Intake persistence now stores
+<code>intake_answers.status</code> as <code>answered | skipped | unknown | blocked</code> beside
+the value.</li>
+<li>The compiler emits status-setting transitions and a non-side-effect static
+bridge for stalled optional fields. The Space Channel path is now:
+<code>intake_interests_ask --stalled--&gt; intake_interests_skipped --&gt; intake_save</code>.</li>
+<li><code>intake_profile_save</code> writes per-field status and refuses
+<code>profile_complete</code> submit when a field whose policy blocks
+<code>profile_complete</code> is not <code>answered</code>.</li>
+<li>The temporary strict-safety exemption for
+<code>space_channel_widgets:intake_interests_ask -&gt; intake_save</code> was deleted.</li>
+</ul>
+<p>Validation run:</p>
+<pre><code class="language-bash">.venv/bin/python -m pytest \
+  tests/test_profile_store.py \
+  tests/test_intake_api.py \
+  tests/test_intake_client.py \
+  tests/test_intake_tools.py \
+  tests/test_shift_left_contract.py \
+  tests/business_pack/test_intake_compile.py \
+  tests/business_pack/test_intake_compile_law_electric.py \
+  tests/business_pack/test_widgets_importer.py \
+  tests/business_pack/test_widgets_flow_sim.py \
+  tests/test_flows_strict_safety_gate.py -q
+
+RIFF_REQUIRE_SAFETY_GATE=1 .venv/bin/python - &lt;&lt;'PY'
+from riff.loader import load_flow
+for path in [
+    &quot;flows/space_channel_widgets.yaml&quot;,
+    &quot;flows/legal_intake.yaml&quot;,
+    &quot;flows/electrical_intake.yaml&quot;,
+]:
+    load_flow(path)
+    print(path, &quot;ok&quot;)
+PY
+
+.venv/bin/python scripts/verify-menu-sweep.py space_channel_widgets
+</code></pre>
+<p>Result: focused suite passed, strict-load passed for the three affected flows,
+and Space Channel menu sweep remained <code>7/7</code>.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#short-answer">Short Answer</a></li><li class="toc-h2"><a href="#problem-this-solves">Problem This Solves</a></li><li class="toc-h2"><a href="#design-goal">Design Goal</a></li><li class="toc-h2"><a href="#proposed-field-shape">Proposed Field Shape</a></li><li class="toc-h2"><a href="#stall-policies">Stall Policies</a></li><li class="toc-h2"><a href="#build-time-rules">Build-Time Rules</a></li><li class="toc-h2"><a href="#runtime-patterns">Runtime Patterns</a></li><li class="toc-h3"><a href="#optional-preference">Optional Preference</a></li><li class="toc-h3"><a href="#unknown-but-continue">Unknown But Continue</a></li><li class="toc-h3"><a href="#high-risk-incomplete">High-Risk Incomplete</a></li><li class="toc-h3"><a href="#web-only">Web Only</a></li><li class="toc-h2"><a href="#vertical-examples">Vertical Examples</a></li><li class="toc-h3"><a href="#space-channel">Space Channel</a></li><li class="toc-h3"><a href="#plumbing">Plumbing</a></li><li class="toc-h3"><a href="#electrical">Electrical</a></li><li class="toc-h3"><a href="#law">Law</a></li><li class="toc-h2"><a href="#compiler-plan-after-approval">Compiler Plan After Approval</a></li><li class="toc-h2"><a href="#review-questions-for-fable-5">Review Questions for Fable 5</a></li><li class="toc-h2"><a href="#recommendation">Recommendation</a></li><li class="toc-h2"><a href="#fable-5-review-2026-07-05">Fable 5 Review (2026-07-05)</a></li><li class="toc-h2"><a href="#implementation-note-2026-07-05">Implementation Note (2026-07-05)</a></li></ul></aside>
+</div>
+</body>
+</html>

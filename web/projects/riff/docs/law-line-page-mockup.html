@@ -1,0 +1,274 @@
+<!-- MOCKUP — superseded by the live, generic /line.html?flow_id=<id> operator
+     page (riff/line_page.py + web/line.html), which renders every phone
+     line's menu/greeting/intake-journey/audio-status straight from its flow
+     YAML — for ANY flow_id, not just legal_intake. This file is the frozen
+     design reference the live page's look-and-feel was matched against;
+     it is illustrative/static, not wired to real flow data. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>512-2777-LAW — Line Page & Menu Builder Mockup</title>
+<style>
+:root {
+  --ground: #faf8f4;
+  --panel: #ffffff;
+  --ink: #22252e;
+  --ink-soft: #5c6070;
+  --hairline: #e3dfd6;
+  --accent: #7d2a35;        /* oxblood — law-book spine */
+  --accent-soft: #f3e6e7;
+  --brass: #8a6d3a;
+  --ok: #2e7d4f;
+  --ok-soft: #e3f0e8;
+  --warn: #9a6a12;
+  --warn-soft: #f6ecd7;
+  --keycap-ground: #f0ede6;
+  --keycap-edge: #d8d3c6;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --serif: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #191b21; --panel: #21242c; --ink: #e8e6e1; --ink-soft: #9a9daa;
+    --hairline: #33363f; --accent: #c4707c; --accent-soft: #3a2a2e;
+    --brass: #c2a066; --ok: #6fbf8f; --ok-soft: #24352c;
+    --warn: #d9a84e; --warn-soft: #3a3122;
+    --keycap-ground: #2a2d36; --keycap-edge: #3d414c;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #191b21; --panel: #21242c; --ink: #e8e6e1; --ink-soft: #9a9daa;
+  --hairline: #33363f; --accent: #c4707c; --accent-soft: #3a2a2e;
+  --brass: #c2a066; --ok: #6fbf8f; --ok-soft: #24352c;
+  --warn: #d9a84e; --warn-soft: #3a3122;
+  --keycap-ground: #2a2d36; --keycap-edge: #3d414c;
+}
+:root[data-theme="light"] {
+  --ground: #faf8f4; --panel: #ffffff; --ink: #22252e; --ink-soft: #5c6070;
+  --hairline: #e3dfd6; --accent: #7d2a35; --accent-soft: #f3e6e7;
+  --brass: #8a6d3a; --ok: #2e7d4f; --ok-soft: #e3f0e8;
+  --warn: #9a6a12; --warn-soft: #f6ecd7;
+  --keycap-ground: #f0ede6; --keycap-edge: #d8d3c6;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font-family: var(--sans); line-height: 1.55; font-size: 15px;
+}
+.wrap { max-width: 980px; margin: 0 auto; padding: 2.2rem 1.4rem 4rem; }
+header.line-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem 1.2rem; border-bottom: 2px solid var(--accent); padding-bottom: 1.1rem; }
+.line-number { font-family: var(--serif); font-size: 2.3rem; letter-spacing: 0.01em; font-variant-numeric: tabular-nums; text-wrap: balance; margin: 0; }
+.line-number .law { color: var(--accent); }
+.line-meta { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-left: auto; }
+.chip {
+  font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.22rem 0.6rem; border-radius: 3px; font-weight: 600;
+}
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.flow { background: var(--accent-soft); color: var(--accent); font-family: var(--mono); text-transform: none; letter-spacing: 0; }
+.greeting-block { margin: 1.6rem 0 0; padding: 1.1rem 1.3rem; background: var(--panel); border: 1px solid var(--hairline); }
+.greeting-block .eyebrow, .eyebrow {
+  font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 700; margin: 0 0 0.4rem;
+}
+.spoken { font-family: var(--serif); font-size: 1.08rem; margin: 0; max-width: 62ch; }
+.spoken em { color: var(--ink-soft); font-size: 0.85rem; font-family: var(--sans); font-style: normal; }
+.editable { position: relative; }
+.editable::after {
+  content: "✎ pack-editable"; position: absolute; top: 0.55rem; right: 0.7rem;
+  font-size: 0.68rem; color: var(--brass); letter-spacing: 0.05em; opacity: 0.85;
+  font-family: var(--sans);
+}
+h2 { font-family: var(--serif); font-size: 1.45rem; margin: 2.4rem 0 0.9rem; text-wrap: balance; }
+h2 .count { color: var(--ink-soft); font-size: 0.95rem; font-family: var(--sans); }
+.menu-grid { display: grid; gap: 0.85rem; }
+.opt {
+  display: grid; grid-template-columns: 74px 1fr auto; gap: 1rem;
+  background: var(--panel); border: 1px solid var(--hairline);
+  padding: 1rem 1.15rem; align-items: start;
+}
+.opt:hover { border-color: var(--brass); }
+.keycap {
+  width: 58px; height: 58px; display: grid; place-items: center;
+  background: var(--keycap-ground); border: 1px solid var(--keycap-edge);
+  border-bottom-width: 3px; border-radius: 8px;
+  font-family: var(--mono); font-size: 1.7rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--accent);
+}
+.keycap.wordkey { font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); text-align: center; line-height: 1.3; padding: 0 4px; }
+.opt-body { min-width: 0; }
+.opt-label { font-weight: 700; font-size: 1.02rem; margin: 0 0 0.15rem; }
+.opt-route { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-soft); margin: 0 0 0.5rem; }
+.opt-route b { color: var(--brass); font-weight: 600; }
+.aliases { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.alias {
+  font-family: var(--mono); font-size: 0.72rem; padding: 0.14rem 0.5rem;
+  background: var(--ground); border: 1px solid var(--hairline); border-radius: 999px;
+  color: var(--ink-soft);
+}
+.opt-side { display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end; }
+.pill { font-size: 0.7rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 999px; }
+.pill.audio-ok { background: var(--ok-soft); color: var(--ok); }
+.pill.default-new { background: var(--accent-soft); color: var(--accent); }
+.journey { margin-top: 0.4rem; padding: 1.15rem 1.3rem; background: var(--panel); border: 1px solid var(--hairline); overflow-x: auto; }
+.rail { display: flex; gap: 0; align-items: stretch; min-width: 840px; }
+.step { flex: 1; position: relative; padding: 0.55rem 0.9rem 0.55rem 1.1rem; border-left: 3px solid var(--hairline); }
+.step:first-child { border-left-color: var(--accent); }
+.step .s-name { font-weight: 700; font-size: 0.85rem; }
+.step .s-note { font-size: 0.74rem; color: var(--ink-soft); max-width: 22ch; }
+.step .s-badge { display: inline-block; margin-top: 0.3rem; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; color: var(--brass); }
+.callout { margin-top: 0.9rem; padding: 0.8rem 1rem; background: var(--warn-soft); color: var(--warn); font-size: 0.85rem; border-left: 3px solid var(--warn); }
+.callout.okc { background: var(--ok-soft); color: var(--ok); border-left-color: var(--ok); }
+.sms-preview { margin-top: 0.9rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-start; }
+.sms-bubble {
+  max-width: 340px; background: var(--panel); border: 1px solid var(--hairline);
+  border-radius: 14px 14px 14px 3px; padding: 0.8rem 1rem; font-size: 0.85rem;
+}
+.sms-bubble .caps { font-weight: 800; letter-spacing: 0.02em; }
+.sms-bubble .sms-meta { font-size: 0.68rem; color: var(--ink-soft); margin-top: 0.55rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.edit-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 720px) { .edit-cols { grid-template-columns: 1fr; } .opt { grid-template-columns: 60px 1fr; } .opt-side { grid-column: 1 / -1; flex-direction: row; } }
+.edit-card { background: var(--panel); border: 1px solid var(--hairline); padding: 1rem 1.2rem; }
+.edit-card h3 { font-family: var(--serif); margin: 0 0 0.5rem; font-size: 1.08rem; }
+.edit-card ol, .edit-card ul { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+.edit-card li { margin: 0.35rem 0; font-size: 0.88rem; }
+.edit-card code { font-family: var(--mono); font-size: 0.78rem; background: var(--ground); border: 1px solid var(--hairline); padding: 0.05rem 0.35rem; border-radius: 3px; }
+.reco { border-left: 3px solid var(--accent); }
+footer.note { margin-top: 2.5rem; font-size: 0.78rem; color: var(--ink-soft); border-top: 1px solid var(--hairline); padding-top: 0.9rem; max-width: 70ch; }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) {
+  .opt { transition: border-color 120ms ease; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="line-head">
+    <h1 class="line-number">512·2777·<span class="law">LAW</span></h1>
+    <div class="line-meta">
+      <span class="chip flow">legal_intake</span>
+      <span class="chip ok">Live · both nodes</span>
+      <span class="chip ok">Audio prerendered</span>
+    </div>
+  </header>
+
+  <div class="greeting-block editable">
+    <p class="eyebrow">Greeting — first thing every caller hears</p>
+    <p class="spoken">"<b>Hello ⟨name⟩, welcome back.</b> Thank you for calling <b>RIFF Law</b>. This call may be recorded. I can't give legal advice — I collect details for an attorney."
+    <br><em>The bolded welcome-back prefix renders only for verified returning callers; strangers hear it from "Thank you…".</em></p>
+  </div>
+  <div class="callout">Business name is currently <b>"RIFF Law"</b> — if this line should follow the David Austin naming (like plumbing and electrical), that's a one-field pack edit.</div>
+
+  <h2>The menu <span class="count">· 3 options + repeat · press or say, any time</span></h2>
+  <p class="spoken" style="margin:0 0 0.9rem">"Which one would you like? You can press a key any time."</p>
+
+  <div class="menu-grid">
+    <div class="opt editable">
+      <div class="keycap">0</div>
+      <div class="opt-body">
+        <p class="opt-label">Set up my case profile</p>
+        <p class="opt-route">routes to <b>intake_name_ask</b> — the profile intake journey below</p>
+        <div class="aliases">
+          <span class="alias">profile</span><span class="alias">text updates</span>
+          <span class="alias">sign up</span><span class="alias">case updates</span><span class="alias">my profile</span>
+        </div>
+      </div>
+      <div class="opt-side">
+        <span class="pill default-new">Default for new callers</span>
+        <span class="pill audio-ok">● audio ready</span>
+      </div>
+    </div>
+
+    <div class="opt editable">
+      <div class="keycap">1</div>
+      <div class="opt-body">
+        <p class="opt-label">Start a new intake</p>
+        <p class="opt-route">routes to <b>the legal matter intake</b> — describe the issue, attorney follow-up</p>
+        <div class="aliases">
+          <span class="alias">new case</span><span class="alias">legal problem</span>
+          <span class="alias">intake</span><span class="alias">describe my issue</span><span class="alias">lawyer</span>
+        </div>
+      </div>
+      <div class="opt-side"><span class="pill audio-ok">● audio ready</span></div>
+    </div>
+
+    <div class="opt editable">
+      <div class="keycap">2</div>
+      <div class="opt-body">
+        <p class="opt-label">Leave a message</p>
+        <p class="opt-route">routes to <b>leave_message</b> — records callback details for the office</p>
+        <div class="aliases">
+          <span class="alias">message</span><span class="alias">voicemail</span><span class="alias">call me back</span>
+        </div>
+      </div>
+      <div class="opt-side"><span class="pill audio-ok">● audio ready</span></div>
+    </div>
+
+    <div class="opt editable">
+      <div class="keycap wordkey">repeat<br>menu</div>
+      <div class="opt-body">
+        <p class="opt-label">Repeat the menu</p>
+        <p class="opt-route">replays the options — no digit assigned</p>
+        <div class="aliases">
+          <span class="alias">repeat</span><span class="alias">say that again</span>
+          <span class="alias">what are my options</span><span class="alias">one more time</span>
+        </div>
+      </div>
+      <div class="opt-side"><span class="pill audio-ok">● audio ready</span></div>
+    </div>
+  </div>
+
+  <h2>Option 0 — the profile intake journey</h2>
+  <div class="journey">
+    <div class="rail">
+      <div class="step"><div class="s-name">Name</div><div class="s-note">"What is your name?" — instant advance on answer</div></div>
+      <div class="step"><div class="s-name">SMS consent</div><div class="s-note">Verbatim consent copy; yes/no</div><span class="s-badge">CONSENT GATE</span></div>
+      <div class="step"><div class="s-name">Text sent</div><div class="s-note">Code on top in caps, link below</div><span class="s-badge">1 TEXT ONLY</span></div>
+      <div class="step"><div class="s-name">Verify code</div><div class="s-note">Spoken readback, 2 attempts; unlocks the web page</div><span class="s-badge">UNLOCKS PAGE</span></div>
+      <div class="step"><div class="s-name">Legal topics</div><div class="s-note">"What matters should we update you on?" — up to 4 rounds</div></div>
+      <div class="step"><div class="s-name">Save → confirm</div><div class="s-note">Saved first, then read back; "no" restarts</div></div>
+      <div class="step"><div class="s-name">Back to menu</div><div class="s-note">Loop, never a dead end</div></div>
+    </div>
+  </div>
+  <div class="callout okc">Latency fixes apply here: ~1s to the first question, instant step advance, silence watchdog underneath. Returning callers get "Hello ⟨name⟩" and option 0 becomes "update your profile" with fields pre-filled.</div>
+
+  <div class="sms-preview">
+    <div class="sms-bubble">
+      <div class="caps">SAY THIS 6 DIGIT CODE: 493 271</div>
+      <br>RIFF Law: open riff.chattychapters.com/intake.html?token=k7…3f to follow along. RIFF will never ask for your password.
+      <div class="sms-meta">the one text a consenting caller receives</div>
+    </div>
+  </div>
+
+  <h2>Editing this page — today, and my recommendation</h2>
+  <div class="edit-cols">
+    <div class="edit-card">
+      <h3>How edits work today</h3>
+      <ol>
+        <li>Edit <code>packs/legal_intake.pack.yaml</code> — labels, digits, aliases, spoken copy, business name all live there.</li>
+        <li>Regenerate: the compiler rebuilds <code>flows/legal_intake.yaml</code> with a provenance hash, and refuses bad menus (digit collisions, missing consent field, dead ends).</li>
+        <li>Prerender changed lines (one command) so callers never pay live-synthesis pauses.</li>
+        <li>Restart nodes; done. Hand-editing the flow YAML is never allowed — regeneration would erase it.</li>
+      </ol>
+    </div>
+    <div class="edit-card reco">
+      <h3>Recommendation: Menu Builder in Studio</h3>
+      <ul>
+        <li>This exact page, rendered <b>from the live flow file</b> per line, with every ✎ field editable in place.</li>
+        <li>Saves write to the <b>pack</b> (not the flow) through the existing builder draft API — so edits survive regeneration by construction.</li>
+        <li>One button: <b>Publish</b> = regenerate → lint gates → prerender changed audio → rolling node restart. One button: <b>Preview call</b> in the browser.</li>
+        <li>Seed new lines from the standard 0–7 commercial template (intake / existing job / changes / schedule / pricing / emergency / billing / human), toggling options per business.</li>
+        <li>Guardrails surfaced in the UI: digit collision, alias overlap between options, missing audio, unreachable states — the compile checks we already have, shown before publish.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="note">
+    Mockup rendered from the real <code>flows/legal_intake.yaml</code> on main (menu reordered today: profile intake moved from option 3 to option 0; options 1–2 unchanged; audio prerendered). The ✎ markers show which text is pack-editable — nothing on this page is hardcoded anywhere else.
+  </footer>
+</div>
+</body>
+</html>
