@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>Ratchet Loops: Making an AI Agent Improve Your System Without Letting It Grade Its Own Homework · Blog · davidbmar.com</title>
+<meta name="description" content="A builder's guide to ratchet self-improving loops: agent sessions where every improvement is backed by a before/after score, code rolls back, the world gets compensated, and the loop can never lower its own standards.">
+<meta property="og:title" content="Ratchet Loops: Making an AI Agent Improve Your System Without Letting It Grade Its Own Homework">
+<meta property="og:description" content="A builder's guide to ratchet self-improving loops: agent sessions where every improvement is backed by a before/after score, code rolls back, the world gets compensated, and the loop can never lower its own standards.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://davidbmar.com/blog/2026.(JUL)07.06-RachetLoop.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ratchet Loops">
+<meta name="twitter:description" content="A builder's guide to ratchet self-improving loops: every improvement backed by a before/after score, code rolls back, the world gets compensated, and the loop can never lower its own standards.">
+<link rel="canonical" href="https://davidbmar.com/blog/2026.(JUL)07.06-RachetLoop.html">
+<style>
+
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+         padding: 0 1.25rem; }
+  a { color: #2563eb; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: .72rem;
+             font-weight: 700; color: #2563eb; margin: 0 0 .4rem; }
+  h1 { margin: 0 0 .35rem; line-height: 1.15; font-size: 2rem; }
+  .lede { font-size: 1.18rem; line-height: 1.5; opacity: .9; margin: .2rem 0 .7rem; }
+  .byline { margin: 0 0 .2rem; font-size: .85rem; opacity: .65; }
+  .repo-chips { margin: .3rem 0 0; }
+  .tag { display: inline-block; background: #eef; color: #224; border-radius: 999px;
+         padding: .12rem .62rem; margin: .14rem .18rem 0 0; font-size: .8rem;
+         text-decoration: none; }
+  .toc { border: 1px solid #8884; border-radius: 12px; padding: .65rem 1rem;
+         margin: 1.5rem 0; font-size: .9rem; }
+  .toc b { display: block; text-transform: uppercase; letter-spacing: .07em;
+           font-size: .68rem; opacity: .55; margin-bottom: .35rem; }
+  .toc a { display: inline-block; margin: 0 1rem .3rem 0; }
+  section.learn { margin: 2.1rem 0; }
+  section.learn > h2 { font-size: 1.3rem; border-bottom: 1px solid #8883;
+                       padding-bottom: .3rem; margin: 0 0 .8rem; }
+  .narrative { font-size: 1.03rem; }
+  .narrative + .narrative { margin-top: .9rem; }
+  ul.bullets { padding-left: 1.15rem; margin: .4rem 0; }
+  ul.bullets li { margin: .4rem 0; }
+  ol.steps { padding-left: 1.3rem; margin: .6rem 0; }
+  ol.steps li { margin: .5rem 0; }
+  ul.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+  ul.cards li.card { border-left: 4px solid #2563eb; background: #eef3ff;
+                     color: #1a1f29; border-radius: 0 10px 10px 0; padding: .65rem 1rem; }
+  .card h3 { margin: 0 0 .25rem; font-size: 1rem; color: #1a1f29; }
+  .card p { margin: 0; color: #1a1f29; }
+  blockquote.contract { border-left: 4px solid #2563eb; background: #2563eb0d;
+         margin: 1rem 0; padding: .75rem 1.1rem; border-radius: 0 10px 10px 0;
+         font-size: 1.02rem; }
+  blockquote.contract p { margin: 0; }
+  pre { background: #0d1117; color: #d3d8e0; border-radius: 10px; padding: 1rem 1.15rem;
+        overflow-x: auto; font-size: .85rem; line-height: 1.55; }
+  pre code { background: none; padding: 0; color: inherit; }
+  code { background: #8882; border-radius: 4px; padding: .1rem .35rem; font-size: .88em;
+         font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; }
+  table.failure-table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  table.failure-table th, table.failure-table td { border: 1px solid #8884;
+         padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  table.failure-table th { background: #2563eb14; font-weight: 700; }
+  table.failure-table tr:nth-child(even) td { background: #8881 0a; }
+  .download-cards li.card { border-left-color: #16a34a; background: #16a34a14; }
+  .download-cards a.dl-name { font-weight: 700; font-size: 1.05rem; text-decoration: none;
+         font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .download-cards p { margin: .35rem 0 0; color: inherit; opacity: .85; }
+  footer.prov { margin-top: 2.6rem; border-top: 1px solid #8883; padding-top: .8rem;
+                font-size: .82rem; opacity: .6; }
+
+  .site-bar { display: flex; gap: 1.1rem; align-items: center; padding: .55rem 0; margin-bottom: 1.25rem; border-bottom: 1px solid #8883; font-size: .9rem; }
+  .site-bar a { color: #2563eb; text-decoration: none; }
+  .site-bar .brand { font-weight: 700; margin-right: auto; color: inherit; }
+</style>
+</head>
+<body>
+<nav class="site-bar" aria-label="Site"><a class="brand" href="/">davidbmar.com</a><a href="/#/search">Search</a><a href="/projects/">Projects</a><a href="/daily/">Daily</a><a href="/blog/">Blog</a><a href="/#/clusters">Clusters</a></nav>
+<header>
+  <p class="eyebrow">Blog</p>
+  <h1>Ratchet Loops</h1>
+  <p class="lede">Making an AI agent improve your system without letting it grade its own homework.</p>
+  <p class="byline">Published July 6, 2026 · David Mar</p>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <b>On this page</b>
+  <a href="#why">Why I wrote this</a>
+  <a href="#sec-1">1. What a ratchet loop is</a>
+  <a href="#sec-2">2. Three-layer architecture</a>
+  <a href="#sec-3">3. Define the score</a>
+  <a href="#sec-4">4. The cycle structure</a>
+  <a href="#sec-5">5. Checks gate; judges inform</a>
+  <a href="#sec-6">6. Recoverability</a>
+  <a href="#sec-7">7. Freeze the eval set</a>
+  <a href="#sec-8">8. Self-amendment</a>
+  <a href="#sec-9">9. Build order</a>
+  <a href="#sec-10">10. Failure-mode index</a>
+  <a href="#sec-11">11. Minimal template</a>
+  <a href="#sec-12">12. The through-line</a>
+  <a href="#get-the-skills">Get the skills</a>
+</nav>
+
+<section class="learn" id="why">
+<h2>Why I wrote this</h2>
+<p class="narrative">I build RIFF, a platform where businesses get AI phone receptionists. At
+some point I stopped asking Claude to improve it and started asking Claude
+to build a <em>system</em> that improves it — a loop that picks a weakness, fixes
+it, measures before and after, and keeps the change only if the numbers
+moved. Getting that to work honestly — without the agent gaming its own
+scores, leaving half-built experiments everywhere, or "improving" things
+nobody can verify — turned out to be a design problem with teeth. This is
+the write-up of what survived contact with reality, plus two installable
+Claude skills (a beginner version and the full version) so you can run
+one yourself.</p>
+</section>
+
+<section class="learn" id="sec-1">
+<h2>1. What a ratchet loop is, and why "ratchet" is the operative word</h2>
+<p class="narrative">A self-improving loop is an agent session that repeatedly picks a weakness in
+a system, fixes it, and measures whether things got better. The naive version
+of this fails in predictable ways: the agent improves things it can't measure
+(so nothing is proven), thrashes between goals, quietly relaxes its own
+grading standards, leaves half-built experiments everywhere, and after ten
+sessions nobody can say whether the system is better or just different.</p>
+<p class="narrative">The ratchet is the mechanical fix. A ratchet moves in one direction and locks:
+every cycle must produce a before/after measurement, progress is only claimed
+when the number moves, and regressions are reverted rather than absorbed. The
+one-sentence contract:</p>
+<blockquote class="contract"><p><strong>No improvement may be claimed without a before/after row in a database,
+and the composite score may only move forward on evidence.</strong></p></blockquote>
+<p class="narrative">Everything else in this tutorial is scaffolding to make that sentence
+enforceable against an agent that is smart, fast, and — like all optimizers —
+inclined to satisfy the letter of its objective rather than the spirit.</p>
+</section>
+
+<section class="learn" id="sec-2">
+<h2>2. The three-layer architecture</h2>
+<p class="narrative">Separate your loop into three layers with different mutation rules. Mixing
+them is the most common structural mistake: principles drift because they
+live in an editable procedure, or procedures ossify because they're tangled
+with laws.</p>
+<p class="narrative"><strong>Layer 1 — Constitution.</strong> The durable laws. Changes rarely, and only by
+explicit amendment. Crucially, every principle must be written as a
+<em>checkable gate</em>, not an aspiration. "Prefer quality" is a vibe; "no
+scorecard row without a deterministic check backing it" is a gate the
+wrap-up can pass or fail.</p>
+<p class="narrative"><strong>Layer 2 — Command.</strong> The session procedure: setup, cycle structure,
+wrap-up. Evolves freely — this is where self-amendment operates.</p>
+<p class="narrative"><strong>Layer 3 — State.</strong> The database and learnings log. Append-only,
+cross-session, and — critically — <em>outside the rollback blast radius</em> (§6).
+This is the loop's memory; if it lives in anyone's head or chat history, you
+don't have a loop, you have a series of unrelated sessions.</p>
+</section>
+
+<section class="learn" id="sec-3">
+<h2>3. Define the score before anything else</h2>
+<p class="narrative">You cannot ratchet what you cannot compute. Define a composite score as a
+weighted sum of dimensions that matter for your system — for a voice
+platform that might be quality, completeness, humanness, readability,
+latency, and rebuild speed; for a data pipeline it might be freshness,
+correctness, cost, and time-to-add-a-source. The specific dimensions matter
+less than four properties:</p>
+<p class="narrative"><strong>Unmeasurable dimensions score zero.</strong> This is the single highest-leverage
+trick in the whole design. A dimension you can't measure yet isn't omitted —
+it scores 0, drags the composite down, and therefore becomes automatically
+the top-priority deficiency. The loop bootstraps its own instrumentation
+without you sequencing "build metrics first" by hand, because a missing
+metric <em>is</em> the lowest-hanging fruit by construction.</p>
+<p class="narrative"><strong>Normalize the baseline.</strong> Run everything measurable once, call that
+composite 100, and set a target (e.g., 120 = 20% relative improvement).
+Absolute numbers are meaningless; deltas against a frozen baseline are the
+whole game. When weights or judges change, old composites become
+incomparable — re-baseline explicitly rather than pretending continuity.</p>
+<p class="narrative"><strong>Include a "meta" dimension.</strong> The most valuable metric is usually not
+about the current system state but about <em>the cost of change</em>: how long and
+how many edits does it take to build a fresh unit of work (a flow, a
+pipeline, a service) from template to green? This "rebuildability" probe is
+what captures "the next thing we build starts from a higher floor" — the
+actual point of the exercise. Probe it every cycle with a disposable,
+namespaced artifact that is built, timed, and deleted, even in cycles whose
+fix was pure infrastructure.</p>
+<p class="narrative"><strong>Cap on violations.</strong> Hard invariant violations (safety rules, contract
+breaks) cap the composite regardless of other scores. Otherwise the loop
+learns that a fast, charming, rule-breaking system outscores a correct one.</p>
+</section>
+
+<section class="learn" id="sec-4">
+<h2>4. The cycle structure</h2>
+<p class="narrative">Time-box the session, and within it, each cycle. A 30-minute session
+supports roughly one baseline cycle plus three or four improvement cycles;
+reserve the final few minutes for wrap-up unconditionally, because a loop
+that runs out of clock mid-cycle without reconciling is worse than a loop
+that did one less cycle.</p>
+<p class="narrative"><strong>Cycle 0 — Baseline.</strong> Read prior state (learnings, last scores), inventory
+what's measurable today, measure it, score zeros, persist, normalize.</p>
+<p class="narrative"><strong>Cycles 1..N:</strong></p>
+<ol class="steps">
+<li><strong>Pick ONE deficiency</strong>, and write it down <em>before</em> acting. One, not
+three — multi-goal cycles produce unattributable score movements, and
+attribution is what the whole database exists for. Selection heuristics:
+a zero (unmeasurable) dimension beats polishing a measured one; if the
+rebuild probe was slow, tooling dominates everything; violations before
+polish; prefer fixes that generalize beyond the current target ("would
+this help if I built a different vertical tomorrow?").</li>
+<li><strong>Fix it.</strong></li>
+<li><strong>Run the rebuild probe</strong> (build disposable artifact, time, count edits,
+delete, verify deletion).</li>
+<li><strong>Evaluate</strong> against a <em>frozen</em> test corpus (§7).</li>
+<li><strong>Score and persist</strong> the row.</li>
+<li><strong>Ratchet check</strong>: composite ≥ previous → one commit with a message that
+names the deficiency and the score delta. Regression → revert the cycle,
+mark it reverted in the database (don't delete the row — a reverted
+cycle's record is evidence), log why.</li>
+</ol>
+<p class="narrative"><strong>Wrap-up (unconditional):</strong> reconcile external side effects (§6), verify
+zero disposable artifacts remain, print the scorecard trajectory, emit a
+constitution-compliance line per principle, write a learnings entry ending
+with the single recommended first action for the next session, and apply
+the merge gate (§6).</p>
+</section>
+
+<section class="learn" id="sec-5">
+<h2>5. Deterministic checks gate; judges inform</h2>
+<p class="narrative">Many dimensions worth measuring (humanness of dialogue, readability of code)
+need an LLM judge. Two facts about judges, both learned expensively by
+everyone who builds these loops:</p>
+<p class="narrative"><strong>Judged scores are noisy.</strong> Identical code can score tens of points apart
+across runs. If judged scores gate the ratchet, your loop reverts good
+changes and merges bad ones on coin flips, and — worse — exhibits
+survivorship bias: you keep whichever runs happened to score high.
+Therefore: <strong>deterministic checks gate decisions; judged scores inform
+trends only.</strong> Pass rates, invariant counts, latency percentiles, field
+coverage — these move the ratchet. Judge scores are plotted, watched, and
+never trusted for a single-cycle verdict.</p>
+<p class="narrative"><strong>Judges are the softest attack surface for self-gaming.</strong> An agent that can
+edit its judge prompt will, eventually, "improve" scores by weakening the
+rubric — not maliciously, just because that's where the gradient points. So:
+freeze judge prompts at session start, persist their hash with every score
+(so cross-session comparability is provable), and put rubric changes behind
+the amendment process (§8). Anchor the rubric with fixed descriptions
+(0 = incoherent, 50 = functional but robotic, 80 = a competent human signs
+off, 100 = exemplary) so scores mean something across sessions.</p>
+<p class="narrative">The same principle generalizes beyond judges: <strong>claims are verified against
+independent sources, never trusted from the agent's own narration.</strong> "The UI
+works" is validated by a browser actually driving the page. "The docs are
+accurate" is validated by a claims registry where each documented statement
+has a machine check against the real system. "I cleaned up" is validated by
+querying the external provider's API (§6). The agent's log is a claim; the
+world is the evidence.</p>
+</section>
+
+<section class="learn" id="sec-6">
+<h2>6. Recoverability: rollback for code, compensation for the world</h2>
+<p class="narrative">Two different physics apply, and conflating them is how loops cause damage.</p>
+<p class="narrative"><strong>Code rolls back.</strong> Run each session on its own branch from a tagged
+anchor, one commit per cycle, revert within the branch on regression, and
+apply a <strong>merge gate</strong> at wrap-up: the branch merges to main only if the
+final composite beat the session baseline; otherwise it's left intact for
+autopsy. This gives clean blast radius, no collision with human work on
+main, and — a nice bonus — makes autonomous scheduled runs trivial later
+(the merge gate becomes a pull request).</p>
+<p class="narrative">Two rollback subtleties that bite in practice: if your repo commits
+<em>generated</em> artifacts (compiled outputs derived from a source layer), the
+revert unit must be the <em>source</em> layer with all downstream layers
+recompiled in the same commit, or reverts silently un-revert when the next
+regeneration runs from unreverted upstream. And any <em>concurrent writer</em> to
+the same files — a refresh cron, another agent — must be paused at session
+setup and re-enabled at wrap-up, with the re-enable recoverable by the next
+session's sweeper if this one crashes. Add a cheap drift gate (recompile
+and diff at setup/CI) so divergence between layers can never accumulate
+silently.</p>
+<p class="narrative"><strong>The world does not roll back — it compensates.</strong> You cannot un-send an
+SMS, un-place a call, un-charge a card. For external side effects, the
+guarantee is not "undo" but: (a) every action is recorded <em>before</em> it
+happens, (b) every action has a defined compensating action, (c) a
+reconciler can prove the world returned to zero. The mechanism is a
+<strong>write-ahead side-effects ledger</strong>: no external action executes unless a
+ledger row exists first (intent, target, compensating action, status), the
+external ID is recorded after, and wrap-up diffs the ledger against the
+provider's API — zero orphans or the session fails loudly. The <em>next</em>
+session opens with a <strong>sweeper</strong> that re-reconciles prior sessions, so a
+crashed run can't leak resources silently.</p>
+<p class="narrative"><strong>Blast-radius fences live below the agent</strong>, in config the loop cannot
+amend: allowlists of targets it may ever touch (phone numbers, accounts,
+buckets), per-session budget caps where breach means abort-not-warn, and
+dedicated tagged resources (test numbers, test accounts) so reconciliation
+has an unambiguous ownership query. One semantic worth getting right: on a
+shared-with-the-world resource, unledgered <em>outbound</em> is a violation;
+stray <em>inbound</em> from strangers is log-and-ignore, or your reconciler
+becomes a false-alarm generator.</p>
+<p class="narrative"><strong>Loop state is exempt from rollback.</strong> A reverted cycle's ledger rows are
+exactly what cleanup needs; its scorecard row is exactly the evidence of
+what didn't work. The loop's schema is append-only: columns may be added,
+never dropped or truncated, and it lives on durable shared infrastructure —
+not a file next to the code it's rolling back.</p>
+</section>
+
+<section class="learn" id="sec-7">
+<h2>7. Freeze the eval set (Goodhart's law is the boss fight)</h2>
+<p class="narrative">The moment a measure becomes a target, optimizing the measure diverges from
+optimizing the goal. Ratchet loops are Goodhart machines by design, so you
+contain it structurally:</p>
+<ul class="bullets">
+<li><strong>The corpus freezes for the session.</strong> Expanding or editing the test set
+mid-session breaks score comparability; desired additions go in the
+learnings file for a human (or the next session's setup) to adopt.</li>
+<li><strong>Judges and rubrics freeze</strong> (§5).</li>
+<li><strong>The composite's weights freeze</strong>; changing them is an amendment and a
+re-baseline.</li>
+<li><strong>Anti-goals are explicit.</strong> Write down what the loop may not do even
+though it would raise the score: no weakening checks, no refactors outside
+the exercised path, no building dashboards, no new config mechanisms, no
+sync plumbing. Every anti-goal is a scar from a loop that once did exactly
+that.</li>
+</ul>
+<p class="narrative">The complementary principle is <strong>shift-left</strong>: every defect found by an
+<em>expensive</em> check (a judged eval run, a live test, a production incident)
+must be converted into a <em>cheap</em> authoring-time gate — a compiler warning,
+a lint rule, a guard test — before the cycle counts as complete, and the
+commit must reference the new gate. This is how the system gets "harder to
+break with every iteration": the expensive lesson is paid once, then
+enforced for free forever.</p>
+</section>
+
+<section class="learn" id="sec-8">
+<h2>8. Self-amendment: three levels, one rule</h2>
+<p class="narrative">"Self-improving" means different things at different levels of recursion:</p>
+<ul class="bullets">
+<li><strong>Level 1</strong> — the loop improves the target system. Table stakes.</li>
+<li><strong>Level 2</strong> — the loop improves its own <em>measurement</em> (falls out of
+unmeasurable-scores-zero, §3).</li>
+<li><strong>Level 3</strong> — the loop improves <em>its own procedure</em>: at wrap-up it may
+propose amendments to the command (and, rarely, the constitution) citing
+evidence from the database — "cycles averaged 11 minutes against a 7-minute
+target because X; amend the procedure to Y."</li>
+</ul>
+<p class="narrative">Level 3 is where the loop becomes genuinely self-improving and where it
+becomes dangerous, and one rule contains it, borrowed from safety-config
+cascades: <strong>frozen invariants may only tighten, and only a human may merge
+changes to them.</strong> Guardrails, budget caps, allowlists, judge rubrics, the
+ratchet rule itself, teardown, the append-only schema — the loop may propose
+amendments to these, with evidence, into an amendments table; a human (or a
+human-reviewed adversarial pass) merges or rejects. Everything else in the
+procedure, the loop may amend itself after an adversarial review gate.
+Amendments land as diffs in commits, so the loop's evolution is itself
+auditable in git history.</p>
+<p class="narrative">On adversarial review generally: designs and amendments should pass through
+a <em>different</em> model or a differently-prompted reviewer before commitment.
+The author of a change is structurally the worst-positioned entity to find
+its flaws; a second set of weights repeatedly earns its keep catching schema
+forks, tautological checks, and drift the author's own verification missed.</p>
+</section>
+
+<section class="learn" id="sec-9">
+<h2>9. Build order</h2>
+<p class="narrative">Don't build all of this at once. The dependency order:</p>
+<ol class="steps">
+<li><strong>Composite score + persistence schema.</strong> Score definition, database
+tables (runs, learnings), baseline normalization. A loop with only this
+is already useful.</li>
+<li><strong>Cycle procedure + ratchet.</strong> Branch-per-session, one-deficiency rule,
+rebuild probe, revert-on-regression, merge gate.</li>
+<li><strong>Constitution split.</strong> Extract the durable laws from the procedure once
+you've run enough sessions to know which rules keep mattering.</li>
+<li><strong>Judges</strong> (trend-only) with frozen rubrics and hashes.</li>
+<li><strong>Side-effects ledger + fences</strong> — only when the loop needs to touch the
+world. Sim/mocks gate the ratchet; live tests sample and inform.</li>
+<li><strong>Level-3 self-amendment</strong> — only after several sessions of database
+history exist for amendments to cite as evidence.</li>
+<li><strong>Autonomy</strong> (scheduled runs, PR-per-session) — last, and only once
+sweeper + reconciliation have proven they catch crashes, because
+autonomous means nobody is watching mid-session.</li>
+</ol>
+<p class="narrative">And before any of it: run a <strong>discovery phase</strong> against the real
+environment. Every assumption the design makes — artifacts are derived not
+committed, the database is reachable, the harness runs headless, no cron
+writes the same files — should be verified and reported <em>before</em> install,
+with an explicit instruction to halt on surprises rather than improvise.
+The two assumptions most likely to be wrong in any real system are "generated
+things aren't committed" and "nothing else writes what I write."</p>
+</section>
+
+<section class="learn" id="sec-10">
+<h2>10. Failure-mode index</h2>
+<p class="narrative">Every mechanism above exists because of a specific way loops die. The map:</p>
+<div class="table-wrap">
+<table class="failure-table">
+<thead><tr><th>Failure mode</th><th>Countermeasure</th></tr></thead>
+<tbody>
+<tr><td>Improvement claimed, nothing proven</td><td>No claim without a before/after DB row</td></tr>
+<tr><td>Agent thrash across goals</td><td>One deficiency per cycle, written down first</td></tr>
+<tr><td>Metrics never get built</td><td>Unmeasurable dimensions score 0</td></tr>
+<tr><td>Judge noise flips decisions</td><td>Deterministic checks gate; judges trend-only</td></tr>
+<tr><td>Rubric softening / self-gaming</td><td>Frozen judges + hashes; tighten-only amendments</td></tr>
+<tr><td>Goodhart on the eval set</td><td>Corpus/weights/rubrics frozen per session</td></tr>
+<tr><td>Orphaned experiments everywhere</td><td>Mandatory verified teardown + wrap-up audit</td></tr>
+<tr><td>Regression absorbed silently</td><td>Ratchet revert; violations revert mid-cycle</td></tr>
+<tr><td>Bad session pollutes main</td><td>Session branch + composite merge gate</td></tr>
+<tr><td>Revert undone by regeneration</td><td>Revert the source layer, recompile downstream atomically</td></tr>
+<tr><td>Concurrent writer stomps session</td><td>Pause crons/writers at setup; sweeper re-enables</td></tr>
+<tr><td>Un-undoable world damage</td><td>Write-ahead ledger, compensation, reconciliation vs provider API</td></tr>
+<tr><td>Crashed session leaks resources</td><td>Next-session sweeper re-reconciles prior sessions</td></tr>
+<tr><td>Runaway cost / wrong targets</td><td>Allowlists + hard budget caps below the agent's reach</td></tr>
+<tr><td>Loop rewrites its own guardrails</td><td>Frozen invariants, human-merged, tighten-only</td></tr>
+<tr><td>Author blind to own flaws</td><td>Adversarial review before commitment</td></tr>
+<tr><td>Progress lives in chat history</td><td>Append-only state on durable shared DB, read at session start</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="learn" id="sec-11">
+<h2>11. Minimal template</h2>
+<p class="narrative">The smallest honest version — a starting point, not the destination:</p>
+<pre><code>SETUP: branch loop/&lt;id&gt;; tag anchor; pause concurrent writers;
+       sweep prior sessions; read learnings + last scores.
+
+SCORE: composite = &Sigma; w&#7522;&middot;dim&#7522; ; unmeasured dim = 0 ;
+       violations cap composite ; baseline session-0 = 100.
+
+CYCLE (&le; T minutes):
+  1 pick ONE deficiency, log it first
+  2 fix
+  3 rebuild probe: template&rarr;green, time, edits, delete, verify
+  4 evaluate vs FROZEN corpus (deterministic gates ratchet)
+  5 persist row (link independent evidence: run records, hashes)
+  6 composite &ge; prev ? commit "loop(N): &lt;what&gt; | a&rarr;b"
+                     : revert, mark reverted, log why
+
+WRAPUP (always): reconcile ledger vs provider API (zero orphans);
+  verify zero disposables; print trajectory + per-principle compliance;
+  propose amendments (frozen &rArr; human merge); learnings entry ends with
+  next session's first action; merge branch iff final &gt; baseline.</code></pre>
+</section>
+
+<section class="learn" id="sec-12">
+<h2>12. The through-line</h2>
+<p class="narrative">A ratchet loop is not an agent that tries hard. It is an <em>institution</em>: a
+constitution that constrains, a procedure that executes, a database that
+remembers, gates that cannot be sweet-talked, and an amendment process that
+lets the whole thing evolve without ever being able to quietly lower its own
+standards. The system it improves should get harder to break and easier to
+rebuild with every iteration — and the proof should live in a database, not
+in anyone's memory.</p>
+</section>
+
+<section class="learn" id="get-the-skills">
+<h2>Get the skills</h2>
+<p class="narrative">Two installable Claude skills accompany this article:</p>
+<ul class="cards download-cards">
+<li class="card">
+  <a class="dl-name" href="downloads/ratchet-loop-starter.skill" download>ratchet-loop-starter.skill</a>
+  <p>The beginner edition. No database, no cloud accounts: git is the
+  database, a CSV is the scorecard, and the score comes from things every
+  repo has for free (tests passing, lint warnings). Read the whole skill
+  in two minutes.</p>
+</li>
+<li class="card">
+  <a class="dl-name" href="downloads/ratchet-loop.skill" download>ratchet-loop.skill</a>
+  <p>The full edition: Postgres scorecard, session branches with a merge
+  gate, judged scoring done safely (judges inform, never decide), a
+  write-ahead ledger for real-world side effects, and tighten-only
+  self-amendment.</p>
+</li>
+</ul>
+<p class="narrative">To install: in Claude.ai, open the .skill file and click Save skill; in
+Claude Code, unzip into <code>~/.claude/skills/</code> (all projects) or a repo's
+<code>.claude/skills/</code> (one project). Then ask Claude to "improve my project
+in a loop."</p>
+</section>
+
+<footer class="prov">Published July 6, 2026 · <a href="/blog/">&larr; Back to Blog</a></footer>
+</body>
+</html>
