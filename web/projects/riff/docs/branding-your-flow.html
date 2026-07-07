@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How-To — Brand Your Flow's Follow-Along Page</title>
+<style>
+  :root {
+    --bg: #0b0e19; --panel: #131730; --edge: #26305c; --ink: #eef1ff;
+    --dim: #8b93c4; --accent: #6f7bff; --good: #34d399; --warn: #f5c542;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f7f8fc; --panel: #ffffff; --edge: #d8ddf0; --ink: #1a2038;
+            --dim: #5b6491; --accent: #4353d8; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 27px; margin: 8px 0 4px; }
+  h2 { font-size: 19px; margin: 38px 0 10px; border-bottom: 1px solid var(--edge); padding-bottom: 6px; }
+  .sub { color: var(--dim); font-size: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .tip { border-left: 4px solid var(--good); }
+  .warn { border-left: 4px solid var(--warn); }
+  code, pre { font-family: var(--mono); font-size: 13.5px; }
+  code { background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 1px 5px; border-radius: 5px; }
+  pre { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 14px 16px; overflow-x: auto; }
+  pre code { background: none; padding: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+  th { color: var(--dim); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+  ol li, ul li { margin: 6px 0; }
+  .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 4px; border: 1px solid var(--edge); }
+</style>
+</head>
+<body>
+<main>
+  <p class="sub">RIFF how-to · 2026-07-06 · design: <a href="config-cascade-and-branding.html">Config Cascade &amp; Per-Org Branding</a></p>
+  <h1>Brand Your Flow's Follow-Along Page</h1>
+  <p class="sub">Give every phone line its own colors, badge, tagline — and its own caller-friendly progress labels — in one YAML block.</p>
+
+  <h2>0 · What you get without doing anything</h2>
+  <ul>
+    <li><b>The menu is already yours.</b> "Press 1 for … 2 for …" comes from your pack's capabilities — every flow has its own.</li>
+    <li><b>The progress is already yours.</b> The page mirrors the live call: your flow's states, your intake stages, your collected (whitelisted) answers.</li>
+    <li><b>A fallback look.</b> Flows with no declared brand get a deterministic color palette derived from the flow id (distinct, but not <i>chosen</i>), or a legacy keyword theme (law, plumbing…). The linter reminds you: <code>companion-brand-missing</code>.</li>
+  </ul>
+
+  <h2>1 · Declare the brand (one block)</h2>
+  <p>Preferred home: your company's <b>org file</b>, so every one of its lines matches automatically.</p>
+<pre><code># orgs/capsule_law.org.yaml
+org_id: capsule_law
+display_name: "Capsule Law"
+brand:
+  name: "Capsule Law"           # header title + page &lt;title&gt;
+  badge: "CL"                   # the little avatar chip (1–3 chars)
+  tagline: "your intake, live"  # subtitle under the name
+  colors:
+    primary: "#c8a24a"          # accents / glow
+    highlight: "#e2c56f"        # highlights / gold
+    bg: "#0b0e19"               # page background (optional)
+    panel: "#131730"            # card background (optional)
+  journey:                      # optional — see §4
+    cap_intake__stage_matter: "Your case"
+    cap_intake__stage_contact: "How to reach you"</code></pre>
+  <p>Then point each of the company's flows at it — one line in the flow/pack YAML:</p>
+<pre><code>org: capsule_law</code></pre>
+  <div class="card tip"><b>Single flow, no org?</b> Put the same block directly in the flow:
+<pre><code>config:
+  brand: {name: "Riff Cafe", badge: "RC", colors: {primary: "#38bdf8"}}</code></pre>
+  A flow-level block also <i>overrides</i> its org's brand per key — capsule_law's immigration line can keep the org colors but swap the badge.</div>
+
+  <h2>2 · Which color does what</h2>
+  <table>
+    <tr><th>token</th><th>page variable</th><th>what the caller sees</th></tr>
+    <tr><td><code>primary</code></td><td><code>--glow</code></td><td>accents, live indicators, links' glow</td></tr>
+    <tr><td><code>highlight</code></td><td><code>--gold</code></td><td>emphasis text, collected-answer highlights</td></tr>
+    <tr><td><code>bg</code></td><td><code>--bg</code></td><td>page background</td></tr>
+    <tr><td><code>panel</code></td><td><code>--panel</code></td><td>cards / sections</td></tr>
+  </table>
+  <p>Pick <code>primary</code>/<code>highlight</code> with good contrast against your <code>bg</code> — a contrast lint gate is planned; until then, eyeball it in the preview (§5).</p>
+
+  <h2 id="read-along">3 · What lights up as the phone reads</h2>
+  <p>The page doesn't just sit there while the agent talks — three surfaces highlight in real time,
+  and <b>all three take your brand's <code>highlight</code> color automatically</b> (no extra config):</p>
+  <table>
+    <tr><th>surface</th><th>when it lights up</th><th>how it uses <code>highlight</code></th></tr>
+    <tr><td><b>Menu options</b></td><td>as each option is read aloud, or hinted for tapping</td><td>the key glows and fills at low opacity (<code>--menu-highlight</code>)</td></tr>
+    <tr><td><b>Karaoke word-sweep</b></td><td>word-by-word as the agent speaks its line</td><td>the current word gets a soft 16% wash + glow (derived <code>--gold-soft</code>)</td></tr>
+    <tr><td><b>Fresh-slot flash</b></td><td>the moment a just-heard answer lands in "heard so far"</td><td>the row's border, wash, and ring flash in <code>highlight</code></td></tr>
+  </table>
+  <div class="card tip"><b>One deliberate exception:</b> the node-degraded warning pill stays
+  warning-gold on every brand — a system-health signal shouldn't dress in brand colors.</div>
+
+  <h2 id="journey">4 · Journey labels — how your progress READS</h2>
+  <p>Without <code>journey:</code>, the page prettifies state ids ("Cap Service Request Stage Problem"). With it, callers see your words:</p>
+<pre><code>journey:
+  cap_service_request__stage_problem:  "Problem"
+  cap_service_request__stage_location: "Address"
+  cap_service_request__stage_timing:   "Time"
+  cap_service_request__confirm:        "Confirm"
+  cap_service_request__done:           "Booked!"</code></pre>
+  <div class="card tip">State ids come from your compiled flow: <code>grep "^  cap_" flows/&lt;flow&gt;.yaml</code>, the Line Page, or <code>python -m riff.flow_eval --describe</code>. Unmapped states fall back to prettified ids — map only the steps callers should recognize.</div>
+
+  <h2 id="verify">5 · Verify</h2>
+  <ol>
+    <li><b>Lint:</b> <code>python -m riff.flow_eval.linter &lt;flow_id&gt;</code> — the <code>companion-brand-missing</code> warn disappears; a dangling <code>org:</code> is an error.</li>
+    <li><b>Tokens:</b> <code>python -c "from riff.branding import brand_for_flow; print(brand_for_flow('&lt;flow_id&gt;'))"</code> — you should see your colors/journey, not the fallback.</li>
+    <li><b>Live:</b> place a test call, say "text link", open the SMS'd companion URL — your colors, your badge, your step names. Org-file edits show on the page's next poll (no restart); <i>Python</i> changes still need a server restart.</li>
+  </ol>
+
+  <h2>6 · How it works (30 seconds)</h2>
+  <p>The effective-config cascade (<code>call → state → state group → flow → org → global</code>) resolves your <code>brand:</code> block; <code>brand_for_flow()</code> projects it to <b>public tokens only</b> (no internal ids, no provenance) into <code>/api/companion/state</code>; the single <code>companion.html</code> template maps tokens onto its CSS variables and label lookup. Resolution order: <b>declared → legacy keyword theme → derived palette</b>.</p>
+
+  <div class="card warn"><b>Safety rails.</b> Brand is freely overridable (it's cosmetic); what data the page may SHOW is governed separately by <code>companion_public_slots</code> + the privacy tier, which only <i>tighten</i> down the cascade. You cannot loosen privacy by branding a page.</div>
+
+  <h2 id="gallery">7 · Gallery — the running flows, branded</h2>
+  <p class="sub">These brands are LIVE in the flow YAMLs (flow-level <code>config.brand</code>; org files lift shared identity up in PR4). Each mock mirrors the follow-along page: header, that flow's REAL menu options, and the "heard so far" slot echo — the value renders in the brand's <code>highlight</code> color.</p>
+  <style>
+    .g { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin: 14px 0; }
+    .mock { border-radius: 14px; border: 1px solid var(--edge); padding: 12px 14px; font-size: 13.5px; }
+    .mtop { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .mtop b { display: block; font-size: 15px; line-height: 1.2; }
+    .mtop small { display: block; font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; }
+    .chip { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center;
+            justify-content: center; font-weight: 700; font-size: 13px; color: #0b0e19; flex: none; }
+    .live { margin-left: auto; font-size: 11px; border: 1px solid; border-radius: 999px; padding: 1px 8px; }
+    .sec { border-top: 1px solid rgba(255,255,255,.1); padding: 8px 0 2px; margin-top: 6px; }
+    .sec small { display: block; font-size: 10px; letter-spacing: 1.4px; margin-bottom: 5px; }
+    .mrow { display: flex; align-items: center; gap: 8px; padding: 2.5px 0; }
+    .key { width: 20px; height: 20px; border-radius: 6px; display: inline-flex; align-items: center;
+           justify-content: center; font-weight: 700; font-size: 11px; color: #0b0e19; flex: none; }
+    .srow { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+    .slabel { opacity: .7; }
+    .sval { font-weight: 600; text-align: right; }
+  </style>
+  <div class="g">
+    <div class="mock" style="background:#0b0e19;color:#eef1ff">
+      <div class="mtop"><div class="chip" style="background:#c8a24a">DA</div>
+        <div><b>David Austin Law</b><small style="color:#e2c56f">lawyer intake</small></div>
+        <span class="live" style="border-color:#c8a24a;color:#c8a24a">● Live</span></div>
+      <div class="sec"><small style="color:#c8a24a">MENU — say it or press it</small><div class="mrow"><span class="key" style="background:#c8a24a">0</span>Set up profile and text follow-along</div><div class="mrow"><span class="key" style="background:#c8a24a">1</span>Start a new intake</div><div class="mrow"><span class="key" style="background:#c8a24a">2</span>Existing client or case update</div><div class="mrow"><span class="key" style="background:#c8a24a">3</span>Appointments</div><div class="mrow"><span class="key" style="background:#c8a24a">…</span>Forms · Billing · Urgent · Message</div></div>
+      <div class="sec"><small style="color:#c8a24a">HEARD SO FAR</small>
+        <div class="srow"><span class="slabel">Full name</span><span class="sval" style="color:#e2c56f">Sarah Thompson</span></div></div>
+    </div>
+    <div class="mock" style="background:#0b0e19;color:#eef1ff">
+      <div class="mtop"><div class="chip" style="background:#c8a24a">DA</div>
+        <div><b>David Austin Law — Immigration</b><small style="color:#e2c56f">immigration intake</small></div>
+        <span class="live" style="border-color:#c8a24a;color:#c8a24a">● Live</span></div>
+      <div class="sec"><small style="color:#c8a24a">MENU — say it or press it</small><div class="mrow"><span class="key" style="background:#c8a24a">1</span>Family petition</div><div class="mrow"><span class="key" style="background:#c8a24a">2</span>Work visa</div><div class="mrow"><span class="key" style="background:#c8a24a">3</span>Naturalization</div><div class="mrow"><span class="key" style="background:#c8a24a">4</span>Asylum or humanitarian</div><div class="mrow"><span class="key" style="background:#c8a24a">…</span>Renewals · Removal defense · Message</div></div>
+      <div class="sec"><small style="color:#c8a24a">HEARD SO FAR</small>
+        <div class="srow"><span class="slabel">Petition type</span><span class="sval" style="color:#e2c56f">Family petition — spouse</span></div></div>
+    </div>
+    <div class="mock" style="background:#0b1220;color:#eef1ff">
+      <div class="mtop"><div class="chip" style="background:#38bdf8">AP</div>
+        <div><b>David Austin Plumbing Pros</b><small style="color:#facc15">plumbing service</small></div>
+        <span class="live" style="border-color:#38bdf8;color:#38bdf8">● Live</span></div>
+      <div class="sec"><small style="color:#38bdf8">NO KEYPAD MENU</small><div class="mrow" style="opacity:.85">Conversational scheduling — the journey strip shows: Your problem → Days that work → Days to avoid → Request summary → All set!</div></div>
+      <div class="sec"><small style="color:#38bdf8">HEARD SO FAR</small>
+        <div class="srow"><span class="slabel">Days that work</span><span class="sval" style="color:#facc15">July 12, 14, or 16</span></div></div>
+    </div>
+    <div class="mock" style="background:#140f06;color:#eef1ff">
+      <div class="mtop"><div class="chip" style="background:#f59e0b">DE</div>
+        <div><b>David Austin Electrical</b><small style="color:#fde047">electrical intake</small></div>
+        <span class="live" style="border-color:#f59e0b;color:#f59e0b">● Live</span></div>
+      <div class="sec"><small style="color:#f59e0b">MENU — say it or press it</small><div class="mrow"><span class="key" style="background:#f59e0b">0</span>New customer / intake</div><div class="mrow"><span class="key" style="background:#f59e0b">1</span>Existing job or problem</div><div class="mrow"><span class="key" style="background:#f59e0b">3</span>Schedule appointment</div><div class="mrow"><span class="key" style="background:#f59e0b">5</span>Emergency service</div><div class="mrow"><span class="key" style="background:#f59e0b">…</span>Pricing · Billing · Speak to someone</div></div>
+      <div class="sec"><small style="color:#f59e0b">HEARD SO FAR</small>
+        <div class="srow"><span class="slabel">Problem</span><span class="sval" style="color:#fde047">Outlet sparking in the kitchen</span></div></div>
+    </div>
+    <div class="mock" style="background:#07130a;color:#eef1ff">
+      <div class="mtop"><div class="chip" style="background:#22c55e">PM</div>
+        <div><b>Property Maintenance</b><small style="color:#a3e635">maintenance requests</small></div>
+        <span class="live" style="border-color:#22c55e;color:#22c55e">● Live</span></div>
+      <div class="sec"><small style="color:#22c55e">MENU — say it or press it</small><div class="mrow"><span class="key" style="background:#22c55e">1</span>Plumbing</div><div class="mrow"><span class="key" style="background:#22c55e">2</span>Appliance</div><div class="mrow"><span class="key" style="background:#22c55e">3</span>Heating or cooling</div><div class="mrow"><span class="key" style="background:#22c55e">4</span>Electrical</div><div class="mrow"><span class="key" style="background:#22c55e">…</span>Pests · Locks · Common areas · Message</div></div>
+      <div class="sec"><small style="color:#22c55e">HEARD SO FAR</small>
+        <div class="srow"><span class="slabel">Issue</span><span class="sval" style="color:#a3e635">Dishwasher won't drain — unit 4B</span></div></div>
+    </div>
+    <div class="mock" style="background:#120b1e;color:#eef1ff">
+      <div class="mtop"><div class="chip" style="background:#8b5cf6">RS</div>
+        <div><b>Riff Scheduling Demo</b><small style="color:#f0abfc">book a visit</small></div>
+        <span class="live" style="border-color:#8b5cf6;color:#8b5cf6">● Live</span></div>
+      <div class="sec"><small style="color:#8b5cf6">NO KEYPAD MENU</small><div class="mrow" style="opacity:.85">Conversational booking demo — offers real slots, no keypad.</div></div>
+      <div class="sec"><small style="color:#8b5cf6">HEARD SO FAR</small>
+        <div class="srow"><span class="slabel">Appointment</span><span class="sval" style="color:#f0abfc">Friday at 10:00 AM</span></div></div>
+    </div>
+    <div class="mock" style="background:#131c3b;color:#eef1ff">
+      <div class="mtop"><div class="chip" style="background:#6f7bff">SC</div>
+        <div><b>Space Channel</b><small style="color:#f5c542">space channel</small></div>
+        <span class="live" style="border-color:#6f7bff;color:#6f7bff">● Live</span></div>
+      <div class="sec"><small style="color:#6f7bff">MENU — say it or press it</small><div class="mrow"><span class="key" style="background:#6f7bff">1</span>Launches</div><div class="mrow"><span class="key" style="background:#6f7bff">2</span>Space Channel news</div><div class="mrow"><span class="key" style="background:#6f7bff">3</span>Space weather</div><div class="mrow"><span class="key" style="background:#6f7bff">4</span>UFO files</div><div class="mrow"><span class="key" style="background:#6f7bff">…</span>Missions · Network · Radio · Report a bug</div></div>
+      <div class="sec"><small style="color:#6f7bff">HEARD SO FAR</small>
+        <div class="srow"><span class="slabel">Bug report</span><span class="sval" style="color:#f5c542">Dashboard shows stale launch data</span></div></div>
+    </div>
+  </div>
+  <p>The exact block behind the plumbing card, as it appears in <code>flows/austin_plumbing.yaml</code>:</p>
+<pre><code>config:
+  brand:
+    name: "David Austin Plumbing Pros"
+    badge: "AP"
+    tagline: "plumbing service"
+    colors: {primary: "#38bdf8", highlight: "#facc15"}
+    journey:
+      greeting: ["Welcome", "The call is getting started."]
+      triage: ["Your problem", "Tell us what's going on."]
+      scheduling_collect_possible_days: "Days that work"
+      scheduling_collect_blocked_days: "Days to avoid"
+      scheduling_request_summary: ["Request summary", "Reading your visit request back."]
+      complete: ["All set!", "Our dispatcher will confirm shortly."]</code></pre>
+  <div class="card tip"><b>Why some journeys are short:</b> auto-generated stage ids
+  (<code>cap_outlet_switch__stage_outlet_switch_3</code>…) aren't self-describing, and a WRONG label is
+  worse than the prettified fallback. Label the states you're sure of; extend as you review each
+  vertical's stages. The 4 in-flight vertical packs (locksmith, barbershop, pet shop, café) get
+  their brands when that work lands — their files are active WIP.</div>
+
+  <h2>8 · Troubleshooting</h2>
+  <table>
+    <tr><th>symptom</th><th>cause → fix</th></tr>
+    <tr><td>page shows space-channel / generic look</td><td>no declared brand reached the server — check <code>org:</code> spelling (lint catches dangling refs), and that the block is <code>brand:</code> under the org root or flow <code>config:</code></td></tr>
+    <tr><td>colors ignored but name/badge applied</td><td><code>colors</code> must be a mapping with keys from §2 — a stray string is skipped</td></tr>
+    <tr><td>step labels not applied</td><td><code>journey</code> keys must match state ids EXACTLY (case, double underscores)</td></tr>
+    <tr><td>two flows of one company look different</td><td>one of them overrides the org brand at flow level — check its <code>config.brand</code></td></tr>
+  </table>
+</main>
+</body>
+</html>
