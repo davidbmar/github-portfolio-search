@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Facts as a Module — Use Cases</title>
+<style>
+  :root { --bg:#0b0e19; --panel:#131730; --edge:#26305c; --ink:#eef1ff;
+    --dim:#8b93c4; --accent:#6f7bff; --good:#34d399; --warn:#f5c542; --bad:#f87171;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  @media (prefers-color-scheme: light) { :root { --bg:#f7f8fc; --panel:#fff;
+    --edge:#d8ddf0; --ink:#1a2038; --dim:#5b6491; --accent:#4353d8; --bad:#c2453a; } }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:26px;margin:8px 0 4px;text-wrap:balance}
+  h2{font-size:18px;margin:34px 0 10px;border-bottom:1px solid var(--edge);padding-bottom:6px}
+  .sub{color:var(--dim);font-size:14px}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:14px 18px;margin:14px 0}
+  code{font-family:var(--mono);font-size:.85em;background:rgba(111,123,255,.12);padding:.1em .35em;border-radius:4px}
+  pre{background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:12px 16px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+  .tw{overflow-x:auto}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--edge);vertical-align:top}
+  th{color:var(--dim);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  .tid{font-family:var(--mono);font-size:11px;background:rgba(52,211,153,.14);color:var(--good);
+    border:1px solid var(--good);border-radius:4px;padding:1px 7px}
+  .never{color:var(--bad);font-weight:600}
+  ol li{margin:4px 0}
+</style>
+</head>
+<body>
+<main>
+<p class="sub">RIFF · session_facts pack module · use-case-first spec · 2026-07-07 · TDD twin: <code>tests/test_session_facts_module.py</code> · siblings: <a href="session-facts-endflow.html">end-flow contract</a>, <a href="call-replay-atlas.html">replay &amp; atlas</a></p>
+<h1>Session Facts as a Module</h1>
+<p class="sub">Until now the session-facts guarantees were engine conventions. This module makes them a
+<b>declared unit in the pack</b> — like <code>welcome:</code> or <code>brand:</code> — so a business
+pack states its facts and trust layers, the compiler enforces them at build, and the atlas draws
+declarations instead of guessing from state names.</p>
+
+<div class="card">
+<b>The block</b> (all fields optional except <code>enabled</code>; the five standard facts are the default):
+<pre>session_facts:
+  enabled: true
+  layers:                      # explicit trust-layer attribution for gate states
+    welcome_first: guest
+    welcome_back: known
+    welcome_unlock_granted: verified
+  facts:                       # extend/override the standard five BY NAME (last wins)
+    - {name: selected_route, writer: router, direction: transient}</pre>
+<p><b>Closed enums</b> (Codex #2): <code>layer ∈ {guest, known, verified, shared}</code>;
+<code>direction ∈ {up_only, durable, transient, forward, refine_only}</code>; <code>writer</code> is a
+free-form attribution string. Duplicate fact names within the block = parse error.
+<b>Inference rule</b> (Codex #1): the compiler MAY infer a gate state's layer, but every inferred
+value is <b>materialized into</b> <code>config.session_facts.layers</code> at build — so the atlas
+never guesses at render time; it only ever reads declarations. A gate state the compiler cannot
+infer AND the pack does not declare fails the build.</p>
+</div>
+
+<h2>Case M1 — Declaring the module embeds the registry <span class="tid">TM1</span></h2>
+<ol>
+<li>A pack adds <code>session_facts: {enabled: true}</code>.</li>
+<li>The compiled flow carries <code>config.session_facts</code>: the fact registry (name, writer,
+direction) and the resolved per-state layer map.</li>
+<li>A pack recompile never strips it (same durability rule as <code>brand:</code>).</li>
+</ol>
+<p><b>Pass:</b> registry + layer map present in the compiled YAML; five standard facts by default.</p>
+
+<h2>Case M2 — Violations fail the BUILD <span class="tid">TM2</span></h2>
+<ol>
+<li>A declaring pack whose compiled flow would leave a <code>welcome_*</code> state with no layer
+attribution (declared or inferable) <b>fails compile</b> — the atlas must never guess for a
+declaring flow.</li>
+<li>A <code>layers:</code> entry naming an unknown state or an invalid layer value fails parse.</li>
+</ol>
+<p><b>Pass:</b> both violations produce build errors naming the state. <b>Never:</b>
+<span class="never">a declaring pack that compiles with an unattributed gate state</span>.</p>
+
+<h2>Case M3 — The atlas draws declarations <span class="tid">TM3</span></h2>
+<p><code>call_replay.py --atlas</code> on a declaring flow reads <code>config.session_facts.layers</code>
+first; name-heuristics remain only as fallback for legacy flows. A declaring flow renders
+<b>zero</b> <code>unattributed</code> states.</p>
+
+<h2>Case M4 — The live proof: a brand-new business on FLOW-101 <span class="tid">TM4</span></h2>
+<p>A mock business built from scratch WITH the module, deployed on the loop test DID
+<b>512-FLOW-101 (+1 512-356-9101)</b>, exercising every guarantee end to end:</p>
+<ol>
+<li><b>First call (unknown number):</b> business greeting → menu → say an option or press a key →
+your choice routes immediately (no gate in the way) → consent asked <b>once</b> if you take the
+follow-along text → goodbye.</li>
+<li><b>Second call (same phone):</b> "welcome back" by name → auth text with code → reading the code
+gets <b>one</b> "Access granted" → a menu choice made right after verification <b>is honored</b>
+(the route survives the ack — the live defect this whole program started from).</li>
+<li><b>Replay:</b> the call's page (<code>call_replay.py &lt;call-id&gt;</code>) shows all four lanes
+— the SLOTS lane proves who wrote every fact.</li>
+</ol>
+<p><b>Never:</b> <span class="never">a repeated "Access granted"</span>;
+<span class="never">a menu choice destroyed by the gate</span>;
+<span class="never">a consent re-ask after answering</span>.</p>
+
+<h2 id="golive-gate">Go-live gate: SMS deliverability (shipped 2026-07-07)</h2>
+<div class="card">
+<p><b>How the build knows a flow texts</b> — four static pack declarations, checkable before any
+compile: a capability with <code>sms_verification: true</code>, any field with
+<code>consent: true</code>, a <code>welcome:</code> block (returning-caller auth/follow-along text),
+or companion <code>auto_send</code>.</p>
+<p><b>What the gate checks</b> — the business phone's 10DLC campaign attachment in the carrier
+registry (<code>assignmentStatus == ASSIGNED</code>), one HTTP call, no message sent. Env-var
+readiness checks cannot see this class: the live incident logged <code>status=sent</code> while the
+carrier dropped every message (error 40010) and a caller sat at <code>intake_verify_code</code>
+waiting for a text that could never arrive.</p>
+<p><b>Behavior</b> — keyed <code>compile</code>/<code>build</code> FAIL with
+<code>❌ sms-not-deliverable</code>; keyless builds print a LOUD
+<code>⚠️ SKIPPED (not passed)</code> — a skipped check is never a green one.
+Code: <code>riff/telecom_checks.py</code> · TDD: <code>tests/test_sms_deliverability_check.py</code>
+(S1–S5). Proven on the incident: the gate failed the Bluebonnet build while its DID was
+<code>PENDING_ASSIGNMENT</code> and passed once carriers mapped it.</p>
+<p><b>Open follow-ups</b>: the opt-in real-send probe (<code>--probe</code>, polls FINAL delivery
+status, operator-invoked only) and the <code>intake_verify_code</code> resend/skip path for callers
+whose text is delayed.</p>
+</div>
+
+<h2>Test matrix (TDD — red before the module exists)</h2>
+<div class="tw"><table>
+<tr><th>id</th><th>case</th><th>asserts</th></tr>
+<tr><td><span class="tid">TM1</span></td><td>M1 registry embed</td><td>config.session_facts in compiled flow; default facts; layers resolved</td></tr>
+<tr><td><span class="tid">TM2</span></td><td>M2 build teeth</td><td>unknown state / bad layer / unattributed gate state ⇒ compile FAIL naming it</td></tr>
+<tr><td><span class="tid">TM3</span></td><td>M3 atlas source</td><td>declaring flow: 0 unattributed; declaration beats heuristic</td></tr>
+<tr><td><span class="tid">TM4</span></td><td>M4 mock business (deterministic half)</td><td>the FLOW-101 pack compiles green with the module; endflow walks (T2-shape route survival, consent once) pass on it — this half gates CI</td></tr>
+<tr><td><span class="tid">TM4L</span></td><td>M4 live proof (evidence half)</td><td>real DID call ids + replay artifacts recorded here after the operator's test calls — evidence only, never gates merge (Codex #3)</td></tr>
+</table></div>
+</main>
+</body>
+</html>

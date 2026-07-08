@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Runbook — Space Profile Intake (v1) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container { max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem; }
+h1, h2, h3, h4 { color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem; line-height: 1.25; }
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code { background: var(--code-bg); color: #f0f0f5; padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.86em; }
+pre { background: var(--code-bg); padding: 0.85rem 1rem; border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent); }
+pre code { background: transparent; padding: 0; font-size: 0.86rem; line-height: 1.45; }
+blockquote { margin: 1rem 0; padding: 0.4rem 1rem; border-left: 3px solid var(--muted);
+  color: var(--muted); background: rgba(255,255,255,0.02); }
+table { border-collapse: collapse; margin: 1rem 0; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 6px; overflow: hidden; width: 100%; }
+th, td { padding: 0.45rem 0.85rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+th { color: var(--accent); font-weight: 600; }
+tr:last-child td { border-bottom: none; }
+.status-live { display: inline-block; background: rgba(80,200,120,0.15); color: #6fdc96;
+  border: 1px solid rgba(80,200,120,0.4); border-radius: 4px; padding: 0.05rem 0.5rem;
+  font-size: 0.85em; font-weight: 600; }
+.status-warn { display: inline-block; background: rgba(212,160,84,0.15); color: var(--accent);
+  border: 1px solid rgba(212,160,84,0.4); border-radius: 4px; padding: 0.05rem 0.5rem;
+  font-size: 0.85em; font-weight: 600; }
+ol li, ul li { margin: 0.4rem 0; }
+.table-scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="doc-container">
+
+<h1>Runbook: Space Profile Intake (v1)</h1>
+
+<p><span class="status-live">LIVE (M3-authoritative) as of 2026-07-04</span></p>
+
+<p><strong>Audience:</strong> operators deploying or troubleshooting this feature<br>
+<strong>Related:</strong> <code>docs/superpowers/specs/2026-07-04-space-profile-intake-design.md</code>
+(design), <code>docs/codex/2026-07-04-progressive-web-intake-design.md</code>
+(parent design), <a href="riff-m1-failover-runbook.html">riff-m1-failover-runbook.html</a>
+(the two-machine phone setup this feature runs on top of)</p>
+
+<h2>What this feature is</h2>
+
+<p>A caller on the Space Channel line (<code>321-559-MARS</code>) presses/says option
+<code>0</code> and, in one short back-and-forth, gives their name, agrees (or
+doesn't) to be texted a link, reads back a verification code so we know the
+phone number is really theirs, and says the space topics they want updates
+on. If they say yes to the text, they get a link to a live web page. While
+the call is still going, that page fills in with what they just said, word
+for word. After the call, they can revisit the same page and edit anything —
+their name, their topic list — and it saves.</p>
+
+<p>The point: voice is fast but bad at exact text (spellings, long lists,
+corrections). The page is the "write it down properly" surface for whatever
+the call already collected.</p>
+
+<p><strong>Caller story, start to finish:</strong></p>
+
+<ol>
+<li>Caller dials in, picks option 0.</li>
+<li>"What's your name?" &rarr; caller answers.</li>
+<li>"Can we text you links...say yes to allow text messages or say no to
+deny." &rarr; caller says yes or no.</li>
+<li>If yes: we text a link plus a 6-digit code, in two lines (link first,
+code second). Caller reads the code back on the call. Two wrong tries and we
+give up on verifying but keep going voice-only.</li>
+<li>"Tell me the most interesting things about space you'd like updates on —
+just speak freely." Caller talks; we ask "anything else?" until they're done
+(or after 4 rounds, or two rounds of silence).</li>
+<li>We save what we heard, then read it back: "I have [name], texting
+[allowed/not allowed], interests: [what they said] — did I get that right?"</li>
+<li>Call loops back to the main Space Channel menu. No dead end.</li>
+<li>If they opened the texted link, they now see (or, once verified, can
+edit) exactly what was saved, plus a running transcript of what they said
+during the call.</li>
+<li>Next time they call from the same verified number, both the phone and
+the page greet them by name.</li>
+</ol>
+
+<h2>The voice sequence (what actually runs)</h2>
+
+<p>Compiled by <code>riff/business_pack/importers/space_channel_widgets.py</code>
+into <code>flows/space_channel_widgets.yaml</code> option 0
+(<code>space_profile_intake</code>). Do not hand-edit that YAML — it is
+regenerated output and gets overwritten.</p>
+
+<pre><code>name &rarr; consent (yes/no) &rarr; [yes: send link+code &rarr; verify code] &rarr; interests
+     &rarr; save &rarr; confirm-back &rarr; loop back to the main menu</code></pre>
+
+<p>If the caller says no to texting: name and interests are still collected
+and saved, nothing is texted, and there is no web page for that call.</p>
+
+<h2>The page (<code>/intake.html</code>)</h2>
+
+<ul>
+<li><strong>Locked by default.</strong> Until the caller has read the
+verification code back on the call, the page shows a "finish verifying on
+your call to unlock this page" placeholder. It does not reveal any saved
+data and does not accept edits — this is true even if someone guesses or
+intercepts the link before verification completes.</li>
+<li><strong>Unlocks automatically.</strong> The page polls its own session
+every couple of seconds; the moment the call marks the session verified, the
+lock screen flips to the real form with no page reload needed.</li>
+<li><strong>Live transcript mirror.</strong> While the call is still active,
+the page shows what the caller is saying, live, underneath the interests
+field — this is the same transcript the phone server already has for that
+call, nothing new is exposed.</li>
+<li><strong>Editing.</strong> Every field (name, SMS-consent checkbox,
+interests) is a normal input. Edits autosave about 800ms after you stop
+typing. Each save carries a version number for that field; if the field
+changed elsewhere in the meantime (e.g., the voice call updated it after you
+loaded the page), your stale save is rejected and the field refreshes to the
+newer value instead of overwriting it.</li>
+<li><strong>Revisits.</strong> Come back to the same link later (within its
+7-day expiry) and it reopens with "Hello &lang;name&rang;" and your saved
+answers, still editable.</li>
+</ul>
+
+<h2>Required deploy environment</h2>
+
+<p>These three environment variables gate the feature. Get any of them wrong
+and either the feature silently doesn't run, or M1 starts writing to a
+database it must never own.</p>
+
+<div class="table-scroll">
+<table>
+<tr><th>Variable</th><th>Value</th><th>Where</th><th>Why</th></tr>
+<tr>
+<td><code>RIFF_INTAKE_STORE_AUTHORITY</code></td>
+<td><code>1</code></td>
+<td><strong>M3 <code>.env</code> ONLY. Never set on M1.</strong></td>
+<td>Turns on the SQLite-backed <code>/api/intake/*</code> routes and makes
+this machine the single writer of <code>data/profiles/profiles.db</code>.
+Both machines load the same <code>riff/phone/server.py</code> code
+(active-active failover), so without this gate M1 would silently create its
+own separate profile database and fork the data away from M3.</td>
+</tr>
+<tr>
+<td><code>RIFF_INTAKE_INTERNAL_TOKEN</code></td>
+<td>&lt;shared secret, same string on both machines&gt;</td>
+<td><strong>M3 <code>.env</code> AND M1 <code>.env</code>, must match
+exactly.</strong></td>
+<td>The intake API's internal endpoints (session create, mark-verified,
+transcript append) require this token in an
+<code>X-RIFF-Intake-Internal</code> header. Voice-side code on M1 needs it
+to authenticate its writes to M3's API. If the two machines' tokens don't
+match, M1's voice saves are silently rejected (403) and fall back to the
+local spool — everything looks fine on the call but nothing reaches the M3
+database until the spool is manually flushed.</td>
+</tr>
+<tr>
+<td><code>RIFF_INTAKE_API_BASE</code></td>
+<td><code>http://100.127.252.53:8767</code> (the M3's Tailscale address)</td>
+<td><strong>M1 <code>.env</code> only.</strong></td>
+<td>Tells M1's voice-side intake client where to send its writes. M3
+doesn't need this — it talks to itself over <code>127.0.0.1:8767</code>.</td>
+</tr>
+</table>
+</div>
+
+<p>A misconfigured deploy (e.g., <code>RIFF_INTAKE_STORE_AUTHORITY=1</code>
+accidentally set on M1 too) is the single most dangerous failure mode here:
+it splits the profile data across two independent databases with no
+reconciliation. Check this first if data looks like it's disappearing or two
+different names show up for the same caller.</p>
+
+<h2>Where the data lives</h2>
+
+<ul>
+<li><strong>The database:</strong> <code>data/profiles/profiles.db</code>
+(SQLite, WAL mode) on the M3 only. Three tables:
+<code>intake_sessions</code> (one row per intake attempt),
+<code>intake_answers</code> (one row per field, with a version number so
+stale writes can be rejected instead of silently overwriting newer ones),
+and <code>caller_identity</code> (verified phone &rarr; name, shared across
+every future vertical — not just Space Channel).</li>
+<li><strong>The spool:</strong> <code>data/profiles/spool/*.jsonl</code> —
+where a voice-side write goes if it can't reach the M3 API right away
+(network blip, M3 briefly down). Each spooled write is tagged with an
+idempotency key so replaying it twice can't double-apply it. The phone
+server replays the spool automatically on boot (it waits for its own
+<code>/healthz</code> to come up first, then flushes); nobody needs to
+trigger this by hand in the normal case.</li>
+</ul>
+
+<h2>How to check it's working</h2>
+
+<pre><code># 1. Schema is being served (confirms the API routes registered — i.e.
+#    RIFF_INTAKE_STORE_AUTHORITY=1 took effect on M3):
+curl -s "http://127.0.0.1:8767/api/intake/schema?flow_id=space_channel_widgets&amp;capability=space_profile_intake"
+
+# 2. Pull a real session by its token (from a texted link, or one you
+#    created for testing) — internal endpoints need the shared token:
+curl -s "http://127.0.0.1:8767/api/intake/session?token=&lt;token&gt;"
+
+# 3. Internal-only endpoints (session create, mark-verified, transcript)
+#    require the header:
+curl -s -X POST "http://127.0.0.1:8767/api/intake/session" \
+  -H "X-RIFF-Intake-Internal: $RIFF_INTAKE_INTERNAL_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"call_id":"test","phone":"+15551234567","flow_id":"space_channel_widgets","capability_id":"space_profile_intake"}'
+
+# 4. Logs — same location as the rest of the phone-node setup:
+tail -f /tmp/riff-phone-node/phone-server.log | grep -i intake</code></pre>
+
+<p>A healthy M3 boot log line looks like registering the intake routes; a
+node that is intentionally NOT the authority (M1) logs "intake API not
+registered: this node is not the intake store authority" — that line on M1
+is expected and correct, not a bug.</p>
+
+<h2>Troubleshooting</h2>
+
+<div class="table-scroll">
+<table>
+<tr><th>Symptom</th><th>Likely cause</th><th>Check</th></tr>
+<tr>
+<td>Page stays locked forever, never unlocks</td>
+<td>The code check on the call never passed (wrong code read back, or
+caller gave up after two tries and only got voice-only intake)</td>
+<td>Pull the session (<code>GET /api/intake/session?token=...</code>) — if
+<code>locked: true</code> persists, the call's verify step didn't complete.
+Re-verify by calling back.</td>
+</tr>
+<tr>
+<td>"Hello, &lang;name&rang;" greeting missing on a repeat call</td>
+<td>Caller identity wasn't populated (first call never got a verified name
+saved), or their caller ID is blocked/unavailable so the lookup can't run</td>
+<td>Check <code>caller_identity</code> for the phone number; blocked caller
+ID has no fix — it's a silent skip by design, not an error.</td>
+</tr>
+<tr>
+<td>Saves from the call aren't showing up on M3 / page never updates</td>
+<td>Either <code>RIFF_INTAKE_STORE_AUTHORITY</code> isn't <code>1</code> on
+M3 (routes never registered), or the write is sitting in the spool because
+M3 was briefly unreachable</td>
+<td>Curl the schema endpoint (above) to confirm routes exist; check
+<code>data/profiles/spool/*.jsonl</code> for unreplayed lines; check the
+internal-token match between M1 and M3.</td>
+</tr>
+<tr>
+<td>M1 writes are silently rejected (403)</td>
+<td><code>RIFF_INTAKE_INTERNAL_TOKEN</code> differs between M1 and M3
+<code>.env</code></td>
+<td>Compare the two files directly; this fails closed (writes fall back to
+spool) rather than loud, so it's easy to miss.</td>
+</tr>
+<tr>
+<td>Data looks split / two names for one caller</td>
+<td><code>RIFF_INTAKE_STORE_AUTHORITY=1</code> was accidentally set on M1
+too — now two independent databases exist</td>
+<td>Check M1's <code>.env</code>; it must NOT have this flag. Unset it and
+restart the M1 node.</td>
+</tr>
+</table>
+</div>
+
+<h2>Known v0 limits</h2>
+
+<ul>
+<li><strong>Correction restarts the whole intake.</strong> If the caller
+says the confirm-back readback is wrong, v0 restarts the whole name &rarr;
+consent &rarr; interests sequence rather than jumping straight to the one
+wrong field. This is a known rough edge, not a bug — a future version will
+target just the field that was wrong.</li>
+<li><strong>Consent only gates this flow.</strong> The recorded
+<code>consent:true</code> marker currently only controls whether this
+flow's own link+code text goes out. It does not yet gate every other
+outbound SMS feature in the system — that wiring is tracked as a follow-up,
+not shipped in v1.</li>
+<li><strong>First personalized greeting has a small delay.</strong> For a
+returning, verified caller, the "Hello &lang;name&rang;" line is synthesized
+live (not pre-rendered), so there's a brief pause before it plays compared
+to the rest of the flow's prerendered audio.</li>
+</ul>
+
+</div>
+</body>
+</html>

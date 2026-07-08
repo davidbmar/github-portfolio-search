@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Facts — End-Flow Behavior, Case by Case</title>
+<style>
+  :root {
+    --bg: #0b0e19; --panel: #131730; --edge: #26305c; --ink: #eef1ff;
+    --dim: #8b93c4; --accent: #6f7bff; --good: #34d399; --warn: #f5c542;
+    --bad: #f87171;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f7f8fc; --panel: #ffffff; --edge: #d8ddf0; --ink: #1a2038;
+            --dim: #5b6491; --accent: #4353d8; --bad: #c2453a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 27px; margin: 8px 0 4px; text-wrap: balance; }
+  h2 { font-size: 19px; margin: 38px 0 10px; border-bottom: 1px solid var(--edge); padding-bottom: 6px; }
+  h3 { font-size: 16px; margin: 22px 0 8px; }
+  .sub { color: var(--dim); font-size: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .tip { border-left: 4px solid var(--good); }
+  .warncard { border-left: 4px solid var(--bad); }
+  code, .mono { font-family: var(--mono); font-size: .85em; }
+  code { background: rgba(111,123,255,.12); padding: .1em .35em; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 10px 0; }
+  .tw { overflow-x: auto; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+  th { color: var(--dim); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+  .say { color: var(--good); }
+  .caller { color: var(--warn); }
+  .fact { font-family: var(--mono); font-size: .82em; color: var(--accent); }
+  .tid { font-family: var(--mono); font-size: 11px; background: rgba(52,211,153,.14);
+         color: var(--good); border: 1px solid var(--good); border-radius: 4px; padding: 1px 7px; }
+  .never { color: var(--bad); font-weight: 600; }
+  ol li, ul li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+<p class="sub">RIFF · session facts · use-case-first specification · 2026-07-07 · spec twin: <code>docs/session-facts-proposal.md</code></p>
+<h1>Session Facts — End-Flow Behavior, Case by Case</h1>
+<p class="sub">What a caller experiences from dial to hangup, at every trust layer — written <em>before</em>
+the implementation, so every case below is also an acceptance test. Test IDs (<span class="tid">T1</span>…)
+map 1:1 to <code>tests/test_session_facts_endflow.py</code>.</p>
+
+<div class="card warncard">
+<b>Why this exists.</b> On 2026-07-07 two live calls broke at trust-layer seams: a verified caller's
+menu choice was destroyed by a re-firing passcode gate (space, <code>v3:GHthPzo8…</code>), and a caller
+with consent on file was asked for consent three more times after it was saved (law,
+<code>v3:Pxu2-…</code>). The rules here make both impossible by construction.
+</div>
+
+<h2>The five facts every call carries</h2>
+<div class="tw"><table>
+<tr><th>fact</th><th>values</th><th>direction</th><th>only writer</th></tr>
+<tr><td class="fact">identity</td><td>none → profile match / spoken name</td><td>refine only</td><td>transport prefill, then the caller's own answer</td></tr>
+<tr><td class="fact">auth_level</td><td>guest → known → verified</td><td><b>up only</b>, never down mid-call</td><td>transport (known), verify tool (verified)</td></tr>
+<tr><td class="fact">sms_consent</td><td>unknown → granted / denied</td><td>durable either way</td><td>profile-on-file ∨ this call's consent answer</td></tr>
+<tr><td class="fact">selected_route</td><td>none → a menu choice</td><td>transient intent</td><td>set by router; exactly three legal clearers — <b>its consumer</b> (route played),
+<b>a newer choice</b> (fresh selection supersedes), or <b>hangup finalization</b> (discarded + logged). Anything else clearing it is a contract violation.</td></tr>
+<tr><td class="fact">journey</td><td>where the call is</td><td>forward</td><td>the FSM itself</td></tr>
+</table></div>
+<p class="sub">The follow-along page, the voice script, and telemetry are three <em>read-only views</em>
+of this one ledger. None of them owns state, so none of them can disagree.</p>
+
+<h2>Case U1 — First call, unknown number (space channel) <span class="tid">T1</span></h2>
+<ol>
+<li><span class="say">"Welcome to Space Channel Network Operations."</span> — no name spoken: <span class="fact">auth_level=guest</span>, we don't know one.</li>
+<li>Menu plays. Caller presses <b>3</b>.</li>
+<li><span class="fact">selected_route=webb_observatory</span> is set — and consumed: Webb briefing plays.</li>
+<li>Caller hangs up. Nothing personal saved; telemetry shows the route set → consumed pair.</li>
+</ol>
+<p><b>Pass:</b> route reaches its capability in one hop. <b>Never:</b> an unlock hint or auth text — there is no profile to unlock.</p>
+
+<h2>Case U2 — Returning caller verifies mid-menu (the space live-bug, specified correct) <span class="tid">T2</span></h2>
+<ol>
+<li><span class="say">"Hi David, welcome back."</span> <span class="fact">auth_level=known</span> (ANI match). Auth text sent once.</li>
+<li>Menu plays. Caller reads the four-digit code.</li>
+<li><span class="fact">auth_level: known→verified</span>. <span class="say">"Access granted."</span> plays <b>exactly once</b> —
+it announces the <em>change</em>. The menu resumes with a short re-prompt, not the full 24-second replay.</li>
+<li>Caller presses <b>3</b>. <span class="fact">selected_route=webb_observatory</span>.</li>
+<li><b>Webb plays.</b> The verified flag is a wristband now, not a bouncer: with a matched route in the
+epoch, gate edges are not even candidates.</li>
+</ol>
+<p><b>Pass:</b> exactly one "Access granted"; route consumed by <code>cap_webb_observatory__say</code>.
+<b>Never:</b> <span class="never">a second "Access granted"</span>; <span class="never">the route cleared by any state that isn't a legal clearer</span>.</p>
+
+<h3>Case U2b — the race: choice lands during the verification turn <span class="tid">T2b</span></h3>
+<p>The live bug's exact timing: the caller presses <b>3</b> while the "Access granted" acknowledgement is
+still playing (or in the same decision epoch as the verify result). Contract: <b>both facts survive</b> —
+<span class="fact">auth_level=verified</span> AND <span class="fact">selected_route=webb_observatory</span>;
+the route is consumed next. The ack and the choice are not competitors, because the ack has no
+transitions to win. <b>Never:</b> <span class="never">the verify result re-entering the gate after the choice is matched</span>.</p>
+
+<h2>Case U3 — Returning caller skips the code <span class="tid">T3</span></h2>
+<ol>
+<li>Welcome back + auth text, menu plays. Caller ignores the code and presses <b>3</b> immediately.</li>
+<li>Webb plays in guest mode. <span class="fact">auth_level=known</span> stays; the unlock hint does not repeat between menu visits.</li>
+</ol>
+<p><b>Pass:</b> choice honored without verification. Verification is an <em>offer</em>, never a toll gate for public content.</p>
+
+<h2>Case U4 — Law intake, consent already on file (the law live-bug, specified correct) <span class="tid">T4</span></h2>
+<ol>
+<li><span class="say">"Welcome back to David Austin — Lawyer Intake."</span> <span class="fact">auth_level=known</span>,
+and the profile says <span class="fact">sms_consent=granted</span>.</li>
+<li>Caller verifies with the code. <span class="fact">auth_level=verified</span>, profile prefilled.</li>
+<li>The consent question <b>never renders</b> — it gates on <span class="fact">sms_consent==unknown</span>, which is false.</li>
+<li>The name question <b>never renders</b> either (identity is prefilled) — but if the flow does ask,
+the spoken answer <b>wins</b>: a caller who says "Gavin" is Gavin, and the save must record what was said.</li>
+<li>Intake proceeds straight to the matter. At hangup the ledger is persisted once, by one writer.</li>
+</ol>
+<p><b>Pass:</b> zero consent asks; spoken identity beats profile prefill when both exist.
+<b>Never:</b> <span class="never">asking a question whose fact is already resolved</span>;
+<span class="never">saving profile data over a direct spoken answer</span>.</p>
+
+<h3>Case U4b — Consent granted mid-call is immediately durable <span class="tid">T4b</span></h3>
+<p>The law bug's actual shape: a caller with <span class="fact">sms_consent=unknown</span> is asked once,
+says <b>yes</b>, and the fact flips to <span class="fact">granted</span> at that moment. From the next
+turn on, the consent question can never render again in this call — no matter what states the flow
+revisits. <b>Never:</b> <span class="never">a consent re-ask in any turn after the grant was recorded</span>
+(live call had three).</p>
+
+<h2>Case U5 — Consent denied sticks <span class="tid">T5</span></h2>
+<ol>
+<li>First-call caller reaches the consent question, says <b>no</b>.</li>
+<li><span class="fact">sms_consent=denied</span> — durable. No re-ask this call; the profile remembers,
+so the next call doesn't re-ask either. No text is ever sent (send tools check the fact, not a slot).</li>
+</ol>
+<p><b>Pass:</b> one ask, one answer, zero sends. Denial is as durable as consent.</p>
+
+<h2>Case U6 — End of call: the ledger is what survives <span class="tid">T6</span></h2>
+<ol>
+<li>At hangup — graceful or mid-sentence — the session facts are the single thing persisted:
+identity as spoken/confirmed, consent as resolved, journey position, any unconsumed route (discarded, logged).</li>
+<li>The follow-along page flips to <b>ended</b> and renders the same final ledger.</li>
+<li>Telemetry closes with a <code>facts_final</code> snapshot so any later question — "what did we know
+when the call ended?" — has one answer.</li>
+</ol>
+
+<h2>When re-asking IS allowed</h2>
+<div class="card">
+<p>"Never re-ask a resolved fact" has exactly three exceptions, and each must be visible in telemetry
+with its reason:</p>
+<ul>
+<li><b>Caller correction</b> — the caller volunteers a contradiction ("actually, it's Gavin"): the fact
+refines, one confirmation is allowed. <span class="fact">slot_write.kind=correction</span></li>
+<li><b>Low confidence</b> — the answer's transcription is flagged uncertain: one clarify re-ask.
+<span class="fact">slot_write.kind=clarify</span></li>
+<li><b>Failed save</b> — the write to the ledger errored: re-ask after telling the caller why.
+<span class="fact">slot_write.kind=retry</span></li>
+</ul>
+<p>An unmarked re-ask of a resolved fact is a defect by definition — that is what the invariant counts.</p>
+</div>
+
+<h2>The two telemetry lanes that prove all of this</h2>
+<div class="card tip">
+<p><b><code>slot_write</code></b> — every write to a fact or control slot:
+<code>{t, slot, old→new, writer, kind: tool | sets | clears | prefill}</code>, including
+compiler-expanded <code>clears:</code> lists (the event names the edge that ran).</p>
+<p><b><code>transition_verdict</code></b> — per decision: every candidate edge with its guard result and
+the winner: <i>"edge 0 matched; edges 3–11 shadowed."</i></p>
+<p>With these two lanes, each Never-clause above is a one-line assertion over the event stream —
+in the simulator and on live calls alike.</p>
+</div>
+
+<h2>Test matrix (doc is the spec; tests cite the case)</h2>
+<div class="tw"><table>
+<tr><th>id</th><th>case</th><th>asserts</th><th>kind</th></tr>
+<tr><td><span class="tid">T1</span></td><td>U1 guest route</td><td>route set → consumed, no auth artifacts</td><td>deterministic walk</td></tr>
+<tr><td><span class="tid">T2</span></td><td>U2 verify then choose</td><td>1× "Access granted"; route reaches Webb; only legal clearers touch <code>_route</code></td><td>deterministic walk (replays live bug)</td></tr>
+<tr><td><span class="tid">T2b</span></td><td>U2b verify/choose race</td><td>both facts survive the same epoch; route consumed next</td><td>deterministic walk (live-bug timing)</td></tr>
+<tr><td><span class="tid">T3</span></td><td>U3 skip code</td><td>guest route honored; no hint repeat</td><td>deterministic walk</td></tr>
+<tr><td><span class="tid">T4</span></td><td>U4 consent on file</td><td>0 consent asks when granted on file</td><td>deterministic walk (replays live bug)</td></tr>
+<tr><td><span class="tid">T4b</span></td><td>U4b mid-call grant durable</td><td>0 re-asks after the in-call grant</td><td>deterministic walk (live-bug shape)</td></tr>
+<tr><td><span class="tid">T7</span></td><td>U4 identity precedence</td><td>spoken answer persisted over profile prefill</td><td>deterministic walk</td></tr>
+<tr><td><span class="tid">T5</span></td><td>U5 denial sticks</td><td>1 ask, denial durable, 0 sends</td><td>deterministic walk</td></tr>
+<tr><td><span class="tid">T6</span></td><td>U6 end of call</td><td>final ledger persisted once; unconsumed route logged</td><td>deterministic walk</td></tr>
+<tr><td><span class="tid">L1</span></td><td>lint</td><td>no transition clears <code>_route</code> unless its <code>when</code> consumes it</td><td>static, every pack</td></tr>
+<tr><td><span class="tid">I1</span></td><td>invariant</td><td><code>route-resolved-then-dropped</code> = 0 across the corpus</td><td>eval sweep</td></tr>
+</table></div>
+
+<p class="sub">Change discipline: this page is the contract. Implementation PRs cite the case they
+satisfy; a behavior change without a case change here is a bug by definition.</p>
+</main>
+</body>
+</html>

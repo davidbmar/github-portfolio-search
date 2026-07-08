@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Debug Workspace — TDD implementation plan</title>
+<style>
+  :root{
+    --ink:#1a1c20; --mut:#5c6470; --line:#e3e6ea; --bg:#fcfcfd; --card:#fff;
+    --accent:#2f6df0; --accent-soft:#eaf1ff; --good:#1f9d55; --warn:#b8860b; --bad:#c0392b;
+    --code-bg:#1d2127; --code-ink:#e6e8eb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.62;font-size:16.5px;}
+  main{max-width:880px;margin:0 auto;padding:34px 40px 90px;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 10px;}
+  .meta{font-size:13.5px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;
+    overflow-x:auto;font-size:13px;line-height:1.55;margin:16px 0;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  td code{font-size:12.5px;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);
+    padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout strong{display:block;margin-bottom:3px;}
+  .phase{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;
+    color:#fff;padding:2px 9px;border-radius:20px;margin-right:8px;font-weight:700;}
+  .phase.a{background:var(--accent);} .phase.b{background:var(--warn);}
+  a.x{color:var(--accent);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<main>
+<p><a class="x" href="index.html">← RIFF docs</a> · <a class="x" href="session-debug-workspace-design-v0.html">design doc</a></p>
+<h1 class="title">Session Debug Workspace — TDD implementation plan</h1>
+<p class="lede">Eight bite-sized tasks, each a failing-test-first cycle ending in its own commit. Phase A ships user value with read-side changes only; Phase B makes the turn record canonical.</p>
+<p class="meta">2026-07-07 · execution source (full test + implementation code per step): <code>docs/superpowers/plans/2026-07-07-session-debug-workspace.md</code> · run tests with <code>.venv/bin/pytest -q</code></p>
+
+<div class="callout"><strong>This page is the overview; the .md is the executable plan.</strong> Every task in the md contains the actual failing test code, the exact run command with expected failure output, the minimal implementation, and the commit — per the writing-plans discipline. Workers execute the md task-by-task; this page exists so reviewers can hold the shape in one screen.</div>
+
+<h2>Global constraints (bind every task)</h2>
+<ul>
+<li>Additive-only schema: new <code>turns.jsonl</code> fields optional; missing <code>schema_version</code> ⇒ v1; readers ignore unknown fields. ONE normalized reader server-side.</li>
+<li>Slot values in any NEW field go through <code>_slot_write_repr</code> — never raw (Call Replay Atlas PII rule adopted verbatim).</li>
+<li>Eval rows NEVER in <code>logs/turns.jsonl</code> — run-scoped <code>logs/evals/&lt;run_id&gt;/turns.jsonl</code> only.</li>
+<li>No new LLM calls, threads, or dependencies; no turn-path latency beyond list appends.</li>
+<li><code>guards_evaluated</code> and verdict candidates capped at 24 (matches the emitter cap in <code>state_manager.py:909</code>).</li>
+<li>Commit per task — no batching.</li>
+</ul>
+
+<h2>The ten tasks</h2>
+<table>
+<tr><th></th><th>Task</th><th>Creates / modifies</th><th>Test seam</th><th>Produces (contract for later tasks)</th></tr>
+<tr><td><span class="phase a">A</span>1</td><td>Durable <code>slot_write</code> + <code>transition_verdict</code></td><td><code>state_trace_writer.py</code> filter set</td><td><code>install_writer(tmp)</code> → emit → assert persisted; noisy type still excluded</td><td><code>state_trace.jsonl</code> carries attribution events as they happen (the durable file alone doesn't change atlas output — Task 1b closes that)</td></tr>
+<tr><td><span class="phase a">A</span>1b</td><td>Lossless teardown dump</td><td><code>scripts/call_replay.py:300</code> (<code>dump_session_bus_events</code>)</td><td>seeded durable trace + rolled ring → merged dump, deduped by <code>(seq, ts, type)</code>, other sessions excluded</td><td>atlas SLOTS/VERDICTS lanes stop truncating on long calls; signature gains optional <code>trace_path</code>, phone-server call site unchanged</td></tr>
+<tr><td><span class="phase a">A</span>2</td><td>Pure merge module</td><td>new <code>riff/session_debug.py</code></td><td>plain-dict fixtures, no I/O: turn-window grouping (by <code>turn_index</code>, else <code>turn_complete</code> boundaries; pre-2b live sessions fall back to first turn — stated behavior), B-016 zero-value guard, session isolation, caps</td><td><code>build_session_debug(turn_rows, trace_events, required) → {turns: [...]}</code> incl. <code>required_slots_in_state</code>; <code>required_by_state(flow)</code></td></tr>
+<tr><td><span class="phase a">A</span>2b</td><td>Live <code>turn_complete</code> emission</td><td><code>riff/events.py</code> helper + one call in <code>live/session.py</code> <code>_record_live_turn_result</code></td><td>subscribe → <code>emit_turn_complete("s", 4)</code> → assert session_id/turn_index/source on the bus</td><td>live calls get real turn boundaries for the window grouping (cascade + locked-choice paths already emit; live path didn't)</td></tr>
+<tr><td><span class="phase a">A</span>3</td><td>HTTP endpoint</td><td><code>web_server.py</code> (+ extracting shared readers from the two existing endpoints)</td><td>HTTPServer+RiffHandler fixture (pattern: <code>test_state_trace_api.py</code>): 400 / 404 / merged-shape contract; regression guard on refactored endpoints</td><td><code>GET /api/debug/session_facts?session_id=X</code>; sources: turns.jsonl + state_trace.jsonl + bus buffer + <code>bus_events.jsonl</code>, deduped by <code>seq</code></td></tr>
+<tr><td><span class="phase a">A</span>4</td><td>flow-studio inspector</td><td>new <code>web/session-facts-view.js</code> (pure model); <code>flow-studio.js/.html</code>, <code>flow-studio-replay.js</code> (render only)</td><td>node-driven contract test on the pure model (incl. volunteered-extra-slot exclusion); Playwright smoke with screenshot on the PR</td><td><code>stateFactsModel(stateId, facts, turnIndex)</code> → triad + guards + verdict; triad built ONLY from <code>required_slots_in_state</code>; panel renders from the model only</td></tr>
+<tr><td><span class="phase b">B</span>5</td><td>Turn-scoped event collector</td><td>new <code>riff/turn_events.py</code></td><td>private <code>EventBus</code>: only target session + relevant types collected; unsubscribes on exit; explicit start/close idempotent across async handlers</td><td><code>TurnEventCollector(session_id)</code> — explicit <code>start()</code>/<code>close()</code> primary (live opens and closes in different handlers), context-manager sugar for sync callers</td></tr>
+<tr><td><span class="phase b">B</span>6</td><td>Dual-source slot diff</td><td><code>riff/turn_events.py</code></td><td>pure fn: attributed pass-through; direct mutation ⇒ <code>unattributed_diff</code> (redacted); dict-valued slots NOT skipped; same-slot direct mutation AFTER an attributed write caught via final-shape reconciliation</td><td><code>reconcile_slot_diff(before, after, events)</code></td></tr>
+<tr><td><span class="phase b">B</span>7</td><td>TurnRecord v2 builder</td><td><code>turn_logger.py</code> (extract builder); call sites in <code>live/session.py</code>, <code>web_server.py</code></td><td>SimpleNamespace fakes: v1 fields intact + <code>schema_version: 2</code>; enrichments only when inputs supplied; caps; then full suite</td><td><code>build_turn_record(result, ctx, *, state_snapshot, turn_events, slots_before, kind, run_id)</code>; <code>log_turn</code> stays backward compatible. Collector opens at user-turn start — before <code>_on_tool_call</code> can mutate slots mid-stream (both <code>_record_live_turn_result</code> and top-of-<code>_on_turn_complete</code> are too late) — and closes on every completion path incl. locked-choice short circuits</td></tr>
+<tr><td><span class="phase b">B</span>8</td><td>Eval sink + tolerant reader</td><td>new <code>riff/turns_reader.py</code>; <code>flow_eval/driver.py</code>; <code>web_server.py</code></td><td>v1/v2/garbage fixture file; unit test on the extracted <code>_write_eval_turn_record</code> seam ⇒ run-scoped rows, global log untouched, per-turn events not cumulative</td><td><code>read_turn_rows(path, session_id)</code>; <code>run_conversation(..., turn_log_dir)</code> slices <code>events[event_mark:]</code> per turn and writes <code>kind="eval"</code> + <code>run_id</code> via the seam</td></tr>
+</table>
+
+<h2>Key decisions baked into the tasks (from the codex consult)</h2>
+<ul>
+<li><b>Phase A before TurnRecord v2</b> (codex Q10): the merge endpoint proves the record shape against real debugging before the shape gets frozen into a writer. Stop-and-evaluate point after Task 4.</li>
+<li><b>slot_diff is dual-source</b> (Q2): <code>slot_write</code> events carry attribution but are incomplete (direct <code>session.slots</code> mutations exist; the tool-diff lane skips dict values). The before/after diff guarantees completeness; misses are <i>labeled</i> <code>unattributed_diff</code>, turning write-discipline drift into a burn-down list.</li>
+<li><b>Embed AND persist</b> (Q3): compact summaries in the turn record answer "why did it ask twice" from one row; durable trace events power per-state aggregation. Duplication is cheaper than joins against missing artifacts.</li>
+<li><b><code>missing_required_slots</code> comes from the caller-supplied post-transition snapshot</b> (Q4): <code>log_turn</code> never infers FSM state from hidden globals; pre-transition missing-lists are misleading.</li>
+<li><b>Extend flow-studio's own panel</b> (Q5): <code>state-trace-panel.js</code> is visit-oriented and styled for voice.html — whole-panel transplant would rot.</li>
+<li><b>Run-scoped eval sink</b> (Q1): <code>kind=eval</code> metadata alone doesn't protect the live log from bloat or the session index from pollution.</li>
+</ul>
+
+<h2>Execution order</h2>
+<p>Tasks 1→1b→2→2b→3→4 ship Phase A on their own (1b and 2b are the two write-side touches: teardown-dump merge, live boundary emit). Tasks 5→6→7→8 are strictly ordered among themselves but independent of Task 4. After Task 4: use the inspector on real calls for a few days before Phase B — <code>/api/debug/session_facts</code> is the contract TurnRecord v2 must serve.</p>
+
+<footer>Session Debug Workspace · TDD plan · 2026-07-07 · executable source: <code>docs/superpowers/plans/2026-07-07-session-debug-workspace.md</code></footer>
+</main>
+</body>
+</html>
