@@ -281,7 +281,7 @@ def fetch_html_doc_assets(
     repo: str,
     *,
     default_branch: str | None = None,
-    max_files: int = 50,
+    max_files: int = 250,
 ) -> list[tuple[str, bytes]]:
     """Fetch binary web assets (images/css/js/fonts) under ``docs/html/``.
 
@@ -300,7 +300,7 @@ def fetch_html_docs(
     repo: str,
     *,
     default_branch: str | None = None,
-    max_files: int = 50,
+    max_files: int = 250,
 ) -> list[tuple[str, str]]:
     """Fetch every ``docs/html/**/*.html`` file from the repo's default branch.
 
@@ -320,7 +320,7 @@ def fetch_markdown_docs(
     repo: str,
     *,
     default_branch: str | None = None,
-    max_files: int = 50,
+    max_files: int = 250,
 ) -> list[tuple[str, str]]:
     """Fetch every ``docs/md/**/*.md`` file from the repo's default branch.
 
