@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Replicant Property Menu Operations · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-08-replicant-property-menu-operations.md</span>
+<a class="raw" href="/docs/docs/superpowers/specs/2026-07-08-replicant-property-menu-operations.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Replicant Property Menu Operations</h1>
+<p>Date: 2026-07-08</p>
+<p>Status: implemented in RIFF pack/compiler/runtime; Replicant receiver endpoints still need to be available at <code>REPLICANT_API_BASE</code>.</p>
+<p>Related:</p>
+<ul>
+<li><a href="2026-07-08-replicant-ticket-operations-design.md?format=html">Replicant ticket operations design</a></li>
+<li><a href="2026-07-07-node-release-channel-design.md?format=html">Two-node release channel design</a></li>
+</ul>
+<h2 id="what-changed">What changed</h2>
+<p>The <code>property_management</code> voice menu now includes an existing-request path:</p>
+<ul>
+<li>Press 8: existing request.</li>
+<li>Press 9: leave a message.</li>
+</ul>
+<p>The existing-request path is generated from <code>packs/property_management.pack.yaml</code> with a first-class <code>replicant_ticket_ops</code> capability, so regenerated flows keep the behavior. The generated states support:</p>
+<ul>
+<li>List accessible open or recent tickets.</li>
+<li>Select a ticket from Replicant-returned choices.</li>
+<li>Read safe status/detail fields.</li>
+<li>Add a tenant update after confirmation.</li>
+<li>Request cancellation after confirmation.</li>
+<li>Tell the property manager the issue is resolved after confirmation.</li>
+<li>Return to the main menu for a new issue; new issue creation still uses the existing category intake and create endpoint.</li>
+</ul>
+<p>There is no <code>/riff/tickets/create</code> alias.</p>
+<h2 id="replicant-receiver-contract">Replicant receiver contract</h2>
+<p>RIFF calls Replicant through signed POST requests under <code>REPLICANT_API_BASE</code>.
+Aman's side needs to expose or implement the signed receiver for:</p>
+<ul>
+<li><code>POST /riff/tickets/list</code></li>
+<li><code>POST /riff/tickets/get</code></li>
+<li><code>POST /riff/tickets/update</code></li>
+<li><code>POST /riff/tickets/cancel</code></li>
+</ul>
+<p>These use the same HMAC headers as identify/create:</p>
+<ul>
+<li><code>X-Riff-Timestamp</code></li>
+<li><code>X-Riff-Signature</code></li>
+</ul>
+<p><code>operation_id</code> is included only on mutations:</p>
+<ul>
+<li>update</li>
+<li>cancel / tenant-resolved</li>
+</ul>
+<p>Read calls do not send <code>operation_id</code>.</p>
+<h2 id="source-of-truth">Source of truth</h2>
+<p>Replicant is the source of truth for ticket access, status, lease authorization, and ticket mutation semantics.</p>
+<p>RIFF local state is only for:</p>
+<ul>
+<li>live call slots,</li>
+<li>intake/profile speed,</li>
+<li>generated menu state,</li>
+<li>durable retry spooling for failed mutations.</li>
+</ul>
+<p>RIFF must not grant ticket access from a local DB or phone-to-unit match. The authorization set is enforced by Replicant: original submitter plus primary tenant and <code>LeaseTenant</code> co-signers on the active lease for the ticket unit. If the phone matches a unit but no active lease record authorizes the caller, Replicant returns <code>pending_reviews</code> instead of ticket access.</p>
+<h2 id="safe-read-fields">Safe read fields</h2>
+<p>The status path reads only tenant-safe fields returned by Replicant:</p>
+<ul>
+<li>title,</li>
+<li>category,</li>
+<li>status and status summary,</li>
+<li>priority,</li>
+<li>created/updated timestamps,</li>
+<li>schedule block with vendor company name only,</li>
+<li>permission to enter,</li>
+<li>entry instructions,</li>
+<li>tenant-visible timeline from visible maintenance notes and status audit events.</li>
+</ul>
+<p>Money fields stay excluded: estimates, quotes, invoices, balances, and vendor phone numbers.</p>
+<h2 id="mutation-behavior">Mutation behavior</h2>
+<p>Updates never overwrite ticket <code>title</code> or <code>description</code> after creation. The voice path sends tenant update text only.</p>
+<p>Cancel/resolved behavior is Replicant-owned:</p>
+<ul>
+<li>Immediate cancel for <code>SUBMITTED</code>, <code>TRIAGED</code>, <code>AWAITING_APPROVAL</code>, <code>APPROVED</code>.</li>
+<li>Requested with PM notification for <code>VENDOR_ASSIGNED</code>, <code>SCHEDULED</code>, <code>IN_PROGRESS</code>, <code>EMERGENCY_DISPATCHED</code>.</li>
+<li>No-op for <code>COMPLETED</code>, <code>CLOSED</code>, <code>CANCELLED</code>.</li>
+</ul>
+<p>RIFF queues timeout, config, and 5xx update/cancel failures to the Replicant ticket spool. Durable retries use an idempotency key based on <code>call_sid|operation_id</code>.</p>
+<h2 id="m3-and-m1-rollout">M3 and M1 rollout</h2>
+<p>M3 is the candidate/latest-code node. M1 is the stable/fallback node.</p>
+<p>Practical behavior:</p>
+<ul>
+<li>Deploy and test this menu on M3 first.</li>
+<li>M1 remains on the old stable behavior until the same commit is promoted there.</li>
+<li>Both nodes can call the same Replicant API base with the same signing secret.</li>
+<li>Retry spools are local per node, but Replicant idempotency dedupes mutation retries by <code>call_sid|operation_id</code>.</li>
+<li>The local profile/intake DB remains M3-authority-only; it is not a ticket authority.</li>
+<li>Real OTA calls still require explicit human <code>GO</code>.</li>
+</ul>
+<p>If a caller is routed to M3 after this ships, they can use the existing-request path. If a caller is routed to M1 before promotion, they will not see the new menu yet.</p>
+<h2 id="verification">Verification</h2>
+<p>Focused verification for this implementation:</p>
+<ul>
+<li><code>tests/business_pack/test_replicant_compile.py</code></li>
+<li><code>tests/test_replicant_ticket_tools.py</code></li>
+<li><code>tests/test_replicant_client.py</code></li>
+<li><code>python -m riff.business_pack compile packs/property_management.pack.yaml --out-dir flows/generated</code></li>
+<li><code>python -m riff.business_pack compile packs/property_management.pack.yaml --out-dir flows</code></li>
+</ul>
+<p>The compile may warn that SMS deliverability is skipped when <code>TELNYX_API_KEY</code> is not set in the local shell. That warning is unrelated to the Replicant ticket operations path.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#what-changed">What changed</a></li><li class="toc-h2"><a href="#replicant-receiver-contract">Replicant receiver contract</a></li><li class="toc-h2"><a href="#source-of-truth">Source of truth</a></li><li class="toc-h2"><a href="#safe-read-fields">Safe read fields</a></li><li class="toc-h2"><a href="#mutation-behavior">Mutation behavior</a></li><li class="toc-h2"><a href="#m3-and-m1-rollout">M3 and M1 rollout</a></li><li class="toc-h2"><a href="#verification">Verification</a></li></ul></aside>
+</div>
+</body>
+</html>
