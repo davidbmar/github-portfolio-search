@@ -1,74 +1,74 @@
 {
   "title": "Riff",
-  "one_liner": "Voice agent platform that generates deterministic state-machine-driven conversational flows from plain English business descriptions.",
-  "what_it_is": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business service in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation and slot extraction) while a deterministic state manager keeps the 'beat' (validating transitions, enforcing guardrails, and preventing hallucinations).",
-  "how_its_built": "The core engine is built in Python, utilizing a hybrid architecture where an LLM adapter (supporting Gemini, Gemma, or Claude) processes user input, but all critical logic—state transitions, slot validation, and guardrails—is handled by pure, deterministic functions. Flows are defined in YAML, parsed into internal StateDef and TransitionDef objects, and managed by a StateManager. The web server exposes APIs for flow generation and real-time conversation via WebSockets/HTTP, while the backend relies on a session store and event bus for state persistence and inter-component communication.",
-  "how_to_apply": "Use riff to rapidly prototype and deploy voice agents for specific business verticals without manual coding of dialogue trees. Developers can define new agents by posting a business description to the generation API, which creates a YAML flow. The platform is suitable for services requiring structured data collection (e.g., plumbing, dental clinics, salons) where strict adherence to a process is required but natural language interaction is preferred. It can be integrated into existing telephony stacks or used as a standalone web-based voice interface.",
-  "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server\ncurl -X POST localhost:8765/api/flows/generate -H \"Content-Type: application/json\" -d '{\"description\":\"Hair salon in Austin. Book cuts and colors.\"}'",
+  "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+  "what_it_is": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with Finite State Machines for strict workflow enforcement. It allows users to describe a business in plain text, automatically generating a YAML-defined state graph that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using pure functions for guardrails, slot validation, and state transitions, preventing LLM hallucinations while maintaining conversational fluidity.",
+  "how_its_built": "The core architecture separates the probabilistic LLM layer from the deterministic control layer. A web server exposes APIs for flow generation and conversation. When a call occurs, speech-to-text feeds into a turn runner that consults a state manager. The state manager uses a declared YAML graph to validate transitions and extract slots via deterministic functions. The LLM is invoked only to generate natural language responses or interpret ambiguous inputs within the bounds set by the FSM. Guardrails are applied as pure functions before and after LLM calls. The system supports local models like Gemma or cloud APIs like Gemini Flash.",
+  "how_to_apply": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail scenarios (coffee, pizza). It is suitable for developers who need reliable voice interfaces without building complex dialogue management systems from scratch. Integrate it into existing telephony stacks via its HTTP API or use the built-in web interface for testing. Extend functionality by defining custom YAML flows or adding new tool handlers for specific business logic.",
+  "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server",
   "features": [
     "Generates voice agent flows from plain English business descriptions",
-    "Enforces deterministic state transitions via YAML-defined FSMs",
-    "Prevents LLM hallucinations with multi-layer guardrails and slot validation",
-    "Supports multiple LLM backends including Gemini, Gemma, and Claude",
-    "Provides real-time web UI for monitoring and inspecting active conversations",
-    "Includes pre-built flows for common services like plumbing, dining, and tutoring"
+    "Enforces strict conversation paths using YAML-defined Finite State Machines",
+    "Prevents LLM hallucinations with deterministic guardrails and slot validators",
+    "Supports both local models (Gemma) and cloud APIs (Gemini, Claude)",
+    "Includes 11 pre-built flows for common service and retail scenarios",
+    "Provides real-time web UI for inspecting and debugging active conversations"
   ],
-  "diagram_architecture": "flowchart TD\n    Caller[Caller]\n    STT[Speech to Text]\n    RunTurn[run_turn]\n    TTS[Text to Speech]\n    Guardrails[Guardrails Pure Functions]\n    LLMCall[LLM Adapter]\n    StateManager[State Manager]\n    SlotExtractor[Slot Extractor]\n    EvalFramework[Evaluation Framework]\n    TurnLogger[Turn Logger JSONL]\n    \n    Caller -->|Speaks| STT\n    STT -->|Text| RunTurn\n    RunTurn -->|Audio| TTS\n    TTS -->|Heard| Caller\n    \n    RunTurn --> Guardrails\n    RunTurn --> LLMCall\n    RunTurn --> StateManager\n    \n    Guardrails -->|Validated| RunTurn\n    LLMCall -->|Response| RunTurn\n    StateManager -->|Transition| RunTurn\n    \n    RunTurn --> SlotExtractor\n    RunTurn --> EvalFramework\n    RunTurn --> TurnLogger",
-  "diagram_sequence": "sequenceDiagram\n    participant User as Caller\n    participant STT as STT Service\n    participant Server as riff Web Server\n    participant RT as run_turn\n    participant SM as State Manager\n    participant LLM as LLM Adapter\n    participant TTS as TTS Service\n    \n    User->>STT: Speaks audio\n    STT->>Server: Sends transcribed text\n    Server->>RT: Invokes run_turn with context\n    RT->>SM: Get current state and valid transitions\n    SM-->>RT: Return state definition\n    RT->>LLM: Request response and slot extraction\n    LLM-->>RT: Return generated text and slots\n    RT->>SM: Validate transition and slots\n    SM-->>RT: Confirm valid transition\n    RT->>TTS: Generate audio response\n    TTS-->>Server: Return audio stream\n    Server-->>User: Plays audio response",
+  "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[Speech to Text]\n    STT --> RunTurn[run_turn]\n    RunTurn --> Guardrails[Guardrails Pure Functions]\n    Guardrails --> LLM[LLM Call Gemini Gemma Claude]\n    LLM --> StateManager[State Manager Declared Graph]\n    StateManager --> SlotExtractor[Slot Extractor Deterministic]\n    SlotExtractor --> TurnResult[Turn Result]\n    TurnResult --> TTS[Text to Speech]\n    TTS --> Caller\n    StateManager --> Eval[Eval Framework]\n    StateManager --> TurnLogger[Turn Logger JSONL]",
+  "diagram_sequence": "sequenceDiagram\n    participant Caller\n    participant STT\n    participant RunTurn\n    participant Guardrails\n    participant LLM\n    participant StateManager\n    participant TTS\n    Caller->>STT: Speaks audio\n    STT->>RunTurn: Transcribed text\n    RunTurn->>Guardrails: Validate input\n    Guardrails->>RunTurn: Pass/Fail\n    RunTurn->>StateManager: Get current state context\n    StateManager->>RunTurn: Allowed actions slots\n    RunTurn->>LLM: Generate response intent\n    LLM->>RunTurn: Natural language output\n    RunTurn->>StateManager: Update state transition\n    StateManager->>RunTurn: New state confirmed\n    RunTurn->>TTS: Synthesize speech\n    TTS->>Caller: Audio response",
   "capabilities": [
-    "Natural language flow generation",
+    "Flow generation from natural language",
     "Deterministic state management",
-    "Multi-LLM support",
-    "Real-time conversation monitoring",
     "Slot filling and validation",
-    "Guardrail enforcement"
+    "Multi-model LLM support",
+    "Real-time conversation inspection",
+    "Silent failure tracking",
+    "LRU caching for performance"
   ],
   "components": [
     "web_server",
     "state_manager",
-    "llm_adapter",
-    "flow_loader",
+    "run_turn",
+    "load_flow",
     "session_store",
-    "event_bus",
-    "guardrails_engine",
-    "slot_extractor"
+    "guardrails",
+    "slot_extractor",
+    "mcp_server"
   ],
   "tech": [
     "Python",
     "YAML",
-    "WebSockets",
-    "JSONL",
+    "Mermaid",
     "SQLite",
-    "Mermaid"
+    "HTTP API",
+    "WebSockets"
   ],
   "depends_on": [
     "pytest",
-    "mcp",
-    "Google Gemini API",
     "Gemma",
-    "Claude API"
+    "Gemini API",
+    "Claude API",
+    "MCP CLI"
   ],
   "integrates_with": [
     "Telephony systems",
-    "Web browsers",
-    "MCP clients",
-    "Custom business APIs"
+    "Browser clients",
+    "MCP clients"
   ],
   "patterns": [
     "Finite State Machine",
-    "LLM Orchestration",
     "Pure Function Guardrails",
     "Event Bus",
     "LRU Cache",
-    "Silent Failure Tracking"
+    "Silent Failure Tracking",
+    "Adapter Pattern"
   ],
   "reuse_tags": [
     "voice-agent",
     "fsm",
-    "llm-integration",
-    "python-framework",
-    "conversational-ai",
-    "deterministic-workflow"
+    "llm-orchestration",
+    "deterministic-ai",
+    "python-platform",
+    "yaml-config"
   ],
   "slug": "riff",
   "repo_url": "https://github.com/davidbmar/riff",
@@ -118,10 +118,10 @@
     }
   ],
   "screenshot_url": "",
-  "generated_at": "2026-07-08T18:10:29.530657Z",
-  "source_commit": "53fba6b",
+  "generated_at": "2026-07-08T18:48:09.273281Z",
+  "source_commit": "3f634d5",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-07-08T17:47:26Z",
+  "pushed_at": "2026-07-08T18:43:41Z",
   "docs": [
     {
       "path": "docs/html/archetypes.html",
