@@ -121,15 +121,15 @@ html { scroll-behavior: smooth; }
 </head>
 <body>
 <header class="doc-header">
-<a class="home" href="index.html">&larr; RIFF Docs</a>
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
 <span class="crumb">2026-07-08-replicant-ticket-operations-design.md</span>
-<a class="raw" href="../superpowers/specs/2026-07-08-replicant-ticket-operations-design.md" title="View raw markdown source">raw .md</a>
+<a class="raw" href="/docs/docs/superpowers/specs/2026-07-08-replicant-ticket-operations-design.md" title="View raw markdown source">raw .md</a>
 </header>
 <div class="doc-layout with-toc">
 <main class="doc-container">
 <h1>Replicant Tenant Ticket Operations Design</h1>
 <p><strong>Date:</strong> 2026-07-08&lt;br&gt;
-<strong>Status:</strong> Draft for Fable5 review&lt;br&gt;
+<strong>Status:</strong> Reviewed with Replicant/Fable5 decisions; Phase 1 client shipped, Phase 2 voice support pending&lt;br&gt;
 <strong>Audience:</strong> Riff engineering, Replicant engineering, Fable5 reviewers&lt;br&gt;
 <strong>Scope:</strong> Extend the live Riff &lt;-&gt; Replicant integration from identify/create/follow-up into tenant-scoped list, get, update, and soft-delete ticket operations.</p>
 <h2 id="review-goal">Review Goal</h2>
@@ -197,9 +197,54 @@ fields can change.</p>
 <p>Use <code>POST</code> for all operations, even read operations, because the existing HMAC
 contract signs the raw request body. That keeps caller phone numbers, tenant
 IDs, and ticket IDs out of URLs and access logs.</p>
+<p><code>operation_id</code> is required on mutating operations only: <code>tickets/update</code> and
+<code>tickets/cancel</code>. Read operations (<code>tickets/list</code> and <code>tickets/get</code>) do not need
+an operation ID.</p>
 <p>Do not add <code>DELETE</code>. Riff should never ask Replicant to hard-delete a ticket.
 The correct tenant-facing operation is cancellation, resolution, or a soft-delete
 state that preserves audit history.</p>
+<p>Do not add a <code>POST /riff/tickets/create</code> alias. New-ticket creation remains
+<code>POST /riff/maintenance-tickets</code>.</p>
+<h2 id="review-decisions">Review Decisions</h2>
+<p>Replicant/Fable5 review confirmed:</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP shape</td>
+<td>Keep <code>POST</code> with signed JSON body for every operation.</td>
+</tr>
+<tr>
+<td>Read operation IDs</td>
+<td>Do not send <code>operation_id</code> on <code>list</code> or <code>get</code>; require it only on <code>update</code> and <code>cancel</code>.</td>
+</tr>
+<tr>
+<td>Create alias</td>
+<td>Do not add <code>tickets/create</code>; keep the existing <code>maintenance-tickets</code> endpoint.</td>
+</tr>
+<tr>
+<td>Pending reviews</td>
+<td>Include <code>pending_reviews</code> in <code>tickets/list</code>.</td>
+</tr>
+<tr>
+<td>Title/description edits</td>
+<td>Never overwrite ticket title or description after creation. Use a tenant note, cancel/resolved state, or a new ticket for a new issue.</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>Allow original submitter plus the primary tenant and <code>LeaseTenant</code> co-signers on the active lease of the ticket's unit. A phone number that matches a unit but has no lease record goes to pending review, not ticket access.</td>
+</tr>
+<tr>
+<td>PM notifications</td>
+<td>Selective PM email, always for severity escalation, cancellation requests, and &quot;tenant says it is resolved.&quot; The final availability-window trigger wording is pending because the review note was truncated.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="tenets">Tenets</h2>
 <ol>
 <li>
@@ -263,7 +308,6 @@ and the transcript URL when available.</p>
 <p>Common fields:</p>
 <pre><code class="language-json">{
   &quot;call_sid&quot;: &quot;CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;,
-  &quot;operation_id&quot;: &quot;CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:update:0002&quot;,
   &quot;organization_id&quot;: &quot;uuid&quot;,
   &quot;caller_phone&quot;: &quot;+15551234567&quot;,
   &quot;tenant_user_id&quot;: &quot;uuid or null&quot;,
@@ -286,7 +330,7 @@ and the transcript URL when available.</p>
 </tr>
 <tr>
 <td><code>operation_id</code></td>
-<td>Required for <code>update</code> and <code>cancel</code>; recommended for <code>list</code> and <code>get</code> if Replicant wants audit entries. Unique within a call.</td>
+<td>Required for <code>update</code> and <code>cancel</code> only. Unique within a call. Do not send on <code>list</code> or <code>get</code>.</td>
 </tr>
 <tr>
 <td><code>organization_id</code></td>
@@ -325,11 +369,7 @@ If the same body is replayed, return the original result with <code>&quot;duplic
 <li>Create a pending voice intake review when the caller is unknown or ambiguous.</li>
 <li>Append repeat unknown calls to the same pending review.</li>
 </ul>
-<p>Optional future alias:</p>
-<pre><code class="language-text">POST /riff/tickets/create
-</code></pre>
-<p>The alias is not required for Phase 1. Avoid adding it unless Replicant wants
-endpoint naming symmetry.</p>
+<p>No create alias should be added.</p>
 <h2 id="operation-2-list-visible-tickets">Operation 2: List Visible Tickets</h2>
 <p>Endpoint:</p>
 <pre><code class="language-text">POST /riff/tickets/list
@@ -342,7 +382,6 @@ tickets.</p>
 <p>Request:</p>
 <pre><code class="language-json">{
   &quot;call_sid&quot;: &quot;CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;,
-  &quot;operation_id&quot;: &quot;CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:list:0001&quot;,
   &quot;organization_id&quot;: &quot;uuid&quot;,
   &quot;caller_phone&quot;: &quot;+15551234567&quot;,
   &quot;tenant_user_id&quot;: &quot;uuid or null&quot;,
@@ -367,11 +406,13 @@ tickets.</p>
       &quot;status_summary&quot;: &quot;A vendor, Best Plumbers, is scheduled to visit on July 8 between 9:00 AM and 11:00 AM.&quot;,
       &quot;created_at&quot;: &quot;2026-07-01T18:04:00Z&quot;,
       &quot;updated_at&quot;: &quot;2026-07-07T22:11:00Z&quot;,
-      &quot;scheduled_date&quot;: &quot;2026-07-08&quot;,
-      &quot;vendor_name&quot;: &quot;Best Plumbers&quot;,
-      &quot;unit_id&quot;: &quot;uuid&quot;,
-      &quot;property_name&quot;: &quot;Elm Street Apartments&quot;,
-      &quot;unit_number&quot;: &quot;3&quot;,
+      &quot;schedule&quot;: {
+        &quot;scheduled_date&quot;: &quot;2026-07-08&quot;,
+        &quot;arrival_window_start&quot;: &quot;09:00&quot;,
+        &quot;arrival_window_end&quot;: &quot;11:00&quot;,
+        &quot;timezone&quot;: &quot;America/Los_Angeles&quot;,
+        &quot;vendor_company_name&quot;: &quot;Best Plumbers&quot;
+      },
       &quot;can_update&quot;: [
         &quot;tenant_update_text&quot;,
         &quot;permission_to_enter&quot;,
@@ -402,9 +443,9 @@ tickets.</p>
 <li><code>identify.open_tickets</code> remains the fast call-start shortcut. <code>tickets/list</code>
 is the fuller operation when the caller asks for more than the newest open
 tickets.</li>
-<li><code>pending_reviews</code> is optional but recommended. It lets Riff avoid telling an
-unknown caller &quot;there are no tickets&quot; when Replicant has an unconverted voice
-intake review for that phone number.</li>
+<li><code>pending_reviews</code> should be included. It lets Riff avoid telling an unknown
+caller &quot;there are no tickets&quot; when Replicant has an unconverted voice intake
+review for that phone number.</li>
 <li><code>status_summary</code> should stay human-readable and safe to read aloud.</li>
 </ul>
 <h2 id="operation-3-get-ticket-detail">Operation 3: Get Ticket Detail</h2>
@@ -416,7 +457,6 @@ notes, access details, or a read-back before changing it.</p>
 <p>Request:</p>
 <pre><code class="language-json">{
   &quot;call_sid&quot;: &quot;CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;,
-  &quot;operation_id&quot;: &quot;CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:get:0002&quot;,
   &quot;organization_id&quot;: &quot;uuid&quot;,
   &quot;ticket_id&quot;: &quot;uuid&quot;,
   &quot;caller_phone&quot;: &quot;+15551234567&quot;,
@@ -428,24 +468,20 @@ notes, access details, or a read-back before changing it.</p>
   &quot;ticket&quot;: {
     &quot;ticket_id&quot;: &quot;uuid&quot;,
     &quot;title&quot;: &quot;Kitchen sink leaking&quot;,
-    &quot;description&quot;: &quot;Water is leaking from the pipe below the kitchen sink.&quot;,
     &quot;category&quot;: &quot;PLUMBING&quot;,
     &quot;status&quot;: &quot;SCHEDULED&quot;,
     &quot;priority&quot;: &quot;NORMAL&quot;,
     &quot;status_summary&quot;: &quot;A vendor, Best Plumbers, is scheduled to visit on July 8 between 9:00 AM and 11:00 AM.&quot;,
     &quot;created_at&quot;: &quot;2026-07-01T18:04:00Z&quot;,
     &quot;updated_at&quot;: &quot;2026-07-07T22:11:00Z&quot;,
-    &quot;unit_id&quot;: &quot;uuid&quot;,
-    &quot;property_name&quot;: &quot;Elm Street Apartments&quot;,
-    &quot;unit_number&quot;: &quot;3&quot;,
     &quot;permission_to_enter&quot;: true,
-    &quot;entry_notes&quot;: &quot;Cat in unit; call 30 minutes ahead.&quot;,
+    &quot;entry_instructions&quot;: &quot;Cat in unit; call 30 minutes ahead.&quot;,
     &quot;schedule&quot;: {
       &quot;scheduled_date&quot;: &quot;2026-07-08&quot;,
       &quot;arrival_window_start&quot;: &quot;09:00&quot;,
       &quot;arrival_window_end&quot;: &quot;11:00&quot;,
       &quot;timezone&quot;: &quot;America/Los_Angeles&quot;,
-      &quot;vendor_name&quot;: &quot;Best Plumbers&quot;
+      &quot;vendor_company_name&quot;: &quot;Best Plumbers&quot;
     },
     &quot;tenant_visible_timeline&quot;: [
       {
@@ -472,9 +508,16 @@ notes, access details, or a read-back before changing it.</p>
   }
 }
 </code></pre>
-<p>Replicant should not expose internal PM notes, vendor private contact
-information, bids, costs, internal triage messages, or fields that the tenant
-could not already see in Replicant's tenant-facing surfaces.</p>
+<p>Safe detail fields are: title, category, status and status summary, priority,
+created/updated timestamps, schedule block with vendor company name only,
+<code>permission_to_enter</code>, entry instructions, and a tenant-visible timeline built
+from <code>MaintenanceNote(is_visible_to_tenant=True)</code> plus status-transition audit
+events.</p>
+<p>Replicant should not expose description rewrites after creation, internal PM
+notes, vendor private contact information such as phone numbers, money-bearing
+fields such as estimates, quotes, invoices, bids, costs, internal triage
+messages, or fields that the tenant could not already see in Replicant's
+tenant-facing surfaces.</p>
 <h2 id="operation-4-update-ticket">Operation 4: Update Ticket</h2>
 <p>Endpoint:</p>
 <pre><code class="language-text">POST /riff/tickets/update
@@ -569,7 +612,7 @@ the ticket.</p>
 </tr>
 <tr>
 <td><code>title</code> / <code>description</code></td>
-<td>Optional for pending review or very early <code>SUBMITTED</code> tickets only. Prefer adding a correction note after PM triage has started.</td>
+<td>Never overwrite after creation. Corrections become tenant notes; a different issue becomes a new ticket.</td>
 </tr>
 </tbody>
 </table>
@@ -654,23 +697,15 @@ behavior depending on current workflow state:</p>
 </thead>
 <tbody>
 <tr>
-<td>Pending review or <code>SUBMITTED</code></td>
-<td>Cancel immediately, preserve audit trail.</td>
+<td><code>SUBMITTED</code>, <code>TRIAGED</code>, <code>AWAITING_APPROVAL</code>, <code>APPROVED</code></td>
+<td>Cancel immediately, preserve audit trail, return <code>cancellation_state: &quot;CANCELLED&quot;</code>.</td>
 </tr>
 <tr>
-<td>Triaged but not scheduled</td>
-<td>Cancel immediately or mark cancelled by tenant, according to Replicant workflow.</td>
+<td><code>VENDOR_ASSIGNED</code>, <code>SCHEDULED</code>, <code>IN_PROGRESS</code>, <code>EMERGENCY_DISPATCHED</code></td>
+<td>Record a cancellation request, notify PM/vendor workflow, return <code>cancellation_state: &quot;REQUESTED&quot;</code>.</td>
 </tr>
 <tr>
-<td>Scheduled/vendor assigned</td>
-<td>Record cancellation request, notify PM/vendor workflow, return <code>cancellation_state: &quot;REQUESTED&quot;</code> if immediate cancel is not safe.</td>
-</tr>
-<tr>
-<td>Emergency/in progress</td>
-<td>Add urgent tenant update and notify PM; avoid silently cancelling active emergency work.</td>
-</tr>
-<tr>
-<td>Closed/completed</td>
+<td><code>COMPLETED</code>, <code>CLOSED</code>, <code>CANCELLED</code></td>
 <td>Return current state with <code>duplicate: true</code> or <code>cancellation_state: &quot;NOOP&quot;</code>.</td>
 </tr>
 </tbody>
@@ -852,6 +887,10 @@ query strings.</li>
 <li>Replicant must authorize every ticket operation server-side.</li>
 <li>Replicant should return <code>404</code> for unauthorized ticket access so callers cannot
 enumerate ticket IDs.</li>
+<li>Authorized callers are the original submitter plus the primary tenant and
+<code>LeaseTenant</code> co-signers on the active lease of the ticket's unit. A phone
+number that matches a unit but has no lease record should go to pending review,
+not ticket access.</li>
 <li>Riff should not persist full ticket details beyond the live call context and
 durable retry queue.</li>
 <li>SMS consent remains Replicant-owned. <code>preferred_contact_method: &quot;SMS&quot;</code> is a
@@ -864,22 +903,21 @@ of an attached ticket. This should remain.</p>
 <ol>
 <li><code>maintenance-tickets</code> continues to append repeat unknown-caller descriptions
 to the same pending review.</li>
-<li><code>tickets/list</code> may return <code>pending_reviews</code> for the caller phone so Riff can
-acknowledge that the request is in review.</li>
+<li><code>tickets/list</code> should return <code>pending_reviews</code> for the caller phone so Riff
+can acknowledge that the request is in review.</li>
 <li>Direct <code>tickets/update</code> on <code>review_id</code> is optional for Phase 1. If Replicant
 wants it, use a sibling endpoint such as <code>POST /riff/reviews/update</code> or allow
 <code>tickets/update</code> to accept <code>{ &quot;review_id&quot;: &quot;uuid&quot; }</code> when no <code>ticket_id</code> is
 present.</li>
 </ol>
-<p>Fable5 should decide whether pending reviews are tenant-visible enough to be
-listed in the same response as tickets.</p>
+<p>Replicant/Fable5 confirmed pending reviews should be listed in the same response
+as tickets.</p>
 <h2 id="implementation-phases">Implementation Phases</h2>
 <h3 id="phase-0-contract-review">Phase 0: Contract Review</h3>
 <ul>
-<li>Replicant and Fable5 review this endpoint shape.</li>
-<li>Decide whether <code>operation_id</code> is required for all operations or only
-mutations.</li>
-<li>Confirm tenant-writable fields and cancellation semantics by workflow state.</li>
+<li>Replicant and Fable5 reviewed this endpoint shape.</li>
+<li><code>operation_id</code> is required for mutating operations only.</li>
+<li>Tenant-writable fields and cancellation semantics are confirmed above.</li>
 </ul>
 <h3 id="phase-1-riff-client-and-fixtures">Phase 1: Riff Client And Fixtures</h3>
 <ul>
@@ -926,30 +964,27 @@ records.</li>
 conflict 409, unsupported field rejection, and priority escalation.</li>
 </ul>
 <h2 id="fable5-review-questions">Fable5 Review Questions</h2>
+<p>Closed by review except one truncated item:</p>
 <ol>
-<li>Are <code>POST /riff/tickets/list|get|update|cancel</code> acceptable, or does Replicant
-prefer REST-style paths with the same signed-body requirement?</li>
-<li>Should <code>operation_id</code> be required on read operations for audit consistency, or
-only on mutations?</li>
-<li>Should create get an alias at <code>POST /riff/tickets/create</code>, or should the live
-<code>maintenance-tickets</code> endpoint remain the only create endpoint?</li>
-<li>Exactly which statuses allow immediate tenant cancellation versus cancellation
-request?</li>
-<li>Which tenant-visible detail fields are safe to return from <code>tickets/get</code>?</li>
-<li>Should <code>tickets/list</code> include <code>pending_reviews</code>, or should review records stay
-hidden until converted into tickets?</li>
-<li>Should title and description corrections ever overwrite ticket fields, or
-should they always become tenant notes after creation?</li>
-<li>What is the authorization rule for household members, property contacts, and
-callers whose phone matches the unit but not the original ticket submitter?</li>
-<li>Should material <code>tickets/update</code> always email the PM, or only when selected
-fields change?</li>
-<li>Is <code>ticket-followup</code> still wanted as a public endpoint after these operations
-exist, or should Riff migrate to the lower-level operations over time?</li>
+<li>Keep <code>POST /riff/tickets/list|get|update|cancel</code> with signed request bodies.</li>
+<li>Require <code>operation_id</code> on mutations only.</li>
+<li>Keep <code>POST /riff/maintenance-tickets</code> as the only create endpoint.</li>
+<li>Cancellation status behavior is specified in Operation 5.</li>
+<li>Safe detail fields are specified in Operation 3.</li>
+<li>Include <code>pending_reviews</code> in <code>tickets/list</code>.</li>
+<li>Never overwrite title or description after creation.</li>
+<li>Authorization is original submitter plus primary tenant and active-lease
+co-signers; unit-phone-only matches go to pending review.</li>
+<li>Use selective PM email, always for severity escalation, cancellation requests,
+and tenant-resolved signals. Confirm the truncated availability-window trigger
+wording before Phase 2.</li>
+<li><code>ticket-followup</code> public-endpoint retirement was not covered in the provided
+review excerpt; keep the current relationship section until Replicant says
+otherwise.</li>
 </ol>
 
 </main>
-<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#review-goal">Review Goal</a></li><li class="toc-h2"><a href="#recommendation">Recommendation</a></li><li class="toc-h2"><a href="#tenets">Tenets</a></li><li class="toc-h2"><a href="#common-request-envelope">Common Request Envelope</a></li><li class="toc-h2"><a href="#operation-1-create-ticket">Operation 1: Create Ticket</a></li><li class="toc-h2"><a href="#operation-2-list-visible-tickets">Operation 2: List Visible Tickets</a></li><li class="toc-h2"><a href="#operation-3-get-ticket-detail">Operation 3: Get Ticket Detail</a></li><li class="toc-h2"><a href="#operation-4-update-ticket">Operation 4: Update Ticket</a></li><li class="toc-h2"><a href="#operation-5-cancel-or-soft-delete-ticket">Operation 5: Cancel Or Soft-Delete Ticket</a></li><li class="toc-h2"><a href="#relationship-to-ticket-followup">Relationship To ticket-followup</a></li><li class="toc-h2"><a href="#conversation-behavior">Conversation Behavior</a></li><li class="toc-h2"><a href="#retry-and-degradation">Retry And Degradation</a></li><li class="toc-h2"><a href="#audit-and-observability">Audit And Observability</a></li><li class="toc-h2"><a href="#security-and-privacy">Security And Privacy</a></li><li class="toc-h2"><a href="#pending-voice-intake-reviews">Pending Voice Intake Reviews</a></li><li class="toc-h2"><a href="#implementation-phases">Implementation Phases</a></li><li class="toc-h3"><a href="#phase-0-contract-review">Phase 0: Contract Review</a></li><li class="toc-h3"><a href="#phase-1-riff-client-and-fixtures">Phase 1: Riff Client And Fixtures</a></li><li class="toc-h3"><a href="#phase-2-voice-conversation-support">Phase 2: Voice Conversation Support</a></li><li class="toc-h3"><a href="#phase-3-follow-along-web-support">Phase 3: Follow-Along Web Support</a></li><li class="toc-h3"><a href="#phase-4-ota-and-replay-evidence">Phase 4: OTA And Replay Evidence</a></li><li class="toc-h2"><a href="#acceptance-criteria">Acceptance Criteria</a></li><li class="toc-h2"><a href="#fable5-review-questions">Fable5 Review Questions</a></li></ul></aside>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#review-goal">Review Goal</a></li><li class="toc-h2"><a href="#recommendation">Recommendation</a></li><li class="toc-h2"><a href="#review-decisions">Review Decisions</a></li><li class="toc-h2"><a href="#tenets">Tenets</a></li><li class="toc-h2"><a href="#common-request-envelope">Common Request Envelope</a></li><li class="toc-h2"><a href="#operation-1-create-ticket">Operation 1: Create Ticket</a></li><li class="toc-h2"><a href="#operation-2-list-visible-tickets">Operation 2: List Visible Tickets</a></li><li class="toc-h2"><a href="#operation-3-get-ticket-detail">Operation 3: Get Ticket Detail</a></li><li class="toc-h2"><a href="#operation-4-update-ticket">Operation 4: Update Ticket</a></li><li class="toc-h2"><a href="#operation-5-cancel-or-soft-delete-ticket">Operation 5: Cancel Or Soft-Delete Ticket</a></li><li class="toc-h2"><a href="#relationship-to-ticket-followup">Relationship To ticket-followup</a></li><li class="toc-h2"><a href="#conversation-behavior">Conversation Behavior</a></li><li class="toc-h2"><a href="#retry-and-degradation">Retry And Degradation</a></li><li class="toc-h2"><a href="#audit-and-observability">Audit And Observability</a></li><li class="toc-h2"><a href="#security-and-privacy">Security And Privacy</a></li><li class="toc-h2"><a href="#pending-voice-intake-reviews">Pending Voice Intake Reviews</a></li><li class="toc-h2"><a href="#implementation-phases">Implementation Phases</a></li><li class="toc-h3"><a href="#phase-0-contract-review">Phase 0: Contract Review</a></li><li class="toc-h3"><a href="#phase-1-riff-client-and-fixtures">Phase 1: Riff Client And Fixtures</a></li><li class="toc-h3"><a href="#phase-2-voice-conversation-support">Phase 2: Voice Conversation Support</a></li><li class="toc-h3"><a href="#phase-3-follow-along-web-support">Phase 3: Follow-Along Web Support</a></li><li class="toc-h3"><a href="#phase-4-ota-and-replay-evidence">Phase 4: OTA And Replay Evidence</a></li><li class="toc-h2"><a href="#acceptance-criteria">Acceptance Criteria</a></li><li class="toc-h2"><a href="#fable5-review-questions">Fable5 Review Questions</a></li></ul></aside>
 </div>
 </body>
 </html>
