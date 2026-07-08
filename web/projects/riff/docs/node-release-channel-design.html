@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF Two-Node Release Channels · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="index.html">&larr; RIFF Docs</a>
+<span class="crumb">2026-07-07-node-release-channel-design.md</span>
+<a class="raw" href="../superpowers/specs/2026-07-07-node-release-channel-design.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF Two-Node Release Channels</h1>
+<p><strong>Date:</strong> 2026-07-07<br />
+<strong>Status:</strong> Design proposal with Phase 1 implemented<br />
+<strong>Scope:</strong> M3 development/candidate node, M1 stable/fallback node, phone traffic routing, drain/undrain, promotion, rollback, and node comparison.</p>
+<h2 id="core-idea">Core Idea</h2>
+<p>RIFF should treat M1 and M3 as two release channels, not just two copies of the
+same process.</p>
+<ul>
+<li><strong>M3 is candidate:</strong> the fast development machine where new code lands first,
+gets restarted often, and is used for test calls, simulator runs, and canary
+traffic.</li>
+<li><strong>M1 is stable:</strong> the fallback node on the last known-good build. It keeps
+answering production traffic while M3 is being changed, tested, or rolled back.</li>
+<li><strong>Promotion is explicit:</strong> after M3 proves healthy, M1 is updated to the same
+commit and both nodes can rejoin as stable.</li>
+<li><strong>Comparison is intentional:</strong> calls and simulations should be routed to a
+specific node or replayed on both nodes. Random active-active routing across
+different builds is a debugging trap.</li>
+</ul>
+<p>The deployment question should never be &quot;is M1 drained?&quot; alone. The better
+question is &quot;which node is stable, which node is candidate, and which traffic is
+allowed to reach each one?&quot;</p>
+<h2 id="amazon-style-business-tenets">Amazon-Style Business Tenets</h2>
+<p>These tenets are written in the style of strong operating principles: customer
+backwards, mechanism-driven, and explicit about tradeoffs.</p>
+<ol>
+<li>
+<p><strong>Never miss a real call for the sake of a deploy.</strong> A caller should always
+have at least one healthy stable node available before a candidate node is
+restarted or tested.</p>
+</li>
+<li>
+<p><strong>Make the blast radius visible and small.</strong> A candidate build should receive
+only canary traffic until it passes defined checks. The default path for
+unknown callers stays stable.</p>
+</li>
+<li>
+<p><strong>Use mechanisms, not heroics.</strong> Drain state, release channel, git SHA,
+active-call count, static-audio freshness, and routing decisions should be
+machine-readable. Operators should not infer them from logs.</p>
+</li>
+<li>
+<p><strong>Single source of truth for promotion.</strong> A node is promoted by commit SHA and
+mode, not by &quot;whatever is currently running.&quot; Promotion requires both code
+identity and health evidence.</p>
+</li>
+<li>
+<p><strong>Two-way doors stay reversible.</strong> Candidate deploys must be easy to roll
+back: drain M3 and leave M1 serving stable traffic. Promotion to both nodes is
+a higher bar.</p>
+</li>
+<li>
+<p><strong>Compare before debating.</strong> When M3 feels better or worse than M1, run the
+same scenario against both nodes and compare traces, latency, audio assets,
+route decisions, and final slots.</p>
+</li>
+<li>
+<p><strong>Operational truth beats intent.</strong> Health pages, call exports, and node
+status must show the node, mode, SHA, routing table version, and drain state.
+If the UI says both nodes are online, both must be able to accept the traffic
+they claim to accept.</p>
+</li>
+<li>
+<p><strong>Automate the boring checks.</strong> <code>.env</code> syntax, routing JSON, active calls,
+static-audio audit, and expected phone-number mappings are deployment gates,
+not manual memory.</p>
+</li>
+</ol>
+<h2 id="why-this-is-good">Why This Is Good</h2>
+<p>This gives RIFF a safer, faster release motion:</p>
+<ul>
+<li><strong>Safer live changes:</strong> M1 keeps production stable while M3 absorbs risky
+changes like LAW auth prompts, barge-in changes, or new flow compiler output.</li>
+<li><strong>Faster debugging:</strong> a test call can be pinned to M3. If it fails, we know
+which code answered.</li>
+<li><strong>Real A/B evidence:</strong> M1 and M3 can run the same simulator or replay payloads
+so latency, route quality, and audio behavior can be compared.</li>
+<li><strong>Cleaner rollback:</strong> if M3 regresses, drain M3 and leave M1 alone.</li>
+<li><strong>Better confidence before promotion:</strong> M1 updates only after M3 has proven the
+commit under test.</li>
+</ul>
+<h2 id="use-cases">Use Cases</h2>
+<h3 id="1-law-auth-prompt-change">1. LAW Auth Prompt Change</h3>
+<p>Problem: a LAW prompt says &quot;six-digit&quot; while the SMS sends a four-digit code.</p>
+<p>Desired workflow:</p>
+<ol>
+<li>M1 remains <code>stable</code>.</li>
+<li>M3 pulls the fix and becomes <code>candidate</code>.</li>
+<li>Caller ID <code>+15124317196</code> or the LAW DID test window routes to M3.</li>
+<li>Operator calls <code>512-277-7LAW</code> and verifies the spoken prompt.</li>
+<li>Static-audio audit confirms the LAW WAV matches the current text.</li>
+<li>Promote the commit to M1.</li>
+</ol>
+<p>Why this is good: the bug can be tested live without exposing all callers to a
+candidate build.</p>
+<h3 id="2-barge-in-latency-comparison">2. Barge-In Latency Comparison</h3>
+<p>Problem: M3 feels faster than M1, or one node misses &quot;0&quot; while the other routes
+correctly.</p>
+<p>Desired workflow:</p>
+<ol>
+<li>Run the same LAW or Space Channel scenario against M1 and M3.</li>
+<li>Compare time-to-first-audio, user-speech-to-route, static audio duration,
+DTMF/locked-choice decisions, and final state.</li>
+<li>Mark the finding as code, data, audio, or infrastructure.</li>
+</ol>
+<p>Why this is good: the team stops arguing from memory and gets node-by-node
+evidence.</p>
+<h3 id="3-space-channel-content-refresh">3. Space Channel Content Refresh</h3>
+<p>Problem: Space Channel audio is regenerated frequently and can dirty local
+working trees.</p>
+<p>Desired workflow:</p>
+<ol>
+<li>M3 refreshes content and validates generated audio.</li>
+<li>M1 is not updated until the content build is committed or deliberately
+excluded.</li>
+<li>Promotion script stashes only approved local generated artifacts on M1 before
+pulling.</li>
+</ol>
+<p>Why this is good: local generated files do not silently block deployment or get
+mixed into unrelated releases.</p>
+<h3 id="4-emergency-rollback">4. Emergency Rollback</h3>
+<p>Problem: a candidate build starts dropping calls or looping in the menu.</p>
+<p>Desired workflow:</p>
+<ol>
+<li>Set M3 <code>drained</code>.</li>
+<li>Confirm M1 is <code>stable</code> and accepting calls.</li>
+<li>Preserve M3 logs and call exports.</li>
+<li>Replay the failing call locally before another deploy attempt.</li>
+</ol>
+<p>Why this is good: rollback is one command and the failed build stays available
+for diagnosis.</p>
+<h2 id="design">Design</h2>
+<h3 id="release-channels">Release Channels</h3>
+<p>Each node has a release channel:</p>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Meaning</th>
+<th>Normal owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stable</code></td>
+<td>Last known-good build for production callers.</td>
+<td>M1, then both nodes after promotion</td>
+</tr>
+<tr>
+<td><code>candidate</code></td>
+<td>New build under active validation.</td>
+<td>M3</td>
+</tr>
+<tr>
+<td><code>shadow</code></td>
+<td>Receives replay/compare work only; does not answer new live calls.</td>
+<td>Either node</td>
+</tr>
+<tr>
+<td><code>drained</code></td>
+<td>Server may run, but node accepts no new tunnel traffic.</td>
+<td>Either node</td>
+</tr>
+</tbody>
+</table>
+<p>The release channel is separate from process health. A node can be healthy but
+drained, or unhealthy while marked stable. Routing must check both.</p>
+<h3 id="node-modes">Node Modes</h3>
+<p>Add a small persistent mode file on each node:</p>
+<pre><code class="language-text">/tmp/riff-phone-node/MODE
+</code></pre>
+<p>Allowed values:</p>
+<pre><code class="language-text">stable
+candidate
+shadow
+drained
+</code></pre>
+<p><code>DRAINED</code> can remain as a compatibility marker, but <code>MODE</code> becomes the richer
+source of truth. For compatibility:</p>
+<ul>
+<li><code>MODE=drained</code> creates or honors <code>/tmp/riff-phone-node/DRAINED</code>.</li>
+<li>Removing <code>DRAINED</code> should not automatically mean <code>stable</code>; the node should
+explicitly transition to <code>stable</code> or <code>candidate</code>.</li>
+</ul>
+<h3 id="health-contract">Health Contract</h3>
+<p><code>/healthz</code> should include:</p>
+<pre><code class="language-json">{
+  &quot;ok&quot;: true,
+  &quot;node&quot;: &quot;M3&quot;,
+  &quot;role&quot;: &quot;M3&quot;,
+  &quot;mode&quot;: &quot;candidate&quot;,
+  &quot;release_channel&quot;: &quot;candidate&quot;,
+  &quot;git_sha&quot;: &quot;ec34a636&quot;,
+  &quot;branch&quot;: &quot;main&quot;,
+  &quot;dirty&quot;: false,
+  &quot;active_calls&quot;: 0,
+  &quot;drained&quot;: false,
+  &quot;accepting_live_calls&quot;: true,
+  &quot;routing_table_hash&quot;: &quot;sha256:...&quot;,
+  &quot;started_at&quot;: &quot;2026-07-07T12:00:00Z&quot;
+}
+</code></pre>
+<p>The follow-along page should keep the current left/right node indicator, but it
+should show mode as well:</p>
+<ul>
+<li>left half: M3</li>
+<li>right half: M1</li>
+<li>green: stable and accepting traffic</li>
+<li>yellow: candidate</li>
+<li>gray: drained</li>
+<li>red: unhealthy</li>
+</ul>
+<h3 id="routing-contract">Routing Contract</h3>
+<p>Do not rely on Cloudflare random active-active behavior when nodes run different
+commits. Use one of these routing levels.</p>
+<h4>Level 1: Manual Drain</h4>
+<p>Current behavior:</p>
+<ul>
+<li>drain M1, all new calls go to M3;</li>
+<li>undrain M1, both can answer.</li>
+</ul>
+<p>This is safe for simple testing but poor for comparison.</p>
+<h4>Level 2: Canary Caller IDs</h4>
+<p>Route known operator caller IDs to M3 candidate while everyone else remains on
+M1 stable.</p>
+<p>Example policy:</p>
+<pre><code class="language-json">{
+  &quot;default_channel&quot;: &quot;stable&quot;,
+  &quot;canary_callers&quot;: {
+    &quot;+15124317196&quot;: &quot;candidate&quot;
+  }
+}
+</code></pre>
+<p>This needs a deterministic ingress/router layer or per-node webhook selection.</p>
+<h4>Level 3: Canary Dialed Numbers</h4>
+<p>Route a specific DID to candidate:</p>
+<pre><code class="language-json">{
+  &quot;+15122777529&quot;: {
+    &quot;flow&quot;: &quot;legal_intake&quot;,
+    &quot;channel&quot;: &quot;candidate&quot;
+  }
+}
+</code></pre>
+<p>Useful when testing a single vertical such as LAW.</p>
+<h4>Level 4: Explicit Test Token</h4>
+<p>Allow a temporary test flag in the incoming webhook or an admin-set call plan:</p>
+<pre><code class="language-json">{
+  &quot;next_call_from&quot;: &quot;+15124317196&quot;,
+  &quot;route_to_node&quot;: &quot;M3&quot;,
+  &quot;expires_at&quot;: &quot;2026-07-07T12:15:00Z&quot;
+}
+</code></pre>
+<p>This is the cleanest operator experience: &quot;my next call should go to M3.&quot;</p>
+<h3 id="promotion-state-machine">Promotion State Machine</h3>
+<pre><code class="language-text">M1 stable @ old SHA
+M3 candidate @ new SHA
+        |
+        | deploy candidate to M3
+        v
+M1 stable @ old SHA
+M3 candidate @ new SHA, healthy
+        |
+        | canary checks pass
+        v
+M1 drained -&gt; pull new SHA -&gt; restart -&gt; health check
+        |
+        | M1 healthy
+        v
+M1 stable @ new SHA
+M3 stable @ new SHA
+</code></pre>
+<p>Rollback:</p>
+<pre><code class="language-text">M3 candidate fails
+        |
+        v
+M3 drained
+M1 stable continues serving
+</code></pre>
+<h3 id="commands">Commands</h3>
+<p>Add a single node-control command:</p>
+<pre><code class="language-bash">scripts/node-mode.sh M1 status
+scripts/node-mode.sh M1 stable
+scripts/node-mode.sh M1 candidate
+scripts/node-mode.sh M1 shadow
+scripts/node-mode.sh M1 drain
+scripts/node-mode.sh M1 undrain
+</code></pre>
+<p>Add release workflow commands:</p>
+<pre><code class="language-bash">scripts/deploy-candidate.sh --node M3
+scripts/compare-nodes.py --flow legal_intake --scenario law_auth_4digit
+scripts/promote-stable.sh
+scripts/rollback-candidate.sh --node M3
+</code></pre>
+<p>Keep <code>scripts/deploy_rolling.sh</code>, but change it to call these lower-level
+commands instead of carrying all deployment logic inline.</p>
+<h3 id="preflight-gates">Preflight Gates</h3>
+<p>Every deploy, drain, undrain, and promotion should run:</p>
+<pre><code class="language-bash">bash -n .env
+python - &lt;&lt;'PY'
+import json, os
+json.loads(os.environ[&quot;RIFF_DIALED_ROUTING_TABLE_JSON&quot;])
+PY
+git rev-parse HEAD
+git status --short
+curl /healthz
+</code></pre>
+<p>Additional routed-flow gates:</p>
+<ul>
+<li>static-audio audit for every routed flow;</li>
+<li>phone-number routing table check;</li>
+<li>active calls must be zero before forced restart;</li>
+<li>node mode must match the intended operation;</li>
+<li>M1 pull must stash or preserve local generated audio artifacts before
+<code>git pull --ff-only</code>.</li>
+</ul>
+<h3 id="compare-nodes-output">Compare-Nodes Output</h3>
+<p>A node comparison should produce a small report:</p>
+<pre><code class="language-text">scenario: legal_intake/law_auth_4digit
+candidate_sha: ec34a636
+stable_sha: a5e63178
+
+M1 stable:
+  time_to_first_audio_ms: 640
+  auth_prompt_text: four-digit
+  final_state: menu
+  result: pass
+
+M3 candidate:
+  time_to_first_audio_ms: 590
+  auth_prompt_text: four-digit
+  final_state: menu
+  result: pass
+
+delta:
+  M3 faster by 50 ms
+  no route divergence
+  no prompt divergence
+</code></pre>
+<p>For a live call, comparison can be done by replaying the captured caller turns
+through the other node in shadow mode.</p>
+<h2 id="implemented-first-cut">Implemented First Cut</h2>
+<p>Commit <code>4c64d3b5</code> implemented the node-mode foundation. This is the current
+operator contract that Claude, Codex, and human operators should use.</p>
+<p>Built now:</p>
+<ul>
+<li><code>scripts/node-mode.sh</code> manages the persistent mode file
+<code>/tmp/riff-phone-node/MODE</code>.</li>
+<li><code>scripts/phone-node-start.sh</code> honors <code>MODE</code> and the legacy
+<code>/tmp/riff-phone-node/DRAINED</code> marker.</li>
+<li><code>/healthz</code> reports <code>mode</code>, <code>release_channel</code>, <code>git_sha</code>, <code>branch</code>, <code>dirty</code>,
+<code>active_calls</code>, <code>drained</code>, <code>accepting_live_calls</code>, <code>routing_table_hash</code>, and
+<code>started_at</code>.</li>
+<li><code>/api/phone/nodes</code> and the voice-page node chip show stable, candidate,
+shadow, drained, and offline states.</li>
+<li><code>.env</code> shell syntax and <code>RIFF_DIALED_ROUTING_TABLE_JSON</code> JSON syntax are
+validated before phone-node restart.</li>
+</ul>
+<p>Not built yet:</p>
+<ul>
+<li><code>scripts/deploy-candidate.sh --node M3</code></li>
+<li><code>scripts/promote-stable.sh</code></li>
+<li><code>scripts/rollback-candidate.sh</code></li>
+<li>deterministic caller-ID canary routing</li>
+<li>simulator <code>--node M1|M3|both</code> routing</li>
+</ul>
+<p>The current system makes node state explicit and machine-readable. It does not
+yet make live Telnyx/Cloudflare traffic route by caller ID.</p>
+<h3 id="agent-quickstart">Agent Quickstart</h3>
+<p>Check local node status:</p>
+<pre><code class="language-bash">scripts/node-mode.sh local status
+</code></pre>
+<p>Check a named node, delegating through SSH when <code>RIFF_M1_SSH</code> or <code>RIFF_M3_SSH</code>
+is configured:</p>
+<pre><code class="language-bash">scripts/node-mode.sh M3 status
+scripts/node-mode.sh M1 status
+</code></pre>
+<p>Mark M3 as the candidate node:</p>
+<pre><code class="language-bash">scripts/node-mode.sh M3 candidate
+</code></pre>
+<p>Mark M1 as stable:</p>
+<pre><code class="language-bash">scripts/node-mode.sh M1 stable
+</code></pre>
+<p>Take a node out of live tunnel service but leave the server available for local
+debugging:</p>
+<pre><code class="language-bash">scripts/node-mode.sh M3 shadow
+</code></pre>
+<p>Drain a node completely from new tunnel traffic:</p>
+<pre><code class="language-bash">scripts/node-mode.sh M3 drain
+</code></pre>
+<p>Return a drained node to stable mode:</p>
+<pre><code class="language-bash">scripts/node-mode.sh M3 undrain
+</code></pre>
+<p>Compatibility:</p>
+<ul>
+<li><code>scripts/phone-node-start.sh --drain</code> still creates <code>DRAINED</code> and now writes
+<code>MODE=drained</code>.</li>
+<li><code>scripts/phone-node-start.sh --undrain</code> clears <code>DRAINED</code> and writes
+<code>MODE=stable</code>.</li>
+<li><code>DRAINED</code> overrides <code>MODE</code> in <code>/healthz</code> so old operational habits remain
+fail-safe.</li>
+</ul>
+<h3 id="live-traffic-semantics">Live-Traffic Semantics</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th style="text-align:right">Server may run</th>
+<th style="text-align:right">Tunnel connector may run</th>
+<th style="text-align:right"><code>accepting_live_calls</code></th>
+<th>Intended use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stable</code></td>
+<td style="text-align:right">yes</td>
+<td style="text-align:right">yes</td>
+<td style="text-align:right">true</td>
+<td>production-safe traffic</td>
+</tr>
+<tr>
+<td><code>candidate</code></td>
+<td style="text-align:right">yes</td>
+<td style="text-align:right">yes</td>
+<td style="text-align:right">true</td>
+<td>explicit validation/canary traffic</td>
+</tr>
+<tr>
+<td><code>shadow</code></td>
+<td style="text-align:right">yes</td>
+<td style="text-align:right">no</td>
+<td style="text-align:right">false</td>
+<td>replay, compare, local debug</td>
+</tr>
+<tr>
+<td><code>drained</code></td>
+<td style="text-align:right">yes</td>
+<td style="text-align:right">no</td>
+<td style="text-align:right">false</td>
+<td>rollback, deploy, maintenance</td>
+</tr>
+</tbody>
+</table>
+<p><code>stable</code> and <code>candidate</code> are the only modes where <code>phone-node-start.sh --ensure</code>
+will start the Cloudflare tunnel connector. <code>shadow</code> and <code>drained</code> keep the
+phone server reachable locally but do not rejoin the live tunnel.</p>
+<h3 id="simulator-routing-guidance">Simulator Routing Guidance</h3>
+<p>The simulator should default to M3/candidate once node targeting is added,
+because M3 is the latest-code validation lane. The planned option shape is:</p>
+<pre><code class="language-bash">python -m riff.flow_eval --flow legal_intake --node M3
+python -m riff.flow_eval --flow legal_intake --node M1
+python -m riff.flow_eval --flow legal_intake --node both
+</code></pre>
+<p>Recommended semantics for the future implementation:</p>
+<ul>
+<li>default <code>--node candidate</code>, resolving to M3 when M3 reports
+<code>mode=candidate</code>;</li>
+<li><code>--node M3</code> hits the M3 phone/service base URL directly;</li>
+<li><code>--node M1</code> hits the M1 phone/service base URL directly;</li>
+<li><code>--node both</code> runs the same scenario against both nodes and stores a
+comparison artifact;</li>
+<li>refuse ambiguous node selection when both nodes report the same mode but
+different SHAs unless <code>--node</code> is explicit.</li>
+</ul>
+<p>Simulator routing should not depend on the public phone ingress. It should hit
+the selected node's base URL directly so validation does not disturb live
+callers.</p>
+<h3 id="current-canary-routing-gap">Current Canary-Routing Gap</h3>
+<p>The system does not yet support &quot;my caller ID goes to M3; everyone else goes to
+M1.&quot; Until a deterministic ingress/canary layer exists, live testing should use
+manual drain/shadow operations and direct simulator/replay targeting.</p>
+<h2 id="implementation-plan">Implementation Plan</h2>
+<h3 id="phase-1-safer-drain-undrain">Phase 1: Safer Drain/Undrain</h3>
+<ol>
+<li>Done: add <code>scripts/node-mode.sh</code>.</li>
+<li>Done: store node mode in <code>/tmp/riff-phone-node/MODE</code>.</li>
+<li>Done: update <code>scripts/phone-node-start.sh</code> to honor <code>MODE</code>.</li>
+<li>Done: add <code>bash -n .env</code> and routing JSON validation before restart.</li>
+<li>Done: add <code>mode</code>, <code>git_sha</code>, <code>dirty</code>, and <code>accepting_live_calls</code> to
+<code>/healthz</code>.</li>
+</ol>
+<p>Exit criteria:</p>
+<ul>
+<li><code>node-mode.sh M1 status</code> reports node, mode, SHA, dirty state, active calls,
+drained state, and health.</li>
+<li>A malformed <code>.env</code> blocks restart before launch.</li>
+</ul>
+<h3 id="phase-2-candidate-deploy">Phase 2: Candidate Deploy</h3>
+<ol>
+<li>Add <code>scripts/deploy-candidate.sh --node M3</code>.</li>
+<li>Restart only M3.</li>
+<li>Keep M1 stable.</li>
+<li>Add canary route declaration, even if manual at first.</li>
+<li>Produce a deploy report with SHA, tests, static-audio audit, and health.</li>
+</ol>
+<p>Exit criteria:</p>
+<ul>
+<li>M3 can run a candidate SHA while M1 remains stable.</li>
+<li>Operator can send their next test call to M3 intentionally.</li>
+</ul>
+<h3 id="phase-3-promotion">Phase 3: Promotion</h3>
+<ol>
+<li>Add <code>scripts/promote-stable.sh</code>.</li>
+<li>Pull exact candidate SHA on M1.</li>
+<li>Restart M1 while drained.</li>
+<li>Verify M1 health and route table.</li>
+<li>Set both nodes to <code>stable</code>.</li>
+</ol>
+<p>Exit criteria:</p>
+<ul>
+<li>M1 and M3 both report the same SHA and <code>mode=stable</code>.</li>
+<li>Promotion refuses if SHAs differ unexpectedly.</li>
+</ul>
+<h3 id="phase-4-node-comparison">Phase 4: Node Comparison</h3>
+<ol>
+<li>Add <code>scripts/compare-nodes.py</code>.</li>
+<li>Support simulator scenarios first.</li>
+<li>Add call replay against the non-answering node in shadow mode.</li>
+<li>Store comparison artifacts in <code>docs/flow-eval/node-compare/&lt;date&gt;/</code>.</li>
+</ol>
+<p>Exit criteria:</p>
+<ul>
+<li>LAW, Space Channel, and property-management scenarios can compare M1 vs M3.</li>
+<li>Reports include latency, route decisions, prompt text, final state, and slot
+deltas.</li>
+</ul>
+<h2 id="open-questions">Open Questions</h2>
+<ol>
+<li>Should canary routing live inside RIFF phone ingress or outside it at the
+tunnel/webhook layer?</li>
+<li>Should M1 ever run <code>candidate</code>, or is candidate always M3 by convention?</li>
+<li>Should <code>shadow</code> be a full running phone node or just a replay endpoint?</li>
+<li>How do we expose &quot;my next call goes to M3&quot; in the operator UI?</li>
+<li>Should generated Space Channel content be promoted independently from code,
+or always committed as part of a release?</li>
+</ol>
+<h2 id="recommended-first-cut">Recommended First Cut</h2>
+<p>Build the smallest mechanism that changes daily behavior:</p>
+<ol>
+<li>Done: add <code>node-mode.sh</code>.</li>
+<li>Done: add richer <code>/healthz</code>.</li>
+<li>Done: add <code>.env</code> and routing JSON validation before restart.</li>
+<li>Next: add <code>deploy-candidate.sh --node M3</code>.</li>
+<li>Next: add <code>promote-stable.sh</code>.</li>
+</ol>
+<p>Do not build a full ingress router first. Start with deterministic operator
+workflow and status visibility. Once the team trusts the mode model, add canary
+caller-ID routing and node comparison.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#core-idea">Core Idea</a></li><li class="toc-h2"><a href="#amazon-style-business-tenets">Amazon-Style Business Tenets</a></li><li class="toc-h2"><a href="#why-this-is-good">Why This Is Good</a></li><li class="toc-h2"><a href="#use-cases">Use Cases</a></li><li class="toc-h3"><a href="#1-law-auth-prompt-change">1. LAW Auth Prompt Change</a></li><li class="toc-h3"><a href="#2-barge-in-latency-comparison">2. Barge-In Latency Comparison</a></li><li class="toc-h3"><a href="#3-space-channel-content-refresh">3. Space Channel Content Refresh</a></li><li class="toc-h3"><a href="#4-emergency-rollback">4. Emergency Rollback</a></li><li class="toc-h2"><a href="#design">Design</a></li><li class="toc-h3"><a href="#release-channels">Release Channels</a></li><li class="toc-h3"><a href="#node-modes">Node Modes</a></li><li class="toc-h3"><a href="#health-contract">Health Contract</a></li><li class="toc-h3"><a href="#routing-contract">Routing Contract</a></li><li class="toc-h3"><a href="#promotion-state-machine">Promotion State Machine</a></li><li class="toc-h3"><a href="#commands">Commands</a></li><li class="toc-h3"><a href="#preflight-gates">Preflight Gates</a></li><li class="toc-h3"><a href="#compare-nodes-output">Compare-Nodes Output</a></li><li class="toc-h2"><a href="#implemented-first-cut">Implemented First Cut</a></li><li class="toc-h3"><a href="#agent-quickstart">Agent Quickstart</a></li><li class="toc-h3"><a href="#live-traffic-semantics">Live-Traffic Semantics</a></li><li class="toc-h3"><a href="#simulator-routing-guidance">Simulator Routing Guidance</a></li><li class="toc-h3"><a href="#current-canary-routing-gap">Current Canary-Routing Gap</a></li><li class="toc-h2"><a href="#implementation-plan">Implementation Plan</a></li><li class="toc-h3"><a href="#phase-1-safer-drain-undrain">Phase 1: Safer Drain/Undrain</a></li><li class="toc-h3"><a href="#phase-2-candidate-deploy">Phase 2: Candidate Deploy</a></li><li class="toc-h3"><a href="#phase-3-promotion">Phase 3: Promotion</a></li><li class="toc-h3"><a href="#phase-4-node-comparison">Phase 4: Node Comparison</a></li><li class="toc-h2"><a href="#open-questions">Open Questions</a></li><li class="toc-h2"><a href="#recommended-first-cut">Recommended First Cut</a></li></ul></aside>
+</div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07T10:26:23.050600Z",
+  "generated_at": "2026-07-08T09:25:12.311000Z",
   "count": 138,
   "entries": [
     {
@@ -2370,15 +2370,15 @@
         "python",
         "html",
         "javascript",
-        "fastapi",
         "sqlite-vec",
-        "sentence-transformers",
+        "fastapi",
         "aws s3",
         "aws lambda",
+        "cloudfront",
         "semantic-search",
         "github-tools",
         "portfolio-manager",
-        "ai-agent-integration",
+        "ai-agent-tool",
         "code-discovery"
       ],
       "chunks": [
@@ -2392,11 +2392,11 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server to find reusable code patterns across a user's portfolio."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend with FastAPI for serving data, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Indexing is handled by a Python pipeline triggered locally or via GitHub Actions."
+          "text": "Python backend with FastAPI for REST services, SQLite-vec for vector storage, sentence-transformers for embeddings, and a static HTML/JS frontend. Deployment uses AWS S3, CloudFront, and Lambda for OAuth/logging. Indexing is automated via GitHub Actions."
         },
         {
           "source": "how_to_apply",
@@ -2404,7 +2404,7 @@
         },
         {
           "source": "features",
-          "text": "Client-side semantic search using TF-IDF and embedding vectors Automated capability clustering of repositories into categories MCP server integration for AI agent access to portfolio data Faceted filtering by language, tech stack, and star count Auto-generated documentation and README snippets for search results Weekly automated reindexing via GitHub Actions"
+          "text": "Client-side semantic search using TF-IDF and embeddings Auto-clustering of repos into capability categories MCP server integration for AI agent access Faceted filtering by language, tech stack, and stars Automated weekly reindexing via GitHub Actions Exportable search results and embeddable widgets"
         }
       ]
     },
@@ -4042,20 +4042,19 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven conversational flows from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
+        "jsonl",
         "mermaid",
         "sqlite",
         "websockets",
-        "pytest",
         "voice-agent",
-        "fsm",
-        "llm-orchestration",
-        "deterministic-ai",
-        "python-framework",
-        "conversational-ui"
+        "fsm-orchestration",
+        "llm-safety",
+        "python-platform",
+        "business-automation"
       ],
       "chunks": [
         {
@@ -4064,23 +4063,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic state-machine-driven conversational flows from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows developers to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by keeping state transitions, slot validation, and guardrails as deterministic pure functions, while the LLM handles only the linguistic generation."
+          "text": "A Python-based platform for building voice agents where an LLM handles natural language generation while a declared YAML state graph enforces business logic, slot validation, and transition guards. It separates the 'riff' (LLM creativity) from the 'beat' (deterministic state management) to prevent hallucinations in phone conversations."
         },
         {
           "source": "how_its_built",
-          "text": "The core engine uses a `run_turn` pipeline where speech-to-text input is processed through eight layers of deterministic guardrails before reaching the LLM. A `StateManager` enforces transitions based on a declared graph, preventing hallucinations. Slot extraction uses deterministic fallbacks, and the system supports multiple LLM adapters (Gemini, Gemma, Claude). The architecture separates the 'riffing' (LLM) from the 'beat' (FSM), ensuring that every component except the LLM call is deterministic and testable without API keys."
+          "text": "Built with Python using a modular architecture. Core components include a YAML flow loader, a pure-function state manager, guardrails layers, and adapters for STT/TTS/LLM providers (Gemini, Gemma, Claude). It uses a web server for API and UI, and JSONL for logging. The system relies on deterministic pure functions for all logic except the LLM call itself."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. Define your business logic in YAML or generate it via the API using a plain English description. Integrate the generated flow into your telephony stack via the provided web server or MCP server. It is suitable for scenarios requiring high reliability and strict adherence to business rules, such as appointment scheduling or order taking, where hallucination must be minimized."
+          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail (coffee, pizza). Describe the business logic in plain English via the API to generate a flow, then integrate the resulting voice endpoint into phone systems or test via the provided web UI."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions using YAML-defined FSMs Eight-layer deterministic guardrail system prevents LLM hallucinations Supports multiple LLM backends including Gemini, Gemma, and Claude Includes 11 pre-built flows for retail and service industries Real-time web UI for monitoring and inspecting live FSM states"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions using YAML-defined graphs Prevents LLM hallucinations via slot validation and guardrails Supports multiple LLM backends including Gemini, Gemma, and Claude Includes built-in flows for common services like plumbing and salons Provides a web UI for real-time conversation inspection and debugging"
         }
       ]
     },

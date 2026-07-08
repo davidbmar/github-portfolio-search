@@ -1,31 +1,110 @@
 {
-  "generated_at": "2026-07-07T10:27:55.957343Z",
-  "count": 159,
+  "generated_at": "2026-07-08T09:26:25.796326Z",
+  "count": 160,
   "days": [
     {
-      "date": "2026-07-07",
-      "headline": "Build Flow-Atlas Viewer and RIFF Loop Quota Gates",
-      "summary": "Developed the Flow-Atlas static tree viewer with BFS unrolling and diagnostic emitters, while implementing RIFF loop amendments for quota blocking and deterministic testing. These updates establish robust CI guards for phantom caller lifecycles and resolve legal intake authentication issues.",
+      "date": "2026-07-08",
+      "headline": "Real Semantic Search, Session Debugging, and Cache-Busting Fixes",
+      "summary": "Implemented numpy-only semantic search via model2vec and a live session debug workspace with durable state tracing. Resolved critical cache invalidation bugs using content hashing and refined loop iteration logic to eliminate false positives.",
       "takeaways": [
-        "Reuse the Flow-Atlas viewer shell featuring sidebar navigation, hash routing, and a BFS-based tree unroller to visualize complex state transitions and detect unreachable nodes.",
-        "Apply the RIFF amendment #6 quota gate pattern to automatically stop self-running loops when resource limits are hit, ensuring safe human review handoffs.",
-        "Implement the keys-gated lifecycle pytest suite to verify user journeys from registration to purge as a continuous integration guardrail.",
-        "Adopt the reusable L0 auth onboarding contract and deterministic phantom caller instruments to standardize welcome branches and reduce baseline anomalies."
+        "Integrate lightweight semantic search using model2vec and RRF to fix keyword blind spots without heavy dependencies like torch.",
+        "Implement content-hash-based cache busting in frontend modules to prevent browsers from serving stale JavaScript after deployments.",
+        "Build per-turn debug endpoints that merge trace events and state verdicts into durable JSONL files for post-mortem analysis.",
+        "Adopt a whole-corpus health check script to institutionalize linting and catch typo-induced test pollution early."
       ],
-      "total_commits": 45,
+      "total_commits": 40,
+      "repos": [
+        {
+          "name": "riff",
+          "commits": 40,
+          "messages": [
+            "fix(iter 11): test-cache-mutation leak — typo test poisoned corpus_lint via shared load_flow object | FX-017",
+            "loop(iter 11): clears-on-forward-edge refined to data-slots-only (F-368 sibling) | 33 warns -> 8 real; B-406 surfaced",
+            "loop(iter 10): B-405 durable fix — menu-module.js cache-busts by CONTENT hash, not build tag",
+            "loop(iter 9): Retro 2 (4 new principles) + B-405 — resync fix shipped to disk but stale cache-bust kept browsers on old JS",
+            "loop(iter 8): scripts/corpus_lint.py — institutionalize the whole-corpus health check (F-368 methodology)",
+            "loop(iter 7): F-368 DONE — clears-unknown-slot allowlist for internal flags | 10 false errors -> 0, typo-catch intact",
+            "loop(iter 6): B-401 root cause CORRECTED (audio race, not text); safe backlog drained — convergence",
+            "loop(iter 5): F-372 MERGED to main (d763b99e) — session debug workspace live; killed wedged Codex to unblock",
+            "Merge branch 'f372-session-debug-workspace' into tree-intake-ingestion",
+            "loop(iter 4): FX-015/016 from F-372 found-defects; B-404 security closed; merge held on active Codex(session.py)",
+            "loop(iter 3): B-403 root-caused + fix design; F-372 merge blocked on Codex(session.py); analysis-not-code by design",
+            "feat(fixlog): hybrid BM25 + semantic search via RRF | fixes the paraphrase/exact-term blind spots",
+            "feat(fixlog): REAL semantic search via model2vec (was silently keyword-only) | numpy-only, no torch/FFmpeg",
+            "docs(principles): the cold-rebuild test — fix the generator, survive teardown+redeploy (operator ruling 2026-07-08)",
+            "feat(session-debug): flow-studio state inspector — live triad, guards, transition verdicts",
+            "fix(session-debug): reject traversal-shaped session_id on session_facts (400) + dump-path containment",
+            "backlog: B-401..404 from call v3:PyNmcWDo review + security finding (double-voice CRIT, freelance-intake CRIT, verified-name-reask, path-traversal routed)",
+            "feat(session-debug): /api/debug/session_facts merged per-turn debug endpoint",
+            "feat(session-debug): live path emits turn_complete — real turn boundaries for grouping",
+            "feat(session-debug): pure per-turn merge of turn rows + trace events",
+            "feat(session-debug): teardown dump merges durable trace — atlas lanes stop truncating",
+            "fix(FX-014): resync_skip storm — deduped per (node,have) pair; misdiagnosis corrected; replay guard locked",
+            "feat(session-debug): make slot_write + transition_verdict durable in state_trace.jsonl",
+            "docs: design Replicant ticket operations API",
+            "docs(fixlog): Codex compliance confirmed; sandboxed-invocation convention added",
+            "backlog: F-372 Session Debug Workspace Phase A (handoff from parallel session, conflict-checked, execution contract embedded)",
+            "docs(session-debug): Session Debug Workspace design v0 + 10-task TDD plan",
+            "chore: armadillo re-rendered static audio from the last rebuilds",
+            "docs(fixlog): college-level tutorial — the loop diagram, a real worked example (FX-011), entry anatomy, retro rules, try-it-yourself | indexed under Start here",
+            "feat(fixlog): annotated, searchable fix journal + retro principles + forced schema | 13 fixes backfilled",
+            "test: welcome send edge asserts the new follow_along_sent guard",
+            "fix(verify): link-only welcome texts no longer claim verification; verify states can resend | v3:ByaxLead",
+            "docs: document node release channel operations",
+            "test: happy-path sims walk the voiced intake_success hop; lint baseline shrinks (legal silent-hub healed by rebuild)",
+            "fix(confirm): corrections re-read ONE field + spell-back rule; leading denial records deny | codex-designed, call v3:fk7uc",
+            "fix(phantom): branch classifier falls back to the opening line | sim-found, keyless guards",
+            "fix(compiler): guest-unlock offer gets announce+hub — the dtmf-0 dead-air incident | silent-choice-hub lint (warn)",
+            "fix(landing+sms): live call lands on the menu view; door-less welcome text drops the code",
+            "feat(companion): menu-first landing — welcome states are a pass-through card, never the hero",
+            "feat(welcome): auth_at_door flag — default OFF = option A (no door ceremony) + admin config menu"
+          ]
+        }
+      ],
+      "commit_sig": "972111b612524b18"
+    },
+    {
+      "date": "2026-07-07",
+      "headline": "Build Flow Atlas Visualizer and One-Command Business Deployments",
+      "summary": "Developed a static Flow Atlas viewer for debugging complex voice interactions and implemented one-command business deployment with automated SMS deliverability gates. Enhanced session fact registries and compiler fixes to ensure robust state management and first-try green deployments for new verticals.",
+      "takeaways": [
+        "Implement a static Flow Atlas using BFS unrolling and hash routing to visualize voice interaction trees, detect unreachable nodes, and debug divergence without live traffic.",
+        "Adopt a one-command deployment pattern that integrates pre-flight SMS deliverability checks and identity gates to prevent broken builds and ensure regulatory compliance.",
+        "Use a declared session-fact registry with trust layers to manage state persistence, ensuring routes survive acknowledgments and consent resolves correctly from user profiles."
+      ],
+      "total_commits": 64,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 2,
+          "commits": 3,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "Rename blog article URL: drop parens from filename",
             "Publish \"Ratchet Loops\" blog article + downloadable skills"
           ]
         },
         {
           "name": "riff",
-          "commits": 43,
+          "commits": 61,
           "messages": [
+            "fix(live): static-advance forwards edge sets:/clears: | AST single-choke guard, red->green",
+            "docs: F-371 cross-call enrichment backlogged + post-call-processing spec QUEUED (Codex-reviewed)",
+            "feat(phone): add node release channel modes",
+            "feat(armadillo-ink): third cold deploy on FLOW-101 — new vertical (tattoo studio), all gates first-try green",
+            "feat(replay): PAGE lane — follow-along enter/exit vs voice, divergence flagged | R6, TDD 12/12",
+            "chore: stage bluebonnet teardown deletions (audio + generated flow)",
+            "feat(deploy): one-command business deploy/teardown + 2 gates | Violet Crown Air cold-built on FLOW-101, first-try green",
+            "fix(compiler): profile-intake + message caps voice their success_line + build gate | THE riders-club-silence root cause",
+            "fix(compiler): content caps always prerender + journey auto-derivation | both live FLOW-101 defects killed at the template",
+            "fix(bluebonnet)+docs: land the pack/flow/registry that a silent git-add abort dropped; document SMS gate + org-membership design",
+            "feat(telecom): SMS deliverability gate — build fails if a texting flow's DID can't deliver | TDD 6/6",
+            "docs: wire node release channel HTML page",
+            "feat(bluebonnet): Riders Club — member-access onboarding at option 0 | identity-eligible, both welcome branches walk",
+            "feat(session-facts): the module — declared fact registry + trust layers, proven by a new business on FLOW-101",
+            "feat(call-replay): TDD replay tool + layered atlas + live lane persistence | doc-first, 9/9 green",
+            "docs: design two-node release channels",
+            "feat(session-facts): gates consume-on-fire, routes survive acks, consent resolves from profile | T1-T7+L1+I1 green",
+            "docs(session-facts): use-case-first end-flow contract + proposal (Codex-reviewed x2) | indexed",
             "loop(wrap-up rifs0707h): 3rd quota-blocked session — human review; loop self-stopped per amendment #6 backstop",
             "loop(wrap-up rifs0707g): amendment #6 quota gate (Codex-approved); 2nd quota-blocked C0 recorded, re-baseline still deferred",
             "loop(wrap-up rifs0707f): amendment #4 proven (apology 0/6); re-baseline deferred on 403 weather; amendment #5 proposed",
@@ -72,7 +151,7 @@
           ]
         }
       ],
-      "commit_sig": "4b2e67a4d4a6760d"
+      "commit_sig": "6bd54ecd021c700e"
     },
     {
       "date": "2026-07-06",
@@ -1538,15 +1617,15 @@
     },
     {
       "date": "2026-06-18",
-      "headline": "Flow Eval Hardening Meets Reusable Portfolio Docs",
-      "summary": "Published per-project portfolio documentation with cleaner routing, docs HTML output, recency/title findability, and Mermaid/dark-mode fixes. In riff, built a fuller flow-evaluation and contact-extraction toolkit with deterministic guardrails, model-provider comparison, repeatable judging, and loop-prevention fixes.",
+      "headline": "Riff Flow-Eval Pipeline and Portfolio Docs Generator Shipped",
+      "summary": "Implemented a deterministic flow-evaluation pipeline with A/B testing for LLM extractors and fixed critical engine rendering bugs. Released per-project documentation generation with recency-based findability and resolved Mermaid syntax and dark mode display issues.",
       "takeaways": [
-        "Reuse the docsgen pattern to publish `/projects/<slug>/docs` pages, expose per-project HTML docs, and improve findability with recency/title metadata.",
-        "Use `flow-pipeline.sh`, `--repeat N`, `RIFF_EVAL_AGENT`, Qwen failover, and the Anthropic adapter as a template for lower-variance flow evaluation across models.",
-        "Apply the Collect Pattern plus double-ask-line and clears hygiene linters to keep conversational states deterministic and prevent repeated questions or bare-denial loops.",
-        "Adapt the gated contact-extractor approach for names, emails, and phones: ground extraction in exact candidates or contiguous digit runs, then validate with A/B sweeps before enabling broadly."
+        "Reuse the `flow-pipeline.sh` script to run deterministic LLM evaluations with `--repeat N` flags, reducing judge variance in flow bring-up.",
+        "Apply the 'Collect Pattern' design with deterministic guardrails and the `double-ask-line` linter to enforce one read-aloud question per state in conversational flows.",
+        "Integrate the gated contact-extractor module to safely extend LLM extraction capabilities for emails and phone numbers, validated via A/B testing against baseline models.",
+        "Adopt the per-project docs generator to publish HTML documentation with trailing-slash tolerance and recency-based title findability for developer portfolios."
       ],
-      "total_commits": 56,
+      "total_commits": 43,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1562,7 +1641,7 @@
         },
         {
           "name": "riff",
-          "commits": 50,
+          "commits": 37,
           "messages": [
             "feat(flow-eval): flow-pipeline.sh — the flow bring-up pipeline",
             "feat(flow-eval): --repeat N to kill n=1 judge variance",
@@ -1600,36 +1679,21 @@
             "fix(eval): unblock real sweeps — fast qwen-flash persona/deriver + escalate NameError",
             "feat(eval): latency-triggered failover to fast Qwen (qwen-flash) when Gemini is slow",
             "docs(flow-eval): map the remaining judge complaints as MODEL-layer, not engine bugs",
-            "docs(flow-eval): correct slot_hold 'loop' — NOT a bug (locked_choice clears it); thread closed",
-            "docs(flow-eval): root-cause the slot_hold bare-denial loop (real, backstop-bounded, deferred)",
-            "docs(flow-eval): retract the deny-ack double-beat (FakeAdapter artifact, real path clean)",
-            "docs(flow-eval): model comparison runnable via RIFF_EVAL_AGENT (blocked on funding)",
-            "feat(eval): RIFF_EVAL_AGENT provider toggle — compare Gemini / Claude / Qwen",
-            "feat(adapters): AnthropicAdapter (Claude) — answer 'would a stronger model help?'",
-            "Merge pull request #17 from davidbmar/docs/night-shift-pricing",
-            "docs(html): night-shift pricing ($1/hr) marketing page + roadmap reframe",
-            "Merge pull request #16 from davidbmar/docs/portfolio-html",
-            "docs(html): publish the Path-to-Revenue / economics page to the portfolio",
-            "feat(linter): clears hygiene checks — guard the bare-denial primitive at build time",
-            "docs(flow-eval): bare-denial clears primitive shipped + 4 scoped follow-ups",
-            "fix(engine): TransitionDef.clears — break the bare-denial loop (austin focus flow)",
-            "docs(authoring): capture the session's engine patterns for flow authors"
+            "docs(flow-eval): correct slot_hold 'loop' — NOT a bug (locked_choice clears it); thread closed"
           ]
         }
       ],
-      "commit_sig": "00e069f1249e62c8"
+      "commit_sig": "1158811cdd898208"
     },
     {
       "date": "2026-06-17",
-      "headline": "Riff Engine: Anti-Loop Guards, Model Failover, and Container Leak Fixes",
-      "summary": "Implemented a no-progress backstop to prevent infinite loops and added automatic provider failover from Gemini to Alibaba MAX during API instability. Resolved critical UX defects by sanitizing raw container representations in speech output and fixing branch-aware fill-rate calculations for accurate A/B testing.",
+      "headline": "Secure Local Artifacts and Refresh Project Documentation",
+      "summary": "Updated the repository configuration to exclude local security reports from public view and regenerated the L0 project documentation. These maintenance tasks ensure cleaner version control history and up-to-date reference materials for the portfolio search tool.",
       "takeaways": [
-        "Implement a 'no-progress backstop' that triggers a model upgrade (e.g., to qwen-max) after stalled turns to break infinite loops.",
-        "Add auto-failover logic to switch LLM providers (Gemini to DashScope) when primary APIs exhibit latency or failures.",
-        "Sanitize object slots by flattening nested containers before read-back to prevent leaking raw Python reprs to users.",
-        "Calculate A/B test fill-rates conditionally per branch to ensure untaken paths do not penalize overall metrics."
+        "Exclude sensitive local artifacts like .gstack/ security reports via .gitignore to prevent accidental leaks in public repositories.",
+        "Automate documentation regeneration using skip-ci tags to keep project references current without triggering unnecessary build pipelines."
       ],
-      "total_commits": 47,
+      "total_commits": 2,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1638,60 +1702,9 @@
             "chore: gitignore .gstack/ to keep local security reports out of the public repo",
             "chore: regenerate L0 project docs [skip ci]"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 45,
-          "messages": [
-            "docs(flow-eval): mark abtest branch-aware fill-rate fixed (eba8bf2)",
-            "fix(abtest): branch-aware fill-rate so conditional slots don't penalize the untaken branch",
-            "docs(flow-eval): record reprompt run-on fix + deferred vagueness/detector-sync work",
-            "fix(rules): clean sentence boundary in the require_question slot-less fallback",
-            "docs(flow-eval): mark rung 2 (Alibaba MAX bump) shipped; value-verification awaits live run",
-            "feat(eval): rung 2 — bump to Alibaba MAX (qwen-max) on the 2nd no-progress stall",
-            "docs(flow-eval): no-progress backstop shipped; rung-2 (Alibaba MAX) + live-wiring next",
-            "feat(engine): no-progress backstop — no flow can loop to max_turns (rungs 1+3)",
-            "docs(flow-eval): ceo_command_center triage-loop root cause + Codex-vetted fix design (not applied)",
-            "docs(flow-eval): log pre-existing plumbing-debug test failure + abtest branch-unaware fill-rate",
-            "fix(generic_inquiry): honest capture-for-callback, kill the confirm-loop (quality 1->)",
-            "docs(flow-eval): self-contained HTML scores table (3 runs x 20 flows)",
-            "fix(coffee+extractor): delivery-address branch for coffee + stop pickup mis-fill",
-            "fix(pizza): collect a delivery address on the delivery branch (judge-penalized defect)",
-            "docs(flow-eval): note deriver-truncation retry covers another contamination source",
-            "fix(eval): retry the deriver on truncated JSON (slow-API quality contamination)",
-            "docs(flow-eval): record provider-failover infra + table-blocked-on-slow-API status",
-            "feat(eval): auto-failover Gemini -> Alibaba/DashScope when the primary flaps",
-            "test(focus-flow): pin austin's clean object-slot read-backs end-to-end",
-            "docs(flow-eval): document the repr-leak runtime trace-lint sentinel",
-            "feat(trace-lint): repr-leak sentinel — flag raw container reprs spoken aloud",
-            "feat(linter): object-slot-no-readback — guard silent container slots in confirms",
-            "docs(authoring-lessons): object-slot read-back trilogy + deny language + hand-driving technique",
-            "docs(flow-eval): austin focus-flow full happy path verified clean end-to-end",
-            "docs(flow-eval): record bare-denial loop follow-up (deny-distinct-language shipped)",
-            "fix(deny): distinct language for deny_order — stop acking a rejection as acceptance",
-            "docs(flow-eval): record 3rd container-leak fix + Claude-subbing-in eval technique",
-            "fix(template): humanize container slots in the BARE {{name}} path (austin repr leak)",
-            "docs(flow-eval): resolve post-confirm watch-for — eval path already acks",
-            "docs(flow-eval): triage caller-repeat in 221255Z (stale P3 + degraded confirm_order)",
-            "docs(flow-eval): record full triage of the 00:40 audit (1 real defect fixed, rest stale)",
-            "docs(flow-eval): mark live-path nested-repr leak fixed (72b8dcf)",
-            "fix(slot-format): flatten nested containers so live read-back never speaks raw repr",
-            "docs(flow-eval): record P4 container-slot fix + live-path nested-repr follow-up",
-            "fix(P4): stale-ask guard skips container-valued slots (austin double-speak)",
-            "docs(flow-eval): convergence note — verified state, blockers, M5 handoffs",
-            "docs(record): restore Invariants section — unblocks 48 primitives tests",
-            "fix(flow-eval): persist transcripts incrementally so a killed sweep keeps evidence",
-            "docs(flow-eval): record path_explorer needs_callback overload bug (M5 decision)",
-            "docs(flow-eval): record FinalStatus-contract lesson + invalid-final-status gate",
-            "fix(flows): enforce FinalStatus contract + add invalid-final-status lint",
-            "test(flow-eval): end-to-end correction re-read-back through run_turn",
-            "docs(flow-eval): AUTHORING-LESSONS P4 section covers all 3 guard shapes",
-            "docs(flow-eval): P4 guard now covers slot corrections at confirmation",
-            "fix(flow-eval): P4 guard re-reads-back a slot CORRECTION at await_confirmation"
-          ]
         }
       ],
-      "commit_sig": "4147649862f03a8a"
+      "commit_sig": "1df65b09e49754c9"
     },
     {
       "date": "2026-06-16",

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07T10:26:23.047552Z",
+  "generated_at": "2026-07-08T09:25:12.307881Z",
   "count": 138,
   "projects": [
     {
@@ -1269,22 +1269,22 @@
         "Python",
         "HTML",
         "JavaScript",
-        "FastAPI",
         "SQLite-vec",
-        "sentence-transformers",
+        "FastAPI",
         "AWS S3",
-        "AWS Lambda"
+        "AWS Lambda",
+        "CloudFront"
       ],
       "reuse_tags": [
         "semantic-search",
         "github-tools",
         "portfolio-manager",
-        "ai-agent-integration",
+        "ai-agent-tool",
         "code-discovery"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-07T02:09:43Z"
+      "pushed_at": "2026-07-07T10:27:57Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2135,26 +2135,25 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven conversational flows from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
+        "JSONL",
         "Mermaid",
         "SQLite",
-        "WebSockets",
-        "Pytest"
+        "WebSockets"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm",
-        "llm-orchestration",
-        "deterministic-ai",
-        "python-framework",
-        "conversational-ui"
+        "fsm-orchestration",
+        "llm-safety",
+        "python-platform",
+        "business-automation"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-07T08:24:33Z"
+      "pushed_at": "2026-07-08T09:18:08Z"
     },
     {
       "slug": "riot",
