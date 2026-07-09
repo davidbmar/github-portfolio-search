@@ -1,23 +1,210 @@
 {
-  "generated_at": "2026-07-08T09:26:25.796326Z",
-  "count": 160,
+  "generated_at": "2026-07-09T10:32:14.467859Z",
+  "count": 161,
   "days": [
     {
-      "date": "2026-07-08",
-      "headline": "Real Semantic Search, Session Debugging, and Cache-Busting Fixes",
-      "summary": "Implemented numpy-only semantic search via model2vec and a live session debug workspace with durable state tracing. Resolved critical cache invalidation bugs using content hashing and refined loop iteration logic to eliminate false positives.",
+      "date": "2026-07-09",
+      "headline": "Build Pluggable RAG QA and Self-Healing Voice Ops",
+      "summary": "Developers launched a modular document QA system with streaming answers and stress-tested evaluation, while simultaneously hardening voice agent reliability through deterministic testing and automated website-to-pack ingestion. The work emphasizes reusable components like pluggable model backends and hermetic test fixtures for complex conversational flows.",
       "takeaways": [
-        "Integrate lightweight semantic search using model2vec and RRF to fix keyword blind spots without heavy dependencies like torch.",
-        "Implement content-hash-based cache busting in frontend modules to prevent browsers from serving stale JavaScript after deployments.",
-        "Build per-turn debug endpoints that merge trace events and state verdicts into durable JSONL files for post-mortem analysis.",
-        "Adopt a whole-corpus health check script to institutionalize linting and catch typo-induced test pollution early."
+        "Implement a pluggable model backend (DOCQA_MODEL) to allow swapping between fast and accurate LLMs without refactoring the core RAG pipeline.",
+        "Use a generic evaluation harness with robust abstain detection to benchmark multi-document QA accuracy against conflicting distractors and overlapping corpora.",
+        "Adopt hermetic testing patterns for complex state machines by mocking external dependencies like API keys and using deterministic escalation tests to prevent flaky failures.",
+        "Build a two-tier website snapshot fetcher that extracts schema.org JSON-LD into structured business packs, handling node merging and alias assignment globally."
       ],
-      "total_commits": 40,
+      "total_commits": 104,
       "repos": [
         {
-          "name": "riff",
-          "commits": 40,
+          "name": "evidence-qa",
+          "commits": 10,
           "messages": [
+            "docqa: scale stress test reveals accuracy degradation on overlapping corpora (C20)",
+            "docqa: validate real PDF + fix oversized-chunk latency (C19)",
+            "docqa: pluggable model backend (DOCQA_MODEL) + fast/accurate tradeoff (C18)",
+            "docqa: harden eval to multi-doc + conflicting distractor (C17)",
+            "docqa: streaming answers (ask_stream) + latency finding (C16)",
+            "docqa: generic eval harness + robust abstain detection (C15)",
+            "docqa: drop-and-ask inbox dir + sync + design doc (C14)",
+            "Add docqa: generic multi-domain document QA (ingest + ask + web UI)",
+            "devlog: record packaging + private-repo reorg (C12)",
+            "Initial commit: evidence-qa — RAG over a security-evidence corpus"
+          ]
+        },
+        {
+          "name": "github-portfolio-search",
+          "commits": 3,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 91,
+          "messages": [
+            "docs(B-414): property_trouble_ticket smoke/metrics stale after Replicant terminal",
+            "docs(loop): triage remaining web/eval scan reds — metrics=B-322, sim=pre-existing LLM",
+            "test(web-server): allow-list 9 phone-served/mockup web files (disk->registry parity)",
+            "fix(tests): the last three reds — all pinned to flow topology that moved",
+            "docs(B-413): property_management ticket flow has 4 silent-choice-hub dead-air paths",
+            "test(soft-escalation): make deterministic-escalation tests hermetic re: API key",
+            "test(choice-compiler): resolve 3 stale migration reds (sources gone)",
+            "fix(security): blocked verification SMS fails CLOSED, not debug_only (FX-051)",
+            "fix(tests): tests/live 3 failed -> 0; stop the stall check swallowing exceptions",
+            "docs(B-412): correct root cause of the 2 remaining locked_choice reds",
+            "fix(test-double): FakeLiveClient exposes public 'connected' (B-412 resolved)",
+            "fix(business_pack): drain the failure floor — 9 failed/18 errors -> 0",
+            "docs(B-412): live locked-choice may not send offer content (booking path)",
+            "test(scheduling): realign triage corpus to DateExpr ambiguity-blocking",
+            "fix(logs): live.log rolls instead of deleting itself; pytest stops polluting it",
+            "test(fsm-debug): drive pizza/plumbing Collect-Pattern via autostate",
+            "test(complex-flows): rewrite 6 stale amazon_returns tests to the Collect-Pattern",
+            "perf(logs): bound the turns.jsonl read and cap the file; keep every reader honest",
+            "test(slot-types): align stale regex to actual book_requires_concrete message",
+            "docs(B-303): precise blocker for the ambiguous-confirm-goes-silent facet",
+            "fix(fsm): B-303 — bare denial no longer loops the readback (FX-050)",
+            "feat(live): detect intakes that capture nothing — a slot-NAME mismatch",
+            "docs(fixlog): FX-049 — per-caller greeting PII never reaches the tracked tree",
+            "fix(privacy): per-caller greeting assets can no longer reach the committed tree",
+            "loop(iter 59): no-verbatim-repeat — build-side integration entry point",
+            "fix(deploy): gate DID→org routing BEFORE routing, not after; add orgs/mfc_law",
+            "loop(iter 58): no-verbatim-repeat — runtime playback composer (last solo-buildable piece)",
+            "perf(greeting): warm the base variant of a templated greeting; prerender mfclaw",
+            "loop(iter 57): no-verbatim-repeat — nightly self-heal scan wired (Unit 4)",
+            "feat(ops): prune_call_artifacts — reclaim disk only where redundancy is PROVEN",
+            "loop(iter 56): no-verbatim-repeat — variant catalog (build<->runtime contract)",
+            "fix(live): FX-031's HEAR lane never emitted — NameError swallowed since it shipped",
+            "fix(deploy): don't demand a welcome module from a menu-only pack",
+            "loop(iter 55): no-verbatim-repeat — nightly self-heal scan (Unit 4)",
+            "loop(iter 54): FX-042 — confirm readback stops folding in the menu label (Phase 1b)",
+            "fix(routing): serve inline chooser guide",
+            "mockup(routing): align editor to sentence-row chooser pattern",
+            "demo(mfclaw): disclaim affiliation before deploying to a live number",
+            "docs(routing): inline business node chooser",
+            "loop(iter 53): no-verbatim-repeat — variant-generation core (Unit 1)",
+            "mockup(routing): approved interactive routing editor UI (per-business pins, caller overrides, live route tester, simulated failover)",
+            "build(audio): complete the mfclaw prerendered audio set (16 cues)",
+            "docs: website-ingest-importer.html — reorganize + add 7-defect ledger",
+            "spec+skill(ingest): correct the slot-options lie; document hidden intents",
+            "fix(website-importer): 3 blocking review findings — FAQ data loss, dropped areaServed, dropped overlay aliases",
+            "docs(routing): operator guide + node routing-policy spec (caller/business canary + failover)",
+            "loop(iter 52): no-verbatim-repeat speech — design spec + tested selector core (Phase 1a)",
+            "feat(compile): `announce: false` hidden intents; stop guessing why audio failed",
+            "fix(schema): warn on screening_gate's inert tool/blocked_line fields",
+            "fix(property): scope existing ticket action menu",
+            "chore: commit working-tree source + build changes (operator request)",
+            "feat(ingest): MFC Law overlay + generated pack; strip space-before-punctuation",
+            "plan(ingest): Task 7 asserts zero failures, not a stale test count",
+            "feat(ingest): website importer CLI — snapshot dir to generated pack",
+            "loop(iter 51): docs — how-to-debug-a-call (unified full-everything-trace reference)",
+            "fix(ingest): treat \"other\"/\"firms\" as greedy alias words",
+            "fix(ingest): make FAQ alias assignment pack-global, not per-question",
+            "fix(property): add front maintenance menu",
+            "fix(spec+plan): alias assignment is pack-global; greedy words are unsafe",
+            "feat(ingest): website_to_pack — profile facts + overlay taste to pack dict",
+            "fix(ingest): guard the networkidle CALL, not the word; flow site hours into the pack",
+            "fix(site_snapshot): browser tier waits on domcontentloaded, not networkidle",
+            "fix(spec+plan): browser tier must not wait for networkidle; correct the venv deps",
+            "feat(ingest): two-tier site snapshot fetcher with logged escalation",
+            "fix(ingest): _ld_nodes cross-key traversal was LIFO-inverted across @graph/mainEntity/itemListElement",
+            "fix(ingest): merge business JSON-LD nodes sharing an @id instead of picking one",
+            "spec+plan(ingest): merge business nodes by @id, never pick one",
+            "feat(ingest): extract_profile — schema.org JSON-LD to riff_site_profile_v0",
+            "loop(iter 50): FX-041 — verify-code double-send hang (in-flight dedup)",
+            "plan(ingest): enforce the importer purity contract with an AST test (U14)",
+            "feat(ingest): should_escalate policy + shared sentence-boundary helper",
+            "fix(docs): resolve website-ingest-importer review findings B1/B3/B4",
+            "chore(skills): version the .claude/skills/ directory; pin ingest schema_versions",
+            "fix(replicant): nest ticket update payload (FX-044)",
+            "loop(iter 49): FX-040 — recorder caps padding to wall-clock (B-409 defense-in-depth)",
+            "loop(iter 48): FX-039 — caller RTP timestamp was ticks-as-ms (B-409 root fix)",
+            "loop(iter 47): file B-409 — caller audio track ~6.9x too long (blocks caller transcript)",
+            "fix(spec+plan): correct the business.phone pack counts (controller error)",
+            "docs(ingest): website importer tutorial, index card, and ingest-website skill",
+            "fix(fixlog): FX-038 uses exact **Root cause**/**Fix** labels (schema green)",
+            "loop(iter 46): FX-038 — post-call Whisper hydration backfills the blank HEAR lane",
+            "loop(iter 45): FX-037 — teardown purges caller_identity (welcome-back-after-wipe)",
+            "spec+plan(ingest): refuse v0's inert submit/screening_gate + add the missing lint",
+            "spec+plan(ingest): the phone number is a deploy artifact, not a build one",
+            "loop(iter 44): Armadillo teardown+redeploy — all fixes LIVE (FX-031/032/033/034/035)",
+            "plan(ingest): 7-task TDD plan for the website ingest importer",
+            "loop(iter 43): B-271 premise-check — corrected root cause + regression baseline",
+            "loop(iter 42): B-402 code-grounded Codex brief (fabricated handoff-sent claims)",
+            "loop(iter 41): FX-036 — restore 4 red SMS tests (stale _send_sms mock signature)",
+            "loop(iter 40): FX-035 — follow-along menu redirect hid the filling intake form (#1 + #4)",
+            "design(ingest): schema.org → business pack website importer"
+          ]
+        }
+      ],
+      "commit_sig": "9a97771953048ca8"
+    },
+    {
+      "date": "2026-07-08",
+      "headline": "Riff: Per-Business Admin Access, Session Debugging, and Semantic Fixlog Search",
+      "summary": "Implemented per-business admin access with token-based scoping and hardened security, while launching a session debug workspace for live state inspection. Enhanced the fixlog with numpy-only semantic search and resolved critical intake data-loss bugs through iterative compiler fixes.",
+      "takeaways": [
+        "Implement per-business admin access using token-scoped login and strict file permissions (0o600) to isolate tenant data securely.",
+        "Build a session debug workspace that merges durable trace events with per-turn state inspectors for real-time flow triage.",
+        "Add lightweight semantic search to documentation or logs using model2vec and RRF, avoiding heavy dependencies like PyTorch.",
+        "Prevent intake data loss by ensuring compiler-level updates preserve existing fields rather than wiping them during re-transcription."
+      ],
+      "total_commits": 84,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 7,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "fix(docs): fetch all riff html docs",
+            "chore: regenerate L0 docs + daily digest [skip ci]",
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 77,
+          "messages": [
+            "loop(iter 39): FX-034 / B-403 — verified caller re-asked name on SMS-unlock path",
+            "loop(iter 38): FX-033 — intake confirm-loop (model re-transcription wiped the whole intake)",
+            "loop(iter 37): FX-032 — recording deploy-invariant (audio trace can't silently ship off)",
+            "feat(trace): FX-031 — auto-persist call transcript into the unified trace (HEAR lane)",
+            "feat(replicant): add property ticket operations menu (FX-032)",
+            "loop(iter 35): B-262 premise re-audit — alias still read; don't ship a breaking cleanup",
+            "loop(iter 34): B-252 — robust outlier threshold in gate analyzer (FX-030)",
+            "loop(iter 33): close B-266 (verified) + scope B-271 (real P1, unsafe to autofix)",
+            "loop(iter 32): B-307 verify-and-close (Tier B transcript paths already use basename)",
+            "docs: business-admin-access how-to (panel + token login + deploy handoff) + index.html",
+            "docs(replicant): fold ticket operations review decisions (FX-031)",
+            "loop(iter 30): B-064 closed — retire stale never-passing austin sim xfail (coverage moved)",
+            "loop(iter 29): B-239 — integration coverage for the F-211 auto-confirm hook (FX-029)",
+            "F-375 DONE + iter 28 log — Armadillo torn down + clean-redeployed on scoped schema (B-408 live)",
+            "feat(replicant): add ticket operations client (FX-029)",
+            "fix(security): FX-028 — admin handoff token file now 0o600 + gitignored (F-374 review finding)",
+            "F-374 done + iter 26 log (admin access reviewed + merged); worktree cleaned up",
+            "F-374: per-business admin access (Codex-built, Claude-reviewed) — merge to main",
+            "loop(iter 25): B-116 verify-and-close (DST date arithmetic already done + tested)",
+            "loop(iter 24): B-250 closed as NOT-REPRODUCIBLE (premise-check)",
+            "F-374: per-business admin access spec (panel + token->scope login + deploy handoff doc)",
+            "F-376: merge per-business caller-identity scoping (Codex 02066668) + clear 2 blockers",
+            "backlog: file the 3 operator-approved items in dependency order (F-376 merge -> F-374 admin access -> F-375 redeploy)",
+            "loop(iter 22): FX-025 — fix B-154 preview 502 prompt-fragment leak (security)",
+            "loop(iter 21): review Codex identity-scoping — approved w/ 2 blockers (FX-024 collision, migration safety)",
+            "loop(iter 20): FX-024 — fix B-408 menu repeat-alias gap (live-call review); close B-305",
+            "loop(iter 19): FX-023 — verify+close F-263; add missing get()-resolver-failure guard",
+            "loop(iter 18): FX-022 — fix same-day dense-cluster offer phrasing + close B-314",
+            "loop(iter 17): FX-021 — close B-317; add SMS build_tools invariant + fix drift guard",
+            "F-373: link the published admin-panel mockup Artifact",
+            "design(identity-scoping): per-business caller-identity spec + F-373 admin panel + mockup",
+            "loop(iter 16): FX-020 — fix B-315 directive-nudge misses mid-string question",
+            "loop(iter 15): FX-019 — close B-309 + add undeclared-core-dep forcing function",
+            "loop(iter 14): FX-018 — freetext-token veto in implied_type; appointment_message no longer mis-typed as time",
+            "chore: track docs/fixlog/.gitignore so embeddings cache stays out of git durably",
+            "loop(iter 13): B-407 root-caused (tree-intake stage prompts double-ask); safe generator backlog drained — convergence",
+            "loop(iter 12): B-406 FIXED — update_offer data-loss bug (yes now KEEPS, no CHANGES) | compiler-level",
             "fix(iter 11): test-cache-mutation leak — typo test poisoned corpus_lint via shared load_flow object | FX-017",
             "loop(iter 11): clears-on-forward-edge refined to data-slots-only (F-368 sibling) | 33 warns -> 8 real; B-406 surfaced",
             "loop(iter 10): B-405 durable fix — menu-module.js cache-busts by CONTENT hash, not build tag",
@@ -61,7 +248,7 @@
           ]
         }
       ],
-      "commit_sig": "972111b612524b18"
+      "commit_sig": "da4ae69f73aa0fde"
     },
     {
       "date": "2026-07-07",
@@ -1420,15 +1607,14 @@
     },
     {
       "date": "2026-06-21",
-      "headline": "Build a Crossed-Panel LLM Eval Matrix with Automated Quality Gates",
-      "summary": "Implemented a comprehensive evaluation framework featuring a 3-agent by 3-judge crossed panel, automated CI quality gates, and a SQLite-backed performance model. The system integrates computed operational metrics with judged aspects like humanness to detect regressions and backend stalls.",
+      "headline": "Automated Evaluation Framework with State-Level Quality Gates and Caching",
+      "summary": "Implemented a comprehensive evaluation system featuring per-state quality metrics, automated regression gates, and resilient batch generation. Enhanced portfolio search performance by caching unchanged days to skip redundant engine runs.",
       "takeaways": [
-        "Implement a crossed-panel evaluation design (multiple agents × multiple judges) to decompose variance and isolate judge noise from model performance.",
-        "Use automated pre-push hooks and CI gates to block commits that cause regression in specific computed aspects like latency or completion rates.",
-        "Store evaluation scores in a structured SQLite database tracking changes over time, enabling trend analysis and rescore capabilities without re-running full suites.",
-        "Apply concreteness gates to scheduling flows by parsing natural language time expressions and blocking bookings on vague inputs before state transitions."
+        "Implement pre-push and CI quality gates using aggregated state-groups to catch regressions in specific workflow segments before merging.",
+        "Use stall detectors and canonicalized humanness metrics to automatically identify backend failures and ensure consistent agent output quality.",
+        "Optimize daily batch processes by caching unchanged data states, allowing re-runs to skip the processing engine entirely for significant speed gains."
       ],
-      "total_commits": 57,
+      "total_commits": 18,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1440,7 +1626,7 @@
         },
         {
           "name": "riff",
-          "commits": 55,
+          "commits": 16,
           "messages": [
             "feat(eval): full_calibration.sh — THE complete crossed panel (3 agents × 3 judges × per-state)",
             "feat(eval): state_data_run.sh — generate per-state data across 3 agents incl claude",
@@ -1457,62 +1643,22 @@
             "loop tune: split dog_grooming owner collection (name then phone) — Collect Pattern",
             "loop fix: persona must give complete 10-digit phones + valid data (systemic eval fix)",
             "feat(eval): expand judge roster — codex + open-model bench (mistral/phi4/gemma/claude)",
-            "fix(eval): Codex robustness pass — canonicalize humanness, cross matrix by agent",
-            "feat(eval): full_matrix.sh — the complete crossed run (20 flows × 2 agents × 3 judges)",
-            "loop tune: route austin availability path through contact collection",
-            "loop iter: fix austin completion_slots + eval_db --export-csv (graph-able data)",
-            "feat(eval): gated operability aggregate — the matrix is complete",
-            "feat(eval): humanness judged aspect — the matrix is now COMPLETE",
-            "docs(eval): the evaluation matrix — 6-flow computed aspects + what each catches",
-            "feat(eval): aspect_scores tidy table + --ingest-aspects + --matrix (Codex matrix #4)",
-            "feat(eval): conversation identity + correctness aspect (Codex matrix #1-3)",
-            "docs(eval): Codex-constructed evaluation matrix spec (7 aspects + DDL + gated aggregate)",
-            "feat(eval): computed aspects from the live event stream (latency/errors/completion)",
-            "docs(eval): multi-aspect evaluation matrix design — computed vs judged",
-            "feat(eval): add codex (GPT) as 3rd judge to the calibration panel",
-            "feat(eval-db): flow-modification tracking — interleave edits with evals",
-            "feat(eval): calibration panel + --flow-table (all flows × agent × judge)",
-            "docs(eval): timeline + measured judge noise (qwen vs gemini, same transcripts)",
-            "feat(eval-db): --timeline — table over time by change (commit) and judge LLM",
-            "feat(eval): eval_rescore.py — rescore saved transcripts with a 2nd judge (Codex cheap path)",
-            "feat(eval): honest performance model — Codex required changes folded in",
-            "feat(eval): performance model — variance budget + noise floor (judge×model×flow)",
-            "docs(eval): performance-model design — variance decomposition (judge×model×flow×persona)",
-            "feat(eval): record the SITUATION per score — agent model (incl. failover), judge, variance",
-            "docs: repeat-3 before/after result — session work slightly regressed quality (-0.26)",
-            "docs: overnight summary — date/time enforcement complete + repeat-3 sweep status",
-            "feat(date-time): booking preflight — downgrade a vague book to availability (Codex #5)",
-            "feat(lint): ungated-booking-time — warn booked flows with an unflagged date/time slot (Codex #4)",
-            "feat(date-time): book_requires_concrete gate — vague times can't book (Codex-reviewed)",
-            "docs(date-time): FSM concreteness-gate implementation plan (for Codex review)",
-            "feat(date-time): shared is_specific_when() concreteness gate (Codex review #1)",
-            "fix(eval-db): composition-aware trend — only delta same-flow-set runs",
-            "fix(prompt): gate date/time guidance to scheduling flows only",
-            "feat(date-time): prompt guidance — never confirm a booking on a vague time",
-            "test(scheduling): end-to-end 'a calendar slot can be scheduled' + vague-can't-book (with Codex)",
-            "feat(timeexpr): human-time corpus + colloquial parsing (computer + human tests)",
-            "fix(timeexpr): correct noon/midnight regex group (6 not 7) — 4 tests pass",
-            "feat(date-time): TimeExpr concreteness classifier (Codex-reviewed, slice 1)",
-            "docs(date-time): structured TimeExpr + date-type design (for Codex review)",
-            "fix(turn): no-progress backstop catches state oscillation (A<->B), not just stalls",
-            "fix(turn): no-progress backstop excludes bookkeeping slots — breaks the #1 loop",
-            "feat(eval): SQLite quality DB — scores over time by judge/model/feature (Codex plan)"
+            "fix(eval): Codex robustness pass — canonicalize humanness, cross matrix by agent"
           ]
         }
       ],
-      "commit_sig": "4bbb11e8d3103369"
+      "commit_sig": "1f0c6ee20df32dde"
     },
     {
       "date": "2026-06-20",
-      "headline": "Daily Digests, Typed Slots, and Resilient Eval Pipelines",
-      "summary": "github-portfolio-search gained an apply-focused /daily headline digest powered by a free in-process MLX engine, plus unified search over the projects corpus, per-project docs, and regenerated navigation. riff shipped a large reliability pass: semantic slot types, typed date intent/readback fixes, scheduling collision fixes, held-out persona evals, multi-judge provenance, live report cards, and trend tracking.",
+      "headline": "Local MLX Search Engine with Auto-Generated Daily Digests",
+      "summary": "Integrated an in-process Qwen3.5-4B MLX engine to power a unified search across project corpora and documentation. Added automated daily headline digests and regenerated navigation to streamline content discovery.",
       "takeaways": [
-        "Build reusable digests by pairing codex-generated summaries with local MLX backfill and a project corpus searchable across generated pages and docs.",
-        "Use a semantic slot-type registry with type-first extraction, build-time lint gates, and ratchets to migrate flows incrementally without reintroducing untyped behavioral slots.",
-        "Model dates as typed DateExpr intent, block ambiguity before confirmation, and render dates as speakable text to avoid leaking ISO/schema details.",
-        "Make evals operational with held-out personas, structured judge provenance, multi-judge fallback, live per-flow report cards, and quality-trend tracking."
+        "Deploy lightweight local inference by embedding the Qwen3.5-4B model via MLX for serverless, in-process search capabilities.",
+        "Automate content summarization by using LLMs to generate apply-focused daily headlines from recent commit activity.",
+        "Unify site navigation and search indexing by regenerating project corpora and documentation pages into a single accessible structure."
       ],
-      "total_commits": 42,
+      "total_commits": 4,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1523,65 +1669,20 @@
             "chore(web): regenerate project corpus + pages with unified nav",
             "feat: unify search on projects corpus + per-project docs + integrated nav"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 38,
-          "messages": [
-            "feat(eval): structured judge provenance on FlowScore + report card (Codex plan #3)",
-            "feat(eval): quality-trend tracker v0 + tracking-DB plan (for Codex review)",
-            "fix(eval): over-promising tag ignores negations (was inflated 16/20 -> true 4/20)",
-            "test(slot-types): cross-flow accuracy guard (was built earlier, uncommitted)",
-            "feat(eval): incremental per-flow report card (live refresh + crash survival)",
-            "feat(eval): readable, searchable use-case summaries of report cards",
-            "feat(eval): add codex CLI as a third panel judge (model-family diversity)",
-            "feat(eval): resilient multi-judge — Alibaba then local qwen+gemma, with provenance",
-            "fix(scheduling): possible/blocked service days are mutually exclusive (collision fix)",
-            "fix(readback): speak ISO dates naturally, never raw — H2 for the date leak",
-            "fix(scheduling): bind calendar-date service days — stop the collect loop (Bug B)",
-            "fix(date): stop the agent leaking date_expr schema + raw ISO into speech (H1)",
-            "fix(date): commit orphaned FSM date-confirmation gate (Stage 3 follow-up)",
-            "eval(splits): rebalance to ~1/4 holdout with 12 diverse personas",
-            "feat(date): speakable DateExpr adapter — typed date intent + ambiguity-blocking (Stages 1-3)",
-            "feat(slot-types): migrate apartment_viewing.caller_email->email (baseline 21->20)",
-            "feat(slot-types): migrate tutorial flows + bellas/math stragglers (baseline 34->21)",
-            "feat(slot-types): implement email type (7th type)",
-            "feat(slot-types): migrate address slots (Codex-APPROVED) — baseline 40->34",
-            "feat(slot-types): implement address type + fix type-first name allow_bare",
-            "feat(slot-types): migrate scheduling flows' name/phone/time (baseline 51->40)",
-            "fix(slot-types): quantity type per Codex review + migrate 4 flows",
-            "feat(slot-types): implement the quantity type (re-homes _extract_quantity)",
-            "feat(slot-types): migrate batch 3 — coffee/pizza customer_name, dental_clinic full",
-            "fix(slot-types): contact extractor preflight validates by semantic type (Codex r3)",
-            "fix(slot-types): Codex re-review round 2 — production path + locked_choice + ratchet",
-            "fix(slot-types): address Codex implementation review (5 required changes)",
-            "feat(slot-types): build-time gate — untyped-behavioral-slot lint rule + ratchet",
-            "feat(slot-types): migrate batch 2 (amazon/it_helpdesk/bellas/math name+phone)",
-            "feat(slot-types): migrate taco_truck + restaurant; add verified slot-types tutorial",
-            "feat(slot-types): migrate dog_grooming to typed slots (slice 2 — hypothesis holds)",
-            "feat(slot-types): type-first extraction dispatch + filtered name fallback (slice 1)",
-            "feat(slot-types): registry + loader build-time gate (slice 1 foundation)",
-            "docs(slot-types): Codex-APPROVED design spec for the semantic slot-type registry",
-            "fix(readback): rephrase the 'Got it!' filler into an echo of captured values",
-            "fix(readback): kill 'pickup or delivery delivery' render + the phone area-code dance",
-            "feat(eval): live mid-run judge fallback — Alibaba 403 -> ALERT + switch to Codex",
-            "feat(flow-pipeline): held-out persona split — gate on generalization, not overfit"
-          ]
         }
       ],
-      "commit_sig": "aa68e28b87929bbe"
+      "commit_sig": "570eff66fd37e1a4"
     },
     {
       "date": "2026-06-19",
-      "headline": "Local LLMs, Safer Judges, and Reusable Collect Flows",
-      "summary": "generate_title_headline_hooks added verbose faithful summary/spine reporting plus a local MLX Qwen3.5-9B provider with reliable no-think JSON output. riff hardened extraction and evaluation, gated Collect Pattern flows across caller paths, shipped several converted flows, and documented GTM cost and revenue plans.",
+      "headline": "Local MLX Qwen3.5-9B Provider with Reliable JSON Output",
+      "summary": "Integrated a local MLX provider for Qwen3.5-9B, resolving JSON parsing issues by enforcing a no-think mode. Enhanced reporting capabilities now include faithful summaries and spine extracts via a verbose flag.",
       "takeaways": [
-        "Reuse a local MLX Qwen provider behind a strict JSON contract when you need offline or cheaper generation with auditable verbose reports.",
-        "Harden extractors with deterministic time handling, phone-accumulation fixes, and garbage-rejection validator tests before tuning prompts.",
-        "Make evals resilient with retry/backoff, surfaced judge failures, and a Codex CLI fallback when the primary judge fails.",
-        "Gate reusable flow patterns on both paced and front-load paths before converting winners like taco_truck, pizza, returns, and pet_store."
+        "Implement a local MLX provider for Qwen3.5-9B to reduce API dependency and latency.",
+        "Enforce 'no-think' modes in LLM providers to guarantee parseable JSON responses without extra cleaning logic.",
+        "Add verbose reporting flags to expose intermediate data artifacts like summaries and spine extracts for debugging."
       ],
-      "total_commits": 17,
+      "total_commits": 3,
       "repos": [
         {
           "name": "generate_title_headline_hooks",
@@ -1591,41 +1692,20 @@
             "Merge feat/local-mlx-qwen: local MLX Qwen3.5-9B provider + no-think JSON fix",
             "feat: local MLX Qwen3.5-9B provider with reliable no-think JSON"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 14,
-          "messages": [
-            "fix(extract): phone accumulation no longer doubles a 555 prefix",
-            "feat(eval): Codex CLI judge as a graceful fallback (qwen-max -> codex)",
-            "docs(gtm): add cost model + path-to-revenue (referenced by roadmap.html)",
-            "test(validators): name-validator garbage-rejection tests (pairs with R3)",
-            "fix(extract): deterministic time + phone-accumulation extractors (the #1 re-ask loop)",
-            "docs(gtm): add showcase-flow plan (the demo call + path to first customer)",
-            "fix(flow-eval): judge retry+backoff, and SURFACE judge failures instead of hiding them",
-            "chore(flows): property_trouble_ticket is NOT a Collect Pattern candidate",
-            "feat(flow-pipeline): gate new flows on BOTH caller paths (paced + front-load)",
-            "chore(flows): record 4 no-lift re-judges (dental/it_helpdesk/bellas/math), rm throwaway",
-            "feat(flows): ship amazon_returns + pet_store to Collect Pattern (batch 2 winners)",
-            "feat(engine): front-load handling algorithm (R2 skip-if-filled + R3 garbage validators)",
-            "feat(flows): convert pizza + restaurant_reservation to Collect Pattern (batch 1)",
-            "feat(flows): convert taco_truck to the Collect Pattern (+1.5 quality, seeded)"
-          ]
         }
       ],
-      "commit_sig": "300a3d186198707f"
+      "commit_sig": "53dbb6ee92ef031a"
     },
     {
       "date": "2026-06-18",
-      "headline": "Riff Flow-Eval Pipeline and Portfolio Docs Generator Shipped",
-      "summary": "Implemented a deterministic flow-evaluation pipeline with A/B testing for LLM extractors and fixed critical engine rendering bugs. Released per-project documentation generation with recency-based findability and resolved Mermaid syntax and dark mode display issues.",
+      "headline": "Per-Project Docs, Recency Search, and Mermaid Rendering Fixes",
+      "summary": "This update introduces per-project documentation publishing with recency-based findability and resolves critical rendering issues for Mermaid diagrams and dark mode visibility. It also fixes routing to ensure project documentation pages load correctly without requiring trailing slashes.",
       "takeaways": [
-        "Reuse the `flow-pipeline.sh` script to run deterministic LLM evaluations with `--repeat N` flags, reducing judge variance in flow bring-up.",
-        "Apply the 'Collect Pattern' design with deterministic guardrails and the `double-ask-line` linter to enforce one read-aloud question per state in conversational flows.",
-        "Integrate the gated contact-extractor module to safely extend LLM extraction capabilities for emails and phone numbers, validated via A/B testing against baseline models.",
-        "Adopt the per-project docs generator to publish HTML documentation with trailing-slash tolerance and recency-based title findability for developer portfolios."
+        "Implement per-project documentation generation that indexes by recency and title to improve content discoverability in portfolio search tools.",
+        "Configure web server or router rules to handle documentation routes gracefully without enforcing trailing slashes for better URL flexibility.",
+        "Apply CSS hygiene fixes to prevent white-on-white text in dark mode and ensure Mermaid diagram syntax errors display visible icons."
       ],
-      "total_commits": 43,
+      "total_commits": 6,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1638,52 +1718,9 @@
             "Merge pull request #1 from davidbmar/feat/per-project-docs-and-recency",
             "feat(docsgen): per-project docs/html publishing + recency/title findability"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 37,
-          "messages": [
-            "feat(flow-eval): flow-pipeline.sh — the flow bring-up pipeline",
-            "feat(flow-eval): --repeat N to kill n=1 judge variance",
-            "docs(tutorials): teach the Collect Pattern + close 5 tutorial teaching gaps",
-            "feat(flows): the Collect Pattern — validated split design + deterministic guardrails",
-            "docs(design): one-act-per-state — Moore-act vs one-slot, Codex-reviewed",
-            "docs(flow-eval): contact-extractor complete (name+email+phone); dental A/B +3.7",
-            "feat(extract): extend gated contact-extractor to PHONE (contiguous digit-run grounded, A/B +3.7)",
-            "docs(flow-eval): email extension shipped (+1.0 apartment); phone deferred, enable-in-eval next",
-            "feat(extract): extend gated contact-extractor to EMAIL (exact-candidate grounded)",
-            "docs(flow-eval): record shipped LLM name-extractor + A/B lift (+1.4 restaurant) + follow-ups",
-            "feat(extract): gated LLM name-extractor for the #1 judged defect (default-OFF, A/B +1.4)",
-            "docs(flow-eval): rule out prompt-strengthening for the contact-miss (it's model compliance, not instruction)",
-            "docs(flow-eval): VERIFIED engine-clean post-all-fixes (24/24 terminal, P1/P3/repr-leak 0)",
-            "docs(flow-eval): last engine P1 fixed; engine lints fully clean, only the gated extractor remains",
-            "fix(turn): drop mid-text questions at a terminal — the last engine P1 double-beat",
-            "docs(flow-eval): raw-dict repr-leak fixed + verified; engine lints now clean",
-            "fix(directive): humanize must_include container slots — stop the model echoing raw dict reprs",
-            "docs(flow-eval): VALIDATE the LLM contact-extractor — qwen-flash 7/7 on the blocked cases",
-            "docs(flow-eval): full 19-flow judged map; contact-extraction is the #1 lever (operator decision)",
-            "docs(flow-eval): graceful handoff shipped; remaining low-quality flows are structural",
-            "fix(turn): graceful no-progress/max-turns handoff line — apologize, don't dismiss",
-            "docs(flow-eval): root-cause the name stale-ask; heuristic extraction Codex-blocked",
-            "docs(flow-eval): judged ranking of 10 originals; repr-leak fixed; repetition is next target",
-            "fix(slot_format): speak the KEYS of a {label: bool} set, never vocalize 'True'",
-            "docs(flow-eval): JUDGED A/B refutes one-thing-per-state decomposition; next = judge originals",
-            "docs(flow-eval): bellas confirm-recognition loop fixed; re-sweep to re-rank next",
-            "fix(turn): deterministic confirm on silent 'yes' at a gate — breaks bellas P3/P4 loop",
-            "docs(flow-eval): P3 phone-loop fixed; bellas confirm-recognition is the next target",
-            "fix(validators): specific re_ask on short phone — breaks the P3 collect-loop",
-            "docs(flow-eval): record one-slot-per-state A/B verdict + double-ask-line linter",
-            "feat(linter): double-ask-line — enforce one read-aloud question per state",
-            "docs(flow-eval): first real-data defect map — P1 fixed, P3 collect-loops next",
-            "fix(turn): suppress redundant entry-line when model already asked (P1 double-beat)",
-            "fix(eval): unblock real sweeps — fast qwen-flash persona/deriver + escalate NameError",
-            "feat(eval): latency-triggered failover to fast Qwen (qwen-flash) when Gemini is slow",
-            "docs(flow-eval): map the remaining judge complaints as MODEL-layer, not engine bugs",
-            "docs(flow-eval): correct slot_hold 'loop' — NOT a bug (locked_choice clears it); thread closed"
-          ]
         }
       ],
-      "commit_sig": "1158811cdd898208"
+      "commit_sig": "0ae248923a6ffbfe"
     },
     {
       "date": "2026-06-17",

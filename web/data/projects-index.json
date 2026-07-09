@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-09T04:54:58.207841Z",
-  "count": 138,
+  "generated_at": "2026-07-09T10:30:41.193424Z",
+  "count": 139,
   "projects": [
     {
       "slug": "2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -1162,7 +1162,7 @@
         "k3s",
         "Helm",
         "Traefik",
-        "code-server"
+        "Vanilla JS"
       ],
       "reuse_tags": [
         "ai-workspace",
@@ -1172,7 +1172,33 @@
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/everyone-ai",
-      "pushed_at": "2026-07-06T15:42:18Z"
+      "pushed_at": "2026-07-08T16:38:21Z"
+    },
+    {
+      "slug": "evidence-qa",
+      "title": "Evidence Qa",
+      "one_liner": "A document-grounded Q&A engine that retrieves, reranks, and synthesizes cited answers from uploaded files.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "NumPy",
+        "pypdf",
+        "python-docx",
+        "BGE Embeddings",
+        "Cross-Encoder",
+        "GGUF LLMs"
+      ],
+      "reuse_tags": [
+        "RAG",
+        "Document-QA",
+        "Semantic-Search",
+        "Python-Library",
+        "Local-LLM",
+        "Cited-Answers"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/evidence-qa",
+      "pushed_at": "2026-07-09T08:46:27Z"
     },
     {
       "slug": "exampleLoops",
@@ -1269,22 +1295,19 @@
         "Python",
         "HTML",
         "JavaScript",
-        "SQLite-vec",
         "FastAPI",
-        "AWS S3",
-        "AWS Lambda",
-        "CloudFront"
+        "SQLite-vec",
+        "sentence-transformers"
       ],
       "reuse_tags": [
         "semantic-search",
         "github-tools",
-        "portfolio-manager",
-        "ai-agent-tool",
-        "code-discovery"
+        "portfolio-management",
+        "ai-integration"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-07T10:27:57Z"
+      "pushed_at": "2026-07-09T04:55:00Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2135,27 +2158,26 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "JSONL",
         "SQLite",
-        "HTML/CSS/JS",
+        "WebSockets",
         "Pytest"
       ],
       "reuse_tags": [
         "voice-agent",
-        "finite-state-machine",
-        "llm-orchestration",
-        "python",
-        "deterministic-ai",
-        "business-automation"
+        "fsm-orchestration",
+        "llm-guardrails",
+        "python-framework",
+        "conversational-ai",
+        "deterministic-workflow"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-09T04:52:03Z"
+      "pushed_at": "2026-07-09T10:15:28Z"
     },
     {
       "slug": "riot",

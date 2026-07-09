@@ -1,24 +1,24 @@
 {
   "title": "Everyone Ai",
   "one_liner": "Self-service AI workspace platform for launching Claude Code environments via Kubernetes.",
-  "what_it_is": "A portal that allows team members to launch pre-configured VS Code workspaces backed by Claude Code in seconds. It manages the lifecycle of workspace pods on a k3s cluster, provides an app catalog for templates, and exposes persistent HTTPS endpoints for deployed targets.",
-  "how_its_built": "Built with Node.js and Express for the backend API, vanilla JavaScript for the frontend SPA, and Helm charts for Kubernetes deployment. It uses k3s for the underlying cluster, Traefik for ingress, and code-server for the browser-based IDE experience.",
-  "how_to_apply": "Operators use the 'afterburner' CLI to bootstrap a Linux VM with k3s and deploy the portal via Helm. End users connect via VPN, access the portal URL, select a template from the App Catalog, and launch a workspace to get a ready-to-use Claude Code terminal in their browser.",
-  "quickstart": "npx afterburner bootstrap --host <ip> --ssh-key ~/.ssh/id_rsa\nnpx afterburner install\nhelm install everyone-ai-portal ./charts/portal -f profiles/k3s.yaml -f config.yaml --namespace myteam --create-namespace\nopen https://portal.<your-domain>",
+  "what_it_is": "A portal that allows team members to launch isolated VS Code workspaces backed by Claude Code without local setup. It manages Kubernetes pods, ingress routes, and workspace templates through a web interface and CLI.",
+  "how_its_built": "Node.js Express backend serving a vanilla JS SPA, deployed on k3s via Helm. Uses Traefik for ingress and standard Kubernetes APIs for pod management.",
+  "how_to_apply": "Operators bootstrap k3s clusters using the afterburner CLI and deploy the portal via Helm. Users connect via VPN, select a template from the catalog, and launch a browser-based IDE.",
+  "quickstart": "npx afterburner bootstrap --host <ip> --ssh-key ~/.ssh/id_rsa\nnpx afterburner install\nhelm install everyone-ai-portal ./charts/portal -f profiles/k3s.yaml -f config.yaml --namespace myteam --create-namespace",
   "features": [
-    "Launch Claude Code workspaces in under 30 seconds",
-    "App Catalog with pre-configured templates like HR Onboarding Agent",
-    "Monitor and stop personal VS Code environments",
-    "Deploy running apps as persistent HTTPS endpoints",
-    "Cross-portal fleet overview for team administrators"
+    "App Catalog with pre-configured Claude Code templates",
+    "One-click launch of personal VS Code workspaces",
+    "Persistent HTTPS endpoints for deployed targets",
+    "Team-wide usage monitoring and fleet overview",
+    "CLI for cluster bootstrapping and workspace management"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User VPN] --> Traefik[Traefik Ingress]\n    Traefik --> Portal[Portal Server Node Express]\n    Portal --> K8sClient[K8s Client Module]\n    K8sClient --> WorkspacePods[Workspace Pods code-server]\n    K8sClient --> TargetPods[Target Pods User Apps]\n    WorkspacePods --> ClaudeCode[Claude Code Terminal]",
-  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Portal\n    participant K8s\n    participant Pod\n    User->>Portal: POST api workspaces\n    Portal->>K8s: Create workspace pod\n    K8s->>Pod: Start code-server container\n    Pod-->>K8s: Running status\n    K8s-->>Portal: Workspace ID\n    Portal-->>User: Workspace URL\n    User->>Pod: Open VS Code browser link",
+  "diagram_architecture": "flowchart TD\n    User[User VPN] --> Traefik[Traefik Ingress]\n    Traefik --> Portal[Portal Server Node Express]\n    Portal --> K8sClient[Kubernetes Client]\n    K8sClient --> WorkspacePods[Workspace Pods code-server]\n    K8sClient --> TargetPods[Target Pods user apps]",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant Browser\n    participant Portal\n    participant K8s\n    participant Workspace\n    User->>Browser: Click Launch\n    Browser->>Portal: POST /api/workspaces\n    Portal->>K8s: Create Pod\n    K8s-->>Portal: Pod Created\n    Portal-->>Browser: Workspace ID\n    Browser->>Portal: GET /api/workspaces/id/events\n    Portal->>K8s: Watch Pod Status\n    K8s-->>Portal: Pod Ready\n    Portal-->>Browser: SSE Ready Event\n    Browser->>Workspace: Open VS Code URL",
   "capabilities": [
     "Workspace provisioning",
-    "Template management",
-    "Ingress routing",
     "Cluster bootstrapping",
+    "Ingress management",
+    "Template execution",
     "Health monitoring"
   ],
   "components": [
@@ -35,7 +35,7 @@
     "k3s",
     "Helm",
     "Traefik",
-    "code-server"
+    "Vanilla JS"
   ],
   "depends_on": [
     "Node.js >= 18",
@@ -45,15 +45,15 @@
   ],
   "integrates_with": [
     "Claude Code",
-    "VS Code Browser",
+    "VS Code Server",
     "ECR",
     "VPN"
   ],
   "patterns": [
     "Self-service portal",
     "GitOps deployment",
-    "Ephemeral environments",
-    "CLI automation"
+    "Event streaming",
+    "Multi-tenancy"
   ],
   "reuse_tags": [
     "ai-workspace",
@@ -69,7 +69,15 @@
   "todos": [
     {
       "kind": "unmerged_branch",
+      "detail": "chore/ci-and-test-hardening is 2 commits ahead of the default branch"
+    },
+    {
+      "kind": "unmerged_branch",
       "detail": "dependabot/npm_and_yarn/portal/npm_and_yarn-e9ce4f7be9 is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #13: CI gate: tests + dependency audit; stop portal test-script masking"
     },
     {
       "kind": "open_pr",
@@ -77,9 +85,9 @@
     }
   ],
   "screenshot_url": "",
-  "generated_at": "2026-07-07T10:24:57.447306Z",
+  "generated_at": "2026-07-09T10:28:46.384157Z",
   "source_commit": "76a083d",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-07-06T15:42:18Z",
+  "pushed_at": "2026-07-08T16:38:21Z",
   "docs": []
 }

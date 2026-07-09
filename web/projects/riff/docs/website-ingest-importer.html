@@ -128,21 +128,34 @@ html { scroll-behavior: smooth; }
 <div class="doc-layout with-toc">
 <main class="doc-container">
 <h1>Website Ingest Importer — schema.org &rarr; <code>riff_business_pack_v0</code></h1>
-<p><strong>Status:</strong> design approved 2026-07-08, documentation phase (this page ships first &mdash; the code does not exist yet).
+<p><strong>Status:</strong> shipped, live-verified on <code>mfclaw.com</code>.
 <strong>First target:</strong> <code>https://mfclaw.com/</code>, a Rhode Island personal-injury firm.
 <strong>Design spec:</strong> <code>docs/superpowers/specs/2026-07-08-website-ingest-importer-design.md</code>.</p>
 
-<h2 id="the-problem">1. The problem</h2>
-<p>You want a phone menu for a business that already has a website. Today that means
-hand-writing a business pack: typing out the business's name, phone, hours, FAQ answers,
-and menu by hand into YAML. This importer does that job for you &mdash; point it at the
-business's URL, and it reads the same structured data the business already publishes for
-Google, and turns it into a caller-shaped phone menu. No LLM guesses a fact. No page prose
-is parsed. If the site doesn't publish enough structured data, the importer says so and
-stops, instead of shipping a menu built on guesses.</p>
+<h2 id="what-it-does">1. What it does, and the two commands to run it</h2>
+<p>Point this at a small business's public website and get back a working phone menu &mdash;
+without hand-typing the business's name, phone, hours, FAQ answers, or menu into YAML.
+The importer reads the same structured data the business already publishes for Google
+(<strong>schema.org JSON-LD</strong>), never the page's prose, and turns it into a caller-shaped
+business pack that compiles the normal way. If the site doesn't publish enough structured
+data, the importer says exactly what's missing and stops &mdash; it never ships a menu built
+on a guess.</p>
+<p><strong>Step 1 &mdash; snapshot the site:</strong></p>
+<pre><code class="language-bash">python scripts/site_snapshot.py https://mfclaw.com/ --out data/site_ingest/mfclaw --fetch auto
+</code></pre>
+<p><strong>Step 2 &mdash; extract the profile and build the pack:</strong></p>
+<pre><code class="language-bash">python -m riff.business_pack.importers.website data/site_ingest/mfclaw --out packs/generated
+</code></pre>
+<p>The <code>--fetch</code> flag on <code>site_snapshot.py</code> accepts <code>auto</code> (try <code>http</code>, escalate to
+<code>browser</code> only when <code>should_escalate</code> fires &mdash; the default), <code>http</code> (force the
+cheap tier), or <code>browser</code> (force Playwright, useful when you already know a site blocks
+plain requests). On the current mfclaw pack this pipeline is fully closed: <code>parse_pack</code>
+returns <strong>0 errors, 0 warns</strong> and <code>compile_pack</code> succeeds &mdash; verified directly against
+<code>packs/generated/mfclaw.pack.yaml</code> as this page was written. (<code>legal_intake</code>, the
+hand-authored comparison pack, ships with 5 warns.)</p>
 
 <h2 id="why-it-works">2. Why it works: two closed vocabularies</h2>
-<p>The obvious objection is that every website is different — different layout, different
+<p>The obvious objection is that every website is different &mdash; different layout, different
 copy, different navigation. That's true, and it's also irrelevant, because the importer
 never reads any of that. It reads exactly one thing: a block of JSON called
 <strong>schema.org JSON-LD</strong>, embedded in the page's <code>&lt;head&gt;</code>.</p>
@@ -170,7 +183,7 @@ plugins emit, and what a business pack accepts &mdash; not a general web-scraper
 parses the middle of a page, which is the one part that varies without bound from site to
 site.</p>
 
-<h2 id="snapshot-first">3. Snapshot-first</h2>
+<h2 id="snapshot-first">3. Snapshot-first architecture</h2>
 <p>The pipeline has a strict one-way shape:</p>
 <pre><code class="language-text">fetch (network, impure)  →  snapshot/  →  extract_profile (pure)  →  profile.json
                                                                           │
@@ -183,26 +196,28 @@ site.</p>
 </code></pre>
 <p>Once the raw bytes are written to disk, <strong>nothing downstream ever touches the network
 again.</strong> Every step after the fetch is a pure function of files already on disk, and every
-one of those steps is unit-tested offline. This is why "should the fetcher use <code>curl</code> or a
-real browser?" is not an architectural question &mdash; it's an implementation detail of one
-box in the diagram. Swap it for a human hitting Save-As in their browser and nothing else in
-the pipeline would need to change.</p>
+one of those steps is unit-tested offline &mdash; a fact structurally enforced, not just
+promised: <code>test_website_importer_never_imports_the_network</code> is an AST-level check that
+<code>riff/business_pack/importers/website.py</code> never imports a networking module, the same
+pattern <code>tests/providers/test_slot_mapper.py::test_slot_mapper_does_not_import_cal_provider</code>
+uses to keep a different adapter honest. <code>scripts/site_snapshot.py</code> owns every socket.</p>
 
-<h2 id="fetch-tiers">4. The fetch tiers</h2>
+<h2 id="fetch-tiers">4. The fetch tiers, and why the browser tier exists</h2>
 <p>It is tempting to assume a plain HTTP request is enough. It isn't. A plain-user-agent
 <code>curl</code> against <code>mfclaw.com</code> returns <strong>226 bytes</strong> &mdash; a ModSecurity
 <code>Not Acceptable!</code> denial, not the page. The identical request with real browser headers
 (the ones an actual Chrome tab sends) returns <strong>693,467 bytes</strong>, containing both
 JSON-LD blocks. Real small-business hosting stacks block requests that don't look like a
 browser; that's not a hypothetical, it's what happened on the very first fixture site.</p>
-<p>So the fetcher has two tiers:</p>
+<p>So the fetcher has two tiers, in <code>scripts/site_snapshot.py</code>:</p>
 <ol>
 <li><strong><code>http</code></strong> &mdash; <code>httpx</code> with full browser headers. The default; cheap and fast.</li>
 <li><strong><code>browser</code></strong> &mdash; a real Playwright Chromium session. Escalation only, because it's
-slow and heavier.</li>
+slow and heavier, and only fires when the HTTP tier is provably thin.</li>
 </ol>
-<p>The decision to escalate is a pure, unit-tested function &mdash; only the I/O around it
-touches the network:</p>
+<p>The decision to escalate is a pure, unit-tested function in
+<code>riff/business_pack/importers/website.py</code> &mdash; only the I/O around it touches the
+network:</p>
 <pre><code class="language-python">def should_escalate(status: int, body: bytes) -> str | None:
     """Return the escalation reason, or None to keep the HTTP snapshot."""
 </code></pre>
@@ -214,19 +229,49 @@ two cases actually observed. Escalation is never silent: every trigger is logged
 recorded in <code>index.json</code> as that page's <code>tier</code>, because a bare fallback that just
 tries again without saying why is exactly the shape that hid a real bug for ten sprints in
 this repo before.</p>
+<p>Building the browser tier surfaced its own bug &mdash; see <a href="#defect-a">defect (a)</a>
+below: the obvious way to wait for a page to finish loading (<code>networkidle</code>) hangs for a
+full minute on any real marketing site. That bug was invisible for a while, precisely
+<em>because</em> the browser tier only runs after the HTTP tier already failed.</p>
 
-<h2 id="why-no-llm">5. Why v1 has no LLM</h2>
-<p>The fourteen FAQ answers on <code>mfclaw.com</code> are words the firm itself wrote, reviewed, and
-published under its own name &mdash; including a line like "the statute of limitations in
-Rhode Island is three years." The importer speaks these answers on the phone
-<strong>verbatim</strong>. The rule that makes this safe is absolute:</p>
+<h2 id="what-it-refuses">5. What the importer refuses to do</h2>
+<p>The obvious website-to-pack mapping walks straight into features that exist in the pack
+schema but do nothing at runtime in v0. The importer emits none of them, on purpose.</p>
+<p><strong>No LLM in the fact path.</strong> The fourteen FAQ answers on <code>mfclaw.com</code> are words
+the firm itself wrote, reviewed, and published under its own name &mdash; including a line
+like "the statute of limitations in Rhode Island is three years." The importer speaks these
+answers on the phone <strong>verbatim</strong>. The rule that makes this safe is absolute:</p>
 <blockquote>a model may compress and label; it may never originate a fact.</blockquote>
 <p>Nothing is inferred, so nothing can be hallucinated, and the firm has nothing new to
 indemnify beyond what it already published. Truncating a long answer to a speakable length
-is done deterministically, on a sentence boundary &mdash; never by asking a model to shorten
-it. For a law firm this is a <strong>bar-advertising constraint before it is a quality one</strong>:
-the phone is legally safer when it says exactly what the website already says, and nothing
-else.</p>
+(320 characters) is done deterministically, on a sentence boundary &mdash; never by asking a
+model to shorten it. For a law firm this is a <strong>bar-advertising constraint before it is a
+quality one</strong>: the phone is legally safer when it says exactly what the website already
+says, and nothing else.</p>
+<p><strong>No <code>submit:</code> block.</strong> <code>riff/business_pack/schema.py:855</code> accepts a
+<code>submit:</code> block but ignores it: no generic submit tool is registered in the runtime
+(<code>record_issue</code> is a <em>state name</em> used by other flows, not a callable tool), so a pack
+declaring <code>submit:</code> gets a loud <code>submit-ignored</code> warn finding at build time. The
+importer omits it entirely rather than implying a claim goes somewhere it does not.
+Confirmed facts persist via slots and the RunRecord.</p>
+<p><strong>No <code>screening_gate</code>.</strong> <code>riff/business_pack/schema.py:1157</code> accepts a
+<code>screening_gate</code>'s <code>tool</code> and <code>blocked_line</code> fields "for forward compat but unused,"
+and grep proves neither is read anywhere else in the codebase.
+<code>riff/business_pack/compile.py:3688</code> compiles the gate into a state with
+<code>speech_act: inform</code> and exactly one transition, <code>when: always</code> &mdash; it announces a
+line, then advances unconditionally. It is not a gate; it's a checkpoint that never checks
+anything. <code>areaServed: [Rhode Island, Massachusetts]</code> <em>reads</em> like a screening gate
+&mdash; the obvious mapping is "block callers outside RI/MA" &mdash; and the resulting pack
+would cheerfully take a claim from Ohio anyway, because the gate never actually blocks
+anyone. So the importer maps <code>service_area[]</code> to a <strong>hidden, spoken <code>content</code>
+capability</strong> instead: a line the caller can ask to hear ("We serve Rhode Island and
+Massachusetts."), never a gate that pretends to enforce anything. It carries no DTMF digit
+and <code>announce: false</code> (see <a href="#hidden-intents">&sect;6</a>), so it never interrupts the
+menu greeting either. The build now also closes this trap for every <em>other</em> pack: a new
+<code>screening-gate-field-ignored</code> warn finding fires on any pack &mdash; ingested or
+hand-authored &mdash; that declares <code>tool</code> or <code>blocked_line</code>, symmetric with
+<code>submit-ignored</code>. It fires on <code>packs/legal_intake.pack.yaml</code> today (that pack's warn
+count is 5, up from 3 before this lint existed).</p>
 
 <h2 id="menu-caller-shaped">6. The menu is caller-shaped, not SEO-shaped</h2>
 <p>Those fourteen FAQs exist because Google rewards <code>FAQPage</code> markup with rich results.
@@ -236,14 +281,21 @@ don't want "press 7 to hear about pure comparative negligence." A phone menu hol
 five options before a caller gives up; a faithful transcription of the site's FAQ index
 would build a hostile phone tree instead of a helpful one. So the menu is hand-ranked in
 <code>overlay.yaml</code>, not derived from the site's own navigation.</p>
-<p>MFC Law's menu, once ranked:</p>
+<p>MFC Law's menu, once ranked &mdash; verified by compiling <code>packs/generated/mfclaw.pack.yaml</code>
+directly:</p>
 <table>
 <tr><th>DTMF</th><th>Capability</th><th><code>kind</code></th><th>Source</th></tr>
 <tr><td><code>1</code></td><td>Start a new claim</td><td><code>intake_form</code></td><td>contact-form fields</td></tr>
-<tr><td><code>2</code></td><td>Case status</td><td><code>message</code></td><td>&mdash;</td></tr>
-<tr><td><code>3</code></td><td>Fees &amp; costs</td><td><code>content</code></td><td>FAQ &ldquo;How much does it cost to hire a personal injury lawyer?&rdquo;, verbatim</td></tr>
+<tr><td><code>2</code></td><td>Existing case or status</td><td><code>message</code></td><td>&mdash;</td></tr>
+<tr><td><code>3</code></td><td>Fees and costs</td><td><code>content</code></td><td>FAQ &ldquo;How much does it cost to hire a personal injury lawyer?&rdquo;, verbatim</td></tr>
 <tr><td><code>4</code></td><td>Something else &mdash; leave a message</td><td><code>message</code></td><td>safe-decline terminal</td></tr>
 </table>
+<p>Plus <strong>fourteen hidden, voice-only intents</strong> (13 FAQ answers + <code>service_area</code>)
+&mdash; reachable by saying an alias, never recited in the greeting. The compiled greeting is
+exactly:</p>
+<blockquote>"Here's the menu. Press 1 &mdash; Start a new claim. Press 2 &mdash; Existing case
+or status. Press 3 &mdash; Fees and costs. Press 4 &mdash; Something else &mdash; leave a
+message."</blockquote>
 <p>Digits must start at <code>1</code> (an optional leading <code>"0"</code> is allowed before it).
 <code>riff/business_pack/schema.py:1021-1024</code> computes the expected sequence as
 <code>[str(n) for n in range(1, len(actual) + 1)]</code> and rejects anything else at build time
@@ -257,87 +309,43 @@ on after declining the consent gate must be a capability that can't loop back in
 path. With <code>handoff</code> off the table, <code>message</code> is the only option left, so the menu is
 required to have one.</p>
 
-<h2 id="practice-areas-not-capabilities">7. The eight practice areas are not capabilities</h2>
+<h3 id="hidden-intents">Hidden intents: <code>announce: false</code></h3>
+<p>See <a href="#defect-e">defect (e)</a> for the incident that produced this field. In short:
+a <code>Capability</code> now has <code>announce: bool = True</code> (<code>riff/business_pack/schema.py</code>).
+Setting it <code>False</code> makes a hidden intent &mdash; reachable by voice, never recited in the
+menu greeting. Routing is untouched, because the announce state carries only a spoken line
+while the <code>menu</code> state's <code>locked_choice</code> carries the aliases &mdash; two different
+states, both built from the same capability list. The website importer marks all 13
+voice-only FAQ capabilities, and the <code>service_area</code> capability, as hidden.</p>
+
+<h3 id="practice-areas-not-capabilities">The eight practice areas are not capabilities</h3>
 <p>Car accidents, slip &amp; fall, dog bite, motorcycle, premises liability, product liability,
-pedestrian, and Uber/Lyft are not eight menu entries. They're the eight values of one field
-&mdash; the intake form's own case-type picker. They compile to the options of the
-<code>matter_area</code> slot inside capability <code>1</code>, not eight separate <code>content</code> capabilities. A
+pedestrian, and Uber/Lyft are not eight menu entries, and they are not slot options either
+&mdash; <code>schema.py</code> has no <code>options</code>/<code>enum</code> mechanism on slots; <code>matter_area</code> is a plain
+<code>{type: string}</code>, and <code>legal_intake</code> models its own <code>matter</code> stage as free text too.
+So each service does two things instead: its <code>label</code> becomes an example in the intake
+form's prompt ("What happened? For example: car accident, slip and fall, dog bite&hellip;"),
+and its <code>aliases</code> merge into the intake capability's own alias list, so <em>"rear
+ended"</em>, <em>"bitten by a dog"</em>, and <em>"uber"</em> all route straight to digit <code>1</code>. A
 caller doesn't want to hunt through a phone tree for their practice area; they want to say
-"I got rear-ended" and be routed.</p>
+what happened and be routed.</p>
 <p>This is also the one place the site's structured data runs out. The observed JSON-LD
 <code>@type</code>s on <code>mfclaw.com</code> are <code>LegalService</code>, <code>PostalAddress</code>, <code>State</code>,
 <code>Person</code>, <code>WebSite</code>, <code>SearchAction</code>, <code>ImageObject</code>, <code>Question</code>, and
 <code>Answer</code> &mdash; there is no <code>Service</code> or <code>OfferCatalog</code> anywhere in it. So
 <code>services[]</code> (the list of practice areas) can't come from the profile at all; it comes
-from <code>overlay.yaml</code>. The overlay isn't a workaround here &mdash; it's the place where facts
-the site never typed get stated by a human, on the record.</p>
+from <code>overlay.yaml</code>, hand-authored. The overlay isn't a workaround here &mdash; it's the
+place where facts the site never typed get stated by a human, on the record.</p>
 
-<h2 id="two-v0-traps">7b. Two v0 traps the importer refuses</h2>
-<p>The obvious website-to-pack mapping walks straight into two features that exist in the
-pack schema but do nothing at runtime in v0. The importer emits neither, and the reasons
-they're dangerous are different in a way that matters.</p>
-<p><strong><code>submit:</code> is dead config that warns.</strong> <code>riff/business_pack/schema.py:855</code>
-accepts a <code>submit:</code> block but ignores it: no generic submit tool is registered in the
-runtime (<code>record_issue</code> is a <em>state name</em> used by other flows, not a callable tool),
-so a pack declaring <code>submit:</code> gets a loud <code>submit-ignored</code> warn finding at build time.
-Nothing silently disappears &mdash; the pack still compiles, but the finding is right there in
-the check output.</p>
-<p><strong><code>screening_gate.blocked_line</code> is dead config that is silent.</strong>
-<code>riff/business_pack/schema.py:1157</code> accepts a <code>screening_gate</code>'s <code>tool</code> and
-<code>blocked_line</code> fields "for forward compat but unused," and grep proves neither is read
-anywhere else in the codebase. <code>riff/business_pack/compile.py:3688</code> compiles the gate
-into a state with <code>speech_act: inform</code> and exactly one transition, <code>when: always</code>
-&mdash; it announces a line, then advances unconditionally. It is not a gate; it's a
-checkpoint that never checks anything. Proof: <code>packs/legal_intake.pack.yaml</code> declares the
-blocked line <em>"I'm sorry, we're unable to help with this matter by phone&hellip;"</em>, and that
-sentence does not appear anywhere in the compiled <code>flows/legal_intake.yaml</code>. A caller who
-should have been blocked walks straight through, and nothing complains.</p>
-<p>This is exactly the trap a website importer would fall into on its own. <code>areaServed:
-[Rhode Island, Massachusetts]</code> <em>reads</em> like a screening gate &mdash; the obvious mapping
-is "add a <code>screening_gate</code> that blocks callers outside RI/MA" &mdash; and the resulting pack
-would cheerfully take a claim from Ohio anyway, because the gate never actually blocks
-anyone. So the importer maps <code>service_area[]</code> to a <strong>spoken <code>content</code>
-capability</strong> instead &mdash; a line the caller hears, never a gate that pretends to enforce
-anything. Task 8 of this plan (the shift-left guard) adds a
-<code>screening-gate-field-ignored</code> warn to <code>schema.py</code> itself, symmetric with
-<code>submit-ignored</code>, so any pack &mdash; ingested or hand-authored &mdash; that declares
-<code>tool</code> or <code>blocked_line</code> gets called out at build time. The principle: fixing this one
-importer only <em>avoids</em> the trap for the packs it generates; adding the lint <em>closes</em>
-it for every pack, forever.</p>
-
-<h2 id="run-it">8. Run it</h2>
-<p>This tutorial is written before the code that implements it &mdash; writing the tutorial
-first is what pins down the exact command-line contract that the implementation tasks
-have to match. Once those tasks land, running the importer looks like this.</p>
-<p><strong>Step 1 &mdash; snapshot the site:</strong></p>
-<pre><code class="language-bash">python scripts/site_snapshot.py https://mfclaw.com/ --out data/site_ingest/mfclaw --fetch auto
-</code></pre>
-<pre><code class="language-text">fetch mfclaw.com/            http tier   226 bytes   escalating: len(body) &lt; 20000
-fetch mfclaw.com/ (browser)  browser tier   693467 bytes   2 json-ld blocks
-wrote data/site_ingest/mfclaw/index.json   1 page, tier=browser
-wrote data/site_ingest/mfclaw/pages/index.html   (gitignored)
-</code></pre>
-<p><strong>Step 2 &mdash; extract the profile and build the pack:</strong></p>
-<pre><code class="language-bash">python -m riff.business_pack.importers.website data/site_ingest/mfclaw --out packs/generated
-</code></pre>
-<pre><code class="language-text">wrote data/site_ingest/mfclaw/profile.json   business=mfclaw, 14 faq, 2 service_area
-read  data/site_ingest/mfclaw/overlay.yaml   4 menu entries, 8 services
-wrote packs/generated/mfclaw.pack.yaml
-  ✅ [parse_pack] 0 errors, 0 warns
-  ✅ [compile_pack] flow written: flows/generated/mfclaw.yaml
-</code></pre>
-<p>The <code>--fetch</code> flag on <code>site_snapshot.py</code> accepts <code>auto</code> (try <code>http</code>, escalate to
-<code>browser</code> only when <code>should_escalate</code> fires &mdash; the default), <code>http</code> (force the
-cheap tier), or <code>browser</code> (force Playwright, useful when you already know a site blocks
-plain requests).</p>
-
-<h2 id="going-live">9. Onboarding: going live</h2>
+<h2 id="going-live">7. Going live</h2>
 <p>Ingest produces a pack. It does not produce a phone line. Those are two different kinds
 of artifact, made by two different steps:</p>
 <ul>
 <li>A <strong>build artifact</strong> is anything the importer writes: <code>profile.json</code>,
 <code>packs/generated/mfclaw.pack.yaml</code>, the compiled flow. Reproducible from a snapshot;
-safe to regenerate any time.</li>
+safe to regenerate any time. A cold rebuild of the mfclaw pack is byte-identical to the
+checked-in one except for the <code>generated_at</code> header line &mdash; enforced by
+<code>test_import_is_deterministic</code>.</li>
 <li>A <strong>deploy artifact</strong> is a decision a human makes once, outside the importer:
 which real phone number this business answers on.</li>
 </ul>
@@ -368,7 +376,8 @@ and messaging profile. 10DLC registration belongs to the <em>number</em>, not th
 packs/generated/mfclaw.pack.yaml --did +1&hellip;</code> &mdash; this runs the gates, builds static
 audio, walks both welcome branches, writes the DID into
 <code>RIFF_DIALED_ROUTING_TABLE_JSON</code> in <code>.env</code>, restarts the phone node, and preflights
-DID&rarr;org routing across all lines.</li>
+DID&rarr;org routing across all lines. On a keyed build, the gate for this pack passes clean:
+<strong>0 FAIL, 0 <code>[ERROR]</code></strong>, and <code>menu-sweep verify: all flows sweep-ready</code>.</li>
 <li><strong>Record the binding &mdash; recommended, not required.</strong> Once deployed, you may
 write that DID into the pack's <code>business.phone</code>. From then on, the gate refuses to
 deploy this pack anywhere else &mdash; that's the point, if you want the pin. Two live packs
@@ -384,7 +393,109 @@ case the line isn't actually working yet. Note that <code>profile.json</code>'s 
 pack's phone. It's provenance only: proof of where the facts came from, not where the flow
 answers calls.</p>
 
-<h2 id="never-clauses">10. Never clauses</h2>
+<h2 id="seven-defects">8. Seven defects this build found, and what each taught</h2>
+<p>Every defect below survived until the real thing was run &mdash; a live fetch, a real
+compile, a real TTS render, or reading the spoken output aloud. None of them was hypothetical
+by the time it was found; each has a measured number attached.</p>
+
+<h3 id="defect-a">(a) The browser tier hung</h3>
+<p><code>wait_until="networkidle"</code> never fires on a site with trackers. Measured on
+<code>mfclaw.com</code>: <code>networkidle</code> &rarr; 60-second timeout; <code>domcontentloaded</code> &rarr; 1.5s,
+HTTP 200, both JSON-LD blocks present; <code>load</code> &rarr; 2.3s. The browser tier only runs
+after the HTTP tier already fails, so this hang was invisible until someone actually forced
+the escalation path. The fix, in <code>scripts/site_snapshot.py</code>'s <code>_fetch_browser</code>: wait
+for <code>domcontentloaded</code>, then wait up to 5 seconds (advisory, not fatal) for a
+<code>script[type="application/ld+json"]</code> element to attach &mdash; covering the client-rendered
+case that's the browser tier's whole reason for existing, and logging a warning rather than
+failing if none shows up.</p>
+
+<h3 id="defect-b">(b) One entity, two nodes</h3>
+<p><code>mfclaw.com</code> emits <strong>two</strong> business nodes sharing one <code>@id</code>
+(<code>https://mfclaw.com/#organization</code>): a Rank Math stub (name without "The", logo,
+<code>openingHours</code>) and a hand-authored <code>LegalService</code> (name, telephone, email, address,
+<code>areaServed</code>, <code>knowsLanguage</code>). A shared <code>@id</code> means a shared entity in JSON-LD, so
+<code>_merge_business_entities</code> in <code>riff/business_pack/importers/website.py</code> merges them
+in document order, later non-empty value winning &mdash; never picks one. Picking "the
+complete node," even a defensible-sounding heuristic, would have silently dropped
+<code>openingHours</code>, because it lives only on the stub.</p>
+
+<h3 id="defect-c">(c) Traversal order inverted across nesting keys</h3>
+<p><code>_ld_nodes</code> used to push a node's <code>@graph</code>, <code>mainEntity</code>, and
+<code>itemListElement</code> children onto one LIFO stack in three separate <code>stack.extend()</code>
+calls &mdash; so the last key processed popped first, inverting document order <em>across</em>
+keys even though each key's own children were internally correct. Because the merge rule in
+defect (b) is "later non-empty value wins," two same-<code>@id</code> nodes reached through
+different nesting keys would have merged <strong>backwards</strong>, silently choosing the wrong
+field value on any conflict. The single-key ordering test passed the whole time, which is
+exactly why this survived: the bug only shows up when nodes arrive via different keys. The
+fix gathers all three keys' children into one combined list, in key order, before pushing it
+(reversed) once.</p>
+
+<h3 id="defect-d">(d) Aliases are a pack-global problem</h3>
+<p><code>riff/business_pack/schema.py</code> unions every match surface (aliases + DTMF digits)
+per <code>menu_group</code> and raises the <code>error</code> finding <code>menu-token-collision</code> when a token
+is claimed by two capabilities &mdash; <code>parse_pack</code> rejects the whole pack. A naive
+per-question alias generator produced <strong>11 collisions</strong> across MFC Law's 14 FAQs:
+<code>injury</code> was claimed by six capabilities, <code>personal</code> by five, because every question
+is about personal injury. A function that only sees one question at a time cannot know
+that. So alias assignment moved into <code>website_to_pack</code>'s <code>_assign_faq_aliases</code>, which
+sees every capability at once, reserves every overlay-declared alias and DTMF digit first
+(the human's taste always wins), and drops <strong>greedy words</strong> &mdash; generic English an
+ordinary caller says about anything, the same posture as <code>schema.py</code>'s
+<code>_GREEDY_URGENCY_ALIASES</code>. Without that filter, words like <code>after</code>, <code>still</code>,
+<code>which</code>, <code>types</code>, and <code>valid</code> become routing tokens, and "after" would send a
+caller straight to the car-accident FAQ.</p>
+
+<h3 id="defect-e">(e) A 56-second menu</h3>
+<p><code>riff/business_pack/compile.py</code>'s <code>_menu_prompt_and_controls</code> (around line 2330)
+appends <code>"Or say &lt;alias&gt;."</code> for every capability without a DTMF digit. <code>legal_intake</code>
+has exactly one such capability, so nobody noticed. The website importer generates
+<strong>thirteen</strong>. The mfclaw greeting compiled to <strong>827 characters, 140 words</strong> &mdash;
+about 56 seconds of speech reciting every FAQ title before the caller could say anything
+&mdash; and its TTS render <strong>failed outright</strong>. The fix: <code>Capability</code> gains
+<code>announce: bool = True</code>; setting it <code>False</code> makes a hidden intent (see
+<a href="#hidden-intents">&sect;6</a>). Routing is unaffected, because the announce state
+carries only the spoken line while the <code>menu</code> state's <code>locked_choice</code> carries the
+aliases &mdash; two different states built from the same capability list. Measured, on the
+actual compiled pack: <strong>827 &rarr; 150 characters, 140 &rarr; 32 words</strong>, routing
+table unchanged. Default is <code>True</code>, so every pre-existing pack compiles byte-identically.</p>
+
+<h3 id="defect-f">(f) The build gate guessed</h3>
+<p><code>riff/business_pack/__main__.py</code>'s <code>build</code> command used to capture the audio
+renderer's stderr, discard it, print only the last line of stdout, and print
+"FAIL (audio render &mdash; is <code>GEMINI_API_KEY</code> set?)" on <strong>any</strong> nonzero exit. The
+key was live the whole time (HTTP 200, 50 models available). The real summary was
+<code>rendered=1 skipped=14 errors=1</code>, and the single error was <code>menu_full_announce</code> &mdash;
+defect (e), the 56-second greeting. It now prints every <code>[ERROR]</code> cue name, the last five
+lines of the renderer's actual stderr, and the process exit code, instead of one generic
+guess.</p>
+
+<h3 id="defect-g">(g) Silent data loss on id collision</h3>
+<p>FAQ capability ids were the question's slug truncated to 60 characters, deduped on that
+id. Two <strong>distinct</strong> questions sharing a 60-character prefix collapsed into one, and the
+second vanished with no warning. This wasn't hypothetical: <code>mfclaw.com</code> already
+publishes a question whose id lands exactly on that boundary
+(<code>how_can_i_contact_the_law_offices_of_michael_f_campopiano_if</code>); a sibling question
+differing only after character 60 would have silently erased it. The fix dedupes on the
+<strong>full question text</strong> instead (an identical question repeated really is a duplicate,
+and is still dropped) and disambiguates colliding-but-distinct ids with a deterministic
+<code>_2</code>, <code>_3</code> suffix in document order.</p>
+
+<p>Every one of these seven lived in a path that looked covered &mdash; tests were green in
+every case. Each was found only by running the real thing: a live fetch against
+<code>mfclaw.com</code>, a real compile of the generated pack, a real TTS render with a live API
+key, and by reading the spoken greeting aloud instead of just checking that it compiled.</p>
+
+<h3 id="cleanup-defects">Two more, found the same way</h3>
+<p><strong>A stray space before punctuation.</strong> Stripping inline <code>&lt;strong&gt;</code> tags out
+of the FAQ HTML left a space before the following punctuation mark, so digit 3 spoke <em>"you
+pay nothing upfront . We work on a contingency fee basis , meaning&hellip;"</em>. Three of the
+fourteen answers had this, including the one promoted to digit 3. The fix lives in
+<code>_clean</code> (<code>riff/business_pack/importers/website.py</code>) and is whitespace-only &mdash; no
+word is added, removed, or reordered, so the "spoken text is a verbatim prefix of the
+published answer" invariant still holds.</p>
+
+<h2 id="never-clauses">9. Never clauses</h2>
 <ol>
 <li>Never let a model originate a fact. Facts come from JSON-LD or the overlay.</li>
 <li>Never emit spoken text that is not traceable to published site copy or the overlay.</li>
@@ -401,20 +512,28 @@ that announces and always advances is not a gate; <code>areaServed</code> is spo
 <code>content</code>.</li>
 </ol>
 
-<h2 id="code-map">11. Code map</h2>
-<p>Nothing below except <code>scripts/deploy_business.py</code> exists yet &mdash; this page documents
-the contract the rest of this plan builds toward.</p>
-<pre><code class="language-text">scripts/site_snapshot.py                       # two-tier fetch → index.json (not yet built)
-riff/business_pack/importers/website.py         # extract_profile + website_to_pack (not yet built)
-data/site_ingest/mfclaw/                        # index.json, profile.json, overlay.yaml; raw pages/ gitignored
-tests/business_pack/test_website_importer.py    # U1-U13, offline, no network in any test
+<h2 id="code-map">10. Code map and test matrix</h2>
+<pre><code class="language-text">scripts/site_snapshot.py                       # two-tier fetch → index.json; the only module
+                                                 # that touches the network
+riff/business_pack/importers/website.py         # extract_profile + website_to_pack (pure)
+data/site_ingest/mfclaw/                        # index.json, profile.json, overlay.yaml;
+                                                 # raw pages/ gitignored
+packs/generated/mfclaw.pack.yaml                # generated pack: 0 errors, 0 warns
+tests/business_pack/test_website_importer.py    # 48 tests, offline, no network in any test
 scripts/deploy_business.py                      # existing; binds business.phone at deploy time
 </code></pre>
+<p>The importer suite is 48 tests covering U1&ndash;U23 from the design spec, plus the seven
+defects above and the stray-space cleanup &mdash; each defect has a named regression test
+(for example <code>test_same_id_nodes_merge_in_document_order_across_nesting_keys</code> for
+defect (c), <code>test_hidden_intents_stay_routable_and_shorten_the_greeting</code> for defect (e),
+<code>test_distinct_questions_with_colliding_slugs_are_both_kept</code> for defect (g)). Adding this
+suite took the full business-pack test count from 373 to <strong>423 passing</strong>, with zero new
+failures elsewhere.</p>
 <p>Full design rationale: <a href="/docs/docs/superpowers/specs/2026-07-08-website-ingest-importer-design.md">docs/superpowers/specs/2026-07-08-website-ingest-importer-design.md</a>.
 Agent-facing quick reference: <code>.claude/skills/ingest-website/SKILL.md</code>.</p>
 
 </main>
-<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#the-problem">1. The problem</a></li><li class="toc-h2"><a href="#why-it-works">2. Why it works</a></li><li class="toc-h2"><a href="#snapshot-first">3. Snapshot-first</a></li><li class="toc-h2"><a href="#fetch-tiers">4. The fetch tiers</a></li><li class="toc-h2"><a href="#why-no-llm">5. Why v1 has no LLM</a></li><li class="toc-h2"><a href="#menu-caller-shaped">6. The menu is caller-shaped, not SEO-shaped</a></li><li class="toc-h2"><a href="#practice-areas-not-capabilities">7. The eight practice areas are not capabilities</a></li><li class="toc-h2"><a href="#two-v0-traps">7b. Two v0 traps the importer refuses</a></li><li class="toc-h2"><a href="#run-it">8. Run it</a></li><li class="toc-h2"><a href="#going-live">9. Onboarding: going live</a></li><li class="toc-h2"><a href="#never-clauses">10. Never clauses</a></li><li class="toc-h2"><a href="#code-map">11. Code map</a></li></ul></aside>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#what-it-does">1. What it does</a></li><li class="toc-h2"><a href="#why-it-works">2. Why it works</a></li><li class="toc-h2"><a href="#snapshot-first">3. Snapshot-first</a></li><li class="toc-h2"><a href="#fetch-tiers">4. The fetch tiers</a></li><li class="toc-h2"><a href="#what-it-refuses">5. What it refuses to do</a></li><li class="toc-h2"><a href="#menu-caller-shaped">6. The menu is caller-shaped</a></li><li class="toc-h3"><a href="#hidden-intents">Hidden intents</a></li><li class="toc-h3"><a href="#practice-areas-not-capabilities">Practice areas aren't capabilities</a></li><li class="toc-h2"><a href="#going-live">7. Going live</a></li><li class="toc-h2"><a href="#seven-defects">8. Seven defects this build found</a></li><li class="toc-h3"><a href="#defect-a">(a) Browser tier hung</a></li><li class="toc-h3"><a href="#defect-b">(b) One entity, two nodes</a></li><li class="toc-h3"><a href="#defect-c">(c) Traversal order inverted</a></li><li class="toc-h3"><a href="#defect-d">(d) Aliases are pack-global</a></li><li class="toc-h3"><a href="#defect-e">(e) A 56-second menu</a></li><li class="toc-h3"><a href="#defect-f">(f) The build gate guessed</a></li><li class="toc-h3"><a href="#defect-g">(g) Silent id-collision loss</a></li><li class="toc-h3"><a href="#cleanup-defects">Two more, same way</a></li><li class="toc-h2"><a href="#never-clauses">9. Never clauses</a></li><li class="toc-h2"><a href="#code-map">10. Code map &amp; tests</a></li></ul></aside>
 </div>
 </body>
 </html>
