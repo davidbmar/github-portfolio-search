@@ -197,7 +197,7 @@ Aman's side needs to expose or implement the signed receiver for:</p>
 </ul>
 <p>Money fields stay excluded: estimates, quotes, invoices, balances, and vendor phone numbers.</p>
 <h2 id="mutation-behavior">Mutation behavior</h2>
-<p>Updates never overwrite ticket <code>title</code> or <code>description</code> after creation. The voice path sends tenant update text only.</p>
+<p>Updates never overwrite ticket <code>title</code> or <code>description</code> after creation. The voice path sends only an <code>updates</code> object containing <code>tenant_update_text</code> for the spoken tenant note.</p>
 <p>Cancel/resolved behavior is Replicant-owned:</p>
 <ul>
 <li>Immediate cancel for <code>SUBMITTED</code>, <code>TRIAGED</code>, <code>AWAITING_APPROVAL</code>, <code>APPROVED</code>.</li>

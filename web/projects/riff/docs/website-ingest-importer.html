@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Website Ingest Importer — schema.org → RIFF Business Pack · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-08-website-ingest-importer-design.md</span>
+<a class="raw" href="/docs/docs/superpowers/specs/2026-07-08-website-ingest-importer-design.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Website Ingest Importer — schema.org &rarr; <code>riff_business_pack_v0</code></h1>
+<p><strong>Status:</strong> design approved 2026-07-08, documentation phase (this page ships first &mdash; the code does not exist yet).
+<strong>First target:</strong> <code>https://mfclaw.com/</code>, a Rhode Island personal-injury firm.
+<strong>Design spec:</strong> <code>docs/superpowers/specs/2026-07-08-website-ingest-importer-design.md</code>.</p>
+
+<h2 id="the-problem">1. The problem</h2>
+<p>You want a phone menu for a business that already has a website. Today that means
+hand-writing a business pack: typing out the business's name, phone, hours, FAQ answers,
+and menu by hand into YAML. This importer does that job for you &mdash; point it at the
+business's URL, and it reads the same structured data the business already publishes for
+Google, and turns it into a caller-shaped phone menu. No LLM guesses a fact. No page prose
+is parsed. If the site doesn't publish enough structured data, the importer says so and
+stops, instead of shipping a menu built on guesses.</p>
+
+<h2 id="why-it-works">2. Why it works: two closed vocabularies</h2>
+<p>The obvious objection is that every website is different — different layout, different
+copy, different navigation. That's true, and it's also irrelevant, because the importer
+never reads any of that. It reads exactly one thing: a block of JSON called
+<strong>schema.org JSON-LD</strong>, embedded in the page's <code>&lt;head&gt;</code>.</p>
+<p><strong>Supply side.</strong> Search engines reward businesses that publish this structured
+data with "rich results" (the star ratings, hours, and phone numbers you see directly in
+Google search results). So the SEO plugins almost every small-business site already runs
+&mdash; Yoast, RankMath, and similar &mdash; emit it automatically. The business owner never
+wrote a line of it; their web developer's plugin did, for Google's benefit. <code>mfclaw.com</code>
+ships this in its <code>&lt;head&gt;</code>:</p>
+<pre><code class="language-text">LegalService.name         "The Law Offices of Michael F. Campopiano"
+LegalService.telephone    "+14012883888"
+LegalService.email        "mfc@mfclaw.com"
+LegalService.address      21 Douglas Ave, Providence, RI 02908
+LegalService.areaServed   [State: Rhode Island, State: Massachusetts]
+LegalService.knowsLanguage ["en", "es", "pt"]
+</code></pre>
+<p>&hellip;plus fourteen <code>Question</code>/<code>Answer</code> pairs: a complete FAQ, written and
+published by the firm itself.</p>
+<p><strong>Demand side.</strong> <code>riff/business_pack/schema.py</code> already defines a closed target
+vocabulary on the other end: eight <code>CAPABILITY_KINDS</code> a pack's menu entries can be
+(<code>intake_form</code>, <code>message</code>, <code>handoff</code>, <code>content</code>, <code>companion_link</code>,
+<code>calendar_booking</code>, <code>replicant_ticket_ops</code>, <code>menu_link</code>).</p>
+<p>The importer is therefore a mapping between two closed vocabularies &mdash; what SEO
+plugins emit, and what a business pack accepts &mdash; not a general web-scraper. It never
+parses the middle of a page, which is the one part that varies without bound from site to
+site.</p>
+
+<h2 id="snapshot-first">3. Snapshot-first</h2>
+<p>The pipeline has a strict one-way shape:</p>
+<pre><code class="language-text">fetch (network, impure)  →  snapshot/  →  extract_profile (pure)  →  profile.json
+                                                                          │
+                                            overlay.yaml (human) ─────────┤
+                                                                          ▼
+                                                          website_to_pack (pure)
+                                                                          │
+                                                                          ▼
+                                              parse_pack → compile_pack → flow
+</code></pre>
+<p>Once the raw bytes are written to disk, <strong>nothing downstream ever touches the network
+again.</strong> Every step after the fetch is a pure function of files already on disk, and every
+one of those steps is unit-tested offline. This is why "should the fetcher use <code>curl</code> or a
+real browser?" is not an architectural question &mdash; it's an implementation detail of one
+box in the diagram. Swap it for a human hitting Save-As in their browser and nothing else in
+the pipeline would need to change.</p>
+
+<h2 id="fetch-tiers">4. The fetch tiers</h2>
+<p>It is tempting to assume a plain HTTP request is enough. It isn't. A plain-user-agent
+<code>curl</code> against <code>mfclaw.com</code> returns <strong>226 bytes</strong> &mdash; a ModSecurity
+<code>Not Acceptable!</code> denial, not the page. The identical request with real browser headers
+(the ones an actual Chrome tab sends) returns <strong>693,467 bytes</strong>, containing both
+JSON-LD blocks. Real small-business hosting stacks block requests that don't look like a
+browser; that's not a hypothetical, it's what happened on the very first fixture site.</p>
+<p>So the fetcher has two tiers:</p>
+<ol>
+<li><strong><code>http</code></strong> &mdash; <code>httpx</code> with full browser headers. The default; cheap and fast.</li>
+<li><strong><code>browser</code></strong> &mdash; a real Playwright Chromium session. Escalation only, because it's
+slow and heavier.</li>
+</ol>
+<p>The decision to escalate is a pure, unit-tested function &mdash; only the I/O around it
+touches the network:</p>
+<pre><code class="language-python">def should_escalate(status: int, body: bytes) -> str | None:
+    """Return the escalation reason, or None to keep the HTTP snapshot."""
+</code></pre>
+<p>It fires on any of three triggers: <code>status</code> outside the 2xx range; <code>len(body) &lt;
+20_000</code>; or zero <code>application/ld+json</code> blocks found. The 20KB floor sits well under
+<code>mfclaw.com</code>'s 693KB homepage and well over the 226-byte ModSecurity denial &mdash; more
+than an order of magnitude of headroom on both sides, so one number cleanly separates the
+two cases actually observed. Escalation is never silent: every trigger is logged and
+recorded in <code>index.json</code> as that page's <code>tier</code>, because a bare fallback that just
+tries again without saying why is exactly the shape that hid a real bug for ten sprints in
+this repo before.</p>
+
+<h2 id="why-no-llm">5. Why v1 has no LLM</h2>
+<p>The fourteen FAQ answers on <code>mfclaw.com</code> are words the firm itself wrote, reviewed, and
+published under its own name &mdash; including a line like "the statute of limitations in
+Rhode Island is three years." The importer speaks these answers on the phone
+<strong>verbatim</strong>. The rule that makes this safe is absolute:</p>
+<blockquote>a model may compress and label; it may never originate a fact.</blockquote>
+<p>Nothing is inferred, so nothing can be hallucinated, and the firm has nothing new to
+indemnify beyond what it already published. Truncating a long answer to a speakable length
+is done deterministically, on a sentence boundary &mdash; never by asking a model to shorten
+it. For a law firm this is a <strong>bar-advertising constraint before it is a quality one</strong>:
+the phone is legally safer when it says exactly what the website already says, and nothing
+else.</p>
+
+<h2 id="menu-caller-shaped">6. The menu is caller-shaped, not SEO-shaped</h2>
+<p>Those fourteen FAQs exist because Google rewards <code>FAQPage</code> markup with rich results.
+That's SEO-shaped information architecture, tuned for a search results page. The person
+calling a personal-injury firm was, quite plausibly, in a car accident this morning. They
+don't want "press 7 to hear about pure comparative negligence." A phone menu holds about
+five options before a caller gives up; a faithful transcription of the site's FAQ index
+would build a hostile phone tree instead of a helpful one. So the menu is hand-ranked in
+<code>overlay.yaml</code>, not derived from the site's own navigation.</p>
+<p>MFC Law's menu, once ranked:</p>
+<table>
+<tr><th>DTMF</th><th>Capability</th><th><code>kind</code></th><th>Source</th></tr>
+<tr><td><code>1</code></td><td>Start a new claim</td><td><code>intake_form</code></td><td>contact-form fields</td></tr>
+<tr><td><code>2</code></td><td>Case status</td><td><code>message</code></td><td>&mdash;</td></tr>
+<tr><td><code>3</code></td><td>Fees &amp; costs</td><td><code>content</code></td><td>FAQ &ldquo;How much does it cost to hire a personal injury lawyer?&rdquo;, verbatim</td></tr>
+<tr><td><code>4</code></td><td>Something else &mdash; leave a message</td><td><code>message</code></td><td>safe-decline terminal</td></tr>
+</table>
+<p>Digits must start at <code>1</code> (an optional leading <code>"0"</code> is allowed before it).
+<code>riff/business_pack/schema.py:1021-1024</code> computes the expected sequence as
+<code>[str(n) for n in range(1, len(actual) + 1)]</code> and rejects anything else at build time
+with a <code>dtmf-not-sequential</code> error &mdash; a menu can't ship with digits <code>2, 3, 4</code> and no
+<code>1</code>.</p>
+<p>Note there is no <code>handoff</code> capability on this menu. <code>handoff</code> means a live warm
+transfer, and MFC Law has no forwarding number to transfer to. Dropping it isn't a free
+choice, though &mdash; it <strong>forces</strong> capability <code>4</code> to be a <code>message</code>. The schema
+defines <code>SAFE_DECLINE_KINDS = frozenset({"message", "handoff"})</code>: whatever a caller lands
+on after declining the consent gate must be a capability that can't loop back into the gated
+path. With <code>handoff</code> off the table, <code>message</code> is the only option left, so the menu is
+required to have one.</p>
+
+<h2 id="practice-areas-not-capabilities">7. The eight practice areas are not capabilities</h2>
+<p>Car accidents, slip &amp; fall, dog bite, motorcycle, premises liability, product liability,
+pedestrian, and Uber/Lyft are not eight menu entries. They're the eight values of one field
+&mdash; the intake form's own case-type picker. They compile to the options of the
+<code>matter_area</code> slot inside capability <code>1</code>, not eight separate <code>content</code> capabilities. A
+caller doesn't want to hunt through a phone tree for their practice area; they want to say
+"I got rear-ended" and be routed.</p>
+<p>This is also the one place the site's structured data runs out. The observed JSON-LD
+<code>@type</code>s on <code>mfclaw.com</code> are <code>LegalService</code>, <code>PostalAddress</code>, <code>State</code>,
+<code>Person</code>, <code>WebSite</code>, <code>SearchAction</code>, <code>ImageObject</code>, <code>Question</code>, and
+<code>Answer</code> &mdash; there is no <code>Service</code> or <code>OfferCatalog</code> anywhere in it. So
+<code>services[]</code> (the list of practice areas) can't come from the profile at all; it comes
+from <code>overlay.yaml</code>. The overlay isn't a workaround here &mdash; it's the place where facts
+the site never typed get stated by a human, on the record.</p>
+
+<h2 id="two-v0-traps">7b. Two v0 traps the importer refuses</h2>
+<p>The obvious website-to-pack mapping walks straight into two features that exist in the
+pack schema but do nothing at runtime in v0. The importer emits neither, and the reasons
+they're dangerous are different in a way that matters.</p>
+<p><strong><code>submit:</code> is dead config that warns.</strong> <code>riff/business_pack/schema.py:855</code>
+accepts a <code>submit:</code> block but ignores it: no generic submit tool is registered in the
+runtime (<code>record_issue</code> is a <em>state name</em> used by other flows, not a callable tool),
+so a pack declaring <code>submit:</code> gets a loud <code>submit-ignored</code> warn finding at build time.
+Nothing silently disappears &mdash; the pack still compiles, but the finding is right there in
+the check output.</p>
+<p><strong><code>screening_gate.blocked_line</code> is dead config that is silent.</strong>
+<code>riff/business_pack/schema.py:1157</code> accepts a <code>screening_gate</code>'s <code>tool</code> and
+<code>blocked_line</code> fields "for forward compat but unused," and grep proves neither is read
+anywhere else in the codebase. <code>riff/business_pack/compile.py:3688</code> compiles the gate
+into a state with <code>speech_act: inform</code> and exactly one transition, <code>when: always</code>
+&mdash; it announces a line, then advances unconditionally. It is not a gate; it's a
+checkpoint that never checks anything. Proof: <code>packs/legal_intake.pack.yaml</code> declares the
+blocked line <em>"I'm sorry, we're unable to help with this matter by phone&hellip;"</em>, and that
+sentence does not appear anywhere in the compiled <code>flows/legal_intake.yaml</code>. A caller who
+should have been blocked walks straight through, and nothing complains.</p>
+<p>This is exactly the trap a website importer would fall into on its own. <code>areaServed:
+[Rhode Island, Massachusetts]</code> <em>reads</em> like a screening gate &mdash; the obvious mapping
+is "add a <code>screening_gate</code> that blocks callers outside RI/MA" &mdash; and the resulting pack
+would cheerfully take a claim from Ohio anyway, because the gate never actually blocks
+anyone. So the importer maps <code>service_area[]</code> to a <strong>spoken <code>content</code>
+capability</strong> instead &mdash; a line the caller hears, never a gate that pretends to enforce
+anything. A later task in this plan (the shift-left guard) adds a
+<code>screening-gate-field-ignored</code> warn to <code>schema.py</code> itself, symmetric with
+<code>submit-ignored</code>, so any pack &mdash; ingested or hand-authored &mdash; that declares
+<code>tool</code> or <code>blocked_line</code> gets called out at build time. The principle: fixing this one
+importer only <em>avoids</em> the trap for the packs it generates; adding the lint <em>closes</em>
+it for every pack, forever.</p>
+
+<h2 id="run-it">8. Run it</h2>
+<p>This tutorial is written before the code that implements it &mdash; writing the tutorial
+first is what pins down the exact command-line contract that the implementation tasks
+have to match. Once those tasks land, running the importer looks like this.</p>
+<p><strong>Step 1 &mdash; snapshot the site:</strong></p>
+<pre><code class="language-bash">python scripts/site_snapshot.py https://mfclaw.com/ --out data/site_ingest/mfclaw --fetch auto
+</code></pre>
+<pre><code class="language-text">fetch mfclaw.com/            http tier   226 bytes   escalating: len(body) &lt; 20000
+fetch mfclaw.com/ (browser)  browser tier   693467 bytes   2 json-ld blocks
+wrote data/site_ingest/mfclaw/index.json   1 page, tier=browser
+wrote data/site_ingest/mfclaw/pages/index.html   (gitignored)
+</code></pre>
+<p><strong>Step 2 &mdash; extract the profile and build the pack:</strong></p>
+<pre><code class="language-bash">python -m riff.business_pack.importers.website data/site_ingest/mfclaw --out packs/generated
+</code></pre>
+<pre><code class="language-text">wrote data/site_ingest/mfclaw/profile.json   business=mfclaw, 14 faq, 2 service_area
+read  data/site_ingest/mfclaw/overlay.yaml   4 menu entries, 8 services
+wrote packs/generated/mfclaw.pack.yaml
+  ✅ [parse_pack] 0 errors, 0 warns
+  ✅ [compile_pack] flow written: flows/generated/mfclaw.yaml
+</code></pre>
+<p>The <code>--fetch</code> flag on <code>site_snapshot.py</code> accepts <code>auto</code> (try <code>http</code>, escalate to
+<code>browser</code> only when <code>should_escalate</code> fires &mdash; the default), <code>http</code> (force the
+cheap tier), or <code>browser</code> (force Playwright, useful when you already know a site blocks
+plain requests).</p>
+
+<h2 id="going-live">9. Onboarding: going live</h2>
+<p>Ingest produces a pack. It does not produce a phone line. Those are two different kinds
+of artifact, made by two different steps:</p>
+<ul>
+<li>A <strong>build artifact</strong> is anything the importer writes: <code>profile.json</code>,
+<code>packs/generated/mfclaw.pack.yaml</code>, the compiled flow. Reproducible from a snapshot;
+safe to regenerate any time.</li>
+<li>A <strong>deploy artifact</strong> is a decision a human makes once, outside the importer:
+which real phone number this business answers on.</li>
+</ul>
+<p>The generated pack therefore <strong>omits <code>business.phone</code> entirely</strong>. The number is
+bound later, by <code>scripts/deploy_business.py</code>:</p>
+<pre><code class="language-python"># deploy_business.py:225-229
+declared_phone = str((raw.get("business") or {}).get("phone") or "")
+if declared_phone and declared_phone != did:
+    _step("pack phone matches --did", False,
+          f"pack says {declared_phone}, deploying to {did}")
+    return 1
+</code></pre>
+<p>An <strong>empty</strong> phone deploys cleanly to any <code>--did</code> you give it. A
+<strong>non-empty</strong> phone <em>pins</em> the pack to exactly that one number &mdash; deploying it
+anywhere else fails this gate on purpose, so a redeploy can't accidentally land a pack on
+the wrong line. Three of the repo's thirteen packs declare <code>business.phone</code> today
+(<code>armadillo_ink</code>, <code>legal_intake</code>, <code>property_management</code>), and each is pinned to
+the number it's actually deployed on. The other ten leave it empty &mdash; including two more
+that are also live right now (<code>space_channel_widgets</code>, <code>electrical_intake</code>), because
+declaring the phone is optional even after go-live; it only matters once you want the pin.
+A <em>placeholder</em> number would be worse than an absent one: it doesn't skip the gate, it
+<strong>fails</strong> it, the moment it doesn't match <code>--did</code> exactly.</p>
+<p>Order of operations, once the pack compiles clean:</p>
+<ol>
+<li><strong>Register the number.</strong> Buy or port a DID in Telnyx, attach it to the connection
+and messaging profile. 10DLC registration belongs to the <em>number</em>, not the business.</li>
+<li><strong>Deploy.</strong> <code>.venv/bin/python scripts/deploy_business.py
+packs/generated/mfclaw.pack.yaml --did +1&hellip;</code> &mdash; this runs the gates, builds static
+audio, walks both welcome branches, writes the DID into
+<code>RIFF_DIALED_ROUTING_TABLE_JSON</code> in <code>.env</code>, restarts the phone node, and preflights
+DID&rarr;org routing across all lines.</li>
+<li><strong>Record the binding.</strong> Once deployed, write that DID into the pack's
+<code>business.phone</code>. From then on, the gate refuses to deploy this pack anywhere else
+&mdash; that's the point.</li>
+<li><strong>Point the website at it, last.</strong> Update the firm's published number only
+after a real call has verified the line works.</li>
+</ol>
+<p>Step 4 is reversible; step 3 is the tripwire. Do them in that order &mdash; not first, in
+case the line isn't actually working yet. Note that <code>profile.json</code>'s own
+<code>business.telephone</code> (<code>+14012883888</code>, the firm's real published line) is never the
+pack's phone. It's provenance only: proof of where the facts came from, not where the flow
+answers calls.</p>
+
+<h2 id="never-clauses">10. Never clauses</h2>
+<ol>
+<li>Never let a model originate a fact. Facts come from JSON-LD or the overlay.</li>
+<li>Never emit spoken text that is not traceable to published site copy or the overlay.</li>
+<li>Never fall back silently. Log the trigger; record the tier; or re-raise.</li>
+<li>Never give legal advice or predict outcomes (inherited from the pack <code>system_prompt</code>).</li>
+<li>Never emit a menu without a <code>message</code> safe-decline terminal.</li>
+<li>Never write a pack that does not <code>parse_pack</code> and <code>compile_pack</code> clean.</li>
+<li>Never check raw scraped HTML into git. The sha256 in <code>index.json</code> is the provenance.</li>
+<li>Never write <code>business.phone</code> into a generated pack. <code>deploy_business.py --did</code>
+binds it. The firm's published <code>telephone</code> is provenance, never the line the flow
+answers on.</li>
+<li>Never emit a <code>submit:</code> block or a <code>screening_gate</code>. Both are inert in v0. A gate
+that announces and always advances is not a gate; <code>areaServed</code> is spoken
+<code>content</code>.</li>
+</ol>
+
+<h2 id="code-map">11. Code map</h2>
+<p>Nothing below except <code>scripts/deploy_business.py</code> exists yet &mdash; this page documents
+the contract the rest of this plan builds toward.</p>
+<pre><code class="language-text">scripts/site_snapshot.py                       # two-tier fetch → index.json (not yet built)
+riff/business_pack/importers/website.py         # extract_profile + website_to_pack (not yet built)
+data/site_ingest/mfclaw/                        # index.json, profile.json, overlay.yaml; raw pages/ gitignored
+tests/business_pack/test_website_importer.py    # U1-U13, offline, no network in any test
+scripts/deploy_business.py                      # existing; binds business.phone at deploy time
+</code></pre>
+<p>Full design rationale: <a href="/docs/docs/superpowers/specs/2026-07-08-website-ingest-importer-design.md">docs/superpowers/specs/2026-07-08-website-ingest-importer-design.md</a>.
+Agent-facing quick reference: <code>.claude/skills/ingest-website/SKILL.md</code>.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#the-problem">1. The problem</a></li><li class="toc-h2"><a href="#why-it-works">2. Why it works</a></li><li class="toc-h2"><a href="#snapshot-first">3. Snapshot-first</a></li><li class="toc-h2"><a href="#fetch-tiers">4. The fetch tiers</a></li><li class="toc-h2"><a href="#why-no-llm">5. Why v1 has no LLM</a></li><li class="toc-h2"><a href="#menu-caller-shaped">6. The menu is caller-shaped, not SEO-shaped</a></li><li class="toc-h2"><a href="#practice-areas-not-capabilities">7. The eight practice areas are not capabilities</a></li><li class="toc-h2"><a href="#two-v0-traps">7b. Two v0 traps the importer refuses</a></li><li class="toc-h2"><a href="#run-it">8. Run it</a></li><li class="toc-h2"><a href="#going-live">9. Onboarding: going live</a></li><li class="toc-h2"><a href="#never-clauses">10. Never clauses</a></li><li class="toc-h2"><a href="#code-map">11. Code map</a></li></ul></aside>
+</div>
+</body>
+</html>
