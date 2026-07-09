@@ -298,7 +298,7 @@ is "add a <code>screening_gate</code> that blocks callers outside RI/MA" &mdash;
 would cheerfully take a claim from Ohio anyway, because the gate never actually blocks
 anyone. So the importer maps <code>service_area[]</code> to a <strong>spoken <code>content</code>
 capability</strong> instead &mdash; a line the caller hears, never a gate that pretends to enforce
-anything. A later task in this plan (the shift-left guard) adds a
+anything. Task 8 of this plan (the shift-left guard) adds a
 <code>screening-gate-field-ignored</code> warn to <code>schema.py</code> itself, symmetric with
 <code>submit-ignored</code>, so any pack &mdash; ingested or hand-authored &mdash; that declares
 <code>tool</code> or <code>blocked_line</code> gets called out at build time. The principle: fixing this one
@@ -369,9 +369,12 @@ packs/generated/mfclaw.pack.yaml --did +1&hellip;</code> &mdash; this runs the g
 audio, walks both welcome branches, writes the DID into
 <code>RIFF_DIALED_ROUTING_TABLE_JSON</code> in <code>.env</code>, restarts the phone node, and preflights
 DID&rarr;org routing across all lines.</li>
-<li><strong>Record the binding.</strong> Once deployed, write that DID into the pack's
-<code>business.phone</code>. From then on, the gate refuses to deploy this pack anywhere else
-&mdash; that's the point.</li>
+<li><strong>Record the binding &mdash; recommended, not required.</strong> Once deployed, you may
+write that DID into the pack's <code>business.phone</code>. From then on, the gate refuses to
+deploy this pack anywhere else &mdash; that's the point, if you want the pin. Two live packs
+(<code>space_channel_widgets</code> on <code>+13215596277</code>, <code>electrical_intake</code> on
+<code>+15122777311</code>) skip this step and work fine; the cost of skipping is only that
+nothing stops a later redeploy to the wrong number.</li>
 <li><strong>Point the website at it, last.</strong> Update the firm's published number only
 after a real call has verified the line works.</li>
 </ol>

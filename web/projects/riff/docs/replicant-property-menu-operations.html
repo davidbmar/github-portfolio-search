@@ -129,17 +129,28 @@ html { scroll-behavior: smooth; }
 <main class="doc-container">
 <h1>Replicant Property Menu Operations</h1>
 <p>Date: 2026-07-08</p>
-<p>Status: implemented in RIFF pack/compiler/runtime; Replicant receiver endpoints still need to be available at <code>REPLICANT_API_BASE</code>.</p>
+<p>Status: implemented in RIFF pack/compiler/runtime; Replicant receiver endpoints must be available at <code>REPLICANT_API_BASE</code>.</p>
 <p>Related:</p>
 <ul>
 <li><a href="2026-07-08-replicant-ticket-operations-design.md?format=html">Replicant ticket operations design</a></li>
 <li><a href="2026-07-07-node-release-channel-design.md?format=html">Two-node release channel design</a></li>
 </ul>
 <h2 id="what-changed">What changed</h2>
-<p>The <code>property_management</code> voice menu now includes an existing-request path:</p>
+<p>The <code>property_management</code> voice menu now opens on a front-desk menu instead of sending every caller straight into the maintenance category intake:</p>
 <ul>
-<li>Press 8: existing request.</li>
-<li>Press 9: leave a message.</li>
+<li>Press 1: start maintenance request.</li>
+<li>Press 2: existing request.</li>
+<li>Press 3: leave a message.</li>
+</ul>
+<p>The start-maintenance path opens the repair category submenu:</p>
+<ul>
+<li>Press 1: plumbing.</li>
+<li>Press 2: appliance.</li>
+<li>Press 3: heating or cooling.</li>
+<li>Press 4: electrical.</li>
+<li>Press 5: pests.</li>
+<li>Press 6: locks or keys.</li>
+<li>Press 7: common areas.</li>
 </ul>
 <p>The existing-request path is generated from <code>packs/property_management.pack.yaml</code> with a first-class <code>replicant_ticket_ops</code> capability, so regenerated flows keep the behavior. The generated states support:</p>
 <ul>
@@ -149,7 +160,7 @@ html { scroll-behavior: smooth; }
 <li>Add a tenant update after confirmation.</li>
 <li>Request cancellation after confirmation.</li>
 <li>Tell the property manager the issue is resolved after confirmation.</li>
-<li>Return to the main menu for a new issue; new issue creation still uses the existing category intake and create endpoint.</li>
+<li>Return to the main menu for a new issue; new issue creation still uses the generated maintenance category intake and create endpoint.</li>
 </ul>
 <p>There is no <code>/riff/tickets/create</code> alias.</p>
 <h2 id="replicant-receiver-contract">Replicant receiver contract</h2>
@@ -226,7 +237,7 @@ Aman's side needs to expose or implement the signed receiver for:</p>
 <li><code>python -m riff.business_pack compile packs/property_management.pack.yaml --out-dir flows/generated</code></li>
 <li><code>python -m riff.business_pack compile packs/property_management.pack.yaml --out-dir flows</code></li>
 </ul>
-<p>The compile may warn that SMS deliverability is skipped when <code>TELNYX_API_KEY</code> is not set in the local shell. That warning is unrelated to the Replicant ticket operations path.</p>
+<p>The property DID must be attached to a 10DLC campaign before keyed builds pass the SMS deliverability gate. On 2026-07-08, <code>+15102160079</code> was attached to the same Telnyx campaign used by the other RIFF SMS-capable numbers and the Telnyx assignment reached <code>ASSIGNED</code> (<code>att=ADDED</code>, <code>tmobile=PENDING</code> at verification time).</p>
 
 </main>
 <aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#what-changed">What changed</a></li><li class="toc-h2"><a href="#replicant-receiver-contract">Replicant receiver contract</a></li><li class="toc-h2"><a href="#source-of-truth">Source of truth</a></li><li class="toc-h2"><a href="#safe-read-fields">Safe read fields</a></li><li class="toc-h2"><a href="#mutation-behavior">Mutation behavior</a></li><li class="toc-h2"><a href="#m3-and-m1-rollout">M3 and M1 rollout</a></li><li class="toc-h2"><a href="#verification">Verification</a></li></ul></aside>
