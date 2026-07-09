@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T04:19:03.682151Z",
+  "generated_at": "2026-07-09T04:54:58.207841Z",
   "count": 138,
   "projects": [
     {
@@ -2135,26 +2135,27 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
         "JSONL",
-        "WebSockets",
-        "SQLite"
+        "SQLite",
+        "HTML/CSS/JS",
+        "Pytest"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm",
-        "llm",
+        "finite-state-machine",
+        "llm-orchestration",
         "python",
-        "yaml-config",
-        "deterministic-ai"
+        "deterministic-ai",
+        "business-automation"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-09T04:15:53Z"
+      "pushed_at": "2026-07-09T04:52:03Z"
     },
     {
       "slug": "riot",

@@ -160,8 +160,13 @@ html { scroll-behavior: smooth; }
 <li>Add a tenant update after confirmation.</li>
 <li>Request cancellation after confirmation.</li>
 <li>Tell the property manager the issue is resolved after confirmation.</li>
-<li>Return to the main menu for a new issue; new issue creation still uses the generated maintenance category intake and create endpoint.</li>
+<li>Return to the main menu.</li>
 </ul>
+<p>After a caller selects an existing ticket, the action menu is scoped to the
+selected request title, for example &quot;For leaky sink, what would you like to do?&quot;
+The selected-ticket menu does not include &quot;start a new request&quot;; new issue
+creation remains top-level option 1 and still uses the generated maintenance
+category intake and create endpoint.</p>
 <p>There is no <code>/riff/tickets/create</code> alias.</p>
 <h2 id="replicant-receiver-contract">Replicant receiver contract</h2>
 <p>RIFF calls Replicant through signed POST requests under <code>REPLICANT_API_BASE</code>.
@@ -237,7 +242,7 @@ Aman's side needs to expose or implement the signed receiver for:</p>
 <li><code>python -m riff.business_pack compile packs/property_management.pack.yaml --out-dir flows/generated</code></li>
 <li><code>python -m riff.business_pack compile packs/property_management.pack.yaml --out-dir flows</code></li>
 </ul>
-<p>The property DID must be attached to a 10DLC campaign before keyed builds pass the SMS deliverability gate. On 2026-07-08, <code>+15102160079</code> was attached to the same Telnyx campaign used by the other RIFF SMS-capable numbers and the Telnyx assignment reached <code>ASSIGNED</code> (<code>att=ADDED</code>, <code>tmobile=PENDING</code> at verification time).</p>
+<p>The property DID must be attached to a 10DLC campaign before keyed builds pass the SMS deliverability gate. On 2026-07-08, <code>+15102160079</code> was attached to the same Telnyx campaign used by the other RIFF SMS-capable numbers and the Telnyx assignment reached <code>ASSIGNED</code> (<code>att=ADDED</code>, <code>tmobile=ADDED</code> at verification time).</p>
 
 </main>
 <aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#what-changed">What changed</a></li><li class="toc-h2"><a href="#replicant-receiver-contract">Replicant receiver contract</a></li><li class="toc-h2"><a href="#source-of-truth">Source of truth</a></li><li class="toc-h2"><a href="#safe-read-fields">Safe read fields</a></li><li class="toc-h2"><a href="#mutation-behavior">Mutation behavior</a></li><li class="toc-h2"><a href="#m3-and-m1-rollout">M3 and M1 rollout</a></li><li class="toc-h2"><a href="#verification">Verification</a></li></ul></aside>
