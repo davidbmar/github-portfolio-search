@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RIFF Browser Phone Simulator</title>
+<style>
+:root{--ink:#191b1f;--mut:#5d6570;--line:#dfe3e8;--bg:#f8f9fb;--blue:#245fca;--warn:#8a5b00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:900px;margin:0 auto;padding:38px 24px 72px}h1{font-size:32px;line-height:1.15;margin:0 0 8px;letter-spacing:0}h2{margin:34px 0 10px;font-size:22px;letter-spacing:0}p{margin:10px 0}.lede{color:var(--mut);font-size:18px}.status{display:inline-block;border:1px solid #c68d27;color:var(--warn);padding:3px 8px;border-radius:4px;font-size:12px;font-weight:800;text-transform:uppercase}code{background:#e9edf2;padding:2px 5px;border-radius:4px}pre{background:#171a20;color:#eef1f5;padding:14px 16px;border-radius:6px;overflow:auto}.band{border-left:4px solid var(--blue);background:#edf3ff;padding:12px 16px;margin:18px 0}.warn{border-left-color:#c68d27;background:#fff7e6}ol,ul{padding-left:22px}a{color:var(--blue)}table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}th{background:#eef1f5}@media(max-width:640px){main{padding:24px 16px 52px}h1{font-size:27px}table{display:block;overflow:auto}}
+</style>
+</head>
+<body><main>
+<span class="status">simulated / live data</span>
+<h1>Browser Phone Simulator</h1>
+<p class="lede">Run a phone-shaped RIFF call in the browser with caller identity, routed line, Live audio, DTMF, FSM state, and provider telemetry visible together.</p>
+
+<h2>Open it</h2>
+<pre><code>http://127.0.0.1:8765/voice.html?flow=property_management</code></pre>
+<p>Enter the caller number in <strong>From</strong>, select <strong>+1 (510) 216-0079</strong> in <strong>To</strong>, and click <strong>start conversation</strong>. The <code>#</code> control opens the keypad after a caller and line are configured.</p>
+
+<div class="band warn"><strong>Live provider boundary.</strong> A simulated caller number can access records associated with that identity. The simulator is a loopback operator tool. Ticket creation, editing, and cancellation are blocked unless <strong>Allow create, edit, cancel</strong> is checked before the call starts.</div>
+
+<h2>What matches a phone call</h2>
+<table><thead><tr><th>Layer</th><th>Simulator behavior</th></tr></thead><tbody>
+<tr><td>Identity</td><td>Caller and called numbers normalize to E.164; Replicant identify runs before provider tools are assembled.</td></tr>
+<tr><td>Audio</td><td>The browser Live microphone, playback gate, static audio, and barge-in path remain active.</td></tr>
+<tr><td>Keypad</td><td>Typed DTMF calls the production <code>handle_dtmf_digit</code> resolver; digits are not sent as speech.</td></tr>
+<tr><td>Debugging</td><td>FSM state, transitions, prompts, transcript, tools, slots, and timeline stay visible on one page.</td></tr>
+<tr><td>Evidence</td><td>Sessions are tagged as simulated and cannot be represented as OTA phone evidence.</td></tr>
+</tbody></table>
+
+<h2>Existing-request check</h2>
+<ol>
+<li>Enter the authorized caller number and select the Property Management line.</li>
+<li>Leave mutations disabled and start the conversation.</li>
+<li>Ask to see an existing maintenance request.</li>
+<li>Confirm identity is resolved before <code>replicant_list_tickets</code>.</li>
+<li>Confirm each ticket label is spoken and the state does not loop through unavailable and menu.</li>
+<li>Use the keypad for a DTMF pass, stop the call, then open <strong>Review</strong>.</li>
+</ol>
+
+<h2>Evidence limit</h2>
+<p>This is L2/L3 browser and provider-path evidence. It does not prove carrier media, PSTN audio, Telnyx DTMF delivery, or OTA routing. An external call still requires explicit human <code>GO</code>.</p>
+<p><a href="index.html">Back to RIFF docs</a> · <a href="../../voice.html?flow=property_management">Open the simulator</a></p>
+</main></body></html>

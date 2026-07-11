@@ -200,6 +200,12 @@ states:
 identical shape to the LLM resolver. The <strong>style</strong> maps to the TTS
 <code>system_instruction</code> (that plumbing already landed in <code>openings.py</code>).</p>
 <h3 id="2-render-mode-prerendered-vs-live-ad-lib">2. Render mode: prerendered vs live (ad-lib)</h3>
+<p><em>Scope note (2026-07-10):</em> per the adopted
+<a href="2026-07-09-architecture-rewrite-decision.html">boundary-architecture ADR</a> (C7),
+call-time synthesized narration of validated slots/runtime results — <code>dynamic_announce</code> —
+is a <strong>distinct compiled audio-only state type</strong> with its own delivery receipts and
+input-hub contracts, <em>not</em> a <code>play_audio.render_mode</code> value. The render-mode dial
+below covers voice/synthesis identity for a state's own audio, and stays.</p>
 <p>Per state, where does the audio come from:</p>
 <ul>
 <li><strong><code>prerendered</code></strong> (default): the preflow rendered a WAV with the resolved

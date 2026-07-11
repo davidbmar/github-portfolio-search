@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fable 5 Review - Node Routing Policy</title>
+  <style>
+    :root { color-scheme: light dark; --line:#8886; --p0:#c43f32; --p1:#d17b20; }
+    body { font:16px/1.55 system-ui,sans-serif; margin:0; }
+    main { max-width:900px; margin:auto; padding:40px 24px 72px; }
+    h1,h2 { line-height:1.2; } h1 { border-bottom:3px solid var(--p0); padding-bottom:12px; }
+    code { background:#8882; padding:2px 5px; border-radius:3px; }
+    table { border-collapse:collapse; width:100%; }
+    th,td { border:1px solid var(--line); padding:9px; text-align:left; vertical-align:top; }
+    .meta { color:#777; } .p0 { color:var(--p0); font-weight:700; }
+    .p1 { color:var(--p1); font-weight:700; }
+    .status { border:1px solid var(--line); border-left:4px solid var(--p1); padding:12px 14px; background:#d17b2015; }
+    a { color:#2764b7; }
+    @media (max-width:680px) { table { display:block; max-width:100%; overflow-x:auto; } }
+  </style>
+</head>
+<body><main>
+  <h1>Fable 5 Review: Node Routing Policy v2</h1>
+  <p class="meta">2026-07-09 &middot; claude-fable-5 &middot; high effort &middot;
+    read-only repository-grounded review</p>
+  <h2>Verdict</h2>
+  <p>The Worker/Durable Object direction is correct, but v2 was not implementation-ready.
+    It removed the peer-forward double-answer path while leaving authority failure,
+    carrier timing, answer fencing, crash recovery, persistent mode, candidate fallback,
+    and drain behavior unresolved.</p>
+  <h2>Disposition and Current State</h2>
+  <p>The normative
+    <a href="2026-07-08-node-routing-policy-design.html">Node Routing Policy v3</a>
+    incorporates the review decisions. Raw-body Telnyx signature/timestamp verification
+    was implemented at <code>3450bcab</code>, and the L5 key/configuration gate was
+    implemented at <code>6b531686</code>.</p>
+  <p class="status"><strong>These commits are not deployed.</strong> The live runtime
+    remains clean property-flow SHA <code>9b4082d</code> while
+    <code>TELNYX_PUBLIC_KEY</code> is provisioned. The Worker/Durable Object engine,
+    durable ownership ledger, persisted policy, automatic fallback, and routing dashboard
+    remain open implementation work. <code>/routing-help.html</code> is a non-operative
+    preview.</p>
+  <h2>Highest-Severity Findings</h2>
+  <table><thead><tr><th>Priority</th><th>Finding</th><th>V3 decision</th></tr></thead><tbody>
+    <tr><td class="p0">P0</td><td>Public webhook can answer/hang up without verifying Telnyx.</td><td>Ship signature/timestamp verification and durable dedup as independent Phase 0.</td></tr>
+    <tr><td class="p1">P1</td><td>DO outage had no degraded mode.</td><td>Retryable 503; never bypass ownership.</td></tr>
+    <tr><td class="p1">P1</td><td>Retry/failover timing was unmeasured.</td><td>Same Worker authority for both URLs; DO redrive; carrier fixture before constants.</td></tr>
+    <tr><td class="p1">P1</td><td>Late old-node delivery could answer after reassignment.</td><td>Expiring assertion, ownership epoch, and DO answer fence.</td></tr>
+    <tr><td class="p1">P1</td><td>Crash after dedup insert could suppress all retries.</td><td>Recoverable event-processing state machine.</td></tr>
+    <tr><td class="p1">P1</td><td>Volatile MODE defaults stable.</td><td>Persistent state; missing/invalid boots drained.</td></tr>
+    <tr><td class="p1">P1</td><td>Candidate could receive arbitrary fallback traffic.</td><td>Explicit canaries only unless fallback-approved.</td></tr>
+    <tr><td class="p1">P1</td><td>Drain kills active media.</td><td>Soft drain eligibility first; isolate only at zero active calls.</td></tr>
+  </tbody></table>
+  <h2>Additional Corrections</h2>
+  <ul>
+    <li>Reconnect-capable media-session token with one active generation.</li>
+    <li>Query-string scrubbing at every logging layer.</li>
+    <li>Canonical <code>config/phone-lines.yaml</code> and effective-config hash.</li>
+    <li>HMAC caller keys, bounded retention, and PII log audit.</li>
+    <li>Separate Worker and per-node signing keys with rotation.</li>
+    <li>Versioned Worker/DO migrations and rollback.</li>
+    <li>Node-scoped L5 for Worker, M1, and M3.</li>
+  </ul>
+  <h2>Build Order</h2>
+  <ol>
+    <li>Secure the current ingress boundary and measure carrier behavior.</li>
+    <li>Fix persistent node state, identity, drain, registry, and keys.</li>
+    <li>Build clean deployment and node-scoped L5.</li>
+    <li>Build fenced Worker/DO ownership and rollback.</li>
+    <li>Add policy UI, then run explicit-GO live drills.</li>
+  </ol>
+</main></body></html>

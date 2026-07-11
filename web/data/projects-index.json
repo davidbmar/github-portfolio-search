@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T10:30:41.193424Z",
+  "generated_at": "2026-07-11T08:46:24.158462Z",
   "count": 139,
   "projects": [
     {
@@ -1290,24 +1290,29 @@
     {
       "slug": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
+      "one_liner": "Semantic search engine for personal GitHub portfolios using embeddings and TF-IDF.",
       "tech": [
         "Python",
         "HTML",
         "JavaScript",
         "FastAPI",
         "SQLite-vec",
-        "sentence-transformers"
+        "Sentence Transformers",
+        "AWS S3",
+        "CloudFront",
+        "Lambda"
       ],
       "reuse_tags": [
         "semantic-search",
-        "github-tools",
-        "portfolio-management",
-        "ai-integration"
+        "github-indexer",
+        "portfolio-tool",
+        "mcp-server",
+        "vector-database",
+        "static-site"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-09T04:55:00Z"
+      "pushed_at": "2026-07-09T10:32:16Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2158,26 +2163,26 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
         "SQLite",
         "WebSockets",
-        "Pytest"
+        "JSONL"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "python-framework",
-        "conversational-ai",
-        "deterministic-workflow"
+        "fsm",
+        "llm-orchestration",
+        "deterministic-ai",
+        "python-platform",
+        "business-automation"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-09T10:15:28Z"
+      "pushed_at": "2026-07-11T08:40:18Z"
     },
     {
       "slug": "riot",

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>State Program Debugger Evidence Design · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-10-state-program-debugger-evidence-design.md</span>
+<a class="raw" href="/docs/design/2026-07-10-state-program-debugger-evidence-design.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>State Program Debugger Evidence Design</h1>
+<p>Date: 2026-07-10<br />
+Revision: 2, after Claude Fable adversarial review<br />
+Status: design contract ready for re-review; prototype and hydrator are not yet
+conformant</p>
+<h2 id="decision">Decision</h2>
+<p>Build the debugger around a strict state-visit frame, not a loose time window.
+Each frame is a replayable state program with an immutable recorded entry
+snapshot, an ordered event stream, an immutable recorded exit snapshot, and a
+declared set of exit edges. A separate conversation lane preserves what the
+caller and agent said in chronological order.</p>
+<p>The debugger must never infer a fact merely because it would make the display
+look complete. Every claim carries two independent labels:</p>
+<ul>
+<li><strong>Evidence status:</strong> <code>proven</code>, <code>disproven</code>, or <code>unavailable</code>.</li>
+<li><strong>Provenance class:</strong> <code>recorded</code>, <code>derived</code>, or <code>simulated</code>.</li>
+</ul>
+<p>This revision closes the four contract gaps found in the first adversarial
+review. It does not declare the current hardcoded prototype production-ready.</p>
+<h2 id="product-outcome">Product Outcome</h2>
+<p>An operator should be able to answer these questions without reading source
+code or correlating logs by hand:</p>
+<ol>
+<li>Which state visit owned this behavior?</li>
+<li>What values entered that visit, and where did they come from?</li>
+<li>What did the state read, write, clear, say, hear, and decide?</li>
+<li>What values existed at the selected program counter?</li>
+<li>What values left the state?</li>
+<li>Which exits were legal, which guards ran, which edge won, and why?</li>
+<li>What did the caller actually hear and say at that point in the call?</li>
+<li>Where did intended and observed behavior first diverge?</li>
+<li>Can the run be replayed or forked without confusing simulation with fact?</li>
+</ol>
+<p>The first screen shows the caller story, current state breadcrumb, first
+divergence, evidence completeness, failure owner, and next action. Internal
+fields remain available one level below that summary.</p>
+<h2 id="state-visit-is-the-unit-of-debugging">State Visit Is the Unit of Debugging</h2>
+<p>A state ID is not a frame because the same state can be visited more than once.
+The unit is a <strong>state visit</strong> with a stable <code>visit_id</code>, derived as
+<code>&lt;state_id&gt;#&lt;ordinal&gt;</code> for old artifacts and emitted directly for new ones.</p>
+<pre><code class="language-text">incoming edge
+-&gt; entry boundary and entry variables
+-&gt; state goal
+-&gt; ordered micro-events
+-&gt; exit edge evaluation
+-&gt; boundary writes and clears
+-&gt; frozen exit variables
+-&gt; transition commit
+-&gt; next state's entry boundary
+</code></pre>
+<p>The debugger cursor is <code>(visit_index, micro_event_index)</code>. The display is a
+pure projection of the recorded prefix plus an optional simulation overlay.</p>
+<h2 id="frame-ownership-contract">Frame Ownership Contract</h2>
+<p>This contract resolves the review's R1 frame-attribution bug.</p>
+<ol>
+<li>A frame begins at its <code>state_entered</code> event. The initial frame begins at the
+<code>session_started</code> initial-state boundary plus the seeded-slot baseline.</li>
+<li>A frame ends at its matching <code>state_exited</code> event. Re-entry creates a new
+visit even when the state ID is unchanged.</li>
+<li>An event with an explicit <code>visit_id</code> belongs only to that visit.</li>
+<li>For legacy events without <code>visit_id</code>, the hydrator may use sequence position
+between matching entry and exit boundaries only when it does not conflict
+with an explicit <code>state_id</code> or trace <code>node</code>.</li>
+<li><code>transition_committed</code> belongs to the outgoing boundary identified by its
+<code>from_state</code> and <code>to_state</code>, even when the current emitter records it after
+the target <code>state_entered</code>. It does not become a target-state event.</li>
+<li>A legacy completion event emitted after commit may attach to the source
+visit only when its <code>from_state</code> and <code>turn_index</code> match exactly one
+<code>transition_committed</code> event and visit. The attribution is labeled derived
+and cites both events. This covers current late <code>locked_choice_evaluated</code>
+rows without assigning them to the next state.</li>
+<li>Other events after <code>state_exited.seq</code> never belong to the prior frame.</li>
+<li>Outgoing edge writes and clears are shown in a boundary band. They are
+mutations caused by the source edge, appear in the source frame's exit
+snapshot, and also appear in the target frame's entry snapshot. They are not
+duplicated as two writes.</li>
+<li>Events that cannot be attributed without conflict go into an <code>unattributed</code>
+lane with an instrumentation finding. They are never forced into the nearest
+frame.</li>
+<li>A static announce state has caller input only when a recorded barge-in,
+DTMF, or caller-audio event occurred before that visit exited.</li>
+</ol>
+<h3 id="property-menu-boundary-example">Property Menu Boundary Example</h3>
+<p>The prototype previously put the caller's &quot;Status&quot; utterance and
+<code>_route=existing_request</code> decision inside <code>menu_full_announce</code>. That is
+incorrect.</p>
+<table>
+<thead>
+<tr>
+<th>Visit</th>
+<th>Owns</th>
+<th>Must not own</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>menu_full_announce#1</code></td>
+<td>intended menu text, generated/sent/heard menu audio, <code>audio_done</code> or <code>audio_failed</code>, edge writes such as <code>_menu_announced=yes</code>, commit to <code>menu</code></td>
+<td>later caller utterance and menu resolver result</td>
+</tr>
+<tr>
+<td><code>menu#1</code></td>
+<td>entry value <code>_menu_announced=yes</code>, Gemini/Whisper/DTMF input, locked-choice resolver, <code>_route</code> mutation, guard verdict, commit to the selected capability</td>
+<td>prior announce playback events</td>
+</tr>
+</tbody>
+</table>
+<p>Cross-frame leakage is a hydration error and a release-blocking debugger test
+failure.</p>
+<h2 id="deterministic-stepping">Deterministic Stepping</h2>
+<p>The debugger has two cursors: an event cursor and an audio playhead. They never
+silently move each other.</p>
+<ul>
+<li><strong>Step into:</strong> advance exactly one canonical micro-event.</li>
+<li><strong>Step over state:</strong> advance to the next visit's entry boundary.</li>
+<li><strong>Step to exit:</strong> stop on the derived <code>exit_boundary</code> marker after recorded
+edge writes/clears are folded and before <code>transition_committed</code> is displayed.</li>
+<li><strong>Reverse step:</strong> decrement one canonical micro-event and re-derive the view.</li>
+<li><strong>Continue:</strong> run until a breakpoint, divergence, unavailable required
+evidence, error, or call end.</li>
+<li><strong>Audio play/scrub:</strong> move only the WAV playhead. Stepping or reversing stops
+playback.</li>
+</ul>
+<p>The <code>exit_boundary</code> marker is explicitly <code>derived</code>. Its <code>derived_from</code> list
+contains the final transition verdict, boundary <code>slot_write</code> events, and the
+matching <code>state_exited</code> or <code>transition_committed</code> event. It is not represented
+as a recorded runtime event when one does not exist.</p>
+<h2 id="variable-boundary-contract">Variable Boundary Contract</h2>
+<p>The main variable table is:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Entry</th>
+<th>At cursor</th>
+<th>Recorded exit</th>
+<th>Access evidence</th>
+<th>Last writer</th>
+</tr>
+</thead>
+</table>
+<p><code>Entry</code> and <code>Recorded exit</code> are immutable recorded projections. A simulation
+edit may change only <code>At cursor</code> and later simulated results. The UI must render
+all declared and observed variables, including unset variables. A cell has an
+availability state of <code>available</code>, <code>redacted</code>, or <code>unavailable</code>; blank never
+means false, null, or absent.</p>
+<h3 id="hydration-sources">Hydration Sources</h3>
+<p>This contract resolves R2 by naming the source and join for each headline
+field.</p>
+<table>
+<thead>
+<tr>
+<th>Debugger field</th>
+<th>Source</th>
+<th>Join/reconstruction rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visit boundaries</td>
+<td><code>session_started</code>, <code>state_entered</code>, <code>state_exited</code>, <code>transition_committed</code></td>
+<td>order by durable <code>seq</code>; pair by <code>visit_id</code>, or by state ID plus visit ordinal for legacy calls</td>
+</tr>
+<tr>
+<td>Initial variables</td>
+<td>new <code>session_slots_seeded</code> baseline</td>
+<td>one row after all transport, identity, prior-call, simulator, and default seeds are applied, before the initial state executes</td>
+</tr>
+<tr>
+<td>Entry variables</td>
+<td>baseline plus <code>slot_write</code></td>
+<td>fold all writes before <code>state_entered.seq</code>; for the initial visit, use the seeded baseline as its logical entry boundary</td>
+</tr>
+<tr>
+<td>At-cursor variables</td>
+<td>entry snapshot plus <code>slot_write</code></td>
+<td>fold only writes owned by the visit whose <code>seq</code> is at or before the cursor, then apply the simulation overlay</td>
+</tr>
+<tr>
+<td>Recorded exit variables</td>
+<td>entry snapshot plus <code>slot_write</code></td>
+<td>fold all recorded visit and outgoing-boundary writes through the matching exit boundary; freeze the result</td>
+</tr>
+<tr>
+<td>Mutation writer</td>
+<td><code>slot_write.writer</code>, <code>slot_write.kind</code></td>
+<td>show exact writer and mutation kind; never infer <code>identify</code> or a tool name from the value</td>
+</tr>
+<tr>
+<td>Declared exits</td>
+<td>compiled flow metadata</td>
+<td>include transition declaration index, stable edge ID, <code>to</code>, <code>when</code>, <code>reason</code>, <code>sets</code>, and <code>clears</code></td>
+</tr>
+<tr>
+<td>Guard result</td>
+<td><code>guard_evaluated</code> and <code>transition_verdict</code></td>
+<td>join to visit and edge ID; preserve every evaluation, declaration order, result, and shadowed status</td>
+</tr>
+<tr>
+<td>Winning exit</td>
+<td>final <code>transition_verdict</code> plus <code>state_exited</code>/<code>transition_committed</code></td>
+<td>winner must agree with committed target; disagreement is an instrumentation defect</td>
+</tr>
+<tr>
+<td>Audio and tools</td>
+<td>section-6 trace plus session event ledger</td>
+<td>join by <code>visit_id</code>; legacy fallback uses node/state and sequence interval with conflict checks</td>
+</tr>
+<tr>
+<td>Caller evidence</td>
+<td>Gemini/export transcript, timed Whisper, DTMF/control trace</td>
+<td>join by audio range and visit; show selected source separately from observations</td>
+</tr>
+</tbody>
+</table>
+<h3 id="baseline-coverage-requirement">Baseline Coverage Requirement</h3>
+<p>The current phone path applies identity and prior-call values using
+<code>self._session_ctx.slots.update(initial_slots)</code> after <code>session_started</code> in
+<code>riff/phone/telnyx_transport.py</code>. Those values do not produce <code>slot_write</code>, so
+the current ledger cannot honestly reconstruct the initial entry snapshot.</p>
+<p>Before the variable view is considered complete, call setup must pass all seed
+values through one instrumented seeding function and emit
+<code>session_slots_seeded</code>. Each baseline variable records its source writer, such
+as <code>transport</code>, <code>caller_identity</code>, <code>replicant_identify</code>, <code>prior_call</code>,
+<code>simulator</code>, or <code>flow_default</code>.</p>
+<p><code>slot_filled</code> is not a substitute. It is emitted later, covers public filled
+slots rather than every mutation, and describes collection evidence rather
+than the original writer.</p>
+<p>The mutation ledger must also cover dictionary-valued changes and non-tool
+direct mutations. A build gate compares a boundary snapshot fingerprint with
+the folded baseline-plus-write result. A mismatch marks the variable view
+<code>incomplete</code> and reports the missing writer; it must not display guessed
+values.</p>
+<h3 id="privacy-and-value-availability">Privacy and Value Availability</h3>
+<p>The complete variable inventory is required; unrestricted raw PII is not.
+Each value carries <code>classification</code> and <code>availability</code>. Authorized local
+artifacts may expose the recorded value under the existing session-retention
+policy. Public or shared artifacts use the PII-safe representation and mark the
+cell <code>redacted</code>. A redacted value cannot be edited in a simulation fork until
+an authorized source provides it.</p>
+<h2 id="exit-edge-contract">Exit Edge Contract</h2>
+<p>The hydrator must extend <code>_load_flow_metadata</code> to emit every transition:</p>
+<pre><code class="language-json">{
+  &quot;edge_id&quot;: &quot;menu:1&quot;,
+  &quot;declaration_index&quot;: 1,
+  &quot;from&quot;: &quot;menu&quot;,
+  &quot;to&quot;: &quot;cap_existing_request__list_tickets&quot;,
+  &quot;when&quot;: &quot;slot_equals:_route:existing_request&quot;,
+  &quot;reason&quot;: &quot;caller chose existing_request&quot;,
+  &quot;sets&quot;: [],
+  &quot;clears&quot;: [&quot;_required_tool_fired:cap_existing_request__list_tickets:replicant_list_tickets&quot;]
+}
+</code></pre>
+<p>The edge table at the cursor shows all declared edges and the latest verdict at
+or before the cursor. On exit it shows the final verdict, one winner at most,
+all evaluated losers, and all post-winner candidates as <code>shadowed</code> rather than
+false. Duplicate target states remain distinct through <code>edge_id</code>; target name
+alone is not a valid join key. The current 24-candidate truncation must either
+be removed for debugger artifacts or produce explicit <code>incomplete</code> evidence.</p>
+<p>The committed target and final verdict must agree. No winner, multiple winners,
+an unknown edge, or a target mismatch is a release-blocking trace invariant.</p>
+<h2 id="access-evidence-contract">Access Evidence Contract</h2>
+<p>This contract resolves R3 without claiming evidence RIFF does not have.</p>
+<p>RIFF already emits guard-level runtime reads in
+<code>guard_evaluated.slots_read</code> from <code>_SlotReadTracker</code>. The reviewer statement
+that no read telemetry exists was therefore too broad. Coverage is limited to
+guard evaluation; prompt rendering, resolver logic, tools, and arbitrary state
+code do not yet have general runtime read instrumentation.</p>
+<p>The access column may show only these evidence-backed labels:</p>
+<ul>
+<li><code>guard read (recorded)</code> from <code>guard_evaluated.slots_read</code>.</li>
+<li><code>write (recorded)</code> or <code>clear (recorded)</code> from <code>slot_write</code>.</li>
+<li><code>referenced (static)</code> from required slots, locked-choice slots, flow guard
+expressions, prompt interpolation, declared edge sets/clears, or declared
+tool arguments.</li>
+<li><code>read unavailable</code> when runtime read coverage does not include that layer.</li>
+<li><code>no access evidence</code> when none of the above exists.</li>
+</ul>
+<p>The UI must not say <code>ignored</code>, because absence of telemetry does not prove a
+state ignored a value. Static references and runtime reads use different icons,
+labels, and provenance links. A future slot-access abstraction may add broader
+runtime <code>slot_read</code> events, but it is not required to hydrate an honest v1.</p>
+<h2 id="canonical-micro-event-vocabulary">Canonical Micro-Event Vocabulary</h2>
+<p>This contract resolves R4. Only canonical events participate in Step Into and
+Reverse Step. Every event uses this envelope:</p>
+<pre><code class="language-json">{
+  &quot;event_id&quot;: &quot;bus:1842&quot;,
+  &quot;visit_id&quot;: &quot;menu#1&quot;,
+  &quot;seq&quot;: 1842,
+  &quot;clock_ms&quot;: 12640,
+  &quot;kind&quot;: &quot;locked_choice_evaluated&quot;,
+  &quot;provenance&quot;: &quot;recorded&quot;,
+  &quot;source_refs&quot;: [{&quot;artifact&quot;: &quot;bus_events.jsonl&quot;, &quot;seq&quot;: 1842}],
+  &quot;derived_from&quot;: [],
+  &quot;payload&quot;: {}
+}
+</code></pre>
+<p><code>clock_ms</code> is nullable. If the source has no trustworthy timestamp, the UI
+shows sequence order only. It never fabricates a precise-looking time.</p>
+<h3 id="recorded-events">Recorded Events</h3>
+<p>Recorded events are direct durable-artifact rows, normalized without changing
+their meaning:</p>
+<ul>
+<li>lifecycle: <code>session_started</code>, <code>state_entered</code>, <code>state_exited</code>,
+<code>transition_committed</code>, <code>call_end</code></li>
+<li>caller and model input: <code>transcription</code>, <code>locked_choice_evaluated</code>, recorded
+DTMF/control or <code>route_decision</code></li>
+<li>state logic: <code>guard_evaluated</code>, <code>transition_verdict</code>, <code>slot_write</code>,
+<code>turn_complete</code></li>
+<li>tools: <code>tool_called</code> or section-6 <code>tool_start</code>, <code>tool_result</code>, <code>degraded</code></li>
+<li>audio: section-6 <code>audio_pushed</code>, <code>audio_done</code>, <code>barge_in</code>, plus recorded WAV
+anchors</li>
+</ul>
+<p>The normalizer keeps source event names in <code>payload.source_kind</code> when multiple
+event dialects map to one debugger kind.</p>
+<h3 id="derived-events">Derived Events</h3>
+<p>Derived events are deterministic projections with <code>derived_from</code> references:</p>
+<ul>
+<li><code>frame_enter</code> and <code>frame_exit</code></li>
+<li><code>entry_snapshot</code>, <code>cursor_snapshot</code>, and <code>exit_boundary</code></li>
+<li><code>text_resolved</code> from a versioned flow template plus recorded inputs</li>
+<li>transcript agreement/diff and WER</li>
+<li>audio energy, overlap, silence, and first-divergence diagnoses</li>
+<li>legal-edge table rows produced from compiled flow metadata</li>
+</ul>
+<p>The old prototype's <code>audio_progress: 52%</code> is not a micro-event. Progress is a
+WAV playhead computed from an actual audio range. When the WAV or range is
+missing, progress is unavailable.</p>
+<h3 id="simulated-events">Simulated Events</h3>
+<p>Simulation events are created only after a fork:</p>
+<ul>
+<li><code>simulation_forked</code></li>
+<li><code>overlay_write</code></li>
+<li><code>fixture_tool_result</code></li>
+<li><code>simulated_guard_evaluated</code></li>
+<li><code>simulated_transition_selected</code></li>
+<li><code>simulation_discarded</code></li>
+</ul>
+<p>They use a separate sequence namespace, retain the recorded parent cursor, and
+can never satisfy a recorded evidence requirement.</p>
+<h3 id="stable-ordering">Stable Ordering</h3>
+<p>Canonical order is <code>(recorded seq, source suborder, event_id)</code>. Derived events
+anchor before or after a named recorded event and declare that placement.
+Simulation events order after their fork root. Rehydrating the same artifact
+must produce byte-for-byte identical event IDs and order.</p>
+<h2 id="six-beat-evidence-spine">Six-Beat Evidence Spine</h2>
+<p>The six beats summarize the detailed event stream without replacing it.</p>
+<table>
+<thead>
+<tr>
+<th>Beat</th>
+<th>Question</th>
+<th>Required evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intended</td>
+<td>What should this visit do or say?</td>
+<td>versioned flow state, prompt/audio policy, legal exits</td>
+</tr>
+<tr>
+<td>Generated</td>
+<td>What did the model, template renderer, or static asset produce?</td>
+<td>generation chunks, resolved text, asset identity, suppression evidence</td>
+</tr>
+<tr>
+<td>Sent</td>
+<td>What reached the transport?</td>
+<td>playback ID, outbound trace, <code>audio_pushed</code>, completion/clear receipt</td>
+</tr>
+<tr>
+<td>Heard</td>
+<td>What is proven audible?</td>
+<td>recorded WAV range, agent energy, silence, overlap, barge-in</td>
+</tr>
+<tr>
+<td>Caller said</td>
+<td>What inputs were observed?</td>
+<td>Gemini, timed Whisper, DTMF/control, audio range</td>
+</tr>
+<tr>
+<td>Decided</td>
+<td>What did RIFF act on?</td>
+<td>selected source, resolver, guard reads/results, slot writes, tools, verdict and commit</td>
+</tr>
+</tbody>
+</table>
+<p>Each beat includes evidence status, provenance class, a short explanation, and
+source references. <code>Sent</code> may be unavailable while <code>Heard</code> is proven from the
+recording; the UI must preserve that distinction.</p>
+<h2 id="conversation-and-caller-input-view">Conversation and Caller-Input View</h2>
+<p>The caller conversation is an always-visible downward lane, not a collection
+of bubbles scattered through technical rows. Agent speech, caller speech, DTMF,
+barge-in, and system decisions align vertically with the owning state frame.</p>
+<p>Timed Whisper anchors caller audio. Gemini shows what the live model observed.
+DTMF and controls share the call-clock row. The resolver shows the text or
+token RIFF selected, its source, and the decision reason. Agreement collapses.
+Disagreement expands to show word differences, WER when supported, and the
+acted-on source. No selected source means <code>Decided</code> is unavailable, not empty.</p>
+<h2 id="visual-information-hierarchy">Visual Information Hierarchy</h2>
+<ul>
+<li><strong>Level 0:</strong> caller story, state breadcrumb, run verdict, evidence
+completeness, first divergence, owner, next action.</li>
+<li><strong>Level 1:</strong> selected state program, entry/exit boundary, six evidence beats,
+legal exits, winner.</li>
+<li><strong>Level 2:</strong> canonical micro-events, variable table, guard reads, tools, model
+and resolver detail.</li>
+<li><strong>Level 3:</strong> raw event payloads, flow version, paths, sequence numbers, log
+anchors, WAV ranges, hashes.</li>
+</ul>
+<p>Correct visits collapse by default. The selected visit and first divergent
+visit open automatically. Recorded is neutral, unavailable is amber, disproven
+is red, and simulated is purple with a persistent <code>SIMULATION BRANCH</code> header.
+Color is reinforced with text and icons.</p>
+<h2 id="replay-and-simulation-safety">Replay and Simulation Safety</h2>
+<p>Variable edits create an overlay at the current cursor. They never mutate the
+recorded entry or exit snapshots. Reversing before the fork root removes the
+overlay and restores the recorded trace. Recorded tool reads replay immutable
+fixtures; writes and external side effects remain disabled. A simulation can
+be exported only as a simulation artifact linked to its recorded parent.</p>
+<p>Audio playback in production review uses the recorded WAV range. Browser
+speech is preview-only, is labeled simulated, and cannot prove Generated,
+Sent, or Heard.</p>
+<h2 id="artifact-contract">Artifact Contract</h2>
+<p><code>state_audio_timeline.json</code> remains the post-call summary source. The debugger
+adds a normalized <code>state_program_debugger.json</code> projection rather than making
+the browser join raw logs differently on every load.</p>
+<p>Minimum top-level fields:</p>
+<pre><code class="language-json">{
+  &quot;schema&quot;: &quot;riff.state_program_debugger/v1&quot;,
+  &quot;session_id&quot;: &quot;v3:example&quot;,
+  &quot;flow_id&quot;: &quot;property_management&quot;,
+  &quot;recorded_engine_revision&quot;: &quot;git:0123456789abcdef&quot;,
+  &quot;recorded_build_id&quot;: &quot;riff-m3-20260710.4&quot;,
+  &quot;flow_version&quot;: &quot;sha256:...&quot;,
+  &quot;completeness&quot;: &quot;complete&quot;,
+  &quot;findings&quot;: [],
+  &quot;conversation&quot;: [],
+  &quot;visits&quot;: [],
+  &quot;unattributed_events&quot;: [],
+  &quot;sources&quot;: []
+}
+</code></pre>
+<p>Each visit contains <code>entry_edge</code>, <code>entry_snapshot</code>, <code>goal</code>, <code>micro_events</code>,
+<code>cursor_projection</code>, <code>evidence_beats</code>, <code>legal_exits</code>, <code>final_verdict</code>,
+<code>exit_snapshot</code>, and <code>exit_commit</code>. Missing required sources downgrade
+<code>completeness</code>; they do not disappear.</p>
+<h2 id="programmatic-ai-debugging-contract">Programmatic AI Debugging Contract</h2>
+<p>The visual debugger is one client of a deterministic debugger engine. Codex,
+Claude, and other authorized agents must use the same projection and simulation
+APIs as the browser; they must not scrape the DOM or reimplement state rules in
+their prompts.</p>
+<h3 id="three-programmatic-modes">Three Programmatic Modes</h3>
+<ol>
+<li><strong>Recorded navigation:</strong> open a retained artifact, list visits, seek, step,
+reverse, inspect variables/edges/evidence, and fetch recorded audio ranges.
+This mode executes no flow logic and can never change the trace.</li>
+<li><strong>Isolated state simulation:</strong> create a fork at an entry boundary or cursor,
+change available variables or input events, and run an explicitly selected
+engine revision and flow revision. Tool reads use recorded or authored
+fixtures; external writes are disabled.</li>
+<li><strong>Pattern runner:</strong> execute a bounded matrix of caller input, STT disagreement,
+DTMF, timeout, audio completion/failure, and tool-result fixtures against one
+state visit, then compare exits, variable deltas, audio output, and findings.</li>
+</ol>
+<p>Recorded navigation answers &quot;what happened.&quot; Isolated simulation and pattern
+runs answer &quot;what would happen if this input or value changed.&quot; The result must
+always identify its mode.</p>
+<h3 id="state-under-test-capsule">State-Under-Test Capsule</h3>
+<p>Any visit can be exported as a self-contained state-under-test capsule:</p>
+<pre><code class="language-json">{
+  &quot;schema&quot;: &quot;riff.state_test_capsule/v1&quot;,
+  &quot;flow_id&quot;: &quot;property_management&quot;,
+  &quot;recorded_engine_revision&quot;: &quot;git:0123456789abcdef&quot;,
+  &quot;recorded_build_id&quot;: &quot;riff-m3-20260710.4&quot;,
+  &quot;flow_version&quot;: &quot;sha256:...&quot;,
+  &quot;visit_id&quot;: &quot;menu#1&quot;,
+  &quot;state_definition&quot;: {},
+  &quot;entry_snapshot&quot;: {},
+  &quot;recorded_events&quot;: [],
+  &quot;legal_exits&quot;: [],
+  &quot;tool_fixtures&quot;: [],
+  &quot;audio_refs&quot;: [],
+  &quot;evidence_refs&quot;: []
+}
+</code></pre>
+<p>The capsule includes every recorded input dependency required to execute the
+state or marks it unavailable. It never silently reads today's flow when the
+recorded call used another flow version. The capsule does not claim that a flow
+definition captures Python behavior: historical reproduction also requires the
+recorded engine revision or a content-addressed engine artifact.</p>
+<h3 id="execution-targets">Execution Targets</h3>
+<p>Every command that executes state logic must select both revisions explicitly:</p>
+<ul>
+<li><strong>Recorded reproduction:</strong> run the recorded engine revision with the recorded
+flow revision and recorded fixtures. This answers whether the historical
+state behavior can be reproduced. If the engine source/artifact or flow
+revision is unavailable, reproduction is <code>unavailable</code>; the debugger must
+not substitute current code.</li>
+<li><strong>Candidate regression:</strong> run an identified candidate engine revision and
+candidate flow revision against the same state inputs and fixtures. This
+answers whether a proposed code/flow change removes the defect or introduces
+a behavioral delta.</li>
+<li><strong>Controlled isolation:</strong> the caller may intentionally pair a candidate
+engine with the recorded flow, or the recorded engine with a candidate flow,
+to isolate code changes from flow-definition changes. The non-recorded pair
+is always simulated and its exact revisions appear in the result.</li>
+</ul>
+<p><code>engine_revision</code> and <code>flow_revision</code> have no execution defaults. Labels such
+as <code>recorded</code>, <code>candidate</code>, or <code>HEAD</code> are resolved to immutable hashes before
+the run begins. The response includes those hashes, runtime/dependency lock
+identity, fixture hash, compatibility/migration notes, and a determinism hash.</p>
+<h3 id="machine-interface">Machine Interface</h3>
+<p>The debugger engine exposes versioned structured commands through a local CLI
+and an authenticated local API. The browser is built on that interface.</p>
+<p>Required actions are:</p>
+<ul>
+<li><code>list_visits</code>, <code>inspect_state</code>, <code>seek</code>, <code>step</code>, <code>reverse</code>, and
+<code>continue_until</code></li>
+<li><code>inspect_variables</code>, <code>inspect_exits</code>, <code>inspect_evidence</code>, and
+<code>fetch_audio_range</code></li>
+<li><code>fork</code>, <code>set_overlay</code>, <code>set_input_fixture</code>, <code>run_to_exit</code>, and
+<code>discard_fork</code></li>
+<li><code>run_patterns</code> and <code>compare_branches</code></li>
+</ul>
+<p>Each request supplies the session or capsule, cursor, action, arguments, and
+expected determinism hash. A command that executes logic also supplies an
+execution target with immutable engine and flow revisions. Each response
+returns the new cursor, mode, resolved execution target, projection, variable
+delta, exit decision, findings, evidence references, and new determinism hash.
+A stale expected hash fails rather than applying an edit to a different cursor.</p>
+<p>Illustrative request:</p>
+<pre><code class="language-json">{
+  &quot;session_id&quot;: &quot;v3:example&quot;,
+  &quot;cursor&quot;: {&quot;visit_id&quot;: &quot;menu#1&quot;, &quot;event_id&quot;: &quot;bus:1842&quot;},
+  &quot;action&quot;: &quot;fork&quot;,
+  &quot;args&quot;: {
+    &quot;execution_target&quot;: {
+      &quot;purpose&quot;: &quot;candidate_regression&quot;,
+      &quot;engine_revision&quot;: &quot;git:fedcba9876543210&quot;,
+      &quot;flow_revision&quot;: &quot;sha256:candidate-flow&quot;
+    },
+    &quot;overlays&quot;: {&quot;_route&quot;: null},
+    &quot;caller_input&quot;: {&quot;gemini&quot;: &quot;status&quot;, &quot;whisper&quot;: &quot;status&quot;}
+  },
+  &quot;expected_hash&quot;: &quot;sha256:recorded-prefix&quot;
+}
+</code></pre>
+<h3 id="state-pattern-testing">State Pattern Testing</h3>
+<p>An AI can generate a JSONL pattern file and ask the engine to run it against a
+single state capsule. A menu-state suite should cover at least:</p>
+<ul>
+<li>matching Gemini and Whisper input;</li>
+<li>conflicting transcripts with each source selected;</li>
+<li>equivalent DTMF and tap input;</li>
+<li>no input, timeout, and retry exhaustion;</li>
+<li>stale route slots at entry;</li>
+<li>audio completion, audio failure, and barge-in;</li>
+<li>tool success, unavailable, timeout, and malformed fixture where applicable.</li>
+</ul>
+<p>The runner returns one row per pattern with the resolved engine and flow
+revisions, exact exit edge, entry-to-exit variable delta,
+generated/simulated audio reference, invariant failures, and a comparison
+against the recorded branch. An AI can therefore search for the smallest input
+change that reproduces or removes a defect, then promote that pattern into a
+deterministic regression test.</p>
+<h3 id="llm-and-audio-limits">LLM and Audio Limits</h3>
+<p>Recorded model output and audio are replayable evidence. New model inference or
+newly synthesized audio is a simulation. A reproducible run pins model,
+configuration, prompt, tool fixtures, and captured output. An unpinned live
+model run is labeled <code>simulated/non-deterministic</code> and cannot pass a regression
+gate until its result is captured as a fixture or replaced by a deterministic
+assertion.</p>
+<p>Agents may fetch and analyze a recorded WAV range, stop it, seek it, or compare
+it with a simulated render. A simulated render receives a new asset ID and
+never overwrites or proves the recorded Generated, Sent, or Heard beats.</p>
+<h3 id="ai-safety-and-resource-limits">AI Safety and Resource Limits</h3>
+<p>Programmatic sessions are read-only by default, local/authenticated, redaction
+aware, and bounded by maximum branches, events, wall time, and model budget.
+External tool writes, calls, texts, ticket mutations, and OTA actions require a
+separate explicit human authorization and are outside state simulation.</p>
+<p>The packet-by-packet execution contract, target files, schemas, tests, model
+routing, and promotion states are in
+<code>docs/design/2026-07-10-state-program-debugger-implementation-plan.md</code>.</p>
+<h2 id="implementation-sequence">Implementation Sequence</h2>
+<ol>
+<li><strong>Frame correctness:</strong> assign visit IDs, split the announce and menu frames,
+quarantine conflicting events, and add the dedicated conversation lane.</li>
+<li><strong>Metadata join:</strong> extend <code>_load_flow_metadata</code> with complete transitions,
+stable edge IDs, sets, clears, reasons, and static references.</li>
+<li><strong>Variable truth:</strong> emit <code>session_slots_seeded</code>, cover all mutation shapes,
+fold baseline plus writes, and add the boundary fingerprint invariant.</li>
+<li><strong>Canonical events:</strong> normalize bus, section-6 trace, transcript, audio, and
+derived events into the artifact contract.</li>
+<li><strong>Debugger controls:</strong> drive step, reverse, breakpoints, audio, and forks
+exclusively from the normalized artifact.</li>
+<li><strong>Programmatic engine:</strong> expose the same projection, state capsule, fork,
+version-resolved execution, pattern-runner, and comparison operations to the
+UI, CLI, and local API.</li>
+<li><strong>Failure fixture:</strong> replace the happy-path center of the prototype with a
+retained failing call that exercises transcript disagreement or audio after
+state exit.</li>
+<li><strong>Promotion:</strong> run focused unit/UI/API tests, replay fixtures, post-run audio
+gates, and a second adversarial review before production integration.</li>
+</ol>
+<h2 id="acceptance-gates">Acceptance Gates</h2>
+<ol>
+<li>No event after a visit's exit can carry that visit ID.</li>
+<li>The property-menu fixture attributes &quot;Status&quot; and <code>_route</code> to <code>menu</code>, never
+<code>menu_full_announce</code>.</li>
+<li>Rehydrating the same artifact yields identical visit IDs, micro-event IDs,
+ordering, entry snapshots, and exit snapshots.</li>
+<li>An overlay edit changes only At Cursor and simulated descendants; recorded
+Entry and Recorded Exit remain byte-for-byte unchanged.</li>
+<li>Reverse before the fork root removes every simulated event.</li>
+<li>Every declared edge appears, including duplicate-target edges; exactly one
+edge may win.</li>
+<li>The final verdict, boundary writes, <code>state_exited</code>, and
+<code>transition_committed</code> agree.</li>
+<li>Guard reads cite <code>guard_evaluated.slots_read</code>; non-guard reads never claim
+runtime coverage.</li>
+<li>Missing baseline, truncated candidates, conflicting attribution, or fold
+mismatch produces <code>incomplete</code>, not a guessed value.</li>
+<li>No precise timestamp, audio percentage, transcript source, or variable
+writer exists without a source reference.</li>
+<li>Recorded, derived, unavailable, redacted, and simulated states remain
+distinguishable without relying on color alone.</li>
+<li>Desktop and mobile screenshots show no overlap; all controls remain usable
+with the longest state and variable names in the property flow.</li>
+<li>UI, CLI, and API commands produce the same projection and determinism hash
+for the same artifact and cursor.</li>
+<li>A state capsule runs without reading mutable production flow files or
+making an external write.</li>
+<li>A pattern matrix can reproduce a recorded branch, isolate a failing
+counterexample, and export that counterexample as a deterministic test.</li>
+<li>Recorded reproduction fails as unavailable when the historical engine or
+flow revision cannot be resolved; it never falls back to current code.</li>
+<li>Recorded and candidate runs report independent immutable engine, flow,
+runtime, and fixture identities so an AI can isolate which layer changed.</li>
+</ol>
+<h2 id="review-resolution-matrix">Review Resolution Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Review item</th>
+<th>Resolution in this contract</th>
+<th>Implementation consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1: next-state evidence leaked into announce frame</td>
+<td>strict visit boundaries, conflict quarantine, and corrected property-menu example</td>
+<td>split current prototype frames and add cross-frame semantic test</td>
+</tr>
+<tr>
+<td>R2: boundary variables and exits lacked hydration source</td>
+<td>explicit baseline/write fold, flow-transition metadata, verdict/commit joins, and identity baseline finding</td>
+<td>add seeded baseline, extend metadata, hydrate both headline tables</td>
+</tr>
+<tr>
+<td>R3: access claims were unbacked</td>
+<td>use existing guard <code>slots_read</code>, static-reference labels, and remove <code>ignored</code></td>
+<td>change access column labels; broader runtime reads remain unavailable</td>
+</tr>
+<tr>
+<td>R4: micro-events were unspecified</td>
+<td>canonical recorded/derived/simulated vocabulary, envelope, ordering, and source rules</td>
+<td>replace synthesized rows and fabricated audio progress</td>
+</tr>
+</tbody>
+</table>
+<p>Recommended items are also incorporated: a failing-call fixture, an
+always-visible conversation lane, explicit owner/next action, and semantic UI
+tests.</p>
+<h2 id="current-prototype-status">Current Prototype Status</h2>
+<p><code>web/state-program-debugger-mockup.html</code> demonstrates the interaction direction
+but remains nonconformant until the implementation sequence above is complete.
+In particular, hardcoded values, browser speech, and the announce/menu frame
+leak must not be mistaken for hydrated debugger evidence.</p>
+<p>The implementation may proceed only through the shift-left steps above. A
+production integration decision requires the focused gates and an explicit
+second-review <code>GO</code>.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#decision">Decision</a></li><li class="toc-h2"><a href="#product-outcome">Product Outcome</a></li><li class="toc-h2"><a href="#state-visit-is-the-unit-of-debugging">State Visit Is the Unit of Debugging</a></li><li class="toc-h2"><a href="#frame-ownership-contract">Frame Ownership Contract</a></li><li class="toc-h3"><a href="#property-menu-boundary-example">Property Menu Boundary Example</a></li><li class="toc-h2"><a href="#deterministic-stepping">Deterministic Stepping</a></li><li class="toc-h2"><a href="#variable-boundary-contract">Variable Boundary Contract</a></li><li class="toc-h3"><a href="#hydration-sources">Hydration Sources</a></li><li class="toc-h3"><a href="#baseline-coverage-requirement">Baseline Coverage Requirement</a></li><li class="toc-h3"><a href="#privacy-and-value-availability">Privacy and Value Availability</a></li><li class="toc-h2"><a href="#exit-edge-contract">Exit Edge Contract</a></li><li class="toc-h2"><a href="#access-evidence-contract">Access Evidence Contract</a></li><li class="toc-h2"><a href="#canonical-micro-event-vocabulary">Canonical Micro-Event Vocabulary</a></li><li class="toc-h3"><a href="#recorded-events">Recorded Events</a></li><li class="toc-h3"><a href="#derived-events">Derived Events</a></li><li class="toc-h3"><a href="#simulated-events">Simulated Events</a></li><li class="toc-h3"><a href="#stable-ordering">Stable Ordering</a></li><li class="toc-h2"><a href="#six-beat-evidence-spine">Six-Beat Evidence Spine</a></li><li class="toc-h2"><a href="#conversation-and-caller-input-view">Conversation and Caller-Input View</a></li><li class="toc-h2"><a href="#visual-information-hierarchy">Visual Information Hierarchy</a></li><li class="toc-h2"><a href="#replay-and-simulation-safety">Replay and Simulation Safety</a></li><li class="toc-h2"><a href="#artifact-contract">Artifact Contract</a></li><li class="toc-h2"><a href="#programmatic-ai-debugging-contract">Programmatic AI Debugging Contract</a></li><li class="toc-h3"><a href="#three-programmatic-modes">Three Programmatic Modes</a></li><li class="toc-h3"><a href="#state-under-test-capsule">State-Under-Test Capsule</a></li><li class="toc-h3"><a href="#execution-targets">Execution Targets</a></li><li class="toc-h3"><a href="#machine-interface">Machine Interface</a></li><li class="toc-h3"><a href="#state-pattern-testing">State Pattern Testing</a></li><li class="toc-h3"><a href="#llm-and-audio-limits">LLM and Audio Limits</a></li><li class="toc-h3"><a href="#ai-safety-and-resource-limits">AI Safety and Resource Limits</a></li><li class="toc-h2"><a href="#implementation-sequence">Implementation Sequence</a></li><li class="toc-h2"><a href="#acceptance-gates">Acceptance Gates</a></li><li class="toc-h2"><a href="#review-resolution-matrix">Review Resolution Matrix</a></li><li class="toc-h2"><a href="#current-prototype-status">Current Prototype Status</a></li></ul></aside>
+</div>
+</body>
+</html>

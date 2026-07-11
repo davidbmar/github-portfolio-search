@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stateful Voice-Flow Shift-Left Framework</title>
+  <style>
+    body { color: #202124; font: 16px/1.55 system-ui, sans-serif; margin: 0; }
+    main { margin: 0 auto; max-width: 880px; padding: 40px 24px 72px; }
+    h1, h2 { line-height: 1.2; }
+    h1 { border-bottom: 3px solid #1976d2; padding-bottom: 12px; }
+    code { background: #f1f3f4; padding: 2px 5px; }
+    pre { background: #202124; color: #f8f9fa; overflow: auto; padding: 16px; }
+    .meta { color: #5f6368; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Stateful Voice-Flow Shift-Left Framework</h1>
+  <p class="meta"><strong>Status:</strong> Implemented first slice &middot;
+    <strong>Date:</strong> 2026-07-09 &middot;
+    <strong>Reference:</strong> Property management, +1 510-216-0079</p>
+
+  <h2>Decision</h2>
+  <p>RIFF validates multi-call, multi-object workflows with declarative stateful
+    scenarios before OTA. Scenarios run production tool functions and deterministic
+    choice resolution against a stateful backend implementing the production client
+    interface.</p>
+  <p>This bridge catches missing objects, incorrect spoken lists, ambiguous selection,
+    cross-object mutation, and weak audit evidence locally. Telephony and external
+    integration remain OTA concerns.</p>
+
+  <h2>Contract and Artifacts</h2>
+  <p><code>riff_stateful_scenario_v1</code> files declare an adapter, synthetic
+    identity, ordered actions, captured references, and exact/contains/excludes
+    assertions. The generic runner writes:</p>
+  <ul>
+    <li><code>trace.jsonl</code> for replayable steps and checks;</li>
+    <li><code>events.jsonl</code> for ordered backend audit operations;</li>
+    <li><code>quality.json</code> for CI;</li>
+    <li><code>quality.md</code> and <code>quality.html</code> for operators.</li>
+  </ul>
+  <p>Fixtures use synthetic data only and never contain credentials, real caller
+    identity, raw card data, or raw passwords.</p>
+
+  <h2>Property-Management Proof</h2>
+  <ol>
+    <li>Create separate sink and heater requests.</li>
+    <li>List both and verify both are spoken.</li>
+    <li>Select, read, and update the first request.</li>
+    <li>List again, then select, read, and update the second request.</li>
+    <li>Read both and prove updates did not cross ticket boundaries.</li>
+    <li>List both at the end and retain ordered audit evidence.</li>
+  </ol>
+  <p>The adapter calls the production create, list, get, and update tools. Selection
+    uses the compiled flow's locked-choice contract and production resolver.</p>
+
+  <h2>Shift-Left Gate</h2>
+  <p>The CI test discovers every YAML file in <code>tests/scenarios</code>, so adding
+    a scenario automatically adds a gate.</p>
+  <pre><code>.venv/bin/python scripts/run-stateful-scenario.py \
+  tests/scenarios/property_management_two_tickets.yaml \
+  --out runs/stateful-scenarios/property_management_two_tickets</code></pre>
+  <p>This command is local and places no phone call. A real OTA call still requires
+    explicit human <code>GO</code>.</p>
+
+  <h2>Extension Rules</h2>
+  <ol>
+    <li>Implement the production client surface in a stateful simulator.</li>
+    <li>Map scenario actions to production tools and resolvers in a small adapter.</li>
+    <li>Add a synthetic scenario with observable assertions.</li>
+    <li>Log object, call, and operation IDs in ordered events.</li>
+    <li>Block promotion on scenario failure before OTA.</li>
+  </ol>
+  <p>Business behavior stays out of the generic runner. Production limitations are
+    fixed in production code, and the revealing scenario remains as the regression
+    gate.</p>
+</main>
+</body>
+</html>

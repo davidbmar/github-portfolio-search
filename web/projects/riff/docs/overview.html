@@ -69,18 +69,22 @@
   nav.side a .badge-new{margin-left:5px;padding:0 6px;font-size:9.5px;}
   a.x{color:var(--accent);}
   footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
-  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}.grid2{grid-template-columns:1fr}}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}.grid2{grid-template-columns:1fr}table{display:block;max-width:100%;overflow-x:auto}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <nav class="side">
   <h1>RIFF Docs</h1>
-  <div class="tag">Build → brand → operate → measure</div>
+  <div class="tag">Contracts → build → brand → operate → measure</div>
   <div class="grp">Start here</div>
   <a href="index.html">Overview &amp; the big picture</a>
   <a href="methodology.html">Methodology &amp; lessons</a>
   <a href="fix-journal-tutorial.html">The Fix Journal (tutorial)<span class="badge-new">New</span></a>
+  <div class="grp">Architecture</div>
+  <a href="2026-07-09-architecture-rewrite-decision.html">Boundary architecture ADR (adopted)<span class="badge-new">New</span></a>
+  <a href="2026-07-09-stateful-flow-shift-left.html">Stateful flow, shift-left<span class="badge-new">New</span></a>
+  <a href="law-line-page-mockup.html">The LAW line (512-2777-LAW)</a>
   <div class="grp">Behavior contracts</div>
   <a href="session-facts-endflow.html">Session Facts: end-flow behavior<span class="badge-new">New</span></a>
   <a href="call-replay-atlas.html">Call Replay &amp; Layered Atlas<span class="badge-new">New</span></a>
@@ -113,15 +117,22 @@
   <a href="calendar-companion-live-offer-design-v0.html">Calendar companion — live offer mirror</a>
   <a href="calendar-scheduler-sim-report.html">Calendar simulator report</a>
   <div class="grp">Operate &amp; review calls</div>
+  <a href="browser-phone-simulator.html">Browser phone simulator<span class="badge-new">New</span></a>
+  <a href="state-program-debugger-evidence-design.html">State Program Debugger contract<span class="badge-new">New</span></a>
+  <a href="state-program-debugger-implementation-plan.html">&#8627; implementation work packets<span class="badge-new">New</span></a>
+  <a href="state-program-debugger-claude-review.html">&#8627; adversarial re-review packet<span class="badge-new">New</span></a>
   <a href="session-debug-workspace-design-v0.html">Session Debug Workspace (design)<span class="badge-new">New</span></a>
   <a href="session-debug-workspace-tdd-plan.html">↳ TDD implementation plan<span class="badge-new">New</span></a>
   <a href="call-review.html">Call quality &amp; reviews</a>
   <a href="call-timeline-mock.html">Call timeline mock</a>
+  <a href="state-audio-timeline-hydration.html">State audio timeline + post-run gate<span class="badge-new">New</span></a>
   <a href="session-replay.html">Session replay</a>
   <a href="post-call-dream-loop.html">Post-call dream loop</a>
   <a href="stall-recovery.html">Stall recovery (FSM)</a>
   <a href="voice-quality.html">Voice Quality Playbook</a>
   <a href="node-release-channel-design.html">Two-node release channels<span class="badge-new">New</span></a>
+  <a href="2026-07-08-node-routing-policy-design.html">Node routing policy v3<span class="badge-new">New</span></a>
+  <a href="2026-07-09-node-routing-policy-fable5-review.html">Fable 5 routing review<span class="badge-new">New</span></a>
   <a href="replicant-ticket-operations-design.html">Replicant ticket operations<span class="badge-new">New</span></a>
   <a href="replicant-property-menu-operations.html">Replicant property menu operations<span class="badge-new">New</span></a>
   <a href="call-plan-artifact-schema-v0.html">Call-plan artifact &amp; trace schema</a>
@@ -154,6 +165,19 @@
   <h1 class="title">The RIFF Evaluation &amp; Goal-Hierarchy System</h1>
   <p class="lede">How a voice-AI flow engine measures itself — at four nested levels, with cheap deterministic gates per commit and an expensive judged matrix at night.</p>
 
+  <h2>Onboarding path</h2>
+  <p>Use this sequence when joining the project, reviewing a live-call issue, or handing context to another AI worker.</p>
+  <div class="grid2">
+    <a href="browser-phone-simulator.html"><div class="card"><h3>Browser phone simulator<span class="badge-new">New</span><span class="badge-date">2026-07-09</span></h3><p>Run a phone-shaped call locally with an entered caller number, a routed business line, real DTMF, Replicant identity prefill, live provider tools, and the FSM debugger on one screen. Mutations are blocked unless explicitly enabled.</p></div></a>
+    <a href="state-program-debugger-evidence-design.html"><div class="card"><h3>State Program Debugger contract<span class="badge-new">New</span><span class="badge-date">2026-07-10</span></h3><p>Treat each state visit as a replayable program with explicit entry and exit variables, canonical micro-events, legal exits, caller evidence, and simulation-safe reverse debugging.</p></div></a>
+    <a href="goal-hierarchy-design.html"><div class="card"><h3>1. Mental model</h3><p>Understand the goal hierarchy: flow quality is a symptom, and state/group metrics are the path to root cause.</p></div></a>
+    <a href="business-pack-schema-v0.html"><div class="card"><h3>2. Build a flow</h3><p>Learn the pack schema that compiles a business profile into deterministic voice behavior, companion surfaces, and tests.</p></div></a>
+    <a href="business-pack-import-architecture-fable5-brief.html"><div class="card"><h3>3. Import facts</h3><p>See how website and company data become strict packs without letting generated prose become source-of-truth facts.</p></div></a>
+    <a href="state-audio-timeline-hydration.html"><div class="card"><h3>4. Debug and gate a call<span class="badge-new">New</span></h3><p>Start here when a caller hears silence, a menu sounds wrong, or the transcript says words were generated but the audio does not prove they were heard. The post-run gate turns those findings into a failing command after OTA or local runs.</p></div></a>
+    <a href="fix-journal-tutorial.html"><div class="card"><h3>5. Record the lesson</h3><p>Write the fix journal entry with symptom, root cause, test gate, and exact call/log evidence so the next agent starts smarter.</p></div></a>
+    <a href="node-release-channel-design.html"><div class="card"><h3>6. Promote safely<span class="badge-new">New</span></h3><p>Use the M3 candidate lane and M1 stable lane deliberately, with health checks before live traffic changes.</p></div></a>
+  </div>
+
   <p><strong>RIFF</strong> is a voice-AI <em>flow engine</em>. A <em>flow</em> is a conversation
   script for a phone agent — &ldquo;book a plumbing visit,&rdquo; &ldquo;take a coffee order,&rdquo;
   &ldquo;reserve a table.&rdquo; Under the hood a flow is a <strong>finite-state machine (FSM)</strong>:
@@ -161,6 +185,21 @@
   evaluated against the call's slot bag. The large language model (LLM) only produces <em>language</em>;
   it never decides which state comes next. That separation — declared graph in the FSM, words from the
   LLM — is the spine the whole evaluation system is built on.</p>
+
+  <div class="callout good">
+    <strong>The boundary architecture (adopted 2026-07-10)</strong>
+    That spine is now a set of <em>enforced contracts</em>, not a convention. The
+    <a class="x" href="2026-07-09-architecture-rewrite-decision.html">boundary-architecture ADR</a>
+    fixes ownership across six layers — transport identity, audio delivery, the Interaction Loop,
+    FSM/control, deterministic capabilities, and the LLM — and defines eleven contracts (C1&ndash;C11)
+    covering menus, extraction, branching, validation, retry/re-entry, escalation, narration
+    ownership, prompt delivery receipts, transport identity, side effects, and operator-visible
+    evidence. The rule that cannot be violated: <em>the LLM may propose; deterministic code
+    validates; the FSM decides whether progress is legal; the transport reports what it delivered.</em>
+    RIFF evolves the current engine in place — the event-bus rewrite was declined with explicit
+    reconsideration triggers. Flows are <strong>build artifacts</strong>: regenerate from the pack,
+    never hand-patch (see FX-101 for what a stale compile did to the LAW line).
+  </div>
 
   <p>This documentation describes everything built to <strong>answer one question reliably:
   &ldquo;is a flow good, and if not, exactly which part is broken?&rdquo;</strong> The answer is not a
@@ -238,8 +277,11 @@
 
   <h2>Read this in order</h2>
   <div class="grid2">
+    <a href="2026-07-09-architecture-rewrite-decision.html"><div class="card"><h3>Boundary architecture ADR<span class="badge-new">New</span><span class="badge-date">adopted 2026-07-10</span></h3><p>The architecture direction: adopt the FSM / deterministic-code / LLM boundary as eleven enforced contracts (C1&ndash;C11) and evolve the current engine in place; the event-bus rewrite is declined with explicit reconsideration triggers. Every contract needs a compile/load gate, runtime behavior, trace evidence, and a replay test — a declaration alone doesn't count. First applied scope: the 512-2777-LAW line (compiler copy-seam fixes FX-100, stale-flow regeneration + routing alignment FX-101, and a committed-artifact contract test for the line).</p></div></a>
     <a href="session-debug-workspace-design-v0.html"><div class="card"><h3>Session Debug Workspace<span class="badge-new">New</span><span class="badge-date">2026-07-07</span></h3><p>One merged debug artifact per call ("why did it ask for the address twice?" answered in three clicks) and a live state inspector inside flow-studio: required/filled/missing triad, guard evaluations, transition verdicts — derived views over events riff already emits, no stored state. Shares its data spine with the Call Replay Atlas and makes the atlas's SLOTS/VERDICTS lanes lossless for long calls. Ships with an 8-task TDD plan.</p></div></a>
     <a href="node-release-channel-design.html"><div class="card"><h3>Two-node release channels<span class="badge-new">New</span><span class="badge-date">2026-07-08</span></h3><p>Operational contract for running M3 as the candidate/latest-code lane and M1 as the stable fallback. Documents the implemented <code>scripts/node-mode.sh</code> commands, richer <code>/healthz</code> fields, live-traffic semantics for <code>stable</code>/<code>candidate</code>/<code>shadow</code>/<code>drained</code>, and the current gap: caller-ID canary routing and simulator <code>--node M1|M3|both</code> are still planned.</p></div></a>
+    <a href="2026-07-08-node-routing-policy-design.html"><div class="card"><h3>Node routing policy v3<span class="badge-new">New</span><span class="badge-date">2026-07-09</span></h3><p><strong>Design approved, not deployed.</strong> Defines the Cloudflare Worker/Durable Object ownership authority, caller and line policy, fail-closed behavior, clean deployment gates, and phased path to a real routing dashboard. Includes a dated implementation table: the property flow is live, webhook authentication is committed but awaits the Telnyx public key, and routing/fallback controls remain preview-only.</p></div></a>
+    <a href="2026-07-09-node-routing-policy-fable5-review.html"><div class="card"><h3>Fable 5 node-routing review<span class="badge-new">New</span><span class="badge-date">2026-07-09</span></h3><p>Historical adversarial review of v2 and its v3 disposition. Covers unauthenticated ingress, unknown forwarding outcomes, answer fencing, crash-recoverable deduplication, persistent fail-closed node mode, candidate fallback limits, soft drain, key rotation, and Worker/DO rollback.</p></div></a>
     <a href="replicant-ticket-operations-design.html"><div class="card"><h3>Replicant ticket operations<span class="badge-new">New</span><span class="badge-date">2026-07-08</span></h3><p>Fable5 review draft for extending the live Replicant integration beyond identify/create/follow-up: tenant-visible list/get/update/cancel operations, operation-level idempotency, tenant-writable field limits, soft-delete semantics, retry behavior, and open contract questions.</p></div></a>
     <a href="business-pack-import-architecture-fable5-brief.html"><div class="card"><h3>Business Pack import architecture<span class="badge-new">New</span><span class="badge-date">2026-07-03</span></h3><p>Design brief for shifting onboarding left: company JSON and AI-generated profiles normalize into a strict RIFF Business Pack, then compile into deterministic flows, companion surfaces, scheduler policy, audio, and tests.</p></div></a>
     <a href="website-ingest-importer.html"><div class="card"><h3>Website ingest importer<span class="badge-new">New</span><span class="badge-date">2026-07-09</span></h3><p>Point it at a business's website, get a phone menu: two commands turn <code>mfclaw.com</code>'s schema.org JSON-LD into a pack that compiles clean (0 errors, 0 warns) with a 150-character, 32-word greeting over 14 hidden voice-only FAQ intents. <strong>No LLM in the fact path</strong> &mdash; FAQ answers are spoken verbatim. Now with the defect ledger: seven real bugs this build found and fixed &mdash; a 60-second browser-tier hang, two business nodes silently merged wrong, an inverted JSON-LD traversal order, 11 alias collisions from one FAQ set, an 827-character menu greeting whose TTS render failed, a build gate that guessed the cause, and a silent id-collision data loss &mdash; each with its measured numbers and a named regression test.</p></div></a>

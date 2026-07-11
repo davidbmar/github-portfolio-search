@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Node Routing Policy v3</title>
+  <style>
+    :root { color-scheme: light dark; --accent:#b33b28; --line:#8a8a8a66; }
+    body { font: 16px/1.55 system-ui, sans-serif; margin: 0; }
+    main { margin: 0 auto; max-width: 940px; padding: 40px 24px 80px; }
+    h1, h2, h3 { line-height: 1.2; }
+    h1 { border-bottom: 3px solid var(--accent); padding-bottom: 14px; }
+    h2 { margin-top: 38px; }
+    code { background: #80808022; border-radius: 3px; padding: 2px 5px; }
+    pre { background: #202124; color: #f8f9fa; overflow: auto; padding: 16px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid var(--line); padding: 9px; text-align: left; vertical-align: top; }
+    .meta { color: #777; }
+    .warning { border-left: 4px solid var(--accent); padding: 10px 14px; background: #b33b2815; }
+    .status { border: 1px solid var(--line); border-left: 4px solid #b7791f; padding: 12px 14px; background: #b7791f15; }
+    a { color: #2764b7; }
+    @media (max-width: 680px) { table { display:block; max-width:100%; overflow-x:auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Node Routing Policy v3</h1>
+  <p class="meta"><strong>Revised:</strong> 2026-07-09 &middot;
+    <strong>Status:</strong> Design approved; Phase 0 partially implemented, not deployed</p>
+
+  <p class="status"><strong>What is live:</strong> Property Management at
+    <code>+1 510-216-0079</code> is accepting calls on clean candidate SHA
+    <code>9b4082d</code>. That proves the property flow, not the routing architecture.
+    The Worker/Durable Object dispatcher, persisted routing policy, automatic fallback,
+    and routing dashboard are not running.</p>
+
+  <h2>Current Implementation Status</h2>
+  <table>
+    <thead><tr><th>Surface</th><th>State on 2026-07-09</th><th>Operator meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Property Management line</td><td>Live on clean candidate SHA <code>9b4082d</code></td><td>Create, list, read, and update ticket flow is callable.</td></tr>
+      <tr><td>Node mode and <code>/healthz</code></td><td>Implemented and live</td><td>Node-local health foundation; not policy routing.</td></tr>
+      <tr><td>Telnyx webhook verification</td><td>Implemented at <code>3450bcab</code>; not deployed</td><td>Blocked until <code>TELNYX_PUBLIC_KEY</code> is provisioned and verified in observe mode.</td></tr>
+      <tr><td>L5 authentication config gate</td><td>Implemented at <code>6b531686</code>; not deployed</td><td>Blocks enforce mode without a valid public key.</td></tr>
+      <tr><td><a href="/routing-help.html">Routing controls</a></td><td>Interactive preview only</td><td>Selections change the page but do not save policy or route calls.</td></tr>
+      <tr><td>Worker/Durable Object engine</td><td>Not built</td><td>No edge caller/line assignment or automatic M1/M3 fallback.</td></tr>
+      <tr><td>Policy dashboard and decision viewer</td><td>Not built; Phase 3</td><td>No operative routing dashboard exists yet.</td></tr>
+    </tbody>
+  </table>
+  <p>Existing <code>/ops</code>, <code>/voice.html</code>, <code>/monitor.html</code>,
+    and <code>/admin</code> pages cover service operation, call observation, legacy
+    monitoring, and business administration. None is the routing-policy dashboard.</p>
+
+  <h2>Decision</h2>
+  <p>Use a Cloudflare Worker and Durable Object as the deterministic ingress
+    dispatcher, policy authority, and call-ownership serializer. M1 remains stable,
+    M3 remains candidate, and the RIFF business panel remains the policy editor.</p>
+  <p class="warning"><strong>Do not implement the earlier app-to-app forwarding
+    design.</strong> An ambiguous timeout can make both nodes answer, and best-effort
+    policy copies can split brain.</p>
+  <p>The Durable Object is a deliberate safety dependency. If it cannot serialize
+    ownership, ingress returns a retryable <code>503</code>; it never bypasses the
+    authority and forwards directly to a phone node.</p>
+
+  <h2>Fable 5 Review</h2>
+  <p>Fable 5 agreed with the edge-ownership direction but found v2 not ready to
+    implement. V3 resolves its P1 decisions: DO outage behavior, answer fencing,
+    recoverable deduplication, persistent fail-closed node mode, candidate fallback
+    limits, non-destructive drain, media reconnect, line registry, key rotation, and
+    Worker/DO rollback.</p>
+  <p><a href="2026-07-09-node-routing-policy-fable5-review.html">Read the complete
+    adversarial review and its disposition.</a></p>
+
+  <h2>Findings</h2>
+  <table>
+    <thead><tr><th>Priority</th><th>Finding</th><th>Required correction</th></tr></thead>
+    <tbody>
+      <tr><td>P0</td><td>The deployed public call webhook has no Telnyx signature gate.</td>
+        <td>Repository implementation exists; provision the key, validate observe mode, and deploy enforcement before routing work.</td></tr>
+      <tr><td>P0</td><td>Forward timeout can have an unknown outcome.</td>
+        <td>Serialize ownership and deduplicate event IDs; never immediately fail over after forwarding starts.</td></tr>
+      <tr><td>P0</td><td>Active media cannot migrate.</td>
+        <td>Limit failover claims to new calls before ownership is committed.</td></tr>
+      <tr><td>P1</td><td>A registered connector can front a dead origin.</td>
+        <td>Use signed heartbeats and withdraw unhealthy origins.</td></tr>
+      <tr><td>P1</td><td>Best-effort peer policy sync permits split brain.</td>
+        <td>Use one versioned Durable Object policy writer.</td></tr>
+      <tr><td>P1</td><td>A dirty checkout can be labelled candidate.</td>
+        <td>Deploy an exact SHA from a clean supervised runtime worktree.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Policy</h2>
+  <p>Resolution order is an unexpired caller override, then a stable business
+    <code>line_id</code> backed by normalized DID, then the default node. Caller
+    rules expire within 24 hours. Updates use a monotonically increasing revision
+    and compare-and-set.</p>
+  <pre><code>{
+  "schema": "riff_node_routing_policy_v1",
+  "revision": 42,
+  "default_node": "M1",
+  "by_line": {
+    "property_management_ca": {
+      "called_number": "+15102160079",
+      "preferred_node": "M3"
+    }
+  }
+}</code></pre>
+
+  <h2>Assignment</h2>
+  <ol>
+    <li>Verify the Telnyx signature and timestamp against the raw body before parsing,
+      assignment, or any other side effect.</li>
+    <li>Reuse existing ownership or resolve the current policy revision.</li>
+    <li>Select preferred only when its heartbeat, mode, capacity, SHA, cleanliness,
+      tunnel, origin, and DID registry are eligible.</li>
+    <li>Persist an ownership assignment with a monotonic epoch before forwarding.</li>
+    <li>Worker forwards through a private/assertion-gated origin route. Origin verifies
+      Telnyx again plus the RIFF assertion, then creates or resumes a durable event
+      state machine.</li>
+    <li>Origin acquires a DO answer fence for the current epoch immediately before
+      calling Telnyx.</li>
+    <li>Origin answers with a media-session token supporting fenced same-call reconnect.</li>
+    <li>Duplicates resume incomplete work or return the recorded terminal result.</li>
+  </ol>
+
+  <h2>Failure Semantics</h2>
+  <p>If preferred is known unavailable before forwarding, assign fallback. If
+    forwarding has begun and the result is unknown, keep the original ownership and
+    return a retryable failure. A DO alarm and Telnyx retry reuse the same claim.</p>
+  <p>Both Telnyx primary and failover URLs terminate at the same Worker/DO. A DO outage
+    returns <code>503</code> rather than bypassing call ownership.</p>
+  <p>Soft drain blocks new assignments without killing the media connector. Node loss during an
+    active call may drop that call; active migration is not part of v1.</p>
+
+  <h2>Clean Deployment</h2>
+  <p><code>deploy-candidate.sh</code> must deploy a full remote SHA into a detached,
+    clean runtime worktree, update the service supervisor, drain before restart,
+    verify local health and artifacts, expose the connector, run public L5, and
+    restore the previous runtime automatically on failure.</p>
+  <p>A node with <code>dirty=true</code>, stale heartbeat, routing hash mismatch,
+    shadow/drained mode, or exhausted capacity is ineligible.</p>
+  <p>Mode is persisted outside <code>/tmp</code> and missing/invalid state boots drained.
+    Candidate receives only explicit canaries unless it separately passes
+    <code>fallback_approved</code>.</p>
+
+  <h2>Panel Contract</h2>
+  <p>Say <strong>Property Management prefers M3</strong>, not "goes to M3." Show
+    actual next-call target, fallback, node SHA, cleanliness, health, policy revision,
+    caller override expiry, and recent decision evidence. Until the engine exists,
+    the routing guide is labelled as a non-operative preview.</p>
+
+  <h2>Build Order</h2>
+  <ol>
+    <li>Telnyx verification, recoverable event ledger, media binding, privacy audit,
+      and carrier retry/reconnect measurements.</li>
+    <li>Persistent mode, clean deploy/promote/rollback, canonical line registry,
+      node-scoped L5, and signed eligibility heartbeats.</li>
+    <li>Worker, Durable Object, fenced ownership epochs, dedicated origins, and
+      versioned edge rollback.</li>
+    <li>Versioned policy API, business panel, and decision viewer.</li>
+    <li>Replay, chaos, explicit-GO canary, failover, and rollback drills.</li>
+  </ol>
+
+  <h2>Acceptance</h2>
+  <p>The engine is ready only when unsigned webhooks have no side effects, duplicate
+    deliveries cannot answer twice, stale epochs cannot answer, DO loss cannot bypass
+    ownership, dirty nodes cannot be selected, dead preferred
+    origins route new calls to fallback, every decision cites policy revision and clean
+    SHA, deployment survives the watchdog, and public L5 passes before a human is told
+    to call.</p>
+
+  <p>Full normative detail is in
+    <code>docs/superpowers/specs/2026-07-08-node-routing-policy-design.md</code>.</p>
+</main>
+</body>
+</html>
