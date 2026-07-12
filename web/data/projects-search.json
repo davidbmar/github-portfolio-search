@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-11T08:46:24.161742Z",
-  "count": 139,
+  "generated_at": "2026-07-12T09:02:27.806292Z",
+  "count": 140,
   "entries": [
     {
       "repo": "2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -2412,23 +2412,23 @@
     {
       "repo": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub portfolios using embeddings and TF-IDF.",
+      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
       "keywords": [
         "python",
         "html",
         "javascript",
         "fastapi",
         "sqlite-vec",
-        "sentence transformers",
-        "aws s3",
+        "sentence-transformers",
+        "aws lambda",
+        "s3",
         "cloudfront",
-        "lambda",
         "semantic-search",
         "github-indexer",
         "portfolio-tool",
         "mcp-server",
         "vector-database",
-        "static-site"
+        "static-site-generator"
       ],
       "chunks": [
         {
@@ -2437,23 +2437,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Semantic search engine for personal GitHub portfolios using embeddings and TF-IDF."
+          "text": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF."
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It enables developers to find reusable code patterns and architectures across their own projects."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the client-side web UI. Deployment uses AWS S3, CloudFront, and Lambda functions for OAuth and logging. GitHub Actions automate weekly reindexing."
+          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON exports. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repo, install dependencies, configure a GitHub token, index your repositories, and serve the web UI or use the CLI/MCP server to search your codebase semantically."
+          "text": "Install locally to index your own repos, deploy to S3/CloudFront for a public portfolio site, or connect via MCP to allow AI agents to search your codebase contextually."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-clustering of repositories into capability categories MCP server integration for AI agents to search portfolio Client-side web UI with faceted filtering and autocomplete Automated weekly reindexing via GitHub Actions Exportable data formats (JSON/Markdown) and embeddable widgets"
+          "text": "Semantic search using embeddings and TF-IDF weighting Auto-clustering of repos into capability categories MCP server integration for AI agent access Static web UI with faceted filtering and autocomplete Automated weekly reindexing via GitHub Actions Exportable data formats for LLM discovery"
         }
       ]
     },
@@ -3883,6 +3883,49 @@
       ]
     },
     {
+      "repo": "prioity_foregrounds_kanban",
+      "title": "Priority Foregrounds Kanban",
+      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles.",
+      "keywords": [
+        "python 3.11+",
+        "standard library http.server",
+        "vanilla javascript",
+        "google gemini api",
+        "html5/css3",
+        "product-management",
+        "prioritization",
+        "kanban",
+        "decision-science",
+        "local-tool"
+      ],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Priority Foregrounds Kanban"
+        },
+        {
+          "source": "one_liner",
+          "text": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles."
+        },
+        {
+          "source": "what_it_is",
+          "text": "A standalone Python web application that helps product teams make tradeoffs explicit by allocating a strict 100-point budget across five customizable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores with strict validation to prevent malformed or partial outputs from affecting the board."
+        },
+        {
+          "source": "how_its_built",
+          "text": "Built with Python 3.11+ using only the standard library for the core server (http.server) and logic. The frontend is vanilla JavaScript, HTML, and CSS. Optional AI integration uses the Google Gemini API via an extra dependency group, with strict in-memory caching, rate limiting, and token budgeting implemented in pure Python."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Use this tool during product strategy sessions to force explicit weighting of decision criteria (e.g., Customer Value vs. Risk). Edit the seed data in web/app.js to reflect your current initiative queue, then use the slider interface to adjust principle weights and observe immediate rank changes. Enable AI rescoring to get structured, evidence-based scoring proposals for specific principles."
+        },
+        {
+          "source": "features",
+          "text": "Enforces an exact 100-point budget across five editable decision principles with a 0.1 floor Deterministic queue ranking that updates instantly as principle weights change Optional AI evaluator that proposes complete score columns with strict validation and rejection of partial outputs Local storage persistence for scores, reasons, prompt state, and budget provenance Responsive UI with unit-economics calculator and queue comparison view Fail-closed security model with same-origin checks and no HTML injection in model reasons"
+        }
+      ]
+    },
+    {
       "repo": "pythonArrays",
       "title": "PythonArrays",
       "one_liner": "An empty or stub repository with no source code or documentation.",
@@ -4091,20 +4134,20 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
         "mermaid",
+        "jsonl",
         "sqlite",
         "websockets",
-        "jsonl",
+        "pytest",
         "voice-agent",
         "fsm",
         "llm-orchestration",
         "deterministic-ai",
-        "python-platform",
-        "business-automation"
+        "python-framework"
       ],
       "chunks": [
         {
@@ -4113,23 +4156,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with Finite State Machines for strict workflow enforcement. It allows users to describe a business in plain text, automatically generating a YAML-defined state graph that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by keeping all logic except the LLM call deterministic, using pure functions for guardrails, slot validation, and state transitions."
+          "text": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation) while a deterministic FSM 'keeps the beat' (validating slots, enforcing transitions, and preventing hallucinations)."
         },
         {
           "source": "how_its_built",
-          "text": "Built in Python with a modular architecture separating the LLM adapter layer from the core state management engine. It uses YAML for flow definitions, a custom session store for context management, and a web server for real-time interaction and visualization. The system employs a 'Metric-Ratchet Loop' for continuous improvement, scoring agent performance on humanness, completeness, and latency. Key components include a state manager, slot extractor, guardrail layers, and adapters for various LLM providers like Gemini and Gemma."
+          "text": "The core architecture separates concerns into deterministic pure functions and non-deterministic LLM calls. A web server exposes APIs for flow generation and conversation. When a call comes in, Speech-to-Text converts audio to text, which is passed to `run_turn()`. This function orchestrates guardrails, an LLM adapter (supporting Gemini, Gemma, Claude), and a `state_manager` that validates inputs against a YAML-defined state graph. Deterministic slot extraction and validation occur outside the LLM. The result is converted back to speech via Text-to-Speech. The system includes a session store, event bus, and observability tools for tracking silent failures and performance metrics."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail scenarios (coffee, pizza). It is suitable for developers who need reliable, hallucination-resistant voice interfaces that can handle complex multi-turn conversations with strict data collection requirements. The platform supports local development with open-source models or cloud deployment with API-key-based providers."
+          "text": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. It is ideal for scenarios requiring strict data collection (slots) and workflow adherence, such as appointment scheduling or order taking, where pure LLM agents might hallucinate or drift. Developers can define new flows via YAML or generate them via API, integrate with existing telephony systems via the web server, and extend functionality through custom tools and guards."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions via YAML-defined FSMs Prevents LLM hallucinations through pure-function guardrails and slot validation Supports multiple LLM providers including local Gemma and cloud Gemini Includes a real-time web UI for monitoring and inspecting active sessions Provides a metric-ratchet loop for automated scoring and improvement of agent humanness and quality"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic workflows using YAML-defined Finite State Machines Prevents LLM hallucination via pure-function guardrails and slot validation Supports multiple LLM providers including Gemini, Gemma, and Claude Includes built-in flows for common services like plumbing, salons, and retail Provides real-time web UI for monitoring active conversations and FSM states"
         }
       ]
     },

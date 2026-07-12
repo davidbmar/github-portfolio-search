@@ -1,0 +1,74 @@
+{
+  "title": "Priority Foregrounds Kanban",
+  "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles.",
+  "what_it_is": "A standalone Python web application that helps product teams make tradeoffs explicit by allocating a strict 100-point budget across five customizable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores with strict validation to prevent malformed or partial outputs from affecting the board.",
+  "how_its_built": "Built with Python 3.11+ using only the standard library for the core server (http.server) and logic. The frontend is vanilla JavaScript, HTML, and CSS. Optional AI integration uses the Google Gemini API via an extra dependency group, with strict in-memory caching, rate limiting, and token budgeting implemented in pure Python.",
+  "how_to_apply": "Use this tool during product strategy sessions to force explicit weighting of decision criteria (e.g., Customer Value vs. Risk). Edit the seed data in web/app.js to reflect your current initiative queue, then use the slider interface to adjust principle weights and observe immediate rank changes. Enable AI rescoring to get structured, evidence-based scoring proposals for specific principles.",
+  "quickstart": "python3 -m priority_foregrounds.server",
+  "features": [
+    "Enforces an exact 100-point budget across five editable decision principles with a 0.1 floor",
+    "Deterministic queue ranking that updates instantly as principle weights change",
+    "Optional AI evaluator that proposes complete score columns with strict validation and rejection of partial outputs",
+    "Local storage persistence for scores, reasons, prompt state, and budget provenance",
+    "Responsive UI with unit-economics calculator and queue comparison view",
+    "Fail-closed security model with same-origin checks and no HTML injection in model reasons"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[Browser User]\n    Frontend[Web App JS]\n    Server[Python HTTP Server]\n    Rescore[Rescore Logic]\n    Cache[In Memory Cache]\n    RateLimiter[Rate Limiter]\n    Gemini[Gemini API]\n    LocalStorage[Browser Local Storage]\n    User --> Frontend\n    Frontend --> Server\n    Server --> Rescore\n    Rescore --> Cache\n    Rescore --> RateLimiter\n    RateLimiter --> Gemini\n    Frontend --> LocalStorage",
+  "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant Server\n    participant RescoreLogic\n    participant GeminiAPI\n    Browser->>Server: POST /api/rescore\n    Server->>RescoreLogic: Validate request schema\n    RescoreLogic->>RescoreLogic: Check rate limits and budgets\n    RescoreLogic->>RescoreLogic: Check cache for identical request\n    alt Cache Hit\n        RescoreLogic-->>Server: Return cached result\n    else Cache Miss\n        RescoreLogic->>GeminiAPI: Send structured prompt\n        GeminiAPI-->>RescoreLogic: Return JSON scores\n        RescoreLogic->>RescoreLogic: Validate complete set and ranges\n        RescoreLogic->>RescoreLogic: Update cache and counters\n        RescoreLogic-->>Server: Return validated result\n    end\n    Server-->>Browser: Return rescore_result/v1",
+  "capabilities": [
+    "Deterministic prioritization",
+    "AI-assisted scoring",
+    "Budget enforcement",
+    "Local persistence",
+    "Strict input validation",
+    "Rate limiting"
+  ],
+  "components": [
+    "priority_foregrounds/server.py",
+    "priority_foregrounds/rescore.py",
+    "web/app.js",
+    "web/index.html",
+    "web/styles.css"
+  ],
+  "tech": [
+    "Python 3.11+",
+    "Standard Library http.server",
+    "Vanilla JavaScript",
+    "Google Gemini API",
+    "HTML5/CSS3"
+  ],
+  "depends_on": [
+    "google-generativeai (optional)",
+    "python-dotenv (optional)"
+  ],
+  "integrates_with": [
+    "Google Gemini API",
+    "Browser Local Storage"
+  ],
+  "patterns": [
+    "Fail-closed validation",
+    "In-memory caching",
+    "Token bucket rate limiting",
+    "Structured output enforcement",
+    "Local-first architecture"
+  ],
+  "reuse_tags": [
+    "product-management",
+    "prioritization",
+    "kanban",
+    "decision-science",
+    "local-tool"
+  ],
+  "slug": "prioity_foregrounds_kanban",
+  "repo_url": "https://github.com/davidbmar/prioity_foregrounds_kanban",
+  "visibility": "public",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-07-12T09:01:46.077899Z",
+  "source_commit": "fafeaf9",
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-07-11T21:09:56Z",
+  "docs": []
+}

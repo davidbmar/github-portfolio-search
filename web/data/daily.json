@@ -1,7 +1,47 @@
 {
-  "generated_at": "2026-07-11T08:48:06.391363Z",
-  "count": 162,
+  "generated_at": "2026-07-12T09:03:30.170227Z",
+  "count": 163,
   "days": [
+    {
+      "date": "2026-07-11",
+      "headline": "Deterministic Turn Engine with Fallback Routing and Priority Kanban",
+      "summary": "Implemented a deterministic-first turn engine that routes no-match scenarios to static menu retries without live model invocation, alongside a new standalone priority workbench. This architecture ensures predictable conversational flows by treating the live model as a backup tier rather than the primary driver.",
+      "takeaways": [
+        "Implement flag-gated deterministic routing in state machines to handle no-match edges via static re-asks, reducing unnecessary LLM costs.",
+        "Adopt a 'deterministic-first' design pattern where live models serve only as a backup tier for ambiguous states, ensuring predictable user experiences.",
+        "Use compiler tags to enforce deterministic turn modes on menu hubs, allowing for declarative control over conversational flow logic."
+      ],
+      "total_commits": 8,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "prioity_foregrounds_kanban",
+          "commits": 1,
+          "messages": [
+            "Initial standalone priority workbench"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 6,
+          "messages": [
+            "build(mfclaw): regenerate flow with menu_retry + menu turn_mode=deterministic",
+            "test(turn-engine): behavioral proof — no-match routes to menu_retry, no model injection",
+            "feat(turn-engine): flag-gated deterministic no-match routes to menu_retry (no live model)",
+            "feat(turn-engine): compiler emits menu_retry static re-ask + flag-gated no-match edge",
+            "feat(turn-engine): compiler tags menu hubs turn_mode=deterministic (phase 1, declarative)",
+            "design(turn-engine): deterministic-first per-state brain; live model as backup tier"
+          ]
+        }
+      ],
+      "commit_sig": "54bf13482aa3507c"
+    },
     {
       "date": "2026-07-10",
       "headline": "Ship Recorded State Debugger with Browser, CLI, and Telemetry",
@@ -1541,14 +1581,14 @@
     },
     {
       "date": "2026-06-24",
-      "headline": "Ship Declarative Read-Back Contracts and Structural Cost Wins",
-      "summary": "The riff project ships Phase 3 features behind a flag, introducing an opt-in declarative read-back contract and validating structural cost reductions via cascade HTTP paths. Concurrently, the portfolio search tool enhances CI efficiency by enabling single-repo documentation publishing.",
+      "headline": "Optimize CI Docs and Enhance Riff Flow Graph Interactivity",
+      "summary": "Added conditional documentation generation to streamline single-repo publishing workflows. Improved the Riff web interface by advancing flow-graph highlights during click-to-talk interactions and filtering generated artifacts.",
       "takeaways": [
-        "Implement opt-in declarative read-back contracts to enable parallel evaluation tracks for LLM flows.",
-        "Achieve structural cost wins by restricting LLM policy cascades to HTTP-path-only interactions.",
-        "Optimize CI pipelines by adding conditional inputs to documentation generation for targeted single-repo publishes."
+        "Implement conditional 'only' inputs in CI pipelines to trigger documentation builds for specific repositories, reducing unnecessary compute.",
+        "Enhance voice interaction UIs by programmatically advancing visual flow-graph highlights on user input events for better feedback.",
+        "Configure build tools to ignore generated evaluation artifacts, keeping version control clean and focused on source code."
       ],
-      "total_commits": 10,
+      "total_commits": 4,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1561,19 +1601,13 @@
         },
         {
           "name": "riff",
-          "commits": 7,
+          "commits": 1,
           "messages": [
-            "fix(web): advance flow-graph highlight on click-to-talk turns + ignore generated eval artifacts",
-            "docs(llm-policy): Phase 2.5 RESOLVED — cost win is cascade/HTTP-path-only (structural)",
-            "docs(llm-policy): parallel read-back track — opt-in contract mechanism shipped",
-            "feat(flow-eval): opt-in declarative read-back contract (parallel track)",
-            "docs(llm-policy): Phase 3 shipped behind the flag — DoD met in text-mode",
-            "feat(flow-eval): ship the Phase-2 validated cost assignment (behind the flag)",
-            "test(flow-eval): fix stale routing test + lock Phase 3 candidate contract"
+            "fix(web): advance flow-graph highlight on click-to-talk turns + ignore generated eval artifacts"
           ]
         }
       ],
-      "commit_sig": "ccada5fd1a04cf8a"
+      "commit_sig": "5c4196097d843c96"
     },
     {
       "date": "2026-06-23",

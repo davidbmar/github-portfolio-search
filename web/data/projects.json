@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-11T08:46:24.011811Z",
-  "count": 139,
+  "generated_at": "2026-07-12T09:02:27.661643Z",
+  "count": 140,
   "projects": [
     {
       "title": "k3s App Builder Platform",
@@ -4492,35 +4492,36 @@
     },
     {
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub portfolios using embeddings and TF-IDF.",
-      "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It enables developers to find reusable code patterns and architectures across their own projects.",
-      "how_its_built": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec), FastAPI for the REST API, and static HTML/JS for the client-side web UI. Deployment uses AWS S3, CloudFront, and Lambda functions for OAuth and logging. GitHub Actions automate weekly reindexing.",
-      "how_to_apply": "Clone the repo, install dependencies, configure a GitHub token, index your repositories, and serve the web UI or use the CLI/MCP server to search your codebase semantically.",
+      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
+      "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio.",
+      "how_its_built": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON exports. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing.",
+      "how_to_apply": "Install locally to index your own repos, deploy to S3/CloudFront for a public portfolio site, or connect via MCP to allow AI agents to search your codebase contextually.",
       "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
       "features": [
-        "Semantic search using embeddings and TF-IDF across READMEs and code",
-        "Auto-clustering of repositories into capability categories",
-        "MCP server integration for AI agents to search portfolio",
-        "Client-side web UI with faceted filtering and autocomplete",
+        "Semantic search using embeddings and TF-IDF weighting",
+        "Auto-clustering of repos into capability categories",
+        "MCP server integration for AI agent access",
+        "Static web UI with faceted filtering and autocomplete",
         "Automated weekly reindexing via GitHub Actions",
-        "Exportable data formats (JSON/Markdown) and embeddable widgets"
+        "Exportable data formats for LLM discovery"
       ],
-      "diagram_architecture": "flowchart TD\n    User[User Browser]\n    CLI[CLI Tool]\n    Agent[AI Agent]\n    WebUI[Web UI Static Files]\n    API[FastAPI Server]\n    Indexer[Indexing Pipeline]\n    DB[SQLite Vector DB]\n    GitHub[GitHub API]\n    S3[AWS S3 Bucket]\n    CloudFront[CloudFront CDN]\n    LambdaOAuth[Lambda OAuth Handler]\n    LambdaLog[Lambda Log Handler]\n    GitHubActions[GitHub Actions Cron]\n    User --> WebUI\n    User --> CLI\n    Agent --> API\n    CLI --> API\n    WebUI --> S3\n    S3 --> CloudFront\n    CloudFront --> User\n    API --> DB\n    Indexer --> GitHub\n    Indexer --> DB\n    GitHubActions --> Indexer\n    WebUI --> LambdaOAuth\n    LambdaOAuth --> GitHub\n    WebUI --> LambdaLog",
-      "diagram_sequence": "sequenceDiagram\n    participant User\n    participant WebUI\n    participant API\n    participant Indexer\n    participant GitHub\n    participant DB\n    User->>WebUI: Open Site\n    WebUI->>User: Display Repo List\n    User->>WebUI: Enter Search Query\n    WebUI->>API: POST /search\n    API->>DB: Query Embeddings\n    DB->>API: Return Results\n    API->>WebUI: JSON Response\n    WebUI->>User: Show Matches\n    User->>Indexer: Run ghps index\n    Indexer->>GitHub: Fetch Repos\n    GitHub->>Indexer: Repo Data\n    Indexer->>Indexer: Generate Embeddings\n    Indexer->>DB: Store Vectors",
+      "diagram_architecture": "flowchart TD\n    User[User or AI Agent]\n    WebUI[Web UI Static Files]\n    CLICLI[CLI Tool ghps]\n    MCPServer[MCP Server]\n    API[FastAPI REST API]\n    Indexer[Indexing Pipeline]\n    GitHubAPI[GitHub API]\n    VectorDB[SQLite vec Database]\n    S3[S3 Bucket]\n    CloudFront[CloudFront CDN]\n    LambdaOAuth[Lambda OAuth Handler]\n    \n    User --> WebUI\n    User --> CLI\n    User --> MCPServer\n    \n    WebUI --> API\n    CLI --> Indexer\n    CLI --> API\n    MCPServer --> API\n    \n    Indexer --> GitHubAPI\n    Indexer --> VectorDB\n    \n    API --> VectorDB\n    \n    Indexer --> S3\n    S3 --> CloudFront\n    CloudFront --> WebUI\n    \n    WebUI --> LambdaOAuth\n    LambdaOAuth --> GitHubAPI",
+      "diagram_sequence": "sequenceDiagram\n    participant Client as Web Browser or CLI\n    participant API as FastAPI Server\n    participant DB as SQLite vec DB\n    participant GH as GitHub API\n    \n    Client->>API: GET /search?q=voice+processing\n    API->>DB: Query embeddings and TF-IDF\n    DB-->>API: Return ranked repo IDs\n    API->>DB: Fetch repo metadata for IDs\n    DB-->>API: Return repo details\n    API-->>Client: Return JSON results with snippets\n    \n    Note over Client,GH: Optional OAuth Flow\n    Client->>API: Request OAuth URL\n    API-->>Client: Return GitHub OAuth URL\n    Client->>GH: Authorize App\n    GH-->>Client: Redirect with Code\n    Client->>API: POST /oauth/callback with Code\n    API->>GH: Exchange Code for Token\n    GH-->>API: Return Access Token\n    API-->>Client: Return Session Token",
       "capabilities": [
-        "Semantic Search",
+        "Semantic Code Search",
         "Repository Indexing",
-        "Embedding Generation",
-        "MCP Server Support",
-        "Static Site Hosting",
-        "OAuth Authentication"
+        "Vector Similarity Matching",
+        "Static Site Generation",
+        "MCP Tool Exposure",
+        "Automated Data Refresh"
       ],
       "components": [
-        "Indexing Pipeline",
+        "ghps CLI",
         "FastAPI Backend",
-        "Static Web UI",
-        "SQLite Vector Store",
-        "MCP Server",
+        "SQLite-vec Storage",
+        "Static Web Frontend",
+        "MCP Server Module",
+        "Indexing Pipeline",
         "AWS Lambda Functions"
       ],
       "tech": [
@@ -4529,32 +4530,30 @@
         "JavaScript",
         "FastAPI",
         "SQLite-vec",
-        "Sentence Transformers",
-        "AWS S3",
-        "CloudFront",
-        "Lambda"
+        "sentence-transformers",
+        "AWS Lambda",
+        "S3",
+        "CloudFront"
       ],
       "depends_on": [
         "GitHub Personal Access Token",
         "Python 3.9+",
         "AWS CLI",
-        "sentence-transformers",
-        "sqlite-vec"
+        "sentence-transformers library",
+        "sqlite-vec extension"
       ],
       "integrates_with": [
         "GitHub API",
-        "Google OAuth",
         "Claude Code",
-        "MCP Clients",
-        "AWS S3",
-        "CloudFront"
+        "AI Agents via MCP",
+        "Google OAuth",
+        "Telegram Bot API"
       ],
       "patterns": [
-        "Semantic Search",
-        "Vector Embeddings",
-        "Static Site Generation",
-        "Serverless Functions",
         "Progressive Disclosure",
+        "Static Site Export",
+        "Vector Search",
+        "Serverless Functions",
         "CI/CD Automation"
       ],
       "reuse_tags": [
@@ -4563,7 +4562,7 @@
         "portfolio-tool",
         "mcp-server",
         "vector-database",
-        "static-site"
+        "static-site-generator"
       ],
       "slug": "github-portfolio-search",
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
@@ -4577,10 +4576,10 @@
         }
       ],
       "screenshot_url": "",
-      "generated_at": "2026-07-11T08:45:28.359566Z",
-      "source_commit": "7860c86",
+      "generated_at": "2026-07-12T09:01:24.277479Z",
+      "source_commit": "f7c9f21",
       "model": "qwen3.7-plus",
-      "pushed_at": "2026-07-09T10:32:16Z",
+      "pushed_at": "2026-07-11T08:48:08Z",
       "docs": []
     },
     {
@@ -7247,6 +7246,80 @@
       "model": "qwen3.7-plus"
     },
     {
+      "title": "Priority Foregrounds Kanban",
+      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles.",
+      "what_it_is": "A standalone Python web application that helps product teams make tradeoffs explicit by allocating a strict 100-point budget across five customizable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores with strict validation to prevent malformed or partial outputs from affecting the board.",
+      "how_its_built": "Built with Python 3.11+ using only the standard library for the core server (http.server) and logic. The frontend is vanilla JavaScript, HTML, and CSS. Optional AI integration uses the Google Gemini API via an extra dependency group, with strict in-memory caching, rate limiting, and token budgeting implemented in pure Python.",
+      "how_to_apply": "Use this tool during product strategy sessions to force explicit weighting of decision criteria (e.g., Customer Value vs. Risk). Edit the seed data in web/app.js to reflect your current initiative queue, then use the slider interface to adjust principle weights and observe immediate rank changes. Enable AI rescoring to get structured, evidence-based scoring proposals for specific principles.",
+      "quickstart": "python3 -m priority_foregrounds.server",
+      "features": [
+        "Enforces an exact 100-point budget across five editable decision principles with a 0.1 floor",
+        "Deterministic queue ranking that updates instantly as principle weights change",
+        "Optional AI evaluator that proposes complete score columns with strict validation and rejection of partial outputs",
+        "Local storage persistence for scores, reasons, prompt state, and budget provenance",
+        "Responsive UI with unit-economics calculator and queue comparison view",
+        "Fail-closed security model with same-origin checks and no HTML injection in model reasons"
+      ],
+      "diagram_architecture": "flowchart TD\n    User[Browser User]\n    Frontend[Web App JS]\n    Server[Python HTTP Server]\n    Rescore[Rescore Logic]\n    Cache[In Memory Cache]\n    RateLimiter[Rate Limiter]\n    Gemini[Gemini API]\n    LocalStorage[Browser Local Storage]\n    User --> Frontend\n    Frontend --> Server\n    Server --> Rescore\n    Rescore --> Cache\n    Rescore --> RateLimiter\n    RateLimiter --> Gemini\n    Frontend --> LocalStorage",
+      "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant Server\n    participant RescoreLogic\n    participant GeminiAPI\n    Browser->>Server: POST /api/rescore\n    Server->>RescoreLogic: Validate request schema\n    RescoreLogic->>RescoreLogic: Check rate limits and budgets\n    RescoreLogic->>RescoreLogic: Check cache for identical request\n    alt Cache Hit\n        RescoreLogic-->>Server: Return cached result\n    else Cache Miss\n        RescoreLogic->>GeminiAPI: Send structured prompt\n        GeminiAPI-->>RescoreLogic: Return JSON scores\n        RescoreLogic->>RescoreLogic: Validate complete set and ranges\n        RescoreLogic->>RescoreLogic: Update cache and counters\n        RescoreLogic-->>Server: Return validated result\n    end\n    Server-->>Browser: Return rescore_result/v1",
+      "capabilities": [
+        "Deterministic prioritization",
+        "AI-assisted scoring",
+        "Budget enforcement",
+        "Local persistence",
+        "Strict input validation",
+        "Rate limiting"
+      ],
+      "components": [
+        "priority_foregrounds/server.py",
+        "priority_foregrounds/rescore.py",
+        "web/app.js",
+        "web/index.html",
+        "web/styles.css"
+      ],
+      "tech": [
+        "Python 3.11+",
+        "Standard Library http.server",
+        "Vanilla JavaScript",
+        "Google Gemini API",
+        "HTML5/CSS3"
+      ],
+      "depends_on": [
+        "google-generativeai (optional)",
+        "python-dotenv (optional)"
+      ],
+      "integrates_with": [
+        "Google Gemini API",
+        "Browser Local Storage"
+      ],
+      "patterns": [
+        "Fail-closed validation",
+        "In-memory caching",
+        "Token bucket rate limiting",
+        "Structured output enforcement",
+        "Local-first architecture"
+      ],
+      "reuse_tags": [
+        "product-management",
+        "prioritization",
+        "kanban",
+        "decision-science",
+        "local-tool"
+      ],
+      "slug": "prioity_foregrounds_kanban",
+      "repo_url": "https://github.com/davidbmar/prioity_foregrounds_kanban",
+      "visibility": "public",
+      "status": "shipped",
+      "thin": false,
+      "todos": [],
+      "screenshot_url": "",
+      "generated_at": "2026-07-12T09:01:46.077899Z",
+      "source_commit": "fafeaf9",
+      "model": "qwen3.7-plus",
+      "pushed_at": "2026-07-11T21:09:56Z",
+      "docs": []
+    },
+    {
       "title": "PythonArrays",
       "one_liner": "An empty or stub repository with no source code or documentation.",
       "what_it_is": "A GitHub repository named pythonArrays that contains no visible source files, README, or description. It appears to be a placeholder, fork, or incomplete project.",
@@ -7631,75 +7704,72 @@
     },
     {
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven voice agents from plain English business descriptions.",
-      "what_it_is": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with Finite State Machines for strict workflow enforcement. It allows users to describe a business in plain text, automatically generating a YAML-defined state graph that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by keeping all logic except the LLM call deterministic, using pure functions for guardrails, slot validation, and state transitions.",
-      "how_its_built": "Built in Python with a modular architecture separating the LLM adapter layer from the core state management engine. It uses YAML for flow definitions, a custom session store for context management, and a web server for real-time interaction and visualization. The system employs a 'Metric-Ratchet Loop' for continuous improvement, scoring agent performance on humanness, completeness, and latency. Key components include a state manager, slot extractor, guardrail layers, and adapters for various LLM providers like Gemini and Gemma.",
-      "how_to_apply": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail scenarios (coffee, pizza). It is suitable for developers who need reliable, hallucination-resistant voice interfaces that can handle complex multi-turn conversations with strict data collection requirements. The platform supports local development with open-source models or cloud deployment with API-key-based providers.",
-      "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server\nopen http://127.0.0.1:8765/voice.html in Chrome\ncurl -X POST localhost:8765/api/flows/generate -H \"Content-Type: application/json\" -d '{\"description\":\"Hair salon in Austin. Book cuts and colors.\"}'",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "what_it_is": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation) while a deterministic FSM 'keeps the beat' (validating slots, enforcing transitions, and preventing hallucinations).",
+      "how_its_built": "The core architecture separates concerns into deterministic pure functions and non-deterministic LLM calls. A web server exposes APIs for flow generation and conversation. When a call comes in, Speech-to-Text converts audio to text, which is passed to `run_turn()`. This function orchestrates guardrails, an LLM adapter (supporting Gemini, Gemma, Claude), and a `state_manager` that validates inputs against a YAML-defined state graph. Deterministic slot extraction and validation occur outside the LLM. The result is converted back to speech via Text-to-Speech. The system includes a session store, event bus, and observability tools for tracking silent failures and performance metrics.",
+      "how_to_apply": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. It is ideal for scenarios requiring strict data collection (slots) and workflow adherence, such as appointment scheduling or order taking, where pure LLM agents might hallucinate or drift. Developers can define new flows via YAML or generate them via API, integrate with existing telephony systems via the web server, and extend functionality through custom tools and guards.",
+      "quickstart": "cd ~/src/riff\n.venv/bin/python3 -m pytest tests/ -q\n.venv/bin/python3 -m riff.web_server",
       "features": [
         "Generates voice agent flows from plain English business descriptions",
-        "Enforces deterministic state transitions via YAML-defined FSMs",
-        "Prevents LLM hallucinations through pure-function guardrails and slot validation",
-        "Supports multiple LLM providers including local Gemma and cloud Gemini",
-        "Includes a real-time web UI for monitoring and inspecting active sessions",
-        "Provides a metric-ratchet loop for automated scoring and improvement of agent humanness and quality"
+        "Enforces deterministic workflows using YAML-defined Finite State Machines",
+        "Prevents LLM hallucination via pure-function guardrails and slot validation",
+        "Supports multiple LLM providers including Gemini, Gemma, and Claude",
+        "Includes built-in flows for common services like plumbing, salons, and retail",
+        "Provides real-time web UI for monitoring active conversations and FSM states"
       ],
-      "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[Speech to Text]\n    STT --> RunTurn[run_turn]\n    RunTurn --> Guardrails[Guardrails Pure Functions]\n    RunTurn --> LLMCall[LLM Call Adapter]\n    RunTurn --> StateManager[State Manager Declared Graph]\n    Guardrails --> RunTurn\n    LLMCall --> RunTurn\n    StateManager --> RunTurn\n    RunTurn --> SlotExtractor[Slot Extractor Deterministic]\n    RunTurn --> EvalFramework[Eval Framework]\n    RunTurn --> TurnLogger[Turn Logger JSONL]\n    RunTurn --> TTS[Text to Speech]\n    TTS --> Caller",
-      "diagram_sequence": "sequenceDiagram\n    participant User as Caller\n    participant STT as Speech to Text\n    participant Server as Web Server\n    participant TurnEngine as run_turn\n    participant Guardrails as Guardrails\n    participant LLM as LLM Adapter\n    participant FSM as State Manager\n    participant TTS as Text to Speech\n    User->>STT: Speaks\n    STT->>Server: Transcribed Text\n    Server->>TurnEngine: Process Turn\n    TurnEngine->>Guardrails: Validate Input\n    Guardrails-->>TurnEngine: Validation Result\n    TurnEngine->>FSM: Get Current State\n    FSM-->>TurnEngine: State Definition\n    TurnEngine->>LLM: Generate Response\n    LLM-->>TurnEngine: Raw Response\n    TurnEngine->>FSM: Validate Transition\n    FSM-->>TurnEngine: Next State\n    TurnEngine->>TTS: Synthesize Audio\n    TTS-->>User: Agent Speaks",
+      "diagram_architecture": "flowchart TD\n    Caller[Caller] --> STT[Speech to Text]\n    STT --> RunTurn[run_turn]\n    RunTurn --> Guardrails[Guardrails Pure Functions]\n    RunTurn --> LLMCall[LLM Call Adapter]\n    RunTurn --> StateManager[State Manager Declared Graph]\n    Guardrails --> TurnResult[Turn Result]\n    LLMCall --> TurnResult\n    StateManager --> TurnResult\n    TurnResult --> SlotExtractor[Slot Extractor Deterministic]\n    TurnResult --> EvalFramework[Evaluation Framework]\n    TurnResult --> TurnLogger[Turn Logger JSONL]\n    TurnResult --> TTS[Text to Speech]\n    TTS --> Caller",
+      "diagram_sequence": "sequenceDiagram\n    participant User as Caller\n    participant STT as Speech to Text\n    participant Server as Web Server\n    participant RunTurn as run_turn\n    participant LLM as LLM Adapter\n    participant FSM as State Manager\n    participant TTS as Text to Speech\n    User->>STT: Speaks\n    STT->>Server: Transcribed Text\n    Server->>RunTurn: Process Turn\n    RunTurn->>FSM: Get Current State\n    FSM->>RunTurn: State Context\n    RunTurn->>LLM: Generate Response\n    LLM->>RunTurn: Raw Output\n    RunTurn->>FSM: Validate Transition\n    FSM->>RunTurn: Validated Result\n    RunTurn->>TTS: Synthesize Speech\n    TTS->>User: Audio Response",
       "capabilities": [
         "Flow generation from natural language",
         "Deterministic state management",
+        "Multi-provider LLM integration",
+        "Real-time conversation monitoring",
         "Slot filling and validation",
-        "Multi-provider LLM support",
-        "Real-time session inspection",
-        "Automated performance scoring"
+        "Silent failure tracking"
       ],
       "components": [
         "web_server",
         "state_manager",
-        "turn_engine",
-        "slot_extractor",
-        "guardrails",
+        "run_turn",
         "session_store",
-        "mcp_server",
-        "flow_atlas"
+        "event_bus",
+        "adapters",
+        "guardrails",
+        "slot_extractor"
       ],
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
+        "JSONL",
         "SQLite",
         "WebSockets",
-        "JSONL"
+        "Pytest"
       ],
       "depends_on": [
-        "pytest",
-        "mcp",
         "Gemini API",
         "Gemma Model",
-        "Chrome Browser"
+        "Claude API",
+        "MCP CLI"
       ],
       "integrates_with": [
-        "MCP Clients",
-        "Gemini Flash",
-        "Local Gemma",
-        "Claude Adapter"
+        "Telephony Systems",
+        "Browser Clients",
+        "MCP Clients"
       ],
       "patterns": [
-        "Finite State Machine",
+        "LLM Riffs FSM Beats",
         "Pure Function Guardrails",
-        "Metric Ratchet Loop",
-        "Event Bus",
-        "LRU Cache",
-        "Silent Failure Tracking"
+        "Declared State Graph",
+        "Silent Failure Tracking",
+        "LRU Cache Helper"
       ],
       "reuse_tags": [
         "voice-agent",
         "fsm",
         "llm-orchestration",
         "deterministic-ai",
-        "python-platform",
-        "business-automation"
+        "python-framework"
       ],
       "slug": "riff",
       "repo_url": "https://github.com/davidbmar/riff",
@@ -7741,7 +7811,7 @@
         },
         {
           "kind": "unmerged_branch",
-          "detail": "tree-intake-ingestion is 59 commits ahead of the default branch"
+          "detail": "tree-intake-ingestion is 100 commits ahead of the default branch"
         },
         {
           "kind": "unmerged_branch",
@@ -7753,10 +7823,10 @@
         }
       ],
       "screenshot_url": "",
-      "generated_at": "2026-07-11T08:46:22.622014Z",
-      "source_commit": "ba8d7a6",
+      "generated_at": "2026-07-12T09:02:26.413433Z",
+      "source_commit": "8c1157c",
       "model": "qwen3.7-plus",
-      "pushed_at": "2026-07-11T08:40:18Z",
+      "pushed_at": "2026-07-12T03:55:48Z",
       "docs": [
         {
           "path": "docs/html/2026-07-08-node-routing-policy-design.html",
