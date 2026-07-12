@@ -57,6 +57,30 @@ class TestFetchHtmlDocs:
         assert docs[0][1] == "<h1>A</h1>"
 
     @patch.object(github_client, "_session")
+    def test_default_fetches_more_than_fifty_html_docs(self, mock_session_fn):
+        session = MagicMock()
+        mock_session_fn.return_value = session
+        tree = {
+            "tree": [
+                {
+                    "type": "blob",
+                    "path": f"docs/html/page-{i:03d}.html",
+                    "sha": f"s{i}",
+                }
+                for i in range(77)
+            ]
+        }
+        session.get.side_effect = [
+            _resp(tree),
+            *(_blob(f"<h1>{i}</h1>") for i in range(77)),
+        ]
+
+        docs = github_client.fetch_html_docs("o", "r", default_branch="main")
+
+        assert len(docs) == 77
+        assert docs[-1][0] == "docs/html/page-076.html"
+
+    @patch.object(github_client, "_session")
     def test_missing_tree_returns_empty(self, mock_session_fn):
         session = MagicMock()
         mock_session_fn.return_value = session

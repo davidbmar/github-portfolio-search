@@ -147,6 +147,16 @@
   as exactly that, noise. Second, <strong>flow-set composition</strong>: a 6-flow re-eval is not
   comparable to a 60-flow sweep; mixing them reads composition as quality. The <code>--trend</code> view
   only shows a delta between runs with the <em>same</em> flow set for this reason.</p>
+  <p>A specific instance of this trap: <strong>single-turn scaffolds</strong>
+  (<code>tutorial_*</code>, <code>module_*</code>, <code>test_*</code>, <code>hey_riff*</code>) are test
+  fixtures that structurally score quality&nbsp;&approx;&nbsp;1.0 — one turn, nothing for a judge to
+  grade. On one 42-flow sweep they were <strong>57 of 126 conversations (45&percnt;)</strong>, dragging the
+  headline <code>avg_quality</code> from a true <strong>5.04 to 4.04</strong> and making the dashboard cry
+  wolf. The report card's headline <code>overall.avg_success / avg_quality / avg_robustness</code> now
+  cover <em>real conversational flows only</em> (falling back to all flows for a scaffold-only run), and
+  surface what was set aside in <code>overall.scaffolds_excluded</code> and
+  <code>overall.scaffold_flow_ids</code> — reported, never silently dropped. Scaffolds still appear in the
+  per-flow list. See <code>riff/flow_eval/report.py::is_scaffold_flow</code>.</p>
 
   <h2>7. Tie scores to changes — the three clocks</h2>
   <p>To answer &ldquo;did the change at time T move the score?&rdquo; you need three separate clocks:

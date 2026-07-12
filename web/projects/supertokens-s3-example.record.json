@@ -1,70 +1,84 @@
 {
   "title": "SuperTokens S3 Example",
-  "one_liner": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2.",
-  "what_it_is": "This project demonstrates how to integrate SuperTokens passwordless authentication into a Go backend service. It includes infrastructure scripts to deploy SuperTokens Core and PostgreSQL via Docker on an AWS EC2 instance, along with a Go server that handles magic link generation and session verification. The architecture is designed for cloud deployment with security considerations for internal service communication.",
-  "how_its_built": "The system uses a Shell script to orchestrate Docker containers for the database and auth core. The application logic is written in Go, utilizing the `supertokens-golang` SDK for auth flows and `gorilla/mux` for HTTP routing. Configuration is managed via environment variables loaded from a `.env` file.",
-  "how_to_apply": "Use this repository as a template for setting up secure, passwordless login for Go-based microservices. It provides a ready-to-use Docker setup for the authentication backend and example code for integrating session handling into your API endpoints.",
+  "one_liner": "Reference implementation of a Go backend with SuperTokens passwordless authentication and Dockerized infrastructure on AWS EC2.",
+  "what_it_is": "A demonstration project that integrates the SuperTokens Golang SDK for passwordless (magic link) authentication with a Go HTTP server. It includes infrastructure scripts to deploy PostgreSQL and the SuperTokens core via Docker on an Ubuntu EC2 instance, providing a complete stack for testing session-based auth flows.",
+  "how_its_built": "The system uses a Shell script to orchestrate Docker containers for PostgreSQL and the SuperTokens core. The application logic is written in Go, using the gorilla/mux router and the official supertokens-golang library. Configuration is managed via environment variables loaded through godotenv.",
+  "how_to_apply": "Use this repository as a template for setting up secure, session-based authentication in Go microservices. It demonstrates how to isolate identity management in Docker containers while keeping the application stateless and connected via internal networks.",
   "quickstart": "scp -i \"your-key.pem\" sample_docker_container_setup.sh ubuntu@<your-ec2-ip>:/home/ubuntu/\nssh -i \"your-key.pem\" ubuntu@<your-ec2-ip>\nchmod +x sample_docker_container_setup.sh\n./sample_docker_container_setup.sh\ncd /home/ubuntu/go/src/transcription-service\ngo run cmd/server/main.go",
   "features": [
-    "Automated Docker setup for SuperTokens Core and PostgreSQL",
-    "Passwordless authentication via magic links",
-    "Go backend integration with session management",
-    "Basic frontend test harness for login flows",
-    "Security best practices for internal network isolation"
+    "Passwordless authentication via magic links using SuperTokens",
+    "Automated Docker deployment for PostgreSQL and SuperTokens core",
+    "Go backend integration with session handling and API routing",
+    "Basic HTML frontend for testing login and verification flows",
+    "Configuration management via environment variables and .env files"
   ],
-  "diagram_architecture": "flowchart TD\n    Client[Client Browser/App] -->|HTTP Requests| GoBackend[Go Backend Server]\n    GoBackend -->|Auth API Calls| STCore[SuperTokens Core]\n    STCore -->|Read/Write Session Data| Postgres[(PostgreSQL Database)]\n    GoBackend -->|Future Integration| S3[AWS S3 Storage]\n    subgraph AWS EC2 Instance\n        GoBackend\n        STCore\n        Postgres\n    end",
-  "diagram_sequence": "sequenceDiagram\n    participant C as Client\n    participant G as Go Backend\n    participant S as SuperTokens Core\n    participant D as PostgreSQL\n\n    C->>G: POST /auth/login (email)\n    G->>S: Create Magic Link Request\n    S->>D: Store Pre-auth Session\n    S-->>G: Return Magic Link URL\n    G-->>C: Return Magic Link JSON\n    \n    C->>G: GET /auth/verify (link params)\n    G->>S: Verify Session/Consume Link\n    S->>D: Update Session Status\n    S-->>G: Session Tokens\n    G-->>C: Set Cookies/Return Tokens",
+  "diagram_architecture": "flowchart TD\n    Client[Web Browser or Curl]\n    GoBackend[Go Backend Server]\n    SuperTokensCore[SuperTokens Core Container]\n    PostgresDB[PostgreSQL Container]\n    Client -->|HTTP Request| GoBackend\n    GoBackend -->|Auth API Calls| SuperTokensCore\n    SuperTokensCore -->|Read Write Data| PostgresDB",
+  "diagram_sequence": "sequenceDiagram\n    participant Client\n    participant GoBackend\n    participant SuperTokensCore\n    participant PostgresDB\n    Client->>GoBackend: POST auth login with email\n    GoBackend->>SuperTokensCore: Create magic link request\n    SuperTokensCore->>PostgresDB: Store pre auth session\n    SuperTokensCore-->>GoBackend: Return magic link URL\n    GoBackend-->>Client: Return JSON with link\n    Client->>GoBackend: GET auth verify with token\n    GoBackend->>SuperTokensCore: Validate session\n    SuperTokensCore->>PostgresDB: Check session validity\n    SuperTokensCore-->>GoBackend: Session valid\n    GoBackend-->>Client: Return success or redirect",
   "capabilities": [
     "Passwordless Login",
     "Session Management",
     "Docker Orchestration",
-    "AWS Deployment"
+    "API Routing"
   ],
   "components": [
-    "Go Backend",
+    "Go Backend Server",
     "SuperTokens Core",
-    "PostgreSQL",
-    "Shell Setup Script",
-    "Static Frontend"
+    "PostgreSQL Database",
+    "Setup Shell Script",
+    "Static HTML Frontend"
   ],
   "tech": [
     "Go",
-    "SuperTokens",
+    "Shell",
     "Docker",
     "PostgreSQL",
-    "AWS EC2",
-    "Shell"
+    "SuperTokens",
+    "AWS EC2"
   ],
   "depends_on": [
     "Docker Engine",
-    "Go Runtime",
-    "AWS Account"
+    "Golang Toolchain",
+    "Ubuntu Linux",
+    "AWS Security Groups"
   ],
   "integrates_with": [
     "AWS S3",
-    "Nginx (Reverse Proxy)",
-    "Let's Encrypt (SSL)"
+    "Nginx Reverse Proxy",
+    "Let's Encrypt SSL"
   ],
   "patterns": [
     "Passwordless Authentication",
-    "Microservices Infrastructure",
-    "Containerized Deployment"
+    "Containerized Infrastructure",
+    "Environment Based Configuration",
+    "Microservice Architecture"
   ],
   "reuse_tags": [
     "authentication",
-    "go",
+    "golang",
+    "supertokens",
     "docker",
     "aws",
-    "supertokens"
+    "infrastructure-as-code"
   ],
   "slug": "supertokens-s3-example",
   "repo_url": "https://github.com/davidbmar/supertokens-s3-example",
   "visibility": "public",
   "status": "shipped",
   "thin": false,
-  "todos": [],
+  "todos": [
+    {
+      "kind": "unmerged_branch",
+      "detail": "dependabot/go_modules/go_modules-5e88a3fa1a is 1 commit ahead of the default branch"
+    },
+    {
+      "kind": "open_pr",
+      "detail": "PR #1: Bump the go_modules group across 1 directory with 4 updates"
+    }
+  ],
   "screenshot_url": "",
-  "generated_at": "2026-06-14T03:57:13.276743Z",
+  "generated_at": "2026-07-03T09:56:02.186652Z",
   "source_commit": "ee99656",
-  "model": "qwen3.7-plus"
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-07-02T10:34:07Z",
+  "docs": []
 }

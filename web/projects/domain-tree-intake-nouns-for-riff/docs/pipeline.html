@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tree-Driven Intake — Pipeline &amp; Operations</title>
+<style>
+:root{
+  --ground:#FAF9F6; --surface:#FFFFFF; --ink:#20242A; --muted:#6A7076;
+  --line:#E3E1DB; --accent:#2A6FB0; --accent-2:#B07800; --good:#2F8F5B;
+  --warn:#C04545; --chip:#F1EFEA; --code-bg:#F4F2ED;
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root{
+  --ground:#16181B; --surface:#1E2126; --ink:#E7E5E0; --muted:#9AA0A6;
+  --line:#2C3036; --accent:#5D9BD6; --accent-2:#D9A33B; --good:#4FAE7B;
+  --warn:#D96A6A; --chip:#282C31; --code-bg:#22262B;
+}}
+:root[data-theme="dark"]{
+  --ground:#16181B; --surface:#1E2126; --ink:#E7E5E0; --muted:#9AA0A6;
+  --line:#2C3036; --accent:#5D9BD6; --accent-2:#D9A33B; --good:#4FAE7B;
+  --warn:#D96A6A; --chip:#282C31; --code-bg:#22262B;
+}
+:root[data-theme="light"]{
+  --ground:#FAF9F6; --surface:#FFFFFF; --ink:#20242A; --muted:#6A7076;
+  --line:#E3E1DB; --accent:#2A6FB0; --accent-2:#B07800; --good:#2F8F5B;
+  --warn:#C04545; --chip:#F1EFEA; --code-bg:#F4F2ED;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:40px 28px 80px}
+h1{font-size:28px;letter-spacing:-.015em;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--muted);max-width:68ch;margin:0 0 34px}
+h2{font-size:14px;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);
+  margin:44px 0 14px;padding-top:18px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin:22px 0 8px}
+p{max-width:70ch}
+code{font:13.5px/1.5 var(--mono);background:var(--code-bg);padding:1.5px 5px;border-radius:4px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow-x:auto;font:13px/1.55 var(--mono)}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;background:var(--surface);
+  border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:14.5px}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);padding:9px 13px;border-bottom:1px solid var(--line)}
+td{padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.tablewrap{overflow-x:auto}
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:18px 0}
+.stage{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);
+  border-radius:8px;padding:12px 14px}
+.stage.riff{border-top-color:var(--accent-2)}
+.stage .n{font:700 11px/1 var(--mono);color:var(--muted)}
+.stage h4{margin:6px 0 4px;font-size:15px}
+.stage p{font-size:13px;color:var(--muted);margin:0}
+.stage code{font-size:11.5px}
+.gate{background:var(--surface);border:1.5px solid var(--warn);border-radius:8px;
+  padding:14px 18px;margin:18px 0;max-width:74ch}
+.gate b{color:var(--warn)}
+.phase-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0}
+.phase{padding:7px 14px;border-radius:99px;font:600 13.5px/1 var(--mono);
+  background:var(--chip);border:1px solid var(--line)}
+.phase.p1{border-color:var(--accent);color:var(--accent)}
+.phase.p2{border-color:var(--accent-2);color:var(--accent-2)}
+.phase.p3{border-color:var(--good);color:var(--good)}
+.arrow{color:var(--muted)}
+.legend{font-size:12.5px;color:var(--muted)}
+.repo-tag{font:600 10.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em;
+  padding:3px 7px;border-radius:4px;background:var(--chip)}
+ul{padding-left:22px}li{margin:5px 0;max-width:68ch}
+.kbd{font:12.5px var(--mono);border:1px solid var(--line);border-bottom-width:2px;
+  border-radius:5px;padding:1px 6px;background:var(--surface)}
+footer{margin-top:52px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Tree-Driven Intake — Pipeline &amp; Operations</h1>
+<p class="sub">How a business vertical goes from an LLM's first draft to a phone
+number answering real calls — and every gate in between. Markdown source of
+truth: <code>docs/pipeline.md</code>. Design: <code>docs/designs/2026-07-04-tree-driven-intake-design.md</code>.</p>
+
+<h2>The pipeline</h2>
+<div class="pipe">
+  <div class="stage"><span class="n">1 · GENERATE</span><h4>tree_gen.py</h4>
+    <p>LLM enumerates nouns + drafts question sets. Output: <code>trees/&lt;domain&gt;.draft.json</code>. Drafts never compile.</p></div>
+  <div class="stage"><span class="n">2 · PRUNE</span><h4>tree_builder.html</h4>
+    <p>Human + business owner delete nouns, add owner notes, fix aliases, <b>Lock</b>. The "we don't do septic" pass.</p></div>
+  <div class="stage"><span class="n">3 · COMPILE</span><h4>tree_to_schema.py</h4>
+    <p>Locked tree → <code>dist/&lt;domain&gt;.capability.json</code>: flat fields + <code>phase</code> + <code>router</code> + <code>noun_map</code>. One emit path; flat = degenerate tree.</p></div>
+  <div class="stage riff"><span class="n">4 · IMPORT</span><h4>tree_intake importer</h4>
+    <p>Capability JSON → riff pack: nouns become menu capabilities with aliases + DTMF; questions become phase-ordered stages.</p></div>
+  <div class="stage riff"><span class="n">5 · BUILD</span><h4>business_pack build</h4>
+    <p>3-gate compile, audio prerender (all intake prompts are static — trees are frozen), gold-sweep check.</p></div>
+  <div class="stage riff"><span class="n">6 · SIMULATE</span><h4>flow_eval gate</h4>
+    <p>LLM caller personas + deterministic invariants. <b>Fails the build</b> on ordering, re-asks, dead air, missing readback.</p></div>
+  <div class="stage riff"><span class="n">7 · PROMOTE</span><h4>flows/&lt;id&gt;.yaml</h4>
+    <p>Only a sim-passing flow is copied where a live number can load it. Mtime-cached; reloads on next call.</p></div>
+  <div class="stage riff"><span class="n">8 · ROUTE</span><h4>.env + _routing.yaml</h4>
+    <p>Dialed number → flow id. Env override wins on collision. Read per call — no restart to reroute.</p></div>
+</div>
+<p class="legend">Blue stages live in the precursor repo (<code>domain-tree-intake-nouns-for-riff</code>); amber stages live in <code>riff</code>.</p>
+
+<div class="gate"><b>Hard requirement:</b> step 6 gates step 7. A flow is not
+"ready" until the simulation passes. Promotion to <code>flows/</code> — which is
+what a routed phone number loads — happens only through the gated build path.
+This rule exists because the no-match menu loop, the urgent-handoff misroute,
+and the missing readback were all discovered by live phone calls that a
+simulation would have caught first.</div>
+
+<h2>Conversation-order contract</h2>
+<div class="phase-row">
+  <span class="phase p1">problem</span><span class="arrow">→</span>
+  <span class="phase p2">triage</span><span class="arrow">→</span>
+  <span class="phase p3">identity</span><span class="arrow">→</span>
+  <span class="phase">readback</span><span class="arrow">→</span>
+  <span class="phase">submit</span>
+</div>
+<ul>
+  <li><b>problem</b> — the root noun choice (the menu <i>is</i> its answer:
+    <code>router: true</code>, never re-asked), then the chosen noun's questions,
+    symptom before detail. Broad → narrow.</li>
+  <li><b>triage</b> — urgency and timing, right after the problem.</li>
+  <li><b>identity</b> — name, address, role, contact preferences. Personal
+    info always comes last of the questions.</li>
+  <li>SMS consent + verification: <b>one</b> ask, the tree's consent copy,
+    after the questions — never an entry gate to the conversation.</li>
+</ul>
+<p>The contract is stamped into every compiled field by the precursor compiler,
+so every vertical — current and future — inherits it with zero code. Origin:
+LLM-as-judge review of two live calls (2026-07-04).</p>
+
+<h2>The simulation gate</h2>
+<p><code>riff.flow_eval</code> drives each generated flow with LLM caller
+personas: <i>cooperative, difficult, edge, terse, oversharer, corrector</i>,
+plus two born from real call failures — <b>narrative</b> (tells a story,
+never names a menu option) and <b>stt_noise</b> (a third of its turns are
+transcription garbage: <code>왔어요.</code>, <code>Olá.</code>, empty strings).</p>
+<div class="tablewrap"><table>
+<tr><th>Deterministic invariant</th><th>Real defect it guards against</th></tr>
+<tr><td><code>phase-order</code></td><td>identity questions before problem/triage complete</td></tr>
+<tr><td><code>router-no-reask</code></td><td>"What fixture is giving you trouble?" after the caller already chose</td></tr>
+<tr><td><code>readback-before-submit</code></td><td>"I have the details, goodbye" with no confirmation</td></tr>
+<tr><td><code>reprompt-on-empty</code></td><td>dead air or the identical menu replayed after a no-match</td></tr>
+<tr><td><code>no-anything-else-loop</code></td><td>re-opening "anything else?" after the caller said no</td></tr>
+</table></div>
+<p>Fast mode (<code>--no-judge</code>) runs invariants only — CI-viable, no
+API key. Full mode adds the judge panel and writes the worst-first report
+card to <code>docs/flow-eval/</code>.</p>
+
+<h2>Artifact map</h2>
+<div class="tablewrap"><table>
+<tr><th>Artifact</th><th>Repo</th><th>Author</th><th>Purpose</th></tr>
+<tr><td><code>trees/&lt;domain&gt;.locked.json</code></td><td><span class="repo-tag">precursor</span></td><td>LLM draft + human prune</td><td>Single source of truth: nouns, aliases, questions, owner notes, consent copy</td></tr>
+<tr><td><code>tree_schema.py</code> + JSON Schema</td><td><span class="repo-tag">precursor</span></td><td>code</td><td>Lints, lock gate, alias-collision check; Python validator is the authority</td></tr>
+<tr><td><code>dist/&lt;domain&gt;.capability.json</code></td><td><span class="repo-tag">precursor</span></td><td>generated</td><td>The ingestion contract riff consumes — never hand-edited</td></tr>
+<tr><td><code>packs/generated/&lt;domain&gt;_intake.pack.yaml</code></td><td><span class="repo-tag">riff</span></td><td>generated</td><td>Menu capabilities + phase-ordered stages + guardrails</td></tr>
+<tr><td><code>flows/generated/&lt;domain&gt;_intake.yaml</code></td><td><span class="repo-tag">riff</span></td><td>generated</td><td>The FSM the phone server runs</td></tr>
+<tr><td><code>flows/&lt;flow_id&gt;.yaml</code></td><td><span class="repo-tag">riff</span></td><td>gated build only</td><td>What a routed number actually loads</td></tr>
+</table></div>
+
+<h2>Runbook</h2>
+<h3>Onboard a new vertical (all content, no code)</h3>
+<pre><code># precursor repo
+.venv/bin/python -m intake_trees.tree_gen --domain hvac \
+    --persona "experienced residential HVAC tech" --out trees/hvac.draft.json
+# prune with the business owner in web/tree_builder.html → Lock
+.venv/bin/python scripts/build_dist.py &amp;&amp; .venv/bin/pytest -q
+
+# riff repo
+cp dist/hvac.capability.json ../riff/data/tree_intake/
+python -m riff.business_pack.importers.tree_intake data/tree_intake/hvac.capability.json
+scripts/verify-intake-sim.sh hvac_intake   # check → compile → audio → SIM → promote</code></pre>
+<p>Shift-left is test-enforced: <code>test_zero_vertical_specific_code</code>
+fails the build if any vertical name appears in pipeline code.</p>
+
+<h3>Edit an existing vertical</h3>
+<p>Load the locked tree in the builder → edit (version bumps, status reverts
+to draft) → re-Lock → drop into <code>trees/</code> → rebuild dist → re-run the
+riff half. Wording changes are audio changes; the build re-renders them.</p>
+
+<h3>Wire a phone number</h3>
+<p>Add the entry in <b>both</b> <code>riff/.env</code>
+(<code>RIFF_DIALED_ROUTING_TABLE_JSON</code> — wins on collision) and
+<code>flows/_routing.yaml</code>, then kill the python server and
+<span class="kbd">launchctl kickstart</span> the phone node (its
+<code>--ensure</code> wrapper won't restart a live process). Routing is read
+per call; flows are mtime-cached and reload automatically.</p>
+
+<h3>Measure performance</h3>
+<pre><code>GEMINI_API_KEY=... .venv/bin/python -m riff.flow_eval \
+  --flows plumbing_intake,electrical_intake,dog_grooming_intake,immigration_law_intake \
+  --personas cooperative,difficult,edge,narrative,stt_noise --json --out docs/flow-eval/</code></pre>
+<p>Baseline (2026-07-05, plumbing, pre-fix): success 9.0 / quality 2.3 /
+robustness 2.0. Completions succeed; the losses came from a single
+<code>escape_target</code> sending every give-up path to the urgent safety
+handoff, and a fixed retry prompt with no guidance.</p>
+
+<h2>Current state &amp; known gaps</h2>
+<ul>
+  <li>Live: <b>+1 (510) 216-0079</b> → <code>plumbing_intake</code>, phase-ordered.</li>
+  <li>Four verticals shipped: plumbing (stress test, nested kitchen-sink branch),
+    electrical (work-type-first), dog grooming (near-linear), immigration law
+    (lightweight and UPL-safe: verbatim disclaimer, no eligibility or
+    entry-status questions by design).</li>
+  <li>v0 degradations: no conditional stages (branch questions flatten),
+    single-digit DTMF (sump pump is voice-alias-only), tenant approval encoded
+    in option labels rather than a conditional stage.</li>
+  <li><b>The big gap:</b> narrative callers. Deterministic menu matching cannot
+    route "there's a leak somewhere" — that is riff Pre-Task E (schema-driven
+    extraction). The aliases, <code>noun_map</code>, and extraction hints are
+    already in every capability JSON waiting for it; the <i>narrative</i>
+    persona quantifies what the gap costs.</li>
+  <li>STT language auto-detect can hallucinate non-English text on unclear
+    audio; the <i>stt_noise</i> persona and <code>reprompt-on-empty</code>
+    invariant guard recovery, not transcription itself.</li>
+</ul>
+
+<footer>Generated 2026-07-05 · sources: <code>docs/pipeline.md</code> (canonical),
+two-call LLM-as-judge review, flow_eval baseline run · precursor repo
+<code>domain-tree-intake-nouns-for-riff</code> ↔ <code>riff</code> branch
+<code>tree-intake-ingestion</code></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>State Program Debugger Implementation Plan · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-10-state-program-debugger-implementation-plan.md</span>
+<a class="raw" href="/docs/design/2026-07-10-state-program-debugger-implementation-plan.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>State Program Debugger Implementation Plan</h1>
+<p>Date: 2026-07-10<br />
+Depends on: <code>2026-07-10-state-program-debugger-evidence-design.md</code> revision 2<br />
+Status: execution plan for implementation models; no packet implies production
+readiness</p>
+<h2 id="purpose">Purpose</h2>
+<p>Turn the design contract into small, independently reviewable work packets.
+This plan is intentionally explicit enough for lower-cost models to implement
+mechanical packets without deciding architecture as they go.</p>
+<p>The first useful milestone is read-only recorded navigation for Codex, Claude,
+and the browser. Historical-code execution and state simulation come later and
+require stronger implementation and security review.</p>
+<h2 id="non-negotiable-rules">Non-Negotiable Rules</h2>
+<ol>
+<li>The Markdown evidence design is authoritative when this plan is silent.</li>
+<li>Do not edit generated business flows to implement debugger behavior.</li>
+<li>Do not put raw PII, secrets, or unredacted caller audio into test fixtures.</li>
+<li>Do not add external tool writes, phone calls, texts, ticket mutations, or
+network access to simulation.</li>
+<li>Do not infer missing values, timestamps, writers, event ownership, or source
+revisions. Mark them unavailable.</li>
+<li>Keep recorded navigation and simulation separate in code and JSON.</li>
+<li>The browser, CLI, and API must call the same pure projection engine.</li>
+<li>Each packet lands with its focused tests before the next packet starts.</li>
+<li>Existing <code>/api/debug/state_trace</code> and <code>/api/debug/session_facts</code> behavior is
+preserved until the replacement client is proven.</li>
+<li>No production integration or OTA test occurs without the design gates and
+explicit human <code>GO</code>.</li>
+<li>Every operator-facing Markdown document has a rendered counterpart under
+<code>docs/html/</code>; <code>docs/html/index.html</code> links the current canonical pages and
+removes or relabels obsolete prototype links.</li>
+</ol>
+<h2 id="documentation-lifecycle">Documentation Lifecycle</h2>
+<p>Markdown under <code>docs/design/</code> or <code>docs/guide/</code> is canonical. After changing an
+operator-facing document, render its HTML counterpart with:</p>
+<pre><code class="language-bash">cd docs
+../.venv/bin/python ../scripts/render_doc.py &lt;source-relative-to-docs&gt; \
+  html/&lt;output-name&gt;.html
+</code></pre>
+<p>Every packet checks whether its user-visible behavior changes the evidence
+design, implementation plan, CLI/API guide, or operator workflow. When it does:</p>
+<ol>
+<li>update the canonical Markdown in the same commit;</li>
+<li>regenerate the complete HTML page, not a hand-maintained excerpt;</li>
+<li>add or update its link and summary in <code>docs/html/index.html</code>;</li>
+<li>remove, relabel, or redirect obsolete index entries so there is one obvious
+current starting point;</li>
+<li>run <code>tests/test_docs_index.py</code>, <code>tests/test_docs_toc.py</code>, and
+<code>tests/test_docs_truth.py</code>.</li>
+</ol>
+<p>Do not delete mock pages while tests or review packets still depend on them.
+WP6 marks them <code>prototype/obsolete</code> after the hydrated page exists; WP10 removes
+their routes and files only after equivalent production tests pass.</p>
+<h2 id="target-module-boundaries">Target Module Boundaries</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Ownership</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>riff/postcall/state_program_artifact.py</code></td>
+<td>normalize durable artifacts and flow metadata into <code>riff.state_program_debugger/v1</code></td>
+</tr>
+<tr>
+<td><code>riff/state_program_debugger.py</code></td>
+<td>I/O-free cursor projection, stepping, reverse, breakpoints, hashes, and later simulation commands</td>
+</tr>
+<tr>
+<td><code>riff/session_slot_ledger.py</code></td>
+<td>seeded baseline, safe value representation, per-session fingerprints, and mutation helpers</td>
+</tr>
+<tr>
+<td><code>scripts/state_program_debugger.py</code></td>
+<td>thin JSON CLI over the artifact builder and pure engine</td>
+</tr>
+<tr>
+<td><code>riff/web_server.py</code></td>
+<td>thin authenticated/local HTTP adapter; no projection or simulation logic</td>
+</tr>
+<tr>
+<td><code>web/state-program-debugger.js</code></td>
+<td>API client and rendering only</td>
+</tr>
+<tr>
+<td><code>web/state-program-debugger.html</code></td>
+<td>production debugger surface; the mock remains a reference until replacement</td>
+</tr>
+<tr>
+<td><code>docs/guide/state-program-debugger.md</code></td>
+<td>operator and AI instructions for build, CLI/API stepping, evidence labels, and safety</td>
+</tr>
+<tr>
+<td><code>docs/html/state-program-debugger.html</code></td>
+<td>complete rendered operator guide</td>
+</tr>
+<tr>
+<td><code>docs/html/index.html</code></td>
+<td>canonical discovery links; obsolete mock/debugger links removed or relabeled</td>
+</tr>
+</tbody>
+</table>
+<p>Do not put hydrator joins in JavaScript or command semantics in HTTP handlers.</p>
+<h2 id="shared-schemas">Shared Schemas</h2>
+<h3 id="seeded-slot-event">Seeded Slot Event</h3>
+<p>New event type:</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;session_slots_seeded&quot;,
+  &quot;session_id&quot;: &quot;v3:example&quot;,
+  &quot;slots&quot;: [
+    {
+      &quot;slot&quot;: &quot;caller_name&quot;,
+      &quot;safe_value&quot;: &quot;&lt;str len=5&gt;&quot;,
+      &quot;availability&quot;: &quot;redacted&quot;,
+      &quot;value_fingerprint&quot;: &quot;hmac-sha256:...&quot;,
+      &quot;writer&quot;: &quot;replicant_identify&quot;
+    }
+  ],
+  &quot;snapshot_fingerprint&quot;: &quot;sha256:...&quot;,
+  &quot;fingerprint_scheme&quot;: &quot;session-hmac-sha256/v1&quot;
+}
+</code></pre>
+<p>The per-session HMAC key is random, lives only on <code>SessionContext</code>, and is not
+persisted. Fingerprints can be compared inside one session but cannot correlate
+caller values across sessions. <code>safe_value</code> uses the existing PII-safe slot
+representation. Internal routing enums may remain visible under the existing
+policy.</p>
+<p>Every later <code>slot_write</code> adds <code>old_fingerprint</code> and <code>new_fingerprint</code> using the
+same session key. Dictionary-valued changes emit a safe shape plus fingerprint;
+they are not skipped. A boundary fingerprint is computed from sorted
+<code>slot -&gt; value_fingerprint</code> pairs.</p>
+<h3 id="execution-target">Execution Target</h3>
+<p>Every command that executes logic uses:</p>
+<pre><code class="language-json">{
+  &quot;purpose&quot;: &quot;recorded_reproduction|candidate_regression|controlled_isolation&quot;,
+  &quot;engine_revision&quot;: &quot;git:&lt;immutable-sha&gt;&quot;,
+  &quot;flow_revision&quot;: &quot;sha256:&lt;immutable-flow-hash&gt;&quot;,
+  &quot;runtime_lock&quot;: &quot;sha256:&lt;dependency-lock-hash&gt;&quot;,
+  &quot;fixture_hash&quot;: &quot;sha256:&lt;capsule-fixtures&gt;&quot;
+}
+</code></pre>
+<p>Read-only recorded navigation has no execution target because it executes no
+FSM, resolver, prompt, or tool code.</p>
+<h2 id="work-packet-summary">Work Packet Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Packet</th>
+<th>Outcome</th>
+<th>Depends on</th>
+<th>Suggested model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WP0</td>
+<td>redacted failing fixture and schema tests</td>
+<td>none</td>
+<td>low-cost/mechanical</td>
+</tr>
+<tr>
+<td>WP1</td>
+<td>complete flow transition metadata</td>
+<td>WP0</td>
+<td>low-cost/mechanical</td>
+</tr>
+<tr>
+<td>WP2</td>
+<td>strict visit framing and canonical recorded events</td>
+<td>WP0-WP1</td>
+<td>medium</td>
+</tr>
+<tr>
+<td>WP3</td>
+<td>seeded baseline and complete mutation attribution</td>
+<td>WP0</td>
+<td>medium; strong review</td>
+</tr>
+<tr>
+<td>WP4</td>
+<td>read-only artifact and cursor engine</td>
+<td>WP1-WP3</td>
+<td>medium</td>
+</tr>
+<tr>
+<td>WP5</td>
+<td>CLI and local read-only API</td>
+<td>WP4</td>
+<td>low-cost/mechanical</td>
+</tr>
+<tr>
+<td>WP6</td>
+<td>production read-only browser UI</td>
+<td>WP4-WP5</td>
+<td>medium frontend</td>
+</tr>
+<tr>
+<td>WP7</td>
+<td>state capsule and candidate simulation</td>
+<td>WP4</td>
+<td>strong model + security review</td>
+</tr>
+<tr>
+<td>WP8</td>
+<td>historical reproduction runner</td>
+<td>WP7</td>
+<td>strongest model + human security review</td>
+</tr>
+<tr>
+<td>WP9</td>
+<td>bounded pattern runner and regression export</td>
+<td>WP7-WP8</td>
+<td>strong model</td>
+</tr>
+<tr>
+<td>WP10</td>
+<td>promotion review and production integration</td>
+<td>all</td>
+<td>Fable/Opus adversarial review + human GO</td>
+</tr>
+</tbody>
+</table>
+<p>Lower-cost models should not receive WP7-WP10 as unsupervised implementation
+tasks. They can implement fixtures, metadata extraction, adapters, and focused
+tests once the interfaces below are fixed.</p>
+<h2 id="current-progress">Current Progress</h2>
+<ul>
+<li>WP0 completed in <code>e935aced</code>: redacted property-menu boundary fixture and
+ownership contract tests.</li>
+<li>WP1 completed in <code>e6f553d2</code>: declared legal edges and static slot-reference
+metadata.</li>
+<li>WP2 completed in <code>e8e8cd6b</code>: deterministic state-visit framing, commit
+boundaries, explicit visit IDs, late-choice attribution, and quarantine.</li>
+<li>WP3 completed: one redacted, source-attributed seed baseline; fingerprinted
+writes including dict-valued tool and locked-choice writes; boundary
+snapshots; and baseline-plus-write hydration with explicit incompleteness
+findings. See <code>FX-122</code>. Existing uninstrumented direct slot mutations are
+detected by the boundary fingerprint gate rather than silently represented.</li>
+<li>WP4 completed: a pure, read-only cursor engine opens normalized artifacts and
+provides deterministic visit, variable, exit, evidence, audio-reference, and
+forward/reverse navigation projections. It is intentionally not yet wired to
+a CLI, HTTP route, browser, simulation, or audio playback.</li>
+<li>WP5 in progress: <code>scripts/state_program_debugger.py</code> can build a normalized
+artifact from a retained session and issue one JSON cursor command for an AI
+or shell client. The loopback HTTP API and its authorization tests remain
+pending; browser hydration is WP6.</li>
+</ul>
+<h2 id="wp0-redacted-boundary-fixture">WP0 - Redacted Boundary Fixture</h2>
+<p><strong>Goal:</strong> create the smallest durable fixture that reproduces the original
+announce/menu attribution defect without caller PII.</p>
+<p><strong>Files:</strong></p>
+<ul>
+<li><code>tests/fixtures/state_program_debugger/property_menu_boundary/manifest.json</code></li>
+<li><code>tests/fixtures/state_program_debugger/property_menu_boundary/bus_events.jsonl</code></li>
+<li><code>tests/fixtures/state_program_debugger/property_menu_boundary/trace.jsonl</code></li>
+<li><code>tests/fixtures/state_program_debugger/property_menu_boundary/expected.json</code></li>
+<li><code>tests/test_state_program_artifact.py</code></li>
+</ul>
+<p><strong>Fixture facts:</strong></p>
+<ul>
+<li><code>menu_full_announce#1</code> enters, pushes/completes audio, evaluates
+<code>audio_done</code>, writes <code>_menu_announced=yes</code>, and exits to <code>menu</code>.</li>
+<li><code>menu#1</code> enters, receives caller input <code>Status</code>, resolves
+<code>existing_request</code>, writes <code>_route=existing_request</code>, and exits to
+<code>cap_existing_request__list_tickets</code>.</li>
+<li>At least one duplicate-target edge is present in metadata to prove edge ID,
+not target name, is the join key.</li>
+<li>Times and sequence numbers are internally consistent but synthetic and
+clearly fixture-labeled.</li>
+</ul>
+<p><strong>Tests written first:</strong></p>
+<ul>
+<li>announce visit contains no <code>Status</code> or <code>_route</code> event;</li>
+<li>menu visit contains both;</li>
+<li>expected JSON contains immutable entry/exit snapshots and all legal edges;</li>
+<li>fixture contains no E.164 number, address, name, token, or raw caller audio.</li>
+</ul>
+<p><strong>Do not:</strong> copy a production session directory into the repository.</p>
+<h2 id="wp1-flow-transition-metadata">WP1 - Flow Transition Metadata</h2>
+<p><strong>Goal:</strong> make declared legal exits machine-readable.</p>
+<p><strong>Files:</strong></p>
+<ul>
+<li>modify <code>riff/postcall/state_audio_timeline.py::_load_flow_metadata</code></li>
+<li>tests in <code>tests/test_state_audio_timeline.py</code></li>
+</ul>
+<p><strong>Required state metadata:</strong></p>
+<pre><code class="language-json">{
+  &quot;transitions&quot;: [
+    {
+      &quot;edge_id&quot;: &quot;menu:1&quot;,
+      &quot;declaration_index&quot;: 1,
+      &quot;to&quot;: &quot;cap_existing_request__list_tickets&quot;,
+      &quot;when&quot;: &quot;slot_equals:_route:existing_request&quot;,
+      &quot;reason&quot;: &quot;caller chose existing_request&quot;,
+      &quot;sets&quot;: [],
+      &quot;clears&quot;: []
+    }
+  ],
+  &quot;static_slot_references&quot;: []
+}
+</code></pre>
+<p><code>edge_id</code> is <code>&lt;state_id&gt;:&lt;zero-based declaration index&gt;</code> and is stable for a
+specific flow hash. Preserve declaration order. Never join by target alone.</p>
+<p><code>static_slot_references</code> is a list of <code>{slot, source, detail}</code> rows. Allowed
+sources in this packet are <code>required_slot</code>, <code>must_include</code>,
+<code>locked_choice_slot</code>, <code>prompt_interpolation</code>, <code>required_tool_arg</code>,
+<code>edge_guard</code>, <code>edge_set</code>, and <code>edge_clear</code>. Parse slot
+names only from structured fields, <code>{{slots.&lt;name&gt;}}</code> interpolation, and known
+guard DSL forms such as <code>slot_equals:</code> and <code>slot_set:</code>. For a custom registered
+guard whose reads cannot be derived from its authored string, emit
+<code>{source: &quot;custom_guard&quot;, slot: null, detail: &lt;guard-name&gt;}</code>; do not inspect
+Python source or guess its reads. Runtime <code>guard_evaluated.slots_read</code> supplies
+the actual guard-read evidence later.</p>
+<p><strong>Definition of done:</strong> focused tests cover duplicate targets, sets, clears,
+reasons, static reference sources, a custom guard with unknown static reads,
+and a state with no transitions.</p>
+<h2 id="wp2-visit-framing-and-canonical-events">WP2 - Visit Framing and Canonical Events</h2>
+<p><strong>Goal:</strong> build strict state visits without variable reconstruction yet.</p>
+<p><strong>Files:</strong></p>
+<ul>
+<li>create <code>riff/postcall/state_program_artifact.py</code></li>
+<li>tests in <code>tests/test_state_program_artifact.py</code></li>
+</ul>
+<p><strong>Pure entry point:</strong></p>
+<pre><code class="language-python">build_state_program_artifact(
+    *, manifest: dict, bus_events: list[dict], trace_events: list[dict],
+    flow_metadata: dict, transcript_events: list[dict], audio_refs: list[dict]
+) -&gt; dict
+</code></pre>
+<p>No file reads occur inside this function. A separate thin loader reads session
+files and calls it.</p>
+<p><strong>Rules:</strong></p>
+<ul>
+<li>derive <code>visit_id=&lt;state&gt;#&lt;ordinal&gt;</code> for legacy events;</li>
+<li>prefer explicit visit ID when present;</li>
+<li>attach <code>transition_committed</code> to the outgoing boundary selected by its
+<code>from_state</code>/<code>to_state</code>, even when its sequence follows target entry;</li>
+<li>attach a late legacy <code>locked_choice_evaluated</code> to its source visit only when
+<code>from_state</code> and <code>turn_index</code> identify exactly one matching
+<code>transition_committed</code>; label the attribution derived and cite both rows;</li>
+<li>quarantine conflicts under <code>unattributed_events</code>;</li>
+<li>normalize only the recorded vocabulary from the design;</li>
+<li>preserve source event kind and evidence refs;</li>
+<li>order by <code>(seq, source_suborder, event_id)</code>;</li>
+<li>never invent <code>clock_ms</code>.</li>
+</ul>
+<p><strong>Definition of done:</strong> WP0 attribution tests pass; re-entry creates distinct
+visits; a post-exit event cannot appear in the prior visit; hydration is
+byte-identical on two runs.</p>
+<h2 id="wp3-seeded-baseline-and-mutation-ledger">WP3 - Seeded Baseline and Mutation Ledger</h2>
+<p><strong>Goal:</strong> make entry/current/exit variable claims reconstructable.</p>
+<p><strong>Files:</strong></p>
+<ul>
+<li>create <code>riff/session_slot_ledger.py</code></li>
+<li>modify <code>riff/types.py</code> for a non-serialized per-session fingerprint key</li>
+<li>modify <code>riff/phone/telnyx_transport.py</code></li>
+<li>modify <code>riff/phone/server.py</code> to preserve phone seed-source writers</li>
+<li>modify the browser simulator session setup in <code>riff/live/transport.py</code></li>
+<li>modify <code>riff/locked_choice.py</code> so matched-choice bulk writes use the ledger</li>
+<li>modify <code>riff/state_manager.py</code> and <code>riff/live_turn_controller.py</code> write sites</li>
+<li>add <code>session_slots_seeded</code> to <code>riff/state_trace_writer.py</code></li>
+<li>focused tests in <code>tests/test_session_slot_ledger.py</code> and phone/simulator tests</li>
+</ul>
+<p><strong>API:</strong></p>
+<pre><code class="language-python">seed_session_slots(ctx, sources: list[tuple[str, dict]]) -&gt; dict
+slot_write_event(ctx, *, slot, old, new, kind, writer) -&gt; dict | None
+snapshot_fingerprint(ctx) -&gt; str
+</code></pre>
+<p>The phone path passes separate sources for <code>prior_call</code>, <code>caller_identity</code>,
+<code>replicant_identify</code>, <code>transport</code>, and <code>flow_default</code>; it must not merge them
+before attribution. Keep the old constructor argument temporarily for test and
+caller compatibility, assigning it writer <code>legacy_initial_slots</code>.</p>
+<p>Replace direct baseline <code>slots.update</code> and initial caller/called-number writes
+with <code>seed_session_slots</code> before the first state performs work. Do not treat
+<code>slot_filled</code> as mutation evidence. Replace the matched locked-choice
+<code>session.slots.update(slot_updates)</code> with per-key ledger writes before guard
+evaluation; keep the event's current turn semantics and add an explicit
+<code>visit_id</code> when available.</p>
+<p><strong>Definition of done:</strong></p>
+<ul>
+<li>phone and simulator produce one seeded event before state work;</li>
+<li>every baseline key has a writer and safe value state;</li>
+<li>dictionary-valued tool changes emit a write;</li>
+<li>same-length string changes produce different fingerprints;</li>
+<li>no fingerprint correlates across two sessions with the same raw value;</li>
+<li>fold mismatch yields <code>completeness=incomplete</code>;</li>
+<li>raw PII is absent from durable ledger assertions.</li>
+</ul>
+<h2 id="wp4-read-only-artifact-and-cursor-engine">WP4 - Read-Only Artifact and Cursor Engine</h2>
+<p><strong>Goal:</strong> deliver Mode 1 for AI use without simulation.</p>
+<p><strong>Files:</strong></p>
+<ul>
+<li>complete <code>riff/postcall/state_program_artifact.py</code></li>
+<li>create <code>riff/state_program_debugger.py</code></li>
+<li>tests in <code>tests/test_state_program_debugger.py</code></li>
+</ul>
+<p><strong>Pure engine API:</strong></p>
+<pre><code class="language-python">open_debugger(artifact: dict) -&gt; DebuggerState
+apply_command(state: DebuggerState, command: dict) -&gt; tuple[DebuggerState, dict]
+</code></pre>
+<p>Supported commands: <code>list_visits</code>, <code>inspect_state</code>, <code>seek</code>, <code>step</code>, <code>reverse</code>,
+<code>continue_until</code>, <code>inspect_variables</code>, <code>inspect_exits</code>, <code>inspect_evidence</code>, and
+<code>fetch_audio_range</code> metadata. The engine returns audio references; it does not
+play audio or read a WAV.</p>
+<p>Every response includes schema, mode=<code>recorded</code>, old/new cursor, projection,
+evidence refs, and determinism hash. Unknown action, stale hash, unavailable
+event, and boundary overrun return typed errors without moving the cursor.</p>
+<p><strong>Definition of done:</strong> forward then reverse returns the original hash;
+Entry/Exit never change; CLI/API/UI fixture projections can be compared later.</p>
+<h2 id="wp5-json-cli-and-local-read-only-api">WP5 - JSON CLI and Local Read-Only API</h2>
+<p><strong>Goal:</strong> let Codex and Claude step without a browser.</p>
+<p><strong>Files:</strong></p>
+<ul>
+<li>create <code>scripts/state_program_debugger.py</code></li>
+<li>add thin routes in <code>riff/web_server.py</code></li>
+<li>tests in <code>tests/test_state_program_debugger_cli.py</code> and web API tests</li>
+</ul>
+<p><strong>CLI examples:</strong></p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py build &lt;session-dir&gt; --out &lt;artifact.json&gt;
+.venv/bin/python scripts/state_program_debugger.py command &lt;artifact.json&gt; \
+  --json '{&quot;action&quot;:&quot;seek&quot;,&quot;visit_id&quot;:&quot;menu#1&quot;}'
+</code></pre>
+<p>The command prints one JSON object to stdout and diagnostics to stderr. It does
+not start a server, execute a model, or call a tool.</p>
+<p><strong>HTTP:</strong> add one read-only command endpoint under <code>/api/debug/state_program</code>.
+Validate session IDs with the existing strict alphabet. Bind/debug access is
+loopback-only by default. If the web server is exposed beyond loopback, require
+<code>Authorization: Bearer $RIFF_DEBUG_API_TOKEN</code>; when the token is unset, return
+403. Do not add wildcard CORS or return raw slot values.</p>
+<p><strong>Definition of done:</strong> CLI and API return the same response and determinism
+hash for WP0; path traversal, stale hash, missing token, and unsupported
+simulation actions are rejected. Create the operator/AI Markdown guide, render
+its complete HTML counterpart, link it from <code>docs/html/index.html</code>, and pass the
+three docs tests listed in Documentation Lifecycle.</p>
+<h2 id="wp6-production-read-only-browser">WP6 - Production Read-Only Browser</h2>
+<p><strong>Goal:</strong> replace hardcoded mock data with Mode 1 artifact hydration.</p>
+<p><strong>Files:</strong></p>
+<ul>
+<li>create <code>web/state-program-debugger.html</code></li>
+<li>create <code>web/state-program-debugger.js</code></li>
+<li>add the page route in <code>riff/web_server.py</code></li>
+<li>browser tests under <code>tests/web/</code></li>
+</ul>
+<p>Use the existing mock only as a visual reference. Remove hardcoded visits and
+browser speech from evidence claims. Render the dedicated conversation lane,
+state breadcrumb, boundary variables, legal exits, six evidence beats, and
+recorded/unavailable/redacted labels.</p>
+<p><strong>Definition of done:</strong> semantic browser tests assert frame ownership and
+immutable Entry/Exit; desktop/mobile Playwright screenshots have no overlap;
+the page and CLI report the same cursor hash. Update the operator guide and
+HTML. Make the hydrated page the primary debugger link in
+<code>docs/html/index.html</code>; relabel mock links as prototypes rather than leaving two
+apparently canonical debugger entries.</p>
+<h2 id="wp7-state-capsule-and-candidate-simulation">WP7 - State Capsule and Candidate Simulation</h2>
+<p><strong>Goal:</strong> support safe counterfactual runs against an explicitly selected
+candidate engine and flow.</p>
+<p><strong>Files:</strong> chosen only after a strong-model design check of WP0-WP6. Extend the
+pure engine rather than adding simulation to HTTP or JavaScript.</p>
+<p><strong>Required behavior:</strong></p>
+<ul>
+<li>export <code>riff.state_test_capsule/v1</code> with recorded engine/build/flow identity;</li>
+<li>resolve labels to immutable hashes before execution;</li>
+<li>run in a subprocess with network disabled and an explicit time/memory limit;</li>
+<li>permit fixture tool reads only; reject every side-effecting tool;</li>
+<li>record overlays and simulated events in a separate namespace;</li>
+<li>return resolved revisions, runtime lock, fixture hash, and determinism hash.</li>
+</ul>
+<p><strong>Definition of done:</strong> a candidate run cannot mutate the recorded artifact,
+filesystem fixtures, network, ticket store, or phone transport. Security review
+is mandatory.</p>
+<h2 id="wp8-historical-reproduction-runner">WP8 - Historical Reproduction Runner</h2>
+<p><strong>Goal:</strong> reproduce recorded Python behavior when the historical engine is
+available.</p>
+<p>Resolve the recorded Git SHA and dependency lock from trusted local artifacts.
+Use an isolated detached worktree or immutable container with network disabled.
+Never fetch or execute an untrusted revision on demand from the API. If code,
+flow, lock, or fixture dependencies are absent, return
+<code>HISTORICAL_RUNTIME_UNAVAILABLE</code>; never use <code>HEAD</code> as fallback.</p>
+<p>Compare four explicit targets when requested:</p>
+<ol>
+<li>recorded engine + recorded flow;</li>
+<li>candidate engine + recorded flow;</li>
+<li>recorded engine + candidate flow;</li>
+<li>candidate engine + candidate flow.</li>
+</ol>
+<p>This packet requires strongest-model implementation, human security review,
+and tests proving unavailable historical code cannot fall through to current
+code.</p>
+<h2 id="wp9-pattern-runner-and-regression-export">WP9 - Pattern Runner and Regression Export</h2>
+<p><strong>Goal:</strong> let an AI sweep bounded patterns against one state.</p>
+<p>Input is JSONL with a schema, unique pattern ID, overlays, caller observations,
+selected source, DTMF/control, audio outcome, tool fixtures, and execution
+target. Reject unknown keys. Enforce branch, event, time, and model-budget caps.</p>
+<p>Output is JSONL with exact exit edge, variable delta, simulated audio/model
+refs, invariant findings, resolved revisions, and comparison to the recorded
+branch. <code>export_regression</code> writes a redacted fixture plus a focused failing
+test template; it never edits production flows.</p>
+<p><strong>Definition of done:</strong> the property-menu matrix reproduces the recorded route,
+finds a transcript-selection counterexample, and exports a deterministic test
+that fails before the candidate fix and passes after it.</p>
+<h2 id="wp10-promotion">WP10 - Promotion</h2>
+<p>Run all focused suites, the full relevant regression suite, docs truth checks,
+security tests, Playwright desktop/mobile screenshots, and the Claude Fable
+re-review packet. Verify the thirteen design GO criteria and all seventeen
+acceptance gates.</p>
+<p>Promotion states are separate:</p>
+<ul>
+<li><code>DESIGN GO</code>: contract approved.</li>
+<li><code>MODE1 GO</code>: recorded AI stepping approved.</li>
+<li><code>SIMULATION GO</code>: candidate state forks approved.</li>
+<li><code>HISTORICAL GO</code>: recorded-SHA execution approved.</li>
+<li><code>PRODUCTION GO</code>: human authorization after all required gates.</li>
+</ul>
+<p>Before <code>PRODUCTION GO</code>, audit every debugger entry in <code>docs/html/index.html</code>.
+Remove superseded entries and delete obsolete mock files/routes only when no
+test, review packet, or operator link references them. Re-render every changed
+Markdown page and run the documentation lifecycle tests.</p>
+<h2 id="required-handoff-from-every-implementation-model">Required Handoff From Every Implementation Model</h2>
+<p>Each packet result reports:</p>
+<ul>
+<li>packet ID and status;</li>
+<li>commit hash;</li>
+<li>exact files changed;</li>
+<li>commands and focused tests run;</li>
+<li>artifact or fixture paths;</li>
+<li>Markdown/HTML documentation pairs changed and index entries updated/removed;</li>
+<li>unresolved evidence gaps;</li>
+<li>security or privacy impact;</li>
+<li>next packet unblocked.</li>
+</ul>
+<p>Do not report a higher promotion state than the packet can prove.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#purpose">Purpose</a></li><li class="toc-h2"><a href="#non-negotiable-rules">Non-Negotiable Rules</a></li><li class="toc-h2"><a href="#documentation-lifecycle">Documentation Lifecycle</a></li><li class="toc-h2"><a href="#target-module-boundaries">Target Module Boundaries</a></li><li class="toc-h2"><a href="#shared-schemas">Shared Schemas</a></li><li class="toc-h3"><a href="#seeded-slot-event">Seeded Slot Event</a></li><li class="toc-h3"><a href="#execution-target">Execution Target</a></li><li class="toc-h2"><a href="#work-packet-summary">Work Packet Summary</a></li><li class="toc-h2"><a href="#current-progress">Current Progress</a></li><li class="toc-h2"><a href="#wp0-redacted-boundary-fixture">WP0 - Redacted Boundary Fixture</a></li><li class="toc-h2"><a href="#wp1-flow-transition-metadata">WP1 - Flow Transition Metadata</a></li><li class="toc-h2"><a href="#wp2-visit-framing-and-canonical-events">WP2 - Visit Framing and Canonical Events</a></li><li class="toc-h2"><a href="#wp3-seeded-baseline-and-mutation-ledger">WP3 - Seeded Baseline and Mutation Ledger</a></li><li class="toc-h2"><a href="#wp4-read-only-artifact-and-cursor-engine">WP4 - Read-Only Artifact and Cursor Engine</a></li><li class="toc-h2"><a href="#wp5-json-cli-and-local-read-only-api">WP5 - JSON CLI and Local Read-Only API</a></li><li class="toc-h2"><a href="#wp6-production-read-only-browser">WP6 - Production Read-Only Browser</a></li><li class="toc-h2"><a href="#wp7-state-capsule-and-candidate-simulation">WP7 - State Capsule and Candidate Simulation</a></li><li class="toc-h2"><a href="#wp8-historical-reproduction-runner">WP8 - Historical Reproduction Runner</a></li><li class="toc-h2"><a href="#wp9-pattern-runner-and-regression-export">WP9 - Pattern Runner and Regression Export</a></li><li class="toc-h2"><a href="#wp10-promotion">WP10 - Promotion</a></li><li class="toc-h2"><a href="#required-handoff-from-every-implementation-model">Required Handoff From Every Implementation Model</a></li></ul></aside>
+</div>
+</body>
+</html>

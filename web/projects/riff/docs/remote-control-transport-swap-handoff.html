@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Remote-Control Transport Swap — Live-Call Handoff · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">remote-control-transport-swap-handoff.md</span>
+<a class="raw" href="/docs/docs/flow-eval/remote-control-transport-swap-handoff.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Remote-Control Transport Swap — Live-Call Handoff</h1>
+<p><strong>Date:</strong> 2026-07-02
+<strong>For:</strong> the operator-present &quot;let's do the transport swap together&quot; session
+<strong>Design:</strong> <code>docs/remote-control-design-v0.md</code> §1.3, §7 Step 2
+<strong>Prereqs done:</strong> the control-layer foundation (<code>input_event</code>, <code>input_arbiter</code>,
+<code>capability</code>, <code>control_event</code>) is on <code>main</code> and tested; the §1.1 wire gate was
+hardened (envelope validation + per-client dedupe) in commit <code>42dd6850</code>.</p>
+<hr />
+<h2 id="1-what-already-landed-safe-autonomous-shadow-only">1. What already landed (safe, autonomous, SHADOW only)</h2>
+<p>The risky refactor half of the transport swap is done and cannot change a live
+call, because it is gated OFF and only ever <em>observes</em>. Concretely, in
+<code>riff/live/session.py</code>:</p>
+<ol>
+<li><strong>A live decision-epoch counter.</strong> <code>_sync_decision_epoch()</code> advances a
+per-session monotonic integer (<code>_current_decision_epoch</code>) once on entry to a
+<strong>new</strong> <code>locked_choice</code> (choose) state — never on a no-match/retry re-ask.
+This is the epoch the arbiter arbitrates on (I8). Until now the live path had
+<strong>no</strong> decision-epoch at all (the §6 <code>TraceEmitter</code> seq has no live producer),
+so this fills the real gap that blocked the swap.</li>
+<li><strong>Input stamping.</strong> <code>TurnAccumulator.input_decision_epoch</code> is stamped beside
+the proven seq-398 <code>user_text_state</code> guard at two points: voice first
+transcript and DTMF commit. (Direct-dial DTMF is left legacy this slice — it
+has no active <code>locked_choice</code> epoch.)</li>
+<li><strong>A shadow-mode arbiter comparison.</strong> At the single committing decision point
+(inside <code>_maybe_handle_locked_choice_turn_complete</code>, after the choice-STT
+assist swap so it sees the <em>final</em> choice), <code>_shadow_arbiter_compare()</code>
+submits the input to the <code>InputArbiter</code> and records agreement vs the legacy
+<code>locked_choice</code> resolver into <code>last_arbiter_shadow</code> + a diag line. <strong>It never
+changes the route.</strong></li>
+</ol>
+<p><strong>The safety contract, locked in by tests</strong> (<code>tests/test_live_decision_epoch_shadow.py</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RIFF_INPUT_ARBITER</code> unset (production default)</td>
+<td>arbiter never consulted; <code>last_arbiter_shadow is None</code>; routing byte-identical</td>
+</tr>
+<tr>
+<td><code>RIFF_INPUT_ARBITER=1</code></td>
+<td>arbiter agrees with the legacy resolver on the real flow; routing/FSM outcome still identical — arbiter only observes</td>
+</tr>
+</tbody>
+</table>
+<p>Everything above is dormant in production. The 1492-test control-layer suite,
+the live-session direct-dial suite, and 6 new epoch/shadow tests are green. (The
+4 pre-existing <code>test_live_session.py</code> failures are flow-schema drift on
+<code>property_trouble_ticket</code> — confirmed identical on clean <code>HEAD</code>, not from this
+work.)</p>
+<hr />
+<h2 id="2-what-we-do-together-on-the-live-call-in-order">2. What we do together on the live call (in order)</h2>
+<h3 id="step-a-watch-the-shadow-believe-nothing-yet">Step A — watch the shadow, believe nothing yet</h3>
+<p>Bring up a real OTA call with <code>RIFF_INPUT_ARBITER=1</code> and drive a menu by voice
+and by DTMF. Watch the diag stream for:</p>
+<pre><code>decision_epoch OPEN: epoch=N state='...' reason='...'
+shadow_arbiter: reason=accepted accepted=True arbiter_choice='X' legacy_choice='X' agree=True ...
+</code></pre>
+<p><strong>Success = <code>agree=True</code> on every real menu turn.</strong> Divergences to expect and
+interpret (not necessarily bugs):</p>
+<ul>
+<li><code>reason=locked</code> on a <strong>self-looping</strong> choose-state (a menu that stays put
+after a match): the epoch does not advance on a self-loop, so the arbiter sees
+the epoch as already decided. Decide together whether self-loops should open a
+fresh epoch (likely yes) — this is the main open epoch-semantics question.</li>
+<li><code>skipped: assist_swap</code>: expected when choice-STT rescued Gemini→Whisper; the
+arbiter is deliberately not re-run on mismatched text.</li>
+</ul>
+<h3 id="step-b-stamp-voice-from-audio-start-required-before-a2">Step B — stamp voice from audio start (REQUIRED before A2)</h3>
+<p>Today voice is stamped at <strong>first transcript</strong>, which is <em>later</em> than utterance
+start. That is fine for shadow agreement but <strong>cannot</strong> prove the A2
+tap-vs-speaking race: a mid-utterance tap could legitimately beat a
+not-yet-transcribed utterance and we'd be timing the wrong instant. Before
+claiming A2, stamp the voice epoch from the earliest non-suppressed caller-audio
+frame in the browser transport (around <code>riff/live/transport.py:1003</code>).</p>
+<h3 id="step-c-flip-the-arbiter-authoritative-the-actual-swap">Step C — flip the arbiter authoritative (the actual swap)</h3>
+<p>Only after A and B: make <code>submit</code>'s decision <em>override</em> the legacy path at the
+commit point (replace the shadow-only call with an authoritative one), still
+behind <code>RIFF_INPUT_ARBITER</code>. Prove A2 live: speak &quot;one&quot;, tap &quot;3&quot; mid-utterance →
+exactly one route, <code>via: web_tap</code>, the voice traced <code>input_dropped {stale}</code>.</p>
+<h3 id="step-d-tap-submit-over-the-companion-ws">Step D — tap/submit over the companion WS</h3>
+<p>Wire inbound <code>control_event</code> frames (already parsed + validated) from the
+companion page into the arbiter + capability. This is where the hardened §1.1
+gate and per-client dedupe start earning their keep.</p>
+<h3 id="step-e-retire-the-seq-398-guard-last">Step E — retire the seq-398 guard (last)</h3>
+<p>The <code>user_text_state != current_state</code> guard stays authoritative until the epoch
+path is proven live. Only then does the arbiter's <code>stale</code> drop subsume it.</p>
+<hr />
+<h2 id="3-hard-rules-from-the-codex-design-consult-kept-as-guardrails">3. Hard rules (from the codex design consult, kept as guardrails)</h2>
+<ul>
+<li><strong>Only committing decision points submit.</strong> The echo-filter predicate, the
+early preview gate, and the whisper/choice-STT comparison must never <code>submit</code>
+(they are speculative — a submit would wrongly lock the epoch).</li>
+<li><strong><code>invalid</code> ≠ suppress.</strong> The arbiter returning <code>invalid</code> (no lock) is the
+mirror of legacy <code>choice is None</code>; it must not suppress the existing
+no-match/retry prompt.</li>
+<li><strong>Never hard-assert divergences in production.</strong> Log them. Use a separate
+strict test flag if you want assertions.</li>
+<li><strong>Handle &quot;repeat options&quot; before the arbiter</strong> — it is meta, not a choice.</li>
+<li><strong>On assist swap, compare the final selected text</strong>, not the pre-swap text.</li>
+</ul>
+<hr />
+<h2 id="4-one-line-status">4. One-line status</h2>
+<p>The transport swap's refactor is done and dormant; the live call is now a
+watch-the-shadow → stamp-from-audio → flip-authoritative → prove-A2 sequence,
+none of which can regress production until we deliberately flip it together.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-what-already-landed-safe-autonomous-shadow-only">1. What already landed (safe, autonomous, SHADOW only)</a></li><li class="toc-h2"><a href="#2-what-we-do-together-on-the-live-call-in-order">2. What we do together on the live call (in order)</a></li><li class="toc-h3"><a href="#step-a-watch-the-shadow-believe-nothing-yet">Step A — watch the shadow, believe nothing yet</a></li><li class="toc-h3"><a href="#step-b-stamp-voice-from-audio-start-required-before-a2">Step B — stamp voice from audio start (REQUIRED before A2)</a></li><li class="toc-h3"><a href="#step-c-flip-the-arbiter-authoritative-the-actual-swap">Step C — flip the arbiter authoritative (the actual swap)</a></li><li class="toc-h3"><a href="#step-d-tap-submit-over-the-companion-ws">Step D — tap/submit over the companion WS</a></li><li class="toc-h3"><a href="#step-e-retire-the-seq-398-guard-last">Step E — retire the seq-398 guard (last)</a></li><li class="toc-h2"><a href="#3-hard-rules-from-the-codex-design-consult-kept-as-guardrails">3. Hard rules (from the codex design consult, kept as guardrails)</a></li><li class="toc-h2"><a href="#4-one-line-status">4. One-line status</a></li></ul></aside>
+</div>
+</body>
+</html>

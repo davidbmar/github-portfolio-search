@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF — Config Cascade &amp; Per-Business Branding (Design v3)</title>
+<style>
+  :root {
+    --bg: #0b0e19; --panel: #131730; --edge: #26305c; --ink: #eef1ff;
+    --dim: #8b93c4; --accent: #6f7bff; --good: #34d399; --warn: #f5c542;
+    --bad: #f87171; --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f7f8fc; --panel: #ffffff; --edge: #d8ddf0; --ink: #1a2038;
+            --dim: #5b6491; --accent: #4353d8; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 8px 0 4px; }
+  h2 { font-size: 20px; margin: 40px 0 10px; border-bottom: 1px solid var(--edge); padding-bottom: 6px; }
+  h3 { font-size: 16px; margin: 24px 0 6px; }
+  .sub { color: var(--dim); font-size: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px;
+          padding: 16px 18px; margin: 14px 0; }
+  .tldr { border-left: 4px solid var(--accent); }
+  code, pre { font-family: var(--mono); font-size: 13.5px; }
+  code { background: color-mix(in srgb, var(--accent) 12%, transparent);
+         padding: 1px 5px; border-radius: 5px; }
+  pre { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px;
+        padding: 14px 16px; overflow-x: auto; }
+  pre code { background: none; padding: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+  th { color: var(--dim); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+  .cascade { display: flex; flex-direction: column; gap: 0; margin: 18px 0; }
+  .lvl { border: 1px solid var(--edge); background: var(--panel); border-radius: 10px;
+         padding: 10px 16px; margin: 0 auto; text-align: center; position: relative; }
+  .lvl b { display: block; font-size: 15px; }
+  .lvl span { color: var(--dim); font-size: 13px; }
+  .lvl.new { border-color: var(--good); box-shadow: 0 0 0 1px color-mix(in srgb, var(--good) 40%, transparent); }
+  .arrow { text-align: center; color: var(--dim); font-size: 13px; padding: 2px 0; }
+  .w1 { width: 46%; min-width: 260px; } .w2 { width: 56%; min-width: 280px; }
+  .w3 { width: 66%; min-width: 300px; } .w4 { width: 76%; min-width: 320px; }
+  .w5 { width: 86%; min-width: 340px; } .w6 { width: 96%; min-width: 360px; }
+  .pill { display: inline-block; font-size: 12px; padding: 1px 9px; border-radius: 999px;
+          border: 1px solid var(--edge); color: var(--dim); margin-left: 6px; }
+  .pill.new { color: var(--good); border-color: var(--good); }
+  .pill.warn { color: var(--warn); border-color: var(--warn); }
+  .src { font-family: var(--mono); font-size: 12.5px; padding: 1px 7px; border-radius: 6px; }
+  .src.b { background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); }
+  .src.s { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+  .src.f { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .sw { width: 150px; border-radius: 10px; border: 1px solid var(--edge); overflow: hidden; }
+  .sw .head { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 10px;
+              color: #fff; font-size: 13px; font-weight: 600; }
+  .sw .body { font-size: 12px; color: var(--dim); padding: 7px 10px; background: var(--panel); }
+  .badge { width: 24px; height: 24px; border-radius: 7px; background: rgba(255,255,255,.22);
+           display: inline-flex; align-items: center; justify-content: center; font-size: 11px; }
+  .flowline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; margin: 10px 0; }
+  .step { border: 1px solid var(--edge); background: var(--panel); border-radius: 8px; padding: 6px 12px; }
+  .flowline .sep { color: var(--dim); }
+  ul { padding-left: 22px; } li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+  <p class="sub">RIFF design doc · v3 · 2026-07-06 · reviewed with Codex (15 findings addressed) · markdown twin: <code>docs/config-cascade-and-branding.md</code></p>
+  <h1>The Config Cascade &amp; Per-Business Branding</h1>
+  <p class="sub">Every flow gets its own branded follow-along link, and every configuration question gets a one-lookup answer.</p>
+
+  <div class="card tldr">
+    <b>TL;DR.</b> Today every flow's companion page wears the space-channel look, and a flow's
+    real configuration lives in six different places. We add <b>one config cascade</b> with a new
+    explicit <b>business</b> level, resolved by <b>one module that remembers where each value came
+    from</b> (provenance). Branding becomes just another config domain riding that cascade — so the
+    plumbing line is blue, the law line is gold, and nobody inherits the space channel by accident.
+  </div>
+
+  <h2>1 · The problem, in three sentences</h2>
+  <ul>
+    <li><b>Branding:</b> <code>web/companion.html</code> guesses a theme by substring-matching the flow id
+        (<code>"plumb"</code> → blue). New flows silently render as the space channel.</li>
+    <li><b>Sprawl:</b> a flow's behavior is assembled from pack YAML, flow YAML, env vars, the record-policy
+        cascade, the LLM-policy inheritance, and the voice hierarchy — six mechanisms, no single answer to
+        "what is this flow's config and <i>why</i>."</li>
+    <li><b>Sharing:</b> flow families already exist (space_channel ×3; capsule_law's two legal flows share one
+        10DLC SMS campaign) but each flow re-declares shared facts, and they drift.</li>
+  </ul>
+
+  <h2>2 · The cascade — six levels, plain nouns</h2>
+  <p>Most specific wins. Only one level is new.</p>
+  <div class="cascade">
+    <div class="lvl w1"><b>call</b><span>one live phone call — per-caller voice, consent</span></div>
+    <div class="arrow">▲ overrides</div>
+    <div class="lvl w2"><b>state</b><span>one step — "collect the address"</span></div>
+    <div class="arrow">▲ overrides</div>
+    <div class="lvl w3"><b>state group</b><span>a named section of one flow — the existing <code>GoalSegment</code> (riff/types.py)</span></div>
+    <div class="arrow">▲ overrides</div>
+    <div class="lvl w4"><b>flow</b><span>one phone experience — one YAML in <code>flows/</code></span></div>
+    <div class="arrow">▲ overrides</div>
+    <div class="lvl w5 new"><b>org <span class="pill new">NEW</span></b><span>one company/business owning several flows — <code>orgs/capsule_law.org.yaml</code></span></div>
+    <div class="arrow">▲ overrides</div>
+    <div class="lvl w6"><b>global</b><span>repo defaults + this deployment's env (keys, phone routing)</span></div>
+  </div>
+  <div class="card">
+    <b>Org vs business — they are the same real-world thing.</b>
+    <p style="margin:8px 0 6px">An org <i>is</i> a business (a company). The two words only tell you
+    <b>where the YAML lives</b>. The old assumption was one company = one flow, so each pack got a
+    <code>business:</code> block — the company's info card for that <i>one phone line</i>
+    (<code>business.id</code> doubles as the flow's identity and feeds the prompt-facing
+    <code>business_profile</code>). That assumption broke — capsule_law has two flows, space_channel
+    three — so the <b>org</b> is simply the missing "shared by all of this company's lines" file.</p>
+    <p style="margin:6px 0 0"><b>One-liner:</b> <code>org</code> = the company's shared file ·
+    the pack's <code>business:</code> block = that company's info card for one specific line.
+    "Group" was unusable (state groups / <code>GoalSegment</code>); "tenant" over-promises isolation
+    we've deferred. Long-term, one word should mean one thing — see <a href="#backlog">backlog F-370</a>.</p>
+  </div>
+
+  <h2>3 · Five domains, one file per org</h2>
+<pre><code># orgs/capsule_law.org.yaml
+org_id: capsule_law
+display_name: "Capsule Law"
+brand:   {badge: "CL", tagline: "your intake, live",
+          colors: {primary: "#c8a24a", highlight: "#e2c56f", bg: "#0b0e19", panel: "#131730"},
+          theme: null}            # optional ALLOWLISTED theme name — never a css path
+telecom: {sms_campaign: C51GVEC}  # identity only; numbers/routing stay in env
+policy:  {record: on, companion_privacy: phone_verified}
+llm:     {default: gemini-2.5-flash}
+voice:   {voice_id: en_GB-alba-medium, style: warm}</code></pre>
+  <ul>
+    <li>Flows point at their org (<code>org: capsule_law</code>) — one direction only; the
+        org file has <b>no member list</b>, so membership can't drift. A dangling reference is a lint error.</li>
+    <li>The five domains (<code>brand / telecom / policy / llm / voice</code>) resolve
+        <b>independently</b> — sharing SMS identity while overriding voice is normal. A flow overrides a
+        domain; it never joins a second org.</li>
+    <li><b>Safety is monotonic:</b> <code>policy.*</code> may only <i>tighten</i> downstream. An org's
+        <code>record: off</code> can never be flipped on by a state. Loosening is a load error.</li>
+  </ul>
+
+  <h2>4 · One resolver, with provenance</h2>
+  <p><code>riff/effective_config.py</code> · <code>resolve(flow_id, state_id=None)</code> + <code>apply_call_overlay(cfg, overlay)</code> for per-call overrides —
+  runs at load time; every value carries its source. The existing record-policy and LLM-policy cascades
+  <b>migrate onto this resolver</b> (behavior-preserving, full-suite diff as the bar) so there is exactly
+  one implementation — and the answer below is always true, never a guess:</p>
+  <div class="card">
+    <b>"Why is this call recording?"</b>
+    <div class="flowline">
+      <span class="step"><code>policy.record = on</code> <span class="src b">org:capsule_law</span></span>
+      <span class="sep">unless</span>
+      <span class="step"><code>record = off</code> <span class="src s">state:collect_ssn</span> <span class="pill">tighten ok</span></span>
+      <span class="sep">never</span>
+      <span class="step"><code>record = on</code> at a state under an off org <span class="pill warn">load error</span></span>
+    </div>
+  </div>
+  <p>Env vars stay the deployment layer forever — phone routing, numbers, and keys never migrate into git.</p>
+
+  <h2>5 · Branding rides the cascade <span class="pill new">PR3 SHIPPED</span></h2>
+  <p class="sub">Hands-on guide: <a href="branding-your-flow.html">How-To — Brand Your Flow's Follow-Along Page</a> (colors, badge, tagline, and <code>journey:</code> caller-friendly step labels). Note: the flow's MENU and live PROGRESS were always per-flow (they're data); branding adds the look and the journey wording.</p>
+  <div class="flowline">
+    <span class="step">org YAML <code>brand:</code></span><span class="sep">→</span>
+    <span class="step">compiler → <code>ui_brand</code> on the flow</span><span class="sep">→</span>
+    <span class="step"><code>/api/companion/state</code> serves <b>tokens only</b></span><span class="sep">→</span>
+    <span class="step">one <code>companion.html</code> applies CSS variables</span>
+  </div>
+  <ul>
+    <li>The resolved brand is served at request time by <code>brand_for_flow()</code> — kept out of the prompt-facing <code>business_profile</code>. (A compiled <code>ui_brand</code> field is the PR4 end-state.)</li>
+    <li>The public bearer link gets colors, name, badge, tagline — <b>no provenance, no internal ids</b>.</li>
+    <li>Bespoke looks (space channel's starfield) become <b>allowlisted named themes</b> shipped in-repo — never arbitrary CSS paths, so contrast checks and screenshots stay trustworthy.</li>
+    <li>Keyword mapping stays as the mid-priority fallback until PR4, then dies. Missing brand on a production flow is a lint <b>warn</b> today, hardening to error at PR4; hash-derived palettes cover otherwise-unbranded flows.</li>
+    <li>One <code>ui_brand</code> object feeds the companion page, the intake live mirror, and the Line Page —
+        link, mirror, and operator view always match.</li>
+  </ul>
+  <div class="swatches">
+    <div class="sw"><div class="head" style="background:#0b3954"><span class="badge">AP</span>Austin Plumbing</div><div class="body">primary #38bdf8 · highlight #facc15</div></div>
+    <div class="sw"><div class="head" style="background:#3d2e0f"><span class="badge">CL</span>Capsule Law</div><div class="body">primary #c8a24a · highlight #e2c56f</div></div>
+    <div class="sw"><div class="head" style="background:#131c3b"><span class="badge">SC</span>Space Channel</div><div class="body">theme: space (allowlisted)</div></div>
+  </div>
+
+  <h2>6 · The admin portal — grows in three deliberate steps</h2>
+  <table>
+    <tr><th>step</th><th>what</th><th>why it's safe</th></tr>
+    <tr><td><b>v0 · report</b></td>
+        <td>a script emits static HTML per flow/org: every resolved value + its source + a drift table + brand swatch</td>
+        <td>zero new surface; validates the model before any app exists</td></tr>
+    <tr><td><b>v1 · read-only page</b></td>
+        <td>Line-Page-style operator page: flow + state picker, call-overlay simulation, config table color-coded by source, org drift view, live brand preview (renders companion.html against a mocked state — same harness as the Playwright screenshot tests)</td>
+        <td>LAN-only like existing operator pages; cannot write anything</td></tr>
+    <tr><td><b>v2 · writes</b> <span class="pill">deferred</span></td>
+        <td>validated YAML patch → compiler + linter run server-side → branch-only git commit</td>
+        <td>ships only with auth, audit log, and an explicit reload story (<code>config_epoch</code> exposes stale servers); separately designed and reviewed</td></tr>
+  </table>
+
+  <h2>7 · Rollout</h2>
+  <table>
+    <tr><th>pr</th><th>content</th><th>gate</th></tr>
+    <tr><td>1</td><td><code>effective_config.py</code> + org loader + linter rules + monotonic/provenance tests</td><td>consumes nothing yet</td></tr>
+    <tr><td>2</td><td>migrate record-policy, LLM-policy, voice onto the resolver + Flow carries EffectiveConfig + org files join the loader cache fingerprint</td><td>semantic ratchet: state-on-over-segment-off flows must be restructured; full-suite diff for the rest</td></tr>
+    <tr><td>3</td><td>branding end-to-end; sniffing deleted</td><td>lint error replaces silent styling</td></tr>
+    <tr><td>4</td><td>org files for real families</td><td><b>after</b> the intake agent's pack WIP lands</td></tr>
+    <tr><td>5</td><td>report v0 → portal v1 + Playwright screenshots</td><td>resolver already authoritative</td></tr>
+  </table>
+
+  <h2>8 · Decided &amp; rejected (Codex review)</h2>
+  <table>
+    <tr><th>decision</th><th>rationale</th></tr>
+    <tr><td>level named <b>org</b></td><td>"business" collides with pack <code>business:</code> + <code>business_profile</code>; "group" with GoalSegment; "tenant" over-promises</td></tr>
+    <tr><td>flows point at org, one direction</td><td>no bidirectional membership drift</td></tr>
+    <tr><td>domains resolve independently</td><td>shared telecom + different brand is normal</td></tr>
+    <tr><td>policy is monotonic</td><td>recording/privacy must never loosen downstream</td></tr>
+    <tr><td>allowlisted themes, no css paths</td><td>keeps contrast + screenshot guarantees</td></tr>
+    <tr><td>env = deployment layer, forever</td><td>no routing/numbers/secrets in git</td></tr>
+    <tr><td>portal read-only until resolver is authoritative</td><td>otherwise the portal lies or forks logic</td></tr>
+    <tr><td>missing prod brand = lint error</td><td>a hash-palette fallback would masquerade as intentional</td></tr>
+  </table>
+
+  <h2 id="backlog">9 · Backlog</h2>
+  <table>
+    <tr><th>item</th><th>what</th><th>blocked on</th></tr>
+    <tr><td><b>F-370</b><br><span class="sub">retire the "business" double-meaning</span></td>
+        <td>Migrate company facts (name, timezone, industry, default hours, brand) up into
+            <code>orgs/&lt;id&gt;.org.yaml</code>; shrink + rename the pack <code>business:</code> block to
+            <code>line:</code>/<code>storefront:</code> holding per-line overrides only, behind a deprecation
+            window (<code>business:</code> emits a lint info). <code>business_profile</code> — the compiled,
+            prompt-facing artifact — keeps its name. End state: one word = one meaning
+            (<code>org</code> = company, <code>line</code> = per-flow card).
+            <br><span class="sub">docs/project-memory/backlog/F-370-retire-business-word-from-pack-schema.md</span></td>
+        <td>PR1/PR2 (org level exists) + the intake agent's pack WIP landing</td></tr>
+  </table>
+</main>
+</body>
+</html>

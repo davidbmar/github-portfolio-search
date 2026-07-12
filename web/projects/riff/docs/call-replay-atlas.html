@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Call Replay &amp; Layered Atlas — Use Cases</title>
+<style>
+  :root {
+    --bg: #0b0e19; --panel: #131730; --edge: #26305c; --ink: #eef1ff;
+    --dim: #8b93c4; --accent: #6f7bff; --good: #34d399; --warn: #f5c542;
+    --bad: #f87171; --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg: #f7f8fc; --panel: #ffffff; --edge: #d8ddf0; --ink: #1a2038;
+            --dim: #5b6491; --accent: #4353d8; --bad: #c2453a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 27px; margin: 8px 0 4px; text-wrap: balance; }
+  h2 { font-size: 19px; margin: 38px 0 10px; border-bottom: 1px solid var(--edge); padding-bottom: 6px; }
+  .sub { color: var(--dim); font-size: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  code { font-family: var(--mono); font-size: .85em; background: rgba(111,123,255,.12); padding: .1em .35em; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 10px 0; }
+  .tw { overflow-x: auto; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+  th { color: var(--dim); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+  .tid { font-family: var(--mono); font-size: 11px; background: rgba(52,211,153,.14);
+         color: var(--good); border: 1px solid var(--good); border-radius: 4px; padding: 1px 7px; }
+  .never { color: var(--bad); font-weight: 600; }
+  ol li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+<p class="sub">RIFF · call replay &amp; layered atlas · use-case-first spec · 2026-07-07 · TDD twin: <code>tests/test_call_replay.py</code></p>
+<h1>Call Replay &amp; Layered Atlas — Use Cases</h1>
+<p class="sub">One command turns any call — live, archived, or simulated — into a self-contained page a
+stranger can read. The success criterion for everything below: <b>answer "why did this call do that?"
+in five minutes without opening flow YAML.</b></p>
+
+<div class="card">
+<b>The four lanes.</b> Every replay page renders the same time-aligned lanes:
+<b>HEAR</b> (what the caller heard/said), <b>PATH</b> (FSM states),
+<b>SLOTS</b> (the <code>slot_write</code> ledger: who set/erased what),
+<b>VERDICTS</b> (per-decision transition arbitration: winner + shadowed edges).
+Command: <code>.venv/bin/python scripts/call_replay.py &lt;call-id | session-dir | transcript.json&gt; [--out page.html]</code>
+</div>
+
+<div class="card">
+<b>Input &amp; ordering contract</b> (Codex #1/#2 — the testable rules):
+<ul>
+<li><b>Inputs.</b> <i>call-id</i> resolves to <code>data/sessions/&lt;id&gt;/</code>. A <i>session dir</i>
+supplies any of: <code>transcription.txt</code> or transcript JSON (HEAR),
+<code>call_export_events.jsonl</code> (PATH checkpoints), <code>bus_events.jsonl</code>
+(SLOTS/VERDICTS). A <i>transcript JSON</i> (eval/phantom) supplies turns with per-turn
+<code>state</code> (PATH+HEAR) and <code>fact_events</code> (SLOTS). Whatever is absent → that
+lane is "not recorded on this call".</li>
+<li><b>Ordering.</b> Sort key is <code>(ts, seq)</code>; events without <code>ts</code> keep
+arrival order via <code>seq</code>; equal keys keep source-file order. Lanes never re-sort a
+source that is already ordered. A re-entered state appears in PATH once per visit — replays show
+what happened, never deduplicate history.</li>
+<li><b>PII, globally</b> (Codex #3): no public (non-<code>_</code>) slot VALUE may appear anywhere
+in ANY output mode — body text, embedded JSON, <code>data-*</code> attributes, titles, or comments.
+The ledger's redactions (<code>&lt;str:12&gt;</code>) render verbatim; the page adds no new
+disclosure surface.</li>
+</ul>
+</div>
+
+<h2>Case R1 — "Why did this call do that?" <span class="tid">TR1</span></h2>
+<ol>
+<li>The operator has a call id (from the phone log, companion page, or postcall dir).</li>
+<li><code>call_replay.py &lt;call-id&gt;</code> finds the session artifacts under <code>data/sessions/</code>
+and writes one self-contained HTML file.</li>
+<li>The page shows the four lanes in time order; every FSM state the call visited appears in PATH,
+in visit order; every slot_write appears in SLOTS with its writer.</li>
+</ol>
+<p><b>Pass:</b> page exists, self-contained (no external fetches), lanes present, states in order.
+<b>Never:</b> <span class="never">a lane silently empty</span> — a lane with no data says
+"not recorded on this call" out loud.</p>
+
+<h2>Case R2 — Pre-lane archived calls degrade honestly <span class="tid">TR2</span></h2>
+<ol>
+<li>The operator replays a call recorded BEFORE the telemetry lanes existed
+(e.g. the 2026-07-07 incident calls).</li>
+<li>The page renders HEAR + PATH from what exists, and marks SLOTS / VERDICTS
+<b>"not recorded on this call"</b>.</li>
+</ol>
+<p><b>Pass:</b> old artifacts still render; missing lanes named. <b>Never:</b>
+<span class="never">an absent lane rendered as an empty (implying clean) lane</span>.</p>
+
+<h2>Case R3 — Layered atlas: the flow that mutates <span class="tid">TR3</span></h2>
+<ol>
+<li>An engineer wants to see how one flow differs for guest / ANI-known / verified callers —
+without any call at all.</li>
+<li><code>call_replay.py --atlas flows/legal_intake.yaml</code> renders the compiled graph with a
+<b>layer toggle</b>: each state is tagged with the trust layers it can serve
+(<code>data-layer="guest known verified"</code>), and the welcome gate zone
+(<code>welcome_*</code>) is visually marked as gate machinery.</li>
+<li>Toggling a layer dims states that can't occur on that layer (e.g. <code>welcome_back</code>
+never happens for a guest; <code>welcome_first</code> never for a known caller).</li>
+</ol>
+<p><b>Pass:</b> every state carries an explicit layer tag from
+<code>guest | known | verified | shared | unattributed</code>; gate zone marked; the welcome
+branches tagged to their layers (<code>welcome_first</code>→guest-entry,
+<code>welcome_back</code>→known, <code>welcome_unlock_granted</code>→verified-edge).
+<b>Never:</b> <span class="never">a state with no tag at all</span> — <code>unattributed</code> is
+allowed but must be visibly called out (it is a to-do, not an error; Codex #4).</p>
+
+<h2>Case R4 — Live calls carry the lanes automatically <span class="tid">TR4</span></h2>
+<ol>
+<li>A live call ends. At teardown the phone server dumps this session's bus events
+(<code>slot_write</code>, <code>transition_verdict</code>, and the rest) to
+<code>data/sessions/&lt;call-id&gt;/bus_events.jsonl</code>.</li>
+<li>Replaying that call id renders all four lanes with no extra flags.</li>
+</ol>
+<p><b>Pass:</b> the dump function writes only THIS session's events, appends nothing to other
+sessions' files, and is safe when the bus buffer has rolled (writes what remains + a truncation
+notice). <b>Never:</b> <span class="never">another session's events in the file</span>;
+<span class="never">a teardown crash because telemetry failed</span> (dump errors are logged, not raised).</p>
+
+<h2>Case R5 — Sim conversations replay the same way <span class="tid">TR5</span></h2>
+<ol>
+<li>An eval or phantom-caller conversation produced a transcript JSON with
+<code>fact_events</code> (the PR1 lane).</li>
+<li><code>call_replay.py path/to/transcript.json</code> renders the same page: HEAR from
+the transcript turns, PATH from per-turn states, SLOTS from fact_events.</li>
+<li>This is the shift-left half: the same page that explains a live incident explains a failing
+eval — one literacy for both.</li>
+</ol>
+<p><b>Pass:</b> phantom/eval transcripts render; SLOTS lane populated from fact_events.
+<b>Never:</b> <span class="never">public slot VALUES anywhere in any mode's output</span>
+(see the global PII rule above) — the ledger's redaction (<code>&lt;str:12&gt;</code>) must
+survive rendering verbatim.</p>
+
+<h2>Case R6 — The PAGE lane: follow-along vs voice, one clock <span class="tid">TR6</span></h2>
+<ol>
+<li>The companion page already reports its life to the server (<code>view</code> = node entered,
+<code>resync_skip</code>, <code>menu_poll</code>) — but those events died in the phone log. The server
+now persists them per call to <code>companion_events.jsonl</code> (wall-clock stamped) beside the
+other artifacts.</li>
+<li>Replay renders a fifth lane, <b>PAGE</b>: node <b>enter/exit</b> intervals (an enter ends the
+previous node — the operator's exact ask: "track when we entered a specific page and when we
+exited"), aligned to the call clock.</li>
+<li>Replay computes <b>divergence windows</b>: any span &gt; 5s where the page's current node and the
+FSM's current state disagree while both are known is flagged in red with its duration — "the page
+showed <code>menu</code> for 41s while the voice walked the Riders Club" becomes one visible bar.</li>
+</ol>
+<p><b>Pass:</b> PAGE lane renders enter/exit intervals; divergence windows named with durations;
+a session without the file says "not recorded on this call".
+<b>Never:</b> <span class="never">page and voice each rendering plausibly with no comparison</span> —
+the lanes exist to disagree loudly.</p>
+
+<h2>Test matrix (TDD: these exist and fail before the tool does)</h2>
+<div class="tw"><table>
+<tr><th>id</th><th>case</th><th>asserts</th></tr>
+<tr><td><span class="tid">TR1</span></td><td>R1 session-dir replay</td><td>page written, self-contained, 4 lanes, states in visit order</td></tr>
+<tr><td><span class="tid">TR1n</span></td><td>R1 Never</td><td>a lane without data renders "not recorded on this call"</td></tr>
+<tr><td><span class="tid">TR2</span></td><td>R2 pre-lane artifacts</td><td>renders; SLOTS+VERDICTS marked not-recorded</td></tr>
+<tr><td><span class="tid">TR3</span></td><td>R3 atlas layers</td><td>every state layer-tagged; welcome_* gate-marked; branch↔layer mapping</td></tr>
+<tr><td><span class="tid">TR4</span></td><td>R4 teardown dump</td><td>session-filtered file; other sessions excluded; errors logged not raised</td></tr>
+<tr><td><span class="tid">TR5</span></td><td>R5 sim transcript</td><td>fact_events → SLOTS lane; PII redactions verbatim; no raw public values</td></tr>
+</table></div>
+
+<p class="sub">Contract discipline: implementation cites the case it satisfies; a behavior change
+without a case change here is a bug by definition. Sibling contract:
+<a href="session-facts-endflow.html">Session Facts — end-flow behavior</a>.</p>
+</main>
+</body>
+</html>

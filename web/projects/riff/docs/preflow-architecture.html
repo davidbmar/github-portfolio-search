@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Preflow Pattern — Prewarming Data, LLM Content, and Audio Before a Call · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-06-30-preflow-architecture.md</span>
+<a class="raw" href="/docs/docs/codex/2026-06-30-preflow-architecture.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>The Preflow Pattern — Prewarming Data, LLM Content, and Audio Before a Call</h1>
+<p><strong>Date:</strong> 2026-06-30
+<strong>Status:</strong> Pattern in production (reference: the Space Channel flow).
+<strong>Audience:</strong> RIFF engineers applying the preflow pattern to <em>other</em> flows.</p>
+<blockquote>
+<p>Authoring note: this doc was scoped for Gemini/antigravity (<code>agy</code>), but <code>agy</code>
+hung in <code>--print</code> mode (a known issue), so it was written directly from the
+same brief. The content is the deliverable; the tool is interchangeable.</p>
+</blockquote>
+<hr />
+<h2 id="in-plain-terms">In plain terms</h2>
+<p>RIFF runs AI phone agents. A fixed state machine (the &quot;flow&quot;) keeps the
+conversation on rails; an LLM decides what to say within each state. On a <strong>live
+phone call, latency is everything</strong> — every second of silence while the agent
+&quot;thinks&quot; is dead air the caller hears.</p>
+<p>A <strong>preflow</strong> is a job that runs <em>before</em> any call and prepares everything the
+call will need, so the live flow only has to <strong>read cached data and play
+pre-rendered audio</strong>. Nothing slow happens while the caller waits.</p>
+<p>The big idea, in one line: <strong>do the slow, expensive work (web fetches, LLM
+writing, speech synthesis) ahead of time, on a schedule — not mid-call.</strong></p>
+<hr />
+<h2 id="the-problem-it-solves">The problem it solves</h2>
+<p>While a caller is on the line, the flow must <strong>never</strong>:</p>
+<ul>
+<li>scrape a website or call a slow external API,</li>
+<li>run an LLM to write prose,</li>
+<li>synthesize speech from scratch.</li>
+</ul>
+<p>Any of these creates dead air and unpredictable quality. A phone call has no
+spinner and no undo.</p>
+<h2 id="the-idea-three-stages">The idea: three stages</h2>
+<p>A preflow runs on a schedule (e.g. every 12 hours) and does three things:</p>
+<pre><code>   ┌─ 1. DATA REFRESH ─┐   ┌─ 2. LLM CONTENT ──┐   ┌─ 3. AUDIO RENDER ─┐
+   │ fetch external →  │ → │ raw data → spoken │ → │ text → TTS WAVs   │
+   │ JSON snapshot     │   │ content (offline) │   │ in an audio cache │
+   └───────────────────┘   └───────────────────┘   └───────────────────┘
+</code></pre>
+<ol>
+<li>
+<p><strong>Data refresh.</strong> Fetch external data into a small JSON <strong>snapshot</strong> with a
+<code>schema</code> and an <code>expires_at</code>/TTL. <em>Space Channel example:</em> upcoming rocket
+launches, space news, NOAA solar weather, UFO wire items, Deep Space Network
+status.</p>
+</li>
+<li>
+<p><strong>LLM content generation.</strong> At <em>build time</em> (not call time), turn the raw
+snapshot into the actual spoken content. <em>Space Channel example:</em> an
+integrity-checked, anchor-style <strong>&quot;3 headlines + summary&quot;</strong> brief per topic,
+written by an LLM. Because this runs offline, it can be slower and
+higher-quality, and it's parallelized across items.</p>
+</li>
+<li>
+<p><strong>Audio render.</strong> Pre-render the static and data-resolved lines to a TTS
+<strong>audio cache</strong>, keyed by <code>(text, voice, model)</code>. At call time a cache hit
+means the audio is served instantly from disk.</p>
+</li>
+</ol>
+<h2 id="at-call-time">At call time</h2>
+<p>The flow reads the <strong>fresh snapshot</strong> (a content tool returns the pre-built
+summary) and plays the matching <strong>pre-rendered WAV</strong>. The caller gets an instant,
+predetermined, high-quality briefing.</p>
+<p>No server restart is needed when a new snapshot is written — the flow reads the
+snapshot per call and serves WAVs from disk by content hash.</p>
+<h2 id="freshness-and-the-ttl-gap-read-this-twice">Freshness and the TTL gap (read this twice)</h2>
+<p>Each snapshot stores <code>generated_at</code>, <code>expires_at</code>, and a TTL. A loader returns
+the cache if fresh, otherwise refreshes.</p>
+<p><strong>The subtle trap:</strong> the <em>live call path</em> refreshes <strong>without the LLM</strong> — the
+turn loop has no LLM budget for batch generation. So if a <em>briefed</em> snapshot
+expires, the next call regenerates plain, non-LLM copy (it silently degrades
+from &quot;anchor brief&quot; to &quot;catalog summary&quot;).</p>
+<p><strong>The fix:</strong> a scheduled briefed-refresh whose <strong>cadence is shorter than the
+TTL</strong>, so the snapshot is never stale when a call arrives. In Space Channel:</p>
+<ul>
+<li>a <code>launchd</code> job runs the briefed preflow <strong>every 12 hours</strong>, and</li>
+<li>the snapshot <strong>TTL is 14 hours</strong> — a 2-hour buffer so it never expires into a
+gap.</li>
+</ul>
+<h2 id="design-seams-worth-copying">Design seams worth copying</h2>
+<p>These are the lessons that make the pattern safe and reusable:</p>
+<ul>
+<li><strong>Opt-in LLM via an injected callable.</strong> The content builder takes an optional
+<code>headline_fn</code> (<code>story -&gt; ranked headlines</code>). <em>With</em> it, summaries become rich
+LLM briefs; <em>without</em> it, deterministic catalog summaries are used. This keeps
+the live and test paths deterministic and makes the LLM a pure <strong>build-time
+enhancer</strong>, not a runtime dependency.</li>
+<li><strong>Fail-closed.</strong> If the LLM or its integrity gate drops everything, fall back
+to grounded source text — <strong>never invent content on a phone line</strong>.</li>
+<li><strong>Parallelize the offline LLM calls</strong> (thread pool + per-item timeout). Serial
+was ~16 s/item × ~12 items = <strong>20+ minutes</strong> and stalled on any slow call;
+fanned out it's <strong>~40–75 seconds</strong>.</li>
+<li><strong>Provider choice is an ops decision.</strong> Offline briefs use a fast batch model
+(DeepSeek/Qwen), selected by env or a flow-level class. The <strong>live voice turn</strong>
+keeps a native realtime-audio model (Gemini Live). Different jobs, different
+tools — don't conflate them.</li>
+</ul>
+<h2 id="reference-implementation-space-channel">Reference implementation (Space Channel)</h2>
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>riff/space_channel_preflow.py</code></td>
+<td><code>run_preflow()</code> orchestrates all 3 stages; <code>build_preflow_audio_items()</code>; <code>refresh_launch_snapshot()</code>; snapshot write/load with schema + TTL freshness</td>
+</tr>
+<tr>
+<td><code>riff/space_channel_content.py</code></td>
+<td>builds the JSON snapshot + topic summaries; <code>build_topic_summaries(..., headline_fn=...)</code> overlays anchor briefs when an LLM fn is supplied</td>
+</tr>
+<tr>
+<td><code>riff/space_channel_briefs.py</code></td>
+<td>wraps the LLM headline engine; <code>make_default_headline_fn()</code>, <code>memoized_parallel_headline_fn()</code></td>
+</tr>
+<tr>
+<td><code>data/space_channel/*.json</code></td>
+<td>the cached snapshots (content, launches, preflow manifest)</td>
+</tr>
+<tr>
+<td><code>scripts/space_channel_refresh.py</code></td>
+<td>refresh CLI (<code>--briefs</code>)</td>
+</tr>
+<tr>
+<td><code>scripts/space_channel_brief_cron.sh</code> + <code>…briefs.plist</code></td>
+<td>the 12-hour <code>launchd</code> cron</td>
+</tr>
+<tr>
+<td><code>python -m riff.space_channel_preflow --briefs</code></td>
+<td>render briefs + audio in one shot</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-this-generalizes-the-vision">Why this generalizes (the vision)</h2>
+<p>Any flow that depends on <strong>external data</strong> or <strong>expensive LLM content</strong> can have a
+preflow. The preflow <strong>prepopulates data</strong> so the LLM can pre-build conversation
+content/scenarios ahead of time — making calls <strong>faster and more consistent for
+all flows</strong>, not just Space Channel.</p>
+<h3 id="checklist-adding-a-preflow-to-a-new-flow">Checklist: adding a preflow to a new flow</h3>
+<ol>
+<li><strong>Identify the slow/external inputs</strong> the flow needs (APIs, scraped data,
+LLM-written prose, synthesized speech).</li>
+<li><strong>Define a snapshot schema + TTL.</strong> What JSON does a call read? How long is it
+valid?</li>
+<li><strong>Write a build-time content generator</strong> with:
+<ul>
+<li>an <strong>opt-in LLM seam</strong> (inject the model as a callable),</li>
+<li>a <strong>fail-closed</strong> fallback to grounded source text.</li>
+</ul>
+</li>
+<li><strong>Pre-render audio</strong> for static and data-resolved lines into the shared audio
+cache (keyed by text+voice+model).</li>
+<li><strong>Schedule a refresh</strong> whose <strong>cadence &lt; TTL</strong> (cron/launchd), so callers never
+hit a stale snapshot.</li>
+<li><strong>Verify</strong> with an end-to-end call simulation across every subpath before
+trusting it live.</li>
+</ol>
+<h2 id="cost-footnote">Cost footnote</h2>
+<p>Because the preflow pre-renders the agent's speech (local TTS) and pre-generates
+content offline (cheap batch model), the <strong>live</strong> call pushes almost all cost
+onto the cheap <em>input</em> side (understanding the caller). Pre-rendering agent audio
+instead of generating it live is roughly a <strong>10×</strong> cost reduction per talk-hour —
+the preflow is a cost story as much as a latency one.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#in-plain-terms">In plain terms</a></li><li class="toc-h2"><a href="#the-problem-it-solves">The problem it solves</a></li><li class="toc-h2"><a href="#the-idea-three-stages">The idea: three stages</a></li><li class="toc-h2"><a href="#at-call-time">At call time</a></li><li class="toc-h2"><a href="#freshness-and-the-ttl-gap-read-this-twice">Freshness and the TTL gap (read this twice)</a></li><li class="toc-h2"><a href="#design-seams-worth-copying">Design seams worth copying</a></li><li class="toc-h2"><a href="#reference-implementation-space-channel">Reference implementation (Space Channel)</a></li><li class="toc-h2"><a href="#why-this-generalizes-the-vision">Why this generalizes (the vision)</a></li><li class="toc-h3"><a href="#checklist-adding-a-preflow-to-a-new-flow">Checklist: adding a preflow to a new flow</a></li><li class="toc-h2"><a href="#cost-footnote">Cost footnote</a></li></ul></aside>
+</div>
+</body>
+</html>

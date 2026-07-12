@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Space Channel Content Refresh Design · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-06-29-space-channel-content-refresh-design.md</span>
+<a class="raw" href="/docs/docs/codex/2026-06-29-space-channel-content-refresh-design.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Space Channel Content Refresh Design</h1>
+<p>Date: 2026-06-29</p>
+<h2 id="goal">Goal</h2>
+<p>Make the Space Channel phone number useful without depending on live page
+scraping or live Gemini speech for known content during a call.</p>
+<p>The production phone path should:</p>
+<ul>
+<li>answer with static droid audio for known prompts;</li>
+<li>fetch read-only Space Channel data before speaking dynamic content;</li>
+<li>put the dynamic content into slots;</li>
+<li>speak the entire dynamic line through <code>droid_full_buffer</code>;</li>
+<li>pace outbound Telnyx media in 20 ms chunks using the fixed absolute-deadline
+sender.</li>
+</ul>
+<h2 id="current-implementation">Current Implementation</h2>
+<p>Refresh command:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/space_channel_refresh.py --once
+</code></pre>
+<p>Long-running four-hour refresh loop:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/space_channel_refresh.py --daemon --interval-hours 4
+</code></pre>
+<p>Cron-style four-hour schedule:</p>
+<pre><code class="language-bash">0 */4 * * * cd /Users/davidmar/src/riff &amp;&amp; .venv/bin/python scripts/space_channel_refresh.py --once &gt;&gt; logs/space_channel_refresh.log 2&gt;&amp;1
+</code></pre>
+<p>Runtime cache:</p>
+<pre><code class="language-text">data/space_channel/content_snapshot.json
+</code></pre>
+<p>That cache is generated runtime data and is ignored by git. If it is missing or
+expired, <code>space_content_fetch</code> attempts one refresh during the read-only act
+state before it speaks.</p>
+<h2 id="data-sources">Data Sources</h2>
+<p>V1 uses two Space Channel-facing sources:</p>
+<ul>
+<li>Launch Command: <code>https://www.spacechannel.com/data/launches.json</code>, with
+Launch Library fallback already in <code>space_launches_fetch</code>.</li>
+<li>Dashboard catalog: <code>https://www.spacechannel.com/</code>, parsed for the current
+Space Channel widget list and subtitles.</li>
+</ul>
+<p>The homepage currently exposes widgets such as Launch Command, Daily Briefing,
+Cosmic Weather, Anomaly Division, Intelligence Feed, ISS Operations, Music, and
+Solar Operations. The phone briefing uses that catalog so callers can ask what
+is online, ask about Space Channel news, solar weather, UFO/UAP files, or radio
+status, and receive a real current dashboard briefing instead of a generic
+&quot;queued&quot; message.</p>
+<h2 id="phone-flow">Phone Flow</h2>
+<p>Production route:</p>
+<pre><code class="language-text">+15122777311 -&gt; space_channel_network_ops
+</code></pre>
+<p>Important states:</p>
+<ul>
+<li><code>greeting</code>: static droid WAV.</li>
+<li><code>suggestions_announce</code>: static droid WAV, regenerated after the capability
+text changed.</li>
+<li><code>fetch_launches</code>: calls <code>space_launches_fetch</code>, then enters
+<code>report_launches_audio</code>.</li>
+<li><code>report_launches_audio</code>: <code>droid_full_buffer</code> slot-templated launch summary.</li>
+<li><code>fetch_space_content</code>: calls <code>space_content_fetch</code>, then enters
+<code>report_space_content_audio</code>.</li>
+<li><code>report_space_content_audio</code>: <code>droid_full_buffer</code> slot-templated dashboard
+or topic summary.</li>
+<li><code>bug_captured_audio</code>: <code>droid_full_buffer</code> acknowledgement of captured bug
+text.</li>
+</ul>
+<p>Terminal states keep <code>entry.line</code> for text-mode transcripts and evals. The
+phone path records and speaks the preceding <code>play_audio.text</code>, then transitions
+to the terminal and hangs up at a logical completion point.</p>
+<h2 id="audio-learning-applied">Audio Learning Applied</h2>
+<p>The diagnostic calls showed that prerecorded audio was not sufficient by itself.
+The phone path became clear only when outbound Telnyx media was sent as:</p>
+<ul>
+<li>20 ms chunks;</li>
+<li>pre-encoded mu-law/base64 frames;</li>
+<li>absolute-deadline paced sends;</li>
+<li>no synthesis work inside the paced send loop.</li>
+</ul>
+<p>For Space Channel V1, static prompts are still pre-rendered, but dynamic content
+uses full-buffer droid synthesis plus the same paced sender. This avoids the
+sentence-by-sentence choppiness that appeared when generation and sending were
+too tightly coupled.</p>
+<h2 id="latency-learning">Latency Learning</h2>
+<p>The 2026-06-29 phone export showed a separate problem from audio quality. After
+the caller asked for UFO files, <code>user_transcription</code> and <code>update_slots</code> landed
+within milliseconds, but the phone did not start the RIFF-owned content audio
+until about 11.9 seconds later. The intervening audio was Gemini Live output
+that the phone path suppressed because Space Channel owns those states.</p>
+<p>The applied mitigation has three layers:</p>
+<ul>
+<li>The classifier prompts now explicitly say nothing after <code>update_slots</code>; RIFF
+will play the next phone-safe audio state.</li>
+<li>Space Channel opts into a bounded <code>phone_processing_tone</code>, a short droid
+compute chirp that starts after a 700 ms wait and loops until real agent audio
+starts or the max wait expires.</li>
+<li>Static audio transitions into blank terminal states no longer send a Live
+policy-change prompt, so Gemini does not improvise an extra goodbye after the
+authored Space Channel line has completed.</li>
+</ul>
+<p>The deeper follow-up is to fast-forward RIFF-owned <code>act</code> and <code>static</code> chains
+immediately after a deterministic tool result instead of waiting for Gemini's
+suppressed turn to complete. That would remove the wait; the processing tone is
+the caller-facing fallback while that broader handoff is designed.</p>
+<h2 id="next-data-connectors">Next Data Connectors</h2>
+<p>The V1 cache provides current dashboard presence/status and launch data. The
+next connectors should deepen the summaries without changing the phone flow:</p>
+<ul>
+<li>Daily Briefing article ingestion.</li>
+<li>NOAA/SWPC solar weather values for the solar weather path.</li>
+<li>UFO/UAP document headline ingestion for the intelligence path.</li>
+<li>Radio/now-playing metadata or live stream handoff.</li>
+</ul>
+<p>Those can all write into the same <code>topics</code> object in
+<code>content_snapshot.json</code>; the phone flow only needs <code>space_content_summary</code>.</p>
+<h2 id="verification">Verification</h2>
+<p>Focused test command:</p>
+<pre><code class="language-bash">.venv/bin/python -m pytest \
+  tests/test_space_channel_content.py \
+  tests/test_space_channel_tools.py \
+  tests/test_space_channel_flow.py
+</code></pre>
+<p>Live refresh smoke test:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/space_channel_refresh.py --once --json
+</code></pre>
+<p>Static menu audio regeneration:</p>
+<pre><code class="language-bash">.venv/bin/python -m riff.static_audio generate \
+  --flow space_channel_network_ops \
+  --state suggestions_announce \
+  --force
+</code></pre>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#goal">Goal</a></li><li class="toc-h2"><a href="#current-implementation">Current Implementation</a></li><li class="toc-h2"><a href="#data-sources">Data Sources</a></li><li class="toc-h2"><a href="#phone-flow">Phone Flow</a></li><li class="toc-h2"><a href="#audio-learning-applied">Audio Learning Applied</a></li><li class="toc-h2"><a href="#latency-learning">Latency Learning</a></li><li class="toc-h2"><a href="#next-data-connectors">Next Data Connectors</a></li><li class="toc-h2"><a href="#verification">Verification</a></li></ul></aside>
+</div>
+</body>
+</html>

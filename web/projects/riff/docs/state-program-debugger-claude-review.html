@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>State Program Debugger - Claude Re-Review Packet · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-10-state-program-debugger-claude-review.md</span>
+<a class="raw" href="/docs/design/2026-07-10-state-program-debugger-claude-review.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>State Program Debugger - Claude Re-Review Packet</h1>
+<p>Date: 2026-07-10<br />
+Review: second pass after initial <code>NO-GO</code></p>
+<h2 id="review-objective">Review Objective</h2>
+<p>Perform an adversarial second review of the revised State Program Debugger
+contract. Return two separate verdicts:</p>
+<ol>
+<li><code>DESIGN GO</code> or <code>DESIGN NO-GO</code>: is the document specific and trustworthy
+enough to implement without inventing evidence, ownership, or stepping
+semantics?</li>
+<li><code>IMPLEMENTATION GO</code> or <code>IMPLEMENTATION NO-GO</code>: does the current prototype
+and hydrator conform to that contract?</li>
+</ol>
+<p>The expected implementation verdict is allowed to remain <code>NO-GO</code> while work is
+pending. Do not turn a design approval into a production approval. Do not edit
+files during the review.</p>
+<h2 id="files-to-read">Files to Read</h2>
+<p>Read these in order:</p>
+<ol>
+<li><code>docs/design/2026-07-10-state-program-debugger-evidence-design.md</code></li>
+<li><code>docs/design/2026-07-10-state-program-debugger-implementation-plan.md</code></li>
+<li><code>web/state-program-debugger-mockup.html</code></li>
+<li><code>tests/web/test_state_program_debugger_mockup.py</code></li>
+<li><code>docs/superpowers/specs/2026-07-09-state-audio-timeline-hydration.md</code></li>
+<li><code>riff/postcall/state_audio_timeline.py</code></li>
+<li><code>riff/state_manager.py</code>, especially <code>_SlotReadTracker</code>,
+<code>evaluate_guard</code>, transition verdicts, slot writes, and transition commit</li>
+<li><code>riff/state_trace_writer.py</code></li>
+<li><code>riff/phone/telnyx_transport.py</code>, especially initial-slot setup</li>
+<li><code>flows/property_management.yaml</code>, especially <code>menu_announce</code>,
+<code>menu_full_announce</code>, <code>menu</code>, and existing-request states</li>
+</ol>
+<h2 id="initial-review-findings">Initial Review Findings</h2>
+<p>The first review returned <code>NO-GO</code> with four blockers:</p>
+<ul>
+<li><strong>R1:</strong> <code>menu_full_announce</code> absorbed caller and resolver evidence from the
+following <code>menu</code> visit.</li>
+<li><strong>R2:</strong> the entry/current/exit table and legal-exit table lacked explicit
+hydration joins.</li>
+<li><strong>R3:</strong> the access column claimed reads and ignored values without a named
+evidence source.</li>
+<li><strong>R4:</strong> Step Into used an unspecified mix of recorded and synthesized
+micro-events.</li>
+</ul>
+<p>The first review also recommended a real failing-call fixture, an always-visible
+conversation lane, identity-prefill verification, and semantic UI tests.</p>
+<h2 id="claimed-contract-resolutions">Claimed Contract Resolutions</h2>
+<p>Verify these claims rather than accepting them at face value.</p>
+<h3 id="r1-frame-ownership">R1 - Frame Ownership</h3>
+<p>The revised contract defines one frame per state visit, sequence and explicit
+identity attribution rules, an unattributed conflict lane, and a concrete
+property-menu boundary example. It states that <code>Status</code> and
+<code>_route=existing_request</code> belong to <code>menu</code>, not <code>menu_full_announce</code>.</p>
+<p>Review questions:</p>
+<ul>
+<li>Do the rules handle re-entry and same-state loops?</li>
+<li>Are outgoing edge writes represented once while appearing in source Exit and
+target Entry?</li>
+<li>Can an event be silently assigned to the wrong visit?</li>
+</ul>
+<h3 id="r2-hydration">R2 - Hydration</h3>
+<p>The revised contract maps:</p>
+<ul>
+<li>visit boundaries to lifecycle and transition events;</li>
+<li>variable snapshots to a new seeded baseline plus a fold of <code>slot_write</code>;</li>
+<li>legal exits to compiled transition metadata;</li>
+<li>guard outcomes to <code>guard_evaluated</code> and <code>transition_verdict</code>;</li>
+<li>the winner to the final verdict plus exit/commit agreement;</li>
+<li>audio, tools, and caller evidence to session and section-6 artifacts.</li>
+</ul>
+<p>It also names the current identity gap: initial slots are applied with
+<code>self._session_ctx.slots.update(initial_slots)</code> after <code>session_started</code>, so a
+new instrumented <code>session_slots_seeded</code> baseline is required. It rejects
+<code>slot_filled</code> as a substitute and requires dictionary/direct-mutation coverage
+plus a fold-integrity gate.</p>
+<p>Review questions:</p>
+<ul>
+<li>Is the baseline-plus-write fold deterministic for the initial and later
+visits?</li>
+<li>Are privacy/redaction and unavailable exact values represented honestly?</li>
+<li>Can duplicate-target edges be joined without ambiguity?</li>
+<li>Does the contract clearly separate existing telemetry from required new
+instrumentation?</li>
+</ul>
+<h3 id="r3-access-evidence">R3 - Access Evidence</h3>
+<p>The initial review said no slot-read telemetry existed. Verify
+<code>riff/state_manager.py</code>: guard evaluation already emits
+<code>guard_evaluated.slots_read</code> via <code>_SlotReadTracker</code>. The revised contract uses
+that only for <code>guard read (recorded)</code>, uses <code>referenced (static)</code> for declared
+flow/template references, marks other runtime reads unavailable, and removes
+the word <code>ignored</code>.</p>
+<p>Review questions:</p>
+<ul>
+<li>Are the labels precise enough to prevent guard-read coverage from being
+mistaken for whole-state read coverage?</li>
+<li>Does any remaining access claim lack a source?</li>
+</ul>
+<h3 id="r4-canonical-events">R4 - Canonical Events</h3>
+<p>The revised contract defines a stable event envelope, recorded/derived/simulated
+vocabularies, source references, deterministic ordering, nullable timestamps,
+and derived placement. It removes fabricated <code>audio_progress</code> as a Step Into
+event and defines audio progress as an independent WAV playhead.</p>
+<p>Review questions:</p>
+<ul>
+<li>Can forward and reverse replay derive the same view every time?</li>
+<li>Are derived events clearly distinct from recorded facts?</li>
+<li>Are any event kinds still too vague to implement?</li>
+</ul>
+<h3 id="programmatic-ai-use">Programmatic AI Use</h3>
+<p>The revised contract says the UI, local CLI, and authenticated local API share
+one deterministic projection and simulation engine. It defines recorded
+navigation, isolated state simulation, a state-under-test capsule, pattern
+matrices, structured commands/results, determinism hashes, LLM/audio limits,
+side-effect controls, and independent immutable engine/flow execution targets.
+Recorded reproduction requires the recorded Python engine revision as well as
+the recorded flow; candidate regression names both candidate revisions. Missing
+historical code makes reproduction unavailable rather than silently selecting
+today's engine.</p>
+<p>Review questions:</p>
+<ul>
+<li>Can an AI inspect and step a recorded state without executing production
+behavior?</li>
+<li>Can it fork any state, vary entry values or input fixtures, run the exact
+selected engine and flow revisions, and compare exits without touching
+external systems?</li>
+<li>Does a state capsule contain enough versioned evidence to avoid reading
+today's mutable flow by accident?</li>
+<li>Does recorded reproduction require historical Python/runtime identity rather
+than treating a pinned YAML flow as the whole program?</li>
+<li>Can the reviewer distinguish recorded reproduction, full candidate
+regression, and a controlled one-layer-at-a-time comparison?</li>
+<li>Can a failing pattern become a deterministic regression test?</li>
+</ul>
+<h2 id="required-state-program">Required State Program</h2>
+<pre><code class="language-text">incoming edge
+-&gt; entry boundary and immutable entry variables
+-&gt; state goal
+-&gt; ordered canonical micro-events
+-&gt; current variables at the cursor
+-&gt; all legal exits and guard verdicts
+-&gt; outgoing edge writes and clears
+-&gt; immutable recorded exit variables
+-&gt; transition commit
+-&gt; next state's entry boundary
+</code></pre>
+<h2 id="required-evidence-spine">Required Evidence Spine</h2>
+<p>Each visit has six summary beats, each with evidence status, provenance class,
+human explanation, and source references:</p>
+<ol>
+<li>Intended</li>
+<li>Generated</li>
+<li>Sent</li>
+<li>Heard</li>
+<li>Caller said</li>
+<li>Decided</li>
+</ol>
+<p>Recorded, derived, simulated, redacted, disproven, and unavailable must remain
+distinguishable without relying only on color.</p>
+<h2 id="design-go-criteria">Design GO Criteria</h2>
+<p>Return <code>DESIGN GO</code> only if:</p>
+<ol>
+<li>Visit boundaries and event ownership are deterministic, including re-entry.</li>
+<li>Entry, cursor, and recorded exit values have explicit sources and cannot be
+confused.</li>
+<li>Baseline or mutation gaps become incomplete evidence, never guessed values.</li>
+<li>Every legal edge, duplicate targets, verdicts, winner, sets, and clears have
+stable joins.</li>
+<li>Access labels do not overstate runtime read coverage.</li>
+<li>Forward and reverse stepping use a canonical, stable event sequence.</li>
+<li>Recorded, derived, unavailable, redacted, and simulated evidence are not
+confusable.</li>
+<li>Caller-input provenance explains Gemini, Whisper, DTMF/control, and the
+acted-on source.</li>
+<li>The artifact schema can hydrate the UI without changing the conceptual
+model.</li>
+<li>The implementation sequence and acceptance gates are sufficient to detect
+the original four defects.</li>
+<li>UI, CLI, and API clients share one deterministic engine, and an AI can run
+bounded state-pattern experiments without production side effects.</li>
+<li>Every executing command pins independent immutable engine and flow
+revisions; unavailable historical code cannot fall back to current code.</li>
+<li>The implementation packets are bounded and specific enough that a
+lower-capability model can execute WP0-WP6 without making architectural,
+privacy, or production-side-effect decisions.</li>
+</ol>
+<p>Otherwise return <code>DESIGN NO-GO</code> with the minimum blocking changes.</p>
+<h2 id="implementation-go-criteria">Implementation GO Criteria</h2>
+<p>Return <code>IMPLEMENTATION GO</code> only if the current code, mock, and tests actually
+meet the design gates. Hardcoded representative values, browser-speech proof,
+the announce/menu frame leak, missing baseline telemetry, or substring-only
+tests are sufficient reasons for <code>IMPLEMENTATION NO-GO</code>.</p>
+<h2 id="required-response-format">Required Response Format</h2>
+<ol>
+<li>Preserve-worthy strengths.</li>
+<li>Design blockers, ordered by severity.</li>
+<li>Implementation conformance gaps, ordered by severity.</li>
+<li>Review of each initial blocker R1-R4: <code>resolved</code>, <code>partial</code>, or <code>unresolved</code>.</li>
+<li>Design scorecard against the thirteen GO criteria.</li>
+<li>Final <code>DESIGN GO|NO-GO</code> and <code>IMPLEMENTATION GO|NO-GO</code> on separate lines.</li>
+<li>Minimum next actions.</li>
+</ol>
+<h2 id="suggested-command">Suggested Command</h2>
+<pre><code class="language-bash">cd ~/src/riff
+claude --safe-mode -p --model fable --effort max \
+  &quot;Read docs/design/2026-07-10-state-program-debugger-claude-review.md and perform the review exactly as requested. Do not edit files.&quot;
+</code></pre>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#review-objective">Review Objective</a></li><li class="toc-h2"><a href="#files-to-read">Files to Read</a></li><li class="toc-h2"><a href="#initial-review-findings">Initial Review Findings</a></li><li class="toc-h2"><a href="#claimed-contract-resolutions">Claimed Contract Resolutions</a></li><li class="toc-h3"><a href="#r1-frame-ownership">R1 - Frame Ownership</a></li><li class="toc-h3"><a href="#r2-hydration">R2 - Hydration</a></li><li class="toc-h3"><a href="#r3-access-evidence">R3 - Access Evidence</a></li><li class="toc-h3"><a href="#r4-canonical-events">R4 - Canonical Events</a></li><li class="toc-h3"><a href="#programmatic-ai-use">Programmatic AI Use</a></li><li class="toc-h2"><a href="#required-state-program">Required State Program</a></li><li class="toc-h2"><a href="#required-evidence-spine">Required Evidence Spine</a></li><li class="toc-h2"><a href="#design-go-criteria">Design GO Criteria</a></li><li class="toc-h2"><a href="#implementation-go-criteria">Implementation GO Criteria</a></li><li class="toc-h2"><a href="#required-response-format">Required Response Format</a></li><li class="toc-h2"><a href="#suggested-command">Suggested Command</a></li></ul></aside>
+</div>
+</body>
+</html>

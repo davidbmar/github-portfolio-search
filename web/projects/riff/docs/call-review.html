@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Call Quality &amp; Reviews — RIFF Eval</title>
+<style>
+  :root{--ink:#1a1c20;--mut:#5c6470;--line:#e3e6ea;--bg:#fcfcfd;--card:#fff;--accent:#2f6df0;--accent-soft:#eaf1ff;--good:#1f9d55;--warn:#b8860b;--bad:#c0392b;--code-bg:#1d2127;--code-ink:#e6e8eb;}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62;font-size:16.5px;}
+  .wrap{display:flex;max-width:1180px;margin:0 auto;}
+  nav.side{flex:0 0 232px;padding:30px 18px 60px;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;border-right:1px solid var(--line);font-size:14.5px;}
+  nav.side h1{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:0 0 4px;}
+  nav.side .tag{color:var(--mut);font-size:12.5px;margin:0 0 18px;}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;padding:5px 9px;border-radius:6px;margin:1px 0;}
+  nav.side a:hover{background:var(--accent-soft);color:var(--accent);}
+  nav.side a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  nav.side .grp{margin-top:16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:0 9px;}
+  nav.side a .badge-new{margin-left:5px;padding:0 6px;font-size:9.5px;display:inline-block;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;background:var(--good);color:#fff;border-radius:20px;vertical-align:middle;font-weight:700;}
+  main{flex:1 1 auto;max-width:860px;padding:34px 40px 90px;min-width:0;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 28px;}
+  h2{font-size:23px;margin:42px 0 12px;letter-spacing:-.01em;padding-top:8px;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:12.5px;line-height:1.5;margin:16px 0;font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  pre .c{color:#8a93a2;} pre .k{color:#9ecbff;} pre .s{color:#9be09b;} pre .n{color:#f0a35e;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin:20px 0;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.bad{border-color:var(--bad);background:#fdecea;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  a.x{color:var(--accent);}
+  .crumb{font-size:13px;color:var(--mut);margin-bottom:10px;}.crumb a{color:var(--mut);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){.wrap{flex-direction:column}nav.side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);width:100%;flex-basis:auto}main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="side">
+  <h1>RIFF Eval</h1>
+  <div class="tag">Goal-hierarchy + quality system</div>
+  <a href="index.html">Overview &amp; the big picture</a>
+  <div class="grp">The hierarchy</div>
+  <a href="goal-hierarchy-design.html">Goal-Hierarchy design</a>
+  <a href="archetypes.html">Archetypes (cross-flow)</a>
+  <a href="group-cohesion.html">Group cohesion</a>
+  <a href="per-state-metrics.html">Per-state metrics</a>
+  <a href="goal-segment-schema.html">GoalSegment schema</a>
+  <a href="goap-selector.html">GOAP-lite selector</a>
+  <div class="grp">Design (proposed)</div>
+  <a href="llm-policy.html">Effective LLM Policy</a>
+  <a href="judge-the-judge.html">Judge-the-Judge &amp; discipline<span class="badge-new">New</span></a>
+  <div class="grp">Measurement</div>
+  <a href="eval-matrix.html">The evaluation matrix</a>
+  <a href="judges.html">Judges</a>
+  <a href="backend-mocks.html">Backend mocks</a>
+  <a href="holdout-validation.html">Holdout validation</a>
+  <a href="transcript-audit.html">Transcript audit</a>
+  <div class="grp">Operations</div>
+  <a href="ci-gate.html">CI quality gate</a>
+  <a href="shift-left-acceptance.html">Shift-left acceptance</a>
+  <a href="session-replay.html">Session replay</a>
+  <a href="stall-recovery.html">Stall recovery (FSM)</a>
+  <a href="call-review.html" class="active">Call quality &amp; reviews<span class="badge-new">New</span></a>
+  <div class="grp">Wisdom</div>
+  <a href="methodology.html">Methodology &amp; lessons</a>
+</nav>
+<main>
+  <div class="crumb"><a href="index.html">Overview</a> &rsaquo; Operations &rsaquo; Call quality &amp; reviews</div>
+  <h1 class="title">Call Quality &amp; Reviews</h1>
+  <p class="lede">How we measure and debug live call performance: VAD endpoint tuning, cascading privacy rules, side-by-side Whisper transcription timelines, and nightly LLM-based grading.</p>
+
+  <h2>1. Why a phone agent needs a review system</h2>
+  <p>In text chat, latency is a minor annoyance. In voice-AI systems, latency is fatal. A single timing mismatch breaks conversational trust, causing immediate hang-ups.</p>
+  <p>Consider this true story from our early live testing. A caller was asked to verify their phone number:</p>
+  <ul>
+    <li>The caller said <em>"Yes"</em> to confirm.</li>
+    <li>A <strong>9-second silence</strong> followed.</li>
+    <li>Confused and wondering if the line dropped, the caller said <em>"Yes"</em> again.</li>
+    <li>The voice agent, which had finally transitioned to the <code>verify_code</code> state, treated this second <em>"Yes"</em> as the verification code.</li>
+    <li>The verification check failed, and the agent hung up.</li>
+  </ul>
+  <p>In another test, a caller became trapped in a state loop for 10 minutes, asking <em>"Are you there?"</em> twice in frustration before abandoning the call.</p>
+  <p>To fix these issues, we couldn't rely on synthetic text benchmarks. We needed a system to record live call audio, align what the user actually said against what the model heard, measure latency at every turn, and automatically grade every session.</p>
+  
+  <div class="callout bad">
+    <strong>Takeaway:</strong>
+    In voice systems, a 9-second silence is not just latency; it is a structural FSM failure that leads directly to an abandoned call.
+  </div>
+
+  <h2>2. Recording a call, safely</h2>
+  <p>Our call quality cycle starts with recording. Every voice call is captured by <code>CallSessionRecorder</code>, producing a mono caller audio file (<code>audio.wav</code>) in <code>data/sessions/&lt;session_id&gt;/</code>, which is then pushed to S3 (<code>s3://riff-s3-audio/calls/…</code>) when the session ends.</p>
+  <p>However, recording voice calls raises massive privacy concerns. Phone calls often contain sensitive Personally Identifiable Information (PII) like credit card numbers, addresses, and verification codes. We cannot persist this audio.</p>
+  <p>We solved this by building a <strong>cascading record-override policy</strong>. This matches the LLM model resolution policy, allowing authors to turn recording on or off at four different scopes: <code>overall &rarr; flow &rarr; group &rarr; state</code>. The smallest explicit scope wins.</p>
+
+  <pre><code><span class="c"># flows/apartment_intake.yaml</span>
+<span class="k">record</span>: <span class="s">"on"</span> <span class="c"># Flow-level default</span>
+
+<span class="k">segments</span>:
+  - <span class="k">name</span>: <span class="s">"triage"</span>
+    <span class="k">record</span>: <span class="s">"inherit"</span>
+  - <span class="k">name</span>: <span class="s">"security_auth"</span>
+    <span class="k">record</span>: <span class="s">"off"</span> <span class="c"># Group-level override: black out this entire phase</span>
+
+<span class="k">states</span>:
+  <span class="k">collect_verification_code</span>:
+    <span class="k">speech_act</span>: <span class="s">collect</span>
+    <span class="k">record</span>: <span class="s">"off"</span> <span class="c"># State-level override: security guard</span></code></pre>
+
+  <p>At runtime, the audio loop checks the policy for the active state using <code>resolve_record_policy()</code>. If a state is marked <code>off</code>, its audio frames are simply skipped and never written to disk, creating a silent blackout window in the final recording.</p>
+  <p>Because a typo like <code>recrod: of</code> could silently leak sensitive data, we enforce strict load-time validation in <code>riff/record_policy.py</code>:</p>
+
+  <pre><code><span class="k">def</span> <span class="n">validate_record_values</span>(flow: <span class="s">"Flow"</span>) -> <span class="s">None</span>:
+    bad = []
+    <span class="k">for</span> tier, name, value <span class="k">in</span> _declared_records(flow):
+        <span class="k">if</span> _norm(value) <span class="k">not in</span> {<span class="s">"on"</span>, <span class="s">"off"</span>, <span class="s">"inherit"</span>}:
+            bad.append(f<span class="s">"{tier} {name!r} record={value!r}"</span>)
+    <span class="k">if</span> bad:
+        <span class="k">raise</span> <span class="n">ValueError</span>(f<span class="s">"Invalid record value(s): {'; '.join(bad)}"</span>)</code></pre>
+
+  <div class="callout good">
+    <strong>Takeaway:</strong>
+    Privacy overrides must cascade down to individual FSM states, blacking out sensitive frames in memory before they ever touch the disk.
+  </div>
+
+  <h2>3. Ground truth vs. what the model heard</h2>
+  <p>When debugging the 9-second silence, our first question was: <em>where did the time go?</em> Was it a browser microphone issue, network packet loss, a slow speech-to-text (STT) transcriber, or Gemini itself?</p>
+  <p>To find out, we built <code>scripts/compare_call_transcription.py</code>. This tool runs a local Whisper model on the recorded audio to get <strong>ground-truth caller segments with timestamps</strong>, then aligns them side-by-side with Gemini's transcriptions (from <code>turns.jsonl</code>) and tool calls (from <code>live.log</code>) on a single timeline.</p>
+  <p>Here is the actual output that exposed the bug:</p>
+
+  <pre><code>=== voice-1782603683638 — caller audio 42.1s, Whisper=tiny ===
+
+--- WHISPER (caller ground truth, timestamped) ---
+  [ 24.9–25.2s]  "Yes."
+
+--- GEMINI (what it heard + did, timestamped) ---
+  [ 34.1s]  GEMINI heard CALLER: 'yes'  [collect_phone&rarr;verify_code]
+  [ 34.2s]  GEMINI tool_call: verify_phone_number {"phone": "5125551234"}</code></pre>
+
+  <p>The timeline was the smoking gun. The caller finished speaking "Yes" at <strong>25.2s</strong>. Gemini did not process the turn until <strong>34.1s</strong>. The microphone logs confirmed audio bytes were streaming continuously during the gap: <code>suppressed=0 forwarded=25</code>.</p>
+  <p>This proved the audio reached the server instantly. The latency was caused by Gemini's default turn-detection endpointing, which was waiting for additional audio before deciding the caller had finished their short, 300ms confirmation.</p>
+
+  <div class="callout good">
+    <strong>Takeaway:</strong>
+    Comparing Whisper ground-truth timestamps with Gemini FSM events isolates whether latency lives in audio collection, network transit, or turn-detection logic.
+  </div>
+
+  <h2>4. Fixing the pause: VAD tuning</h2>
+  <p>To eliminate this pause, we tuned the Voice Activity Detection (VAD) parameters inside the Gemini Live session. By default, API model turn-taking is conservative, optimized to avoid cutting users off if they pause mid-thought. This behaves poorly for short confirmations ("yes", "no", "that works").</p>
+  <p>We override Gemini's default endpointing in <code>riff/live/live_client.py</code>, enabling <code>END_SENSITIVITY_HIGH</code> and dropping the silence window to 700ms via <code>RIFF_LIVE_SILENCE_MS</code>:</p>
+
+  <pre><code><span class="k">def</span> <span class="n">_vad_config</span>(types_mod: Any):
+    <span class="k">if</span> os.environ.get(<span class="s">"RIFF_LIVE_VAD"</span>, <span class="s">"1"</span>).strip() == <span class="s">"0"</span>:
+        <span class="k">return</span> <span class="s">None</span>
+    <span class="k">return</span> types_mod.RealtimeInputConfig(
+        automatic_activity_detection=types_mod.AutomaticActivityDetection(
+            end_of_speech_sensitivity=types_mod.EndSensitivity.END_SENSITIVITY_HIGH,
+            silence_duration_ms=int(os.environ.get(<span class="s">"RIFF_LIVE_SILENCE_MS"</span>, <span class="s">"700"</span>)),
+            prefix_padding_ms=int(os.environ.get(<span class="s">"RIFF_LIVE_PREFIX_MS"</span>, <span class="s">"300"</span>)),
+        ),
+    )</code></pre>
+  <p>By forcing the model to decide the turn is over after 700ms of silence (and keeping 300ms of pre-speech padding to avoid clipping the start), response latency dropped from 9 seconds to under 1.2 seconds, matching natural human cadences.</p>
+
+  <div class="callout warn">
+    <strong>The VAD Sweet Spot:</strong>
+    Setting the silence threshold too low (e.g. &lt;500ms) will cut off callers who pause mid-sentence. We found 700ms is the optimal balance for intake forms.
+  </div>
+
+  <h2>5. The two-layer review</h2>
+  <p>To ensure we catch latency regressions and loop issues automatically, we built a <strong>two-layer review architecture</strong> that integrates with our SQLite quality database, <code>quality.db</code>.</p>
+
+  <table>
+    <tr>
+      <th>Dimension</th>
+      <th>Layer 1: Objective (Instant)</th>
+      <th>Layer 2: Subjective (Nightly)</th>
+    </tr>
+    <tr>
+      <td><strong>Execution</strong></td>
+      <td>At call-end via FSM hook</td>
+      <td>Nightly batch cycle (01:30)</td>
+    </tr>
+    <tr>
+      <td><strong>Cost &amp; Deps</strong></td>
+      <td>Free, no API, no Whisper</td>
+      <td>LLM API cost, Whisper local GPU/CPU</td>
+    </tr>
+    <tr>
+      <td><strong>Metrics</strong></td>
+      <td>Turn count, completion, final state, and <code>loop_score</code></td>
+      <td>Subjective rubrics (humanness, efficiency), Word Error Rate (WER)</td>
+    </tr>
+    <tr>
+      <td><strong>Goal</strong></td>
+      <td>Catch catastrophic loop crashes immediately</td>
+      <td>Grade conversational quality and catch mis-hears</td>
+    </tr>
+  </table>
+
+  <h3>Layer 1: The Loop Score</h3>
+  <p>Layer 1 computes the <code>loop_score</code>. By counting the maximum number of times a session visits any single state, we can flag runaway loops deterministically. For example, if a call visits <code>verify_code</code> 6 times, it gets a <code>loop_score = 6</code>, signaling a block:</p>
+
+  <pre><code><span class="k">def</span> <span class="n">_objective_metrics</span>() -> dict[str, dict]:
+    <span class="c"># Counts state frequencies in turns.jsonl</span>
+    states = Counter(r.get(<span class="s">"to_state"</span>) <span class="k">for</span> r <span class="k">in</span> rows <span class="k">if</span> r.get(<span class="s">"to_state"</span>))
+    <span class="k">return</span> {
+        <span class="s">"turn_count"</span>: len(rows),
+        <span class="s">"loop_score"</span>: max(states.values()) <span class="k">if</span> states <span class="k">else</span> <span class="n">0</span>,
+        <span class="s">"completed"</span>: <span class="n">1</span> <span class="k">if</span> last.get(<span class="s">"verdict"</span>) == <span class="s">"complete"</span> <span class="k">else</span> <span class="n">0</span>,
+        <span class="s">"final_state"</span>: last.get(<span class="s">"to_state"</span>),
+    }</code></pre>
+
+  <h3>Layer 2: The LLM Judge</h3>
+  <p>Layer 2 runs our standard evaluation rubric on the live transcript. An LLM parses the conversation and assigns scores from 1 to 5 across <code>task_completion</code>, <code>naturalness</code>, <code>efficiency</code>, and <code>error_recovery</code>, saving them to the <code>live_call_reviews</code> table.</p>
+
+  <div class="callout good">
+    <strong>Takeaway:</strong>
+    Separating instant objective metrics from nightly subjective evaluations ensures the system catches loop crashes for free while reserving LLM API budget for quality audits.
+  </div>
+
+  <h2>6. The nightly cycle</h2>
+  <p>Every night at <strong>01:30 AM local time</strong>, a macOS <code>launchd</code> job (configured via <code>com.riff.nightly-review</code>) kicks off the script <code>scripts/nightly_review_cycle.sh</code>. This script coordinates three actions:</p>
+  <ol>
+    <li>Runs <code>scripts/judge_all_sessions.py</code> to run the Layer 2 LLM judge over all un-reviewed live call transcripts from the past 24 hours.</li>
+    <li>Runs <code>scripts/ingest_call_reviews.py</code> to extract Layer 1 metrics and upsert everything into <code>quality.db</code>.</li>
+    <li>Runs <code>riff.nightly_review --once --window-hours 24</code> to output a failure-mode summary, highlighting latency spikes and loop detections.</li>
+  </ol>
+  
+  <p>The entire output is logged to <code>logs/nightly-review/cycle.log</code>, keeping the development team updated every morning on live runtime quality.</p>
+
+  <div class="callout good">
+    <strong>Takeaway:</strong>
+    Automating evaluations at 01:30 AM ensures yesterday's caller issues are compiled, graded, and indexed in the database before the workday begins.
+  </div>
+
+  <h2>7. Try it yourself</h2>
+  <p>Operators and developers can query the review database or audit a specific call directly from the terminal:</p>
+
+  <h3>Query the worst-performing recent calls</h3>
+  <pre><code>sqlite3 -header -column docs/flow-eval/quality.db \
+  "SELECT substr(session_id,7) sid, flow_id, overall, efficiency, loop_score, turn_count, completed
+   FROM live_call_reviews 
+   ORDER BY overall ASC, loop_score DESC 
+   LIMIT 10;"</code></pre>
+
+  <h3>Drill into a call's Whisper-vs-Gemini timeline</h3>
+  <pre><code><span class="c"># Transcribe the caller audio and line it up with Gemini events</span>
+.venv/bin/python scripts/compare_call_transcription.py voice-1782603683638</code></pre>
+
+  <h3>Review calls in the developer interface</h3>
+  <p>You can also recommend the <code>/review-calls</code> command in the chat interface to trigger a run-through, fetch recent failure summaries, or re-run the nightly ingest cycle manually.</p>
+
+  <div class="callout good">
+    <strong>Takeaway:</strong>
+    One SQL query locates the outlier, one timeline script reveals the timestamp gap, and one FSM edit or config change deploys the fix.
+  </div>
+
+  <footer>
+    Sources across the build: <code>riff/live/live_client.py</code>, <code>riff/record_policy.py</code>, <code>scripts/compare_call_transcription.py</code>, <code>scripts/ingest_call_reviews.py</code>, and the <code>live_call_reviews</code> database schema.
+  </footer>
+</main>
+</div>
+</body>
+</html>

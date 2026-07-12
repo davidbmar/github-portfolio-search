@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFF State Audio Timeline Hydration</title>
+<style>
+  :root{
+    --bg:#f7f8fb;
+    --panel:#ffffff;
+    --ink:#18202a;
+    --muted:#5f6978;
+    --line:#d9dee7;
+    --blue:#285fd3;
+    --blue-soft:#e9f0ff;
+    --green:#18794e;
+    --green-soft:#e7f7ef;
+    --amber:#9a6a00;
+    --amber-soft:#fff4d7;
+    --red:#b42318;
+    --red-soft:#fde8e5;
+    --code:#111827;
+    --code-ink:#eef2f7;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;
+  }
+  header{
+    padding:34px 28px 24px;
+    border-bottom:1px solid var(--line);
+    background:#fff;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  .eyebrow{
+    color:var(--blue);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin:0 0 8px;
+  }
+  h1{font-size:32px;line-height:1.16;margin:0 0 10px;letter-spacing:0}
+  .lede{max-width:860px;color:var(--muted);font-size:18px;margin:0}
+  main{max-width:1180px;margin:0 auto;padding:26px 28px 64px}
+  h2{font-size:22px;margin:34px 0 12px}
+  h3{font-size:17px;margin:0 0 8px}
+  p{margin:10px 0}
+  code{
+    background:#edf0f5;
+    border-radius:5px;
+    padding:1px 5px;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+    font-size:.9em;
+  }
+  pre{
+    background:var(--code);
+    color:var(--code-ink);
+    padding:14px 16px;
+    overflow:auto;
+    border-radius:8px;
+    font-size:13px;
+    line-height:1.45;
+  }
+  table{width:100%;border-collapse:collapse;background:#fff}
+  th,td{border:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+  th{background:#f0f3f8;font-weight:700}
+  .section-note{
+    border-left:4px solid var(--blue);
+    background:var(--blue-soft);
+    padding:12px 14px;
+    margin:18px 0;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px;
+  }
+  .panel.before{border-top:4px solid var(--amber)}
+  .panel.after{border-top:4px solid var(--green)}
+  .small{color:var(--muted);font-size:13px}
+  .pill{
+    display:inline-block;
+    border-radius:999px;
+    padding:2px 8px;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    font-weight:700;
+    margin-right:6px;
+  }
+  .pill.good{background:var(--green-soft);color:var(--green)}
+  .pill.warn{background:var(--amber-soft);color:var(--amber)}
+  .pill.bad{background:var(--red-soft);color:var(--red)}
+  .timeline{display:grid;gap:12px;margin-top:16px}
+  .visit{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    display:grid;
+    grid-template-columns:150px 1fr;
+    overflow:hidden;
+  }
+  .time{
+    background:#f1f4f8;
+    padding:14px;
+    border-right:1px solid var(--line);
+    color:var(--muted);
+    font-size:13px;
+  }
+  .body{padding:14px}
+  .state-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .state-title strong{font-size:16px}
+  .facts{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px;
+    margin-top:10px;
+  }
+  .fact{
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px;
+    min-height:70px;
+  }
+  .fact b{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+  .fact .bad{color:var(--red);font-weight:700}
+  .fact .good{color:var(--green);font-weight:700}
+  .fact .warn{color:var(--amber);font-weight:700}
+  .compare-table td:first-child{width:210px;font-weight:700;background:#fafbfc}
+  .ai-flow{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-top:12px;
+  }
+  .step{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px;
+  }
+  .step-number{
+    width:24px;
+    height:24px;
+    display:inline-grid;
+    place-items:center;
+    border-radius:50%;
+    background:var(--blue);
+    color:#fff;
+    font-weight:700;
+    font-size:12px;
+    margin-bottom:8px;
+  }
+  footer{
+    border-top:1px solid var(--line);
+    margin-top:36px;
+    padding-top:16px;
+    color:var(--muted);
+    font-size:13px;
+  }
+  @media(max-width:900px){
+    .grid,.ai-flow{grid-template-columns:1fr}
+    .visit{grid-template-columns:1fr}
+    .time{border-right:0;border-bottom:1px solid var(--line)}
+    .facts{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:560px){
+    header,main{padding-left:16px;padding-right:16px}
+    .facts{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Post-call diagnostic</p>
+    <h1>State Audio Timeline Hydration</h1>
+    <p class="lede">An implemented post-call artifact that makes every state explain what it intended to say, what the model generated, what the recording proves, and why a caller heard silence or heard audio after the state boundary.</p>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h2>Clearest Possible Reader Contract</h2>
+    <div class="section-note">
+      The first screen should answer six questions without forcing Codex, Claude, or a human operator to inspect logs: did the caller hear the prompt, what state failed, what state came immediately before it, what defect code applies, which layer owns the fix, and what command opens the evidence.
+    </div>
+    <div class="grid">
+      <div class="panel after">
+        <h3>AI-first summary</h3>
+        <p class="small">This is the object future agents should read before opening logs.</p>
+        <pre>{
+  "verdict": "broken",
+  "primary_failure": {
+    "code": "BROKEN_AUDIO_CONTRACT",
+    "state_id": "replicant_confirm_identity",
+    "previous_state_id": "welcome_static",
+    "human": "The identity prompt was generated but never sent to Telnyx.",
+    "owner": "compiler/playback",
+    "fix": "Use deterministic playback or skip this prompt."
+  },
+  "audio_totals": {
+    "model_generated_states": 1,
+    "audio_sent_states": 1,
+    "silent_prompt_states": 1,
+    "caller_spoke_during_silence_states": 1
+  },
+  "problem_frame": {
+    "previous_state": {
+      "state_id": "welcome_static",
+      "verdict": "audible",
+      "telnyx_out_duration_ms": 4280,
+      "agent_energy_ms": 4010,
+      "audio_completed": true
+    },
+    "problem_state": {
+      "state_id": "replicant_confirm_identity",
+      "verdict": "silent",
+      "model_generated": true,
+      "telnyx_out_duration_ms": 0,
+      "agent_energy_ms": 0
+    },
+    "boundary": {
+      "silent_prompt_window_ms": 5840,
+      "caller_whisper": "I have a maintenance request.",
+      "routing_result": "no_match_yes_no_only"
+    }
+  }
+}</pre>
+      </div>
+      <div class="panel before">
+        <h3>Human-first summary</h3>
+        <p><span class="pill bad">Broken</span><strong>Caller heard silence after the welcome.</strong></p>
+        <p>The flow entered <code>replicant_confirm_identity</code>. Gemini generated the identity prompt, but Live audio was suppressed and no deterministic audio was available. Telnyx sent zero prompt chunks.</p>
+        <p><strong>Owner:</strong> compiler/playback contract<br>
+        <strong>Fix:</strong> deterministic playback for suppressed prompts, or skip this prompt and route to the property menu.</p>
+        <pre>jq '.summary.primary_failure' \
+  logs/post_call/&lt;sid&gt;/state_audio_timeline.json</pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Problem Frame: Previous, Current, Next</h2>
+    <div class="section-note">
+      This is the highest-signal view for the current failure. The previous state proves whether the phone audio path worked, the problem state proves whether generated text was heard, and the next state shows whether audio arrived after the state boundary.
+    </div>
+    <table class="compare-table">
+      <tr>
+        <th>Question</th>
+        <th>Previous state: <code>welcome_static</code></th>
+        <th>Problem state: <code>replicant_confirm_identity</code></th>
+      </tr>
+      <tr>
+        <td>What was expected?</td>
+        <td>Static welcome line.</td>
+        <td>Dynamic identity confirmation prompt.</td>
+      </tr>
+      <tr>
+        <td>Was audio allowed?</td>
+        <td>Yes, deterministic playback.</td>
+        <td>No, Live audio was suppressed by state policy.</td>
+      </tr>
+      <tr>
+        <td>Was audio sent?</td>
+        <td><span class="pill good">Yes</span> Telnyx outbound duration and agent-channel energy present.</td>
+        <td><span class="pill bad">No</span> Model generated output, but Telnyx outbound chunks were zero.</td>
+      </tr>
+      <tr>
+        <td>What did the recording prove?</td>
+        <td>Agent channel active during the welcome.</td>
+        <td>Agent channel silent while the state waited for yes/no.</td>
+      </tr>
+      <tr>
+        <td>What did Whisper add?</td>
+        <td>No caller correction needed.</td>
+        <td>Caller spoke during the silent prompt window: "I have a maintenance request."</td>
+      </tr>
+      <tr>
+        <td>What should an AI conclude?</td>
+        <td>The phone path was alive before the transition.</td>
+        <td>The failure is the state audio contract, not general Telnyx outage or caller silence.</td>
+      </tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>July 9 Field Evidence</h2>
+    <div class="grid">
+      <div class="panel before">
+        <h3>Property management silent prompt</h3>
+        <p><span class="pill bad">BROKEN_AUDIO_CONTRACT</span><code>replicant_confirm_identity</code></p>
+        <p class="small">Session <code>v3:uXdsR2ht5Zj71T7XcK-4aHjk0o8agpSVFO1o8pB8yTnJf7KPay6Nuw</code>, started <code>2026-07-09T12:37:36.200Z</code> / <code>07:37:36 CDT</code>.</p>
+        <table>
+          <tr><td>Previous audible state</td><td><code>welcome_first</code>, <code>0.001s-4.407s</code>, <code>4000 ms</code> agent energy</td></tr>
+          <tr><td>Problem state</td><td><code>4.409s-30.132s</code>, <code>57</code> suppressed chunks, <code>0 ms</code> agent energy</td></tr>
+          <tr><td>Caller evidence</td><td><code>2850 ms</code> caller energy; Gemini first heard <code>¿Qué?</code>; Whisper captured the caller trying to start a maintenance request and asking if the agent was there.</td></tr>
+          <tr><td>Artifact</td><td><code>logs/post_call/v3:uXdsR2ht5Zj71T7XcK-4aHjk0o8agpSVFO1o8pB8yTnJf7KPay6Nuw/state_audio_timeline.json</code></td></tr>
+        </table>
+      </div>
+      <div class="panel after">
+        <h3>Space Channel MARS menu boundary</h3>
+        <p><span class="pill warn">AUDIO_AFTER_STATE_EXIT</span><code>menu_full_announce</code></p>
+        <p class="small">Session <code>v3:IxN4WywfRrjSK08g2XMOgNuYJCgKLEYh08sP91i-9dcC9Lqx65YPGw</code>, started <code>2026-07-09T15:55:34.759Z</code> / <code>10:55:34 CDT</code>.</p>
+        <table>
+          <tr><td>Problem state</td><td><code>107.871s-110.512s</code>, expected full numbered menu, <code>14</code> suppressed chunks, <code>0 ms</code> agent energy</td></tr>
+          <tr><td>Next state</td><td><code>menu</code>, <code>110.512s-136.080s</code>, <code>13618 ms</code> agent energy and <code>14668 ms</code> caller energy</td></tr>
+          <tr><td>Number evidence</td><td>Timed Whisper later captured agent-channel menu language for <code>Press 0</code> through <code>Press 6</code>, proving transcript text and state-owned audio must be inspected separately.</td></tr>
+          <tr><td>Artifact</td><td><code>logs/post_call/v3:IxN4WywfRrjSK08g2XMOgNuYJCgKLEYh08sP91i-9dcC9Lqx65YPGw/state_audio_timeline.json</code></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What We Currently Have Per State</h2>
+    <table class="compare-table">
+      <tr>
+        <th>Surface</th>
+        <th>Current per-state evidence</th>
+        <th>Gap exposed by the maintenance call</th>
+      </tr>
+      <tr>
+        <td><code>/api/debug/state_trace</code></td>
+        <td>State id, entered/exited timestamps, duration, exit target, guard evaluations, tool calls, locked-choice cascade, match status, turn latency, diagnosis tags.</td>
+        <td>Does not prove what audio the caller heard. It can show a state was active and choices failed, but not that the prompt was silent.</td>
+      </tr>
+      <tr>
+        <td>Section-6 trace</td>
+        <td><code>state_enter</code>, <code>audio_pushed</code>, <code>audio_done</code>, <code>barge_in</code>, <code>route_decision</code>, tools, stalls, call end.</td>
+        <td>Shows positive playback when it happens. It does not currently emit an explicit "model audio was generated but suppressed" event.</td>
+      </tr>
+      <tr>
+        <td>Post-call files</td>
+        <td>Rendered transcript, Whisper comparison, FSM trace, session audio files, local logs.</td>
+        <td>These are separate lanes. A future AI has to join logs, WAV energy, trace rows, and generated transcript by hand.</td>
+      </tr>
+      <tr>
+        <td>Live / phone logs</td>
+        <td>Useful low-level lines such as <code>model_output: suppressed</code>, <code>audio_out</code>, and <code>telnyx_out</code>.</td>
+        <td>Correct but not structured as a per-state post-call artifact. Easy to miss and hard to compare against the transcript.</td>
+      </tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Before vs After</h2>
+    <div class="grid">
+      <div class="panel before">
+        <h3>Before: current review surface</h3>
+        <p class="small">The state trace and transcript make it look like the assistant spoke, but the audible path is not joined to the state.</p>
+        <pre>state: replicant_confirm_identity
+prompt: "Based on your caller ID..."
+locked_choice: confirm_yesno
+match_status: no_match
+caller: "I have a maintenance request."
+transcript: Assistant line appears</pre>
+        <p><span class="pill warn">Problem</span>The reviewer must separately inspect phone logs and WAV energy to realize the assistant line was generated but not heard.</p>
+      </div>
+      <div class="panel after">
+        <h3>After: hydrated state-audio row</h3>
+        <p class="small">The post-call artifact directly separates generated text from sent audio and heard audio.</p>
+        <pre>state: replicant_confirm_identity
+expected: identity confirmation prompt
+live_audio_allowed: false
+deterministic_audio_available: false
+model_generated: true
+telnyx_out_chunks: 0
+agent_energy_after_welcome: 0 ms
+diagnosis: BROKEN_AUDIO_CONTRACT</pre>
+        <p><span class="pill good">Fix</span>The row says why the caller heard blank audio and points to the compiler or playback contract.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Implemented Per-State Timeline</h2>
+    <div class="section-note">
+      Each row is one state visit. The row includes the previous state because audio bugs often happen at the boundary: the prior WAV ends, the next state enters, and nothing reaches the phone.
+    </div>
+
+    <div class="timeline">
+      <article class="visit">
+        <div class="time">
+          <strong>00.00s - 04.28s</strong><br>
+          previous: none
+        </div>
+        <div class="body">
+          <div class="state-title">
+            <strong>welcome_static</strong>
+            <span class="pill good">audible</span>
+          </div>
+          <p>The static welcome played successfully. This row proves the call audio path was working at the start.</p>
+          <div class="facts">
+            <div class="fact"><b>Expected</b>Static welcome WAV</div>
+            <div class="fact"><b>Model</b>No Live speech needed</div>
+            <div class="fact"><b>Transport</b><span class="good">Telnyx outbound present</span></div>
+            <div class="fact"><b>Energy</b><span class="good">Agent channel active</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="visit">
+        <div class="time">
+          <strong>04.28s - 10.12s</strong><br>
+          previous: welcome_static
+        </div>
+        <div class="body">
+          <div class="state-title">
+            <strong>replicant_confirm_identity</strong>
+            <span class="pill bad">broken audio contract</span>
+          </div>
+          <p>The flow expected a yes/no identity prompt, but the prompt was a suppressed Live output with no deterministic playback. The caller heard silence and spoke a maintenance intent.</p>
+          <div class="facts">
+            <div class="fact"><b>Expected</b>Locked-choice identity prompt</div>
+            <div class="fact"><b>Policy</b><span class="bad">Live audio suppressed</span></div>
+            <div class="fact"><b>Transport</b><span class="bad">0 Telnyx chunks</span></div>
+            <div class="fact"><b>Energy</b><span class="bad">0 ms agent activity</span></div>
+          </div>
+          <div class="facts">
+            <div class="fact"><b>Caller</b>"I have a maintenance request."</div>
+            <div class="fact"><b>Route</b><span class="warn">Rejected: expected yes/no</span></div>
+            <div class="fact"><b>Silence</b><span class="bad">State entered, no playback</span></div>
+            <div class="fact"><b>Suggested fix</b>Deterministic playback or skip prompt</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Hydrated JSON Shape</h2>
+    <pre>{
+  "session_id": "v3:example",
+  "flow_id": "property_management",
+  "summary": {
+    "verdict": "broken",
+    "worst_severity": "error",
+    "findings": [
+      {
+        "code": "BROKEN_AUDIO_CONTRACT",
+        "state_id": "replicant_confirm_identity",
+        "message": "State suppressed live audio but had no deterministic playback."
+      }
+    ]
+  },
+  "states": [
+    {
+      "state_id": "replicant_confirm_identity",
+      "previous_state_id": "welcome_static",
+      "started_ms": 4280,
+      "ended_ms": 10120,
+      "expected_speech": {
+        "kind": "locked_choice",
+        "redacted_text": "Based on your caller ID, I see your unit. Is that right?",
+        "asset": null
+      },
+      "audio_policy": {
+        "live_audio_allowed": false,
+        "deterministic_audio_required": true,
+        "deterministic_audio_available": false,
+        "suppression_reason": "business_profile.suppress_live_audio_states"
+      },
+      "model_generation": {
+        "output_transcription_chunks": 12,
+        "generated_text_present": true,
+        "suppressed": true
+      },
+      "transport_output": {
+        "telnyx_out_chunks": 0,
+        "telnyx_out_duration_ms": 0,
+        "audio_pushed": false,
+        "audio_done": false
+      },
+      "recording_energy": {
+        "agent_active_ms": 0,
+        "caller_active_ms": 1450,
+        "silent_ms": 4390
+      },
+      "routing": {
+        "expected": "yes_or_no",
+        "match_status": "no_match",
+        "transition": null
+      },
+      "diagnosis": [
+        {
+          "severity": "error",
+          "code": "BROKEN_AUDIO_CONTRACT",
+          "suggested_fix": "Use deterministic playback for suppressed prompts or skip this prompt."
+        }
+      ]
+    }
+  ]
+}</pre>
+  </section>
+
+  <section>
+    <h2>Post-Run Gate Workflow</h2>
+    <div class="ai-flow">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Run the gate</h3>
+        <p>After an OTA or local run, execute <code>scripts/post_run_audio_gate.py</code> with the session id.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Open the artifact</h3>
+        <p>The command writes <code>logs/post_call/&lt;sid&gt;/state_audio_timeline.json</code> and Markdown.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Read the problem frame</h3>
+        <p>The frame names the previous state, problem state, next state, caller audio, and prompt evidence.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>Fix the correct layer</h3>
+        <p>If model generated but Telnyx sent zero audio, fix playback policy or compiler gates, not STT.</p>
+      </div>
+    </div>
+
+    <pre>.venv/bin/python scripts/post_run_audio_gate.py &lt;sid&gt;
+
+jq '.summary.findings[] | select(.severity == "error")' \
+  logs/post_call/&lt;sid&gt;/state_audio_timeline.json</pre>
+    <p>The gate fails on every error finding and, by default, on <code>AUDIO_AFTER_STATE_EXIT</code>. It also fails when retained <code>data/sessions</code> artifacts are missing unless <code>--allow-unavailable</code> is passed. That is the change detector for the MARS failure class: simulation can pass while the recorded phone path proves the menu audio crossed the state boundary.</p>
+  </section>
+
+  <section>
+    <h2>Stable Defect Codes</h2>
+    <table>
+      <tr><th>Code</th><th>Meaning</th><th>Likely owner</th></tr>
+      <tr><td><code>BROKEN_AUDIO_CONTRACT</code></td><td>A state required caller-facing audio, but the configured audio path could not produce audible output.</td><td>Compiler or playback runtime</td></tr>
+      <tr><td><code>MODEL_GENERATED_BUT_NOT_SENT</code></td><td>Gemini produced output, but RIFF suppressed it before Telnyx.</td><td>Live session / transport policy</td></tr>
+      <tr><td><code>STATE_ENTERED_NO_AUDIO</code></td><td>A prompt state entered and no outbound audio occurred inside the allowed window.</td><td>Runtime or asset manifest</td></tr>
+      <tr><td><code>AUDIO_AFTER_STATE_EXIT</code></td><td>A prompt state was silent, but agent-channel audio began in the next state.</td><td>Playback boundary / trace attribution</td></tr>
+      <tr><td><code>CALLER_SPOKE_DURING_SILENCE</code></td><td>Caller speech occurred after a silent prompt window, usually meaning they were waiting or confused.</td><td>Flow UX and playback</td></tr>
+      <tr><td><code>LOCKED_CHOICE_REJECTED_INTENT</code></td><td>A locked-choice state rejected a task intent because only narrow answers were accepted.</td><td>Flow compiler / choice spec</td></tr>
+    </table>
+  </section>
+
+  <footer>
+    Source spec: <code>docs/superpowers/specs/2026-07-09-state-audio-timeline-hydration.md</code>
+  </footer>
+</main>
+</body>
+</html>

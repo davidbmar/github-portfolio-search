@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF — Console, Corridor &amp; Simulation Tooling (how to run + review) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">console-and-sim-tooling.md</span>
+<a class="raw" href="/docs/docs/console-and-sim-tooling.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF — Console, Corridor &amp; Simulation Tooling (how to run + review)</h1>
+<p><strong>Status:</strong> live tooling guide — reflects what's built and runnable today
+<strong>Date:</strong> 2026-07-01
+<strong>See also:</strong> <code>call-plan-artifact-schema-v0.md</code> (the artifact + §6 trace contracts), <code>console-flow-map-design-v0.md</code> (the corridor design), <code>companion-channel-design-v0.md</code> (the texted-link channel).</p>
+<p>This is the operator/engineer guide to the design-review surfaces and the simulations that feed them. Everything here is offline (no phone, no live Gemini) unless noted — it renders the compiled artifact + recorded/simulated §6 traces.</p>
+<hr />
+<h2 id="1-serve-the-review-pages">1. Serve the review pages</h2>
+<p>The web pages fetch data files (<code>/data/...</code>), so they must be served over HTTP (not <code>file://</code>):</p>
+<pre><code class="language-bash">cd /Users/davidmar/src/riff/web
+python3 -m http.server 8799        # or any port
+</code></pre>
+<p>Then open (the pages read the live files, so a reload picks up new commits):</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>URL</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L1 Corridor</strong> ⭐</td>
+<td><code>http://127.0.0.1:8799/corridor.html</code></td>
+<td>past · now · next around a cursor; <strong>replays a real §6 sim trace per permutation</strong> (dropdown). <code>j</code>/<code>k</code>/click scrub · <code>F</code> follow · <code>Z</code> = L2 overview.</td>
+</tr>
+<tr>
+<td><strong>Console</strong></td>
+<td><code>http://127.0.0.1:8799/console.html</code></td>
+<td>keypad route-table (&quot;what does 4 do?&quot;) + node list + L0 findings + trace panel.</td>
+</tr>
+<tr>
+<td><strong>Walk the flow</strong></td>
+<td><code>http://127.0.0.1:8799/flow-walk.html</code></td>
+<td>level-by-level drill-down: state 0 → options → next level.</td>
+</tr>
+<tr>
+<td><strong>Flow map</strong></td>
+<td><code>http://127.0.0.1:8767/space-channel-map.html?flow=space_channel_network_ops&amp;admin_token=&lt;TOKEN&gt;</code></td>
+<td>the real YAML state graph (served by the phone server; needs the admin token).</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>live phone/web call</strong> is separate from these: <code>http://127.0.0.1:8765/voice.html?flow=space_channel_network_ops</code> (browser mic) or the Telnyx number (needs the cloudflared tunnel up).</p>
+<hr />
+<h2 id="2-riffc-the-pre-flow-compiler-validation-only-no-runtime-effect">2. riffc — the pre-flow compiler (validation-only, no runtime effect)</h2>
+<p><code>riffc</code> compiles a flow YAML into the node/edge/finding data the console + corridor render, and runs the L0 compile-time checks.</p>
+<pre><code class="language-bash">python -m riff.riffc flows/space_channel_network_ops.yaml            # prints the L0 report
+python -m riff.riffc flows/austin_plumbing.yaml --json out.json      # + writes the artifact JSON
+</code></pre>
+<p>What it emits: <code>classify_node</code> (say/choose/collect/do/end), <code>flow_shape</code> (hub|chain), <code>classify_edges</code> (advance/failure/reloop, DFS back-edges), <code>traversal_order</code>, and L0 findings (missing degraded assets, no reject path, unpinned collect, orphaned states, template leaks …). It never touches the runtime.</p>
+<p><strong>Rigor:</strong> <code>tests/test_riffc_all_flows.py</code> classifies every state of all ~60 flows (0 unknowns); <code>tests/test_riffc_edges_adversarial.py</code> proves every reloop forms a real cycle corpus-wide.</p>
+<hr />
+<h2 id="3-the-simulations-the-transcript-data-evidence">3. The simulations (the transcript / data evidence)</h2>
+<h3 id="3a-full-audio-sim-what-the-caller-hears">3a. Full audio sim — what the caller HEARS</h3>
+<p>Drives all Space Channel options through the real transport audio path, Whisper-transcribes what plays, and LLM-judges each:</p>
+<pre><code class="language-bash">set -a &amp;&amp; . ./.env &amp;&amp; set +a
+python scripts/space_channel_all_options_sim.py
+# → docs/flow-eval/space-channel-all-options.md   (per-option transcript + judge + verdict)
+</code></pre>
+<h3 id="3b-6-trace-sim-the-step-by-step-data-the-corridor-replays">3b. §6 trace sim — the step-by-step data the corridor replays</h3>
+<p>Drives the real FSM per permutation and emits a §6 trace (JSONL) per option:</p>
+<pre><code class="language-bash">python scripts/space_channel_trace_sim.py
+# → web/data/traces/space_channel/&lt;route&gt;.jsonl  + index.json
+</code></pre>
+<p>Then regenerate the corridor artifact (nodes + exits, derived from riffc + the sim index):</p>
+<pre><code class="language-bash">python scripts/gen_corridor_artifact.py space_channel_network_ops
+# → web/data/corridor/space_channel_network_ops.json
+</code></pre>
+<p>Reload the corridor and pick a permutation — you're now stepping through that option's real trace.</p>
+<hr />
+<h2 id="4-the-6-trace-format">4. The §6 trace format</h2>
+<p>One JSON object per line, keyed by <code>call_id</code>, dense monotonic <code>seq</code>, <code>t_ms</code> since call_start. Types: <code>call_start, state_enter, audio_pushed, audio_done{source}, barge_in, route_decision{via,token,goto,heard_*,confidence}, collect_turn, tool_start, tool_result, degraded, stall_detected, call_end</code>. Emitted by <code>riff/trace.py::TraceEmitter</code> (one per call, engine-owned). Canonical fixture: <code>tests/fixtures/trace_plumbing_sample.jsonl</code>.</p>
+<hr />
+<h2 id="5-test-it-s-all-solid">5. Test it's all solid</h2>
+<pre><code class="language-bash">python -m pytest tests/test_riffc*.py tests/test_trace.py \
+  tests/test_space_channel_trace_sim.py tests/test_web_static_push.py -q
+</code></pre>
+<p>Covers: node classification across the corpus, edge/reloop correctness, the trace emitter + fixture schema, every permutation emitting a valid trace, and the web static-audio push (the regression for the pump-crash that caused the 'huge delay' on the web path).</p>
+<hr />
+<h2 id="6-where-things-live">6. Where things live</h2>
+<table>
+<thead>
+<tr>
+<th>Thing</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compiler</td>
+<td><code>riff/riffc.py</code></td>
+</tr>
+<tr>
+<td>Trace emitter</td>
+<td><code>riff/trace.py</code></td>
+</tr>
+<tr>
+<td>Full audio sim</td>
+<td><code>scripts/space_channel_all_options_sim.py</code></td>
+</tr>
+<tr>
+<td>§6 trace sim</td>
+<td><code>scripts/space_channel_trace_sim.py</code></td>
+</tr>
+<tr>
+<td>Corridor artifact gen</td>
+<td><code>scripts/gen_corridor_artifact.py</code></td>
+</tr>
+<tr>
+<td>Review pages</td>
+<td><code>web/{corridor,console,flow-walk}.html</code></td>
+</tr>
+<tr>
+<td>Sim data</td>
+<td><code>web/data/{traces,corridor}/</code></td>
+</tr>
+<tr>
+<td>Transcripts</td>
+<td><code>docs/flow-eval/space-channel-all-options.md</code></td>
+</tr>
+</tbody>
+</table>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-serve-the-review-pages">1. Serve the review pages</a></li><li class="toc-h2"><a href="#2-riffc-the-pre-flow-compiler-validation-only-no-runtime-effect">2. riffc — the pre-flow compiler (validation-only, no runtime effect)</a></li><li class="toc-h2"><a href="#3-the-simulations-the-transcript-data-evidence">3. The simulations (the transcript / data evidence)</a></li><li class="toc-h3"><a href="#3a-full-audio-sim-what-the-caller-hears">3a. Full audio sim — what the caller HEARS</a></li><li class="toc-h3"><a href="#3b-6-trace-sim-the-step-by-step-data-the-corridor-replays">3b. §6 trace sim — the step-by-step data the corridor replays</a></li><li class="toc-h2"><a href="#4-the-6-trace-format">4. The §6 trace format</a></li><li class="toc-h2"><a href="#5-test-it-s-all-solid">5. Test it&#x27;s all solid</a></li><li class="toc-h2"><a href="#6-where-things-live">6. Where things live</a></li></ul></aside>
+</div>
+</body>
+</html>

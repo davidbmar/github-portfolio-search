@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Admin Access — Panel, Login &amp; Deploy Handoff</title>
+<style>
+  :root { --bg:#0b0e19; --panel:#131730; --edge:#26305c; --ink:#eef1ff;
+    --dim:#8b93c4; --accent:#6f7bff; --good:#34d399; --warn:#f5c542; --bad:#f87171;
+    --ink2:#e0574c; --mono:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  @media (prefers-color-scheme: light) { :root { --bg:#f7f8fc; --panel:#fff;
+    --edge:#d8ddf0; --ink:#1a2038; --dim:#5b6491; --accent:#4353d8; --bad:#c2453a; } }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:26px;margin:8px 0 4px;text-wrap:balance}
+  h2{font-size:18px;margin:34px 0 10px;border-bottom:1px solid var(--edge);padding-bottom:6px}
+  h3{font-size:15px;margin:20px 0 6px}
+  .sub{color:var(--dim);font-size:14px}
+  .lede{font-size:17px;margin:14px 0 6px}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:14px 18px;margin:14px 0}
+  .answer{border-left:4px solid var(--good);background:rgba(52,211,153,.08);border-radius:0 10px 10px 0;padding:12px 18px;margin:16px 0}
+  code{font-family:var(--mono);font-size:.85em;background:rgba(111,123,255,.14);padding:.1em .35em;border-radius:4px}
+  pre{background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:12px 16px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+  .tw{overflow-x:auto}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--edge);vertical-align:top}
+  th{color:var(--dim);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .tid{font-family:var(--mono);font-size:11px;background:rgba(52,211,153,.14);color:var(--good);
+    border:1px solid var(--good);border-radius:4px;padding:1px 7px}
+  .never{color:var(--bad);font-weight:600}
+  .fig{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:16px;margin:18px 0}
+  .figcap{color:var(--dim);font-size:12.5px;margin-top:8px;text-align:center}
+  ol li,ul li{margin:4px 0}
+  /* inline panel mockup */
+  .mock{border:1px solid var(--edge);border-radius:12px;overflow:hidden;font-size:13px;margin:6px 0}
+  .mock .bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--edge)}
+  .mock .logo{width:34px;height:34px;border-radius:9px;background:radial-gradient(circle at 30% 25%,#2a2320,#100d0b);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .mock .scope{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink2);border:1px solid var(--ink2);border-radius:6px;padding:2px 8px}
+  .mock table{margin:0}.mock th,.mock td{padding:9px 16px}
+  .pill{font-size:11px;padding:1px 8px;border-radius:20px;border:1px solid var(--edge)}
+  .pill.ok{color:var(--good);border-color:var(--good)} .pill.new{color:var(--accent);border-color:var(--accent)}
+  .mock .iso{padding:9px 16px;font-size:12px;color:var(--good);border-top:1px solid var(--edge)}
+</style>
+</head>
+<body>
+<main>
+
+<p class="sub">RIFF · operator how-to · 2026-07-08 · siblings:
+  <a href="org-membership.html">org-scoped membership (the design)</a>,
+  <a href="config-cascade-and-branding.html">config cascade</a>,
+  <a href="session-facts-endflow.html">session facts</a></p>
+
+<h1>Business Admin Access — panel, login &amp; deploy handoff</h1>
+<p class="lede">Every business you deploy gets its own admin panel, its own login, and a
+one-page handoff doc — so a business owner can see <em>their own</em> callers and leads, and
+nobody else's. This is the operator surface on top of
+<a href="org-membership.html">per-business identity scoping</a>.</p>
+
+<div class="answer">
+<strong>How do I get in?</strong> Open <code>https://riff.chattychapters.com/admin</code>
+(locally: <code>http://127.0.0.1:8767/admin</code>), paste the business's login token, submit.
+The token lives in the handoff doc the deploy wrote — read it with
+<code>cat docs/businesses/&lt;scope&gt;-admin.md</code> (owner-only, e.g. <code>armadillo_ink-admin.md</code>).
+</div>
+
+<h2>The two questions everyone asks</h2>
+<table><tr><th>Question</th><th>Answer</th></tr>
+<tr><td>Is the panel for <strong>all</strong> businesses, or just this one?</td>
+<td>All of them. One <code>/admin</code> route, but each business logs in with <em>its own</em>
+token and sees <em>only its own</em> scope's data. A business only has a token once it has been
+<strong>deployed</strong> since this feature shipped — so today only ones you've (re)deployed have one.</td></tr>
+<tr><td>Is the token generated on flow <strong>build</strong>?</td>
+<td>No — on <strong>deploy</strong>. <code>riff.business_pack build</code> (pack&nbsp;→&nbsp;flow YAML)
+touches nothing admin-related; <code>deploy_business.py</code>'s final step mints the token and writes
+the handoff doc. <strong>Every deploy rotates the token</strong> (a fresh one replaces the old — which
+then stops working), so always use the newest handoff doc.</td></tr>
+</table>
+
+<h2>How it works — three parts</h2>
+<div class="fig">
+<svg viewBox="0 0 860 250" width="100%" role="img" aria-label="Deploy mints a token, writes a handoff doc; the admin logs in and gets a scoped panel.">
+  <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L7,3 L0,6 Z" fill="#6f7bff"/></marker>
+    <style>.b{fill:#131730;stroke:#26305c;rx:10} .t{fill:#eef1ff;font:600 12px system-ui} .d{fill:#8b93c4;font:11px ui-monospace} .l{stroke:#6f7bff;stroke-width:1.6;fill:none;marker-end:url(#a)}</style>
+  </defs>
+  <rect class="b" x="8"  y="20"  width="150" height="56" rx="10"/>
+  <text class="t" x="20" y="44">deploy_business.py</text><text class="d" x="20" y="62">mint(scope) + handoff</text>
+  <rect class="b" x="8"  y="150" width="150" height="60" rx="10"/>
+  <text class="t" x="20" y="174">admin_tokens.db</text><text class="d" x="20" y="192">scope → token HASH</text><text class="d" x="20" y="205">(plaintext never stored)</text>
+  <rect class="b" x="230" y="20"  width="170" height="56" rx="10" style="stroke:#e0574c"/>
+  <text class="t" x="244" y="44">handoff doc 0o600</text><text class="d" x="244" y="62">&lt;scope&gt;-admin.md · token</text>
+  <rect class="b" x="470" y="20"  width="150" height="56" rx="10"/>
+  <text class="t" x="484" y="44">Admin pastes token</text><text class="d" x="484" y="62">POST /admin/login</text>
+  <rect class="b" x="690" y="20"  width="160" height="56" rx="10"/>
+  <text class="t" x="704" y="42">scoped session</text><text class="d" x="704" y="60">signed cookie = scope</text>
+  <rect class="b" x="470" y="150" width="380" height="60" rx="10" style="stroke:#34d399"/>
+  <text class="t" x="486" y="174">Panel — reads ONLY this scope</text><text class="d" x="486" y="194">every query: WHERE scope = cookie.scope</text>
+  <path class="l" d="M83,80 L83,146"/>
+  <path class="l" d="M158,48 L226,48"/>
+  <path class="l" d="M400,48 L466,48"/>
+  <path class="l" d="M620,48 L686,48"/>
+  <path class="l" d="M770,80 L680,148"/>
+</svg>
+<div class="figcap">Deploy mints a token (only its hash is stored) and writes an owner-only handoff doc.
+The admin pastes that token, gets a signed scope-bound cookie, and the panel reads only that scope.</div>
+</div>
+
+<ol>
+<li><strong>Scope</strong> — a business's identity key is <code>scope_for_flow(flow)</code> =
+its <code>org_id</code> if it declares one, else its <code>flow_id</code>
+(<code>riff/effective_config.py</code>). Same key the caller-identity store uses, so the panel and
+the phone agent agree on "who belongs to whom."</li>
+<li><strong>Token → scope login</strong> — no passwords. <code>riff/admin_tokens.py</code> mints a
+random <code>riff_admin_…</code> token, stores only its <strong>SHA-256 hash</strong>, and verifies
+with <code>secrets.compare_digest</code> (constant-time). Login sets a signed
+<code>HttpOnly</code>/<code>Secure</code>/<code>SameSite=Strict</code> cookie carrying the scope.</li>
+<li><strong>Scoped panel</strong> — routes on the phone server (<code>riff/phone/server.py</code>):
+<code>/admin</code>, <code>/admin/login</code>, <code>/admin/logout</code>. Every read filters by the
+cookie's scope, reusing the scoped store (<code>ProfileStore.identities_for_phone</code>,
+<code>intake_sessions WHERE scope = ?</code>). v0 is read-only.</li>
+</ol>
+
+<h2>What the admin sees</h2>
+<div class="mock" aria-label="Mockup of the business admin panel">
+  <div class="bar"><span class="logo">🖋️</span><div><strong>Armadillo Ink</strong><div class="sub" style="font-size:11px">Tattoo studio · Austin, TX</div></div><span class="scope">scope: armadillo_ink</span></div>
+  <div class="tw"><table>
+    <tr><th>Phone</th><th>Name</th><th>Verified</th><th>SMS</th><th>Used</th></tr>
+    <tr><td>+1 512-•••-1188</td><td>Marisol Vega</td><td><span class="pill ok">yes</span></td><td><span class="pill ok">yes</span></td><td>ink_club · consultation</td></tr>
+    <tr><td>+1 737-•••-0455</td><td>Devon Pratt</td><td><span class="pill ok">yes</span></td><td><span class="pill">no</span></td><td>ink_club</td></tr>
+    <tr><td>+1 512-•••-7196</td><td><em>— new caller —</em></td><td><span class="pill new">new</span></td><td><span class="pill">—</span></td><td>leave_message</td></tr>
+  </table></div>
+  <div class="iso">🔒 Isolated — this table only runs <code>WHERE scope = 'armadillo_ink'</code>. A caller
+  known at another business never appears here.</div>
+</div>
+<div class="figcap">Live mockup: <code>web/_business-admin-mockup.html</code>. Read-only in v0 (callers,
+leads, message tickets, recent activity); config editing is a later slice.</div>
+
+<h2>Use cases</h2>
+
+<h2>Case A1 — Log in and see your own callers <span class="tid">TA1</span></h2>
+<p>Deploy writes <code>docs/businesses/&lt;scope&gt;-admin.md</code>. The admin copies the
+<code>Login token</code>, POSTs it to <code>/admin/login</code>, and lands on the panel showing that
+business's callers/leads. A missing or wrong token → <span class="never">401</span>, no panel.
+<em>Test:</em> <code>tests/phone/test_business_admin.py::test_business_admin_login_401s_on_bad_or_absent_token</code>.</p>
+
+<h2>Case A2 — Each business is isolated <span class="tid">TA2</span></h2>
+<p>A cookie scoped to Business A can <span class="never">never</span> read Business B's callers —
+every query filters by the cookie's scope. Two businesses, two tokens, two disjoint views.
+<em>Test:</em> <code>test_business_admin_cookie_scope_cannot_read_other_business_callers</code>.</p>
+
+<h2>Case A3 — The token is a deploy artifact, not a build artifact <span class="tid">TA3</span></h2>
+<p><code>riff.business_pack build</code> mints <span class="never">no</span> token. Only
+<code>deploy_business.py</code>'s <code>_write_admin_handoff</code> step does — after gates, build,
+route, restart, preflight. So a plain recompile leaves tokens untouched.</p>
+
+<h2>Case A4 — Redeploy rotates the token <span class="tid">TA4</span></h2>
+<p><code>mint</code> uses <code>ON CONFLICT(scope) DO UPDATE</code>, so each deploy replaces the token.
+The previous token stops working — that is also the "rotate on leak" story: if a token leaks, just
+redeploy and the old one is dead. Always use the newest handoff doc.</p>
+
+<h2>Case A5 — The secret is safe at rest and out of git <span class="tid">TA5</span></h2>
+<p>The store keeps only the token's hash. The handoff file (which shows the plaintext once) is written
+<code>0o600</code> (owner-only) into a <code>0o700</code> dir, and <code>docs/businesses/</code> is
+<code>.gitignore</code>d so a token <span class="never">never</span> enters git history.
+<em>Tests:</em> <code>tests/test_admin_tokens.py::test_admin_token_plaintext_is_never_stored</code>,
+<code>tests/test_deploy_admin_handoff_perms.py</code>.</p>
+
+<h2>Code map — where each claim lives</h2>
+<div class="tw"><table>
+<tr><th>Concern</th><th>File</th><th>What</th></tr>
+<tr><td>Scope key</td><td><code>riff/effective_config.py</code></td><td><code>scope_for_flow(flow)</code> — org_id or flow_id</td></tr>
+<tr><td>Token store</td><td><code>riff/admin_tokens.py</code></td><td><code>mint/verify/rotate/list</code>; SHA-256 hash-only; constant-time verify</td></tr>
+<tr><td>Panel + login</td><td><code>riff/phone/server.py</code></td><td><code>/admin</code>, <code>/admin/login</code>, <code>/admin/logout</code>; signed scoped cookie; per-scope reads</td></tr>
+<tr><td>Deploy handoff</td><td><code>scripts/deploy_business.py</code></td><td><code>_write_admin_handoff</code> — mint + write <code>docs/businesses/&lt;scope&gt;-admin.md</code> (0o600)</td></tr>
+<tr><td>Scoped data</td><td><code>riff/profile_store.py</code></td><td><code>identities_for_phone</code>, scoped <code>get_identity</code> / <code>intake_sessions</code></td></tr>
+<tr><td>Mockup</td><td><code>web/_business-admin-mockup.html</code></td><td>the panel's visual reference</td></tr>
+</table></div>
+
+<h2>Give another business its panel</h2>
+<p>Any deployed business can have one — just deploy it since the feature shipped:</p>
+<pre>.venv/bin/python scripts/deploy_business.py packs/&lt;biz&gt;.pack.yaml --did +1512... --yes
+# → prints:  ADMIN HANDOFF: docs/businesses/&lt;scope&gt;-admin.md
+cat docs/businesses/&lt;scope&gt;-admin.md      # copy the Login token, hit /admin</pre>
+<p class="sub">Related backlog: <code>F-374</code> (this panel), <code>F-376</code> (per-business
+identity scoping it stands on), fix journal <code>FX-027</code> (build) &amp; <code>FX-028</code>
+(handoff-token file permissions). Design rationale: <a href="org-membership.html">org-scoped membership</a>.</p>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Voice-Quality Playbook — detect → reproduce → prevent → fix → document · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">VOICE-QUALITY-PLAYBOOK.md</span>
+<a class="raw" href="/docs/docs/VOICE-QUALITY-PLAYBOOK.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Voice-Quality Playbook — detect → reproduce → prevent → fix → document</h1>
+<p><strong>Why this exists.</strong> Voice bugs hide. They feel like &quot;the call was weird,&quot; they're invisible in
+the text transcript (it reads &quot;yes → complete&quot;), and they're often <em>races</em> that only fire on
+some calls. B-319 (the <code>read_back</code> confirmation stall) sat in <strong>48% of flows</strong> and hit <strong>6% of
+real calls</strong> — 15 callers literally asked <em>&quot;Are you still there?&quot;</em> — yet looked fine in the logs.
+This playbook is the standing process so that when one is found, it gets <strong>caught at the source,
+fixed everywhere, and never relearned.</strong></p>
+<p>The tools below already exist; this is how they fit together.</p>
+<h2 id="the-loop">The loop</h2>
+<pre><code>   DETECT ──► REPRODUCE ──► (a) SHIFT-LEFT ──► (b) FIX EXISTING ──► (c) DOCUMENT ──► (d) CLARIFY
+  (review)   (voice case)   (prevent)          (root cause)         (lessons)        (the fix)
+</code></pre>
+<h3 id="1-detect-the-nightly-review-surfaces-it-no-human-listening">1. DETECT — the nightly review surfaces it (no human listening)</h3>
+<p>The two-layer review runs at 01:30 (<code>scripts/nightly_review_cycle.sh</code>) and lands in
+<code>quality.db.live_call_reviews</code>. Pull the worst calls (<code>/review-calls</code>):</p>
+<pre><code class="language-sql">SELECT session_id, flow_id, overall, efficiency, loop_score, round(wer,2) wer, completed
+FROM live_call_reviews ORDER BY overall ASC, loop_score DESC;
+</code></pre>
+<p><strong>Signatures of a systemic voice bug</strong> (vs a one-off):</p>
+<ul>
+<li><code>loop_score ≥ 4</code> / high <code>turn_count</code> + <code>completed=0</code> — runaway / stall</li>
+<li>the caller said <strong>&quot;are you still there?&quot;</strong> — dead air (grep turns.jsonl)</li>
+<li><code>efficiency</code>/<code>naturalness</code> low while <code>task_completion</code> high — bad UX, right answer</li>
+<li>high <code>wer</code> — the model mis-heard (Whisper vs Gemini)</li>
+<li>a slot value absent from the audio — hallucination
+Then <strong>count it across calls/flows</strong> before calling it systemic (B-319 was 6% of 265 calls, 9 flows).</li>
+</ul>
+<h3 id="2-reproduce-turn-the-real-call-into-a-deterministic-voice-case">2. REPRODUCE — turn the real call into a deterministic voice case</h3>
+<p>A human can't reliably hit a race; <code>scripts/voice_case.py</code> can. It's event-driven: it drives the
+<strong>real</strong> live audio path and fires the caller's reply off the <strong>agent's own turn boundary</strong>
+(<code>playback_end + offset</code>), so the trigger is exact and repeatable.</p>
+<pre><code class="language-bash">python scripts/voice_case.py --flow coffee --confirm-offset-ms 0      # tight race → expect stall
+python scripts/voice_case.py --flow coffee --confirm-offset-ms 1500   # polite pause → expect clean
+</code></pre>
+<p>An <strong>offset sweep</strong> isolates the trigger (race window, barge-in, interrupt). The case records to
+<code>data/sessions/&lt;sid&gt;/</code> so the review tools evaluate it, and it measures the stall directly.</p>
+<h3 id="3-a-shift-left-prevent-it-recurring-as-early-as-possible">3. (a) SHIFT LEFT — prevent it recurring, as early as possible</h3>
+<p>Two layers, by bug class:</p>
+<ul>
+<li><strong>Live / timing / transport bugs (like B-319):</strong> add the reproducing voice case to a
+<strong>CI voice-case suite</strong> (<code>tests/voice_cases/</code>). It fails until fixed, then guards forever. This
+is the primary shift-left for anything that only manifests in the real audio path. <em>(To build:
+a runner that boots the server, runs the suite at offset=0, asserts no stall. See &quot;Build next&quot;.)</em></li>
+<li><strong>Flow-authoring bugs (a flow YAML pattern that's intrinsically fragile):</strong> add a <strong>build-time
+linter check</strong> in <code>riff/flow_eval/linter.py</code> so the risky pattern is flagged <em>when the flow is
+written</em>, not in production — the cheapest possible shift-left. (Mirror the existing
+<code>pickup-delivery-close-misleading</code> / <code>collect-state-no-reprompt</code> checks.)</li>
+<li>Rule of thumb: <strong>fix the bug at the lowest layer that owns it, and add the guard at the earliest
+layer that can see it.</strong> B-319 is owned by the transport (fix there) but is guarded by a voice
+case in CI (the earliest place a timing race is visible).</li>
+</ul>
+<h3 id="4-b-fix-existing-systemically-once">4. (b) FIX EXISTING — systemically, once</h3>
+<p>Find the single place the bug lives and fix it there so every affected flow is fixed at once.</p>
+<ul>
+<li>B-319: the live transport doesn't evaluate <code>response_emitted</code> on the agent's <code>turn_complete</code>
+→ one transport fix unsticks all <strong>25</strong> flows. Don't patch 25 YAMLs.</li>
+<li>File a backlog item (B-NNN), <strong>codex-review the fix</strong>, and <strong>verify with the voice case</strong> from
+step 2 (offset=0 must now advance, no stall).</li>
+</ul>
+<h3 id="5-c-document-so-the-pattern-is-recognized-next-time">5. (c) DOCUMENT — so the pattern is recognized next time</h3>
+<p>Every systemic find leaves a trail:</p>
+<ul>
+<li>a <strong>backlog item</strong> (<code>docs/project-memory/backlog/B-NNN-*.md</code>) with the audio evidence + reproducer,</li>
+<li>a <strong>roadmap line</strong> (<code>docs/html/roadmap.html</code>) if it's reliability-class,</li>
+<li>a <strong>memory</strong> entry for the non-obvious lesson (the <em>signature</em>, not the fix),</li>
+<li>and, for a class of bug, an entry in this playbook's <strong>Lessons</strong> section below.</li>
+</ul>
+<h3 id="6-d-clarify-the-fix-precise-not-vibes">6. (d) CLARIFY THE FIX — precise, not vibes</h3>
+<p>The fix writeup must state, in order: <strong>root cause</strong> (one sentence) · <strong>fix location</strong> (file:line) ·
+<strong>the regression test</strong> that proves it · <strong>blast radius</strong> (how many flows/calls). If you can't fill
+all four, you haven't found the root cause yet.</p>
+<h2 id="worked-examples">Worked examples</h2>
+<h3 id="b-319-read-back-confirmation-stall">B-319 — Read-back confirmation stall</h3>
+<ul>
+<li><strong>Symptom:</strong> A coffee call &quot;felt broken.&quot; Review showed ~50s dead air; 15 callers said &quot;are you still there?&quot;</li>
+<li><strong>Root Cause:</strong> <code>riff/live/session.py:1353-1365</code> classified the agent's read-back as a model-only turn (no user text, no tool calls) and skipped the FSM transition walk.</li>
+<li><strong>Fix Location:</strong> [riff/live/session.py](file:///Users/davidmar/src/riff/riff/live/session.py#L1359-L1365). A model-only turn now walks the FSM when the agent actually emitted text and the current state has a <code>response_emitted</code> transition.</li>
+<li><strong>Regression Tests:</strong>
+<ul>
+<li>Fast simulator parametric sweep: <code>test_confirm_gate_advances_on_agent_emission</code> in [tests/test_live_confirm_gates_all_flows.py](file:///Users/davidmar/src/riff/tests/test_live_confirm_gates_all_flows.py#L44)</li>
+<li>Unit regression test: <code>test_b319_readback_advances_on_model_only_turn</code> in [tests/test_live_transport.py](file:///Users/davidmar/src/riff/tests/test_live_transport.py#L274)</li>
+</ul>
+</li>
+<li><strong>Blast Radius:</strong> 25 Collect-Pattern flows / 6% of real calls.</li>
+</ul>
+<h3 id="b-320-terminal-close-state-re-narration">B-320 — Terminal close state re-narration</h3>
+<ul>
+<li><strong>Symptom:</strong> After a ticket was submitted (<code>voice-1782604290879</code>), the caller said &quot;Thanks&quot; and the agent re-narrated the entire closing summary summary twice.</li>
+<li><strong>Root Cause:</strong> Post-terminal caller input arrived before carrier hangup, triggering Gemini to re-narrate from the terminal state policy.</li>
+<li><strong>Fix Location:</strong> [riff/live/session.py](file:///Users/davidmar/src/riff/riff/live/session.py#L1369-L1377) and [riff/live/session.py](file:///Users/davidmar/src/riff/riff/live/session.py#L741). Sets <code>_terminal_close_delivered = True</code> after the terminal close is spoken, causing <code>should_suppress_model_output()</code> to suppress further agent output.</li>
+<li><strong>Regression Test:</strong> <code>test_b320_terminal_close_suppresses_post_close_renarration</code> in [tests/test_live_confirm_gates_all_flows.py](file:///Users/davidmar/src/riff/tests/test_live_confirm_gates_all_flows.py#L104)</li>
+<li><strong>Blast Radius:</strong> All completed calls ending in terminal close states.</li>
+</ul>
+<h3 id="b-318-verification-quot-yes-quot-submitted-as-passcode-open">B-318 — Verification &quot;yes&quot; submitted as passcode (Open)</h3>
+<ul>
+<li><strong>Symptom:</strong> Verification failed (<code>voice-1782603683638</code>) because the model submitted the caller's confirmation &quot;yes&quot; as the numeric verification code.</li>
+<li><strong>Root Cause:</strong> Three compounding faults: same-turn tool firing (send then verify), acknowledgment word reuse as <code>code</code> argument, and <code>verification_max_attempts: 1</code>.</li>
+<li><strong>Proposed Fix:</strong> Filter code formatting on the tool arguments, separate turns with prompt directives, and increase max attempts to 3.</li>
+<li><strong>Blast Radius:</strong> All verify-caller flows.</li>
+</ul>
+<h2 id="lessons-the-recurring-signatures">Lessons (the recurring signatures)</h2>
+<ul>
+<li><strong>&quot;Are you still there?&quot; is a smoke alarm.</strong> It means dead air — almost always a live FSM
+transition not firing promptly (a confirm/collect gate that needs the agent's emission to advance).</li>
+<li><strong>The text transcript lies about timing.</strong> &quot;yes → complete&quot; can hide a 50s hole. Always check the
+<em>audio</em> (Whisper timestamps) for latency/mis-hear/hallucination — the judge reads Gemini's own
+(possibly wrong) transcript.</li>
+<li><strong>Clean browser audio plus bad phone audio is usually a transport question first.</strong> The
+2026-06-29 Space Channel case sounded &quot;worbly&quot; on the handset while local/browser audio was
+clean. Piper was not the root cause; Telnyx outbound chunking/pacing was. The stable path is
+20 ms chunks, absolute-deadline pacing, and pre-encoded μ-law/base64 payloads before the paced
+send loop. See <code>docs/codex/2026-06-29-space-channel-phone-audio-learning.md</code> and
+<code>docs/html/space-channel-phone-audio-learning.html</code>.</li>
+<li><strong>Pre-generate known lines, but do not confuse pregeneration with phone safety.</strong> Static audio
+reduces TTS latency and makes branded prompts deterministic, but it still must pass through a
+phone-safe paced sender. Use a static-first, live-second policy: pre-generate greetings,
+capabilities, launch summaries, and hold/computing sounds; reserve live/Gemini speech for
+caller-specific or genuinely dynamic answers.</li>
+<li><strong>Races need event-driven repro, not recordings.</strong> Control the <em>caller's</em> timing off the <em>agent's</em>
+turn boundary; a fixed audio file or a human can't hit the window reliably.</li>
+<li><strong>Model the listener's playback clock, not the network's arrival clock.</strong> <code>audio_out</code> arrives
+faster than real time; &quot;agent finished&quot; = <code>first_arrival + bytes/(24kHz·2)</code>, not last byte.</li>
+</ul>
+<h2 id="audio-simulation-tier-2-built-2026-06-28">Audio Simulation (Tier 2) — BUILT (2026-06-28)</h2>
+<p>The faithful audio tier now drives <strong>every</strong> flow with injected audio, end to end:</p>
+<ul>
+<li><strong><code>scripts/voice_case.py --mode converse</code></strong> — a generic LLM caller (gemini-2.5-flash) answers
+whatever the agent asks, so one harness drives any flow to a terminal state with real audio.</li>
+<li><strong>Caller PERSONAS</strong> (<code>--persona</code>) — each stresses a failure mode: <code>cooperative</code> (baseline),
+<code>confused</code> (B-303 confirm loop), <code>corrector</code> (re-read path), <code>terse</code> (mis-hear/WER).</li>
+<li><strong>Timing variance</strong> (<code>--reply-delay-ms</code>) — eager (0ms, trips races) … polite (2500ms).</li>
+<li><strong><code>scripts/voice_scenarios.py</code></strong> — the named scenario registry (part-1 'scenarios as DATA'):
+confirm-fast/-slow, barge-in-mild/-deep (B-300), confused-answer (B-303), corrector, terse
+(B-321), thanks-at-close (B-320, deterministic), real-booking (serene). <code>--list</code> for the
+coverage matrix (scenario -&gt; bug -&gt; expected outcome); <code>--run &lt;name&gt;</code> runs + checks one.</li>
+<li><strong><code>scripts/voice_dream.py</code></strong> — the &quot;dreamer&quot;: randomly samples <code>(flow × persona × timing)</code>,
+drives with audio, transcribes (Whisper), and upserts every metric to
+<code>quality.db.live_call_reviews</code> (incl. <code>persona</code>, <code>reply_delay_ms</code>, <code>wer</code>, <code>completed</code>). Property-
+based testing for voice — the breaking <em>combinations</em> surface in the data, not in inspection.</li>
+</ul>
+<p><strong>Two protocol fixes the dreamer forced</strong> (you only find these by placing the real call):</p>
+<ol>
+<li><strong>Trailing silence</strong> — Gemini's VAD ends a turn on speech→<em>silence</em>; the harness stopped sending
+frames (absence ≠ silence) so turns never ended. Send explicit zero-PCM silence after each
+utterance.</li>
+<li><strong><code>static_done</code></strong> — 28 flows (62%) have a <code>static</code> greeting that advances on <code>audio_done</code>, fired
+only when the <em>browser</em> sends <code>static_done</code>. The synthetic client must send it too, or every one
+stalls at greeting. <strong>Lesson: a static check passes the YAML; only a real call finds the message
+the test client forgot to send.</strong></li>
+</ol>
+<p><strong>Part-3 word-level finding (2026-06-28, corrected) — the corpus WER is REAL mis-hears, not formatting.</strong>
+<code>scripts/voice_mishears.py</code> transcribes the persisted caller audio (<code>audio_caller.wav</code>) with Whisper
+(ground truth) and diffs it against what Gemini heard (<code>turns.jsonl</code>), normalizing formatting first
+(case, punctuation, number-words→digits, digit-grouping). It computes <code>semantic_wer</code> — the WER after
+formatting is removed — now stored alongside the raw <code>wer</code> column (<code>--backfill N</code>).</p>
+<ul>
+<li><strong>For the cleanest cooperative calls</strong>, formatting CAN be the only diff (a coffee call: 0 semantic
+mis-hears, raw WER all &quot;two pm&quot; vs &quot;2 pm&quot; / &quot;512-555-0147&quot; vs &quot;5125550147&quot;). That single example
+first suggested &quot;WER is all formatting.&quot;</li>
+<li><strong>At corpus scale that's WRONG</strong> (self-corrected by the backfill, 18 sessions): mean raw WER 0.115
+vs mean <strong>semantic</strong> WER 0.121 — essentially EQUAL. Per persona: terse 0.25/0.25, confused
+0.11/0.11, corrector 0.08/0.10, cooperative 0.06/0.07. So the corpus WER measures GENUINE mis-hears,
+not formatting; it is a valid signal. (semantic_wer runs slightly HIGHER on phone-heavy turns because
+digit-grouping collapses &quot;512 555 0147&quot; into one token, shrinking the denominator.)</li>
+<li><strong>Real mis-hears concentrate in the terse/confused personas</strong> (semantic WER up to 0.5 on
+<code>deli_counter</code>/<code>taco_truck</code>) — that's <strong>B-321</strong> (a VAD/endpointing limit on bare mumbled values),
+not a systemic ASR problem; cooperative ASR is sound.
+ERROR-TYPE BREAKDOWN (2026-06-28) — separate mis-hears / hallucinations / drops, with a caveat.
+voice_mishears.mishear_breakdown() splits the formatting-normalized word errors into the three
+part-3 categories: substitutions (wrong word), drops (truth word heard as nothing = VAD clip),
+hallucinations (heard a word never said). On the high-WER sessions the apparent split is ~68%
+hallucinations / 17% substitutions / 14% drops.
+CAVEAT (do NOT overclaim): the 'hallucination' count is CONFOUNDED by Whisper's own unreliability
+on mumbled/terse audio. A pair like truth='' heard='name is sarah miller' is scored a hallucination,
+but it's at least as likely the caller DID say it and WHISPER (our ground truth) under-transcribed
+the mumbled audio. So 'Gemini hallucinated' vs 'Whisper missed it' can't be separated by the
+transcripts alone — it needs a human spot-check of the WAV. The tool surfaces the candidates; it
+does not adjudicate them. Net: on hard audio BOTH ASRs struggle; the breakdown ranks where to
+listen, it isn't a verdict. (This is why cooperative ASR — clean audio — shows ~0 of all three.)</li>
+</ul>
+<p>RESOLVED via caller_truth (2026-06-28): in converse mode the caller is an LLM whose lines are KNOWN
+text BEFORE TTS — the real ground truth, no ASR confound. voice_case now persists them to
+<code>data/sessions/&lt;sid&gt;/caller_truth.txt</code>, and <code>voice_mishears._ground_truth()</code> prefers them over Whisper
+(falling back to Whisper for old sessions). A three-way check on a terse call settled it: truth &quot;Order
+something. A turkey sandwich. Two.&quot; → GEMINI dropped &quot;Two&quot; (a real DROP = B-321), WHISPER caught it,
+and ZERO hallucinations from either. So the &quot;68% hallucinations&quot; above WAS the Whisper-as-truth
+confound; against caller_truth the breakdown adjudicates instead of merely ranking. Use caller_truth
+for any converse session; reserve the Whisper-truth caveat for legacy sessions that lack it.</p>
+<p>FULL-CORPUS CONFIRMATION (2026-06-28): semantic_wer is now backfilled across the whole audio
+corpus — 117 sessions (99 dreamer vc-* + legacy). The full-scale aggregate holds: by persona
+terse 0.19/0.20, corrector 0.10/0.12, confused 0.08/0.08, cooperative 0.06/0.07 (raw/semantic)
+— sem ~= raw everywhere, so the corpus WER is real mis-hears. terse is the worst (n=22), = B-321.
+Robustness note: semantic_wer has NO Inf/NaN (it returns 0.0 for an empty truth); the raw wer
+column has 1 legacy Inf (empty-reference division) — the dreamer rows have zero. So semantic_wer
+is the safer column to average. 'Capture ALL metrics' is met for the mis-hear axis.
+Lesson (twice over): don't generalize a metric claim from ONE clean session — the corpus disagreed.
+Now the DB has both <code>wer</code> and <code>semantic_wer</code> so formatting-vs-real is visible per call. Tested core:
+<code>tests/test_voice_mishears.py</code>.</p>
+<p><strong>Corpus findings (fixed + open):</strong></p>
+<ul>
+<li><strong>static-greeting stall</strong> (28 flows) — harness didn't send <code>static_done</code>; <strong>fixed</strong>.</li>
+<li><strong>cal-provider tool-scoping leak</strong> — provider tools (<code>schedule_event</code>, <code>propose_booking</code>) reached
+EVERY flow's model when the provider was booted, so <code>pizza</code> mis-called <code>schedule_event</code> (&quot;booked a
+haircut&quot;). <strong>Fixed</strong>: <code>get_tools_for_turn</code> now scopes provider tools to the flow's declared
+<code>allowed_tools</code> (real booking flows declare them and keep them; order flows lose the footgun).
+Evolved the B-050 surface-parity contract to &quot;declared provider tools reach the LLM&quot;; guard:
+<code>tests/test_live_tool_scoping.py</code>.</li>
+<li><strong>B-303 / B-300</strong> — flows reach <code>await_confirmation</code> then stall: the half-duplex mic gate ate the
+caller's confirm because the harness replied while the agent's audio was still playing. <strong>Harness
+fixed</strong> (wait for <code>playback_end</code>). The <em>product</em> mirror (a real fast confirmer gets eaten) is the
+open B-300 gate-tail decision.</li>
+</ul>
+<p><strong>Validation flow:</strong> <code>flows/sweet_things_bakery.yaml</code> exercises all three fixes by construction —
+the deterministic suites (<code>test_live_confirm_gates_all_flows.py</code>, <code>test_live_tool_scoping.py</code>)
+auto-discover it, so a regression of any fix fails CI on this flow too.</p>
+<h2 id="build-next">Build next</h2>
+<ul>
+<li>Decide B-300 gate-tail policy (shrink the speaking-tail so real fast confirmers aren't eaten?).</li>
+<li>A flow-linter check that any flow with a <code>response_emitted</code> confirm gate has a registered voice case.</li>
+<li>Promote a few bug-catching recordings to a &quot;golden&quot; replay set (deterministic, no Gemini).</li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#the-loop">The loop</a></li><li class="toc-h3"><a href="#1-detect-the-nightly-review-surfaces-it-no-human-listening">1. DETECT — the nightly review surfaces it (no human listening)</a></li><li class="toc-h3"><a href="#2-reproduce-turn-the-real-call-into-a-deterministic-voice-case">2. REPRODUCE — turn the real call into a deterministic voice case</a></li><li class="toc-h3"><a href="#3-a-shift-left-prevent-it-recurring-as-early-as-possible">3. (a) SHIFT LEFT — prevent it recurring, as early as possible</a></li><li class="toc-h3"><a href="#4-b-fix-existing-systemically-once">4. (b) FIX EXISTING — systemically, once</a></li><li class="toc-h3"><a href="#5-c-document-so-the-pattern-is-recognized-next-time">5. (c) DOCUMENT — so the pattern is recognized next time</a></li><li class="toc-h3"><a href="#6-d-clarify-the-fix-precise-not-vibes">6. (d) CLARIFY THE FIX — precise, not vibes</a></li><li class="toc-h2"><a href="#worked-examples">Worked examples</a></li><li class="toc-h3"><a href="#b-319-read-back-confirmation-stall">B-319 — Read-back confirmation stall</a></li><li class="toc-h3"><a href="#b-320-terminal-close-state-re-narration">B-320 — Terminal close state re-narration</a></li><li class="toc-h3"><a href="#b-318-verification-quot-yes-quot-submitted-as-passcode-open">B-318 — Verification &amp;quot;yes&amp;quot; submitted as passcode (Open)</a></li><li class="toc-h2"><a href="#lessons-the-recurring-signatures">Lessons (the recurring signatures)</a></li><li class="toc-h2"><a href="#audio-simulation-tier-2-built-2026-06-28">Audio Simulation (Tier 2) — BUILT (2026-06-28)</a></li><li class="toc-h2"><a href="#build-next">Build next</a></li></ul></aside>
+</div>
+</body>
+</html>

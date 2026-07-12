@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Remote-Control Transport Swap — Quality &amp; Testing Report · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">remote-control-transport-swap-quality-report.md</span>
+<a class="raw" href="/docs/docs/flow-eval/remote-control-transport-swap-quality-report.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Remote-Control Transport Swap — Quality &amp; Testing Report</h1>
+<p><strong>Date:</strong> 2026-07-02
+<strong>Reviewer audience:</strong> Fable 5
+<strong>Scope:</strong> the transport-swap <em>prep</em> slice of the remote-control build — wiring the
+proven control layer (<code>input_event</code> / <code>input_arbiter</code>) into the live phone
+session (<code>riff/live/session.py</code>) in SHADOW, plus a hardening pass on the §1.1
+wire gate (<code>control_event.py</code>). Design of record: <code>docs/remote-control-design-v0.md</code>
+§1.3, §7 Step 2.</p>
+<hr />
+<h2 id="1-what-this-slice-claims-and-what-it-deliberately-does-not">1. What this slice claims — and what it deliberately does not</h2>
+<p><strong>Claims (proven below):</strong></p>
+<ul>
+<li>The live phone session now maintains a real <strong>decision epoch</strong> (the thing the
+arbiter arbitrates on, I8) — which the live path previously <em>lacked entirely</em>.</li>
+<li>Voice and DTMF inputs are <strong>stamped</strong> with that epoch, and at the one
+committing decision point the <code>InputArbiter</code> is consulted in <strong>shadow</strong> and
+<strong>agrees</strong> with the legacy <code>locked_choice</code> resolver on the real flow.</li>
+<li>With the feature flag off (production default) the change is <strong>inert</strong>: the
+arbiter is not even imported or constructed, and routing is byte-identical.</li>
+</ul>
+<p><strong>Explicitly NOT claimed (fenced behind the operator + a live call):</strong></p>
+<ul>
+<li>The <strong>A2 tap-vs-speaking race</strong>. Voice is stamped at first transcript, which is
+<em>later</em> than utterance start; a valid A2 test needs audio-start stamping. We
+refuse to claim A2 until that lands live.</li>
+<li>The arbiter is <strong>not authoritative</strong>. It only observes. Making it steer routing
+is a separate, operator-gated step.</li>
+</ul>
+<p>This honesty is the point: the risky refactor is done and proven safe <em>first</em>, so
+the live call is a clean watch-the-shadow → flip sequence, not a debugging session.</p>
+<hr />
+<h2 id="2-engineering-discipline-three-review-and-harden-cycles">2. Engineering discipline: three review-and-harden cycles</h2>
+<p>Every module went through codex review; each cycle found real defects, each was
+fixed with a test. This is the same loop that hardened the control-layer
+foundation.</p>
+<h3 id="cycle-1-control-event-py-the-1-1-wire-gate-2-findings-fixed">Cycle 1 — <code>control_event.py</code> (the §1.1 wire gate) — 2 findings, fixed</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Severity</th>
+<th>Finding</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>P2</td>
+<td><code>parse_control_event</code> returned <code>ok=True</code> for frames missing/malformed in required envelope fields (<code>v</code>/<code>call_id</code>/<code>role</code>/<code>channel</code>)</td>
+<td>Fail-closed validation before any <code>InputEvent</code> is built; version checked first with a distinct <code>unsupported_version:&lt;v&gt;</code> reason</td>
+</tr>
+<tr>
+<td>2</td>
+<td>P2</td>
+<td><code>client_seq</code> deduper keyed on <code>(call_id, channel)</code>; <code>channel</code> is a coarse enum shared by every browser tab → one tab could censor another's sequence</td>
+<td>Re-keyed on the per-connection <code>client_id</code> (WS/session identity); two-tab collision impossible by construction</td>
+</tr>
+</tbody>
+</table>
+<p>Codex re-reviewed the diff → <strong>PASS</strong>. 44 tests (<code>test_control_event</code> + adversarial).
+<strong>Landed on <code>main</code>: <code>42dd6850</code>.</strong></p>
+<h3 id="cycle-2-3-riff-live-session-py-shadow-slice-5-findings-fixed">Cycle 2 + 3 — <code>riff/live/session.py</code> shadow slice — 5 findings, fixed</h3>
+<p>First codex review returned <strong>FAIL</strong> with findings; all addressed, then re-reviewed:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Severity</th>
+<th>Finding</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>High</strong></td>
+<td>Epoch gated on state-<em>name</em> equality could not tell a menu <strong>re-entry</strong> (new decision → must open new epoch) from a <strong>re-ask</strong> (same decision) → would spuriously report valid inputs as <code>locked</code> divergences and, once authoritative, drop them</td>
+<td>Epoch now opens off the FSM <strong><code>state_entered</code> bus event</strong>: a real re-entry transitions (new epoch), a re-ask does not transition (no event, same epoch)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Medium</td>
+<td>Flag-off not strictly byte-identical — arbiter imported/constructed unconditionally</td>
+<td>When the flag is off the arbiter is <strong>not imported, not constructed, not subscribed</strong>; all helpers early-return</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Medium</td>
+<td>Shadow &quot;agreement&quot; masked <code>locked</code>/<code>stale</code>/<code>no_decision</code> drops when legacy also had no choice</td>
+<td>No-choice agreement now <strong>requires <code>reason == INVALID</code></strong> (true no-match); other drops register as divergences</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Low</td>
+<td><code>RIFF_INPUT_ARBITER=0</code> was truthy</td>
+<td>Explicit true-parsing (<code>1/true/yes/on</code>)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Low</td>
+<td>Assist-swap skip lacked attributable context</td>
+<td>Records epoch/state/mode</td>
+</tr>
+</tbody>
+</table>
+<p>Codex re-review verdict: <strong>PASS</strong> — &quot;No new HIGH/MEDIUM issues found,&quot; all four
+prior findings confirmed resolved, and &quot;Shadow mode does not steer routing when
+on.&quot; Two residual <strong>LOW</strong> notes, handled deliberately:</p>
+<ul>
+<li><code>_shadow_arbiter_compare()</code> given a top-level <code>enabled</code> early-return so the
+helper is self-guarding (the call site was already guarded — behavior-neutral).</li>
+<li>A filtered, inert <code>state_entered</code> handler can linger only on an <em>abnormal
+connect-failure path that never calls <code>close()</code></em> (normal Telnyx teardown awaits
+<code>close()</code>, which unsubscribes). Documented as a known minor rather than
+over-engineered, because the handler is session-id-filtered, does nothing for
+other sessions, and is bounded to one per leaked session. See §4.</li>
+</ul>
+<hr />
+<h2 id="3-test-evidence">3. Test evidence</h2>
+<h3 id="3-1-the-safety-contract-tests-test-live-decision-epoch-shadow-py-15-tests">3.1 The safety contract (<code>tests/test_live_decision_epoch_shadow.py</code>, 15 tests)</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>How it is proven</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flag OFF → arbiter dormant, routing byte-identical</td>
+<td><code>test_flag_off_arbiter_is_dormant</code> — asserts <code>_input_arbiter is None</code>, not subscribed, <code>last_arbiter_shadow is None</code>, and the DTMF route/dest match the flag-on run</td>
+</tr>
+<tr>
+<td>Flag ON → arbiter agrees, route unchanged</td>
+<td><code>test_dtmf_shadow_agrees_and_route_is_unchanged</code> (3 digits) — <code>accepted</code>, <code>agree=True</code>, <code>arbiter_choice==legacy_choice</code>, same FSM destination</td>
+</tr>
+<tr>
+<td>No-match → <code>invalid</code> (no lock), retry preserved</td>
+<td><code>test_out_of_range_digit_shadow_invalid_and_no_route</code></td>
+</tr>
+<tr>
+<td>Epoch advances on entry + <strong>re-entry</strong>, not on re-ask</td>
+<td><code>test_epoch_advances_on_entry_and_reentry_not_reask</code></td>
+</tr>
+<tr>
+<td><strong>The High-fix, end-to-end</strong></td>
+<td><code>test_press_after_menu_reentry_is_accepted_not_locked</code> — a 2nd valid press <em>after a menu re-entry</em> is <code>accepted</code>, not dropped <code>locked</code>. This is the exact failure the High finding warned about; it FAILS on the pre-fix (state-name) epoch and passes on the <code>state_entered</code>-driven epoch.</td>
+</tr>
+<tr>
+<td><strong>The shadow is not a rubber stamp</strong></td>
+<td><code>test_shadow_reports_divergence_on_stale_epoch</code> — with the arbiter's fresh epoch open but the input stamped stale, the arbiter drops <code>stale</code> while legacy matches, and the shadow records <code>agree=False</code>. Proves disagreement is reportable, so <code>agree=True</code> elsewhere is meaningful.</td>
+</tr>
+<tr>
+<td>Flag parsing is explicit</td>
+<td><code>test_flag_parsing_is_explicit</code> (<code>0/false/&quot;&quot;</code>→off, <code>1/true/on</code>→on)</td>
+</tr>
+<tr>
+<td>Subscription torn down on close</td>
+<td><code>test_close_unsubscribes_from_bus</code> — no leaked global-bus handler</td>
+</tr>
+</tbody>
+</table>
+<p>Both starred tests were independently <strong>mutation-checked by codex</strong>: it confirmed
+the re-entry guard <em>fails</em> if the epoch reverts to the name-based logic, and the
+divergence test <em>fails</em> if <code>agree</code> is rubber-stamped to <code>True</code>. So they are real
+regression guards, not vacuous passes.</p>
+<h3 id="3-2-byte-identical-routing-control-layer-foundation-unchanged">3.2 Byte-identical routing (control-layer foundation, unchanged)</h3>
+<p><code>test_input_event.py</code> proves <code>resolve_input_event</code> is byte-identical to the direct
+<code>evaluate_choice</code> across 1450+ corpus cases (full decision-trace parity). The
+shadow comparison rides on that guarantee, which is why flag-on agreement is
+expected, not hoped for.</p>
+<h3 id="3-3-control-layer-suites-green">3.3 Control-layer suites (green)</h3>
+<p><code>input_event</code> + <code>input_arbiter</code> + <code>capability</code> + <code>control_event</code> (+ adversarial):
+all green. Totals reconfirmed after every edit in this slice.</p>
+<h3 id="3-4-full-suite-regression-zero-new-failures-attributable-to-this-work">3.4 Full-suite regression — zero new failures attributable to this work</h3>
+<p>Method: full <code>pytest</code> on clean <code>origin/main</code> (<code>42dd6850</code>) vs. the same tree with
+<strong>only</strong> the two changed files applied (parallel-session WIP excluded via a
+throwaway git worktree, so the diff isolates exactly this change).</p>
+<ul>
+<li>
+<p>Baseline (<code>42dd6850</code> session.py): <strong>110 failed, 7467 passed, 27 skipped, 183
+xfailed, 5 errors</strong> (7:21).</p>
+</li>
+<li>
+<p>With the session shadow work: <strong>109 failed, 7481 passed, 27 skipped, 183
+xfailed, 5 errors</strong> (7:28).</p>
+</li>
+<li>
+<p><strong>New failures attributable to this slice: NONE.</strong> The set diff of failing test
+IDs (<code>comm -13 baseline mine</code>) is empty.</p>
+</li>
+<li>
+<p>The only delta is one <em>baseline-only</em> failure that this work does <strong>not</strong> touch:
+<code>test_telnyx_transport.py::test_paced_audio_preencodes_before_send_deadlines</code>
+— an audio-pacing <strong>timing/deadline</strong> test (flaky), failing in baseline and
+passing in mine. Not a fix and not a regression — timing noise.</p>
+</li>
+<li>
+<p><code>MINE</code> has +14 passing tests: the 13 new shadow tests plus that flaky flip.</p>
+</li>
+<li>
+<p>The 4 <code>test_live_session.py</code> failures seen in targeted runs are pre-existing
+flow-schema drift on <code>property_trouble_ticket</code> (a state renamed out from under
+the test); they appear identically in the clean baseline. (They are among the
+110/109 above and, being present in both columns, contribute nothing to the
+attributable-failure diff.)</p>
+<p><em>Method note:</em> the isolation was run <strong>in the main tree</strong>, swapping only
+<code>session.py</code> between the <code>42dd6850</code> and shadow versions, with the parallel
+surface-emission WIP held constant in both columns (so it cancels). A first
+attempt using <code>git worktree</code> was discarded because the shared editable install
+(<code>pip -e</code>) resolves <code>import riff</code> to the main tree regardless of the worktree —
+it would have tested the wrong code. Caught and corrected before trusting the
+numbers.</p>
+</li>
+</ul>
+<hr />
+<h2 id="4-why-it-is-safe-to-have-landed-this-without-the-live-call">4. Why it is safe to have landed this without the live call</h2>
+<p>The only always-on additions when the flag is off are inert field initializers and
+no-op helper calls; the arbiter code is never imported or run. The shadow
+comparison — even when enabled — is wrapped so a bug in it cannot throw into the
+live turn, and it writes only a log + an observability field. A wrong epoch stamp
+therefore surfaces as a <em>divergence log</em>, never a behavior change. That is the
+whole reason the refactor is done before the live call: regressions are
+attributable and cannot reach a caller until we deliberately flip the flag
+together.</p>
+<p><strong>Known limitation (LOW, accepted):</strong> the <code>state_entered</code> subscription is torn
+down in <code>close()</code>, which normal Telnyx teardown awaits. A session that is
+constructed and subscribed but then hits an abnormal connect-failure path that
+never calls <code>close()</code> can retain its handler on the global bus until process
+exit. The handler is session-id-filtered (a no-op for every other session) and
+bounded to one per leaked session, so we documented it rather than move the
+subscription into <code>connect()</code> — that would couple the shadow wiring to the full
+connect path and break the constructor-only test harness for no real gain. Worth
+revisiting only if the live path grows a constructor-then-abandon pattern.</p>
+<h2 id="5-handoff-for-the-live-call">5. Handoff for the live call</h2>
+<p>See <code>remote-control-transport-swap-handoff.md</code>: the watch-shadow → stamp-from-audio
+→ flip-authoritative → prove-A2 → wire-WS → retire-seq-398-guard sequence, each
+step gated so nothing can regress production until we choose to.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-what-this-slice-claims-and-what-it-deliberately-does-not">1. What this slice claims — and what it deliberately does not</a></li><li class="toc-h2"><a href="#2-engineering-discipline-three-review-and-harden-cycles">2. Engineering discipline: three review-and-harden cycles</a></li><li class="toc-h3"><a href="#cycle-1-control-event-py-the-1-1-wire-gate-2-findings-fixed">Cycle 1 — control_event.py (the §1.1 wire gate) — 2 findings, fixed</a></li><li class="toc-h3"><a href="#cycle-2-3-riff-live-session-py-shadow-slice-5-findings-fixed">Cycle 2 + 3 — riff/live/session.py shadow slice — 5 findings, fixed</a></li><li class="toc-h2"><a href="#3-test-evidence">3. Test evidence</a></li><li class="toc-h3"><a href="#3-1-the-safety-contract-tests-test-live-decision-epoch-shadow-py-15-tests">3.1 The safety contract (tests/test_live_decision_epoch_shadow.py, 15 tests)</a></li><li class="toc-h3"><a href="#3-2-byte-identical-routing-control-layer-foundation-unchanged">3.2 Byte-identical routing (control-layer foundation, unchanged)</a></li><li class="toc-h3"><a href="#3-3-control-layer-suites-green">3.3 Control-layer suites (green)</a></li><li class="toc-h3"><a href="#3-4-full-suite-regression-zero-new-failures-attributable-to-this-work">3.4 Full-suite regression — zero new failures attributable to this work</a></li><li class="toc-h2"><a href="#4-why-it-is-safe-to-have-landed-this-without-the-live-call">4. Why it is safe to have landed this without the live call</a></li><li class="toc-h2"><a href="#5-handoff-for-the-live-call">5. Handoff for the live call</a></li></ul></aside>
+</div>
+</body>
+</html>

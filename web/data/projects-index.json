@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-26T10:22:04.417771Z",
-  "count": 137,
+  "generated_at": "2026-07-12T09:02:27.802864Z",
+  "count": 140,
   "projects": [
     {
       "slug": "2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -226,28 +226,27 @@
     {
       "slug": "Browser-Text-to-Speech-TTS-Realtime",
       "title": "Browser Text To Speech TTS Realtime",
-      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX models.",
       "tech": [
         "TypeScript",
-        "React",
+        "React 18",
         "Vite",
         "WebAssembly",
         "ONNX Runtime",
         "Tailwind CSS",
-        "shadcn ui"
+        "TanStack Query"
       ],
       "reuse_tags": [
         "tts",
         "webassembly",
         "onnx",
-        "react",
+        "react-hook",
         "client-side-ai",
-        "offline-first",
-        "privacy-focused"
+        "privacy-first"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/Browser-Text-to-Speech-TTS-Realtime",
-      "pushed_at": "2026-06-23T01:21:49Z"
+      "pushed_at": "2026-06-29T19:44:28Z"
     },
     {
       "slug": "COE-overview",
@@ -858,28 +857,28 @@
     },
     {
       "slug": "cal-provider",
-      "title": "cal-provider",
-      "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server.",
+      "title": "Cal Provider",
+      "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server and admin UI.",
       "tech": [
         "Python",
         "Asyncio",
         "Google Calendar API",
-        "CalDAV Protocol",
-        "Model Context Protocol (MCP)",
-        "Web Framework (for Admin UI)"
+        "CalDAV",
+        "MCP",
+        "Web UI"
       ],
       "reuse_tags": [
-        "calendar-integration",
-        "async-python",
-        "mcp-server",
+        "calendar",
+        "scheduling",
         "google-calendar",
         "caldav",
-        "scheduling",
-        "ai-agent-tool"
+        "mcp",
+        "async-python",
+        "admin-ui"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/cal-provider",
-      "pushed_at": null
+      "pushed_at": "2026-06-29T00:07:03Z"
     },
     {
       "slug": "character-iris-kade-noir-cyberpunk-ai-browser-native-rag-llm-tts-stt",
@@ -1082,6 +1081,30 @@
       "pushed_at": null
     },
     {
+      "slug": "domain-tree-intake-nouns-for-riff",
+      "title": "Domain Tree Intake Nouns for riff",
+      "one_liner": "A Python library that validates domain-specific JSON trees and compiles them into flat capability dictionaries for the riff intake system.",
+      "tech": [
+        "Python",
+        "JSON",
+        "Standard Library",
+        "Argparse",
+        "Pathlib",
+        "Regex"
+      ],
+      "reuse_tags": [
+        "intake-form-generator",
+        "json-tree-compiler",
+        "dsl-validator",
+        "llm-drafting-tool",
+        "schema-flattener",
+        "domain-modeling"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/domain-tree-intake-nouns-for-riff",
+      "pushed_at": "2026-07-05T22:43:11Z"
+    },
+    {
       "slug": "easy-cognito-nginx-gateway-auth-",
       "title": "Easy Cognito Nginx Gateway Auth",
       "one_liner": "A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.",
@@ -1144,13 +1167,38 @@
       "reuse_tags": [
         "ai-workspace",
         "kubernetes-platform",
-        "developer-portal",
-        "claude-code",
-        "self-hosted"
+        "developer-tools",
+        "claude-code"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/everyone-ai",
-      "pushed_at": "2026-06-22T23:42:03Z"
+      "pushed_at": "2026-07-08T16:38:21Z"
+    },
+    {
+      "slug": "evidence-qa",
+      "title": "Evidence Qa",
+      "one_liner": "A document-grounded Q&A engine that retrieves, reranks, and synthesizes cited answers from uploaded files.",
+      "tech": [
+        "Python",
+        "FastAPI",
+        "NumPy",
+        "pypdf",
+        "python-docx",
+        "BGE Embeddings",
+        "Cross-Encoder",
+        "GGUF LLMs"
+      ],
+      "reuse_tags": [
+        "RAG",
+        "Document-QA",
+        "Semantic-Search",
+        "Python-Library",
+        "Local-LLM",
+        "Cited-Answers"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/evidence-qa",
+      "pushed_at": "2026-07-09T08:46:27Z"
     },
     {
       "slug": "exampleLoops",
@@ -1255,14 +1303,16 @@
         "CloudFront"
       ],
       "reuse_tags": [
-        "search-engine",
+        "semantic-search",
+        "github-indexer",
         "portfolio-tool",
-        "code-discovery",
-        "ai-assistant-integration"
+        "mcp-server",
+        "vector-database",
+        "static-site-generator"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-06-25T10:17:36Z"
+      "pushed_at": "2026-07-11T08:48:08Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2004,6 +2054,28 @@
       "pushed_at": null
     },
     {
+      "slug": "prioity_foregrounds_kanban",
+      "title": "Priority Foregrounds Kanban",
+      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles.",
+      "tech": [
+        "Python 3.11+",
+        "Standard Library http.server",
+        "Vanilla JavaScript",
+        "Google Gemini API",
+        "HTML5/CSS3"
+      ],
+      "reuse_tags": [
+        "product-management",
+        "prioritization",
+        "kanban",
+        "decision-science",
+        "local-tool"
+      ],
+      "thin": false,
+      "repo_url": "https://github.com/davidbmar/prioity_foregrounds_kanban",
+      "pushed_at": "2026-07-11T21:09:56Z"
+    },
+    {
       "slug": "pythonArrays",
       "title": "PythonArrays",
       "one_liner": "An empty or stub repository with no source code or documentation.",
@@ -2113,27 +2185,26 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
         "JSONL",
-        "Pytest",
-        "FastAPI",
-        "WebSockets"
+        "SQLite",
+        "WebSockets",
+        "Pytest"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "python-platform",
-        "yaml-configuration",
-        "deterministic-workflow"
+        "fsm",
+        "llm-orchestration",
+        "deterministic-ai",
+        "python-framework"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-06-26T06:22:07Z"
+      "pushed_at": "2026-07-12T03:55:48Z"
     },
     {
       "slug": "riot",
@@ -2414,25 +2485,26 @@
     {
       "slug": "supertokens-s3-example",
       "title": "SuperTokens S3 Example",
-      "one_liner": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2.",
+      "one_liner": "Reference implementation of a Go backend with SuperTokens passwordless authentication and Dockerized infrastructure on AWS EC2.",
       "tech": [
         "Go",
-        "SuperTokens",
+        "Shell",
         "Docker",
         "PostgreSQL",
-        "AWS EC2",
-        "Shell"
+        "SuperTokens",
+        "AWS EC2"
       ],
       "reuse_tags": [
         "authentication",
-        "go",
+        "golang",
+        "supertokens",
         "docker",
         "aws",
-        "supertokens"
+        "infrastructure-as-code"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/supertokens-s3-example",
-      "pushed_at": null
+      "pushed_at": "2026-07-02T10:34:07Z"
     },
     {
       "slug": "supertokens_nodejs",

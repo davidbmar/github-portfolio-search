@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF boundary architecture: adopt contracts, evolve in place · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-09-architecture-rewrite-decision.md</span>
+<a class="raw" href="/docs/design/2026-07-09-architecture-rewrite-decision.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF boundary architecture: adopt contracts, evolve in place</h1>
+<ul>
+<li><strong>Status:</strong> Adopted, v4 - operator directed implementation 2026-07-10 (first applied scope: the 512-2777-LAW line — compiler copy-seam fixes, flow regeneration from packs, routing-table alignment, line contract tests)</li>
+<li><strong>Date:</strong> 2026-07-09 (adopted 2026-07-10)</li>
+<li><strong>Decision owner:</strong> RIFF operator</li>
+<li><strong>Implementation status:</strong> Contracts are being applied via the existing engine per the phase plan; OTA calls and node deploys still require explicit human <code>GO</code></li>
+<li><strong>Supersedes:</strong> v1 of this file (<code>2a8823df</code>)</li>
+<li><strong>Evidence window:</strong> FX-069 through FX-080 against repository baseline <code>2a8823df</code></li>
+<li><strong>Browser version:</strong> <code>docs/html/2026-07-09-architecture-rewrite-decision.html</code></li>
+</ul>
+<h2 id="decision-in-one-paragraph">Decision in one paragraph</h2>
+<p>Adopt the FSM / deterministic code / LLM boundary as a set of enforced contracts,
+but do not rewrite RIFF around a new event-bus FSM now. Evolve the current engine in
+place. The new work is larger than a <code>voice: announce | model | none</code> field: RIFF
+needs explicit narration ownership, a dynamic-announce building block, and a prompt
+delivery receipt that survives connect races, barge-in, and re-entry. Keep the
+existing guard-based control model unless evidence reaches the rewrite triggers in
+this document. Treat per-state LLM routing as a cascade/text/HTTP capability only;
+it does not affect the Gemini Live phone path and is not part of the voice rollout.</p>
+<p>This is a decision about architecture direction. It is not approval to regenerate
+flows, deploy to a phone node, enable a feature flag, or place an OTA call. OTA still
+requires explicit human <code>GO</code>.</p>
+<h2 id="decisions-requested">Decisions requested</h2>
+<p>Approve, reject, or amend these six decisions:</p>
+<ol>
+<li><strong>Adopt the boundary contracts.</strong> The FSM owns legal progress; deterministic code
+owns resolution, validation, side-effect mediation, and delivery state; the LLM
+may interpret or phrase only inside declared envelopes.</li>
+<li><strong>Evolve in place.</strong> Add contracts to the current compiler, state manager, live
+session, and transports instead of replacing the state graph or moving to an
+event-bus transition model.</li>
+<li><strong>Build narration in two parts.</strong> First make ownership explicit and lintable;
+then add <code>dynamic_announce</code> plus delivery receipts. Ownership metadata alone is
+not the end state.</li>
+<li><strong>Formalize one Interaction Loop.</strong> Give cascade and Live the same outcome names,
+progress rules, and trace vocabulary without pretending they share one model
+execution path today.</li>
+<li><strong>Separate LLM-routing decisions.</strong> The existing per-state routing cascade may be
+enabled only for cascade/text/HTTP deployments after its own gates. Gemini Live
+voice routing requires a separate architecture decision.</li>
+<li><strong>Decline a rewrite now, not forever.</strong> Reconsider only when the explicit triggers
+under &quot;Rewrite reconsideration&quot; are met.</li>
+</ol>
+<h2 id="why-this-decision-exists">Why this decision exists</h2>
+<p>The original architecture discussion bundled several different questions:</p>
+<ul>
+<li>Should menus, extraction, branching, validation, retries, and escalation be
+explicit contracts?</li>
+<li>Should those contracts fail at compile/load time?</li>
+<li>Should narration ownership be declared?</li>
+<li>Should RIFF expose an Interaction Loop abstraction?</li>
+<li>Should different states use different LLMs?</li>
+<li>Should the current FSM and generated flows be replaced?</li>
+</ul>
+<p>Those questions do not have one shared answer. Most control contracts already have
+an implementation foothold. The largest reliability gaps exposed by recent calls
+were narration, delivery, and transport gaps around that control layer. The correct
+response is to widen the contract boundary and enforce it, not to infer from a small
+incident sample that either the current FSM or a rewrite has been proven superior.</p>
+<h2 id="scope-and-non-goals">Scope and non-goals</h2>
+<h3 id="in-scope">In scope</h3>
+<ul>
+<li>Generated business-pack flows and hand-authored modules.</li>
+<li>Deterministic choice resolution, extraction validation, guards, transitions,
+retries, escalation, and side-effect mediation.</li>
+<li>Static audio, call-time synthesized audio, model speech, barge-in, connect-time
+prompting, re-entry, and audio delivery evidence.</li>
+<li>Gemini Live and cascade/text/HTTP as separate execution paths behind common
+control contracts.</li>
+<li>Compiler/load-time gates, runtime traces, replay tests, and staged promotion.</li>
+</ul>
+<h3 id="not-in-scope">Not in scope</h3>
+<ul>
+<li>Replacing the YAML flow language.</li>
+<li>Introducing a distributed event bus.</li>
+<li>Moving transport lifecycle into the LLM.</li>
+<li>Mid-session model switching on a persistent Gemini Live connection.</li>
+<li>Rewriting spoken copy merely to conform to a new object model.</li>
+<li>Any OTA call without explicit human <code>GO</code>.</li>
+</ul>
+<h2 id="terms">Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning in this document</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Contract</strong></td>
+<td>A declared invariant with a compile/load gate, runtime behavior, trace evidence, and a replay test. Documentation alone is not a contract.</td>
+</tr>
+<tr>
+<td><strong>Candidate</strong></td>
+<td>An LLM or deterministic extractor's proposed value. It is not trusted context until validation succeeds.</td>
+</tr>
+<tr>
+<td><strong>Narration</strong></td>
+<td>The words RIFF intends to speak and the declared component responsible for producing them.</td>
+</tr>
+<tr>
+<td><strong>Delivery</strong></td>
+<td>The transport-observable lifecycle of intended audio: queued, started, progressed, completed, failed, or interrupted. It does not prove human perception.</td>
+</tr>
+<tr>
+<td><strong>Prompt receipt</strong></td>
+<td>Runtime evidence that a specific prompt reached a defined delivery threshold. Never call this a &quot;heard&quot; receipt.</td>
+</tr>
+<tr>
+<td><strong>Interaction Loop</strong></td>
+<td>Enter state, satisfy narration obligation, observe, resolve/extract, validate, account for progress, transition or retry, mediate actions, and emit trace evidence.</td>
+</tr>
+<tr>
+<td><strong>Rewrite</strong></td>
+<td>Replacing the current guard/pull transition model or flow representation, not an incremental compiler emission change.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="architectural-ownership">Architectural ownership</h2>
+<p>The system has six layers. A layer may consume facts from the layer below it, but it
+must not silently take over another layer's decision.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Owns</th>
+<th>Must not own</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Transport identity</strong></td>
+<td>Binding webhook, call, stream, and media lifecycle to one call/business</td>
+<td>Business routing guesses from stale or unnamed streams</td>
+</tr>
+<tr>
+<td><strong>Audio delivery</strong></td>
+<td>Playback/synthesis lifecycle, interruption fraction, completion/failure events</td>
+<td>Whether a branch is legal or a caller answer is valid</td>
+</tr>
+<tr>
+<td><strong>Interaction Loop</strong></td>
+<td>Turn ordering, prompt obligations, attempt/progress accounting, trace vocabulary</td>
+<td>Business-specific branch policy</td>
+</tr>
+<tr>
+<td><strong>FSM/control</strong></td>
+<td>Legal states, guards, transitions, terminal outcomes, escalation targets</td>
+<td>Free-form language interpretation</td>
+</tr>
+<tr>
+<td><strong>Deterministic capabilities</strong></td>
+<td>Choice resolution, schema validation, side-effect mediation, idempotency</td>
+<td>Inventing missing business facts</td>
+</tr>
+<tr>
+<td><strong>LLM</strong></td>
+<td>Candidate extraction and natural wording within a declared envelope</td>
+<td>Adding choices, choosing undeclared branches, committing side effects, or claiming unobserved success</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-non-negotiable-boundary">The non-negotiable boundary</h3>
+<p>The LLM may propose; deterministic code validates; the FSM decides whether progress
+is legal; the transport reports what it delivered. No model utterance, tool call, or
+audio callback is itself proof that the state may advance.</p>
+<h2 id="normative-contract-stack">Normative contract stack</h2>
+<p>The words <strong>MUST</strong>, <strong>MUST NOT</strong>, <strong>SHOULD</strong>, and <strong>MAY</strong> below are normative.</p>
+<h3 id="c1-menu-contract">C1. Menu contract</h3>
+<ul>
+<li>Code MUST build the complete choice set, aliases, announced DTMF map, and escape
+choices.</li>
+<li>Narration MUST use the same ordered announced-choice projection as resolution.</li>
+<li>The LLM MUST NOT add, drop, renumber, or reorder choices.</li>
+<li>A digit not explicitly announced MUST resolve to <code>no_match</code>; it MUST NOT fall
+through to a hidden list position.</li>
+<li>Ambiguity MUST abstain rather than select the nearest option.</li>
+<li>Every choice state MUST declare retry and escalation/recovery behavior.</li>
+</ul>
+<p>Existing footholds: <code>locked_choice</code>, <code>evaluate_choice</code>, alias compilation,
+<code>tests/test_choice_escape_coverage.py</code>, and the FX-069 DTMF gate.</p>
+<h3 id="c2-extraction-contract">C2. Extraction contract</h3>
+<ul>
+<li>An extractor MUST return a typed candidate, confidence/provenance where available,
+or an explicit abstention.</li>
+<li>A candidate MUST pass the declared <code>slot_types</code> validator before entering session
+context.</li>
+<li>Negation, ambiguity, and schema violations MUST NOT silently become affirmative
+values.</li>
+<li>A rejected candidate MUST count according to the state's declared attempt policy.</li>
+<li>An LLM acknowledgement without a validated slot write MUST NOT count as progress.</li>
+</ul>
+<p>Existing footholds: typed slots, enum abstention, deterministic extractors, and
+<code>all_state_slots_filled_and_valid</code>.</p>
+<h3 id="c3-branch-contract">C3. Branch contract</h3>
+<ul>
+<li>Branches MUST be pure functions of validated context plus explicit engine facts.</li>
+<li>Branch evaluation MUST NOT depend on prose generated by the LLM.</li>
+<li>Guard inputs and the winning transition MUST be serializable in the run trace.</li>
+<li>Transition <code>sets</code> and <code>clears</code> MUST apply atomically and identically in cascade,
+Live, simulation, and replay.</li>
+<li>Unknown guards and unreachable destinations MUST fail before deployment.</li>
+</ul>
+<p>RIFF's pull-based guards satisfy this shape. Named pushed events are not required to
+obtain it.</p>
+<h3 id="c4-validation-and-sole-exit-contract">C4. Validation and sole-exit contract</h3>
+<ul>
+<li>A collect state MUST NOT take its success edge until required slots are present
+and valid.</li>
+<li>A side-effect state MUST NOT run until its declared preconditions are true.</li>
+<li>Validation failure MUST return a typed outcome such as <code>invalid</code>, <code>ambiguous</code>, or
+<code>missing</code>, not an unstructured boolean plus prose.</li>
+<li>The success validator and escape/escalation edges MUST have explicit precedence.</li>
+</ul>
+<h3 id="c5-progress-retry-and-re-entry-contract">C5. Progress, retry, and re-entry contract</h3>
+<ul>
+<li>Every input-bearing state MUST declare what counts as progress.</li>
+<li>Failed attempts MUST be counted per state and failure kind, not inferred only from
+total turns.</li>
+<li>Re-entering a state MUST be idempotent: it cannot duplicate a side effect, consume
+a one-shot before delivery, or inherit stale answer text from another state.</li>
+<li>One-shot narration flags MUST be committed from delivery outcome, not merely from
+playback start or state entry.</li>
+<li>Retry exhaustion MUST produce one declared outcome; it cannot leave the caller in
+an unbounded loop.</li>
+</ul>
+<p>Existing footholds: <code>no_progress_streak</code>, <code>stalled</code>, state-stamped user text, and
+FX-076/078 recovery behavior. The missing piece is a uniform engine-level policy.</p>
+<h3 id="c6-escalation-contract">C6. Escalation contract</h3>
+<ul>
+<li>Every collect/choice state MUST declare an exhaustion target.</li>
+<li>Escalation kind MUST be preserved. A safety or human-handoff capability MUST NOT
+be demoted to a generic menu recovery.</li>
+<li>Partial validated context SHOULD accompany escalation.</li>
+<li>Escalation outcome and reason MUST be observable in the run record.</li>
+</ul>
+<p>FX-080 demonstrates why &quot;has an escape&quot; is weaker than &quot;has the correct escape.&quot;</p>
+<h3 id="c7-narration-ownership-contract">C7. Narration ownership contract</h3>
+<p>Every compiled state MUST declare a narration policy. The canonical proposal is
+<code>narration</code>, not a scalar <code>voice</code>, because <code>voice</code> already names synthesis identity
+and field-level voice policies elsewhere in the pack schema.</p>
+<pre><code class="language-yaml">narration:
+  owner: static_announce      # static_announce | dynamic_announce | model | none
+  obligation: required       # required | optional | forbidden
+  prompt_id: main_menu_v3
+  on_interrupt: replay_if_unmet  # replay_if_unmet | continue | escalate
+  max_replays: 3
+  on_replay_exhausted: escalate
+  one_shot:
+    min_delivery_fraction: 0.75
+  answer_admission:
+    requires_content_delivered: true
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li><code>static_announce</code> MUST resolve entirely at build time and MUST have a manifest
+asset or an explicit, tested failure policy.</li>
+<li><code>dynamic_announce</code> MAY resolve validated slots or runtime results at call time,
+but MUST be a distinct compiled audio-only state type followed by a separate input
+hub. It is not merely a <code>play_audio.render_mode</code> because receipt emission,
+synthesis failure, input forwarding, and successor shape are structural contracts.</li>
+<li><code>model</code> MAY own flexible narration only where exact deterministic audio is not a
+contract. It MUST NOT narrate a locked menu's authoritative option list or own a
+prompt with declared critical content. Once <code>dynamic_announce</code> exists, either
+declaration is a compile error. Until then, critical model narration is a flagged
+temporary fallback listed in the Phase 2 compatibility report.</li>
+<li><code>none</code> is legal for silent routing/action states and listening hubs. If the hub
+accepts an answer to a prompt, it MUST declare the required prompt receipt.</li>
+<li><code>one_shot.min_delivery_fraction</code> governs whether narration may be marked consumed.
+It MUST NOT be reused as proof that an answer is admissible.</li>
+<li><code>answer_admission.requires_content_delivered</code> governs whether an answer may confirm
+the prompt. It MUST be true for prompts containing interpolated values or other
+declared critical content.</li>
+<li>Delivery-failure replays MUST be counted separately from caller-answer attempts.
+<code>max_replays</code> and <code>on_replay_exhausted</code> are required when interruption policy may
+replay; exhaustion MUST NOT loop.</li>
+<li>A state suppressed from model speech MUST NOT declare <code>owner: model</code>.</li>
+<li>Compiler analysis MUST examine every reachable inbound path. &quot;At least one
+speaking predecessor&quot; is insufficient when another inbound path can arrive mute.</li>
+</ul>
+<p>The initial migration MAY derive policies to produce a report, but generated packs
+MUST materialize the final policy. Hidden compiler defaults are not acceptable as
+the steady state.</p>
+<h3 id="c8-prompt-delivery-contract">C8. Prompt delivery contract</h3>
+<p>Narration ownership answers who should produce words. It does not answer whether the
+audio survived. Delivery is a separate runtime contract.</p>
+<p>A delivery receipt has this minimum shape:</p>
+<pre><code class="language-json">{
+  &quot;prompt_id&quot;: &quot;identity_confirmation_v1&quot;,
+  &quot;state_epoch&quot;: &quot;replicant_confirm_identity:7&quot;,
+  &quot;state_id&quot;: &quot;replicant_confirm_identity_announce&quot;,
+  &quot;source&quot;: &quot;dynamic_announce&quot;,
+  &quot;status&quot;: &quot;completed&quot;,
+  &quot;prompt_content_hash&quot;: &quot;sha256:resolved-text-and-render-policy&quot;,
+  &quot;audio_content_hash&quot;: &quot;sha256:audio-bytes-played&quot;,
+  &quot;delivered_fraction&quot;: 1.0,
+  &quot;delivered_through_word_index&quot;: 17,
+  &quot;required_content_delivered&quot;: true,
+  &quot;one_shot_consumable&quot;: true,
+  &quot;interrupted_by&quot;: null,
+  &quot;attempt&quot;: 1
+}
+</code></pre>
+<p>Allowed terminal statuses are <code>completed</code>, <code>interrupted</code>, and <code>failed</code>. <code>queued</code> and
+<code>started</code> are non-terminal observations. The receipt means transport-observed
+delivery only; it MUST NOT be described as proof the caller heard or understood it.</p>
+<p>Input hubs that depend on a prompt declare:</p>
+<pre><code class="language-yaml">requires_prompt_receipt: identity_confirmation_v1
+</code></pre>
+<p>Rules:</p>
+<ul>
+<li>One-shot consumption and answer admission MUST be computed independently. A
+proportional delivery threshold MAY consume a menu one-shot; it MUST NOT certify
+that a confirmation's critical content was delivered.</li>
+<li>A semantic yes/no answer MUST NOT confirm a prompt that has no qualifying receipt
+with <code>required_content_delivered: true</code>.</li>
+<li>For a prompt containing interpolated or declared critical content, the compiler
+MUST identify the required content spans, <code>answer_admission.requires_content_delivered</code>
+MUST be true, and the delivery layer MUST map the spans to word timings produced at
+render or synthesis time. A fraction alone is insufficient because the critical
+value may be near the end of the prompt. An unevaluable content receipt is recorded
+as such and treated as not delivered; answer admission fails closed.</li>
+<li>The receipt MUST bind the fully resolved prompt/render policy and the audio bytes
+actually played. A versioned manifest entry or call-time synthesis record MUST
+prove the mapping from <code>prompt_content_hash</code> to <code>audio_content_hash</code>; a missing or
+mismatched binding cannot satisfy <code>required_content_delivered</code>, regardless of
+fraction or completion status.</li>
+<li>A hub's <code>requires_prompt_receipt</code> is satisfied only by a receipt from the current
+narration-obligation <code>state_epoch</code>. A receipt from a prior entry into the same
+state MUST NOT qualify after re-entry establishes a new obligation.</li>
+<li>An exact DTMF or exact spoken-alias barge during an announce MAY resolve early. The
+announce records its interruption receipt and forwards the buffered input to the
+declared input hub; the hub performs resolution. An announce state never resolves
+choices itself. The trace records <code>early_choice</code>, interruption, and forwarding.</li>
+<li>Noise, ambiguous speech, or non-matching input before the receipt threshold MUST
+preserve/replay the prompt obligation.</li>
+<li><code>audio_failed</code> MUST take a declared fallback: retry audio, switch to an allowed
+owner, or escalate. It MUST NOT silently enter a listening hub.</li>
+<li>Connect-time entry, normal transitions, and re-entry MUST use the same receipt
+rules.</li>
+</ul>
+<p>This contract closes the gap that a <code>voice:</code> declaration alone leaves open.</p>
+<h3 id="c9-transport-identity-contract">C9. Transport identity contract</h3>
+<ul>
+<li>Every media stream MUST bind to one active call identity before business/session
+state can consume it.</li>
+<li>Binding, active-call insertion, and invalidation MUST be serialized. Any
+check-and-mark operation MUST be atomic across webhook and media threads.</li>
+<li>Call teardown MUST invalidate the binding and prevent later frames from reviving
+it.</li>
+<li>Fallback binding without a stable identity MUST be alarmed and bounded; it cannot
+look like an ordinary successful bind.</li>
+<li>The trace MUST record the identifiers and binding reason without exposing secrets.</li>
+<li>Replay fixtures MUST cover stale call entries, missing hangup callbacks, and
+overlapping calls.</li>
+</ul>
+<p>FX-075/079/080 show that a correct FSM cannot compensate for the wrong caller's
+stream.</p>
+<h3 id="c10-side-effect-and-success-contract">C10. Side-effect and success contract</h3>
+<ul>
+<li>LLM tool calls are requests. The state manager or capability mediator MUST enforce
+state, argument, authorization, and idempotency preconditions.</li>
+<li>A write MUST carry an idempotency key scoped to the call and logical action.</li>
+<li>Booking, message, or escalation success MUST derive from a typed provider result,
+never from model wording.</li>
+<li>Retries and re-entry MUST return the prior committed result or make one safe retry.
+A retry is safe only when the provider deduplicates on the idempotency key or the
+prior attempt is provably uncommitted. Otherwise the action returns a typed
+<code>unknown_outcome</code>, records it, and escalates instead of re-executing.</li>
+</ul>
+<h3 id="c11-operator-visible-evidence-contract">C11. Operator-visible evidence contract</h3>
+<ul>
+<li>Every deterministic outcome defined by C1-C10 MUST appear in the primary run
+record used by operators and replay tools, not only inside a nested debug payload.</li>
+<li>Choice match/refusal, extraction acceptance/rejection, guard verdict, narration
+owner, prompt receipt, retry/exhaustion, escalation, and action result MUST have
+stable typed fields.</li>
+<li>A record MUST carry enough state epoch and provenance to distinguish an answer in
+state A from narration or transition behavior in state B.</li>
+<li>Adding an internal debug field without updating the operator-facing projection
+does not satisfy this contract.</li>
+<li>Each projection MUST have a non-vacuous test that fails when the typed field is
+removed while the underlying decision still occurs.</li>
+</ul>
+<h2 id="the-interaction-loop">The Interaction Loop</h2>
+<p>The Interaction Loop is a shared behavioral model, not a claim that cascade and
+Gemini Live have one implementation today.</p>
+<p>For each state epoch:</p>
+<ol>
+<li><strong>Enter</strong> with validated context and a unique state epoch.</li>
+<li><strong>Satisfy narration</strong> or establish that narration is optional/forbidden.</li>
+<li><strong>Observe</strong> caller input, DTMF, provider result, timeout, or delivery event.</li>
+<li><strong>Resolve/extract</strong> deterministic signals first; ask an LLM only inside the
+declared capability envelope.</li>
+<li><strong>Validate</strong> candidates and action preconditions.</li>
+<li><strong>Account</strong> for progress, failed attempt, interruption, or no-op.</li>
+<li><strong>Decide</strong> exactly one transition, retry, escalation, or wait outcome.</li>
+<li><strong>Commit</strong> transition mutations and mediated side effects idempotently.</li>
+<li><strong>Trace</strong> the inputs, outcome, owner, receipt, guard verdict, and resulting state.</li>
+</ol>
+<p>The first implementation target is common typed outcomes and trace fields. It is not
+a big-bang refactor of <code>turn.py</code> and <code>live/session.py</code>. A new shared abstraction is
+justified only where it removes duplicated semantics and has parity tests on both
+paths.</p>
+<h2 id="current-implementation-map">Current implementation map</h2>
+<table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Current footing</th>
+<th>Required delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Menu</td>
+<td><code>locked_choice</code>, aliases, deterministic resolver, escape tests</td>
+<td>One compiler-owned announced projection, full contract lint, and a Phase 1 parity fixture proving cascade and Live dispatchers return identical outcomes for identical input</td>
+</tr>
+<tr>
+<td>Extraction</td>
+<td>Typed slots, validators, enum abstention</td>
+<td>Explicit counted schema-failure outcomes and provenance</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td>Guard registry and transition evaluator</td>
+<td>Purity/serialization gate and cross-path <code>sets</code>/<code>clears</code> parity</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Required-slot success guards</td>
+<td>Typed validator outcomes and explicit precedence</td>
+</tr>
+<tr>
+<td>Retry/re-entry</td>
+<td><code>no_progress_streak</code>, <code>stalled</code>, state-stamped input</td>
+<td>Per-state policy and engine-level idempotent re-entry</td>
+</tr>
+<tr>
+<td>Escalation</td>
+<td>Per-kind edges after FX-076/080</td>
+<td>Exhaustive compile gate and run-record outcome</td>
+</tr>
+<tr>
+<td>Narration</td>
+<td>Suppression lists, announce/hub idiom, voiceless lint</td>
+<td>Declarative policy on every generated state; all-path analysis</td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td>Audio events and barge timing exist in transports</td>
+<td>Prompt identity, receipts, common semantics, hub precondition</td>
+</tr>
+<tr>
+<td>Transport identity</td>
+<td>FX-075/079 binding fixes and tripwire</td>
+<td>Durable identity invariant and overlap replay suite</td>
+</tr>
+<tr>
+<td>Side effects</td>
+<td>State manager and required tools</td>
+<td>Uniform idempotency/success contract across capabilities</td>
+</tr>
+<tr>
+<td>Operator evidence</td>
+<td>Turn/run records and nested debug payloads</td>
+<td>Promote all contract outcomes into stable operator-visible fields</td>
+</tr>
+</tbody>
+</table>
+<h2 id="evidence-matrix">Evidence matrix</h2>
+<p>Recent incidents are coverage evidence, not votes. They overlap, some share one call,
+and FX-080 was found by adversarial review rather than by a live caller. Therefore no
+&quot;6.5 of 8&quot; conclusion is used.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Primary contract</th>
+<th>Would this architecture help?</th>
+<th>Current status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FX-069: unannounced digits reached hidden choices</td>
+<td>C1 Menu</td>
+<td>Prevent at compile/test and resolver</td>
+<td>Fixed with generalized DTMF gate</td>
+</tr>
+<tr>
+<td>FX-071: negated message intent became affirmative</td>
+<td>C2 Extraction</td>
+<td>Reject candidate or abstain</td>
+<td>Fixed with negation handling</td>
+</tr>
+<tr>
+<td>FX-075: stale call captured another stream</td>
+<td>C9 Transport identity</td>
+<td>Detect/prevent before FSM input</td>
+<td>Fixed and hardened by FX-079/080</td>
+</tr>
+<tr>
+<td>Property call: muted choice state had no speaker</td>
+<td>C7 Narration</td>
+<td>Compile failure on owner/path gap</td>
+<td>Stop-gap unmute and lint shipped</td>
+</tr>
+<tr>
+<td>FX-077: state entered before Live connected</td>
+<td>C7/C8 Narration/delivery</td>
+<td>Require connect-time prompt receipt before answer</td>
+<td>Narrow locked-choice fix shipped; general contract open</td>
+</tr>
+<tr>
+<td>FX-078: early barge burned one-shot menu</td>
+<td>C5/C8 Re-entry/delivery</td>
+<td>Commit one-shot from delivery outcome</td>
+<td>Barge path mitigated; zero-delivery audio failure/missing path remains open until separately fixed and proven</td>
+</tr>
+<tr>
+<td>FX-076: caller trapped in message collection</td>
+<td>C5/C6 Retry/escalation</td>
+<td>Require bounded declared exhaustion</td>
+<td>Fixed with collect escape gate</td>
+</tr>
+<tr>
+<td>FX-080: emergency stall returned to menu</td>
+<td>C6 Escalation</td>
+<td>Require correct typed target, not any escape</td>
+<td>Fixed through adversarial review</td>
+</tr>
+</tbody>
+</table>
+<p>FX-074 is migration evidence, not a caller-failure vote: rebuilding two stale flows
+produced hundreds of lines of unrelated spoken-copy drift. That proves regeneration
+needs a controlled diff/audio/deploy process. It does not measure the engineering
+cost of an event-FSM rewrite, and this document does not claim that it does.</p>
+<h2 id="execution-path-truth-llm-routing">Execution-path truth: LLM routing</h2>
+<p>The repository has two materially different model execution paths:</p>
+<ol>
+<li><strong>Cascade/text/HTTP:</strong> <code>run_turn</code> selects an adapter. The per-state policy cascade
+and <code>RIFF_PRIMARY_LLM_ROUTING</code> can affect this path. A repeat-N text-mode result
+measured an approximately 85% cost reduction for a scoped coffee-flow assignment.</li>
+<li><strong>Gemini Live voice:</strong> <code>GeminiLiveSession</code> opens one persistent model connection
+for the call. It does not invoke the cascade's per-state adapter selector.</li>
+</ol>
+<p>Therefore:</p>
+<ul>
+<li>The measured cost result is real only for the cascade/text/HTTP scope tested.</li>
+<li>Flipping <code>RIFF_PRIMARY_LLM_ROUTING</code> has zero expected effect on Gemini Live phone
+cost, latency, or quality.</li>
+<li>&quot;Live parity&quot; cannot mean rerunning the same flag OTA; the path is structurally
+different.</li>
+<li>Voice model routing requires a separate decision: session-level model choice or a
+non-persistent/per-turn voice architecture. Neither is part of this adoption.</li>
+</ul>
+<h2 id="alternatives-considered">Alternatives considered</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Reliability benefit</th>
+<th>Migration/replay risk</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Rewrite flows and control around event-style lifecycle objects</strong></td>
+<td>Could unify event provenance if designed well</td>
+<td>Highest migration surface; re-proves mature guards, compiler output, audio, and all flows</td>
+<td>Decline now; retain revisit triggers</td>
+</tr>
+<tr>
+<td><strong>B. Add the full contract stack to the existing engine</strong></td>
+<td>Directly covers observed control, narration, delivery, and identity failures</td>
+<td>Incremental but spans compiler, Live, and transport; requires strict phase gates</td>
+<td><strong>Choose</strong></td>
+</tr>
+<tr>
+<td><strong>C. Keep fixes as tests and conventions only</strong></td>
+<td>Lowest immediate cost</td>
+<td>Hidden defaults and path-specific patches continue to drift</td>
+<td>Decline</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-option-b">Why option B</h3>
+<ul>
+<li>Existing deterministic control primitives are useful and testable.</li>
+<li>The observed gaps cross control, narration, delivery, and transport; an FSM-only
+rewrite would not cover the whole failure surface.</li>
+<li>Contracts can be introduced with compatibility reports and per-business rollout.</li>
+<li>Each phase has an independent rollback.</li>
+<li>The design does not depend on incident-count arithmetic or a claim that rewrite
+cost has already been measured.</li>
+</ul>
+<h2 id="delivery-plan-and-gates">Delivery plan and gates</h2>
+<p>No phase starts implementation until Fable 5 review findings are resolved and the
+operator approves the amended design.</p>
+<h3 id="phase-0-freeze-the-decision-and-baseline">Phase 0 - freeze the decision and baseline</h3>
+<p><strong>Deliverables</strong></p>
+<ul>
+<li>This versioned ADR and HTML counterpart.</li>
+<li>A machine-readable inventory of every generated state's current menu, validation,
+escalation, narration, suppression, and audio shape.</li>
+<li>Per routed flow, a count and state list for every muted/input state reachable from
+at least one inbound path that does not establish the required prompt receipt. The
+counts MUST be stored in a versioned inventory artifact referenced from this ADR
+before Phase 2 starts.</li>
+<li>Baseline compile diffs and focused replay results for FX-069, 071, 075, 076, 077,
+078, 079, and 080.</li>
+<li>Measured latency/failure baselines for static and call-time audio. Thresholds for
+Phase 3 are approved before its code is written.</li>
+</ul>
+<p><strong>Exit gate:</strong> evidence can be regenerated from a clean checkout without an OTA call.</p>
+<h3 id="phase-1-enforce-existing-control-contracts">Phase 1 - enforce existing control contracts</h3>
+<p><strong>Deliverables</strong></p>
+<ul>
+<li>Compiler/load gates for C1-C6, C10, and C11.</li>
+<li>The C9 transport-identity invariant: serialized bind/insert/invalidate with an
+atomic check-and-mark across webhook and media threads, plus replays for stale call
+entries, missing hangup callbacks, and overlapping calls.</li>
+<li>A parity fixture proving <code>maybe_handle_locked_choice_turn</code> and Live's
+<code>_maybe_handle_locked_choice_turn_complete</code> produce identical deterministic
+outcomes for identical inputs.</li>
+<li>Explicit schema-violation attempt accounting.</li>
+<li>Idempotent re-entry tests for one-shots, state-stamped input, and mediated actions.</li>
+<li>One contract matrix showing gate, runtime outcome, trace field, and replay test.</li>
+</ul>
+<p><strong>Exit gate:</strong> all packs cold-compile; all routed flows pass focused contract tests;
+removing each new gate makes its reproduction fail. The C9 overlap, stale-entry, and
+missing-hangup replays pass; removing serialization or atomic binding makes the
+FX-075/079 reproductions fail. The locked-choice parity fixture runs both dispatchers,
+not only cascade.</p>
+<p><strong>Rollback:</strong> remove additive gates before any flow regeneration. No live behavior
+changes in this phase.</p>
+<h3 id="phase-2-materialize-narration-ownership">Phase 2 - materialize narration ownership</h3>
+<p><strong>Deliverables</strong></p>
+<ul>
+<li>Parse and validate the C7 <code>narration</code> object.</li>
+<li>Compiler emission for every generated state; no hidden steady-state default.</li>
+<li>All-reachable-inbound-path analysis for silent listening hubs.</li>
+<li>A compatibility report before enforcement, followed by a hard gate once all packs
+are migrated.</li>
+<li>Studio/trace display of owner, obligation, prompt id, and interruption policy.</li>
+</ul>
+<p><strong>Exit gate:</strong> every state has one valid policy; every required prompt has an owner;
+no suppressed state is model-owned; every <code>none</code> input hub proves its prompt source
+on every reachable inbound path; the Phase 0 exposure counts are zero or have an
+explicit migration in the operator-approved compatibility report. A conformance
+replay per routed flow compares each declared owner with the observed narration
+source per state epoch; any mismatch fails.</p>
+<p><strong>Rollback:</strong> compiled metadata is additive and ignored by runtime until Phase 3.</p>
+<h3 id="phase-3-build-dynamic-announce-and-prompt-receipts">Phase 3 - build <code>dynamic_announce</code> and prompt receipts</h3>
+<p><strong>Deliverables</strong></p>
+<ul>
+<li>Call-time synthesis for validated template/runtime content in an audio-only state.</li>
+<li>Dynamic audio artifacts are call-scoped, MUST NOT enter a versioned/shared static
+manifest, and carry an approved retention bound on the phone node. A test fails if
+the versioned manifest writer can reach a dynamic artifact path.</li>
+<li>C8 receipt events across web and phone transports.</li>
+<li>Input-hub enforcement of <code>requires_prompt_receipt</code>.</li>
+<li>Connect, barge, audio-failure, retry, and re-entry behavior using one receipt model.</li>
+<li>Deterministic fallback or escalation when synthesis fails.</li>
+</ul>
+<p><strong>Exit gate</strong></p>
+<ul>
+<li>FX-077 replay cannot confirm an unspoken identity prompt.</li>
+<li>FX-078 replay does not consume a one-shot below its declared threshold.</li>
+<li>A confirmation replay cannot admit <code>yes</code> when the proportional threshold is met
+but any declared critical content remains undelivered.</li>
+<li>A stale receipt from a prior state epoch cannot admit an answer after re-entry.</li>
+<li>A prompt/audio hash mismatch cannot satisfy critical-content delivery.</li>
+<li>Repeated delivery interruptions exhaust at the declared replay budget and take the
+declared outcome rather than looping.</li>
+<li>Static, dynamic, and model-owned prompt fixtures each exercise success, interrupt,
+and failure.</li>
+<li>Latency and synthesis-failure rates remain inside the Phase 0 approved thresholds.</li>
+<li>No second voice speaks the same prompt in one state epoch.</li>
+<li>The narration-source trace field is the named mechanism used to prove the
+single-owner gate.</li>
+</ul>
+<p><strong>Rollback:</strong> runtime feature flag returns affected states to the last approved
+owner before regeneration. After regeneration, rollback means restoring the prior
+generated flow/audio artifact as defined in Phase 5; a flag cannot restore an owner
+that regeneration removed.</p>
+<h3 id="phase-4-formalize-interaction-loop-parity">Phase 4 - formalize Interaction Loop parity</h3>
+<p><strong>Deliverables</strong></p>
+<ul>
+<li>Shared typed outcome names for extraction, validation, progress, delivery, retry,
+transition, escalation, and action result.</li>
+<li>A shared run-record schema used by cascade and Live.</li>
+<li>Parity tests for transition mutations, attempt counting, and prompt receipts.</li>
+<li>Removal of path-specific rescue logic only when a shared mechanism proves the same
+behavior.</li>
+</ul>
+<p><strong>Exit gate:</strong> one replay fixture produces equivalent control outcomes and required
+trace evidence on both paths, with documented differences limited to model/audio
+execution. Remaining differences live in an explicit allowlist; every entry has an
+owner and removal condition, and an undocumented divergence fails the gate.</p>
+<p><strong>Rollback:</strong> keep the old path behind a temporary comparison flag until parity is
+demonstrated; do not delete working rescue behavior first.</p>
+<h3 id="phase-5-regenerate-and-promote-one-business-at-a-time">Phase 5 - regenerate and promote one business at a time</h3>
+<p>Order:</p>
+<ol>
+<li>Property management first because it exercises per-caller identity and dynamic
+ticket narration. It is also the highest-risk pilot: its stop-gap unmutes and
+model-voiced locked-choice states are load-bearing. Its Phase 2 report MUST show
+each affected state resolving deliberately to <code>dynamic_announce</code> or another
+approved owner, never silently defaulting to <code>static_announce</code>.</li>
+<li>One low-risk static-menu business.</li>
+<li>Remaining businesses only after both shapes promote.</li>
+</ol>
+<p>For each business:</p>
+<ul>
+<li>Regenerate from its pack; never hand-patch the generated flow.</li>
+<li>Review spoken-copy and graph diffs separately from contract metadata.</li>
+<li>Render/verify content-addressed audio and manifest.</li>
+<li>Run the standard Static/L1/L2/L3 promotion ladder with replay artifacts.</li>
+<li>Deploy to M3 candidate, verify <code>/healthz</code> SHA/mode/dirty state, and preserve the M1
+rollback artifact.</li>
+<li>Run OTA only after explicit human <code>GO</code>.</li>
+</ul>
+<p><strong>Rollback:</strong> drain candidate, restore the prior flow/audio manifest and code SHA,
+restart, and verify health before accepting calls.</p>
+<h3 id="separate-track-cascade-text-http-llm-routing">Separate track - cascade/text/HTTP LLM routing</h3>
+<p>This track is not a prerequisite for Phases 0-5 and does not claim a voice win.</p>
+<ul>
+<li>Revalidate the scoped assignment with the documented repeat-N/judge quorum.</li>
+<li>Enable only on a cascade/text/HTTP deployment.</li>
+<li>Log effective model, source tier, tokens, latency, and route decision per turn.</li>
+<li>Roll back by disabling <code>RIFF_PRIMARY_LLM_ROUTING</code>.</li>
+<li>Write a new ADR before any Gemini Live voice-routing work.</li>
+</ul>
+<h2 id="definition-of-done">Definition of done</h2>
+<p>The architecture is adopted only when all of these are true:</p>
+<h3 id="language-and-compiler">Language and compiler</h3>
+<ul>
+<li>Every normative field has a schema, validation error, and generated example.</li>
+<li>Every pack survives a cold teardown/rebuild with no hand-edited flow dependency.</li>
+<li>Unknown owners, missing prompt sources, invalid escape targets, and unmediated
+side effects fail before deployment.</li>
+</ul>
+<h3 id="runtime">Runtime</h3>
+<ul>
+<li>Cascade and Live emit the same control-outcome vocabulary.</li>
+<li>Prompt delivery, interruption, and failure are traceable by prompt/state epoch.</li>
+<li>Retry, re-entry, escalation, and action idempotency are deterministic.</li>
+<li>Success is tied to validated context or provider result, never model wording.</li>
+</ul>
+<h3 id="evidence">Evidence</h3>
+<ul>
+<li>Each contract has a positive test, a reproduction that fails when the gate is
+removed, and a replay artifact.</li>
+<li><strong>Falsifier:</strong> removing any one new gate or operator-facing projection MUST make a
+named bad-behavior reproduction fail. A vacuous test or documentation-only field
+does not count.</li>
+<li>The standard promotion ladder is green for each regenerated business.</li>
+<li>OTA evidence, when authorized, records call id, node SHA/mode, flow hash, audio
+manifest hash, outcome, and artifact paths.</li>
+</ul>
+<h3 id="operations">Operations</h3>
+<ul>
+<li>M3 candidate and M1 rollback artifacts are both known before live promotion.</li>
+<li>Feature flags have owners, defaults, removal conditions, and observable state.</li>
+<li>Operator/future-agent documentation exists in Markdown and HTML.</li>
+</ul>
+<h2 id="ownership">Ownership</h2>
+<table>
+<thead>
+<tr>
+<th>Work</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compiler, FSM, Live session, providers, service traces, focused tests</td>
+<td>M3 service lane</td>
+</tr>
+<tr>
+<td>Caller harness, replay bundles, promotion reports, OTA artifacts</td>
+<td>M5 client lane</td>
+</tr>
+<tr>
+<td>Spoken-copy/audio review and explicit OTA <code>GO</code></td>
+<td>Human operator</td>
+</tr>
+<tr>
+<td>Architecture approval and unresolved policy choices</td>
+<td>Human operator after Fable 5/Codex review</td>
+</tr>
+</tbody>
+</table>
+<p>Cross-lane findings should be posted with evidence rather than repaired by crossing
+ownership boundaries casually.</p>
+<h2 id="risks-and-mitigations">Risks and mitigations</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Consequence</th>
+<th>Mitigation/gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ownership metadata creates false confidence</td>
+<td>Declared owner still produces silence</td>
+<td>Separate C7 ownership from C8 delivery receipt</td>
+</tr>
+<tr>
+<td><code>dynamic_announce</code> adds latency or fails</td>
+<td>Dead air before input hub</td>
+<td>Phase 0 baseline, deterministic fallback, measured Phase 3 gate</td>
+</tr>
+<tr>
+<td>Dynamic synthesis persists caller data</td>
+<td>PII audio enters git/shared manifests or fills node storage</td>
+<td>Call-scoped artifacts, versioned-manifest exclusion, retention bound, reachability test</td>
+</tr>
+<tr>
+<td>Receipt refers to stale audio</td>
+<td>Full delivery is recorded for an obsolete prompt asset</td>
+<td>Bind prompt and played-audio hashes; fail critical admission on missing/mismatched binding</td>
+</tr>
+<tr>
+<td>Static and dynamic voices sound inconsistent</td>
+<td>Caller hears multiple personas</td>
+<td>One prompt owner per epoch; voice/model identity pinned in trace and audio config</td>
+</tr>
+<tr>
+<td>Live and cascade drift</td>
+<td>Tests pass in text but fail by phone</td>
+<td>Common outcome/trace contract plus path-specific replays</td>
+</tr>
+<tr>
+<td>Compiler regeneration changes copy</td>
+<td>Audio churn and unreviewed caller behavior</td>
+<td>Per-business diff, audio manifest gate, candidate rollout</td>
+</tr>
+<tr>
+<td>Receipt is mislabeled as human perception</td>
+<td>Unsafe confirmation inference</td>
+<td>Call it delivery receipt; exact threshold and limitations in schema/trace</td>
+</tr>
+<tr>
+<td>One fraction is reused for two decisions</td>
+<td>A truncated confirmation admits <code>yes</code> before its critical value is spoken</td>
+<td>Separate <code>one_shot_consumable</code> from semantic <code>required_content_delivered</code></td>
+</tr>
+<tr>
+<td>Retry fixes demote safety escalation</td>
+<td>Emergency caller returns to menu</td>
+<td>Typed exhaustion target and adversarial escape-target test</td>
+</tr>
+<tr>
+<td>Compatibility flag becomes permanent</td>
+<td>Two architectures accumulate</td>
+<td>Every flag has removal criteria and an owner in the implementation plan</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rewrite-reconsideration">Rewrite reconsideration</h2>
+<p>&quot;Decline rewrite&quot; is the current decision, not a permanent ban. Open a new ADR when
+one or more of these is demonstrated with traces and reproductions:</p>
+<ol>
+<li>A required transition cannot be represented as a pure guard over validated
+context and explicit engine facts.</li>
+<li>Replay cannot reproduce ordering because causally relevant events are absent from
+the current state/transition record.</li>
+<li>Known hand-copied control semantics between cascade and Live, including the
+duplicated locked-choice dispatchers, persist or grow after Phase 1 parity and
+Phase 4 shared outcome/trace work, and parity tests cannot constrain them.</li>
+<li>Idempotent asynchronous actions require durable event processing that the current
+transition commit cannot provide.</li>
+<li>Flow/state growth causes a measured regression in cold-compile wall time,
+per-flow gate runtime, or defect escape rate past the contract gates that compiler
+composition demonstrably cannot control.</li>
+<li>Two or more promoted production defects share one architectural cause that the
+contract stack detects but cannot prevent without replacing the control model.</li>
+</ol>
+<p>Meeting a trigger starts comparative design work; it does not automatically select
+an event bus. The replacement must show migration, replay, rollback, and call-quality
+advantages against the contract-based current engine.</p>
+<h2 id="reviewer-recommendations-pending-operator-ratification">Reviewer recommendations pending operator ratification</h2>
+<p>Fable 5 answered the eight v3 open decisions as follows. These become final only when
+the operator approves this ADR:</p>
+<ol>
+<li><code>dynamic_announce</code> is a distinct compiled state type, not a render mode.</li>
+<li>Epoch-bound <code>requires_prompt_receipt</code> is sufficient for v1; introduce a larger
+handshake object only when a hub legitimately depends on multiple prompts.</li>
+<li>Only exact DTMF and exact spoken aliases of declared choices resolve during an
+announce; the hub performs the resolution from forwarded input.</li>
+<li>Model ownership remains legal for non-critical flexible narration. Critical
+prompts move to <code>dynamic_announce</code>; model ownership is only a flagged stop-gap.</li>
+<li>Critical content includes compiler-derived interpolation spans plus explicitly
+authored semantic markers for critical literal copy.</li>
+<li>Phase 0 sets numeric latency/failure limits from measurements. The rule form is
+fixed now: compare dynamic p95 time-to-first-audio with measured static p95 plus an
+approved budget, and require an explicit fallback on any breach.</li>
+<li>Shared outcome vocabulary before shared implementation is correct, except the
+known locked-choice dispatcher pair receives parity coverage in Phase 1.</li>
+<li>Rewrite triggers remain conditional; triggers 3 and 5 use the measurable forms in
+the amended &quot;Rewrite reconsideration&quot; section.</li>
+</ol>
+<h2 id="repository-evidence">Repository evidence</h2>
+<p>The ADR is self-contained, but these versioned sources contain the detailed traces,
+mechanisms, and measurement qualifications behind it:</p>
+<ul>
+<li><code>docs/design/fsm-code-llm-boundary-gap-analysis.md</code></li>
+<li><code>docs/design/voice-ownership-building-block.md</code></li>
+<li><code>docs/flow-eval/LLM-POLICY.md</code></li>
+<li><code>docs/flow-eval/LLM-POLICY-ROADMAP.md</code></li>
+<li><code>docs/fixlog/PRINCIPLES.md</code></li>
+<li><code>docs/fixlog/FX-069-a-keypad-digit-selected-a-list-position-so-unannounced-digits-reached-hidden-capabilities.md</code></li>
+<li><code>docs/fixlog/FX-071-negation-was-measured-by-distance-so-a-refused-option-was-selected.md</code></li>
+<li><code>docs/fixlog/FX-075-a-dead-call-captured-the-next-callers-media-stream-and-answered-as-the-wrong-business.md</code></li>
+<li><code>docs/fixlog/FX-076-a-caller-told-us-three-times-we-were-wrong-and-the-state-machine-had-no-exit.md</code></li>
+<li><code>docs/fixlog/FX-077-the-fsm-reached-the-question-before-gemini-existed-so-nobody-asked-it.md</code></li>
+<li><code>docs/fixlog/FX-078-a-one-second-barge-burned-the-one-shot-menu-so-the-caller-never-heard-the-numbers.md</code></li>
+<li><code>docs/fixlog/FX-080-a-stalled-emergency-caller-was-recovered-to-the-menu-instead-of-a-human.md</code></li>
+</ul>
+<hr />
+<h2 id="paste-ready-final-fable-5-verification-packet">Paste-ready final Fable 5 verification packet</h2>
+<p>Paste this entire Markdown document, including the prompt below, into Claude Fable 5.</p>
+<h3 id="review-prompt">Review prompt</h3>
+<p>You are Claude Fable 5 acting as RIFF's senior adversarial architecture reviewer.
+RIFF is a production voice agent whose standard is: a real caller can complete a
+phone workflow, and every failure can be replayed, diagnosed, fixed, and promoted
+through deterministic, model-backed, service, and OTA testing.</p>
+<p>This is final verification of the v4 ADR. Confirm that the round-two P1-P11 changes
+are present and enforceable: Phase 1 owns C9; critical model narration fails closed;
+receipts bind prompt, played audio, and state epoch; dynamic artifacts are call-scoped
+and retention-bounded; both locked-choice dispatchers have Phase 1 parity coverage;
+delivery replay is bounded; early input is forwarded to the hub; ambiguous provider
+outcomes do not retry unsafely; narration policy is checked against observed source;
+and Phase 4/rewrite gates use explicit measures and allowlists.</p>
+<p>Do not optimize for agreement, politeness, or preserving the author's framing. Look
+for unsafe assumptions, contracts that cannot be enforced, execution-path confusion,
+hidden state, non-idempotent behavior, incomplete rollback, and plans whose tests can
+pass while a caller still fails.</p>
+<p>Pay special attention to these counterexamples:</p>
+<ul>
+<li>The FSM enters a question before Gemini Live connects.</li>
+<li>A caller or noise barges one second into a long menu.</li>
+<li>A per-caller identity line and a runtime ticket list cannot be prerendered.</li>
+<li>One inbound path speaks a prompt and another reaches the same hub silently.</li>
+<li>A caller says &quot;okay&quot; before an identity question was delivered.</li>
+<li>The cascade/text route supports per-state model selection while Gemini Live holds
+one persistent model connection.</li>
+<li>A stalled emergency caller must escalate, while an ordinary message caller may
+return to the menu.</li>
+<li>A stale media stream binds to the wrong business before the FSM sees input.</li>
+</ul>
+<p>Return exactly these sections:</p>
+<ol>
+<li><strong>Verdict:</strong> <code>APPROVE</code>, <code>APPROVE WITH REQUIRED CHANGES</code>, or <code>REJECT</code>.</li>
+<li><strong>Findings:</strong> severity-ranked (<code>Critical</code>, <code>High</code>, <code>Medium</code>, <code>Low</code>), each citing
+the ADR section, the failure mechanism, and the smallest adequate correction.</li>
+<li><strong>Invalid or unproven assumptions:</strong> distinguish facts from hypotheses.</li>
+<li><strong>Contract counterexamples:</strong> give at least one concrete trace for every contract
+you believe is underspecified.</li>
+<li><strong>Phase-gate audit:</strong> identify gates that are subjective, circular, non-vacuous
+only on paper, or unable to fail on the bad behavior.</li>
+<li><strong>Decision audit:</strong> challenge the eight reviewer recommendations and identify any
+one the operator should reject.</li>
+<li><strong>Minimal safe v1:</strong> identify the smallest independently shippable subset and what
+must explicitly wait.</li>
+<li><strong>Rewrite ruling:</strong> say whether evolving in place remains justified, and name the
+evidence that would change your ruling.</li>
+<li><strong>Proposed patch:</strong> provide replacement text for every required ADR change, not
+just commentary.</li>
+</ol>
+<p>Do not credit a declaration as enforcement unless you can name its compile/load gate,
+runtime behavior, trace evidence, and reproduction test. Do not describe transport
+delivery as proof a human heard audio. Do not treat text-eval model-routing evidence
+as a Gemini Live voice result.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#decision-in-one-paragraph">Decision in one paragraph</a></li><li class="toc-h2"><a href="#decisions-requested">Decisions requested</a></li><li class="toc-h2"><a href="#why-this-decision-exists">Why this decision exists</a></li><li class="toc-h2"><a href="#scope-and-non-goals">Scope and non-goals</a></li><li class="toc-h3"><a href="#in-scope">In scope</a></li><li class="toc-h3"><a href="#not-in-scope">Not in scope</a></li><li class="toc-h2"><a href="#terms">Terms</a></li><li class="toc-h2"><a href="#architectural-ownership">Architectural ownership</a></li><li class="toc-h3"><a href="#the-non-negotiable-boundary">The non-negotiable boundary</a></li><li class="toc-h2"><a href="#normative-contract-stack">Normative contract stack</a></li><li class="toc-h3"><a href="#c1-menu-contract">C1. Menu contract</a></li><li class="toc-h3"><a href="#c2-extraction-contract">C2. Extraction contract</a></li><li class="toc-h3"><a href="#c3-branch-contract">C3. Branch contract</a></li><li class="toc-h3"><a href="#c4-validation-and-sole-exit-contract">C4. Validation and sole-exit contract</a></li><li class="toc-h3"><a href="#c5-progress-retry-and-re-entry-contract">C5. Progress, retry, and re-entry contract</a></li><li class="toc-h3"><a href="#c6-escalation-contract">C6. Escalation contract</a></li><li class="toc-h3"><a href="#c7-narration-ownership-contract">C7. Narration ownership contract</a></li><li class="toc-h3"><a href="#c8-prompt-delivery-contract">C8. Prompt delivery contract</a></li><li class="toc-h3"><a href="#c9-transport-identity-contract">C9. Transport identity contract</a></li><li class="toc-h3"><a href="#c10-side-effect-and-success-contract">C10. Side-effect and success contract</a></li><li class="toc-h3"><a href="#c11-operator-visible-evidence-contract">C11. Operator-visible evidence contract</a></li><li class="toc-h2"><a href="#the-interaction-loop">The Interaction Loop</a></li><li class="toc-h2"><a href="#current-implementation-map">Current implementation map</a></li><li class="toc-h2"><a href="#evidence-matrix">Evidence matrix</a></li><li class="toc-h2"><a href="#execution-path-truth-llm-routing">Execution-path truth: LLM routing</a></li><li class="toc-h2"><a href="#alternatives-considered">Alternatives considered</a></li><li class="toc-h3"><a href="#why-option-b">Why option B</a></li><li class="toc-h2"><a href="#delivery-plan-and-gates">Delivery plan and gates</a></li><li class="toc-h3"><a href="#phase-0-freeze-the-decision-and-baseline">Phase 0 - freeze the decision and baseline</a></li><li class="toc-h3"><a href="#phase-1-enforce-existing-control-contracts">Phase 1 - enforce existing control contracts</a></li><li class="toc-h3"><a href="#phase-2-materialize-narration-ownership">Phase 2 - materialize narration ownership</a></li><li class="toc-h3"><a href="#phase-3-build-dynamic-announce-and-prompt-receipts">Phase 3 - build dynamic_announce and prompt receipts</a></li><li class="toc-h3"><a href="#phase-4-formalize-interaction-loop-parity">Phase 4 - formalize Interaction Loop parity</a></li><li class="toc-h3"><a href="#phase-5-regenerate-and-promote-one-business-at-a-time">Phase 5 - regenerate and promote one business at a time</a></li><li class="toc-h3"><a href="#separate-track-cascade-text-http-llm-routing">Separate track - cascade/text/HTTP LLM routing</a></li><li class="toc-h2"><a href="#definition-of-done">Definition of done</a></li><li class="toc-h3"><a href="#language-and-compiler">Language and compiler</a></li><li class="toc-h3"><a href="#runtime">Runtime</a></li><li class="toc-h3"><a href="#evidence">Evidence</a></li><li class="toc-h3"><a href="#operations">Operations</a></li><li class="toc-h2"><a href="#ownership">Ownership</a></li><li class="toc-h2"><a href="#risks-and-mitigations">Risks and mitigations</a></li><li class="toc-h2"><a href="#rewrite-reconsideration">Rewrite reconsideration</a></li><li class="toc-h2"><a href="#reviewer-recommendations-pending-operator-ratification">Reviewer recommendations pending operator ratification</a></li><li class="toc-h2"><a href="#repository-evidence">Repository evidence</a></li><li class="toc-h2"><a href="#paste-ready-final-fable-5-verification-packet">Paste-ready final Fable 5 verification packet</a></li><li class="toc-h3"><a href="#review-prompt">Review prompt</a></li></ul></aside>
+</div>
+</body>
+</html>

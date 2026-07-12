@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fix Journal — How This Codebase Remembers Its Mistakes</title>
+<style>
+  :root {
+    --bg:#0b0e19; --panel:#131730; --edge:#26305c; --ink:#eef1ff;
+    --dim:#8b93c4; --accent:#6f7bff; --good:#34d399; --warn:#f5c542; --bad:#f87171;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f7f8fc; --panel:#fff; --edge:#d8ddf0; --ink:#1a2038;
+            --dim:#5b6491; --accent:#4353d8; --bad:#c2453a; }
+  }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:880px;margin:0 auto;padding:32px 20px 90px}
+  h1{font-size:27px;margin:8px 0 6px;text-wrap:balance}
+  h2{font-size:19px;margin:40px 0 10px;border-bottom:1px solid var(--edge);padding-bottom:6px}
+  h3{font-size:16px;margin:24px 0 8px}
+  .sub{color:var(--dim);font-size:14px;max-width:70ch}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:16px 20px;margin:16px 0}
+  .tip{border-left:4px solid var(--good)}
+  .warncard{border-left:4px solid var(--bad)}
+  .try{border-left:4px solid var(--warn)}
+  code{font-family:var(--mono);font-size:.85em;background:rgba(111,123,255,.13);padding:.12em .4em;border-radius:4px}
+  pre{background:#0d1020;color:#dfe4ff;border:1px solid var(--edge);border-radius:10px;
+    padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55}
+  @media (prefers-color-scheme: light){ pre{background:#1d2127} }
+  .loop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:18px 0}
+  .lnode{background:var(--panel);border:2px solid var(--accent);border-radius:10px;
+    padding:10px 14px;font-size:13.5px;text-align:center;min-width:120px}
+  .lnode b{display:block;font-size:14.5px}
+  .lnode small{color:var(--dim)}
+  .larrow{color:var(--accent);font-size:20px;font-weight:700}
+  .lnode.gold{border-color:var(--warn)}
+  .anatomy{font-family:var(--mono);font-size:12.5px;background:var(--panel);
+    border:1px solid var(--edge);border-radius:10px;padding:14px 16px;margin:14px 0;overflow-x:auto}
+  .anatomy .f{color:var(--accent);font-weight:700}
+  .anatomy .note{color:var(--warn);font-style:italic}
+  .msg{max-width:340px;border-radius:16px;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.45}
+  .msg.link{background:#20304d;border:1px solid var(--edge)}
+  .msg.code{background:#1f3d2f;border:1px solid var(--good)}
+  @media (prefers-color-scheme: light){ .msg.link{background:#e7eefb} .msg.code{background:#e2f6ea} }
+  .msg .from{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+  .tw{overflow-x:auto}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--edge);vertical-align:top}
+  th{color:var(--dim);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  .step{display:flex;gap:14px;margin:14px 0;align-items:flex-start}
+  .stepnum{flex:0 0 34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+</style>
+</head>
+<body>
+<main>
+<p class="sub">RIFF · developer tutorial · 2026-07-07 · code: <code>scripts/fixlog.py</code> · records: <code>docs/fixlog/</code> · contract: <code>docs/fixlog/CONTRIBUTING.md</code></p>
+<h1>The Fix Journal: How This Codebase Remembers Its Mistakes</h1>
+<p class="sub">Written so anyone new to the project can use it in five minutes. Short version: every bug we
+fix gets a little story written about it, a robot can search those stories, and every so often we turn the
+stories into rules. Result: the same bug never costs us a day twice.</p>
+
+<h2>The big idea, as a picture</h2>
+<div class="loop">
+  <div class="lnode"><b>🐛 Something breaks</b><small>a caller hears silence</small></div>
+  <div class="larrow">→</div>
+  <div class="lnode gold"><b>🔍 SEARCH FIRST</b><small>has this happened before?</small></div>
+  <div class="larrow">→</div>
+  <div class="lnode"><b>🔧 Fix it</b><small>root cause, not band-aid</small></div>
+  <div class="larrow">→</div>
+  <div class="lnode gold"><b>✍️ Write the story</b><small>FX-014-my-bug.md</small></div>
+  <div class="larrow">→</div>
+  <div class="lnode"><b>🧠 Retro</b><small>every ~10 stories → rules</small></div>
+</div>
+<p>The two gold boxes are the habits this system enforces. Searching first means you inherit every past
+debugging session for free. Writing the story means the <em>next</em> person (human or AI) inherits yours.</p>
+
+<h2>A real example, start to finish</h2>
+<p>This actually happened on 2026-07-07. A caller pressed 0 to update their profile. The system said
+"I'll text you a code" — and no code ever arrived. Here's what the caller's phone showed:</p>
+<div class="card">
+  <div class="msg link"><div class="from">Armadillo Ink · 4:32 PM</div>
+    Armadillo Ink: open https://…/intake.html?token=… to follow your call live. RIFF will never ask for your password.</div>
+  <div class="msg code" style="opacity:.35"><div class="from">the message that never came</div>
+    SAY THIS 4 DIGIT CODE: 4827 …</div>
+</div>
+<p><b>Why?</b> The first text (just a link, no code — that's on purpose) accidentally checked the internal
+box that says <em>"a verification code has been sent."</em> So when the caller asked for a real code, the
+system looked at the box, saw it checked, and skipped sending one. The caller was asked to read a code
+from a message that never existed. One checkbox, shared by two different features.</p>
+
+<h3>Step 1 — Search before touching anything</h3>
+<pre>$ .venv/bin/python scripts/fixlog.py search "code text never arrived"
+
+[semantic] top matches:
+  FX-008  Texts 'sent' but never delivered (10DLC)
+  FX-011  Verify chain skipped the real code (welcome text claimed verification)</pre>
+<p>Ten seconds in, you already know: this smells like FX-008 (a carrier problem) or FX-011 (a bookkeeping
+problem) — and each record tells you exactly how to check which one, because the last person wrote down
+their evidence.</p>
+
+<h3>Step 2 — The story that got written (anatomy of an entry)</h3>
+<div class="anatomy">
+<span class="f"># Verify chain skipped the real code</span> <span class="note">← title = the symptom family</span><br><br>
+<span class="f">**Symptom**</span>: Pressed 0, said yes to "text you a code" — no code ever arrived. <span class="note">← the caller's words</span><br>
+<span class="f">**Root cause**</span>: the link-only welcome text set _caller_verification_sent=True<br>
+with an EMPTY code; the verify chain saw "already sent" and skipped. <span class="note">← the mechanism</span><br>
+<span class="f">**Fix**</span>: verification-sent now strictly means A CODE IS OUTSTANDING. <span class="note">← what changed</span><br>
+<span class="f">**Why this way**</span>: fixing the MEANING of the claim beats special-casing<br>
+the skip check — every future reader gets the truth. <span class="note">← alternatives were weighed</span><br>
+<span class="f">**Shift-left gate**</span>: tests/test_link_only_verification_isolation.py <span class="note">← can't happen again</span><br>
+<span class="f">**Test**</span>: the guard's exact path::name <span class="note">← required on new entries</span><br>
+<span class="f">**Success**</span>: pending — next live call, press 0, code arrives <span class="note">← closed at retro</span><br>
+<span class="f">**Evidence**</span>: call v3:ByaxLead, slot ledger, commit 84f0a649
+</div>
+
+<h3>Step 3 — The retro (where stories become rules)</h3>
+<p>Every ~10 entries (or before a deploy, or at a session wrap), whoever's working reads the new stories
+and asks: <em>is there a pattern?</em> Patterns get one line each in
+<code>docs/fixlog/PRINCIPLES.md</code>. Today's first retro produced nine. Three examples:</p>
+<div class="tw"><table>
+<tr><th>rule</th><th>born from</th><th>plain English</th></tr>
+<tr><td>Deterministic paths need deterministic audio</td><td>FX-004, 006, 007</td>
+  <td>If a keypress can reach a state, that state's voice must be a pre-recorded file — keypresses mute the AI's mouth.</td></tr>
+<tr><td>A claim slot must mean exactly what it says</td><td>FX-001, 002, 011</td>
+  <td>If a flag is called "verification sent," it better mean a code is really out there — lies in bookkeeping become bugs downstream.</td></tr>
+<tr><td>Every fix ships its gate</td><td>all 13</td>
+  <td>A fix without a test that would catch the regression is a fix you'll do twice.</td></tr>
+</table></div>
+
+<h2>How the rules are enforced (not the honor system)</h2>
+<div class="tw"><table>
+<tr><th>habit</th><th>enforced by</th><th>what happens if skipped</th></tr>
+<tr><td>Annotate every fix, all fields</td><td><code>tests/test_fixlog_schema.py</code></td><td>CI fails — the build is red until the story is complete</td></tr>
+<tr><td>Search before changing</td><td><code>AGENTS.md</code> (read by every AI agent at session start) + persistent memory</td><td>the agent's own instructions call it mandatory</td></tr>
+<tr><td>Retro on cadence</td><td>10 entries · before deploy · session wrap</td><td>pending Success fields pile up and the schema test surfaces them</td></tr>
+</table></div>
+
+<div class="card try">
+<h3 style="margin-top:2px">🧪 Try it yourself (2 minutes)</h3>
+<pre># 1. Search like a debugger would:
+.venv/bin/python scripts/fixlog.py search "menu kept repeating"
+
+# 2. Read the whole catalog:
+.venv/bin/python scripts/fixlog.py list
+
+# 3. Start a new entry when you fix something:
+.venv/bin/python scripts/fixlog.py new my-bug-slug
+#    → creates docs/fixlog/FX-014-my-bug-slug.md with the template
+
+# 4. Prove your entry is complete:
+.venv/bin/python -m pytest tests/test_fixlog_schema.py -q</pre>
+</div>
+
+<div class="card tip">
+<b>Why this makes the AI (and you) faster over time.</b> Debugging is mostly re-deriving what someone
+already knew. On 2026-07-07 one day of live phone testing produced thirteen root-caused mechanisms —
+sticky gate slots, silent dispatch states, carrier registration, bookkeeping lies. Re-deriving any one
+of them costs hours; searching costs ten seconds. The journal turns experience into a lookup table, and
+the retro turns the lookup table into instincts.</div>
+
+<div class="card warncard">
+<b>The one anti-rule.</b> Don't write essays. An entry is 8 lines that a stranger can act on. If your
+root cause doesn't name a mechanism (a file, a slot, a guard), you haven't found it yet — keep digging
+before you write.</div>
+</main>
+</body>
+</html>

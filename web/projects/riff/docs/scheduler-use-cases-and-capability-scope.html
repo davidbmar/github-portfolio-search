@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scheduler Use Cases &amp; Capability Scope — input for Fable 5&#x27;s design doc · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">scheduler-use-cases-and-capability-scope.md</span>
+<a class="raw" href="/docs/docs/flow-eval/scheduler-use-cases-and-capability-scope.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Scheduler Use Cases &amp; Capability Scope — input for Fable 5's design doc</h1>
+<p><strong>Date:</strong> 2026-07-02
+<strong>Purpose:</strong> define the <strong>use cases</strong> we want the phone/voice scheduler to support,
+map each to the capability that already exists (or must be built), and give Fable 5
+enough to design the tutorial flows + the &quot;offers are quotes&quot; architecture.
+<strong>Companion:</strong> <code>scheduler-demo-problem-statement.md</code> (why the current demo is
+fragile). This doc is the <em>forward-looking</em> &quot;what to build.&quot;</p>
+<hr />
+<h2 id="0-tl-dr-is-there-enough-to-design-from">0. TL;DR — is there enough to design from?</h2>
+<p><strong>Yes.</strong> The calendar backend (<code>cal-provider</code>, <code>~/src/cal-provider</code>) already exposes
+the full CRUD-on-time surface across <strong>3 calendar systems</strong> (<code>google</code>,
+<code>google-oauth</code>, <code>caldav</code>). What's missing is (a) surfacing all of it as
+caller-facing flow tools, (b) a robust LLM↔tool contract (the #20 &quot;offers are
+quotes&quot; fix), and (c) tutorial flows + deterministic tests per capability. This
+doc scopes those.</p>
+<h2 id="1-the-capability-surface-that-already-exists">1. The capability surface that already exists</h2>
+<p><code>CalendarProvider</code> (the <code>cal-provider</code> protocol, provider-agnostic across
+google/caldav) offers:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>What it does</th>
+<th>Exposed as a riff flow tool today?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list_calendars</code></td>
+<td>list the caller/tenant's calendars</td>
+<td>only in boot_check (not caller-facing)</td>
+</tr>
+<tr>
+<td><code>get_events</code></td>
+<td><strong>list meetings/events</strong> in a time window</td>
+<td><strong>NO — must be built</strong></td>
+</tr>
+<tr>
+<td><code>get_available_slots</code></td>
+<td><strong>list free/available slots</strong></td>
+<td>yes (via <code>check_availability</code>/<code>propose_booking</code>)</td>
+</tr>
+<tr>
+<td><code>create_event</code></td>
+<td><strong>schedule/book</strong> an appointment</td>
+<td>yes (via <code>schedule_event</code>)</td>
+</tr>
+<tr>
+<td><code>update_event</code></td>
+<td><strong>reschedule/modify</strong> an event</td>
+<td><strong>NO — must be built</strong></td>
+</tr>
+<tr>
+<td><code>cancel_event</code></td>
+<td><strong>cancel</strong> an event</td>
+<td>partial (<code>cancel_booking</code> in adapter; no flow)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Calendar systems (CAL_PROVIDER):</strong> <code>google</code> | <code>google-oauth</code> | <code>caldav</code>. The
+riff adapter (<code>riff/providers/cal_provider_adapter/</code>) is the single seam that
+imports <code>cal_provider</code>; flows/tools are <strong>provider-agnostic</strong> — a tutorial flow
+written once runs on any of the three systems by swapping the env var. (Tutorial
+flows should be designed to this abstraction, not to Google specifics.)</p>
+<h2 id="2-the-use-cases-the-full-calendar-operation-taxonomy">2. The use cases — the full calendar-operation taxonomy</h2>
+<p>Think broadly: everything a caller (or operator) might want to <em>do</em> with a
+calendar over voice. Each use case lists the caller intent, the backend
+capability, and whether it exists as a flow tool today. <strong>Bold &quot;NEW&quot;</strong> = the
+backend can do it but it is not surfaced as a caller-facing tool yet.</p>
+<blockquote>
+<p>Design instruction to Fable 5: treat this taxonomy as the menu of capabilities.
+A v0 need not build all of them, but the design should say which tier each lands
+in (v0 / v1 / later) and why. Prefer covering the <em>categories</em> broadly over
+polishing one path.</p>
+</blockquote>
+<h3 id="a-read-availability-amp-discovery">A. READ — availability &amp; discovery</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Caller intent</th>
+<th>Capability</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-1</td>
+<td>&quot;When are you free Thursday afternoon?&quot;</td>
+<td><code>get_available_slots(date, window, duration)</code></td>
+<td>exists (read-only entry <strong>NEW</strong>)</td>
+</tr>
+<tr>
+<td>UC-2</td>
+<td>&quot;What's on the calendar Thursday?&quot; / &quot;what's blocked?&quot;</td>
+<td><code>get_events(range)</code></td>
+<td><strong>NEW</strong> (<code>list_events</code>)</td>
+</tr>
+<tr>
+<td>UC-3</td>
+<td>&quot;Are you free at 2 PM Thursday?&quot;</td>
+<td>availability/events filtered to the slot</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-4</td>
+<td>&quot;What's the next available appointment?&quot;</td>
+<td><code>get_available_slots(soonest)</code></td>
+<td>exists (<code>scheduling_v1</code> &quot;soonest&quot;)</td>
+</tr>
+<tr>
+<td>UC-5</td>
+<td>&quot;Any openings this week?&quot;</td>
+<td><code>get_available_slots</code> over a range</td>
+<td>exists (range)</td>
+</tr>
+<tr>
+<td>UC-6</td>
+<td>&quot;First opening that's at least 90 min, mornings only, not Mondays&quot;</td>
+<td>constrained availability search (duration + time-of-day + day filters)</td>
+<td>partial</td>
+</tr>
+<tr>
+<td>UC-7</td>
+<td>&quot;What's my 2 PM about?&quot;</td>
+<td><code>get_events</code> → event detail</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-8</td>
+<td>&quot;How booked am I Friday?&quot; / &quot;how many appointments this week?&quot;</td>
+<td><code>get_events</code> → summary/count</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-9</td>
+<td>&quot;When are both Dr. A and Room 2 free?&quot;</td>
+<td>mutual availability across calendars/resources</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-10</td>
+<td>&quot;What are your hours?&quot; / &quot;are you open Sunday?&quot;</td>
+<td>business/working-hours query</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-11</td>
+<td>&quot;Read me my upcoming appointments.&quot;</td>
+<td>lookup by caller identity (see §D) → <code>get_events</code></td>
+<td><strong>NEW</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="b-write-booking-amp-mutation">B. WRITE — booking &amp; mutation</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Caller intent</th>
+<th>Capability</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC-12</td>
+<td>&quot;Book an hour at 2 PM Thursday.&quot;</td>
+<td><code>create_event</code> (after a vetted offer)</td>
+<td>exists — <strong>fragile</strong> (the demo bug)</td>
+</tr>
+<tr>
+<td>UC-13</td>
+<td>&quot;Move my Thursday appointment to Friday at 10.&quot;</td>
+<td><code>update_event(event_id, new_time)</code></td>
+<td><strong>NEW</strong> (needs lookup)</td>
+</tr>
+<tr>
+<td>UC-14</td>
+<td>&quot;Cancel my Thursday appointment.&quot;</td>
+<td><code>cancel_event(event_id)</code></td>
+<td>partial (<code>cancel_booking</code>; no flow)</td>
+</tr>
+<tr>
+<td>UC-15</td>
+<td>&quot;Hold that slot while I check with my wife.&quot;</td>
+<td>tentative/hold (pending confirm), auto-expire</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-16</td>
+<td>&quot;Book me every Tuesday at 3 for a month.&quot;</td>
+<td>recurring <code>create_event</code></td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-17</td>
+<td>&quot;Add my partner to the appointment.&quot;</td>
+<td><code>create_event</code>/<code>update_event</code> with attendees/invites</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-18</td>
+<td>&quot;Make my 2 PM 90 minutes instead of 60.&quot;</td>
+<td><code>update_event</code> (extend/shorten)</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-19</td>
+<td>&quot;Note that it's a leaky faucet.&quot;</td>
+<td><code>update_event</code> (notes/details/purpose)</td>
+<td>partial (purpose on create)</td>
+</tr>
+<tr>
+<td>UC-20</td>
+<td>&quot;Block off Friday morning — I'm out.&quot;</td>
+<td><code>create_event</code> as a busy/blocked block (not a customer meeting)</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-21</td>
+<td>&quot;Yes, confirm the tentative hold.&quot;</td>
+<td>confirm/accept a held slot</td>
+<td>partial (<code>confirm_booking</code>)</td>
+</tr>
+<tr>
+<td>UC-22</td>
+<td>&quot;Book my next cleaning in six months.&quot;</td>
+<td>forward/follow-up booking</td>
+<td><strong>NEW</strong></td>
+</tr>
+<tr>
+<td>UC-23</td>
+<td>&quot;Sign me up for the 10 AM class.&quot;</td>
+<td>group/class booking (many attendees → one slot, capacity)</td>
+<td><strong>NEW</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="c-policy-amp-rules-constrain-every-read-write">C. POLICY &amp; RULES — constrain every read/write</h3>
+<p>Not caller &quot;commands&quot; but rules the flow must enforce (design must specify where
+they live — flow YAML vs cal-provider):</p>
+<ul>
+<li><strong>UC-24</strong> min/max advance + lead time (&quot;nothing sooner than 2 hours; nothing past 60 days&quot;).</li>
+<li><strong>UC-25</strong> duration inference by service type (a &quot;cleaning&quot; = 90 min; a &quot;consult&quot; = 30).</li>
+<li><strong>UC-26</strong> capacity / overbooking (N bookings per slot; classes vs 1:1).</li>
+<li><strong>UC-27</strong> cancellation / reschedule policy (notice window, fees, &quot;too late to cancel&quot;).</li>
+<li><strong>UC-28</strong> buffer / travel time between appointments.</li>
+<li><strong>UC-29</strong> blackout dates / holidays / working-hours enforcement.</li>
+</ul>
+<h3 id="d-identity-amp-multi-tenant-quot-whose-calendar-which-appointment-quot">D. IDENTITY &amp; MULTI-TENANT — &quot;whose calendar, which appointment&quot;</h3>
+<ul>
+<li><strong>UC-30</strong> identify the caller's existing appointment over the phone (by phone number, name, or a confirmation code) — prerequisite for UC-13/14/18.</li>
+<li><strong>UC-31</strong> multiple staff / resources / rooms — pick which (a specific technician, any available).</li>
+<li><strong>UC-32</strong> multi-tenant — which business's calendar this call is for.</li>
+<li><strong>UC-33</strong> list the tenant's calendars (<code>list_calendars</code>).</li>
+</ul>
+<h3 id="e-lifecycle-amp-notifications">E. LIFECYCLE &amp; NOTIFICATIONS</h3>
+<ul>
+<li><strong>UC-34</strong> confirmation + read-back before any write (already an invariant we test — never fabricate).</li>
+<li><strong>UC-35</strong> reminders (SMS/call before the appointment).</li>
+<li><strong>UC-36</strong> waitlist / cancellation backfill (&quot;text me if something opens up Thursday&quot;).</li>
+<li><strong>UC-37</strong> change notifications (tell the caller/attendees when something moves or cancels).</li>
+</ul>
+<h3 id="f-cross-cutting-non-functional-apply-to-every-use-case">F. CROSS-CUTTING (non-functional — apply to <em>every</em> use case)</h3>
+<ul>
+<li><strong>UC-X1 · Robust time understanding.</strong> Natural phrasings (&quot;between 12 and 3&quot;,
+&quot;2-4pm&quot;, &quot;after lunch&quot;, ISO datetimes) must map or <strong>re-ask — never
+hard-escalate</strong> (the current bug; repro: <code>pytest tests/providers/test_slot_mapper.py -k time_range</code>).</li>
+<li><strong>UC-X2 · Deterministic offers (&quot;offers are quotes&quot;, #20).</strong> The caller picks a
+<strong>backend-vetted <code>offer_id</code></strong>, not an LLM-formatted time — fixes UC-12 and makes
+the offer step testable (the robust <code>scheduling_v1</code> locked_choice model).</li>
+<li><strong>UC-X3 · Provider-agnostic.</strong> Every use case works on <code>google</code> / <code>google-oauth</code>
+/ <code>caldav</code> unchanged (the adapter abstracts it).</li>
+<li><strong>UC-X4 · Timezone + DST correctness.</strong> All of the above must be right across
+timezones and DST transitions (a known scheduling footgun; the adapter refuses
+unset/ambiguous TZ by design).</li>
+<li><strong>UC-X5 · Degraded mode + idempotency.</strong> If the calendar is unreachable, degrade
+gracefully (callback), never fabricate a booking, and never double-book on retry
+(the B-CAL invariants we already test).</li>
+</ul>
+<h2 id="3-proposed-tutorial-flows-for-fable-5-to-design">3. Proposed tutorial flows (for Fable 5 to design)</h2>
+<p>One small, focused tutorial flow per capability cluster (mirrors the existing
+<code>tutorial_*</code> flows), each with a deterministic simulator like the one that caught
+B-CAL-1/2. Suggested set (Fable 5 picks the v0 subset):</p>
+<p><strong>v0 (core reads + a fixed booking):</strong></p>
+<ol>
+<li><strong><code>tutorial_list_availability</code></strong> — UC-1/3/4/5: read-only &quot;when are you free.&quot;</li>
+<li><strong><code>tutorial_list_events</code></strong> — UC-2/7/8: &quot;what's on the calendar / what's blocked /
+how booked am I&quot; (drives the new <code>list_events</code> tool).</li>
+<li><strong><code>tutorial_book_appointment</code></strong> (fix the existing one) — UC-12 via the UC-X2
+offer_id model so it stops escalating.</li>
+</ol>
+<p><strong>v1 (mutation + identity):</strong>
+4. <strong><code>tutorial_manage_appointment</code></strong> — UC-13/14/18: reschedule / cancel / resize
+(drives new <code>update_event</code> / <code>cancel_event</code> tools + the UC-30 lookup).
+5. <strong><code>tutorial_hold_and_confirm</code></strong> — UC-15/21: tentative hold → confirm/expire.</p>
+<p><strong>later (advanced):</strong>
+6. <strong><code>tutorial_recurring</code></strong> — UC-16/22: recurring + follow-up booking.
+7. <strong><code>tutorial_multi_resource</code></strong> — UC-9/31/33: pick a staff/room, mutual
+availability, multi-calendar.
+8. <strong><code>tutorial_waitlist</code></strong> — UC-36: cancellation backfill / &quot;text me if it opens.&quot;</p>
+<p>Each tutorial demonstrates one capability cleanly, runs on all three calendar
+systems, and ships with a <code>SchedulerSim</code>-style deterministic test suite.</p>
+<p>Each tutorial flow demonstrates one capability cleanly, runs on all three calendar
+systems, and ships with a <code>SchedulerSim</code>-style deterministic test suite.</p>
+<h3 id="3b-quot-several-different-ways-quot-the-demonstration-matrix">3b. &quot;Several different ways&quot; — the demonstration matrix</h3>
+<p>The tutorials should not be a single happy-path script; they should show the
+<strong>same use case done several different ways</strong>, so an operator/learner sees the
+range. Four independent axes to demonstrate (a tutorial can hold one axis fixed
+and vary another):</p>
+<table>
+<thead>
+<tr>
+<th>Axis</th>
+<th>The &quot;different ways&quot; to show</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Calendar system</strong></td>
+<td>the <em>same</em> flow on <code>google</code>, <code>google-oauth</code>, and <code>caldav</code> — proving provider-agnosticism (swap <code>CAL_PROVIDER</code>, nothing else changes)</td>
+</tr>
+<tr>
+<td><strong>Input modality</strong></td>
+<td><strong>voice</strong> (spoken), <strong>DTMF/keypad</strong> (press 1–3 for a slot), and <strong>tap</strong> (pick a slot on the companion screen — ties to the remote-control work) — all resolving to the same decision</td>
+</tr>
+<tr>
+<td><strong>Offer / selection model</strong></td>
+<td><strong>deterministic <code>locked_choice</code> offers</strong> (robust, testable — the <code>scheduling_v1</code> style we hardened) vs <strong>LLM free-text</strong> (flexible but fragile — the <code>book_appointment_v1</code> style that breaks today); the tutorials should make the trade-off visible and steer toward the offer_id model (#20)</td>
+</tr>
+<tr>
+<td><strong>Domain / vertical</strong></td>
+<td>the same scheduling capability across <strong>plumbing / massage / dental / apartment-viewing / generic appointment</strong> — showing the flow is a reusable module, not a one-off</td>
+</tr>
+</tbody>
+</table>
+<p>Concretely: <code>tutorial_book_appointment</code> should exist in a &quot;voice + LLM-offers&quot;
+form (today's, fragile), a &quot;voice + locked_choice-offers&quot; form (robust), and a
+&quot;DTMF/tap&quot; form — each documented so the difference is teachable, plus a note that
+the same YAML runs on any of the three calendar backends.</p>
+<h2 id="3c-documentation-standard-every-tutorial-must-ship-with">3c. Documentation standard (every tutorial must ship with)</h2>
+<p>Nuance-rich designs get documented extensively — for humans <strong>and</strong> for the LLMs
+that read them. Each tutorial flow ships with:</p>
+<ol>
+<li><strong>A spec</strong> (the design/contract): the use case, the states, the tools it
+calls, the offer model, and the calendar-systems it's verified on.</li>
+<li><strong>A college-readable HTML tutorial</strong> (rendered via <code>scripts/render_doc.py</code>):
+what the caller experiences, an annotated example transcript, and <em>why</em> each
+design choice was made (e.g., why offers are a locked_choice, why the LLM
+never formats a time).</li>
+<li><strong>Inline flow comments</strong> in the YAML explaining each state + guard (the flows
+are read by both operators and the model).</li>
+<li><strong>A deterministic test suite</strong> (the <code>SchedulerSim</code> pattern) whose test names
+read as the capability's behavior spec, listed in the tutorial doc.</li>
+<li><strong>A &quot;run it&quot; section</strong>: the exact <code>voice.html?flow=...</code> URL, the <code>CAL_PROVIDER</code>
+env to try each backend, and the <code>pytest</code> command for the deterministic tests.</li>
+</ol>
+<p>Target audience for the docs: an operator who has never seen the flow should be
+able to run it in an afternoon, and Fable 5 (or a future agent) should be able to
+extend it from the spec alone.</p>
+<h2 id="4-what-must-be-built-the-design-eng-scope">4. What must be BUILT (the design/eng scope)</h2>
+<ul>
+<li><strong>New adapter tools:</strong> <code>list_events</code> (get_events) and <code>reschedule</code>/<code>cancel</code>
+(update_event/cancel_event) surfaced as flow tools with the same slot-mapping
+discipline. (<code>get_available_slots</code> + <code>create_event</code> already surfaced.)</li>
+<li><strong>The #20 offer object:</strong> cal-provider returns concrete bookable offers with an
+<code>offer_id</code> + <code>policy_hash</code>; booking passes an <code>offer_id</code>; cal-provider
+revalidates. Removes the LLM <code>time_range</code> hand-formatting failure entirely.</li>
+<li><strong>Slot-mapper robustness</strong> (interim, if #20 is later): normalize ranges/ISO or
+re-ask (the repro test flips green when done).</li>
+<li><strong>Tutorial flows + deterministic sims</strong> (§3), reusing <code>tests/scheduler_sim.py</code>
+patterns.</li>
+</ul>
+<h2 id="5-open-design-questions-for-fable-5">5. Open design questions for Fable 5</h2>
+<ol>
+<li><strong>One engine or two?</strong> Converge <code>scheduling_v1</code> (deterministic locked_choice
+offers, hardened this session) and <code>book_appointment_v1</code> (LLM offers, live)
+onto one canonical path — likely the offer_id model for both.</li>
+<li><strong>Read-only vs transactional entry points.</strong> UC-1/UC-2 are read-only queries;
+should they be their own top-level intents, or sub-flows of booking?</li>
+<li><strong>Event lookup for reschedule/cancel.</strong> How does the caller identify their
+event over the phone (by time? by confirmation? by a code)? — affects UC-7/8.</li>
+<li><strong>Multi-calendar / multi-tenant.</strong> Does the tutorial assume one calendar, or
+surface <code>list_calendars</code>?</li>
+<li><strong>How much does the LLM touch time at all</strong> post-#20 (ideally: never — it only
+picks an offer_id and reads back).</li>
+</ol>
+<h2 id="6-handoff-to-fable-5-produce-a-v0-design-from-this">6. Handoff to Fable 5 — produce a v0 design from this</h2>
+<p><strong>Next step:</strong> Fable 5 thinks through the above and produces a <strong>v0 design doc</strong>.
+This document is the input, not the design — it gives the use-case list (UC-1…UC-8),
+the capability surface that already exists, the &quot;several different ways&quot; demo
+matrix (§3b), the documentation standard every tutorial must meet (§3c), and the
+open questions to resolve (§5).</p>
+<p>The backend already does the full read/write surface (list events, list free
+slots, create/update/cancel) across three calendar systems; the v0 design should
+cover: <strong>which capabilities to surface as new caller tools (list_events,
+reschedule, cancel), the canonical offer model (the #20 offer_id — so the LLM
+never formats a time), the set of tutorial flows and which &quot;different ways&quot; each
+demonstrates (§3b), and the documentation deliverables per tutorial (§3c)</strong> — each
+tutorial backed by a <code>SchedulerSim</code>-style deterministic test suite like the one
+that caught B-CAL-1/2.</p>
+<p>A good v0 answers §5's open questions, picks the tutorial-flow set, and specifies
+the offer_id contract precisely enough that engineering can build the first
+<code>tutorial_list_availability</code> + fixed <code>tutorial_book_appointment</code> behind it.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#0-tl-dr-is-there-enough-to-design-from">0. TL;DR — is there enough to design from?</a></li><li class="toc-h2"><a href="#1-the-capability-surface-that-already-exists">1. The capability surface that already exists</a></li><li class="toc-h2"><a href="#2-the-use-cases-the-full-calendar-operation-taxonomy">2. The use cases — the full calendar-operation taxonomy</a></li><li class="toc-h3"><a href="#a-read-availability-amp-discovery">A. READ — availability &amp;amp; discovery</a></li><li class="toc-h3"><a href="#b-write-booking-amp-mutation">B. WRITE — booking &amp;amp; mutation</a></li><li class="toc-h3"><a href="#c-policy-amp-rules-constrain-every-read-write">C. POLICY &amp;amp; RULES — constrain every read/write</a></li><li class="toc-h3"><a href="#d-identity-amp-multi-tenant-quot-whose-calendar-which-appointment-quot">D. IDENTITY &amp;amp; MULTI-TENANT — &amp;quot;whose calendar, which appointment&amp;quot;</a></li><li class="toc-h3"><a href="#e-lifecycle-amp-notifications">E. LIFECYCLE &amp;amp; NOTIFICATIONS</a></li><li class="toc-h3"><a href="#f-cross-cutting-non-functional-apply-to-every-use-case">F. CROSS-CUTTING (non-functional — apply to every use case)</a></li><li class="toc-h2"><a href="#3-proposed-tutorial-flows-for-fable-5-to-design">3. Proposed tutorial flows (for Fable 5 to design)</a></li><li class="toc-h3"><a href="#3b-quot-several-different-ways-quot-the-demonstration-matrix">3b. &amp;quot;Several different ways&amp;quot; — the demonstration matrix</a></li><li class="toc-h2"><a href="#3c-documentation-standard-every-tutorial-must-ship-with">3c. Documentation standard (every tutorial must ship with)</a></li><li class="toc-h2"><a href="#4-what-must-be-built-the-design-eng-scope">4. What must be BUILT (the design/eng scope)</a></li><li class="toc-h2"><a href="#5-open-design-questions-for-fable-5">5. Open design questions for Fable 5</a></li><li class="toc-h2"><a href="#6-handoff-to-fable-5-produce-a-v0-design-from-this">6. Handoff to Fable 5 — produce a v0 design from this</a></li></ul></aside>
+</div>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Debug Workspace — design v0</title>
+<style>
+  :root{
+    --ink:#1a1c20; --mut:#5c6470; --line:#e3e6ea; --bg:#fcfcfd; --card:#fff;
+    --accent:#2f6df0; --accent-soft:#eaf1ff; --good:#1f9d55; --warn:#b8860b; --bad:#c0392b;
+    --code-bg:#1d2127; --code-ink:#e6e8eb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.62;font-size:16.5px;}
+  main{max-width:880px;margin:0 auto;padding:34px 40px 90px;}
+  h1.title{font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;}
+  .lede{font-size:18px;color:var(--mut);margin:0 0 10px;}
+  .meta{font-size:13.5px;color:var(--mut);margin:0 0 28px;}
+  .meta code{font-size:12px;}
+  h2{font-size:23px;margin:42px 0 12px;padding-top:8px;letter-spacing:-.01em;}
+  h3{font-size:18px;margin:28px 0 8px;}
+  p{margin:12px 0;}
+  code{background:#eef0f3;padding:1.5px 6px;border-radius:5px;font-size:13.5px;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;
+    overflow-x:auto;font-size:13px;line-height:1.55;margin:16px 0;
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;}
+  pre code{background:none;padding:0;color:inherit;font-size:inherit;}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top;}
+  th{background:#f4f6f9;font-weight:600;}
+  td code{font-size:12.5px;}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);
+    padding:12px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-color:var(--warn);background:#fdf6e3;}
+  .callout.good{border-color:var(--good);background:#eafaf0;}
+  .callout strong{display:block;margin-bottom:3px;}
+  .pill{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;
+    background:#eef0f3;color:var(--mut);padding:2px 8px;border-radius:20px;margin-right:6px;}
+  .uc{border:1px solid var(--line);border-radius:10px;padding:4px 20px 12px;margin:16px 0;background:#fff;}
+  .uc h3{margin-top:14px;}
+  .steps{margin:8px 0 8px 4px;padding-left:18px;}
+  .steps li{margin:5px 0;}
+  .before{color:var(--bad);font-weight:600;font-size:13px;letter-spacing:.03em;text-transform:uppercase;}
+  .after{color:var(--good);font-weight:600;font-size:13px;letter-spacing:.03em;text-transform:uppercase;}
+  a.x{color:var(--accent);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--mut);font-size:13px;}
+  @media(max-width:860px){main{padding:24px 18px 60px}}
+</style>
+</head>
+<body>
+<main>
+<p><a class="x" href="index.html">← RIFF docs</a></p>
+<h1 class="title">Session Debug Workspace</h1>
+<p class="lede">One merged debug artifact per call, and a state inspector inside flow-studio — the observability payoff of the "global workspace" pattern, built as derived views over data riff already emits.</p>
+<p class="meta">design v0 · 2026-07-07 · owner dmar · codex consult <code>019f3f35</code> · md source <code>docs/session-debug-workspace-design-v0.md</code> · implementation plan <code>docs/superpowers/plans/2026-07-07-session-debug-workspace.md</code></p>
+
+<h2>1 · Origin and framing</h2>
+<p>This started from the Transformer Circuits "global workspace" discussion — a small shared space every module can read. Auditing riff against that proposal showed <b>riff already implements the workspace pattern in the superior, derived form</b>: facts in <code>session.slots</code> decoupled from FSM position (<code>types.py:590</code>), missing fields <i>derived</i> per turn (never stored), policy vetoing LLM tool calls (the I-2 confirm-state ban), and the two main slot-write lanes — tool-handler diffs and transition sets/clears — emitted with attribution as <code>slot_write {slot, old, new, kind, writer}</code>. (Not <i>every</i> write: direct <code>session.slots.update/.pop</code> paths still bypass that choke point, which is exactly what UC5 makes measurable.)</p>
+<p>What riff lacks is the workspace's <b>observability payoff</b>: one artifact answering <i>"what did the system know, when, and why did it act?"</i> — and a place in flow-studio where an operator sees it. The evidence exists but is scattered across four artifacts, two of which evaporate.</p>
+<div class="callout"><strong>This design adds no stored state.</strong> Every new field is derived at read or write time from ground truth (slots, events, flow YAML). No workspace object, no universal slot schema, no numeric LLM confidences, no per-turn reflection calls. See §9.</div>
+
+<h2>2 · What exists today (verified)</h2>
+<table>
+<tr><th>Artifact</th><th>Contents</th><th>Live calls?</th><th>Eval runs?</th></tr>
+<tr><td><code>logs/turns.jsonl</code><br><span class="pill">turn_logger.py:52</span></td><td>One rich row per turn: utterance, assistant text, from/to state, verdict, latency, layers, slot_updates, tool_calls with results, public slots, <code>post_turn_snapshot</code></td><td>✅</td><td>❌ evals never call <code>log_turn</code></td></tr>
+<tr><td><code>logs/state_trace.jsonl</code><br><span class="pill">state_trace_writer.py</span></td><td>Durable filtered events: state entered/exited, <code>guard_evaluated</code> (with <code>slots_read</code>), tool_called, transition_committed, turn_complete, …</td><td>✅</td><td>partial</td></tr>
+<tr><td>Event-bus RAM ring<br><span class="pill">events.py:73</span></td><td>ALL events incl. <code>slot_write</code> and <code>transition_verdict</code> (winner + matched/no/shadowed candidates)</td><td>⚠️ evaporates after ~500 events</td><td>⚠️ same</td></tr>
+<tr><td>Eval in-memory transcript<br><span class="pill">flow_eval/driver.py:280–410</span></td><td>Richest per-turn record in the codebase: per-turn state, <code>missing_required_slots</code>, <code>fact_events</code>, <code>state_aspects</code></td><td>n/a</td><td>⚠️ in-memory, gone after the run</td></tr>
+<tr><td><code>web/state-trace-panel.js</code></td><td>Real per-state inspector (guards, tools, transitions, stuck-state diagnosis) via <code>/api/debug/state_trace</code> — mounted in voice.html and post-call.html, <b>not flow-studio</b></td><td>✅</td><td>❌</td></tr>
+<tr><td>flow-studio replay/live<br><span class="pill">flow-studio-replay.js</span></td><td>State-card glow, caller/agent text, tools line, judge score</td><td>✅</td><td>❌</td></tr>
+<tr><td>flow-studio side panel<br><span class="pill">flow-studio.js:1860</span></td><td><b>Static</b> authored <code>required_slots</code> chips only</td><td>no live data</td><td>no live data</td></tr>
+<tr><td><code>data/sessions/&lt;sid&gt;/bus_events.jsonl</code> + <code>scripts/call_replay.py</code><br><span class="pill">Call Replay Atlas, 2026-07-07</span></td><td>Phone-teardown dump of <i>this session's remaining</i> bus events; static replay page with HEAR/PATH/SLOTS/VERDICTS lanes; eval transcripts render too (its R5)</td><td>✅ phone only, <b>truncates when the ring rolled</b></td><td>✅ static page</td></tr>
+</table>
+<div class="callout good"><strong>Relationship to the Call Replay &amp; Layered Atlas.</strong> The atlas is the post-hoc, shareable artifact — one command, one static page per call. This design is the queryable data spine plus the live/interactive surface: an API that flow-studio (and <code>curl</code>+<code>jq</code>) can hit mid-call or post-call. Same three artifacts underneath; A1 provides the durable event source and plan Task 1b merges it into the teardown dump (<code>dump_session_bus_events</code>, <code>scripts/call_replay.py:300</code>, today reads only the RAM ring), which is what makes the atlas's SLOTS/VERDICTS lanes lossless for long calls. The atlas's PII rule (no public slot values anywhere; <code>&lt;str:12&gt;</code>-style reprs survive rendering verbatim) is adopted unchanged.</div>
+
+<h2>3 · The gaps</h2>
+<p><b>Gap 1 — scattered and lossy evidence.</b> "Why did it ask for the address twice?" means hand-joining <code>turns.jsonl</code> + <code>state_trace.jsonl</code> + <code>bus_events.jsonl</code>. And the two most valuable event types — <code>slot_write</code> and <code>transition_verdict</code> — are <b>not durable</b>: they live in the 500-event RAM ring until teardown dumps <i>what remains</i> (phone calls only; web/console/sim sessions get no dump at all). A 40-turn call loses its early slot history precisely when it's the interesting call.</p>
+<p><b>Gap 2 — flow-studio is blind.</b> The editor where authors work shows a state glowing and a transcript — not the live triad (required / filled / missing <i>at that turn</i>), not guard evaluations, not transition verdicts. All of it already exists (<code>get_state_snapshot</code> returns <code>missing_slots_in_state</code>; the state-trace panel renders guards on voice.html) — it just isn't surfaced where authoring happens.</p>
+<p><b>Gap 3 — eval/live schism.</b> Evals compute the richest per-turn record in the codebase, then throw it away. Eval failures can't be scrubbed interactively next to the flow being edited, and there's no single canonical record format to diff an eval run against a live call.</p>
+
+<h2>4 · Design principles (constraints, not aspirations)</h2>
+<table>
+<tr><th></th><th>Principle</th><th>Why</th></tr>
+<tr><td>1</td><td><b>Derive, don't store.</b> Every new field is computed from ground truth at read/write time.</td><td>Stored derivations drift (this is why B-016 was fixable in one function).</td></tr>
+<tr><td>2</td><td><b>Additive-only schema.</b> <code>schema_version: 2</code>; missing = v1; readers ignore unknown fields; ONE server-side normalized reader.</td><td>turns.jsonl has existing consumers (replay UI, replay scripts).</td></tr>
+<tr><td>3</td><td><b>Redaction mandatory</b> for slot values in new fields via <code>_slot_write_repr</code>.</td><td>Deltas are higher-risk than snapshots — they highlight exactly what changed.</td></tr>
+<tr><td>4</td><td><b>Eval rows never land in the live log.</b> Run-scoped <code>logs/evals/&lt;run_id&gt;/turns.jsonl</code>.</td><td>Bloat, index pollution, <code>/api/sessions/active</code> latching.</td></tr>
+<tr><td>5</td><td><b>No new turn-path latency.</b> Event collection + one <i>additional</i> cheap <code>get_state_snapshot()</code> call where the caller holds a StateManager (<code>snapshot_session</code> is a different serializer and doesn't compute the missing list) + appends that already happen.</td><td>Live phone call; the budget is already spent on ASR/LLM/TTS.</td></tr>
+</table>
+
+<h2>5 · The design — two phases</h2>
+<h3>Phase A — merged debug view over existing logs (prove the shape)</h3>
+<p><b>A1 · Durable <code>slot_write</code> + <code>transition_verdict</code>.</b> Two strings added to <code>_RELEVANT_EVENT_TYPES</code> (<code>state_trace_writer.py:46</code>). Written as events happen — lossless where the teardown ring-dump truncates, and covers non-phone sessions. Values are already redacted at the emit sites. The durable file alone doesn't change atlas output (<code>call_replay.py</code> reads only <code>bus_events.jsonl</code>) — plan Task 1b extends the teardown dump to merge it, deduped by the <code>(seq, ts, type)</code> key.</p>
+<p><b>A2 · <code>/api/debug/session_facts?session_id=X</code>.</b> One endpoint merging, per turn: the turns.jsonl row + <code>required_slots_in_state</code> and <code>missing_required_slots</code> (computed server-side from <code>post_turn_snapshot</code> against the flow's required slots — the same derivation <code>is_state_complete</code> uses; the triad needs the required list, not just the missing list) + <code>slot_diff</code> + <code>guards_evaluated</code> + <code>transition_verdict</code>, from all three event sources deduplicated by the <code>(seq, ts, type)</code> key the state-trace endpoint already uses. Per-state <i>visit</i> aggregation stays on the existing <code>/api/debug/state_trace</code>. The live voice path emits no <code>turn_complete</code> boundary today — plan Task 2b adds that emit; older live sessions group unboundaried events to the first turn (stated fallback). Pure merge function in <code>riff/session_debug.py</code>; thin handler.</p>
+<pre><code>{
+  "session_id": "voice-1777009875064",
+  "turns": [{
+    "turn_index": 2,
+    "user_utterance": "uh, two months",
+    "from_state": "collect_duration", "to_state": "collect_duration",
+    "required_slots_in_state": ["service_duration_minutes"],
+    "missing_required_slots": [],
+    "slot_diff": [{"slot": "service_duration_minutes", "old": null,
+                   "new": "&lt;str:8&gt;", "kind": "tool", "writer": "update_slots"}],
+    "guards_evaluated": [{"guard": "all_state_slots_filled_and_valid",
+                          "result": false, "slots_read": ["service_duration_minutes"]}],
+    "transition_verdict": {"winner": null,
+      "candidates": [{"to": "confirm", "when": "…", "result": "no"}]}
+  }]
+}</code></pre>
+<p><b>A3 · flow-studio state inspector.</b> Extend flow-studio's <b>own</b> side panel (decision: do <i>not</i> transplant <code>state-trace-panel.js</code> — it's visit-oriented and styled for voice.html; whole-panel reuse would rot). With a replay/live session attached: the scrubber's turn selects <code>to_state</code>; <code>#spSlots</code> switches from static chips to the triad (filled green, missing amber); new sections render guards (name, ✓/✗, <code>slots_read</code>) and the transition-verdict candidate table. One <code>session_facts</code> fetch on the existing 3-second polling cadence.</p>
+
+<h3>Phase B — canonical TurnRecord v2 + eval parity</h3>
+<p><b>B1 · TurnRecord v2 builder.</b> <code>log_turn</code>'s entry construction becomes <code>build_turn_record(result, ctx, *, state_snapshot, turn_events, slots_before, kind, run_id)</code>. New optional fields: <code>schema_version: 2</code>, <code>kind</code>, <code>run_id</code>, <code>missing_required_slots</code> (from the <b>post-transition</b> snapshot), <code>slot_diff</code>, <code>transition_verdict</code>, <code>guards_evaluated</code> (capped at 24).</p>
+<div class="callout warn"><strong>slot_diff is dual-source with precedence (codex Q2).</strong> Primary: <code>slot_write</code> events collected during the turn (attribution: kind/writer). Reconciliation: before/after diff of <code>session.slots</code>; changes with no matching event are labeled <code>kind: "unattributed_diff"</code> — verified today, several live paths mutate slots directly, and the tool-diff lane skips dict-valued slots. An unattributed entry is a <i>finding</i> (a writer to move behind the choke point), not noise.</div>
+<p><b>B2 · Eval sink + replay.</b> <code>flow_eval/driver.py</code> writes each turn through the same builder to <code>logs/evals/&lt;run_id&gt;/turns.jsonl</code>. The turns API gains a tolerant normalized reader (malformed lines skipped, v1 defaults stamped) and an opt-in way to load an eval run into the same flow-studio scrubber.</p>
+
+<h2>6 · Use cases — step by step</h2>
+
+<div class="uc">
+<h3>UC1 · "Why did Riff ask for the address twice?"</h3>
+<p><span class="before">Today (~20 min, often inconclusive)</span></p>
+<ol class="steps">
+<li>Grep <code>logs/turns.jsonl</code> for the session; find both address turns.</li>
+<li>See <code>slots.address</code> filled at turn 3, absent at turn 6. The row doesn't say who cleared it — <code>slot_updates</code> shows what the LLM proposed, not what the FSM cleared.</li>
+<li>Grep <code>state_trace.jsonl</code>, correlate timestamps by hand. <code>slot_write</code> isn't there (RAM ring only); if the ring rolled before teardown: dead end.</li>
+<li>Re-listen to the audio and guess.</li>
+</ol>
+<p><span class="after">After Phase A (~2 min)</span></p>
+<ol class="steps">
+<li>Open flow-studio <code>?replay=&lt;sid&gt;</code>; scrub to turn 6.</li>
+<li>Side panel <code>slot_diff</code>: <code>{"slot": "address", "old": "&lt;str:14&gt;", "new": null, "kind": "clears", "writer": "confirm_details-&gt;collect_address"}</code> — the writer for transition sets/clears is the edge itself (<code>from_state-&gt;to_state</code>): a transition re-entered <code>collect_address</code>, whose entry clears the slot.</li>
+<li>Root cause in three clicks: fix the re-entry clear or the transition, not the symptom.</li>
+</ol>
+</div>
+
+<div class="uc">
+<h3>UC2 · "Why didn't it move on?" — the call already cited in the code</h3>
+<p>Call <code>voice-1777009875064</code> turn 2 (cited at <code>types.py:632</code>): caller answered a duration question with "2 months"; the FSM correctly refused to advance. The transcript alone can't tell an operator whether that's a bug.</p>
+<p><span class="after">After Phase A</span></p>
+<ol class="steps">
+<li>Open the replay, click turn 2's state card.</li>
+<li>Triad: <code>service_duration_minutes</code> shows <b>filled</b> — so why re-ask?</li>
+<li>Guards: <code>all_state_slots_filled_and_valid → ✗</code>, <code>slots_read: ["service_duration_minutes"]</code> — the validator rejected the value.</li>
+<li>Transition verdict: <code>→ confirm</code> result <code>no</code>. Nothing shadowed. <b>Working as designed</b>, visible without reading Python.</li>
+</ol>
+</div>
+
+<div class="uc">
+<h3>UC3 · Live test call while editing the flow</h3>
+<p><span class="before">Today</span> — flow-studio <code>?live=1</code> shows state glow + transcript; whether the address actually landed in the slot is unknown until post-call.</p>
+<p><span class="after">After Phase A</span></p>
+<ol class="steps">
+<li>Operator calls the test number, watches flow-studio.</li>
+<li>Caller gives name + address in one breath. Triad flips: <code>name</code> ✅ <code>address</code> ✅ <code>problem</code> ⏳ — early-volunteered facts visibly captured (or visibly not, which is the bug you wanted to catch live).</li>
+<li>A garbage write shows immediately as a filled chip + failed validator guard — UC2's failure mode caught during the call instead of from a complaint.</li>
+</ol>
+</div>
+
+<div class="uc">
+<h3>UC4 · Eval regression triage (Phase B)</h3>
+<p><span class="before">Today</span> — CI prints a transcript; the atlas renders a static page if you have the transcript JSON. No interactive scrubber next to the flow being edited; no canonical record to diff against live calls.</p>
+<p><span class="after">After Phase B</span></p>
+<ol class="steps">
+<li>Run <code>eval-2026-07-07-a3f</code> fails on <code>plumbing_urgent_leak</code>.</li>
+<li>Load <code>logs/evals/eval-2026-07-07-a3f/turns.jsonl</code> in flow-studio.</li>
+<li>Scrub to the failing turn: <code>missing_required_slots</code> still lists <code>address</code> while the persona already gave it — <code>slot_diff</code> shows the extractor never wrote it.</li>
+<li>Fix, re-run, diff the two eval replays side by side.</li>
+</ol>
+</div>
+
+<div class="uc">
+<h3>UC5 · "Who wrote this slot?" — attribution audit (Phase B)</h3>
+<ol class="steps">
+<li>Filter a day of turn records for <code>kind: "unattributed_diff"</code>.</li>
+<li>Each hit names a code path that mutates <code>session.slots</code> without the choke point.</li>
+<li>Move it behind the choke point; the category empties. Write-discipline drift becomes a measurable burn-down list instead of silent corruption of the "canonical" record.</li>
+</ol>
+</div>
+
+<h2>7 · Why this is useful (grounded)</h2>
+<ul>
+<li><b>The pain is named in the code.</b> Comments cite specific calls (<code>voice-1777009875064</code>), specific bugs (B-181 "booked while nothing was written" is why tool_calls carry results), and buffer-aging failures (B-148: the editor lost live sessions because the ring aged out <code>state_entered</code>). Every one of those investigations becomes a UC1/UC2 replay.</li>
+<li><b>Eval gates get replayable evidence</b> — every judged failure becomes a scrubbable artifact instead of CI text.</li>
+<li><b>Write discipline becomes observable</b> (UC5) — <code>unattributed_diff</code> measures the choke-point leak instead of letting it silently rot future records.</li>
+<li><b>Zero drift risk, zero latency cost</b> — every field derives from data already in memory or on disk.</li>
+</ul>
+
+<h2>8 · Risks and deterministic defenses</h2>
+<table>
+<tr><th>Risk</th><th>Defense</th></tr>
+<tr><td><b>False canonical record</b> — event capture misses writers; <code>slot_diff</code> looks authoritative but isn't</td><td>Dual-source reconciliation: the before/after diff catches every change, including a direct mutation of the same slot after an attributed write (final redacted shape reconciled against the last event's <code>new</code>); unmatched changes are <i>labeled</i> <code>unattributed_diff</code>, never dropped. Known limit: a mutation whose redacted shape exactly matches the last attributed value is indistinguishable. Test every known writer path.</td></tr>
+<tr><td><b>Log growth / slow replay APIs</b> — bulk evals × rich rows</td><td>Run-scoped eval sinks; summaries bounded (guards and candidates capped at 24, matching the emitter); rotation plan required before bulk eval logging defaults on.</td></tr>
+<tr><td><b>Wrong turn/state attribution</b> — events grouped into the wrong turn window</td><td>Group by <code>turn_index</code> where events carry it; else by <code>turn_complete</code> boundaries. Explicit tests: multi-transition turns, locked-choice short-circuit turns, delayed live <code>turn_complete</code>.</td></tr>
+</table>
+
+<h2>9 · What we are explicitly NOT building</h2>
+<ul>
+<li><b>A stored workspace object</b> (<code>missing_fields</code>/<code>next_best_action</code> as state) — stored derivations go stale the moment the caller says "actually, it's the toilet."</li>
+<li><b>A universal slot schema</b> in the runtime — vertical knowledge lives in tree data (Tree DSL contract).</li>
+<li><b>Numeric LLM confidences</b> — categorical outcomes only (<code>matched / no / shadowed</code>, guard true/false).</li>
+<li><b>Per-turn LLM reflection calls</b> — the deterministic guards already do this in microseconds, without hallucinated "all clear"s.</li>
+<li><b>J-lens / activation-level interpretability</b> — needs model internals hosted APIs don't expose; not a runtime debugging tool.</li>
+</ul>
+
+<h2>10 · Open questions</h2>
+<ol>
+<li>Should <code>/api/sessions/active</code> drop the <code>voice-</code> prefix heuristic in Phase B for a <code>kind</code>-field filter? (Leaning yes; not blocking.)</li>
+<li>Eval replay loading UX: query param vs picker in flow-studio — decide when B2 lands.</li>
+<li>Rotation for <code>state_trace.jsonl</code> once <code>slot_write</code> volume lands (v1 punted rotation; A1 increases volume).</li>
+</ol>
+
+<footer>Session Debug Workspace · design v0 · 2026-07-07 · md source: <code>docs/session-debug-workspace-design-v0.md</code> · plan: <code>docs/superpowers/plans/2026-07-07-session-debug-workspace.md</code></footer>
+</main>
+</body>
+</html>

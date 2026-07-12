@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF Console — Flow Map Design, v0 (addendum to the artifact &amp; trace schema) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">console-flow-map-design-v0.md</span>
+<a class="raw" href="/docs/docs/console-flow-map-design-v0.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF Console — Flow Map Design, v0 (addendum to the artifact &amp; trace schema)</h1>
+<p><strong>Status:</strong> design handoff for the implementing Claude — open decisions marked <code>OD-Mn</code>
+<strong>Date:</strong> 2026-07-01
+<strong>Author:</strong> Fable 5 (design)
+<strong>Depends on:</strong> <code>docs/call-plan-artifact-schema-v0.md</code> (artifact §3, trace §6, invariants I1–I6) and the existing <code>web/console.html</code> + <code>web/flow-walk.html</code> mockups
+<strong>Replaces:</strong> the node-graph problem as previously framed. This is the seventh and final rebuild of the flow view, because it changes the problem, not the rendering.</p>
+<hr />
+<h2 id="0-the-design-decision">0. The design decision</h2>
+<p><strong>The map is a projection of the artifact around a cursor, not a graph layout.</strong> Every prior attempt drew the whole FSM and then tried to make it readable. The operator's actual question during a call is always the same: <em>what just happened, what is happening, what can happen next.</em> That question has a fixed shape — past | present | futures — which is computable from the artifact with zero layout heuristics. Readable by construction.</p>
+<p>We explicitly refuse to solve general graph layout. The domain has exactly two flow topologies (§4.3), each with a deterministic layout. If a third topology ever appears, it gets its own deterministic layout; we still never ship a force-directed renderer.</p>
+<hr />
+<h2 id="1-one-component-three-semantic-zoom-levels">1. One component, three semantic zoom levels</h2>
+<p>Zoom is <strong>semantic, not pixel</strong> — each level shows different information, never smaller text.</p>
+<table>
+<thead>
+<tr>
+<th>level</th>
+<th>name</th>
+<th>shows</th>
+<th>default when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L2</strong></td>
+<td>Overview</td>
+<td>the whole flow, molecules folded, traversed path as a gold trail, return rail</td>
+<td>browsing a flow with no call</td>
+</tr>
+<tr>
+<td><strong>L1</strong></td>
+<td>Corridor</td>
+<td>past breadcrumb | current node | all exits</td>
+<td>live call, replay, or sim step (the default lens)</td>
+</tr>
+<tr>
+<td><strong>L0</strong></td>
+<td>Inspector</td>
+<td>the existing detail row (aliases, asset, freshness, then-what)</td>
+<td>a node is selected</td>
+</tr>
+</tbody>
+</table>
+<p>Transitions: scroll-out / <code>Z</code> key / minimap click → L2. Click any node at L2 → L1 centered there. Click the current node at L1 → L0 opens as the detail row (already built). L0 never replaces the map; it docks below it.</p>
+<hr />
+<h2 id="2-the-cursor">2. The cursor</h2>
+<p>The single unifying concept. The map always renders relative to a cursor <code>(call_id, seq)</code>:</p>
+<ul>
+<li><strong>Live mode:</strong> cursor = the latest <code>state_enter</code> on the call's trace stream (engine bus, per-call topic — handoff step 1). The current node pulses gold.</li>
+<li><strong>Replay / sim mode:</strong> cursor = the selected trace row. <strong>Clicking a trace row moves the map.</strong> Selecting row 6 (<code>route_decision</code> at <code>intent</code>) recenters the corridor on <code>intent</code>, lights the taken edge, dims the roads not taken. The trace panel is the map's scrubber; <code>j</code>/<code>k</code> step the cursor.</li>
+<li>Breadcrumb edge labels come verbatim from trace events: <code>route_decision</code> → <code>heard 'book' · 0.91 · grammar</code>, <code>audio_done</code> → <code>audio done</code> (+ <code>watchdog</code> amber tag when <code>source=watchdog</code>), <code>tool_result</code> → <code>ok · 730ms · slot_offered.morning</code>.</li>
+</ul>
+<p>Consequence for build order: <strong>the map lands after trace-on-the-engine-bus (handoff step 1), not before.</strong> Against the static mockup, the cursor is driven by the hand-written sample trace.</p>
+<hr />
+<h2 id="3-l1-the-corridor">3. L1 — the corridor</h2>
+<p>Three fixed zones, left to right.</p>
+<h3 id="3-1-past-left-25-width">3.1 Past (left, ~25% width)</h3>
+<ul>
+<li>The last 1–3 states as breadcrumb chips, opacity fading with age (1.0 → 0.55 → 0.35). Older history collapses to <code>⋯</code> which opens the trace panel scrolled to that point.</li>
+<li>Each breadcrumb → next edge carries its decision label (§2). This is the &quot;why am I here&quot; answer inline.</li>
+</ul>
+<h3 id="3-2-now-center-30-width">3.2 Now (center, ~30% width)</h3>
+<ul>
+<li>Current node, large, gold ring; pulses only when the cursor is live (CSS animation gated on live mode; static in replay).</li>
+<li>Shows: shape glyph + name, one-line status (<code>listening · no LLM</code> for choose; <code>▶ playing offer.morning · 3.2s left</code> with a progress bar for say; <code>turn 2/4 · gemini-flash</code> for collect; <code>⏱ 4.1s of 6.0s deadline</code> for do), mic icon <strong>only when the mic is open</strong> (collect only — a mic icon appearing on any other node type renders red and links to the L0 finding).</li>
+</ul>
+<h3 id="3-3-next-right-45-width-exhaustive-grouped-classed">3.3 Next (right, ~45% width) — exhaustive, grouped, classed</h3>
+<p>Every possible exit from the current node, no exceptions. Three edge classes with fixed styling:</p>
+<table>
+<thead>
+<tr>
+<th>class</th>
+<th>derivation from artifact</th>
+<th>rendering</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>advance</strong></td>
+<td><code>on_done</code>, token <code>goto</code>s, <code>on_complete</code>, <code>on_success</code>, confirm yes/no</td>
+<td>solid arrow → chip</td>
+</tr>
+<tr>
+<td><strong>failure</strong></td>
+<td><code>on_timeout</code>, <code>no_match.*</code>, <code>on_failure</code>, <code>on_deadline</code>, fallback rungs</td>
+<td>thin amber arrow → amber chip, grouped below the advance chips</td>
+</tr>
+<tr>
+<td><strong>reloop</strong></td>
+<td>edge whose target is an ancestor on the cursor's entry path</td>
+<td><strong>no drawn back-edge.</strong> A <code>↻ returns to &lt;target&gt;</code> badge line under the chips; at L2 it's the return rail</td>
+</tr>
+</tbody>
+</table>
+<p>Node-type-specific rendering of the next zone — this is the keypad unification:</p>
+<ul>
+<li><strong>choose:</strong> the chips <em>are</em> the keypad — digit + label + freshness dot, in DTMF order; &gt;6 tokens collapse to the top 5 + <code>… n more</code> (expands in place). The separate caller-view keypad panel and the corridor's next zone are the same component (<code>&lt;KeypadChips&gt;</code>); the standalone caller view simply renders it with the cursor pinned to the hub.</li>
+<li><strong>say:</strong> usually one advance chip; show remaining-audio progress on the current node instead.</li>
+<li><strong>collect:</strong> advance chip (<code>on_complete → …</code>) + slot checklist (filled slots ticked live from <code>collect_turn</code> events) + failure chips (<code>timeout → handoff</code>).</li>
+<li><strong>do:</strong> the outcome frames as chips (<code>slot_offered.morning ▭</code>, <code>no_slots ▭</code>) + <code>failure/deadline → handoff</code> amber; if a speculative fetch is in flight during a <em>collect</em> cursor, show a small ghost chip <code>⬒ check_calendar · speculative</code> above the next zone.</li>
+</ul>
+<h3 id="3-4-lookahead">3.4 Lookahead</h3>
+<p>Depth 1 strictly (<code>OD-M1</code>: hover-to-peek depth 2 deferred; add only if operators ask. Depth 2 doubles the visual budget and the corridor's whole value is restraint).</p>
+<hr />
+<h2 id="4-l2-the-overview">4. L2 — the overview</h2>
+<h3 id="4-1-what-it-must-show">4.1 What it must show</h3>
+<p>The entire flow with: molecules folded (announce+choose = one node; parameterized states as one node with <code>×N</code> badge per I6 — an unfold toggle expands per-topic, engineer view only), the traversed path of the cursor's call drawn as a gold trail over the base map, current node pulsing in context, freshness dots on every say node, orphaned/legacy nodes in a collapsed &quot;unreachable&quot; tray (not on the canvas).</p>
+<h3 id="4-2-reloops-the-return-rail">4.2 Reloops: the return rail</h3>
+<p>All loop-back edges exit their source node rightward into a single dashed vertical rail at the right edge, which returns as one dashed lane to the loop target. One lane, however many loops. This is the single rule that keeps IVR overviews readable — back-edges are what make flow graphs spaghetti, so they get a dedicated road instead of individual curves.</p>
+<h3 id="4-3-shape-driven-layout-the-only-two-layouts">4.3 Shape-driven layout — the only two layouts</h3>
+<p>Detection runs on the artifact at render time; no config.</p>
+<ul>
+<li><strong>Hub layout</strong> (Space Channel): triggered when a choose node has ≥4 tokens. Columns: entry chain → hub → destination column (stacked, grouped say/collect/do/end) → return rail. Multiple hubs (menu + suggestions) stack vertically as two hub rows sharing the destination column.</li>
+<li><strong>Pipeline layout</strong> (austin_plumbing): everything else. Vertical top-to-bottom chain in FSM order; failure exits as short right-side stubs landing on a shared <code>degraded.handoff</code> node pinned bottom-right; Do nodes inline in the chain with their outcome frames as immediate children; the return rail degenerates to single retry edges (<code>check_calendar_next → check_calendar</code>).</li>
+</ul>
+<p>Mixed flows (a pipeline that opens with a small hub — plumbing's proposed <code>intent</code> front door) render as pipeline with the hub as the first row, its non-booking branches (<code>hours</code>, <code>emergency</code>) as short right-side branches terminating early.</p>
+<h3 id="4-4-minimap">4.4 Minimap</h3>
+<p>At L1, a passive thumbnail of L2 in the corner with the cursor dot — click to zoom out. No interaction beyond that.</p>
+<hr />
+<h2 id="5-behaviors">5. Behaviors</h2>
+<h3 id="5-1-auto-follow-and-pinning-specify-don-t-improvise">5.1 Auto-follow and pinning (specify, don't improvise)</h3>
+<p>Live default = follow: the corridor recenters on every <code>state_enter</code>. Any user interaction (click, hover &gt;1s on a chip, scroll) <strong>pauses follow</strong>; a <code>call moved → resume</code> pill appears top-right showing the current node's name; click or <code>F</code> resumes. This is the log-tail pattern. Replay mode never auto-follows; the cursor moves only by trace selection or <code>j</code>/<code>k</code>.</p>
+<h3 id="5-2-keyboard">5.2 Keyboard</h3>
+<p><code>j</code>/<code>k</code> cursor step (replay) · <code>Z</code> toggle L1/L2 · <code>F</code> resume follow · <code>1–9</code> at a choose cursor = simulate that DTMF press in sim mode (drives the existing offline simulator, appends sim trace rows).</p>
+<h3 id="5-3-diagnosis-rows-stay-in-the-trace-echoed-on-the-map">5.3 Diagnosis rows stay in the trace, echoed on the map</h3>
+<p><code>stall_detected</code> and <code>degraded</code> events flash the current node red/amber and pin a badge until the next <code>state_enter</code>. The trace row remains the primary diagnostic record; the map echo is so an operator watching only the map can't miss it.</p>
+<hr />
+<h2 id="6-data-contract-nothing-new">6. Data contract — nothing new</h2>
+<p>Everything renders from artifact + trace. Derivations, all client-side:</p>
+<ul>
+<li>Edge class: table in §3.3. Reloop = target is an ancestor on the path from <code>entry</code> to source (compute once per artifact).</li>
+<li>Hub detection: choose with ≥4 tokens.</li>
+<li>Freshness: <code>now − asset.rendered_at</code> vs. <code>cadence.max_honest_age</code> → green/amber; missing/unrendered → red.</li>
+<li>Mic state: node type (collect = open; anything else showing open = red flag, matches L0 finding).</li>
+<li>Molecule folding: one node per compiled route-table entry (announce+choose pairs detected as <code>say → choose</code> where the say has no other in-edges and no tokens of its own).</li>
+</ul>
+<p>No schema changes. No layout hints in the artifact. If the client ever needs a hint, that's a signal the layout rule is wrong, not that the schema is incomplete.</p>
+<h2 id="7-console-layout-changes">7. Console layout changes</h2>
+<ul>
+<li>The map takes the engineer panel. The current node list + L0 findings move to a <strong>drawer</strong> (badge shows <code>0e 35w</code>; opens over the map's right third).</li>
+<li>The standalone caller-view keypad panel remains for the no-call browsing state, but is the same <code>&lt;KeypadChips&gt;</code> component as the corridor's choose rendering (§3.3) — one implementation.</li>
+<li>Trace panel unchanged in position; gains row-selection (drives the cursor) and the amber/red row treatments it already has.</li>
+</ul>
+<h2 id="8-audiences-and-rendering-modes">8. Audiences and rendering modes</h2>
+<ul>
+<li><strong>Engineer mode</strong> (default): everything above.</li>
+<li><strong>White-label / customer mode</strong> (<code>OD-M2</code>, default off): keypad + corridor + trace only — no L2, no L0-findings drawer, no node internals, engineer vocabulary replaced (&quot;state&quot; → &quot;step&quot;, node ids hidden). This is the plumber's-office-manager view of their own agent; it exists as a render flag now, styled later.</li>
+<li><strong>Mobile / texted-observer-link</strong> (<code>OD-M3</code>, capability designed, not built — per OD-6 of the schema spec): renders L1 only, single column (breadcrumb above, current, exits below), read-only, driven by the same per-call trace topic behind a short-lived signed URL. The corridor being narrow-by-nature is what makes this free; the overview is desk furniture and never ships to mobile.</li>
+<li><strong>Per-call</strong> (<code>OD-M4</code>): the map component is strictly per-call in v0. Multi-call supervision (N cursors on one L2, shift-supervisor census) is a later layer over the same component, not a v0 concern.</li>
+</ul>
+<h2 id="9-build-order-and-acceptance">9. Build order and acceptance</h2>
+<p>Static mockup first (extends <code>console.html</code>, hand-written data, no live wiring):</p>
+<ol>
+<li><code>&lt;KeypadChips&gt;</code> extracted as the shared component; corridor skeleton (three zones) rendering the §6-sample plumbing trace with <code>j</code>/<code>k</code> scrubbing and trace-row click → cursor.</li>
+<li>Edge classing + failure grouping + reloop badge; node-type-specific next zones (choose/say/collect/do), including the Do outcome-frame chips and the speculative ghost chip.</li>
+<li>L2 hub layout for Space Channel with return rail + gold trail; L2 pipeline layout for austin_plumbing; <code>Z</code> toggle; minimap.</li>
+<li>Follow/pin behavior with the resume pill (fake a &quot;live&quot; mode by replaying the sample trace on a timer).</li>
+<li>Drawer for L0 findings; white-label render flag (hide, don't style).</li>
+</ol>
+<p>Acceptance (the &quot;stop re-litigating&quot; tests):</p>
+<ul>
+<li><strong>A1:</strong> From a cold open on Space Channel, an operator answers &quot;what happens when I press 4, what audio plays, is it fresh, and how does the caller get back to the menu&quot; without reading YAML — in one screen, ≤2 clicks.</li>
+<li><strong>A2:</strong> Clicking trace row 6 of the sample plumbing trace recenters the corridor on <code>intent</code> with <code>heard 'book' · 0.91</code> on the incoming edge and <code>collect_job</code> lit as the taken route.</li>
+<li><strong>A3:</strong> The watchdog-save row (seq 13) flashes/badges the map amber, and the call visibly proceeds — an operator watching only the map sees both the anomaly and the recovery.</li>
+<li><strong>A4:</strong> austin_plumbing renders as a readable pipeline with zero manual layout input, both Do nodes inline with their outcome frames, all failure stubs landing on one <code>degraded.handoff</code>.</li>
+<li><strong>A5:</strong> During the fake-live replay, interacting with any chip pauses follow and the resume pill appears; <code>F</code> snaps back to the current state.</li>
+</ul>
+<h2 id="10-open-decisions">10. Open decisions</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>decision</th>
+<th>default in v0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OD-M1</td>
+<td>Corridor lookahead depth</td>
+<td>1. Hover-peek depth 2 only if operators ask.</td>
+</tr>
+<tr>
+<td>OD-M2</td>
+<td>White-label mode scope</td>
+<td>Render flag exists, hides engineer surfaces; visual styling deferred until the first external customer view.</td>
+</tr>
+<tr>
+<td>OD-M3</td>
+<td>Mobile observer</td>
+<td>Capability in the design (L1-only, per-call trace topic, signed URL); build nothing until OD-6 lands.</td>
+</tr>
+<tr>
+<td>OD-M4</td>
+<td>Multi-call supervision</td>
+<td>Out of v0; component stays per-call.</td>
+</tr>
+<tr>
+<td>OD-M5</td>
+<td>Sim entry point</td>
+<td><code>1–9</code> keypress at a choose cursor drives the existing offline simulator. Confirm the all-options harness can emit §6 trace rows; if not, that emission is a prerequisite (and generally useful — it's L1-sim speaking the shared format).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-implementation-plan-amp-status-claude">11. Implementation plan &amp; status (Claude)</h2>
+<p><strong>Division of labor (per David):</strong> Claude implements (with <strong>codex</strong> reviewing plans/diffs); <strong>antigravity (<code>agy</code>)</strong> publishes documentation to <code>docs/html</code>.</p>
+<p><strong>Dependencies already landed:</strong></p>
+<ul>
+<li><code>riff/trace.py</code> — the §6 <code>TraceEmitter</code> (the cursor stream). <code>e6f78fbd</code>.</li>
+<li><code>riff/riffc.py</code> — node classification + L0 checks; extends to emit <code>{shape, edges}</code> (the corridor's layout data — hub=choose≥4 tokens; edge classes advance/failure/reloop). Shape signal verified: space_channel=hub (10 tokens), austin_plumbing=chain (max 3 tokens).</li>
+<li><code>web/console.html</code>, <code>web/flow-walk.html</code> — the mockups this extends. <code>flow-walk</code> is the proto-corridor (drill-down = the &quot;next&quot; zone).</li>
+</ul>
+<p><strong>Build steps (map to §9), each shippable, static mockup first (no live wiring):</strong></p>
+<ol>
+<li>Extend <code>riffc</code> to emit <code>{shape, edges:[{from,to,class}]}</code> (derivations in §6). Validation-only, safe. → feeds L2 layout + edge classing.</li>
+<li>Extract <code>&lt;KeypadChips&gt;</code> shared component; corridor three-zone skeleton rendering the §6 sample trace; <code>j</code>/<code>k</code> scrub + trace-row→cursor. (§9.1)</li>
+<li>Edge classing + failure grouping + reloop badge; node-type next zones incl. Do outcome-frames + speculative ghost. (§9.2)</li>
+<li>L2 hub layout (Space Channel) + pipeline layout (austin) + return rail + gold trail + <code>Z</code> toggle + minimap. (§9.3)</li>
+<li>Follow/pin + resume pill (fake-live via timed replay). (§9.4)</li>
+<li>L0-findings drawer + white-label render flag. (§9.5)</li>
+</ol>
+<p><strong>Validation:</strong> the five acceptance tests A1–A5 (§9). Each build step is validated against its acceptance criterion in the browser (Playwright screenshot). No live wiring until the trace-on-the-engine-bus step (schema §9 step 1, part 2) lands.</p>
+<p><strong>Codex:</strong> review this plan before build step 2 (the front-end architecture — <code>&lt;KeypadChips&gt;</code> boundary, cursor model). Review the diff after steps 3 and 4 (the layout logic, where bugs hide).</p>
+<p><strong>Codex plan review (2026-07-01) — 8 findings, resolutions:</strong></p>
+<ol>
+<li>&quot;Static prototype&quot; vs &quot;production map&quot; conflict with the &quot;map after trace-bus&quot; rule → <strong>split them; require a §6 JSONL trace fixture before live wiring.</strong> DONE: <code>tests/fixtures/trace_plumbing_sample.jsonl</code> + schema test.</li>
+<li>Cursor <code>(call_id, seq)</code> underspecified for non-<code>state_enter</code> rows (e.g. <code>tool_start</code> while state is still <code>collect_job</code>) → <strong>current_state = latest prior <code>state_enter</code>; the selected event is an overlay.</strong> (corridor build note)</li>
+<li>Live follow + pause + resume + scrubbing in single-file HTML → <strong>use a tiny event reducer/state machine, not scattered DOM mutations.</strong> (corridor build note)</li>
+<li><code>&lt;KeypadChips&gt;</code> coupling risk → <strong>make it a pure token-chip renderer; caller-view and corridor are separate adapters.</strong> (corridor build note)
+5/6. Client-side edge derivation duplicates FSM semantics → <strong>riffc's edge list is canonical (class + reason); the browser renders, never infers.</strong> DONE: <code>classify_edges</code> emits <code>{class, reason}</code>; L1 recomputes reloop vs the live cursor path.</li>
+<li><strong>Real contradiction:</strong> hub = choose≥4 tokens, but austin's <em>proposed</em> <code>intent</code> (4 tokens) is a pipeline → token-count alone is wrong. Correct on today's real flows (space=hub/10, austin=chain/3); flagged as <strong>OD-M-shape</strong> — distinguish menu-hub from front-door intent by compiled topology (fan-out to distinct destinations) before adding <code>intent</code>.</li>
+<li>Pipeline needs deterministic order but <code>nodes</code> is a map → <strong>riffc emits <code>order</code> (DFS pre-order from entry).</strong> DONE.</li>
+</ol>
+<p><strong>Status log:</strong></p>
+<ul>
+<li>2026-07-01 — design saved. Dependencies landed: <code>riff/trace.py</code> (§6 emitter, <code>e6f78fbd</code>), <code>riff/riffc.py</code> classifier + <strong><code>{shape, edges, order}</code></strong> (build step 1 — DONE, codex-informed: canonical edges w/ class+reason, node order, DFS-backedge reloops; 4 reloops correctly = the briefing→menu returns). Trace fixture landed. Codex reviewed the plan (8 findings above). <strong>Next:</strong> corridor skeleton (build step 2) — <code>&lt;KeypadChips&gt;</code> pure renderer + a cursor reducer driving the §6 fixture, <code>j</code>/<code>k</code> scrub + trace-row→cursor.</li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#0-the-design-decision">0. The design decision</a></li><li class="toc-h2"><a href="#1-one-component-three-semantic-zoom-levels">1. One component, three semantic zoom levels</a></li><li class="toc-h2"><a href="#2-the-cursor">2. The cursor</a></li><li class="toc-h2"><a href="#3-l1-the-corridor">3. L1 — the corridor</a></li><li class="toc-h3"><a href="#3-1-past-left-25-width">3.1 Past (left, ~25% width)</a></li><li class="toc-h3"><a href="#3-2-now-center-30-width">3.2 Now (center, ~30% width)</a></li><li class="toc-h3"><a href="#3-3-next-right-45-width-exhaustive-grouped-classed">3.3 Next (right, ~45% width) — exhaustive, grouped, classed</a></li><li class="toc-h3"><a href="#3-4-lookahead">3.4 Lookahead</a></li><li class="toc-h2"><a href="#4-l2-the-overview">4. L2 — the overview</a></li><li class="toc-h3"><a href="#4-1-what-it-must-show">4.1 What it must show</a></li><li class="toc-h3"><a href="#4-2-reloops-the-return-rail">4.2 Reloops: the return rail</a></li><li class="toc-h3"><a href="#4-3-shape-driven-layout-the-only-two-layouts">4.3 Shape-driven layout — the only two layouts</a></li><li class="toc-h3"><a href="#4-4-minimap">4.4 Minimap</a></li><li class="toc-h2"><a href="#5-behaviors">5. Behaviors</a></li><li class="toc-h3"><a href="#5-1-auto-follow-and-pinning-specify-don-t-improvise">5.1 Auto-follow and pinning (specify, don&#x27;t improvise)</a></li><li class="toc-h3"><a href="#5-2-keyboard">5.2 Keyboard</a></li><li class="toc-h3"><a href="#5-3-diagnosis-rows-stay-in-the-trace-echoed-on-the-map">5.3 Diagnosis rows stay in the trace, echoed on the map</a></li><li class="toc-h2"><a href="#6-data-contract-nothing-new">6. Data contract — nothing new</a></li><li class="toc-h2"><a href="#7-console-layout-changes">7. Console layout changes</a></li><li class="toc-h2"><a href="#8-audiences-and-rendering-modes">8. Audiences and rendering modes</a></li><li class="toc-h2"><a href="#9-build-order-and-acceptance">9. Build order and acceptance</a></li><li class="toc-h2"><a href="#10-open-decisions">10. Open decisions</a></li><li class="toc-h2"><a href="#11-implementation-plan-amp-status-claude">11. Implementation plan &amp;amp; status (Claude)</a></li></ul></aside>
+</div>
+</body>
+</html>

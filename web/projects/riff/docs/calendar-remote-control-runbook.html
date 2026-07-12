@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Runbook — Testing the Calendar Shift-Left + Companion Remote-Control Work · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">calendar-remote-control-runbook.md</span>
+<a class="raw" href="/docs/docs/calendar-remote-control-runbook.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Runbook — Testing the Calendar Shift-Left + Companion Remote-Control Work</h1>
+<p><strong>Date:</strong> 2026-07-02 · <strong>Branch:</strong> <code>voice-capability-hierarchy</code></p>
+<p>Everything here runs <strong>locally, no phone call and no cloud creds</strong> — except the
+last step (the live voice booking demo), which is called out. Each step lists the
+command, what success looks like, and what it proves.</p>
+<hr />
+<h2 id="0-prerequisites-once">0. Prerequisites (once)</h2>
+<pre><code class="language-bash">cd ~/src/riff
+set -a; . ./.env; set +a          # load env
+which .venv/bin/python            # confirm the venv exists
+</code></pre>
+<hr />
+<h2 id="1-fast-deterministic-suite-the-whole-session-s-work-1-min">1. Fast deterministic suite — the whole session's work (~1 min)</h2>
+<p>The highest-confidence check. Proves the calendar guardrail, the companion-WS
+wire + hardening, the scheduler <code>time_range</code> fix, and the booking invariants.</p>
+<pre><code class="language-bash">RIFF_SKIP_EVAL=1 .venv/bin/python -m pytest -q -p no:cacheprovider \
+  tests/test_calendar_auth_load_checks.py \
+  tests/test_companion_control.py tests/phone/test_companion_control_ws.py \
+  tests/phone/test_observer.py \
+  tests/providers/test_slot_mapper.py \
+  tests/primitives/test_book_appointment_invariants.py
+</code></pre>
+<p><strong>Expected:</strong> <code>89 passed, 2 xfailed</code>.
+<strong>Proves:</strong> the load-time auth guardrail (9), the tap→ladder wire + concurrency
+hardening (28), the <code>time_range</code> normalization incl. the tool boundary (47), and
+book-appointment invariants I-1..I-5 (rest).</p>
+<hr />
+<h2 id="2-the-calendar-shift-left-guardrail-catch-a-bad-flow-at-build-time">2. The calendar shift-left guardrail — catch a bad flow at BUILD time ⭐</h2>
+<p>The headline. A calendar <strong>mutation</strong> flow that skips the verification gate
+<strong>fails to load</strong> — so one caller can never move/cancel another's appointment,
+and the bug is caught at build, not on a live call.</p>
+<pre><code class="language-bash">RIFF_SKIP_EVAL=1 .venv/bin/python - &lt;&lt;'PY'
+from riff.loader import _check_calendar_mutation_verified as chk
+from riff.types import Flow, StateDef
+mk = lambda *s: Flow(flow_id='demo', display_name='', business_profile={},
+                     system_prompt='', initial_state=s[0].id,
+                     states={x.id: x for x in s})
+# an UNGATED cancel state (declares calendar.cancel, no caller_verified gate)
+bad = StateDef(id='cancel_it', speech_act='act',
+               allowed_tools=('schedule_event',), effects=('calendar.cancel',))
+try:
+    chk(mk(bad)); print('NO RAISE — bug!')
+except ValueError as e:
+    print('GUARDRAIL FIRED ✔\n ', e)
+PY
+</code></pre>
+<p><strong>Expected:</strong> <code>GUARDRAIL FIRED ✔</code> with a message naming <code>cancel_it</code> and telling
+you to add <code>preconditions: [caller_verified]</code>.
+<strong>Proves:</strong> the load-time enforcement (§2a) works. Sanity: the four real calendar
+flows still load (<code>tests/test_calendar_auth_load_checks.py</code> covers this).</p>
+<hr />
+<h2 id="3-companion-quot-text-follow-along-quot-the-texted-link-page-visual">3. Companion &quot;text follow along&quot; — the texted-link page (visual)</h2>
+<p>The page a caller gets by SMS, following a call live. No phone needed — a sim
+drives the real Flask+Sock app.</p>
+<pre><code class="language-bash">.venv/bin/python scripts/companion_sim_server.py 8807
+# then open in a browser:
+#   http://127.0.0.1:8807/companion.html?call=sim-call-1
+</code></pre>
+<p><strong>Expected:</strong> the page follows a simulated Space Channel call live — menu →
+launches → space weather → &quot;text link&quot; → send. <code>Ctrl-C</code> to stop.
+<strong>Proves:</strong> the companion channel (the supplementary-info transport the calendar
+live-offer-mirror design builds on).</p>
+<hr />
+<h2 id="4-the-tap-control-wire-flag-on-plumbing-proven-honest-v0-limit">4. The tap control wire — flag on (plumbing proven; honest v0 limit)</h2>
+<pre><code class="language-bash">RIFF_COMPANION_CONTROL=1 .venv/bin/python scripts/companion_sim_server.py 8807
+</code></pre>
+<p>Open the page, open DevTools <strong>Console</strong>, paste:</p>
+<pre><code class="language-js">const ws = new WebSocket(&quot;ws://127.0.0.1:8807/ws/companion?call=sim-call-1&quot;);
+ws.onmessage = e =&gt; console.log(&quot;REPLY:&quot;, e.data);
+ws.onopen = () =&gt; ws.send(JSON.stringify({
+  v:&quot;0.1&quot;, call_id:&quot;sim-call-1&quot;, role:&quot;caller&quot;, channel:&quot;companion&quot;,
+  session_id:&quot;tab1&quot;, client_id:&quot;tab1&quot;, client_seq:1, decision_epoch:1,
+  type:&quot;tap&quot;, payload:{node:&quot;suggestions&quot;, token:&quot;launches&quot;}
+}));
+</code></pre>
+<p><strong>Expected:</strong> a <code>REPLY: {&quot;type&quot;:&quot;control_result&quot;, ...}</code> in the console. Send the
+same frame again → the reply reason becomes <code>duplicate</code> (dedupe works).
+<strong>Honest v0 limit:</strong> the reply status is <code>dropped / no_decision</code> — a tap
+<strong>routes and replies</strong> (the wire is proven) but doesn't yet <em>move the FSM</em>. Full
+tap-drives-the-call needs the surface renderer (item 3) + a live call (item 1).</p>
+<hr />
+<h2 id="5-the-humanness-fix-no-leaked-placeholders">5. The humanness fix — no leaked placeholders</h2>
+<pre><code class="language-bash">grep -rn &quot;(internal)&quot; flows/modules/book_appointment_v1.yaml flows/modules/scheduling_v1.yaml \
+  &amp;&amp; echo &quot;LEAK STILL PRESENT&quot; || echo &quot;CLEAN ✔ — internal placeholders replaced&quot;
+</code></pre>
+<p><strong>Expected:</strong> <code>CLEAN ✔</code>.
+<strong>Proves:</strong> the act-state <code>entry.line</code>s that were being spoken aloud
+(<code>&quot;(internal) booking now&quot;</code>) are now natural fillers (&quot;Great — booking that in
+for you now.&quot;).</p>
+<hr />
+<h2 id="6-live-voice-booking-demo-needs-the-voice-server-cal-provider-creds">6. Live voice booking demo (needs the voice server + cal-provider creds)</h2>
+<p>The end-to-end booking path with the <code>time_range</code> P1 fix — the demo that used to
+escalate now books.</p>
+<pre><code class="language-bash"># start the voice/phone server (see scripts/start-phone-quick.sh on a tunneled host),
+# then open:  http://127.0.0.1:8765/voice.html?flow=tutorial_book_appointment
+# Say: &quot;Tuesday afternoon&quot; → pick an offered slot → give name + phone →
+#      say &quot;yes&quot; at the read-back → hear &quot;you're booked&quot;.
+</code></pre>
+<p><strong>Expected:</strong> a real booking (an <code>event_id</code>), no escalation on &quot;12:00 to 15:00&quot;
+/ &quot;2-4pm&quot; style phrasing.
+<strong>Proves:</strong> the P1 fix end-to-end. <em>(This is the one step needing a running voice
+server + cal-provider; steps 1–5 need neither.)</em></p>
+<hr />
+<h2 id="what-each-step-covers-at-a-glance">What each step covers, at a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Needs</th>
+<th>Proves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>nothing</td>
+<td>all deterministic logic (89 tests)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>nothing</td>
+<td>build-time auth guardrail</td>
+</tr>
+<tr>
+<td>3</td>
+<td>browser</td>
+<td>companion &quot;follow along&quot; page</td>
+</tr>
+<tr>
+<td>4</td>
+<td>browser</td>
+<td>tap→ladder wire + dedupe (v0: routes, doesn't act)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>nothing</td>
+<td>humanness placeholder fix</td>
+</tr>
+<tr>
+<td>6</td>
+<td>voice server + creds</td>
+<td>the booking path end-to-end</td>
+</tr>
+</tbody>
+</table>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#0-prerequisites-once">0. Prerequisites (once)</a></li><li class="toc-h2"><a href="#1-fast-deterministic-suite-the-whole-session-s-work-1-min">1. Fast deterministic suite — the whole session&#x27;s work (~1 min)</a></li><li class="toc-h2"><a href="#2-the-calendar-shift-left-guardrail-catch-a-bad-flow-at-build-time">2. The calendar shift-left guardrail — catch a bad flow at BUILD time ⭐</a></li><li class="toc-h2"><a href="#3-companion-quot-text-follow-along-quot-the-texted-link-page-visual">3. Companion &amp;quot;text follow along&amp;quot; — the texted-link page (visual)</a></li><li class="toc-h2"><a href="#4-the-tap-control-wire-flag-on-plumbing-proven-honest-v0-limit">4. The tap control wire — flag on (plumbing proven; honest v0 limit)</a></li><li class="toc-h2"><a href="#5-the-humanness-fix-no-leaked-placeholders">5. The humanness fix — no leaked placeholders</a></li><li class="toc-h2"><a href="#6-live-voice-booking-demo-needs-the-voice-server-cal-provider-creds">6. Live voice booking demo (needs the voice server + cal-provider creds)</a></li><li class="toc-h2"><a href="#what-each-step-covers-at-a-glance">What each step covers, at a glance</a></li></ul></aside>
+</div>
+</body>
+</html>

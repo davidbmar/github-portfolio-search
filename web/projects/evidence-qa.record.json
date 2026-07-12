@@ -1,0 +1,86 @@
+{
+  "title": "Evidence Qa",
+  "one_liner": "A document-grounded Q&A engine that retrieves, reranks, and synthesizes cited answers from uploaded files.",
+  "what_it_is": "A Python library and CLI for building retrieval-augmented generation systems. It ingests PDF, DOCX, TXT, MD, and CSV files into named collections, embeds them using BGE models, and answers user questions by retrieving relevant chunks, reranking them with a cross-encoder, and synthesizing a concise answer via an LLM. It prioritizes factual grounding, returning 'I don't have information' if evidence is insufficient.",
+  "how_its_built": "The system uses a two-layer architecture: a generic `docqa` engine for dynamic file ingestion and a specialized `evidence_qa` module for fixed-corpus benchmarks. The pipeline consists of semantic retrieval (BGE embeddings), cross-encoder reranking, and LLM synthesis. It supports local GGUF models for synthesis or falls back to extractive answers if no LLM backend is configured. Storage is file-based using JSONL for chunks and NumPy arrays for embeddings.",
+  "how_to_apply": "Use the `docqa` library to ingest documents into a collection via `ingest()` or the CLI, then query using `ask()`. Integrate the `retrieve()` and `ask()` functions into other applications, such as voice agents or customer support bots, to provide grounded responses. The FastAPI app (`app.py`) serves as a reference UI for upload and query interactions.",
+  "quickstart": "python -m venv .venv && ./.venv/bin/pip install -e \".[ui,local-llm]\"\n./.venv/bin/docqa ingest gardening tomatoes.pdf notes.md\n./.venv/bin/docqa ask gardening \"how often should I water tomatoes?\"\n./.venv/bin/uvicorn app:app --port 8000",
+  "features": [
+    "Ingests PDF, DOCX, TXT, MD, and CSV files into named collections",
+    "Semantic retrieval using BGE embeddings with cross-encoder reranking",
+    "LLM-synthesized answers with source citations or safe abstention",
+    "File-based persistence for chunks and embeddings without external databases",
+    "Minimal FastAPI web UI for document upload and interactive querying",
+    "Headless library API for integration into custom agents or workflows"
+  ],
+  "diagram_architecture": "flowchart TD\n    User[User]\n    CLI[CLI Interface]\n    WebUI[FastAPI Web UI]\n    DocQA[DocQA Engine]\n    Ingest[Ingestion Module]\n    Store[Collection Store]\n    EvidenceQA[Evidence QA Primitives]\n    Semantic[Semantic Retrieval BGE]\n    Rerank[Cross Encoder Rerank]\n    LLM[LLM Synthesis]\n    Files[Document Files]\n    Chunks[Chunks JSONL]\n    Embeddings[Embeddings NPY]\n    User --> CLI\n    User --> WebUI\n    CLI --> DocQA\n    WebUI --> DocQA\n    DocQA --> Ingest\n    DocQA --> EvidenceQA\n    Ingest --> Files\n    Ingest --> Store\n    Store --> Chunks\n    Store --> Embeddings\n    EvidenceQA --> Semantic\n    EvidenceQA --> Rerank\n    EvidenceQA --> LLM\n    Semantic --> Embeddings\n    Rerank --> Semantic\n    LLM --> Rerank",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant App as Application\n    participant DocQA as DocQA Engine\n    participant Store as Collection Store\n    participant Retriever as Semantic Retriever\n    participant Reranker as Cross Encoder\n    participant Synthesizer as LLM Synthesizer\n    User->>App: ask question\n    App->>DocQA: ask collection question\n    DocQA->>Store: load embeddings and chunks\n    Store-->>DocQA: return vectors and text\n    DocQA->>Retriever: embed query and search\n    Retriever-->>DocQA: return top k chunks\n    DocQA->>Reranker: rerank chunks\n    Reranker-->>DocQA: return ranked chunks\n    DocQA->>Synthesizer: generate answer from context\n    Synthesizer-->>DocQA: return cited answer\n    DocQA-->>App: return result\n    App-->>User: display answer and citations",
+  "capabilities": [
+    "Multi-format document parsing",
+    "Incremental file ingestion",
+    "Semantic vector search",
+    "Cross-encoder reranking",
+    "Grounded answer synthesis",
+    "Safe abstention mechanism"
+  ],
+  "components": [
+    "docqa ingest module",
+    "docqa store module",
+    "evidence_qa semantic module",
+    "evidence_qa rerank module",
+    "evidence_qa llm module",
+    "FastAPI web interface"
+  ],
+  "tech": [
+    "Python",
+    "FastAPI",
+    "NumPy",
+    "pypdf",
+    "python-docx",
+    "BGE Embeddings",
+    "Cross-Encoder",
+    "GGUF LLMs"
+  ],
+  "depends_on": [
+    "pypdf",
+    "python-docx",
+    "numpy",
+    "fastapi",
+    "uvicorn",
+    "sentence-transformers",
+    "torch"
+  ],
+  "integrates_with": [
+    "Local LLM backends",
+    "Custom voice agents",
+    "External benchmark suites",
+    "File systems for storage"
+  ],
+  "patterns": [
+    "Retrieval-Augmented Generation",
+    "Headless Library Design",
+    "File-Based Persistence",
+    "Graceful Degradation",
+    "Incremental Indexing"
+  ],
+  "reuse_tags": [
+    "RAG",
+    "Document-QA",
+    "Semantic-Search",
+    "Python-Library",
+    "Local-LLM",
+    "Cited-Answers"
+  ],
+  "slug": "evidence-qa",
+  "repo_url": "https://github.com/davidbmar/evidence-qa",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-07-09T10:29:15.200087Z",
+  "source_commit": "62e2d90",
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-07-09T08:46:27Z",
+  "docs": []
+}

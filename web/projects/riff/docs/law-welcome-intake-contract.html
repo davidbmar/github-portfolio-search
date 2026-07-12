@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Law Welcome + Intake Contract</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1f2933;
+      --muted: #5d6778;
+      --line: #d7dce5;
+      --panel: #f7f8fb;
+      --gold: #c8a24a;
+      --green: #2f855a;
+      --red: #b42318;
+    }
+    body {
+      margin: 0;
+      font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #fff;
+    }
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    h1, h2 {
+      line-height: 1.2;
+      margin: 0 0 12px;
+    }
+    h1 {
+      font-size: 28px;
+    }
+    h2 {
+      font-size: 20px;
+      margin-top: 32px;
+    }
+    p {
+      max-width: 840px;
+    }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .diagram {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin: 18px 0 28px;
+    }
+    .lane {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 16px;
+    }
+    .lane h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+    ol.path {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: step;
+    }
+    ol.path li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+    }
+    ol.path li:first-child {
+      border-top: 0;
+    }
+    ol.path li::before {
+      content: counter(step);
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--gold);
+      color: #111;
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.94em;
+      background: #eef1f6;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+    .callout {
+      border-left: 4px solid var(--gold);
+      background: #fff9e8;
+      padding: 12px 14px;
+      margin: 18px 0;
+    }
+    .ok {
+      color: var(--green);
+      font-weight: 700;
+    }
+    .bad {
+      color: var(--red);
+      font-weight: 700;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    @media (max-width: 760px) {
+      .diagram {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Law Welcome + Intake Contract</h1>
+    <div class="meta">Flow: <code>legal_intake</code> | Phone: <code>+15122777529</code> / 512-277-7LAW | Updated 2026-07-07</div>
+
+    <p>The law line is auth-first for returning callers, but intake-first for useful lead capture. Caller ID may select the returning path; the saved profile facts are not copied into intake slots until the SMS code succeeds.</p>
+
+    <h2>Path Diagram</h2>
+    <div class="diagram">
+      <section class="lane">
+        <h3>New caller</h3>
+        <ol class="path">
+          <li><code>welcome_first</code></li>
+          <li><code>intake_guest_gate</code></li>
+          <li><code>intake_name_ask</code></li>
+          <li><code>intake_legal_topics_ask</code></li>
+          <li><code>intake_sms_optin_gate</code></li>
+          <li><code>intake_send_link</code> if SMS consent is yes</li>
+          <li><code>intake_verify_code</code> if a code was sent</li>
+          <li><code>intake_pre_save</code> - silent bridge</li>
+          <li><code>intake_save</code></li>
+          <li><code>intake_confirm</code> then menu</li>
+        </ol>
+      </section>
+
+      <section class="lane">
+        <h3>Known caller with SMS consent</h3>
+        <ol class="path">
+          <li><code>welcome_back</code></li>
+          <li><code>welcome_send_follow_along</code></li>
+          <li><code>welcome_follow_along_sent</code></li>
+          <li><code>welcome_auth_choice</code>: link or code verifies; 0/skip is guest</li>
+          <li><code>welcome_verify_code</code> after explicit verify/code retry</li>
+          <li><code>welcome_unlock_granted</code> on correct code</li>
+          <li><code>intake_verified_prefill</code></li>
+          <li><code>intake_legal_topics_ask</code></li>
+          <li><code>intake_sms_optin_gate</code> skips re-asking consent</li>
+          <li><code>intake_pre_save</code> then <code>intake_save</code></li>
+        </ol>
+      </section>
+    </div>
+
+    <div class="callout">
+      <span class="ok">Invariant:</span> opening the unique link or giving the correct four-digit code authenticates the session. <code>0</code>, skip, or guest continues without authentication.
+    </div>
+
+    <h2>Why It Regressed</h2>
+    <ul>
+      <li>The welcome-auth gate was added, but successful verification reused the old generic option-0 profile entry.</li>
+      <li>The old entry had no post-auth prefill state, so verified callers could be routed through stale name/SMS prompts or toward the menu.</li>
+      <li>Code handling was not narrow enough; the regression test now proves codes are accepted only in verification-code states.</li>
+    </ul>
+
+    <h2>Tests</h2>
+    <ul>
+      <li><code>TestLegalWelcomeEntryPathSim::test_known_caller_security_code_requires_zero_before_unlock</code></li>
+      <li><code>TestLegalProfileIntakeCompileShape::test_welcome_module_authenticates_returning_callers_before_intake</code></li>
+      <li><code>TestLegalProfileIntakeCompileShape::test_sms_consent_gate_skips_only_for_verified_on_file_consent</code></li>
+    </ul>
+
+    <p>Markdown source: <code>docs/superpowers/specs/2026-07-07-law-welcome-intake-contract.md</code>.</p>
+  </main>
+</body>
+</html>

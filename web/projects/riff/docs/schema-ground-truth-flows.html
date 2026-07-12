@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ground-truth fact sheet for the v0 artifact schema · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">schema-ground-truth-flows.md</span>
+<a class="raw" href="/docs/docs/schema-ground-truth-flows.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Ground-truth fact sheet for the v0 artifact schema</h1>
+<p><strong>For:</strong> Fable 5's v0 artifact/trace schema draft
+<strong>From:</strong> Claude (Opus 4.8), reading the actual <code>flows/*.yaml</code>
+<strong>Date:</strong> 2026-07-01
+<strong>Why:</strong> Fable 5's condition on the schema was &quot;pin against two flows, not one — space_channel + austin_plumbing.&quot; Here's what those two flows <em>actually</em> are in the codebase, so v0 fits reality and isn't rebuilt in a month.</p>
+<h2 id="node-type-census-grep-level-from-flows-yaml">Node-type census (grep-level, from <code>flows/*.yaml</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Flow</th>
+<th>Choose (locked_choice)</th>
+<th>Collect (ask+update_slots)</th>
+<th>Say (static/play_audio)</th>
+<th>Do (required_tool)</th>
+<th>books via</th>
+<th>prerendered?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>space_channel</strong></td>
+<td><strong>2</strong></td>
+<td>1</td>
+<td>1</td>
+<td>0*</td>
+<td>— (info flow)</td>
+<td><strong>yes (all)</strong></td>
+</tr>
+<tr>
+<td><strong>austin_plumbing</strong></td>
+<td><strong>0</strong></td>
+<td><strong>5</strong></td>
+<td>1</td>
+<td>0</td>
+<td><strong>async post-call export</strong></td>
+<td>no (greeting only)</td>
+</tr>
+<tr>
+<td><strong>apartment_scheduler</strong></td>
+<td>2</td>
+<td>2</td>
+<td>4</td>
+<td>0</td>
+<td><strong>live <code>schedule_event</code> mid-call</strong></td>
+<td>partial</td>
+</tr>
+<tr>
+<td>bellas_hair_salon</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>(thin)</td>
+<td>no</td>
+</tr>
+<tr>
+<td>serene_mobile_massage</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>(module-based)</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>* Space Channel's <code>fetch_*</code> required_tool states still exist but we deliberately routed the flow <em>around</em> them; they're orphaned, not on the path.</p>
+<h2 id="the-five-findings-that-should-shape-v0">The five findings that should shape v0</h2>
+<p><strong>1. The two anchor flows are near-opposite shapes.</strong> Space Channel is <strong>Choose-heavy, fully prerendered</strong> — the &quot;frozen menu&quot; the compiler model fits perfectly. austin_plumbing is <strong>Collect-heavy (5 Collect, 0 Choose), ~all live TTS (1 Say of ~20 states)</strong> — almost no frozen skeleton. A schema whose center of gravity is &quot;frozen route table + resolved WAVs&quot; fits Space Channel and <em>barely touches</em> austin_plumbing. Pinning against both is exactly right; the risk is that v0 comes out Space-Channel-shaped.</p>
+<p><strong>2. <code>Collect</code> is the under-specified node, and it's the whole booking vertical.</strong> The reframe treats <code>Do</code> as the interesting typed hole. But no flow dispatches a tool from the FSM (see #3), while austin_plumbing is <em>five</em> Collect states. Collect is not Say (frozen), not Choose (deterministic), not Do (tool) — it's an <strong>LLM-owned sub-dialogue with a slot-schema contract</strong>. The artifact can pin <code>{slot schema, prompt, model, max_turns, confirm/deny phrasing, extraction rules}</code> but not the conversation. <strong>This is where cost/latency/quality (the LLM knobs) actually live</strong> — Space Channel has ~0 Collect, booking flows are mostly Collect, so the entire model-selection story is a Collect-node story. v0 must specify Collect as richly as Do.</p>
+<p><strong>3. No flow uses <code>required_tool</code> for booking — the FSM-dispatched typed-hole <code>Do</code> is a NEW pattern, not existing behavior.</strong> Today booking is either an <strong>LLM-called tool via <code>allowed_tools</code></strong> (apartment_scheduler: <code>schedule_event</code> mid-call, mic open, model-driven) or <strong>deferred to post-call</strong>. The reframe's &quot;Do = FSM dispatches the tool with a deadline, mic closed, model never sees it&quot; is a <em>good</em> design that <strong>replaces</strong> apartment_scheduler's mic-open pattern — but the schema is introducing it, not codifying it. Justify the Do node against apartment_scheduler specifically; that's the flow it fixes.</p>
+<p><strong>4. Two distinct booking patterns — and austin's <em>validates the pre/flow/post reframe</em>.</strong> apartment_scheduler books <strong>live, in-flow</strong> (mid-call tool). austin_plumbing collects preferences in-flow and <strong>books async in post-flow</strong> (terminal-state export → provider matcher; the prompts literally say &quot;do NOT call schedule_event... the post-call export sends the provider-matching data&quot;). austin is <em>already</em> practicing &quot;collect in flow, act in post-flow&quot; — the exact discipline the reframe advocates. So <strong>&quot;post-flow action&quot; (async booking / provider-match / callback) should be a first-class artifact concept</strong>, not just eval+canary. The schema needs both: an in-flow typed-hole Do <em>and</em> a post-flow deferred action.</p>
+<p><strong>5. Prerendering is Space-Channel-only today.</strong> 1 of ~20 austin states is prerendered (the greeting). So &quot;resolved WAV per Say&quot; is nearly empty for booking flows unless we redesign them (as we just did for Space Channel — that was days of work). v0 should let a <code>Say</code> be <strong>either</strong> a prerendered-WAV <strong>or</strong> a live-TTS-with-frozen-prompt, and mark which — because live→prerendered is a per-flow migration project, and the manifest should show an operator which of their prompts are still live (slower, variable) vs. frozen.</p>
+<h2 id="direct-implications-for-the-v0-units-in-fable-5-s-own-priority-order">Direct implications for the v0 units (in Fable 5's own priority order)</h2>
+<ul>
+<li><strong>Node types:</strong> keep the five, but promote <strong>Collect</strong> to a fully-specified node (slot schema, model, max_turns, confirm/deny phrasing, extraction contract) — it's the majority of the revenue flows and the entire LLM-cost surface. Keep <strong>Do</strong> as the typed hole (tool ref, deadline, hold asset, result frames: enumerable variants vs slot-TTS, failure→Say) — but tag it &quot;new pattern, replaces mic-open <code>allowed_tools</code> booking.&quot;</li>
+<li><strong>Say:</strong> must carry a discriminator — <code>{prerendered: wav_ref+hash+rendered_at+cadence}</code> <strong>or</strong> <code>{live_tts: frozen_prompt+voice}</code>. Freshness dots only apply to the former; the latter is flagged &quot;live&quot; in the console.</li>
+<li><strong>Post-flow action:</strong> first-class (async booking, provider match, callback) — austin needs it; it's the honest home for &quot;act after the call.&quot;</li>
+<li><strong>Choose grammar block:</strong> tokens, aliases, DTMF map, thresholds, <strong>and a reject/garbage path</strong> (Fable 5's gotcha #1 — a constrained decoder with no escape forces babble onto the nearest token). Confidence = constrained-vs-unconstrained likelihood ratio.</li>
+<li><strong>Degraded assets:</strong> the &quot;temporarily unavailable&quot; Say per state is a compiled asset present in <em>every</em> artifact, validated at build (gotcha #2 — the fallback is the one asset that can never 404).</li>
+<li><strong>Trace schema (universal):</strong> <code>state_enter</code>, <code>audio_pushed</code>, <code>audio_done{source: client|watchdog}</code>, <code>route_decision{source: dtmf|grammar|fallback, confidence}</code>, <code>collect_turn{slot, model, latency}</code>, <code>tool_start/result</code>, <code>postflow_action</code>, <code>stall_detected</code>. This is the one contract shared by live calls, all sim tiers, the console, <strong>and the research-agent vertical</strong> (which has no compiled menu but still emits trace — trace is universal, the artifact schema is phone/booking-scoped).</li>
+</ul>
+<h2 id="bottom-line-for-v0">Bottom line for v0</h2>
+<p>Pin against <strong>space_channel (all-frozen) AND apartment_scheduler (live-tool Do) AND austin_plumbing (Collect-heavy, post-flow booking)</strong> — three shapes, not two, because austin and apartment book <em>differently</em> and neither looks like Space Channel. If the schema spans those three, it spans the product. The single biggest correction to the reframe: <strong>Collect, not Do, is the node that carries the booking vertical and the entire cost-optimization story</strong> — spec it accordingly.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#node-type-census-grep-level-from-flows-yaml">Node-type census (grep-level, from flows/*.yaml)</a></li><li class="toc-h2"><a href="#the-five-findings-that-should-shape-v0">The five findings that should shape v0</a></li><li class="toc-h2"><a href="#direct-implications-for-the-v0-units-in-fable-5-s-own-priority-order">Direct implications for the v0 units (in Fable 5&#x27;s own priority order)</a></li><li class="toc-h2"><a href="#bottom-line-for-v0">Bottom line for v0</a></li></ul></aside>
+</div>
+</body>
+</html>

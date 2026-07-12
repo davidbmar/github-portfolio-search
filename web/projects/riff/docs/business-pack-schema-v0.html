@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF Business Pack — Schema v0 (`riff_business_pack_v0`) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">business-pack-schema-v0.md</span>
+<a class="raw" href="/docs/docs/business-pack-schema-v0.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF Business Pack — Schema v0 (<code>riff_business_pack_v0</code>)</h1>
+<p><strong>Status:</strong> codex-reviewed (session 019f2a3a, 25 findings folded — rev 2), implementing
+<strong>Date:</strong> 2026-07-03
+<strong>Companions:</strong> <code>docs/codex/2026-07-03-business-pack-import-architecture-fable5-brief.md</code> (architecture brief), <code>docs/codex/2026-07-03-business-pack-v0-design-feedback-fable5.md</code> (design review this draft implements), <code>docs/codex/2026-07-04-progressive-web-intake-design.md</code> (progressive web intake surface)
+<strong>Acceptance target:</strong> <code>flows/legal_intake.yaml</code> (hand-built lawyer flow), plus locksmith and pet-shop packs proving generality.</p>
+<h2 id="0-what-this-is">0. What this is</h2>
+<p>A business pack is a small, strict YAML file that describes a business — not a flow.
+The pack compiler turns it into a normal RIFF flow YAML built from <strong>generic atomic
+units</strong> (greeting, menu, collect stages, confirm, act, terminals, guard-gated
+topologies). The generated flow then passes through every existing gate unchanged:
+<code>riff/loader.py</code> hard-rejects, the <code>riff/flow_eval/linter.py</code> rule set, and
+<code>riff/riffc.py</code> L0 checks.</p>
+<pre><code class="language-text">source material → importer (later) → business pack → pack validator
+                                          → pack compiler → flow YAML (+ provenance header)
+                                          → loader + linter + riffc   (unchanged)
+                                          → runtime                   (unchanged)
+</code></pre>
+<p>Shift-left thesis: a pet shop, a locksmith, and a law office differ only in their
+pack. Everything below the pack is shared, deterministic machinery. No per-business
+Python. No per-business prompt engineering. Bad packs fail at compile time, before
+any caller hears them.</p>
+<h2 id="1-the-one-core-runtime-change-slot-equals-parameterized-guard">1. The one core-runtime change: <code>slot_equals</code> parameterized guard</h2>
+<p>Today every menu route needs a hand-registered Python guard
+(<code>hub_route_is_book</code> — riff/demo_hub_tools.py:20; <code>space_route_launches</code> — the
+Space Channel hub). This is the single reason flows cannot be generated from data.</p>
+<p><strong>Change:</strong> a contained edit across exactly two files — <code>riff/state_manager.py:: evaluate_guard</code> (line 631) and the loader's guard validation (<code>loader.py:1041-1059</code>)
+— plus tests. (Codex: this is not &quot;one change&quot;; it is two resolution sites and a
+test surface. Correct; both are named here and nothing else moves.)</p>
+<pre><code class="language-yaml">transitions:
+  - to: cap_book_visit__start
+    when: &quot;slot_equals:route:book_visit&quot;
+</code></pre>
+<ul>
+<li><strong>Syntax (strict):</strong> exactly three segments split on <code>:</code>; segment 1 is the
+literal <code>slot_equals</code>; segments 2 and 3 must each fully match <code>[a-z0-9_]+</code>
+(non-empty, lowercase; no extra colons, whitespace, uppercase, or empty parts).
+Anything else is NOT a slot_equals guard and falls through to the registry
+lookup → the existing loud unknown-guard error.</li>
+<li><strong>Semantics:</strong> <code>str(ctx.slots.get(slot, &quot;&quot;)).strip().lower() == value</code>. Since
+<code>value</code> is constrained lowercase-identifier at load, the normalization is total.</li>
+<li><strong>Load-time validation:</strong> accepted iff it parses AND <code>&lt;slot&gt;</code> is declared in
+<code>slot_types</code> AND — when the transition's own state has a <code>locked_choice</code> whose
+<code>slot</code> matches — <code>&lt;value&gt;</code> is one of that choice set's values (kills the
+typo→silently-unreachable-branch failure codex flagged).</li>
+<li><strong>play_audio states are unchanged:</strong> <code>_PLAY_AUDIO_VALID_GUARDS</code>
+(loader.py:686) still allows only <code>audio_done</code>/<code>audio_failed</code>; <code>slot_equals</code>
+is invalid there, deliberately.</li>
+<li><code>evaluate_guard</code> synthesizes the comparison fn <em>before</em> the registry lookup, so
+the F-282 <code>guard_evaluated</code> trace event fires identically (slot-read tracker
+sees the read; unknown guards still raise before any event).</li>
+<li>Nothing else in the guard registry changes; existing named guards are untouched.</li>
+</ul>
+<h2 id="2-pack-schema-reference">2. Pack schema reference</h2>
+<pre><code class="language-yaml">schema_version: riff_business_pack_v0        # required, exactly this string
+
+business:
+  id: legal_intake            # required; [a-z0-9_]+; becomes flow_id
+  name: RIFF Law Intake       # required; spoken + business_profile.business_name
+  industry: legal             # required; drives the guardrail matrix (§5)
+  timezone: America/Chicago   # required; compiled to business_profile.business_tz
+                              # (the key the schedule_event loader check reads)
+  phone: &quot;+15122777529&quot;       # optional; provenance only — routing stays in
+                              # RIFF_DIALED_ROUTING_TABLE_JSON, the compiler never wires it
+  hours: &quot;Mon-Fri 9-5&quot;        # optional → business_profile.store_hours
+
+system_prompt: |              # required; the flow-level system prompt
+  You are a legal intake assistant. ...
+
+capabilities:                 # required, &gt;=1; order = menu order
+  - id: start_intake          # required; [a-z0-9_]+; unique
+    kind: intake_form         # required; one of §3's kinds
+    label: Start a new intake # required; companion/menu label
+    aliases: [new case, legal problem]   # required, &gt;=1; voice aliases (lowercase)
+    dtmf: &quot;2&quot;                 # optional; single digit, unique across the menu.
+                              # A leading &quot;0&quot; option is valid, then &quot;1&quot;, &quot;2&quot;, ...
+    commit: false             # optional (default false); reserved — v0 accepts only false
+    sms_verification: true     # optional intake_form prelude: consent to one SMS,
+                              # send link+code, verify spoken code before stages
+    # kind-specific fields — see §3
+
+completion_slots: [menu_choice_served]  # optional; copied to flow completion_slots.
+                              # Generated menu/informational flows can declare
+                              # `menu_choice_served`; the compiler writes it when
+                              # any menu choice is served while keeping `_route`
+                              # transient for loop-safe routing.
+                              # Use declared intake slots for problem-solving flows.
+
+menu:                         # required
+  greeting_line: &gt;            # required; spoken first (disclaimers get appended — §5)
+    Thank you for calling RIFF Law. ...
+  prompt: &gt;                   # required; the locked_choice prompt
+    Say 1 to ... or 3 to leave a message.
+  retry_prompt: ...           # optional
+  exit:                       # optional; adds a goodbye choice + close terminal
+    aliases: [goodbye, that's all, hang up]
+    line: &quot;Thanks for calling. Goodbye.&quot;
+
+welcome:                      # optional returning-caller front door
+  business_name: RIFF Law Intake
+  first_call_line: &quot;Thanks for calling {business}. Let's get your details set up.&quot;
+  returning_line_template: &quot;Hi {name}, welcome back to {business}.&quot;
+  returning_menu_hint: &quot;Press 0 from the menu to update your details.&quot;
+  render_on: profile_save
+  opportunistic_render: sms_verify_deadair
+  stt_roundtrip_qa: true
+  fallback: generic
+  auth_choice_gate: false     # true: text link/code, then 0 verify or 1 guest before menu
+
+slots:                        # required; EXACTLY the flow `slot_types` contract —
+  caller_name: {type: string, semantic_type: name}      # copied through verbatim and
+  callback_number: {type: string, semantic_type: phone} # validated by validate_semantic_types
+  matter_area: {type: string}                           # (riff/slot_types.py:334) at pack-check
+  short_description: {type: string}                     # time. No pack-local slot dialect,
+  adverse_parties: {type: string}                       # no `pii:` flag (PII stays the
+                                                        # two-whitelist model).
+
+guardrails:                   # optional list; structural kinds (§5)
+  - kind: disclaimer
+    id: no_advice
+    text: &quot;... I can't give legal advice ...&quot;
+    placement: greeting       # v0: greeting only (appended to greeting_line)
+  - kind: consent_gate
+    id: intake_consent
+    applies_to: [start_intake]
+    prompt: &quot;Before we start: ... Do you agree to continue?&quot;
+    decline_to: leave_message # capability id; the denial path MUST have somewhere safe to go
+  - kind: screening_gate
+    id: conflict_check
+    applies_to: [start_intake]
+    after_stage: identity     # stage id within the intake_form
+    tool: record_issue
+    blocked_line: &quot;I'm sorry, we're unable to help with this matter by phone. ...&quot;
+
+companion:                    # optional
+  privacy: phone_verified     # default: phone_verified when any slot has a PII
+                              # semantic type (name/phone/email/address), else public
+  public_slots: []            # default []; deny-by-default; checked by the existing
+                              # companion_public_slot_violations (riff/surface.py:192)
+
+defaults:                     # optional
+  max_turns: 60               # default 60
+  voice: {default: Umbriel, style: british}   # optional; flow `voice:` block
+  llm:                        # default: fast → gemini-2.5-flash
+    default_class: fast
+    classes: {fast: gemini-2.5-flash}
+</code></pre>
+<p>Unknown top-level keys, unknown capability kinds, and unknown guardrail kinds are
+<strong>errors</strong> (strict-by-default; forward compatibility comes from <code>schema_version</code>
+bumps, not silent tolerance).</p>
+<h2 id="3-capability-kinds-the-atomic-units-and-their-compiled-topologies">3. Capability kinds — the atomic units and their compiled topologies</h2>
+<p>State ids are namespaced <code>cap_&lt;id&gt;__&lt;part&gt;</code> so packs can never collide with
+imported modules. All emitted transitions use registered guards or <code>slot_equals:</code>.</p>
+<h3 id="3-1-intake-form">3.1 <code>intake_form</code></h3>
+<pre><code class="language-yaml">kind: intake_form
+stages:                        # required, &gt;=1, ordered
+  - id: identity               # required; [a-z0-9_]+
+    slots: [caller_name, callback_number]   # required; declared in `slots`
+    prompt: &quot;What's your name and the best callback number?&quot;
+  - id: adverse                # the conflict-check inputs — their own stage so the
+    slots: [adverse_parties]   # screening gate can sit AFTER them and BEFORE matter
+    prompt: &quot;Who is on the other side of this matter? Say their names, or 'none'.&quot;
+  - id: matter
+    slots: [matter_area, short_description]
+    prompt: &quot;What's the issue about, and can you briefly describe what happened?&quot;
+confirm:                       # required
+  line: &quot;Let me read that back: {{slots.caller_name}}, about {{slots.matter_area}}.&quot;
+  must_include: [caller_name, matter_area]
+submit:                        # required
+  tool: record_issue           # v0 allowlist: record_issue
+success_line: &quot;Thank you — the office will follow up using the number you gave. Goodbye.&quot;
+</code></pre>
+<p>(The legal pack's screening gate is <code>after_stage: adverse</code> — the gate needs the
+adverse parties collected first. Codex caught the earlier example gating after
+<code>identity</code>, which would have skipped adverse-party collection entirely.)</p>
+<p>Compiles to: per-stage <code>collect</code> states (speech_act: collect, <code>allowed_tools: [update_slots]</code>, <code>required_slots</code>, entry line, <code>all_state_slots_filled</code> forward
+edge) → optional screening-gate act state after its named stage (§5) → <code>confirm</code>
+state (confirm_order/deny_order; denied → last stage) → submit <code>act</code> state
+(<code>required_tool</code>) → shared <code>complete</code> terminal (final_status: complete, the
+success_line). This is exactly <code>flows/legal_intake.yaml</code>'s
+collect_identity → collect_adverse → conflict_screen → collect_matter →
+fact_confirm → packet_submit → complete topology.</p>
+<p>If <code>sms_verification: true</code>, the compiler inserts a reusable prelude before the
+first intake stage (and after any industry consent gate): prerendered SMS opt-in
+prompt → deterministic <code>confirm_yesno</code> choice → <code>act</code> state with
+<code>required_tool: intake_send_verification_link</code> → code collection using
+<code>tutorial_verify_caller_code</code>. The SMS contains a follow-along link plus a
+one-time code; the assistant never says the code aloud. On success,
+<code>caller_phone</code> is verified and the first intake stage runs with that phone
+already populated. On SMS send failure or verification failure, the generated
+flow returns to the menu or the standard handoff escape.</p>
+<h3 id="3-2-message">3.2 <code>message</code></h3>
+<pre><code class="language-yaml">kind: message
+slots: [short_description]     # required; declared in `slots`
+prompt: &quot;Go ahead with your message and I'll pass it to the office.&quot;
+</code></pre>
+<p>Compiles to: one <code>collect</code> state (<code>allowed_tools: [update_slots]</code>) → an <code>act</code>
+state with <code>required_tool: record_issue</code> → <code>complete</code> terminal. (Codex: the
+hand-built <code>leave_message</code> lets the caller reach the terminal without
+<code>record_issue</code> ever firing; the compiled unit closes that by making the record
+step a <code>required_tool</code> act state.)</p>
+<h3 id="3-3-handoff">3.3 <code>handoff</code></h3>
+<pre><code class="language-yaml">kind: handoff
+line: &quot;This sounds urgent — I'm connecting you to someone now. Stay on the line.&quot;
+</code></pre>
+<p>Compiles to: one <code>close</code> terminal, <code>final_status: escalated</code>. Locksmith lockouts,
+electrician burning-smell, after-hours emergencies. Also the automatic target for
+menu-retry exhaustion (§3.5).</p>
+<h3 id="3-4-content">3.4 <code>content</code></h3>
+<pre><code class="language-yaml">kind: content
+text: &quot;We're open Monday to Friday, nine to five, at 12 Oak Street.&quot;
+prerender: true    # v0.1: emit a static play_audio state (flow voice, no LLM)
+</code></pre>
+<p>Compiles to: one <code>inform</code> state speaking the text then <code>any_utterance</code> back to
+the menu — or, with <code>prerender: true</code> (SHIPPED, v0.1), a <code>static</code> state with
+<code>play_audio</code> whose <code>audio_done</code>/<code>audio_failed</code> edges return to the menu.
+<strong>Every return-to-menu edge clears <code>_route</code></strong> — a stale value would instantly
+re-fire the same <code>slot_equals</code> route (content ↔ menu loop; regression-pinned in
+tests/business_pack/test_compile_extensions.py).</p>
+<h3 id="3-4b-companion-link-v0-1-shipped">3.4b <code>companion_link</code> (v0.1, SHIPPED)</h3>
+<pre><code class="language-yaml">kind: companion_link
+prompt: &quot;Want me to text you a link so you can follow the call live? Say yes, or no.&quot;
+</code></pre>
+<p>Compiles to the proven companion topology
+(subflows/space_channel_network_ops/companion_link.yaml): deterministic yes/no
+(<code>confirm_yesno</code> choice module, <code>_confirm_choice</code> slot) → <code>act</code> state with
+<code>required_tool: send_companion_link</code> → prerendered sent/failed outcome states →
+menu (clearing <code>_route</code> + <code>_confirm_choice</code>). Pack-level <code>companion.auto_send: true</code> compiles to <code>business_profile.auto_send_companion</code>. <code>menu.prerender: true</code> additionally makes the greeting a static play_audio state (flow voice —
+no Gemini default-voice leak at call open).</p>
+<h3 id="3-5-calendar-booking-parsed-refused">3.5 <code>calendar_booking</code> — parsed, refused</h3>
+<p>Capability kinds have <strong>three states</strong>, not two: unknown (schema error),
+known-and-compilable (§3.1-3.4), and <strong>known-but-uncompilable</strong> — <code>calendar_booking</code>
+is the third. The parser accepts it and a reserved <code>scheduler:</code> section shaped
+exactly like <code>BusinessSchedulePolicy</code>/<code>ServiceOverlay</code> from
+<code>docs/codex/2026-07-02-scheduler-combined-handoff-fable5-claude.md</code> §11; the
+compiler then emits a <strong>blocking finding</strong> (&quot;calendar_booking is reserved pending
+the scheduler policy work, task #20&quot;) and produces no flow output. No silent
+fallback: refusing loudly beats compiling a booking path that mints times.</p>
+<h3 id="menu-compilation-shared">Menu compilation (shared)</h3>
+<ul>
+<li><code>greeting</code> state: speech_act greet, <code>greeting_line</code> + appended disclaimer texts;
+<code>any_utterance</code> → <code>menu</code>.</li>
+<li><code>menu</code> state: <code>locked_choice</code> with <strong><code>inline: true</code></strong> (required — the loader
+deprecation-warns without it and hard-fails under <code>RIFF_REQUIRE_INLINE_FLAG=1</code>,
+loader.py:304), <code>slot: route</code>, one choice per capability — value = capability
+id, label, aliases + dtmf digit prepended to aliases, collision-checked at pack
+level — <code>required_slots: [route]</code>, <code>allowed_tools: [update_slots, escalate_to_human]</code>, <code>rules: {max_sentences: 2, max_questions: 1}</code>.</li>
+<li>One transition per capability: <code>when: slot_equals:route:&lt;cap_id&gt;</code> → the
+capability's entry state (or its consent gate, §5).</li>
+<li>Escape hatch: the compiler always emits <code>escalation_requested</code> → the first
+<code>handoff</code> capability if one exists, else an auto-generated <code>menu_handoff</code>
+escalated terminal. <strong>Guard choice matters:</strong> the <code>choice-no-escape</code> lint
+(linter.py:844) recognizes only the recovery substrings in
+<code>_CHOICE_RECOVERY_GUARDS</code> (linter.py:181 — <code>escalation_requested</code>, <code>no_match</code>,
+<code>denied</code>, <code>stalled</code>, …); <code>choice_retry_exhausted</code> is NOT in that set (and is
+registered in cc_tools, an import we shouldn't depend on), so the escape edge
+uses <code>escalation_requested</code>. Pack authors cannot produce a trap menu.</li>
+<li><code>route</code> is auto-added to <code>slot_types</code> as <code>{type: string}</code> by the compiler.</li>
+</ul>
+<h2 id="4-validation-ownership-each-fact-checked-once-at-the-lowest-layer-that-sees-it">4. Validation ownership — each fact checked once, at the lowest layer that sees it</h2>
+<p><strong>Pack validator (<code>python -m riff.business_pack check</code>) — new, errors block compile:</strong></p>
+<table>
+<thead>
+<tr>
+<th>rule</th>
+<th>detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>schema shape</td>
+<td>required sections, unknown keys/kinds are errors, id regexes</td>
+</tr>
+<tr>
+<td>slot contract</td>
+<td><code>slots</code> passes <code>validate_semantic_types</code> verbatim</td>
+</tr>
+<tr>
+<td>referential integrity</td>
+<td>stage/message slots declared; <code>applies_to</code>/<code>decline_to</code>/<code>after_stage</code> resolve; <code>confirm.must_include</code> ⊆ slots collected by stages that precede the confirm (declaration alone isn't enough — loader template validation accepts any declared slot, loader.py:1075)</td>
+</tr>
+<tr>
+<td>menu token collisions</td>
+<td>uniqueness across the union of ALL match surfaces: every capability's aliases + dtmf digits + exit aliases (case-folded); when dtmf digits are present they must be sequential in menu order, with optional leading <code>0</code> followed by <code>1</code>, <code>2</code>, ... (riffc L0-5 warns on numeric-alias/visible-order mismatch)</td>
+</tr>
+<tr>
+<td>capability coverage</td>
+<td>every capability appears in the menu (it <em>is</em> the menu in v0)</td>
+</tr>
+<tr>
+<td>industry ⇒ guardrail matrix</td>
+<td><code>legal</code> ⇒ a consent_gate applying to every intake_form + a disclaimer; <code>locksmith</code>/<code>electrical</code>/<code>plumbing</code>/<code>hvac</code> ⇒ at least one <code>handoff</code> capability</td>
+</tr>
+<tr>
+<td>consent decline safety</td>
+<td><code>decline_to</code> must reference a <code>message</code> or <code>handoff</code> capability (denial always lands somewhere safe)</td>
+</tr>
+<tr>
+<td>commit reserved</td>
+<td><code>commit: true</code> is an error in v0 (reserved for the tier-COMMIT marriage)</td>
+</tr>
+<tr>
+<td>booking reserved</td>
+<td><code>calendar_booking</code> compiles to a blocking finding</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Existing layers (run on generated output; NOT re-implemented in the pack layer):</strong>
+typed slots (riffc L0-10 error + ratchet), reachability/terminals (L0-1,
+<code>no-success-terminal</code>), choice grammar + DTMF collisions at flow level (L0-5),
+voice paths (L0-11), companion PII (<code>companion-public-slot-unsafe</code> error +
+runtime drop), reprompts (<code>collect-state-no-reprompt</code>), template slot references
+(loader). Note the loader safety gate covers only <code>ask</code>→<code>act</code> without <code>confirmed</code>
+(loader.py:1246) — it does NOT prove collect→act paths safe; confirmation before
+submit is enforced <strong>structurally</strong> by the compiler (intake_form requires a
+<code>confirm</code> block), with the heuristic <code>no-confirmation</code> lint as backstop only.</p>
+<p><strong>Compiler self-check (three gates, same compile call):</strong> after emitting, the
+compiler (1) loads its own output with <code>load_flow</code>, (2) runs <code>lint_flow</code> — any
+<code>error</code>-severity finding or any code in the <code>flow_generator.py:157</code> blocking set
+fails the compile, and (3) runs <code>riffc.compile_flow</code> — any <code>error</code> Finding fails
+the compile. (Codex: riffc was in acceptance but missing from the compile gate;
+all three now run at compile time.)</p>
+<h2 id="5-guardrails-are-topology-not-text">5. Guardrails are topology, not text</h2>
+<ul>
+<li><strong>disclaimer</strong> → sentence appended to the greeting line (spoken before the menu).</li>
+<li><strong>consent_gate</strong> → a <code>confirm</code> state inserted in front of each <code>applies_to</code>
+capability's entry: confirmed → capability start; denied → <code>decline_to</code>
+capability's entry. The menu transition retargets to the gate.</li>
+<li><strong>screening_gate</strong> → an <code>act</code> state (<code>required_tool: &lt;tool&gt;</code>) spliced after the
+named stage inside an intake_form: <code>all_state_slots_filled</code> → next stage;
+<code>escalation_requested</code> → a dedicated blocked terminal (final_status: escalated,
+<code>blocked_line</code>). Phase B of the intake is reachable ONLY through the gate.</li>
+<li><strong>emergency routing</strong> is not a separate kind: it is a <code>handoff</code> capability with
+high-priority aliases, plus the industry matrix making it mandatory for trade
+industries. (Acknowledged codex point: the matrix checks <em>presence</em>, not that
+emergency utterances actually route there — routing quality is the alias set's
+job and an L1-scenario concern, v0.1.)</li>
+</ul>
+<p><strong>Named contracts / accepted debts (codex findings kept as-is for hand-built
+parity, documented rather than hidden):</strong> (a) the screening gate's forward edge
+uses <code>all_state_slots_filled</code> on an <code>act</code> state with no <code>required_slots</code> — this
+fires after the <code>required_tool</code> runs, mirroring <code>conflict_screen</code> in the
+hand-built flow; it is a tool-completion convention, not a tool-<em>success</em> check
+(a real result contract needs the tool to write a posture slot — v0.1). (b)
+<code>consent_gate</code> and <code>confirm</code> both ride the global <code>_order_confirmed</code>/<code>_order_denied</code>
+bits from <code>confirm_order</code>/<code>deny_order</code>; they are cleared on transition, but two
+confirms in one flow sharing one bit is fragile — same debt the hand-built flow
+carries.</p>
+<h2 id="6-provenance-what-keeps-the-pack-canonical">6. Provenance — what keeps the pack canonical</h2>
+<p>Generated YAML begins:</p>
+<pre><code class="language-yaml"># GENERATED — do not edit. Edit packs/&lt;name&gt;.pack.yaml and recompile.
+# generated-by: riff-business-pack-compiler v0
+# pack: legal_intake sha256:&lt;16-hex of canonical pack JSON&gt;
+</code></pre>
+<p>The hash is computed over the <strong>canonical JSON of the parsed pack</strong>
+(<code>yaml.safe_load</code> → sorted-keys JSON → sha256, same approach as
+<code>riff/choice_compiler</code>), never over YAML text — so comments, anchors, key order,
+and multiline-scalar formatting churn cannot invalidate it.
+<code>python -m riff.business_pack check --flows-dir flows/</code> verifies every pack's
+generated flow exists and its embedded hash matches the pack — a stale or
+hand-edited generated flow is an <strong>error</strong>. Hand-authored flows (no provenance
+header) are untouched by all of this.</p>
+<h2 id="7-acceptance">7. Acceptance</h2>
+<ol>
+<li><strong>Lawyer:</strong> <code>packs/legal_intake.pack.yaml</code> compiles to a flow that loads, lints
+with zero errors, passes riffc with zero error findings, and preserves the
+hand-built <code>flows/legal_intake.yaml</code> <strong>intake-path topology</strong>: consent gate →
+identity → adverse → screening gate → matter → confirm → submit → complete,
+consent-denied → message, screening-blocked terminal, same PII posture
+(<code>companion_public_slots: []</code>, phone_verified). The <strong>front door is
+intentionally different</strong>: the hand-built flow opens with a free-form listen
+state; the generated flow opens with a deterministic locked_choice menu (that
+upgrade is the point — codex correctly flagged that calling this &quot;same
+topology&quot; was false, so the claim is now scoped to the intake path).
+<strong>The hand-built flow stays live on the LAW number</strong> until the operator
+promotes the generated one — compiler bring-up must not be coupled to
+replacing a production flow (codex), and another agent is actively working
+the live line today. Generated output lands in <code>flows/generated/</code> for
+inspection; promotion is a deliberate one-command copy.</li>
+<li><strong>Locksmith:</strong> emergency <code>handoff</code> + quote <code>intake_form</code> + <code>message</code>; compiles
+clean from the same atomic units. Industry matrix enforces the handoff.</li>
+<li><strong>Pet shop:</strong> <code>content</code> (hours) + <code>intake_form</code> (grooming request) + <code>message</code>;
+compiles clean.</li>
+<li>Full-suite regression diff vs clean HEAD: zero new failures (the validation bar).</li>
+</ol>
+<h2 id="8-non-goals-for-v0-explicitly-deferred">8. Non-goals for v0 (explicitly deferred)</h2>
+<ul>
+<li><strong>Scheduler policy / calendar_booking compilation</strong> — gated on the scheduler
+handoff work (task #20); section reserved, shape pinned to that doc.</li>
+<li><strong>caller_memory / returning-caller menu variants</strong> — needs verified-caller
+gating (raw caller-ID variants leak &quot;this number has an open matter&quot;); will key
+on the existing <code>caller_lookup_status</code> slot via <code>slot_equals</code>, no new DSL.</li>
+<li><strong>Widgets importer + 12h refresh (SHIPPED, v0.1):</strong>
+<code>riff/business_pack/importers/space_channel_widgets.py</code> maps the numbered
+widgets export (menu.json + N-slug/widget.json) → pack; policy:
+FIXED-NUMBERED menus keep a degraded widget's slot with last-good text (vs
+the NOC importer's drop-stale). Live on 321-559-MARS.
+<code>scripts/refresh-space-widgets.sh</code> (crontab <code>0 */12</code>) re-fetches → recompiles
+(fail-closed: gate errors keep the previous flow) → prerenders only changed
+audio (<code>--timeout 60</code>: standard-ladder briefings render ~22s and Gemini's
+trailing turn-complete latency blew the 30s default once). No restart needed
+(mtime-cached loader, lookup-time manifest reads).
+<ul>
+<li><em>v0.1 spoken ladder</em>: briefings speak <code>spoken.standard</code> (fallback
+<code>spoken.summary</code>), cleaned of feed truncation fragments (<code>…</code>/<code>[…]</code>) and
+capped at 550 chars on a sentence boundary for the TTS render budget.
+(The one-line summaries live callers heard as &quot;it did nothing&quot; were v0.)</li>
+<li><em>v0.1 episode audio</em>: a widget carrying <code>audio.url</code> (mp3) — widget 5's
+UFO Files episode — is downloaded (30 MB cap), ffmpeg-transcoded to
+24 kHz mono PCM16 capped at 600 s, cached by url-hash under
+<code>static_audio/.episode_cache/</code>, and registered in the manifest as that
+state's prerendered WAV (voice marker <code>episode-audio</code>; the caption
+&quot;Today's episode: &lt;title&gt; — &lt;show&gt;&quot; is the karaoke text). Any
+download/transcode failure falls back to the TTS text path — the refresh
+never breaks on a bad episode.</li>
+<li><em>Karaoke stylesheet</em>: the companion read-along styles live in
+<code>web/assets/companion-theme.css</code> (served like <code>menu-theme.css</code>) — restyle
+the subflow karaoke without touching <code>companion.html</code>.</li>
+</ul>
+</li>
+<li><strong>Importers</strong> (website/CRM → pack) — the pack is the contract they target.
+<s>NOC → pack</s> SHIPPED: <code>riff/business_pack/importers/space_channel.py</code> maps
+noc_briefing.json (schema 0.3) → pack — healthy categories become <code>content</code>
+capabilities (stale/degraded DROPPED, fail-closed), <code>priority_order</code> drives
+menu order, DTMF on the first nine, plus a standing <code>report_bug</code> message
+capability. Proven against a live feed snapshot
+(tests/business_pack/test_space_channel_importer.py).</li>
+<li><strong>Prerendered audio for content capabilities</strong>; <strong>commit-tier propagation</strong>
+(<code>commit: true</code> reserved); <strong>module imports from packs</strong> (verify_caller_v1,
+book_appointment_v1 composition) — v0.1 candidates.</li>
+</ul>
+<h2 id="9-file-map">9. File map</h2>
+<pre><code class="language-text">riff/business_pack/__init__.py
+riff/business_pack/schema.py      # parse + validate → Pack dataclasses + Finding list
+riff/business_pack/compile.py     # Pack → flow dict → YAML text (+ provenance, self-check)
+riff/business_pack/__main__.py    # CLI: check | compile | verify-provenance
+riff/state_manager.py             # slot_equals guard resolution in evaluate_guard
+riff/loader.py                    # slot_equals load-time validation
+packs/legal_intake.pack.yaml
+packs/locksmith_austin.pack.yaml
+packs/pet_shop.pack.yaml
+flows/legal_intake.yaml           # hand-built; STAYS LIVE until operator promotes
+flows/generated/legal_intake.yaml # generated candidate (promotion = deliberate copy)
+flows/locksmith_austin.yaml       # generated (new id, safe to ship directly)
+flows/pet_shop.yaml               # generated (new id, safe to ship directly)
+tests/business_pack/test_slot_equals_guard.py
+tests/business_pack/test_schema_validation.py
+tests/business_pack/test_compile_legal.py     # topology vs fixture
+tests/business_pack/test_generality.py        # locksmith + pet shop compile/lint/riffc clean
+tests/business_pack/fixtures/legal_intake_handbuilt.yaml
+</code></pre>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#0-what-this-is">0. What this is</a></li><li class="toc-h2"><a href="#1-the-one-core-runtime-change-slot-equals-parameterized-guard">1. The one core-runtime change: slot_equals parameterized guard</a></li><li class="toc-h2"><a href="#2-pack-schema-reference">2. Pack schema reference</a></li><li class="toc-h2"><a href="#3-capability-kinds-the-atomic-units-and-their-compiled-topologies">3. Capability kinds — the atomic units and their compiled topologies</a></li><li class="toc-h3"><a href="#3-1-intake-form">3.1 intake_form</a></li><li class="toc-h3"><a href="#3-2-message">3.2 message</a></li><li class="toc-h3"><a href="#3-3-handoff">3.3 handoff</a></li><li class="toc-h3"><a href="#3-4-content">3.4 content</a></li><li class="toc-h3"><a href="#3-4b-companion-link-v0-1-shipped">3.4b companion_link (v0.1, SHIPPED)</a></li><li class="toc-h3"><a href="#3-5-calendar-booking-parsed-refused">3.5 calendar_booking — parsed, refused</a></li><li class="toc-h3"><a href="#menu-compilation-shared">Menu compilation (shared)</a></li><li class="toc-h2"><a href="#4-validation-ownership-each-fact-checked-once-at-the-lowest-layer-that-sees-it">4. Validation ownership — each fact checked once, at the lowest layer that sees it</a></li><li class="toc-h2"><a href="#5-guardrails-are-topology-not-text">5. Guardrails are topology, not text</a></li><li class="toc-h2"><a href="#6-provenance-what-keeps-the-pack-canonical">6. Provenance — what keeps the pack canonical</a></li><li class="toc-h2"><a href="#7-acceptance">7. Acceptance</a></li><li class="toc-h2"><a href="#8-non-goals-for-v0-explicitly-deferred">8. Non-goals for v0 (explicitly deferred)</a></li><li class="toc-h2"><a href="#9-file-map">9. File map</a></li></ul></aside>
+</div>
+</body>
+</html>

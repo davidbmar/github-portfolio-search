@@ -1,0 +1,78 @@
+{
+  "title": "Domain Tree Intake Nouns for riff",
+  "one_liner": "A Python library that validates domain-specific JSON trees and compiles them into flat capability dictionaries for the riff intake system.",
+  "what_it_is": "This project serves as a business-component precursor for riff's intake substrate. It manages vertical content as JSON tree data, enforces a strict Tree DSL via validation, and transforms locked hierarchical trees into flat capability dictionaries. These dictionaries define intake forms with branching logic, field phases (problem, triage, identity), and alias resolution maps, enabling structured data ingestion into the riff runtime.",
+  "how_its_built": "The core logic is implemented in pure Python using only the standard library. It consists of three main modules: tree_schema.py for DSL validation, tree_gen.py for LLM-assisted draft generation, and tree_to_schema.py for compiling locked trees into flat schemas. The build process is managed by scripts/build_dist.py, which reads locked JSON trees from the trees/ directory and outputs compiled capability JSON files to dist/.",
+  "how_to_apply": "Use this repository to author and validate domain-specific intake forms. Generate draft trees using the CLI, manually prune and lock them, then compile them into capability JSONs. Ingest these JSONs into the riff runtime by copying them into riff/intake_schemas.py or loading them directly. The resulting schemas drive the conversation flow, alias resolution, and field validation within the riff application.",
+  "quickstart": ".venv/bin/pytest -q\n.venv/bin/python scripts/build_dist.py\n.venv/bin/python -m intake_trees.tree_gen --domain plumbing --persona \"experienced residential plumber\" --out trees/plumbing.draft.json",
+  "features": [
+    "Validates hierarchical JSON trees against a strict DSL schema",
+    "Compiles locked trees into flat capability dictionaries with branching logic",
+    "Generates draft domain trees using LLM prompts for rapid authoring",
+    "Supports alias resolution maps for robust entity extraction",
+    "Enforces conversation-order contracts (problem, triage, identity phases)",
+    "Integrates with verification tools like SMS code and USPS address validation"
+  ],
+  "diagram_architecture": "flowchart TD\n    Author[Human Author]\n    LLM[LLM Service]\n    TreeGen[tree_gen.py]\n    LockedTree[Locked JSON Tree]\n    Validator[tree_schema.py]\n    Compiler[tree_to_schema.py]\n    Capability[Capability JSON]\n    Riff[riff Runtime]\n    Author -->|Prunes Draft| LockedTree\n    LLM -->|Draft Tree| TreeGen\n    TreeGen -->|Draft JSON| Author\n    LockedTree -->|Validates| Validator\n    Validator -->|Pass| Compiler\n    Compiler -->|Compiles| Capability\n    Capability -->|Ingests| Riff",
+  "diagram_sequence": "sequenceDiagram\n    participant User as Human Author\n    participant CLIGen as tree_gen CLI\n    participant LLM as LLM Service\n    participant TreeFile as Locked JSON Tree\n    participant Compiler as tree_to_schema\n    participant Dist as dist capability JSON\n    participant Riff as riff Runtime\n    User->>CLIGen: Run draft generation\n    CLIGen->>LLM: Request domain nouns/questions\n    LLM-->>CLIGen: Return draft JSON\n    CLIGen-->>User: Save draft file\n    User->>TreeFile: Prune and lock status\n    User->>Compiler: Run build_dist script\n    Compiler->>TreeFile: Read locked tree\n    Compiler->>Compiler: Validate and compile\n    Compiler->>Dist: Write capability JSON\n    Riff->>Dist: Load capability JSON\n    Riff->>Riff: Ingest intake schema",
+  "capabilities": [
+    "Tree DSL Validation",
+    "LLM Draft Generation",
+    "Schema Compilation",
+    "Alias Resolution Mapping",
+    "Branching Logic Flattening",
+    "Field Phase Enforcement"
+  ],
+  "components": [
+    "intake_trees/tree_schema.py",
+    "intake_trees/tree_gen.py",
+    "intake_trees/tree_to_schema.py",
+    "scripts/build_dist.py",
+    "trees/*.locked.json",
+    "dist/*.capability.json"
+  ],
+  "tech": [
+    "Python",
+    "JSON",
+    "Standard Library",
+    "Argparse",
+    "Pathlib",
+    "Regex"
+  ],
+  "depends_on": [
+    "Python Standard Library",
+    "LLM API (for draft generation)"
+  ],
+  "integrates_with": [
+    "riff Runtime",
+    "SMS Verification Service",
+    "USPS Address Validation"
+  ],
+  "patterns": [
+    "Three-Pass Pipeline",
+    "Tree-to-Flat Compilation",
+    "DSL Validation",
+    "Capability Dictionary Contract",
+    "Alias-Based Entity Resolution"
+  ],
+  "reuse_tags": [
+    "intake-form-generator",
+    "json-tree-compiler",
+    "dsl-validator",
+    "llm-drafting-tool",
+    "schema-flattener",
+    "domain-modeling"
+  ],
+  "slug": "domain-tree-intake-nouns-for-riff",
+  "repo_url": "https://github.com/davidbmar/domain-tree-intake-nouns-for-riff",
+  "visibility": "private",
+  "status": "shipped",
+  "thin": false,
+  "todos": [],
+  "screenshot_url": "",
+  "generated_at": "2026-07-06T11:26:19.581358Z",
+  "source_commit": "453a33d",
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-07-05T22:43:11Z",
+  "docs": []
+}

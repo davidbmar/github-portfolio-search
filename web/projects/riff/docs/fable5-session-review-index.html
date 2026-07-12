@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fable 5 Review — Session Index (2026-07-02) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">fable5-session-review-index.md</span>
+<a class="raw" href="/docs/docs/flow-eval/fable5-session-review-index.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Fable 5 Review — Session Index (2026-07-02)</h1>
+<p>One entry point for the morning review. Everything below is committed on branch
+<code>voice-capability-hierarchy</code> (pushed to origin, ~22 commits ahead of <code>main</code>),
+tested, and codex-reviewed. Open the linked HTML reports for detail.</p>
+<hr />
+<h2 id="what-shipped-key-commits-on-main">What shipped (key commits on <code>main</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Commit</th>
+<th>Work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>42dd6850</code></td>
+<td><code>control_event</code> §1.1 wire gate hardened (fail-closed envelope validation + per-client dedupe)</td>
+</tr>
+<tr>
+<td><code>46b2b03d</code></td>
+<td>Remote-control <strong>transport-swap shadow slice</strong> — live decision-epoch + <code>InputArbiter</code> comparison, flag-off, byte-identical</td>
+</tr>
+<tr>
+<td><code>025fd753</code></td>
+<td>Two <strong>mutation-verified</strong> shadow regression guards</td>
+</tr>
+<tr>
+<td><code>b503b348</code></td>
+<td><strong>Deterministic calendar/scheduler simulator</strong> + tests + finding B-CAL-1</td>
+</tr>
+<tr>
+<td><code>e9dce83b</code></td>
+<td>propose→recovery→book coverage (calendar suite → 122 tests)</td>
+</tr>
+<tr>
+<td><code>f0d3e5e1</code></td>
+<td>Whole-repo aggregate integration check</td>
+</tr>
+<tr>
+<td><code>9430dcf4</code></td>
+<td><strong><code>control_router</code></strong> — the §1.3 validity-ladder composition (remote-control item 2: control_event → dedupe → capability → arbiter), built + tested ahead of the live WS wiring</td>
+</tr>
+<tr>
+<td><code>7faa0034</code></td>
+<td><strong>B-CAL-1 FIXED</strong> — the calendar simulator caught a real slot-conflict retry bug, then validated its fix (re-offer fresh slots on a same-slot race); full-suite regression diff shows zero new failures</td>
+</tr>
+<tr>
+<td><code>72c75b19</code></td>
+<td><strong>B-CAL-2 FIXED</strong> — edge-hunting off the B-CAL-1 fix surfaced a second bug (repeat consecutive conflicts left the caller unable to book, via the required-tool latch); fixed + validated (zero new failures)</td>
+</tr>
+<tr>
+<td><code>8fd0136f</code></td>
+<td><strong>Space Channel: &quot;text follow along&quot;</strong> — advertised the companion text-link option in the menu + return to the main menu after sending; tested, zero repo-wide regressions (isolation-confirmed). <em>Optional follow-up: regenerate the prerendered companion-outcome WAVs so their spoken wording matches — behavior is already correct.</em></td>
+</tr>
+<tr>
+<td><code>58a3b6cf</code>, <code>8e42f092</code></td>
+<td><strong>Scheduler handoff docs for Fable 5</strong> — <code>scheduler-demo-problem-statement</code> (why the live book path escalates) + <code>scheduler-use-cases-and-capability-scope</code> (~37 use-case taxonomy + &quot;several ways&quot; matrix → input for the v0 design)</td>
+</tr>
+<tr>
+<td><code>34fbf68b</code></td>
+<td><strong>Scheduler P1 — time_range fast-path FIXED</strong> (Fable-5 §6 steps 1-2). The live demo escalated whenever the LLM emitted a <code>time_range</code> the slot-mapper rejected (range / ISO datetime / <code>2-4pm</code>); <code>_coerce_time_range</code> now strips ISO decoration + splits ranges to the window-start instead of raising into a handoff. Ambiguous bare ranges still re-ask. Validated 43/43 slot_mapper (incl. isolation), codex SAFE, full-suite <strong>net −4 vs clean HEAD</strong> (the 2 &quot;new&quot; proven flaky). Flips acceptance-criterion #3 + the 3 xfails → concrete passing assertions.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="later-this-session-calendar-shift-left-companion-humanness">Later this session (calendar shift-left + companion + humanness)</h3>
+<table>
+<thead>
+<tr>
+<th>Commit</th>
+<th>Work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>7145d86a</code></td>
+<td><strong>Humanness fix</strong> — a live-call review of <code>tutorial_book_appointment</code> (session voice-1783015078520) caught the agent SPEAKING <code>&quot;(internal) booking now&quot;</code> / <code>&quot;(internal) fetching available slots&quot;</code> placeholders to the caller (act-state <code>entry.line</code> is voiced). Replaced with natural fillers. Validated: book_appointment I-1..I-5 + slot_mapper 52 passed; triage suites identical to clean HEAD (zero new). <em>4 more humanness defects reviewed + reported (premature &quot;you're booked&quot;, raw-ISO double read-back) — deferred pending eval validation.</em></td>
+</tr>
+<tr>
+<td><code>f0f23910</code></td>
+<td><strong>Remote-control item 2 — companion-WS control wire + hardening.</strong> A tap on the texted companion page routes through the proven §1.3 ladder (<code>route_control_event</code>). Flag-gated (<code>RIFF_COMPANION_CONTROL</code>, default OFF). <strong>All 4 codex concurrency findings fixed + tested</strong> (send-race lock, per-call route-lock, bounded store + pre-parse gate, call_id-rotation defense). 28 tests.</td>
+</tr>
+<tr>
+<td><code>21195e1b</code></td>
+<td><strong>Calendar shift-left — first load-time guardrail.</strong> A state declaring a <code>calendar.modify</code>/<code>calendar.cancel</code> effect now <strong>fails to load</strong> unless it declares <code>caller_verified</code> precondition AND the flow has a verification tool — so one caller can never move/cancel another's appointment, caught at BUILD not runtime (sibling of I-5). Sound + non-breaking (broad flow-load regression zero-new). 9 tests.</td>
+</tr>
+<tr>
+<td><code>7ff2c8dc</code>, <code>ea405211</code>, <code>89b63d6e</code>, <code>1ef97bc3</code></td>
+<td><strong>Calendar design docs</strong> — the concierge/actions spec (codex plan-reviewed; §2a precompiler-enforced owner identity), the read-only <strong>live offer-mirror</strong> companion design, the newcomer <strong>calendar flows &amp; tutorials</strong> walkthrough; <code>F-364</code> RunRecord filed as GATED behind the calendar work + a Bezos review.</td>
+</tr>
+<tr>
+<td><code>7a3ea0cc</code></td>
+<td><strong>Old-code cleanup</strong> — fixed the drifted <code>10-book-appointment</code> tutorial (documented removed <code>TRIAGE/DAY_PICK/TIME_PICK</code> states; now the production booking engine). Doc-test alignment passes.</td>
+</tr>
+<tr>
+<td><code>7da5d765</code>, <code>0360a8d4</code></td>
+<td><strong>Live phone — hidden &quot;schedule&quot; jump</strong> on the Space Channel line: say &quot;schedule&quot;/&quot;book&quot; (not announced) → composed <code>book_appointment_v1</code> booking flow. 14 regression tests; riffc golden + slot ratchet regenerated (zero-new).</td>
+</tr>
+<tr>
+<td><code>a5334beb</code>, <code>84f3bece</code></td>
+<td><strong>Live phone — consolidated <code>demo_hub</code></strong> on the California number (<code>+15102160079</code>): a menu → <strong>book / verify(OTP) / text-follow-along</strong> (real composed flows; verify + text loop back to the menu). Both numbers live simultaneously via <code>RIFF_DIALED_ROUTING_TABLE_JSON</code>. 13 tests, riffc 0 hard errors, not flagged by the safety gate. List/delete are next (gated on the owner-marker decision).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="headline-results">Headline results</h2>
+<ul>
+<li><strong>Aggregate (final, both B-CAL fixes integrated):</strong> 7,622 passed / 108 failed /
+183 xfailed / 5 errors. Net effect of the whole session vs the pre-work baseline
+(<code>42dd6850</code>: 7,467 passed / 110 failed): <strong>+155 passing, −2 failing, and zero
+new failures introduced</strong> — every remaining failure is pre-existing, confirmed
+by clean-<code>HEAD</code> regression diffs on each source change.</li>
+<li><strong>Two real scheduling bugs (B-CAL-1, B-CAL-2) caught AND fixed by the
+simulator</strong> — the harness that caught them also validated the fixes.</li>
+<li><strong>Remote-control shadow slice:</strong> zero production risk (flag off → arbiter not
+even imported; proven byte-identical by a per-slice isolation diff across
+7,500+ tests). The risky refactor is done <em>before</em> the live call so
+regressions are attributable.</li>
+<li><strong>Calendar simulator:</strong> 122 deterministic permutation tests over the offer→book
+loop — a path the existing sim harness deliberately skipped. Caught a real bug
+on day one (B-CAL-1).</li>
+<li><strong>Scheduler demo unblocked (P1):</strong> the live <code>book_appointment_v1</code> path no longer
+hard-escalates on well-intentioned time phrasing — the exact three formats that
+broke the demo (<code>&quot;12:00 to 15:00&quot;</code>, <code>&quot;2026-07-02T14:00:00-05:00&quot;</code>, <code>&quot;2-4pm&quot;</code>)
+now normalize to a bookable window-start; genuinely-ambiguous phrasing re-asks
+instead of dropping to a human. This is the interim fast-path; the durable fix
+(Fable-5 #20 &quot;offers are quotes&quot;, where the LLM never hand-formats a time) is
+scoped in the problem statement.</li>
+<li><strong>Rigor note (how every &quot;zero-new&quot; claim was verified):</strong> each source change was
+diffed as a <em>failure set</em> against a clean-<code>HEAD</code> full-suite run, not by absolute
+count — the suite carries ~110 pre-existing flaky live/network/creds failures
+whose count drifts run-to-run. For the P1 fix the delta was −4 net, and the 2
+apparent &quot;new&quot; failures were each reproduced in isolation to be flaky (one passes
+alone; one is a DashScope network probe with no connectivity), not caused by the
+change. A first pass of that same diff was <em>rejected</em> because it had read the
+wrong output file (showed an implausible &quot;clean HEAD passes 100%, change breaks
+109&quot;) — investigated and corrected rather than trusted.</li>
+</ul>
+<h2 id="the-two-reports-to-open">The two reports to open</h2>
+<ol>
+<li><strong><code>remote-control-transport-swap-quality-report.html</code></strong> — the shadow slice:
+three review-and-harden cycles, all findings + fixes, the isolation method
+(including the worktree/editable-install trap I caught and corrected),
+mutation-checked guards, known limitations.
+Companion: <strong><code>remote-control-transport-swap-handoff.html</code></strong> — the turnkey
+live-call sequence.</li>
+<li><strong><code>calendar-scheduler-sim-report.html</code></strong> — the calendar simulator, its
+coverage matrix, and finding B-CAL-1 with the recommended fix.</li>
+</ol>
+<h2 id="two-findings-handed-off-full-repro-recommended-fix-not-blind-fixed">Two findings handed off (full repro + recommended fix; NOT blind-fixed)</h2>
+<ul>
+<li><strong>Transport-swap live validation</strong> — flip <code>RIFF_INPUT_ARBITER=1</code> on a real OTA
+call, watch shadow agreement, add audio-start stamping (required before A2 can
+be claimed), then make the arbiter authoritative. Needs the operator + a live
+call.</li>
+<li><strong>B-CAL-1 — caught AND fixed</strong> (<code>7faa0034</code>). The simulator caught a real
+slot-conflict retry bug on the cascade path (caller re-confirmed the same dead
+slot instead of getting fresh offers; live path unaffected; never fabricated a
+booking). Two reverted attempts localized it to inside <code>dispatch_required_tools</code>'
+post-book walk; the fix clears the dead selection there so <code>slot_busy</code> re-offers
+fresh slots. Validated: sim 125 green, targeted scheduling+live diff zero-new,
+full suite same failure count +15 passing. The harness that caught the bug also
+validated its fix.</li>
+</ul>
+<h2 id="scope-discipline">Scope discipline</h2>
+<p>Gated goals — scheduler #20 (&quot;offers are quotes&quot; redesign) and quality-contract
+#21 — were <strong>not started</strong>; the P1 time_range fix is a deliberately-scoped interim
+fast-path (Fable-5 §6 steps 1-2) that unblocks the demo <em>without</em> pre-empting the
+#20 redesign it points to. The parallel surface-emission WIP (<code>riffc.py</code>,
+<code>types.py</code>, <code>loader.py</code>, <code>surface.py</code>) was not touched — commits were staged
+file-by-file to keep it isolated. codex was used as the review proxy throughout
+(one approved plan + several diff reviews, including the P1 fix → verdict SAFE);
+<code>agy</code> was not run headless.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#what-shipped-key-commits-on-main">What shipped (key commits on main)</a></li><li class="toc-h3"><a href="#later-this-session-calendar-shift-left-companion-humanness">Later this session (calendar shift-left + companion + humanness)</a></li><li class="toc-h2"><a href="#headline-results">Headline results</a></li><li class="toc-h2"><a href="#the-two-reports-to-open">The two reports to open</a></li><li class="toc-h2"><a href="#two-findings-handed-off-full-repro-recommended-fix-not-blind-fixed">Two findings handed off (full repro + recommended fix; NOT blind-fixed)</a></li><li class="toc-h2"><a href="#scope-discipline">Scope discipline</a></li></ul></aside>
+</div>
+</body>
+</html>

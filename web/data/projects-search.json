@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-26T10:22:04.420816Z",
-  "count": 137,
+  "generated_at": "2026-07-12T09:02:27.806292Z",
+  "count": 140,
   "entries": [
     {
       "repo": "2026-FEB-21-K3-App-Builder-Claude-proto",
@@ -404,20 +404,20 @@
     {
       "repo": "Browser-Text-to-Speech-TTS-Realtime",
       "title": "Browser Text To Speech TTS Realtime",
-      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX.",
+      "one_liner": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX models.",
       "keywords": [
         "typescript",
-        "react",
+        "react 18",
         "vite",
         "webassembly",
         "onnx runtime",
         "tailwind css",
-        "shadcn ui",
+        "tanstack query",
         "tts",
         "onnx",
+        "react-hook",
         "client-side-ai",
-        "offline-first",
-        "privacy-focused"
+        "privacy-first"
       ],
       "chunks": [
         {
@@ -426,23 +426,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX."
+          "text": "A client-side, real-time neural text-to-speech engine using WebAssembly and ONNX models."
         },
         {
           "source": "what_it_is",
-          "text": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It utilizes VITS neural TTS models compiled to WebAssembly via ONNX Runtime, enabling streaming audio playback, multi-core parallel processing, and offline capability without server costs or API keys."
+          "text": "This project is a high-performance, browser-based text-to-speech system that runs entirely on the client. It leverages WebAssembly and ONNX Runtime to execute VITS neural TTS models locally, eliminating server costs and privacy concerns. The system supports streaming playback, where audio begins playing as soon as the first sentence is generated, while subsequent sentences are processed in parallel using WebAssembly threads."
         },
         {
           "source": "how_its_built",
-          "text": "The application is built with React 18, TypeScript, and Vite. It leverages the @diffusionstudio/vits-web library for model inference. The UI is styled with Tailwind CSS and shadcn/ui components. State management for TTS operations is handled by a custom useTTS hook that interfaces with a TTSEngine class, which manages sentence splitting, chunk generation, and audio playback synchronization."
+          "text": "The application is built with React 18 and TypeScript, bundled via Vite. It uses the @diffusionstudio/vits-web library for model inference, which compiles VITS models to WebAssembly. State management is handled by custom React hooks (useTTS) and TanStack Query. The UI is styled with Tailwind CSS and shadcn/ui components. Multi-threading is enabled via Cross-Origin Opener/Embedder Policies (COOP/COEP) to allow WebAssembly workers to accelerate generation."
         },
         {
           "source": "how_to_apply",
-          "text": "Integrate the useTTS hook into any React component to add voice capabilities. Configure voice ID, speed, and volume via hook options. Use the returned speak, stop, pause, and resume methods to control playback. Monitor state variables like isReady, isPlaying, and progress to update UI elements dynamically."
+          "text": "Integrate the useTTS hook into any React component to add voice capabilities. Configure the voice ID, speed, and volume via options. The hook manages model downloading, caching in IndexedDB, and audio playback state. It is suitable for accessibility tools, interactive storytelling, or any web application requiring natural-sounding speech without backend dependencies."
         },
         {
           "source": "features",
-          "text": "100% client-side processing with no server dependencies Streaming playback allowing audio to start before full generation Multi-core WebAssembly threads for parallel sentence processing Eight built-in natural voices across English, German, French, and Spanish Offline support via browser IndexedDB caching of voice models Privacy-first architecture ensuring no data leaves the local machine"
+          "text": "100% client-side processing with no server API calls Streaming playback with parallel sentence generation Multi-core acceleration via WebAssembly threads Offline support with IndexedDB model caching Eight built-in natural voices across four languages Privacy-first architecture keeping data local"
         }
       ]
     },
@@ -1585,47 +1585,45 @@
     },
     {
       "repo": "cal-provider",
-      "title": "cal-provider",
-      "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server.",
+      "title": "Cal Provider",
+      "one_liner": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server and admin UI.",
       "keywords": [
         "python",
         "asyncio",
         "google calendar api",
-        "caldav protocol",
-        "model context protocol (mcp)",
-        "web framework (for admin ui)",
-        "calendar-integration",
-        "async-python",
-        "mcp-server",
-        "google-calendar",
         "caldav",
+        "mcp",
+        "web ui",
+        "calendar",
         "scheduling",
-        "ai-agent-tool"
+        "google-calendar",
+        "async-python",
+        "admin-ui"
       ],
       "chunks": [
         {
           "source": "title",
-          "text": "cal-provider"
+          "text": "Cal Provider"
         },
         {
           "source": "one_liner",
-          "text": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server."
+          "text": "Unified async Python library for Google Calendar and CalDAV with an optional MCP server and admin UI."
         },
         {
           "source": "what_it_is",
-          "text": "cal-provider is a Python library that abstracts away the differences between Google Calendar and CalDAV-compatible services (like iCloud, Nextcloud, and Fastmail). It provides a single asynchronous API for listing calendars, checking availability, retrieving events, and creating or canceling meetings. It includes built-in error handling, timezone support, and an optional Model Context Protocol (MCP) server to allow AI agents to interact with calendars, along with a web-based admin UI for easy configuration."
+          "text": "A Python library that abstracts calendar operations behind a single async interface, supporting Google Calendar (via service accounts) and CalDAV providers (iCloud, Nextcloud, Fastmail). It includes an administrative web UI for credential setup and configuration generation, and an optional Model Context Protocol (MCP) server to expose calendar capabilities to AI agents."
         },
         {
           "source": "how_its_built",
-          "text": "The library is built in Python using an async-first design. It implements a provider pattern where specific backend implementations (Google, CalDAV) adhere to a common interface. It uses standard Python libraries for datetime handling and likely HTTP clients for API communication. The project includes an optional admin UI built with a web framework (likely serving on port 8100) and an MCP server component for AI integration. Configuration is managed via environment variables or generated .env files."
+          "text": "Python 3.12+ using asyncio for all I/O. It implements a provider pattern with specific backends for Google Calendar API and CalDAV. The admin UI is likely built with a lightweight web framework (implied by local host serving), and the MCP server integrates with the core provider logic to expose tools like get_available_slots and create_event."
         },
         {
           "source": "how_to_apply",
-          "text": "Use cal-provider when building Python applications that need to interact with multiple calendar backends without maintaining separate code paths for each. It is ideal for scheduling bots, AI agents requiring calendar access via MCP, or internal tools that need to check availability and book meetings across different organizational calendar systems. Install it via pip with the appropriate extras for your target backend."
+          "text": "Use it in Python applications requiring calendar integration without locking into a single vendor. Ideal for booking bots, scheduling assistants, or AI agents needing to read/write events across different calendar ecosystems. The MCP server allows LLMs to interact with calendars naturally."
         },
         {
           "source": "features",
-          "text": "Unified async API for Google Calendar and CalDAV (iCloud, Nextcloud, Fastmail) Automatic timezone conversion for event retrieval and availability checks Optional MCP server for seamless integration with AI agents Web-based admin UI for credential setup and connection testing Structured exception hierarchy for granular error handling Support for listing calendars, checking slots, and creating/canceling events"
+          "text": "Unified async API for Google Calendar and CalDAV (iCloud, Nextcloud, Fastmail) Admin UI wizard for credential setup, connection testing, and config generation Optional MCP server for AI agent integration Timezone-aware availability checking and event retrieval Structured exception hierarchy for granular error handling Round-trip testing dashboard for create/cancel workflows"
         }
       ]
     },
@@ -2018,6 +2016,51 @@
       ]
     },
     {
+      "repo": "domain-tree-intake-nouns-for-riff",
+      "title": "Domain Tree Intake Nouns for riff",
+      "one_liner": "A Python library that validates domain-specific JSON trees and compiles them into flat capability dictionaries for the riff intake system.",
+      "keywords": [
+        "python",
+        "json",
+        "standard library",
+        "argparse",
+        "pathlib",
+        "regex",
+        "intake-form-generator",
+        "json-tree-compiler",
+        "dsl-validator",
+        "llm-drafting-tool",
+        "schema-flattener",
+        "domain-modeling"
+      ],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Domain Tree Intake Nouns for riff"
+        },
+        {
+          "source": "one_liner",
+          "text": "A Python library that validates domain-specific JSON trees and compiles them into flat capability dictionaries for the riff intake system."
+        },
+        {
+          "source": "what_it_is",
+          "text": "This project serves as a business-component precursor for riff's intake substrate. It manages vertical content as JSON tree data, enforces a strict Tree DSL via validation, and transforms locked hierarchical trees into flat capability dictionaries. These dictionaries define intake forms with branching logic, field phases (problem, triage, identity), and alias resolution maps, enabling structured data ingestion into the riff runtime."
+        },
+        {
+          "source": "how_its_built",
+          "text": "The core logic is implemented in pure Python using only the standard library. It consists of three main modules: tree_schema.py for DSL validation, tree_gen.py for LLM-assisted draft generation, and tree_to_schema.py for compiling locked trees into flat schemas. The build process is managed by scripts/build_dist.py, which reads locked JSON trees from the trees/ directory and outputs compiled capability JSON files to dist/."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Use this repository to author and validate domain-specific intake forms. Generate draft trees using the CLI, manually prune and lock them, then compile them into capability JSONs. Ingest these JSONs into the riff runtime by copying them into riff/intake_schemas.py or loading them directly. The resulting schemas drive the conversation flow, alias resolution, and field validation within the riff application."
+        },
+        {
+          "source": "features",
+          "text": "Validates hierarchical JSON trees against a strict DSL schema Compiles locked trees into flat capability dictionaries with branching logic Generates draft domain trees using LLM prompts for rapid authoring Supports alias resolution maps for robust entity extraction Enforces conversation-order contracts (problem, triage, identity phases) Integrates with verification tools like SMS code and USPS address validation"
+        }
+      ]
+    },
+    {
       "repo": "easy-cognito-nginx-gateway-auth-",
       "title": "Easy Cognito Nginx Gateway Auth",
       "one_liner": "A production-ready authentication gateway that protects web applications using AWS Cognito, nginx, and oauth2-proxy without requiring code changes.",
@@ -2118,9 +2161,8 @@
         "vanilla js",
         "ai-workspace",
         "kubernetes-platform",
-        "developer-portal",
-        "claude-code",
-        "self-hosted"
+        "developer-tools",
+        "claude-code"
       ],
       "chunks": [
         {
@@ -2133,19 +2175,66 @@
         },
         {
           "source": "what_it_is",
-          "text": "A portal that allows team members to launch pre-configured VS Code workspaces backed by Claude Code without local setup. It manages Kubernetes pods, ingress routes, and workspace templates through a Node.js API and static frontend."
+          "text": "A portal that allows team members to launch isolated VS Code workspaces backed by Claude Code without local setup. It manages Kubernetes pods, ingress routes, and workspace templates through a web interface and CLI."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Node.js/Express for the backend API, vanilla JavaScript for the frontend SPA, and Helm charts for Kubernetes deployment. Uses k3s for lightweight cluster management and Traefik for ingress routing. Includes a CLI tool called afterburner for bootstrapping and management."
+          "text": "Node.js Express backend serving a vanilla JS SPA, deployed on k3s via Helm. Uses Traefik for ingress and standard Kubernetes APIs for pod management."
         },
         {
           "source": "how_to_apply",
-          "text": "Operators use the afterburner CLI to bootstrap k3s on Linux VMs and deploy the portal via Helm. End users connect via VPN, access the portal URL, select a template from the App Catalog, and launch a workspace to get a browser-based VS Code instance with Claude Code ready."
+          "text": "Operators bootstrap k3s clusters using the afterburner CLI and deploy the portal via Helm. Users connect via VPN, select a template from the catalog, and launch a browser-based IDE."
         },
         {
           "source": "features",
-          "text": "App Catalog with pre-configured Claude Code templates One-click launch of personal VS Code workspaces in browser Automatic Kubernetes pod and ingress management Team-wide usage monitoring and fleet overview CLI tools for operator bootstrap and lifecycle management"
+          "text": "App Catalog with pre-configured Claude Code templates One-click launch of personal VS Code workspaces Persistent HTTPS endpoints for deployed targets Team-wide usage monitoring and fleet overview CLI for cluster bootstrapping and workspace management"
+        }
+      ]
+    },
+    {
+      "repo": "evidence-qa",
+      "title": "Evidence Qa",
+      "one_liner": "A document-grounded Q&A engine that retrieves, reranks, and synthesizes cited answers from uploaded files.",
+      "keywords": [
+        "python",
+        "fastapi",
+        "numpy",
+        "pypdf",
+        "python-docx",
+        "bge embeddings",
+        "cross-encoder",
+        "gguf llms",
+        "rag",
+        "document-qa",
+        "semantic-search",
+        "python-library",
+        "local-llm",
+        "cited-answers"
+      ],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Evidence Qa"
+        },
+        {
+          "source": "one_liner",
+          "text": "A document-grounded Q&A engine that retrieves, reranks, and synthesizes cited answers from uploaded files."
+        },
+        {
+          "source": "what_it_is",
+          "text": "A Python library and CLI for building retrieval-augmented generation systems. It ingests PDF, DOCX, TXT, MD, and CSV files into named collections, embeds them using BGE models, and answers user questions by retrieving relevant chunks, reranking them with a cross-encoder, and synthesizing a concise answer via an LLM. It prioritizes factual grounding, returning 'I don't have information' if evidence is insufficient."
+        },
+        {
+          "source": "how_its_built",
+          "text": "The system uses a two-layer architecture: a generic `docqa` engine for dynamic file ingestion and a specialized `evidence_qa` module for fixed-corpus benchmarks. The pipeline consists of semantic retrieval (BGE embeddings), cross-encoder reranking, and LLM synthesis. It supports local GGUF models for synthesis or falls back to extractive answers if no LLM backend is configured. Storage is file-based using JSONL for chunks and NumPy arrays for embeddings."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Use the `docqa` library to ingest documents into a collection via `ingest()` or the CLI, then query using `ask()`. Integrate the `retrieve()` and `ask()` functions into other applications, such as voice agents or customer support bots, to provide grounded responses. The FastAPI app (`app.py`) serves as a reference UI for upload and query interactions."
+        },
+        {
+          "source": "features",
+          "text": "Ingests PDF, DOCX, TXT, MD, and CSV files into named collections Semantic retrieval using BGE embeddings with cross-encoder reranking LLM-synthesized answers with source citations or safe abstention File-based persistence for chunks and embeddings without external databases Minimal FastAPI web UI for document upload and interactive querying Headless library API for integration into custom agents or workflows"
         }
       ]
     },
@@ -2334,10 +2423,12 @@
         "aws lambda",
         "s3",
         "cloudfront",
-        "search-engine",
+        "semantic-search",
+        "github-indexer",
         "portfolio-tool",
-        "code-discovery",
-        "ai-assistant-integration"
+        "mcp-server",
+        "vector-database",
+        "static-site-generator"
       ],
       "chunks": [
         {
@@ -2350,19 +2441,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a semantic search interface via CLI, REST API, and static web UI. It enables developers to find reusable code patterns across their own portfolio."
+          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web UI is a static HTML/JS application consuming JSON data exported by the CLI. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing."
+          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON exports. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing."
         },
         {
           "source": "how_to_apply",
-          "text": "Clone the repo, install dependencies, configure a GitHub token, index your repos, and serve the web UI or use the CLI/MCP server to search your codebase."
+          "text": "Install locally to index your own repos, deploy to S3/CloudFront for a public portfolio site, or connect via MCP to allow AI agents to search your codebase contextually."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF weighting Faceted filtering by language, tech stack, and stars Auto-generated capability clusters for repo grouping MCP server integration for AI agent access Static web UI with shareable URLs and collections Automated weekly reindexing via GitHub Actions"
+          "text": "Semantic search using embeddings and TF-IDF weighting Auto-clustering of repos into capability categories MCP server integration for AI agent access Static web UI with faceted filtering and autocomplete Automated weekly reindexing via GitHub Actions Exportable data formats for LLM discovery"
         }
       ]
     },
@@ -3792,6 +3883,49 @@
       ]
     },
     {
+      "repo": "prioity_foregrounds_kanban",
+      "title": "Priority Foregrounds Kanban",
+      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles.",
+      "keywords": [
+        "python 3.11+",
+        "standard library http.server",
+        "vanilla javascript",
+        "google gemini api",
+        "html5/css3",
+        "product-management",
+        "prioritization",
+        "kanban",
+        "decision-science",
+        "local-tool"
+      ],
+      "chunks": [
+        {
+          "source": "title",
+          "text": "Priority Foregrounds Kanban"
+        },
+        {
+          "source": "one_liner",
+          "text": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles."
+        },
+        {
+          "source": "what_it_is",
+          "text": "A standalone Python web application that helps product teams make tradeoffs explicit by allocating a strict 100-point budget across five customizable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores with strict validation to prevent malformed or partial outputs from affecting the board."
+        },
+        {
+          "source": "how_its_built",
+          "text": "Built with Python 3.11+ using only the standard library for the core server (http.server) and logic. The frontend is vanilla JavaScript, HTML, and CSS. Optional AI integration uses the Google Gemini API via an extra dependency group, with strict in-memory caching, rate limiting, and token budgeting implemented in pure Python."
+        },
+        {
+          "source": "how_to_apply",
+          "text": "Use this tool during product strategy sessions to force explicit weighting of decision criteria (e.g., Customer Value vs. Risk). Edit the seed data in web/app.js to reflect your current initiative queue, then use the slider interface to adjust principle weights and observe immediate rank changes. Enable AI rescoring to get structured, evidence-based scoring proposals for specific principles."
+        },
+        {
+          "source": "features",
+          "text": "Enforces an exact 100-point budget across five editable decision principles with a 0.1 floor Deterministic queue ranking that updates instantly as principle weights change Optional AI evaluator that proposes complete score columns with strict validation and rejection of partial outputs Local storage persistence for scores, reasons, prompt state, and budget provenance Responsive UI with unit-economics calculator and queue comparison view Fail-closed security model with same-origin checks and no HTML injection in model reasons"
+        }
+      ]
+    },
+    {
       "repo": "pythonArrays",
       "title": "PythonArrays",
       "one_liner": "An empty or stub repository with no source code or documentation.",
@@ -4000,21 +4134,20 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
         "mermaid",
         "jsonl",
-        "pytest",
-        "fastapi",
+        "sqlite",
         "websockets",
+        "pytest",
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "python-platform",
-        "yaml-configuration",
-        "deterministic-workflow"
+        "fsm",
+        "llm-orchestration",
+        "deterministic-ai",
+        "python-framework"
       ],
       "chunks": [
         {
@@ -4023,23 +4156,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business in plain text, automatically generating a voice flow that handles tasks like scheduling, ordering, and intake while preventing LLM hallucinations through deterministic guardrails and slot validation."
+          "text": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation) while a deterministic FSM 'keeps the beat' (validating slots, enforcing transitions, and preventing hallucinations)."
         },
         {
           "source": "how_its_built",
-          "text": "The system is built in Python using a modular architecture where the LLM handles conversational nuance ('riffs') and a state manager enforces business logic ('keeps the beat'). Core components include a YAML-based flow loader, a pure-function state manager, deterministic guardrails, and adapters for STT/TTS and LLM providers (Gemini, Gemma, Claude). It uses an event bus for internal communication and JSONL for turn logging."
+          "text": "The core architecture separates concerns into deterministic pure functions and non-deterministic LLM calls. A web server exposes APIs for flow generation and conversation. When a call comes in, Speech-to-Text converts audio to text, which is passed to `run_turn()`. This function orchestrates guardrails, an LLM adapter (supporting Gemini, Gemma, Claude), and a `state_manager` that validates inputs against a YAML-defined state graph. Deterministic slot extraction and validation occur outside the LLM. The result is converted back to speech via Text-to-Speech. The system includes a session store, event bus, and observability tools for tracking silent failures and performance metrics."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail scenarios (coffee, pizza). It is suitable for developers who need reliable, hallucination-free voice interactions without manually coding complex state machines. The platform supports local development with open-source models or cloud deployment with proprietary APIs."
+          "text": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. It is ideal for scenarios requiring strict data collection (slots) and workflow adherence, such as appointment scheduling or order taking, where pure LLM agents might hallucinate or drift. Developers can define new flows via YAML or generate them via API, integrate with existing telephony systems via the web server, and extend functionality through custom tools and guards."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions via YAML-defined FSMs Prevents LLM hallucinations with pure-function guardrails and validators Supports multiple LLM backends including Gemini, Gemma, and Claude Includes 11 pre-built flows for common service and retail scenarios Provides real-time web UI for monitoring and inspecting active sessions"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic workflows using YAML-defined Finite State Machines Prevents LLM hallucination via pure-function guardrails and slot validation Supports multiple LLM providers including Gemini, Gemma, and Claude Includes built-in flows for common services like plumbing, salons, and retail Provides real-time web UI for monitoring active conversations and FSM states"
         }
       ]
     },
@@ -4569,16 +4702,18 @@
     {
       "repo": "supertokens-s3-example",
       "title": "SuperTokens S3 Example",
-      "one_liner": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2.",
+      "one_liner": "Reference implementation of a Go backend with SuperTokens passwordless authentication and Dockerized infrastructure on AWS EC2.",
       "keywords": [
         "go",
-        "supertokens",
+        "shell",
         "docker",
         "postgresql",
+        "supertokens",
         "aws ec2",
-        "shell",
         "authentication",
-        "aws"
+        "golang",
+        "aws",
+        "infrastructure-as-code"
       ],
       "chunks": [
         {
@@ -4587,23 +4722,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A reference implementation of passwordless authentication using SuperTokens, Go, and Docker on AWS EC2."
+          "text": "Reference implementation of a Go backend with SuperTokens passwordless authentication and Dockerized infrastructure on AWS EC2."
         },
         {
           "source": "what_it_is",
-          "text": "This project demonstrates how to integrate SuperTokens passwordless authentication into a Go backend service. It includes infrastructure scripts to deploy SuperTokens Core and PostgreSQL via Docker on an AWS EC2 instance, along with a Go server that handles magic link generation and session verification. The architecture is designed for cloud deployment with security considerations for internal service communication."
+          "text": "A demonstration project that integrates the SuperTokens Golang SDK for passwordless (magic link) authentication with a Go HTTP server. It includes infrastructure scripts to deploy PostgreSQL and the SuperTokens core via Docker on an Ubuntu EC2 instance, providing a complete stack for testing session-based auth flows."
         },
         {
           "source": "how_its_built",
-          "text": "The system uses a Shell script to orchestrate Docker containers for the database and auth core. The application logic is written in Go, utilizing the `supertokens-golang` SDK for auth flows and `gorilla/mux` for HTTP routing. Configuration is managed via environment variables loaded from a `.env` file."
+          "text": "The system uses a Shell script to orchestrate Docker containers for PostgreSQL and the SuperTokens core. The application logic is written in Go, using the gorilla/mux router and the official supertokens-golang library. Configuration is managed via environment variables loaded through godotenv."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this repository as a template for setting up secure, passwordless login for Go-based microservices. It provides a ready-to-use Docker setup for the authentication backend and example code for integrating session handling into your API endpoints."
+          "text": "Use this repository as a template for setting up secure, session-based authentication in Go microservices. It demonstrates how to isolate identity management in Docker containers while keeping the application stateless and connected via internal networks."
         },
         {
           "source": "features",
-          "text": "Automated Docker setup for SuperTokens Core and PostgreSQL Passwordless authentication via magic links Go backend integration with session management Basic frontend test harness for login flows Security best practices for internal network isolation"
+          "text": "Passwordless authentication via magic links using SuperTokens Automated Docker deployment for PostgreSQL and SuperTokens core Go backend integration with session handling and API routing Basic HTML frontend for testing login and verification flows Configuration management via environment variables and .env files"
         }
       ]
     },

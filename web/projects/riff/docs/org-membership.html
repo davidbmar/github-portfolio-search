@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Org-Scoped Membership — Use Cases</title>
+<style>
+  :root { --bg:#0b0e19; --panel:#131730; --edge:#26305c; --ink:#eef1ff;
+    --dim:#8b93c4; --accent:#6f7bff; --good:#34d399; --warn:#f5c542; --bad:#f87171;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  @media (prefers-color-scheme: light) { :root { --bg:#f7f8fc; --panel:#fff;
+    --edge:#d8ddf0; --ink:#1a2038; --dim:#5b6491; --accent:#4353d8; --bad:#c2453a; } }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:26px;margin:8px 0 4px;text-wrap:balance}
+  h2{font-size:18px;margin:34px 0 10px;border-bottom:1px solid var(--edge);padding-bottom:6px}
+  .sub{color:var(--dim);font-size:14px}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:14px 18px;margin:14px 0}
+  code{font-family:var(--mono);font-size:.85em;background:rgba(111,123,255,.12);padding:.1em .35em;border-radius:4px}
+  pre{background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:12px 16px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+  .tw{overflow-x:auto}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--edge);vertical-align:top}
+  th{color:var(--dim);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  .tid{font-family:var(--mono);font-size:11px;background:rgba(52,211,153,.14);color:var(--good);
+    border:1px solid var(--good);border-radius:4px;padding:1px 7px}
+  .never{color:var(--bad);font-weight:600}
+  ol li,ul li{margin:4px 0}
+</style>
+</head>
+<body>
+<main>
+<p class="sub">RIFF · org-scoped membership · use-case-first spec · 2026-07-07 · status: DESIGN v1.1, Codex-reviewed (verdict: ORG; 6 findings folded) · siblings: <a href="session-facts-endflow.html">session facts</a>, <a href="session-facts-module.html">session_facts module</a>, org-telecom-identity.md</p>
+<h1>Org-Scoped Membership: every business keeps its own list</h1>
+<p class="sub">Born from a live incident (2026-07-07): erasing a caller "from the bike shop" erased them from
+the law office too, because <code>caller_identity</code> is one global phone-keyed table. Membership is a
+relationship between a PERSON and a BUSINESS — this design scopes it that way and tags every stored
+row with the business it belongs to.</p>
+
+<div class="card">
+<b>Scoping ruling: business (org), not flow.</b> (1) The caller joins the <i>Riders Club</i>, not a
+YAML file — when a business adds a second line, members must carry over. (2) SMS consent under
+TCPA/10DLC is brand-scoped in law; the storage must match. (3) Cross-business isolation is the
+correct privacy default. The <b>flow</b> that enrolled a member is kept as provenance, never as scope.
+Key: <code>org_id = pack business.id</code> (today 1:1 with flows; n:1 when org files land — the key
+does not change).
+</div>
+
+<div class="card">
+<b>The tables</b> (same store, same M3 authority, no new sync plumbing):
+<pre>membership(
+  org_id        TEXT NOT NULL,     -- business.id ("flow101_bluebonnet_bikes", "legal_intake")
+  phone         TEXT NOT NULL,     -- E.164
+  display_name  TEXT,
+  sms_consent   INTEGER,           -- tri-state: NULL unknown / 1 granted / 0 DENIED (denial durable)
+  consent_at    REAL, verified_at REAL,
+  enrolled_via_flow TEXT,          -- provenance, not scope
+  created_at REAL, updated_at REAL,
+  PRIMARY KEY (org_id, phone))
+
+intake_sessions += org_id TEXT     -- every session row tagged; answers/transcripts
+                                   -- inherit via their token join</pre>
+Runtime source of <code>org_id</code>: the compiled flow's <code>org</code> field (falls back to
+<code>flow_id</code> for today's 1:1 packs). The dialed DID resolves to a flow, the flow names its org,
+the org names its list.
+</div>
+
+<h2>Case B1 — Isolation is the default <span class="tid">TB1</span></h2>
+<ol>
+<li>A caller enrolls in the bike shop's Riders Club.</li>
+<li>They call the law office for the first time.</li>
+<li>The law office greets them as a <b>stranger</b> — no name, no consent, nothing.</li>
+</ol>
+<p><b>Never:</b> <span class="never">any business reading another business's membership row</span> —
+the resolver takes <code>(org_id, phone)</code>; there is no phone-only lookup in the call path.</p>
+
+<h2>Case B2 — One phone, many memberships, different data <span class="tid">TB2</span></h2>
+<p>The same number can be "Dave" with cruiser preferences at the bike shop and "David B. Marr" at the
+law office. Names, consents, and preferences never bleed between orgs. Updating one leaves the other
+byte-identical.</p>
+
+<h2>Case B3 — Erasure is per-org; compliance erase is everywhere <span class="tid">TB3</span></h2>
+<ol>
+<li>"Erase me from the bike shop" deletes the bike shop membership + the bike shop's tagged sessions
+/answers/transcripts — and NOTHING else. The law office still knows the caller.</li>
+<li>A compliance erase (<code>--all-orgs</code>) removes every membership and every tagged row for the
+phone, and reports counts per org.</li>
+<li><b>Suppression tombstones</b> (Codex): erasing deletes CONTENT (name, preferences, sessions) but
+retains a minimal suppression record <code>{org_id, phone_hash, sms_suppressed, erased_at}</code> —
+"erase me" must never resurrect textability by erasing a durable opt-out. Tombstones carry no PII
+(hashed phone) and are readable only by the send gate.</li>
+</ol>
+<p><b>Never:</b> <span class="never">a per-org erase touching another org's rows</span>;
+<span class="never">orphaned answers/transcripts surviving either erase</span> (the token join is part
+of the delete, fixing the purge-tool gap found 2026-07-07);
+<span class="never">an erase that re-enables texting a caller who had opted out</span>.</p>
+
+<h2>Case B4 — Consent is per-org and denial sticks <span class="tid">TB4</span></h2>
+<ol>
+<li>Caller grants SMS consent at the bike shop, denies at the law office.</li>
+<li>The bike shop's DID may text them; the law office's may not — the send path resolves consent by
+the org that owns the sending DID (composing with the existing fail-closed sms_from resolver).</li>
+<li>Denial is durable per org: the law office never re-asks on later calls; the bike shop is unaffected.</li>
+</ol>
+<p><b>Never:</b> <span class="never">consent granted to one brand authorizing a text from another</span>.</p>
+
+<h2>Case B5 — Members survive new lines and flow renames <span class="tid">TB5</span></h2>
+<p>The business adds a second flow (or renames/rebuilds one) under the same <code>org_id</code>: every
+member is recognized on the new line with zero migration — because scope was never the flow.</p>
+
+<h2>Case B6 — Migration from the global table <span class="tid">TB6</span></h2>
+<ol>
+<li>Each existing <code>caller_identity</code> row becomes a membership in every org where that phone
+has a completed profile-intake session (provenance from <code>intake_sessions</code>).</li>
+<li>A phone with identity but NO attributable session gets a membership in the org of the flow that
+verified it if determinable, else it is reported for operator review — never silently dropped,
+never silently globalized.</li>
+<li>During a deprecation window the resolver reads membership FIRST, legacy global table second
+(logged as <code>legacy_identity_hit</code> so the window's end is data-driven); writes go ONLY to
+membership. <b>Fallback discipline</b> (Codex #2 — "the biggest incident risk"): the legacy fallback
+serves GREETINGS only; it is <b>disabled in the send path and the erase path</b>, metriced, and
+time-boxed — a phone-only read can never again decide who gets texted or what gets deleted.</li>
+<li><b>Consent migrates conservatively</b> (Codex #3): <code>sms_consent=1</code> copies only where
+org-specific evidence exists (a consent answer row in that org's sessions); otherwise the membership
+starts <code>NULL</code> (asked once, fresh). A legacy denial becomes per-org suppression wherever
+attribution is plausible.</li>
+</ol>
+
+<h2>Case B7 — The session_facts tie-in <span class="tid">TB7</span></h2>
+<p>The fact registry gains a <code>scope</code> column: <code>identity</code> and
+<code>sms_consent</code> become <code>scope: org</code>; <code>selected_route</code>/<code>journey</code>
+stay <code>scope: call</code>. <code>auth_level=known</code> now means "<b>this org</b> knows you."
+The membership desk (option 0) is the writer of org-scoped facts; the transport prefill reads only
+the dialed org's row.</p>
+
+<h2>Edge-case register (Codex #5 — specified now, most deferred with owners)</h2>
+<div class="tw"><table>
+<tr><th>edge</th><th>v1 ruling</th></tr>
+<tr><td>Phone canonicalization</td><td>REQUIRED in v1: all keys pass <code>normalize_caller_phone</code> (E.164); the PK is only sound canonicalized (Codex PK finding)</td></tr>
+<tr><td>Number reassignment</td><td>v1: <code>verified_at</code> staleness threshold — greetings degrade to "is this still &lt;name&gt;?" re-confirm past it; full reuse signals deferred</td></tr>
+<tr><td>Org merge / split / franchise</td><td>Deferred to org files (PR4): a mapping table migration, possible because every row is org-tagged</td></tr>
+<tr><td>Transactional vs marketing SMS</td><td>v1 sends are all transactional (follow-along/status); a <code>consent_kind</code> column is reserved before any marketing use</td></tr>
+<tr><td>Audit: "why could this org text this phone?"</td><td>v1: every send already writes a ledger row; it gains <code>consent_evidence</code> (membership row id or tombstone check)</td></tr>
+</table></div>
+
+<h2>Out of scope (v1), recorded deliberately</h2>
+<ul>
+<li>Cross-business "RIFF ID" (opt-in platform identity) — a future layer on top, never a default.</li>
+<li>Org files (PR4) — this design keys on <code>business.id</code> now and is unchanged by org files landing.</li>
+<li>Membership tiers/points — the schema leaves room (a later <code>tier</code> column), not built.</li>
+</ul>
+
+<h2>Test matrix (TDD — written red before implementation)</h2>
+<div class="tw"><table>
+<tr><th>id</th><th>case</th><th>asserts</th></tr>
+<tr><td><span class="tid">TB1</span></td><td>isolation</td><td>enroll(orgA); resolve(orgB, phone) ⇒ unknown; no phone-only lookup API in the call path</td></tr>
+<tr><td><span class="tid">TB2</span></td><td>divergent data</td><td>two orgs, same phone, different names/consents; update A ⇒ B byte-identical</td></tr>
+<tr><td><span class="tid">TB3</span></td><td>erasure</td><td>per-org erase leaves other org intact + zero orphans; --all-orgs erases everywhere with per-org counts</td></tr>
+<tr><td><span class="tid">TB4</span></td><td>consent</td><td>send-path consent joins the sending DID's org; denied org never re-asked, never texted</td></tr>
+<tr><td><span class="tid">TB5</span></td><td>org continuity</td><td>second flow with same org_id recognizes existing member</td></tr>
+<tr><td><span class="tid">TB6</span></td><td>migration</td><td>provenance-attributed copy; unattributable rows reported not dropped; reads fall back, writes never do</td></tr>
+<tr><td><span class="tid">TB7</span></td><td>facts scope</td><td>registry carries scope; prefill reads dialed org only</td></tr>
+</table></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Strong Slot Typing — Quality &amp; Testing Report · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">strong-typing-quality-report.md</span>
+<a class="raw" href="/docs/docs/flow-eval/strong-typing-quality-report.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Strong Slot Typing — Quality &amp; Testing Report</h1>
+<p><strong>For:</strong> Fable 5 design review
+<strong>Scope:</strong> schema-0.2 strong slot typing (remote-control design §2.2) + the codex-review fixes
+<strong>Date:</strong> 2026-07-02
+<strong>Branch/commits:</strong> <code>voice-capability-hierarchy</code> → <code>main</code> — <code>2513a7d4</code>, <code>c6871ce3</code>, <code>cc84fa6a</code>, <code>8d991170</code> (+ design docs <code>10ff8b52</code>, <code>a2d6d991</code>)</p>
+<hr />
+<h2 id="1-what-shipped">1. What shipped</h2>
+<p>The <code>slot_types</code> facility was extended (not replaced) to make collect slots strongly typed, enforced at <strong>compile time</strong> (riffc L0-10) and <strong>runtime</strong> (validators):</p>
+<ul>
+<li><strong>Unified <code>type:</code> field</strong> — semantic names (<code>enum</code>, <code>phone</code>, …) never collide with JSON types (<code>string</code>, …), so one <code>type:</code> carries both; <code>{semantic_type: …}</code> long-form still works.</li>
+<li><strong><code>enum</code></strong> value domain — <code>options</code> (scalar or <code>{value, label, aliases}</code>), validated at load (non-empty), enforced at runtime (value ∈ options, alias→canonical).</li>
+<li><strong>Presentation</strong> — <code>label</code> (screen), <code>optional</code>, <code>widget</code> (override, restyle-only per OD-R5), and <code>reask</code> canonized as the per-slot voice prompt (OD-R7).</li>
+<li><strong><code>date</code> implemented</strong> — extraction (<code>_extract_calendar_dates</code>) + <code>IMPLEMENTED_TYPES</code>, closing a pre-existing gap.</li>
+<li><strong>riffc L0-10</strong> — an untyped collect slot is a hard build error.</li>
+</ul>
+<h2 id="2-codex-findings-fixes-evidence">2. Codex findings → fixes → evidence</h2>
+<p>Codex reviewed the design + first slice and found real gaps. All slice-level findings are closed with tests:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Sev</th>
+<th>Finding</th>
+<th>Fix</th>
+<th>Test evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>HIGH</td>
+<td>runtime ignored unified <code>type:</code> → <code>{type: phone}</code> accepted garbage</td>
+<td>resolve via <code>effective_semantic_type</code> at all 3 validation sites</td>
+<td><code>test_unified_type_enforced_at_runtime</code>, <code>test_unified_and_longform_agree_at_runtime</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>MED</td>
+<td><code>{type: phone, semantic_type: email}</code> silently resolved by precedence</td>
+<td>reject conflicting semantics at load</td>
+<td><code>test_conflicting_semantics_rejected</code> (3 forms)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>HIGH</td>
+<td><code>enum</code> declared but not enforced at runtime</td>
+<td><code>enum_match</code> membership check in <code>validate_slot_value</code></td>
+<td><code>test_enum_accepts_and_canonicalizes</code> (5), <code>test_enum_rejects_out_of_domain</code> (5), <code>test_enum_rejects_injection_before_membership</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>HIGH</td>
+<td>channel-bind unsound (design)</td>
+<td>resolved by Fable 5 → §3.1 device-pairing (OD-R6)</td>
+<td>design doc</td>
+</tr>
+<tr>
+<td>8</td>
+<td>MED</td>
+<td>L0-11 undefined field-voice-prompt (design)</td>
+<td>resolved → canonize <code>reask</code> (OD-R7)</td>
+<td>design doc</td>
+</tr>
+</tbody>
+</table>
+<p>Design findings #7/#8 are in Fable 5's court (recorded as OD-R6/OD-R7 §9). Surface-lane findings #4 (GoalSegment <code>target_slots</code>), #5 (enum option metadata), #6 (untyped-degrade) are assigned to the parallel surface session with the <code>iter_slots(flow)</code> directive.</p>
+<h2 id="3-acceptance-a5-coverage">3. Acceptance A5 coverage</h2>
+<blockquote>
+<p>A5: <code>riffc</code> rejects a surface button naming a nonexistent token, a <strong>form field with an untyped slot</strong>, and a screen-only state with no voice path.</p>
+</blockquote>
+<ul>
+<li><strong>Untyped-field leg — DONE &amp; tested:</strong> L0-10 makes an untyped collect slot a hard error. <code>test_l0_10_untyped_synthetic_flow_errors</code> (error-level, names the slot), <code>test_l0_10_typed_synthetic_flow_compiles_clean</code>. Corpus: 3 golden anchors emit <strong>0</strong> L0-10 errors; migration checklist enumerates the remaining 10 flows.</li>
+<li>Token + screen-only legs are in the parallel surface slice (L0-11/L0-12).</li>
+</ul>
+<h2 id="4-test-inventory">4. Test inventory</h2>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Tests</th>
+<th>Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_slot_types_schema02.py</code></td>
+<td>16</td>
+<td>vocabulary, validation, unified-type + enum runtime, L0-10</td>
+</tr>
+<tr>
+<td><code>test_slot_typing_adversarial.py</code></td>
+<td>53</td>
+<td><strong>adversarial</strong>: every semantic via <code>type:</code>; enum alias/case/whitespace/<strong>injection</strong>/collision; conflicts in every form; runtime enforcement per semantic; widget override; <code>date</code>; L0-10 synthetic flows</td>
+</tr>
+<tr>
+<td><code>test_typed_slots_across_flows.py</code></td>
+<td>157</td>
+<td>cross-fleet: every typed slot resolves to an implemented type + validates type-correctly</td>
+</tr>
+<tr>
+<td><code>test_slot_type_ratchet.py</code></td>
+<td>2</td>
+<td>exact ratchet — no untyped behavioral slot silently added</td>
+</tr>
+<tr>
+<td><code>test_riffc_golden.py</code> / <code>test_riffc_all_flows.py</code></td>
+<td>3 + 60</td>
+<td>anchor census/checks locked; whole-corpus classification</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Adversarial highlights</strong> (the &quot;under pressure&quot; evidence): enum rejects an injection payload (<code>&quot;drain\x00; DROP TABLE&quot;</code>) via the shape check <em>before</em> membership; alias collisions resolve deterministically by declaration order; conflicting <code>type:</code>/<code>semantic_type:</code> rejected; <code>{type: phone}</code> and <code>{semantic_type: phone}</code> proven byte-identical at runtime.</p>
+<h2 id="5-regression-discipline-every-remaining-failure-is-pre-existing">5. Regression discipline — every remaining failure is pre-existing</h2>
+<p>The full <code>-k &quot;validator or slot&quot;</code> suite has 11 failures + 1 error. <strong>Every one was verified failing on clean HEAD (<code>41792be4</code>, before any typing work)</strong> via isolated <code>git worktree</code> runs — pizza/scheduling/offer/fsm-debug scenario tests unrelated to typing. This slice:</p>
+<ul>
+<li>introduced <strong>zero</strong> new failures, and</li>
+<li><strong>net-fixed</strong> one pre-existing failure (<code>apartment_intake:move_in_date=date</code>) by implementing <code>date</code> (<code>test_typed_slots_across_flows</code>: was 1-failed/150-passed → now <strong>157/157</strong>).</li>
+</ul>
+<p>Method note: each suspected regression was reproduced on a clean checkout before attribution — no failure was assumed mine or pre-existing without proof.</p>
+<h2 id="6-honest-caveats-open-items">6. Honest caveats / open items</h2>
+<ul>
+<li><strong><code>main</code> carries ~11 pre-existing test failures</strong> (pizza slot-extractor, austin acceptance/readback, scheduling offer loop) unrelated to typing — flagged, not owned by this slice.</li>
+<li><strong><code>enum</code> extraction</strong> is validation + membership only; free-speech→option <em>extraction</em> (constrained decode for collect) is a later slice — declaring an enum today validates a filled value but relies on the LLM/other extractors to propose it.</li>
+<li><strong>Surface-lane #4/#5/#6</strong> (GoalSegment, enum metadata, untyped-degrade) are open in the parallel session; my L0-10 should adopt <code>iter_slots</code> once it lands (single enumeration contract).</li>
+<li>The I5 emission-location debt (state broadcast from transport, not engine bus) is separate and tracked in the console-map plan.</li>
+</ul>
+<h2 id="7-verdict">7. Verdict</h2>
+<p>Strong typing is <strong>real end-to-end</strong>: declared at load, enforced at compile (L0-10) and runtime (unified <code>type:</code> + enum membership), covered by 228 passing typing tests (schema02 16 + adversarial 53 + cross-fleet 157 + ratchet 2) including a 53-case adversarial suite, with a proven-zero-regression, net-positive impact on the corpus.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-what-shipped">1. What shipped</a></li><li class="toc-h2"><a href="#2-codex-findings-fixes-evidence">2. Codex findings → fixes → evidence</a></li><li class="toc-h2"><a href="#3-acceptance-a5-coverage">3. Acceptance A5 coverage</a></li><li class="toc-h2"><a href="#4-test-inventory">4. Test inventory</a></li><li class="toc-h2"><a href="#5-regression-discipline-every-remaining-failure-is-pre-existing">5. Regression discipline — every remaining failure is pre-existing</a></li><li class="toc-h2"><a href="#6-honest-caveats-open-items">6. Honest caveats / open items</a></li><li class="toc-h2"><a href="#7-verdict">7. Verdict</a></li></ul></aside>
+</div>
+</body>
+</html>
