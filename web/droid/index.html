@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Local droid voice experiment comparing DSP, vocoder, hybrid, and Space Channel droid voice presets.">
+  <meta property="og:title" content="Droid Voice Experiment - davidbmar.com">
+  <meta property="og:description" content="Local text-to-speech droid voice variants plus Space Channel network operations voice presets with playable audio samples.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://davidbmar.com/droid/">
+  <link rel="canonical" href="https://davidbmar.com/droid/">
+  <title>Droid Voice Experiment - davidbmar.com</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel-2: #1c2128;
+      --line: #30363d;
+      --text: #e6edf3;
+      --muted: #9aa4af;
+      --blue: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+      --violet: #bc8cff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .site-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 24px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .brand {
+      color: var(--text);
+      font-weight: 700;
+      margin-right: auto;
+    }
+    .site-bar a:not(.brand) {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+    .site-bar a.active,
+    .site-bar a:not(.brand):hover {
+      color: var(--text);
+      background: #21262d;
+      text-decoration: none;
+    }
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+    .hero {
+      padding: 28px 0 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(34px, 8vw, 76px);
+      line-height: .95;
+      letter-spacing: 0;
+    }
+    .lede {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 24px 0 0;
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .stat strong { display: block; font-size: 22px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    section { margin-top: 34px; }
+    h2 { margin: 0 0 14px; font-size: 24px; }
+    h3 { margin: 0 0 8px; font-size: 18px; }
+    .genesis {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .card.a { border-top: 3px solid var(--green); }
+    .card.b { border-top: 3px solid var(--red); }
+    .card.c { border-top: 3px solid var(--blue); }
+    .card.d { border-top: 3px solid var(--violet); }
+    .card p { margin: 8px 0 0; color: var(--muted); }
+    .spotlight {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .spotlight-head {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .spotlight h2 { margin: 0; }
+    .spotlight p { margin: 6px 0 0; color: var(--muted); max-width: 780px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 1px solid var(--blue);
+      border-radius: 8px;
+      color: var(--text);
+      background: #1f6feb33;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .button:hover {
+      background: #1f6feb55;
+      text-decoration: none;
+    }
+    .preset-list {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .preset-list span {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 8px 10px;
+    }
+    code {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      padding: 1px 5px;
+      font-size: 13px;
+    }
+    .samples {
+      display: grid;
+      gap: 16px;
+    }
+    .line-card {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .line-card blockquote {
+      margin: 0 0 14px;
+      color: var(--text);
+      font-size: 17px;
+    }
+    .players {
+      display: grid;
+      grid-template-columns: 140px minmax(260px, 1fr) 170px;
+      gap: 10px 14px;
+      align-items: center;
+    }
+    .head {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .variant {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .variant.a { color: var(--green); }
+    .variant.b { color: var(--red); }
+    .variant.c { color: var(--blue); }
+    .variant.d { color: var(--violet); }
+    audio { width: 100%; min-width: 0; }
+    .timing {
+      color: var(--muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .notes {
+      color: var(--muted);
+      max-width: 860px;
+    }
+    .footer {
+      margin-top: 42px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media (max-width: 760px) {
+      .stats, .genesis, .preset-list { grid-template-columns: 1fr; }
+      .players { grid-template-columns: 1fr; }
+      .head { display: none; }
+      .site-bar { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-bar" aria-label="Site">
+    <a class="brand" href="/">davidbmar.com</a>
+    <a class="active" href="/droid/">Droid</a>
+    <a href="/#/search">Search</a>
+    <a href="/projects/">Projects</a>
+    <a href="/daily/">Daily</a>
+    <a href="/#/clusters">Clusters</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>Droid</h1>
+      <p class="lede">
+        A local text-to-speech experiment for android-style voice design. The first pass compares
+        core DSP/vocoder paths; the new Space Channel pass tests ten network-operations droid voices
+        against the same prompt set.
+      </p>
+      <div class="stats" aria-label="Experiment stats">
+        <div class="stat"><strong>10</strong><span>Space Channel presets</span></div>
+        <div class="stat"><strong>66</strong><span>playable samples</span></div>
+        <div class="stat"><strong>0.5s</strong><span>A/B/D generation, typical</span></div>
+        <div class="stat"><strong>local</strong><span>macOS, Piper, NumPy/SciPy</span></div>
+      </div>
+    </header>
+
+    <section class="spotlight">
+      <div class="spotlight-head">
+        <div>
+          <h2>Space Channel Droid Voices</h2>
+          <p>
+            Ten new presets tuned from the current MVP feedback: keep the metallic <code>a_dsp</code>
+            character, reduce scratch, and push toward a Euro/protocol network-operations voice.
+          </p>
+        </div>
+        <a class="button" href="space-channel-voices/">Open voice switcher</a>
+      </div>
+      <audio controls preload="metadata" src="space-channel-voices/01-thank-you-for-calling-space-channel-networ-retirement_party_mvp.wav"></audio>
+      <div class="preset-list" aria-label="Featured Space Channel voice presets">
+        <span>retirement_party_mvp</span>
+        <span>space_ops_switchboard</span>
+        <span>uap_archive_vocoder</span>
+        <span>bug_intake_clerk</span>
+        <span>deep_space_radio</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Genesis Of The Variants</h2>
+      <div class="genesis">
+        <article class="card a">
+          <h3><code>a_dsp</code> - Processed Speech Droid</h3>
+          <p>
+            This began as the fastest baseline: synthesize clean Piper speech, then make the voice
+            mechanical with ring modulation, comb filtering, bit-crush, tone leak, and soft clipping.
+            It keeps the words clear because the human-like TTS remains the dominant layer.
+          </p>
+        </article>
+        <article class="card b">
+          <h3><code>b_vocoder</code> - Carrier-Synthesis Droid</h3>
+          <p>
+            This variant came from the classic robot-vocoder idea: extract the speech envelope and
+            use it to drive a saw/square synthetic carrier. It is the most machine-generated path,
+            with stronger droid character and less natural intelligibility.
+          </p>
+        </article>
+        <article class="card c">
+          <h3><code>c_light</code> - Premium Android</h3>
+          <p>
+            This tests the opposite hypothesis: start from a higher-quality Piper voice and apply
+            only subtle metallic treatment. It is meant to sound like a cleaner protocol-style
+            android rather than a harsh machine.
+          </p>
+        </article>
+        <article class="card d">
+          <h3><code>d_hybrid</code> - Vocoder-Forward Hybrid</h3>
+          <p>
+            This was retuned after the first blend sounded too much like <code>a_dsp</code>. The new
+            version makes the vocoder the primary layer and mixes in a smaller processed-speech layer
+            only to recover clarity. It should sit closer to <code>b_vocoder</code> than to A.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Listen</h2>
+      <div class="samples">
+        <article class="line-card">
+          <blockquote>Affirmative. All systems nominal. Awaiting your command.</blockquote>
+          <div class="players">
+            <div class="head">Variant</div><div class="head">Audio</div><div class="head">Generated</div>
+            <div class="variant a">a_dsp</div><audio controls preload="metadata" src="audio/01-affirmative-all-systems-nominal-awaiting-y-a_dsp.wav"></audio><div class="timing">0.504s</div>
+            <div class="variant b">b_vocoder</div><audio controls preload="metadata" src="audio/01-affirmative-all-systems-nominal-awaiting-y-b_vocoder.wav"></audio><div class="timing">0.537s</div>
+            <div class="variant c">c_light</div><audio controls preload="metadata" src="audio/01-affirmative-all-systems-nominal-awaiting-y-c_light.wav"></audio><div class="timing">0.891s</div>
+            <div class="variant d">d_hybrid</div><audio controls preload="metadata" src="audio/01-affirmative-all-systems-nominal-awaiting-y-d_hybrid.wav"></audio><div class="timing">0.544s</div>
+          </div>
+        </article>
+
+        <article class="line-card">
+          <blockquote>I am a synthetic intelligence. State your designation.</blockquote>
+          <div class="players">
+            <div class="head">Variant</div><div class="head">Audio</div><div class="head">Generated</div>
+            <div class="variant a">a_dsp</div><audio controls preload="metadata" src="audio/02-i-am-a-synthetic-intelligence-state-your-d-a_dsp.wav"></audio><div class="timing">0.501s</div>
+            <div class="variant b">b_vocoder</div><audio controls preload="metadata" src="audio/02-i-am-a-synthetic-intelligence-state-your-d-b_vocoder.wav"></audio><div class="timing">0.525s</div>
+            <div class="variant c">c_light</div><audio controls preload="metadata" src="audio/02-i-am-a-synthetic-intelligence-state-your-d-c_light.wav"></audio><div class="timing">0.820s</div>
+            <div class="variant d">d_hybrid</div><audio controls preload="metadata" src="audio/02-i-am-a-synthetic-intelligence-state-your-d-d_hybrid.wav"></audio><div class="timing">0.530s</div>
+          </div>
+        </article>
+
+        <article class="line-card">
+          <blockquote>Directive seven one four acknowledged. Power cell at forty two percent.</blockquote>
+          <div class="players">
+            <div class="head">Variant</div><div class="head">Audio</div><div class="head">Generated</div>
+            <div class="variant a">a_dsp</div><audio controls preload="metadata" src="audio/03-directive-seven-one-four-acknowledged-powe-a_dsp.wav"></audio><div class="timing">0.525s</div>
+            <div class="variant b">b_vocoder</div><audio controls preload="metadata" src="audio/03-directive-seven-one-four-acknowledged-powe-b_vocoder.wav"></audio><div class="timing">0.553s</div>
+            <div class="variant c">c_light</div><audio controls preload="metadata" src="audio/03-directive-seven-one-four-acknowledged-powe-c_light.wav"></audio><div class="timing">0.942s</div>
+            <div class="variant d">d_hybrid</div><audio controls preload="metadata" src="audio/03-directive-seven-one-four-acknowledged-powe-d_hybrid.wav"></audio><div class="timing">0.568s</div>
+          </div>
+        </article>
+
+        <article class="line-card">
+          <blockquote>I do not experience fear, but I recognize the urgency of your request.</blockquote>
+          <div class="players">
+            <div class="head">Variant</div><div class="head">Audio</div><div class="head">Generated</div>
+            <div class="variant a">a_dsp</div><audio controls preload="metadata" src="audio/04-i-do-not-experience-fear-but-i-recognize-t-a_dsp.wav"></audio><div class="timing">0.530s</div>
+            <div class="variant b">b_vocoder</div><audio controls preload="metadata" src="audio/04-i-do-not-experience-fear-but-i-recognize-t-b_vocoder.wav"></audio><div class="timing">0.575s</div>
+            <div class="variant c">c_light</div><audio controls preload="metadata" src="audio/04-i-do-not-experience-fear-but-i-recognize-t-c_light.wav"></audio><div class="timing">1.013s</div>
+            <div class="variant d">d_hybrid</div><audio controls preload="metadata" src="audio/04-i-do-not-experience-fear-but-i-recognize-t-d_hybrid.wav"></audio><div class="timing">0.587s</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>What This Shows</h2>
+      <p class="notes">
+        The effects are cheap. The generation time is dominated by launching Piper and synthesizing
+        speech. A, B, and D all share the same Piper render, so they cluster around the same latency;
+        B and D add only a few dozen milliseconds for vocoder-band processing. C is slower because it
+        uses a higher-quality Piper voice.
+      </p>
+      <p class="notes">
+        For sub-200 ms replies, the practical path is to pre-generate common short responses and keep
+        live synthesis for dynamic text. Full timing data is available in <a href="timings.csv">timings.csv</a>.
+      </p>
+    </section>
+
+    <div class="footer">
+      Built locally in <code>~/src/droid-voice</code>. Deployed as a static listening page on davidbmar.com.
+    </div>
+  </main>
+</body>
+</html>
