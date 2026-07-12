@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Mar — Portfolio Constellation</title>
+<meta name="description" content="A 3D star atlas of every public repo — clusters as constellations, embedding similarity as the threads between stars.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="constellation.css">
+</head>
+<body>
+<canvas id="sky"></canvas>
+
+<header id="hud-top">
+  <div class="brand">
+    <div class="brand-mark">✦</div>
+    <div>
+      <h1>PORTFOLIO CONSTELLATION</h1>
+      <p class="sub">EVERY REPO AS A STAR · SIMILARITY AS THE SKY</p>
+    </div>
+  </div>
+  <nav class="views glass">
+    <a href="index.html">PORTFOLIO</a>
+    <a class="current">CONSTELLATION</a>
+  </nav>
+  <div class="controls">
+    <input id="search" type="search" placeholder="Find a repo…" autocomplete="off">
+  </div>
+</header>
+
+<div id="hint">drag to orbit the sky · shift-drag to pan · scroll to zoom · click a star for its story</div>
+
+<div id="tooltip" class="hidden"></div>
+
+<div id="zoomctl" class="glass">
+  <button id="zin" title="Zoom in (+)">+</button>
+  <button id="zout" title="Zoom out (−)">−</button>
+  <button id="zreset" title="Reset view (0)">⌂</button>
+</div>
+
+<aside id="panel" class="hidden">
+  <button id="panel-close" aria-label="Close">✕</button>
+  <div id="panel-body"></div>
+</aside>
+
+<div id="counter"></div>
+
+<script src="constellation.js"></script>
+</body>
+</html>

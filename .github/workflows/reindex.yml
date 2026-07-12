@@ -35,6 +35,11 @@ jobs:
       - name: Export static data
         run: ghps export --db ghps.db --output web/data/
 
+      - name: Export portfolio constellation
+        # Adapter over the freshly-exported data — keeps constellation.json
+        # consistent with clusters/similarity on every reindex. Public repos only.
+        run: python scripts/export_constellation.py --data web/data --output web/data/constellation.json
+
       - name: Deploy to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
