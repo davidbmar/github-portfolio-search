@@ -132,3 +132,18 @@ def test_reuse_check_greenfield_when_nothing_passes_threshold():
     out = reuse_check(store, _FakeEmbedder(), _PROJECTS, "quantum compiler", min_score=0.5)
     assert out["verdict"] == "greenfield"
     assert out["candidates"] == []
+
+
+def test_reuse_check_default_threshold_admits_positive_rejects_negative():
+    """Locks the calibrated default (0.05): sqlite-vec L2 gives relevant repos a
+    small positive score (~0.06-0.26) and off-topic ones a negative score. The
+    default must keep the positive and drop the negative. Regression guard for
+    the 0.5-vs-0.05 metric-mismatch bug found by live smoke."""
+    from ghps.reuse import reuse_check
+    store = _FakeStore([
+        _row("parakeet-asr-service", 0.9, "positive match"),   # score 0.1  -> keep
+        _row("web-dashboard", 1.2, "negative / off-topic"),    # score -0.2 -> drop
+    ])
+    out = reuse_check(store, _FakeEmbedder(), _PROJECTS, "streaming transcription")  # default min_score
+    assert out["verdict"] == "candidates"
+    assert [c["repo"] for c in out["candidates"]] == ["parakeet-asr-service"]

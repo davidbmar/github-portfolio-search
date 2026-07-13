@@ -70,8 +70,15 @@ def _embedding_candidates(store, embedder, query: str, k: int) -> list[dict]:
 
 
 def reuse_check(store, embedder, projects: list[dict], building: str,
-                k: int = 5, min_score: float = 0.5) -> dict:
-    """Surface existing repos relevant to what's about to be built, with provenance."""
+                k: int = 5, min_score: float = 0.05) -> dict:
+    """Surface existing repos relevant to what's about to be built, with provenance.
+
+    Score is `1.0 - sqlite_vec_L2_distance` (see ghps.store.search). Empirically,
+    relevant repos land at a small POSITIVE score (~0.06-0.26) and off-topic ones
+    go negative, so the default floor sits just above zero. (An earlier 0.5 default
+    was mis-calibrated against similarity.json's cosine scale and returned
+    'greenfield' for everything — caught by live smoke; see ADR-0001.)
+    """
     from ghps.docsgen.search_docs import search_docs
 
     text, source = load_building_text(building)

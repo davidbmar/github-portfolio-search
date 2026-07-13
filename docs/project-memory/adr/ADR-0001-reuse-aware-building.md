@@ -40,7 +40,7 @@ Build **reuse-aware building** as an *interactive, in-the-loop* mechanism, and
 
 Five units, each with one job:
 
-- **A — `portfolio_reuse_check(building, k=5, min_score=0.5)`** (new MCP tool,
+- **A — `portfolio_reuse_check(building, k=5, min_score=0.05)`** (new MCP tool,
   read-only). `building` may be a short natural-language description **or the text
   / path of a design doc, spec, or plan** — the tool embeds it and finds nearest
   existing repos via the *existing* `_handle_portfolio_search` path, joins each hit
@@ -108,8 +108,13 @@ v1's job is to **collect the reuse data**; v2 derives the blocks from it.
   input retrieves poorly.
 
 ### Neutral
-- Adds a threshold policy (`min_score`) that will need tuning, mirroring the
-  exporter's existing `FAINT_FLOOR` / top-N cutoffs.
+- `min_score` is calibrated to the **store's** scoring scale, not the constellation's.
+  `reuse_check` ranks on `1.0 - sqlite_vec_L2_distance` (query↔chunk), where relevant
+  repos score a small positive value (~0.06–0.26) and off-topic ones go negative —
+  NOT the `similarity.json` cosine scale (median ~0.56, repo↔repo). Default floor is
+  `0.05`, just above the natural zero boundary. (An initial `0.5` — wrongly borrowed
+  from the exporter's `FAINT_FLOOR` reasoning — made the tool return 'greenfield' for
+  everything; caught only by the live end-to-end smoke, not the mocked unit tests.)
 - `reuse-ledger.jsonl` becomes a new committed artifact the deploy syncs.
 
 ## Evidence

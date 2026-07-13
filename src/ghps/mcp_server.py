@@ -119,7 +119,7 @@ TOOLS: list[dict[str, Any]] = [
             "properties": {
                 "building": {"type": "string", "description": "What you're about to build — a description or a path to a design doc/plan"},
                 "k": {"type": "integer", "description": "Max candidates (default 5)", "default": 5},
-                "min_score": {"type": "number", "description": "Similarity floor 0-1 (default 0.5)", "default": 0.5},
+                "min_score": {"type": "number", "description": "Relevance floor on (1 - L2 distance); relevant repos score positive, off-topic negative (default 0.05)", "default": 0.05},
             },
             "required": ["building"],
         },
@@ -323,7 +323,7 @@ def _handle_portfolio_reuse_check(store: Any, embedder: Any, docs_feed: str, arg
     projects = load_feed(docs_feed)
     return reuse_check(
         store, embedder, projects, building,
-        k=args.get("k", 5), min_score=args.get("min_score", 0.5),
+        k=args.get("k", 5), min_score=args.get("min_score", 0.05),
     )
 
 
