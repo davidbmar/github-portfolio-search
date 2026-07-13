@@ -106,6 +106,43 @@ TOOLS: list[dict[str, Any]] = [
             "required": ["query"],
         },
     },
+    {
+        "name": "portfolio_reuse_check",
+        "description": (
+            "BEFORE building something new, scan the portfolio for existing repos to "
+            "reuse/extend/link/take inspiration from. Accepts a short description OR a "
+            "path to a design doc/plan. Returns ranked candidates with provenance "
+            "(why each matched + score) or verdict 'greenfield' when nothing is close."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "building": {"type": "string", "description": "What you're about to build — a description or a path to a design doc/plan"},
+                "k": {"type": "integer", "description": "Max candidates (default 5)", "default": 5},
+                "min_score": {"type": "number", "description": "Similarity floor 0-1 (default 0.5)", "default": 0.5},
+            },
+            "required": ["building"],
+        },
+    },
+    {
+        "name": "portfolio_record_reuse",
+        "description": (
+            "Record a reuse decision after a reuse_check, building the repo→repo reuse "
+            "graph. relation is one of reuse|extend|link|inspired|new. Use 'new' with a "
+            "note when nothing fit (records why, so it isn't re-litigated later)."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "built": {"type": "string", "description": "Slug/name of the thing being built"},
+                "reused": {"type": "array", "items": {"type": "string"}, "description": "Repo names reused (empty for relation=new)"},
+                "relation": {"type": "string", "enum": ["reuse", "extend", "link", "inspired", "new"]},
+                "note": {"type": "string", "description": "One line on how/why"},
+                "session": {"type": "string", "description": "Session ID, if any"},
+            },
+            "required": ["built", "relation"],
+        },
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -275,6 +312,35 @@ def _handle_portfolio_find_docs(docs_feed: str, args: dict) -> list[dict]:
     return search_docs(projects, query, limit=limit)
 
 
+def _handle_portfolio_reuse_check(store: Any, embedder: Any, docs_feed: str, args: dict) -> dict:
+    """Execute portfolio_reuse_check — surface reusable existing repos with provenance."""
+    from ghps.docsgen.search_docs import load_feed
+    from ghps.reuse import reuse_check
+
+    building = args.get("building", "")
+    if not building:
+        raise ValueError("building is required")
+    projects = load_feed(docs_feed)
+    return reuse_check(
+        store, embedder, projects, building,
+        k=args.get("k", 5), min_score=args.get("min_score", 0.5),
+    )
+
+
+def _handle_portfolio_record_reuse(ledger_path: str, args: dict) -> dict:
+    """Execute portfolio_record_reuse — append a reuse decision to the ledger."""
+    from ghps.reuse import record_reuse
+
+    return record_reuse(
+        ledger_path,
+        built=args.get("built", ""),
+        reused=args.get("reused", []),
+        relation=args.get("relation", ""),
+        note=args.get("note", ""),
+        session=args.get("session", ""),
+    )
+
+
 def _handle_portfolio_reindex(store: Any, args: dict) -> dict:
     """Execute portfolio_reindex tool."""
     username = args.get("username", "davidbmar")
@@ -329,6 +395,7 @@ def handle_message(
     store: Any,
     embedder: Any,
     docs_feed: str = "web/data/projects.json",
+    ledger_path: str = "web/data/reuse-ledger.jsonl",
 ) -> dict | None:
     """Process a single JSON-RPC message and return a response (or None for notifications)."""
     method = msg.get("method", "")
@@ -366,6 +433,10 @@ def handle_message(
                 result = _handle_portfolio_reindex(store, arguments)
             elif tool_name == "portfolio_find_docs":
                 result = _handle_portfolio_find_docs(docs_feed, arguments)
+            elif tool_name == "portfolio_reuse_check":
+                result = _handle_portfolio_reuse_check(store, embedder, docs_feed, arguments)
+            elif tool_name == "portfolio_record_reuse":
+                result = _handle_portfolio_record_reuse(ledger_path, arguments)
             else:
                 return _jsonrpc_error(msg_id, -32601, f"Unknown tool: {tool_name}")
 
@@ -405,7 +476,8 @@ def _write_message(msg: dict, stream) -> None:
     stream.flush()
 
 
-def run_stdio(db_path: str, docs_feed: str = "web/data/projects.json") -> None:
+def run_stdio(db_path: str, docs_feed: str = "web/data/projects.json",
+              ledger_path: str = "web/data/reuse-ledger.jsonl") -> None:
     """Run the MCP server over stdio (newline-delimited JSON-RPC)."""
     from ghps.embeddings import EmbeddingPipeline
     from ghps.store import VectorStore
@@ -427,7 +499,7 @@ def run_stdio(db_path: str, docs_feed: str = "web/data/projects.json") -> None:
             if msg is None:
                 break
 
-            response = handle_message(msg, store, embedder, docs_feed)
+            response = handle_message(msg, store, embedder, docs_feed, ledger_path)
             if response is not None:
                 _write_message(response, sys.stdout)
     except (KeyboardInterrupt, BrokenPipeError):
@@ -452,10 +524,16 @@ def main() -> None:
         default="web/data/projects.json",
         help="Path to the L0 docs feed for portfolio_find_docs (default: web/data/projects.json)",
     )
+    parser.add_argument(
+        "--reuse-ledger",
+        type=str,
+        default="web/data/reuse-ledger.jsonl",
+        help="Path to the reuse-decision ledger (default: web/data/reuse-ledger.jsonl)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, stream=sys.stderr)
-    run_stdio(args.db, args.docs_feed)
+    run_stdio(args.db, args.docs_feed, args.reuse_ledger)
 
 
 if __name__ == "__main__":

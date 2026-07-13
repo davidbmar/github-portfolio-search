@@ -101,7 +101,7 @@ def embedder():
 
 class TestToolDefinitions:
     def test_tool_count(self):
-        assert len(TOOLS) == 5
+        assert len(TOOLS) == 7
 
     def test_tool_names(self):
         names = {t["name"] for t in TOOLS}
@@ -111,6 +111,8 @@ class TestToolDefinitions:
             "portfolio_repo_detail",
             "portfolio_reindex",
             "portfolio_find_docs",
+            "portfolio_reuse_check",
+            "portfolio_record_reuse",
         }
 
     def test_tools_have_schemas(self):
@@ -142,13 +144,15 @@ class TestMCPProtocol:
         resp = handle_message(msg, mcp_store, embedder)
         assert resp["id"] == 2
         tools = resp["result"]["tools"]
-        assert len(tools) == 5
+        assert len(tools) == 7
         names = {t["name"] for t in tools}
         assert "portfolio_search" in names
         assert "portfolio_clusters" in names
         assert "portfolio_repo_detail" in names
         assert "portfolio_reindex" in names
         assert "portfolio_find_docs" in names
+        assert "portfolio_reuse_check" in names
+        assert "portfolio_record_reuse" in names
 
     def test_ping(self, mcp_store, embedder):
         msg = {"jsonrpc": "2.0", "id": 3, "method": "ping", "params": {}}
@@ -497,4 +501,49 @@ class TestPortfolioFindDocs:
             "params": {"name": "portfolio_find_docs", "arguments": {"query": "x"}},
         }
         resp = handle_message(msg, mcp_store, embedder, str(tmp_path / "nope.json"))
+        assert resp["result"].get("isError") is True
+
+
+# ---------------------------------------------------------------------------
+# Tests: reuse-aware building tools (portfolio_reuse_check / portfolio_record_reuse)
+# ---------------------------------------------------------------------------
+
+class TestReuseTools:
+    def _feed(self, tmp_path):
+        feed = tmp_path / "projects.json"
+        feed.write_text(json.dumps({"projects": [{
+            "slug": "ml-pipeline", "title": "ML Pipeline",
+            "one_liner": "Data pipeline.", "repo_url": "https://github.com/u/ml-pipeline",
+            "tech": ["python"], "reuse_tags": ["machine-learning"],
+            "patterns": [], "how_to_apply": "import it",
+        }]}))
+        return str(feed)
+
+    def test_reuse_check_returns_verdict(self, mcp_store, embedder, tmp_path):
+        msg = {"jsonrpc": "2.0", "id": 80, "method": "tools/call", "params": {
+            "name": "portfolio_reuse_check",
+            "arguments": {"building": "machine learning data pipeline"}}}
+        resp = handle_message(msg, mcp_store, embedder, self._feed(tmp_path),
+                              str(tmp_path / "ledger.jsonl"))
+        out = json.loads(resp["result"]["content"][0]["text"])
+        assert out["verdict"] in ("candidates", "greenfield")
+        assert "candidates" in out and "source" in out
+
+    def test_record_reuse_writes_ledger(self, mcp_store, embedder, tmp_path):
+        ledger = tmp_path / "ledger.jsonl"
+        msg = {"jsonrpc": "2.0", "id": 81, "method": "tools/call", "params": {
+            "name": "portfolio_record_reuse",
+            "arguments": {"built": "x", "reused": ["ml-pipeline"],
+                          "relation": "reuse", "note": "used it"}}}
+        resp = handle_message(msg, mcp_store, embedder, self._feed(tmp_path), str(ledger))
+        rec = json.loads(resp["result"]["content"][0]["text"])
+        assert rec["relation"] == "reuse"
+        assert ledger.read_text().count("\n") == 1
+
+    def test_record_reuse_bad_relation_is_error(self, mcp_store, embedder, tmp_path):
+        msg = {"jsonrpc": "2.0", "id": 82, "method": "tools/call", "params": {
+            "name": "portfolio_record_reuse",
+            "arguments": {"built": "x", "reused": [], "relation": "borrow"}}}
+        resp = handle_message(msg, mcp_store, embedder, self._feed(tmp_path),
+                              str(tmp_path / "l.jsonl"))
         assert resp["result"].get("isError") is True
