@@ -54,3 +54,51 @@ def record_reuse(
     with path.open("a") as fh:
         fh.write(json.dumps(record) + "\n")
     return record
+
+
+def _embedding_candidates(store, embedder, query: str, k: int) -> list[dict]:
+    """Nearest repos by embedding, deduped to best score per repo."""
+    vec = embedder.embed_text(query)
+    raw = store.search(vec, limit=k * 3)
+    best: dict[str, dict] = {}
+    for row in raw:
+        repo = row["repo_name"]
+        score = round(1.0 - row["distance"], 4)
+        if repo not in best or score > best[repo]["score"]:
+            best[repo] = {"repo": repo, "score": score, "snippet": (row["text"] or "")[:200]}
+    return sorted(best.values(), key=lambda c: -c["score"])[:k]
+
+
+def reuse_check(store, embedder, projects: list[dict], building: str,
+                k: int = 5, min_score: float = 0.5) -> dict:
+    """Surface existing repos relevant to what's about to be built, with provenance."""
+    from ghps.docsgen.search_docs import search_docs
+
+    text, source = load_building_text(building)
+    by_slug = {p.get("slug", ""): p for p in projects}
+    matched_by_slug = {h["slug"]: h["matched"] for h in search_docs(projects, text, limit=50)}
+
+    candidates = []
+    for cand in _embedding_candidates(store, embedder, text, k):
+        if cand["score"] < min_score:
+            continue
+        rec = by_slug.get(cand["repo"], {})
+        candidates.append({
+            "repo": cand["repo"],
+            "score": cand["score"],
+            "one_liner": rec.get("one_liner", ""),
+            "repo_url": rec.get("repo_url", ""),
+            "reuse_tags": rec.get("reuse_tags", []),
+            "patterns": rec.get("patterns", []),
+            "how_to_apply": rec.get("how_to_apply", ""),
+            "why": {
+                "matched_fields": matched_by_slug.get(cand["repo"], []),
+                "snippet": cand["snippet"],
+            },
+        })
+
+    return {
+        "source": source,
+        "verdict": "candidates" if candidates else "greenfield",
+        "candidates": candidates,
+    }
