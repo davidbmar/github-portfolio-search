@@ -171,12 +171,12 @@ This repo uses the Afterburner multi-agent sprint system for parallelizing work.
 
 ### Your Workflow
 
-**0. Reuse-Aware Building (do this FIRST).** Before building any new
-component/feature/service/script, run the `reuse-check` skill: call
-`portfolio_reuse_check` with a description or the design-doc path, weigh the
-surfaced candidates (reuse/extend/link/inspired/new), then record the choice with
-`portfolio_record_reuse`. This builds the repo→repo reuse graph
-(`web/data/reuse-ledger.jsonl`). See ADR-0001.
+**0. Reuse-Aware Building — ask after a design.** When a design/spec/plan/ADR doc
+has just been written, run the `reuse-check` skill: **ask** "check this design
+against past work?" and *only if the user says yes*, call `portfolio_reuse_check`
+with the design-doc path, weigh the candidates (reuse/extend/link/inspired/new),
+and record the choice with `portfolio_record_reuse`. Ask-first keeps it
+token-cheap; the search runs only on opt-in. See ADR-0001.
 
 1. **Start of work:** Create or identify Session ID (HHMM is UTC)
 2. **Create session doc:** Use template, fill in Title/Goal/Context/Plan

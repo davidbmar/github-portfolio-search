@@ -1,7 +1,8 @@
 {
   "hooks": {
-    "UserPromptSubmit": [
+    "PostToolUse": [
       {
+        "matcher": "Write|Edit",
         "hooks": [
           { "type": "command", "command": ".claude/hooks/reuse-reminder.sh" }
         ]
