@@ -547,3 +547,24 @@ class TestReuseTools:
         resp = handle_message(msg, mcp_store, embedder, self._feed(tmp_path),
                               str(tmp_path / "l.jsonl"))
         assert resp["result"].get("isError") is True
+
+
+class TestToolFilter:
+    """`--tools reuse` advertises only the 2 reuse tools (cuts the always-in-context
+    schema tax for the global registration)."""
+
+    def test_filter_tools_all_returns_seven(self):
+        from ghps.mcp_server import filter_tools
+        assert len(filter_tools("all")) == 7
+
+    def test_filter_tools_reuse_returns_only_reuse(self):
+        from ghps.mcp_server import filter_tools
+        names = {t["name"] for t in filter_tools("reuse")}
+        assert names == {"portfolio_reuse_check", "portfolio_record_reuse"}
+
+    def test_tools_list_honors_filter(self, mcp_store, embedder):
+        from ghps.mcp_server import filter_tools
+        msg = {"jsonrpc": "2.0", "id": 90, "method": "tools/list", "params": {}}
+        resp = handle_message(msg, mcp_store, embedder, tools=filter_tools("reuse"))
+        names = {t["name"] for t in resp["result"]["tools"]}
+        assert names == {"portfolio_reuse_check", "portfolio_record_reuse"}

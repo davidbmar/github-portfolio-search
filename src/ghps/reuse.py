@@ -70,7 +70,7 @@ def _embedding_candidates(store, embedder, query: str, k: int) -> list[dict]:
 
 
 def reuse_check(store, embedder, projects: list[dict], building: str,
-                k: int = 5, min_score: float = 0.05) -> dict:
+                k: int = 5, min_score: float = 0.05, verbose: bool = False) -> dict:
     """Surface existing repos relevant to what's about to be built, with provenance.
 
     Score is `1.0 - sqlite_vec_L2_distance` (see ghps.store.search). Empirically,
@@ -90,19 +90,22 @@ def reuse_check(store, embedder, projects: list[dict], building: str,
         if cand["score"] < min_score:
             continue
         rec = by_slug.get(cand["repo"], {})
-        candidates.append({
+        why = {"matched_fields": matched_by_slug.get(cand["repo"], [])}
+        candidate = {
             "repo": cand["repo"],
             "score": cand["score"],
             "one_liner": rec.get("one_liner", ""),
             "repo_url": rec.get("repo_url", ""),
             "reuse_tags": rec.get("reuse_tags", []),
-            "patterns": rec.get("patterns", []),
-            "how_to_apply": rec.get("how_to_apply", ""),
-            "why": {
-                "matched_fields": matched_by_slug.get(cand["repo"], []),
-                "snippet": cand["snippet"],
-            },
-        })
+            "why": why,
+        }
+        # Compact by default (token-cheap); verbose adds the heavy fields, and is
+        # meant to be fetched only for the one candidate the caller actually picks.
+        if verbose:
+            candidate["patterns"] = rec.get("patterns", [])
+            candidate["how_to_apply"] = rec.get("how_to_apply", "")
+            why["snippet"] = cand["snippet"]
+        candidates.append(candidate)
 
     return {
         "source": source,
