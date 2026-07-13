@@ -64,8 +64,14 @@ Five units, each with one job:
 - **C — Reuse protocol** (a skill + a CLAUDE.md rule): "before building a new
   component, run `portfolio_reuse_check`; after deciding, `portfolio_record_reuse`."
   The habit layer, self-triggered by any agent that reads project instructions.
-- **D — Reuse hook** (`settings.json`, `UserPromptSubmit` matching build-intent):
-  injects a reminder to run the check. The deterministic "can't forget it" backstop.
+- **D — Reuse ask-gate hook** (`settings.json`, `PostToolUse` matching `Write|Edit`
+  on design-doc paths — `*design*.md`, `*spec*.md`, `docs/**/{specs,plans,adr}/*.md`,
+  `DESIGN.md`, `ADR-*.md`). When a design/spec/plan/ADR doc is written, it injects a
+  prompt to **ask** the user "check this design against past work?" — it does NOT run
+  the search. The retrieval fires only on an explicit yes. This artifact-driven,
+  ask-first trigger is self-throttling (can't fire more often than you produce
+  designs) and defers all token-heavy work behind opt-in — replacing the earlier
+  per-prompt build-intent trigger.
 - **E — Discovery surfacing** (`llms.txt`): register the reuse tools and
   `constellation.json` so external agents discover them.
 
