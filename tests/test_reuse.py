@@ -119,11 +119,25 @@ def test_reuse_check_returns_candidates_with_provenance():
     assert top["repo"] == "parakeet-asr-service"      # 1.0-0.2 = 0.8 >= 0.5
     assert top["score"] == 0.8
     assert top["reuse_tags"] == ["asr", "streaming-transcription"]
-    assert top["how_to_apply"] == "POST audio to /transcribe"
-    assert "snippet" in top["why"] and top["why"]["snippet"]
+    assert top["one_liner"]                           # compact keeps the human-readable line
     assert isinstance(top["why"]["matched_fields"], list)
+    # compact default omits the token-heavy fields
+    assert "how_to_apply" not in top
+    assert "patterns" not in top
+    assert "snippet" not in top["why"]
     # web-dashboard scored 0.3 (< min_score) → filtered out
     assert [c["repo"] for c in out["candidates"]] == ["parakeet-asr-service"]
+
+
+def test_reuse_check_verbose_includes_full_fields():
+    from ghps.reuse import reuse_check
+    store = _FakeStore([_row("parakeet-asr-service", 0.2, "streaming ASR readme excerpt")])
+    out = reuse_check(store, _FakeEmbedder(), _PROJECTS,
+                      "streaming transcription", k=5, min_score=0.5, verbose=True)
+    top = out["candidates"][0]
+    assert top["how_to_apply"] == "POST audio to /transcribe"
+    assert top["patterns"] == ["websocket audio ingestion"]
+    assert top["why"]["snippet"]                      # verbose keeps the evidence snippet
 
 
 def test_reuse_check_greenfield_when_nothing_passes_threshold():

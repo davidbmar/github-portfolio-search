@@ -120,6 +120,7 @@ TOOLS: list[dict[str, Any]] = [
                 "building": {"type": "string", "description": "What you're about to build — a description or a path to a design doc/plan"},
                 "k": {"type": "integer", "description": "Max candidates (default 5)", "default": 5},
                 "min_score": {"type": "number", "description": "Relevance floor on (1 - L2 distance); relevant repos score positive, off-topic negative (default 0.05)", "default": 0.05},
+                "verbose": {"type": "boolean", "description": "Include the heavy fields (patterns, how_to_apply, evidence snippet). Default false = compact/token-cheap; set true for the one candidate you pick.", "default": False},
             },
             "required": ["building"],
         },
@@ -144,6 +145,15 @@ TOOLS: list[dict[str, Any]] = [
         },
     },
 ]
+
+def filter_tools(mode: str = "all") -> list:
+    """Which tool schemas to advertise. 'reuse' exposes only the 2 reuse tools —
+    used for the global/user-scope registration so unrelated repos don't pay the
+    full 7-tool schema tax in every session's context."""
+    if mode == "reuse":
+        return [t for t in TOOLS if "reuse" in t["name"]]
+    return list(TOOLS)
+
 
 # ---------------------------------------------------------------------------
 # Tool handlers
@@ -324,6 +334,7 @@ def _handle_portfolio_reuse_check(store: Any, embedder: Any, docs_feed: str, arg
     return reuse_check(
         store, embedder, projects, building,
         k=args.get("k", 5), min_score=args.get("min_score", 0.05),
+        verbose=args.get("verbose", False),
     )
 
 
@@ -396,6 +407,7 @@ def handle_message(
     embedder: Any,
     docs_feed: str = "web/data/projects.json",
     ledger_path: str = "web/data/reuse-ledger.jsonl",
+    tools: list | None = None,
 ) -> dict | None:
     """Process a single JSON-RPC message and return a response (or None for notifications)."""
     method = msg.get("method", "")
@@ -416,7 +428,7 @@ def handle_message(
         return None
 
     if method == "tools/list":
-        return _jsonrpc_response(msg_id, {"tools": TOOLS})
+        return _jsonrpc_response(msg_id, {"tools": tools if tools is not None else TOOLS})
 
     if method == "tools/call":
         tool_name = params.get("name", "")
@@ -477,7 +489,8 @@ def _write_message(msg: dict, stream) -> None:
 
 
 def run_stdio(db_path: str, docs_feed: str = "web/data/projects.json",
-              ledger_path: str = "web/data/reuse-ledger.jsonl") -> None:
+              ledger_path: str = "web/data/reuse-ledger.jsonl",
+              tools: list | None = None) -> None:
     """Run the MCP server over stdio (newline-delimited JSON-RPC)."""
     from ghps.embeddings import EmbeddingPipeline
     from ghps.store import VectorStore
@@ -499,7 +512,7 @@ def run_stdio(db_path: str, docs_feed: str = "web/data/projects.json",
             if msg is None:
                 break
 
-            response = handle_message(msg, store, embedder, docs_feed, ledger_path)
+            response = handle_message(msg, store, embedder, docs_feed, ledger_path, tools)
             if response is not None:
                 _write_message(response, sys.stdout)
     except (KeyboardInterrupt, BrokenPipeError):
@@ -530,10 +543,17 @@ def main() -> None:
         default="web/data/reuse-ledger.jsonl",
         help="Path to the reuse-decision ledger (default: web/data/reuse-ledger.jsonl)",
     )
+    parser.add_argument(
+        "--tools",
+        choices=["all", "reuse"],
+        default="all",
+        help="Which tools to advertise: 'all' (7) or 'reuse' (just the 2 reuse tools — "
+             "use for global/user-scope registration to shrink the per-session schema tax)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, stream=sys.stderr)
-    run_stdio(args.db, args.docs_feed, args.reuse_ledger)
+    run_stdio(args.db, args.docs_feed, args.reuse_ledger, filter_tools(args.tools))
 
 
 if __name__ == "__main__":
