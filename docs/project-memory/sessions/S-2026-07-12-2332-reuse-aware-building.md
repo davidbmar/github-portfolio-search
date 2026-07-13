@@ -35,8 +35,16 @@ which measures typicality, not reuse value.
   reindex.yml deploy verified live — 98 stars, all assets HTTP 200).
 - Resolved merge conflicts (sitemap union; dropped stale paren-named blog
   duplicate in favor of main's clean `2026.JUL07.06-RachetLoop.html`).
-- Wrote ADR-0001 (reuse-aware building design).
-- (implementation pending)
+- Wrote ADR-0001 (reuse-aware building design) + implementation plan.
+- Implemented v1 (TDD, all green):
+  - `src/ghps/reuse.py` — `RELATIONS`, `load_building_text`, `record_reuse`
+    (JSONL ledger), `_embedding_candidates`, `reuse_check` (retrieval + provenance).
+  - `src/ghps/mcp_server.py` — `portfolio_reuse_check` + `portfolio_record_reuse`
+    tools; `handle_message`/`run_stdio`/`main` thread a `--reuse-ledger` path.
+  - `.claude/skills/reuse-check/SKILL.md` + CLAUDE.md "step 0" rule.
+  - `.claude/hooks/reuse-reminder.sh` + `.claude/settings.json` build-intent hook.
+  - `web/llms.txt` — surfaced the reuse tools + `constellation.json`.
+- Tests: `tests/test_reuse.py` (8) + `tests/test_mcp.py` (28, was 25) — 36 pass.
 
 ## Decisions Made
 
