@@ -43,6 +43,7 @@ What should happen?
 | F-009 | Public tier should be accessible without sign-in, auth only for gated features | Fixed | High |
 | B-020 | `static-site-deployer` IAM user cannot deploy (missing s3:PutObject) — deploy needs admin profile | Open | Medium |
 | B-021 | gen-docs exhausts GitHub rate limit on full runs — needs backoff/respect reset | Open | Medium |
+| B-022 | narrate pipeline re-matures/re-renders a published theme on a second run (2 test failures, pre-existing) | Open | Medium |
 
 ## Archived (Fixed, pre-Sprint 10)
 

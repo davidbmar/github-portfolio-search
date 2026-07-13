@@ -23,6 +23,16 @@ MCP server `ghps-mcp` exposes `portfolio_find_docs(query)` — returns ranked ma
 (slug, title, one_liner, the fields that matched). Prefer this over downloading the
 full corpus when you only need a few results.
 
+For reuse-aware building (scan before you build), `ghps-mcp` also exposes:
+- `portfolio_reuse_check(building)` — before building something new, get existing
+  repos to reuse/extend/link/take inspiration from, with provenance (why each matched).
+- `portfolio_record_reuse(built, reused, relation, note)` — record the decision;
+  builds the repo→repo reuse graph.
+
+Precomputed portfolio map (read instead of re-deriving the graph yourself):
+https://davidbmar.com/data/constellation.json — every repo as a star, plus clusters,
+similarity threads, centrality, and reuse tags.
+
 ## Full corpus (last resort — only if you genuinely need every record at once)
 
 https://davidbmar.com/data/projects.json
