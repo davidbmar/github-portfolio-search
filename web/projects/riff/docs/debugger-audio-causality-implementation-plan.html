@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugger Audio Causality Implementation Plan · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  width: 100%; max-width: 820px; margin: 0 auto;
+  padding: 2.4rem 1.4rem 4rem; box-sizing: border-box;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  display: block; max-width: 100%; overflow-x: auto;
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+.doc-container { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .doc-layout.with-toc {
+    max-width: 820px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .doc-toc { display: none; }
+  header.doc-header .crumb {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .doc-container { padding-top: 1.4rem; }
+}
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-12-debugger-audio-causality-implementation-plan.md</span>
+<a class="raw" href="/docs/docs/codex/2026-07-12-debugger-audio-causality-implementation-plan.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Debugger Audio Causality Implementation Plan</h1>
+<p><strong>Date:</strong> 2026-07-12<br />
+<strong>Status:</strong> Approved for implementation by Claude <code>CL2C-002</code><br />
+<strong>Design:</strong> <code>docs/design/2026-07-12-debugger-audio-causality-design.md</code><br />
+<strong>Coordination:</strong> <code>docs/toclaude/2025.07.12</code> and
+<code>docs/tocodex/2025.07.12</code></p>
+<h2 id="goal">Goal</h2>
+<p>Make one audible failure explainable from one bounded debugger command and one
+synchronized UI cursor. A human, Codex, or Claude must be able to distinguish:</p>
+<ul>
+<li>model audio interrupted and restarted;</li>
+<li>an FSM deliberately requesting equivalent content twice;</li>
+<li>one transport/player attempt being duplicated;</li>
+<li>a policy/directive model request producing forbidden caller-facing output;</li>
+<li>model-received audio versus outbound-accepted, browser-played, and
+carrier-recorded evidence;</li>
+<li>valid caller input followed by output from the wrong state path;</li>
+<li>a state guard firing from inherited non-slot context.</li>
+</ul>
+<p>The first release is recorded observability only. It must not change prompts,
+FSM behavior, audio bytes, transport ordering, or production tool effects.</p>
+<h2 id="rules-for-implementation-agents">Rules for Implementation Agents</h2>
+<ol>
+<li>Read the design, this plan, relevant fixlog entries, and both coordination
+mailboxes before editing.</li>
+<li>Work one packet at a time. Do not combine capture, hydration, UI, and caller
+behavior in one commit.</li>
+<li>Search the fix journal before each behavioral or telemetry fix and add an FX
+entry after the fix.</li>
+<li>Do not infer historical facts from current YAML or current Python.</li>
+<li>Do not add a second stored timeline. Normalize into the existing artifact.</li>
+<li>Never label <code>record_audio_out</code> as sent or played evidence; both current
+transports call it before their send boundary.</li>
+<li>Do not enable the purple Fork UI in these packets.</li>
+<li>No OTA call without explicit human <code>GO</code>; use fake clients, fixtures, browser
+simulation, and retained replay overnight.</li>
+<li>Never stage unrelated dirty files. At plan creation these include Claude's
+mailbox, <code>packs/space_channel_widgets.pack.yaml</code>, and static-audio assets.</li>
+<li>Each packet ends with focused tests, a narrow commit, and a mailbox result.</li>
+<li>If a packet discovers that caller-facing ordering must change, stop and
+split that into a separately reviewed behavior packet.</li>
+</ol>
+<h2 id="ownership">Ownership</h2>
+<table>
+<thead>
+<tr>
+<th>Lane</th>
+<th>Owner</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request/provider capture</td>
+<td>Claude</td>
+<td><code>riff/live/live_client.py</code>, <code>riff/live/session.py</code>, capture-focused tests</td>
+</tr>
+<tr>
+<td>Browser/phone playback capture</td>
+<td>Claude</td>
+<td><code>riff/live/transport.py</code>, <code>riff/phone/telnyx_transport.py</code>, <code>web/live/*</code>, <code>web/voice-dispatcher.js</code>, capture tests</td>
+</tr>
+<tr>
+<td>Shared evidence schema</td>
+<td>Claude proposes, Codex reviews</td>
+<td><code>riff/playback_evidence.py</code>, schema tests</td>
+</tr>
+<tr>
+<td>FSM context capture</td>
+<td>Claude/service lane</td>
+<td><code>riff/state_manager.py</code>, new or existing context-ledger helper, tests</td>
+</tr>
+<tr>
+<td>Artifact normalization</td>
+<td>Codex</td>
+<td><code>riff/postcall/state_program_artifact.py</code>, artifact tests</td>
+</tr>
+<tr>
+<td>Debugger commands/detectors</td>
+<td>Codex</td>
+<td><code>riff/state_program_debugger.py</code>, CLI/service/HTTP tests</td>
+</tr>
+<tr>
+<td>Browser UI and operator docs</td>
+<td>Codex</td>
+<td><code>web/state-program-debugger.*</code>, Playwright, Markdown/HTML</td>
+</tr>
+<tr>
+<td>Caller-flow behavior fixes</td>
+<td>Claude, separate plan</td>
+<td>live/FSM/compiler files; never mixed with telemetry packets</td>
+</tr>
+</tbody>
+</table>
+<p>Do not edit another owner's files without a mailbox handoff naming the exact
+file and reason.</p>
+<h2 id="verified-starting-point">Verified Starting Point</h2>
+<p>These facts were rechecked on the plan's working tree. Function names are the
+contract; line numbers may move during implementation.</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Current evidence</th>
+<th>Consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Caller-facing session sends</td>
+<td>10 direct <code>self.client.send_client_content(...)</code> calls in <code>riff/live/session.py</code></td>
+<td>AC-01 wraps these 10; the source gate is scoped to this file</td>
+</tr>
+<tr>
+<td>Inbound browser text send</td>
+<td><code>riff/live/transport.py::_browser_to_session</code> sends caller text directly to the provider</td>
+<td>This is input, not a logical caller-facing output, and must not receive an output ID</td>
+</tr>
+<tr>
+<td>Scratch clears</td>
+<td>11 direct <code>self.turn.reset()</code> calls in <code>riff/live/session.py</code></td>
+<td>AC-01 replaces all 11 with the reasoned reset wrapper</td>
+</tr>
+<tr>
+<td>Browser model PCM</td>
+<td><code>riff/live/transport.py::_session_to_browser</code> calls <code>record_audio_out</code> before <code>await ws.send</code></td>
+<td>The first call is model receipt; only the successful send boundary proves outbound acceptance</td>
+</tr>
+<tr>
+<td>Phone model PCM</td>
+<td><code>TelnyxPhoneTransport._emit_audio_out</code> calls <code>record_audio_out</code> before <code>_emit_pcm24_bytes</code>; actual sends occur in <code>_emit_pcm24_bytes_locked</code></td>
+<td>Pre-codec receipt, outbound wire submission, and carrier recording remain separate</td>
+</tr>
+<tr>
+<td>Browser generated player</td>
+<td><code>web/voice-dispatcher.js</code> enqueues anonymous PCM; <code>web/live/audio-player.js</code> and <code>pcm-up-processor.js</code> report no per-attempt start/drain today</td>
+<td>AC-03A needs a bounded begin/end envelope and worklet acknowledgement</td>
+</tr>
+<tr>
+<td>Guard reads</td>
+<td><code>riff/state_manager.py::evaluate_guard</code> reports slot reads only; <code>_guard_stalled</code> reads <code>no_progress_streak</code> and <code>max_no_progress_loops</code></td>
+<td>AC-04 adds explicit non-slot <code>context_reads</code> before making a stale-context claim</td>
+</tr>
+</tbody>
+</table>
+<h2 id="packet-dependency-graph">Packet Dependency Graph</h2>
+<pre><code class="language-text">AC-00 schema + synthetic fixture
+  -&gt; AC-01 request identity + structural gates
+  -&gt; AC-02 provider output-attempt capture
+       -&gt; AC-03A browser playback truth
+       -&gt; AC-03B phone outbound truth
+       -&gt; AC-04 non-slot state-context capture
+  AC-03A + AC-03B + AC-04 -&gt; AC-05 artifact normalization
+  -&gt; AC-06 mechanism-aware findings
+  -&gt; AC-07 explain_moment + compact AI CLI
+  -&gt; AC-08 browser visualization
+  -&gt; AC-09 regression promotion seam
+  -&gt; AC-10 local/OTA validation and rollout
+</code></pre>
+<p>AC-03A and AC-03B may run in parallel after AC-02. AC-04 may run in parallel
+with AC-03 only when ownership does not overlap. AC-05 begins only after the
+schema and capture examples are frozen.</p>
+<h2 id="ac-00-freeze-schema-and-synthetic-evidence">AC-00: Freeze Schema and Synthetic Evidence</h2>
+<p><strong>Owner:</strong> Codex with Claude approval<br />
+<strong>Risk:</strong> Low<br />
+<strong>Behavior change:</strong> None</p>
+<h3 id="files">Files</h3>
+<ul>
+<li><code>riff/playback_evidence.py</code></li>
+<li><code>tests/test_playback_evidence.py</code></li>
+<li>new fixture under
+<code>tests/fixtures/state_program_debugger/generated_output_restart/</code></li>
+<li>new fixture under
+<code>tests/fixtures/state_program_debugger/selected_input_primary/</code></li>
+<li><code>tests/test_state_program_artifact.py</code></li>
+</ul>
+<h3 id="work">Work</h3>
+<ol>
+<li>Add schema constants for logical output, output-attempt, playback, evidence
+stage, terminal outcome, and confidence while preserving existing static
+playback fields.</li>
+<li>Add bounded <code>model_request_id</code>, <code>request_kind</code>, and
+<code>output_expectation=required|allowed|forbidden|unknown</code> fields.</li>
+<li>Freeze the additive raw events exactly as
+<code>model_request_recorded</code>, <code>model_output_attempt_started</code>, and
+<code>model_output_attempt_terminal</code>; the last carries a typed outcome rather
+than separate provider-lifecycle event names.</li>
+<li>Extend <code>record_playback_event</code> validation to accept the new optional fields.</li>
+<li>Do not change existing event output when optional fields are absent.</li>
+<li>Build a synthetic, PII-free ledger representing:
+<ul>
+<li>matched caller input;</li>
+<li>consent state entry;</li>
+<li>model attempt 1 start and interruption;</li>
+<li>model attempt 2 linked restart with matching prefix;</li>
+<li>one browser playback bound to attempt 2;</li>
+<li>model-received PCM followed by a failed outbound send;</li>
+<li>completed second attempt;</li>
+<li>a separate pair of identical static outputs requested by two FSM visits;</li>
+<li>one transport duplicate represented by duplicate starts/copies for the
+same playback ID;</li>
+<li>distinct playback IDs for one output attempt with no retry relationship,
+producing a weaker unexplained-multiple finding;</li>
+<li>a policy request with forbidden output followed by an unexpected model
+response.</li>
+</ul>
+</li>
+<li>Commit the expected normalized attempt rows and findings only after Claude
+approves the reconciled schema in <code>CL2C-002</code>.</li>
+</ol>
+<h3 id="tests">Tests</h3>
+<ul>
+<li>Existing static event JSON remains byte-identical.</li>
+<li>Invalid IDs, source kinds, parent-kind relationships, evidence stages, and
+terminal states fail.</li>
+<li>Fingerprints remain session-scoped and do not retain raw prompt text.</li>
+<li><code>selected_source</code> and <code>decision_reason</code> are bounded scalars; full transcript
+observations remain source references.</li>
+<li>Maximum-length session/state inputs still generate safe IDs of at most 160
+characters with no raw prompt/caller text.</li>
+<li>Model receipt cannot satisfy an outbound/client/carrier assertion.</li>
+<li>Fixture contains no raw caller PII or production secrets.</li>
+</ul>
+<h3 id="done">Done</h3>
+<p>One schema commit; no imports from <code>riff/live/session.py</code>; no UI changes.</p>
+<h2 id="ac-01-request-identity-and-structural-gates">AC-01: Request Identity and Structural Gates</h2>
+<p><strong>Owner:</strong> Claude<br />
+<strong>Risk:</strong> Medium<br />
+<strong>Behavior change:</strong> None<br />
+<strong>Feature flag:</strong> <code>RIFF_DEBUG_OUTPUT_ATTEMPTS=1</code> until validated</p>
+<h3 id="files-2">Files</h3>
+<ul>
+<li><code>riff/live/session.py</code></li>
+<li>focused source/AST contract test</li>
+<li><code>tests/test_live_session.py</code></li>
+<li>new focused test such as <code>tests/test_live_output_attempts.py</code></li>
+</ul>
+<h3 id="work-2">Work</h3>
+<ol>
+<li>Freeze a baseline inventory of all 10 caller-facing direct
+<code>send_client_content</code> calls in <code>riff/live/session.py</code> and
+all 11 direct <code>self.turn.reset()</code> calls. Record each call's semantic reason
+in the packet result.</li>
+<li>Add <code>_send_client_content_with_evidence(...)</code>, the only approved caller in
+<code>GeminiLiveSession</code>. It delegates exactly one unchanged client call and does
+not add an await, retry, copy, or reorder.</li>
+<li>With the flag on, allocate a bounded <code>model_request_id</code> from the semantic key
+<code>(session_id, causal_visit_id, request_ordinal)</code>. The encoded ID uses stable
+ordinals/tokens and must pass the existing 160-character safe-ID validator;
+wall time and content equality are prohibited.</li>
+<li>Require every call site to supply <code>request_kind</code> and
+<code>output_expectation=required|allowed|forbidden|unknown</code>. Allocate a logical
+output at request time only for required/allowed speech.</li>
+<li>Emit <code>model_request_recorded(dispatch_outcome=accepted)</code> only after the
+awaited provider call returns. On its existing exception path, emit
+<code>dispatch_outcome=failed</code> best-effort and re-raise the identical exception;
+never retry or translate it.</li>
+<li>Bind <code>input_id</code>, <code>selected_source</code>, and <code>decision_reason</code> when the request is
+caused by a caller decision. Reference the full <code>transcript_sources</code> event;
+do not duplicate all transcript text.</li>
+<li>Replace all 10 session send calls with the wrapper. Every call site supplies
+a bounded <code>source_kind</code> and typed request reason. Do not wrap the separate
+inbound caller-text send in <code>riff/live/transport.py</code> as output.</li>
+<li>Add <code>_reset_turn_scratch(reason)</code>. The output-attempt tracker lives on
+<code>GeminiLiveSession</code>, not <code>TurnAccumulator</code>; the wrapper records an attempt
+boundary or terminal-unavailable marker before calling <code>self.turn.reset()</code>.</li>
+<li>Replace all 11 raw resets with the wrapper and a typed reason.</li>
+<li>Add source gates that reject a new direct send or raw reset outside its
+wrapper. The tests must prove each gate fails on a violating source fixture.</li>
+</ol>
+<h3 id="tests-2">Tests</h3>
+<ul>
+<li>Flag off preserves client method arguments, call count, await order, emitted
+audio bytes, and the pre-existing bus event sequence.</li>
+<li>Two requests from two visits with identical text receive different logical
+output IDs.</li>
+<li>A forbidden-output policy request gets a request ID but no intended logical
+output at send time.</li>
+<li>One request binds the acted-on Whisper-primary source and reason; a Gemini
+backup fixture binds its source and reason.</li>
+<li>Request IDs contain no raw prompt/caller text.</li>
+<li>Every existing send and reset is reachable only through its wrapper.</li>
+<li>Both source gates fail when their synthetic violating line is introduced.</li>
+</ul>
+<h3 id="done-2">Done</h3>
+<p>Claude appends the two baseline inventories, event examples, flag-off proof, and
+test output to <code>CL2C-*</code>. Codex confirms the identity spine before AC-02.</p>
+<h2 id="ac-02-provider-output-attempt-capture">AC-02: Provider Output-Attempt Capture</h2>
+<p><strong>Owner:</strong> Claude<br />
+<strong>Risk:</strong> High telemetry risk, zero intended behavior risk<br />
+<strong>Feature flag:</strong> <code>RIFF_DEBUG_OUTPUT_ATTEMPTS=1</code> until validated</p>
+<h3 id="files-3">Files</h3>
+<ul>
+<li><code>riff/live/live_client.py</code></li>
+<li><code>riff/live/session.py</code></li>
+<li><code>tests/test_live_client.py</code></li>
+<li><code>tests/test_fake_live_client.py</code> when fake event parity requires it</li>
+<li><code>tests/test_live_session.py</code></li>
+<li><code>tests/test_live_output_attempts.py</code></li>
+</ul>
+<h3 id="work-3">Work</h3>
+<ol>
+<li>Extend <code>_translate_server_message</code> to emit provider interruption before
+<code>turn_complete</code> in the same message and retain a provider response ID when
+the SDK exposes one.</li>
+<li>If no stable provider ID exists, allocate a connection-local monotonic
+response ordinal labelled <code>derived_local</code>; never present it as provider ID.</li>
+<li>Open the first output attempt on the first output transcription or PCM tied
+to a logical request. Two PCM chunks remain one attempt.</li>
+<li>If output arrives for a request with <code>output_expectation=forbidden</code>, allocate
+an observed-unexpected logical output linked to that request. Do not relabel
+it as intended.</li>
+<li>For a logical output with an existing started attempt, open another only
+after an explicit interruption, changed response ID, typed RIFF retry/resume,
+or <code>_reset_turn_scratch(reason)</code> followed by fresh first text/PCM.</li>
+<li>When the provider bit is absent and a recorded boundary precedes fresh
+output, close the prior attempt as derived interruption and link the new
+attempt at lower confidence. A time gap or repeated text alone is forbidden.</li>
+<li><code>record_audio_out</code> records <code>model_received</code> bytes and extends
+<code>assistant_first_audio</code> with causal IDs. It must <strong>not</strong> emit
+outbound/client/carrier playback truth.</li>
+<li>Terminalize the provider attempt on explicit interruption, <code>turn_complete</code>,
+typed provider failure, or teardown. An unclassified reset records
+<code>OUTPUT_ATTEMPT_TERMINAL_UNAVAILABLE</code>; it never synthesizes completion.</li>
+<li>Preserve the prior <code>assistant_first_audio</code> fields for compatibility and keep
+the attempt tracker independent of <code>TurnAccumulator</code> scratch fields.</li>
+</ol>
+<h3 id="tests-3">Tests</h3>
+<ul>
+<li>Duck-typed SDK fixture with <code>interrupted=true</code> yields exactly one event before
+<code>turn_complete</code>; missing attributes remain backward compatible.</li>
+<li>One generated response produces one provider attempt and one completion.</li>
+<li>Caller barge-in produces interrupted attempt 1 and linked attempt 2.</li>
+<li>Provider-bit-absent plus a recorded reset/response boundary yields a derived,
+lower-confidence restart; a gap-only fixture remains unlinked/unavailable.</li>
+<li>Two PCM chunks produce one output attempt.</li>
+<li>Two model responses sharing <code>SessionContext.turn_count</code> get different attempt
+and local response IDs.</li>
+<li>Reset, reconnect, state transition, cancellation, and teardown cannot erase
+a started attempt without a terminal or typed terminal-unavailable row.</li>
+<li>Feature flag off preserves the prior bus event sequence and audio bytes.</li>
+<li>Event-emitter failure does not interrupt audio.</li>
+<li>No <code>model_received</code> row satisfies an outbound/client/carrier predicate.</li>
+</ul>
+<h3 id="done-3">Done</h3>
+<p>No caller-facing text/output ordering delta in fake-client transcript and PCM
+goldens. Codex reviews the raw attempt artifact before playback capture begins.</p>
+<h2 id="ac-03a-browser-playback-truth">AC-03A: Browser Playback Truth</h2>
+<p><strong>Owner:</strong> Claude<br />
+<strong>Risk:</strong> Medium protocol/telemetry risk, zero intended audio-content risk<br />
+<strong>Feature flag:</strong> <code>RIFF_DEBUG_OUTPUT_ATTEMPTS=1</code></p>
+<h3 id="files-4">Files</h3>
+<ul>
+<li><code>riff/live/transport.py</code></li>
+<li><code>web/live/live-client.js</code></li>
+<li><code>web/live/audio-player.js</code></li>
+<li><code>web/live/pcm-up-processor.js</code></li>
+<li><code>web/voice-dispatcher.js</code></li>
+<li>focused browser transport, JavaScript, and Playwright tests</li>
+</ul>
+<h3 id="work-4">Work</h3>
+<ol>
+<li>Bind each generated binary PCM stream to a <code>playback_id</code> and its
+<code>output_attempt_id</code>. Send one bounded control envelope before its first PCM
+frame and one terminal boundary; never add metadata to every frame.</li>
+<li>Preserve every PCM byte and binary-frame order. Existing clients with the
+flag off receive the byte-identical stream and no new control envelope.</li>
+<li>Emit <code>audio_requested</code> when dispatch begins. Emit an
+<code>outbound_accepted</code> acknowledgement only after successful
+<code>await ws.send(payload)</code>; a failed send cannot appear accepted.</li>
+<li>Extend the browser player/worklet to report <code>client_playback</code> start when the
+first sample for that playback ID is consumed, completion after the explicit
+end marker drains, interruption on clear/stop/supersession, and typed error.</li>
+<li>Persist client acknowledgements through the existing
+<code>playback_event</code> endpoint with logical/output/playback IDs and evidence stage.</li>
+<li>Do not claim browser speaker perception; the acknowledgement proves the Web
+Audio boundary only.</li>
+</ol>
+<h3 id="tests-4">Tests</h3>
+<ul>
+<li>Metadata envelope precedes only the first binary frame and preserves all PCM
+frame bytes/order.</li>
+<li>A failed <code>ws.send</code> records requested+failed, never outbound accepted.</li>
+<li>Two PCM frames produce one client start and one completion after FIFO drain.</li>
+<li>Interruption before drain produces no completion for that stage.</li>
+<li>Static browser playback fixtures remain unchanged.</li>
+<li>Playwright proves client acknowledgements survive refresh in the artifact.</li>
+</ul>
+<h3 id="done-4">Done</h3>
+<p>One browser call can distinguish model receipt, server WebSocket acceptance,
+and actual Web Audio start/terminal on the same playback ID.</p>
+<h2 id="ac-03b-phone-outbound-truth">AC-03B: Phone Outbound Truth</h2>
+<p><strong>Owner:</strong> Claude<br />
+<strong>Risk:</strong> Medium telemetry risk, zero intended audio-content risk<br />
+<strong>Feature flag:</strong> <code>RIFF_DEBUG_OUTPUT_ATTEMPTS=1</code></p>
+<h3 id="files-5">Files</h3>
+<ul>
+<li><code>riff/phone/telnyx_transport.py</code></li>
+<li><code>riff/playback_evidence.py</code> only for the frozen optional fields</li>
+<li>focused Telnyx transport/playback tests</li>
+</ul>
+<h3 id="work-5">Work</h3>
+<ol>
+<li>Allocate one <code>playback_id</code> for each phone delivery of an output attempt and
+retain it across all PCM chunks for that attempt.</li>
+<li>Emit <code>audio_requested</code> before the first encoded chunk. Emit
+<code>outbound_accepted</code> start only after the first successful <code>ws_send</code> inside
+<code>_emit_pcm24_bytes_locked</code>.</li>
+<li>Accumulate exact submitted wire bytes and the existing
+<code>audio_agent_played</code> clock interval without emitting one lifecycle row per
+chunk.</li>
+<li>Terminalize through a nonblocking transport observer when AC-02 reports the
+provider attempt terminal: completed after all submitted chunks,
+interrupted on barge/clear/supersession, or failed when no chunk succeeds.</li>
+<li>Preserve current swallowed-exception behavior and audio ordering. Telemetry
+observes <code>ws_send</code>; it does not change whether an exception escapes.</li>
+<li>Label this stage RIFF outbound acceptance. Carrier audibility remains the
+separately authorized dual-channel recording contract.</li>
+</ol>
+<h3 id="tests-5">Tests</h3>
+<ul>
+<li>First successful <code>ws_send</code> produces exactly one outbound start.</li>
+<li>Failed first/all sends cannot produce outbound accepted or completed.</li>
+<li>Multiple Gemini PCM events retain one playback ID and one terminal.</li>
+<li>Barge-in produces interruption with exact submitted duration.</li>
+<li>Pre-codec <code>audio_agent.wav</code>, wire <code>audio_agent_played.wav</code>, and carrier
+evidence remain distinct.</li>
+<li>Existing static Telnyx playback fixtures remain unchanged.</li>
+</ul>
+<h3 id="done-5">Done</h3>
+<p>A phone artifact distinguishes model receipt from submitted Telnyx wire audio;
+it still labels carrier confirmation unavailable unless independently retained.</p>
+<h2 id="ac-04-capture-behavior-affecting-context">AC-04: Capture Behavior-Affecting Context</h2>
+<p><strong>Owner:</strong> Claude/service lane<br />
+<strong>Risk:</strong> Medium<br />
+<strong>Behavior change:</strong> None</p>
+<h3 id="files-6">Files</h3>
+<ul>
+<li><code>riff/state_manager.py</code></li>
+<li><code>riff/session_slot_ledger.py</code> or a new narrowly named context-ledger module</li>
+<li><code>riff/types.py</code> only if a typed snapshot helper is required</li>
+<li><code>tests/test_session_slot_ledger.py</code></li>
+<li><code>tests/test_state_manager.py</code></li>
+</ul>
+<h3 id="work-6">Work</h3>
+<ol>
+<li>Emit <code>state_context_snapshot</code> at the same entry/exit boundaries as
+<code>state_slot_snapshot</code>.</li>
+<li>Record at minimum <code>turn_count</code>, <code>no_progress_streak</code>,
+<code>max_no_progress_loops</code>, <code>decision_epoch</code>, bounded recent states, pending
+transition identity, and active logical-output/output-attempt/playback IDs.</li>
+<li>Inventory unavailable behavior-affecting fields rather than silently
+omitting them.</li>
+<li>Extend guard telemetry with <code>context_reads</code>. For <code>stalled</code>, record the exact
+<code>no_progress_streak</code> and <code>max_no_progress_loops</code> values used.</li>
+<li>Keep context reads distinct from slot reads.</li>
+<li>Never mutate context while serializing it.</li>
+</ol>
+<h3 id="tests-6">Tests</h3>
+<ul>
+<li>Fresh consent entry records the exact progress counter.</li>
+<li><code>stalled</code> event identifies both context inputs and its result.</li>
+<li>Snapshot ordering is entry before the target state's first guard evaluation
+and exit before state exit/commit.</li>
+<li>Serialization is bounded and deterministic.</li>
+<li>Snapshot failure cannot block the state transition.</li>
+</ul>
+<h3 id="done-6">Done</h3>
+<p>The motivating <code>stalled</code> question can be answered from a synthetic ledger
+without reading current Python.</p>
+<h2 id="ac-05-normalize-output-and-playback-attempts">AC-05: Normalize Output and Playback Attempts</h2>
+<p><strong>Owner:</strong> Codex<br />
+<strong>Risk:</strong> Medium<br />
+<strong>Behavior change:</strong> None</p>
+<h3 id="files-7">Files</h3>
+<ul>
+<li><code>riff/postcall/state_program_artifact.py</code></li>
+<li><code>tests/test_state_program_artifact.py</code></li>
+<li>fixture expected output</li>
+</ul>
+<h3 id="work-7">Work</h3>
+<ol>
+<li>Add pure <code>_build_output_attempts</code> over recorded request/provider evidence and
+<code>_build_playback_attempts</code> over canonical playback lifecycle events.</li>
+<li>Join request -&gt; output attempt -&gt; playback ID by explicit IDs; never by
+nearest timestamp alone.</li>
+<li>Validate provider terminals separately from playback-stage terminals.</li>
+<li>Preserve causal and observed visits separately.</li>
+<li>Preserve <code>selected_source</code> and <code>decision_reason</code> on compact input links while
+retaining source references to full transcript observations.</li>
+<li>Derive compatibility <code>playback_spans</code> from normalized playback attempts.</li>
+<li>Add typed findings for missing/contradictory lifecycle and unavailable stage.</li>
+<li>Fold events only in <code>(seq, source_suborder)</code> order. No mutable flow file,
+clock, random value, process hash order, or set iteration may affect output.</li>
+</ol>
+<h3 id="tests-7">Tests</h3>
+<ul>
+<li>Event order permutations with stable sequence produce one canonical result.</li>
+<li>Duplicate starts on one playback ID at the same stage are invalid; starts at
+different evidence stages are not duplicates.</li>
+<li>Two attempts for one logical output remain distinct and linked.</li>
+<li>Two playback IDs for one output attempt remain distinct and stage-labelled.</li>
+<li>Late events retain causal ownership.</li>
+<li>Model receipt followed by failed transport send never appears outbound/client
+accepted.</li>
+<li>Legacy static fixtures produce unchanged compatibility spans.</li>
+<li>Same artifact rehydrates byte-identically.</li>
+</ul>
+<h3 id="done-7">Done</h3>
+<p>Artifact schema version increments; migration/legacy behavior is documented.</p>
+<h2 id="ac-06-mechanism-aware-findings-and-pause-audit">AC-06: Mechanism-Aware Findings and Pause Audit</h2>
+<p><strong>Owner:</strong> Codex<br />
+<strong>Risk:</strong> Medium</p>
+<h3 id="files-8">Files</h3>
+<ul>
+<li><code>riff/postcall/state_program_artifact.py</code></li>
+<li><code>riff/state_program_debugger.py</code></li>
+<li><code>tests/test_state_program_artifact.py</code></li>
+<li><code>tests/test_state_program_debugger.py</code></li>
+</ul>
+<h3 id="work-8">Work</h3>
+<p>Implement only evidence-backed findings:</p>
+<ul>
+<li><code>MODEL_OUTPUT_RESTART_REPEATED_PREFIX</code>;</li>
+<li><code>FSM_REPEATED_OUTPUT_REQUEST</code>;</li>
+<li><code>TRANSPORT_DUPLICATE_ATTEMPT</code>;</li>
+<li><code>MULTIPLE_PLAYBACK_ATTEMPTS_UNEXPLAINED</code>;</li>
+<li><code>UNEXPECTED_OUTPUT_FROM_NON_SPEAKING_REQUEST</code>;</li>
+<li><code>STATE_EXITED_BEFORE_FIRST_OUTPUT</code>;</li>
+<li><code>MATCHED_INPUT_FOLLOWED_BY_UNRELATED_OUTPUT</code>;</li>
+<li><code>STALE_PROGRESS_GUARD_ON_ENTRY</code>;</li>
+<li><code>DYNAMIC_POST_PROMPT_SILENCE</code>;</li>
+<li><code>OUTPUT_AFTER_STATE_EXIT</code>.</li>
+</ul>
+<p>Every finding includes required source event IDs, causal visit, confidence
+class, and typed unavailable dependencies. Keep legacy
+<code>DUPLICATE_AGENT_PLAYBACK</code> for pre-schema calls.</p>
+<h3 id="tests-8">Tests</h3>
+<ul>
+<li>Two FSM visits requesting the same asset are not called a transport duplicate.</li>
+<li>Interrupted/restarted generated output with matching prefix gets the model
+restart code.</li>
+<li>A generated prompt contributes a pause boundary at the selected playback
+evidence stage, not merely at model receipt.</li>
+<li>Missing text/terminal/context evidence downgrades or suppresses a finding.</li>
+<li>No detector uses current YAML or calls a model.</li>
+<li>Multiple truth stages for one playback do not create a duplicate finding.</li>
+<li>Multiple distinct playback IDs without retry evidence get the weaker
+unexplained-multiple finding, not a definitive transport-duplicate claim.</li>
+<li>A response to a forbidden-output request gets the unexpected-output finding,
+not an intended-prompt label.</li>
+</ul>
+<h3 id="done-8">Done</h3>
+<p>The synthetic motivating fixture produces the expected distinct findings and
+zero false transport-duplicate claim.</p>
+<h2 id="ac-07-compact-explain-moment-and-ai-cli">AC-07: Compact <code>explain_moment</code> and AI CLI</h2>
+<p><strong>Owner:</strong> Codex<br />
+<strong>Risk:</strong> Medium</p>
+<h3 id="files-9">Files</h3>
+<ul>
+<li><code>riff/state_program_debugger.py</code></li>
+<li><code>riff/state_program_debugger_service.py</code> only if filtered loading is needed</li>
+<li><code>scripts/dbg.py</code></li>
+<li><code>scripts/state_program_debugger.py</code></li>
+<li>debugger engine/CLI/service/HTTP tests</li>
+</ul>
+<h3 id="work-9">Work</h3>
+<ol>
+<li>Add <code>explain_moment</code> with exactly one event/time anchor.</li>
+<li>Resolve state, causal input, selected STT and decision reason, context reads,
+model-request kind/expectation, output attempts, playback attempts/stages,
+first deterministic divergence, gaps, and next commands.</li>
+<li>Default to a canonical response of at most 4 KB.</li>
+<li>Add <code>detail=evidence</code> with a 32 KB cap and pagination.</li>
+<li>Return raw events only via filtered, explicit references.</li>
+<li>Add <code>latest</code> and <code>explain-moment</code> ergonomic CLI commands without duplicating
+engine logic.</li>
+<li>Build deterministic indexes by event, visit, input, logical output, output
+attempt, and playback ID so each join is bounded by IDs plus the requested
+time window rather than a full-timeline scan.</li>
+<li>Include zero-model-call execution metadata.</li>
+</ol>
+<h3 id="tests-9">Tests</h3>
+<ul>
+<li>Size caps are measured on canonical encoded bytes.</li>
+<li>Unknown/ambiguous anchor and stale hash fail without cursor motion.</li>
+<li>Browser, CLI, direct engine, and HTTP return byte-identical projections.</li>
+<li>The command uses zero model calls/tokens.</li>
+<li><code>latest</code> plus summary explanation returns at most 10 KB total.</li>
+<li>The motivating fixture explanation names the first attempt and linked restart
+plus its playback truth stage without embedding the whole timeline.</li>
+</ul>
+<h3 id="done-9">Done</h3>
+<p>Claude can diagnose the synthetic failure using only <code>latest</code>,
+<code>explain-moment</code>, and one optional detail command.</p>
+<h2 id="ac-08-browser-causal-ui">AC-08: Browser Causal UI</h2>
+<p><strong>Owner:</strong> Codex<br />
+<strong>Risk:</strong> Medium</p>
+<h3 id="files-10">Files</h3>
+<ul>
+<li><code>web/state-program-debugger.html</code></li>
+<li><code>web/state-program-debugger.js</code></li>
+<li>static UI and Playwright tests</li>
+<li>cache-bust value</li>
+</ul>
+<h3 id="work-10">Work</h3>
+<ol>
+<li>Render one Agent-lane band per playback attempt, grouped by logical output
+and output attempt, with textual stage and outcome.</li>
+<li>Connect linked output restarts and label transport retries without adding
+another cursor.</li>
+<li>Add <strong>Explain this moment</strong> to the existing inspector.</li>
+<li>Render a downward causal story: caller -&gt; selected STT/reason -&gt; decision -&gt;
+state -&gt; model request/expectation -&gt; output attempt -&gt; playback stage -&gt;
+interruption/restart -&gt; finding.</li>
+<li>Keep Entry/Exit slots and context values visible in the right inspector.</li>
+<li>Store attempt IDs and finding code with durable issue markers.</li>
+<li>Add a bounded <strong>Replay this evidence</strong> interval and <strong>Confirm this point</strong>
+action. An AI may propose a marker/deep link; only the operator confirmation
+changes its status from <code>proposed</code> to <code>confirmed</code>.</li>
+<li>Preserve mobile ordering and no horizontal overflow.</li>
+</ol>
+<h3 id="tests-10">Tests</h3>
+<ul>
+<li>Playwright seeks and plays through an interruption/restart pair.</li>
+<li>State, transcript, attempt, and explanation follow one playhead.</li>
+<li>Model-received, outbound-accepted, client-playback, carrier-recorded, and
+unavailable are visually and textually unconfusable.</li>
+<li>Attempt color is redundant with labels/icons.</li>
+<li>A marked issue URL restores the same event and explanation.</li>
+<li>Proposed versus confirmed problem points are visually and structurally
+distinct and replay the same bounded interval.</li>
+<li>Desktop and mobile screenshots show no overlap or nested-card layout.</li>
+</ul>
+<h3 id="done-10">Done</h3>
+<p>An operator can locate and share the repeated prefix without inspecting JSON.</p>
+<h2 id="ac-09-reproduction-and-regression-promotion-seam">AC-09: Reproduction and Regression Promotion Seam</h2>
+<p><strong>Owner:</strong> Codex design; implementation only after separate approval<br />
+<strong>Risk:</strong> High</p>
+<h3 id="work-11">Work</h3>
+<ol>
+<li>Add logical outputs, output/playback attempts, truth stages, selected input,
+and context snapshots to exported capsules.</li>
+<li>Define a PII-safe synthetic input fixture for the marked defect.</li>
+<li>Define, but do not yet enable, an isolated runner request containing exact
+engine/flow revisions and typed overlays.</li>
+<li>Define promotion output: a deterministic regression fixture and expected
+finding/exit/audio-attempt assertions.</li>
+</ol>
+<h3 id="done-11">Done</h3>
+<p>The packet produces a reviewed runner contract. The browser Fork button remains
+disabled.</p>
+<h2 id="ac-10-validation-and-rollout">AC-10: Validation and Rollout</h2>
+<p><strong>Owner:</strong> Shared<br />
+<strong>Risk:</strong> Medium; OTA step requires human GO</p>
+<h3 id="ladder">Ladder</h3>
+<ol>
+<li>Unit schemas and invariants.</li>
+<li>Synthetic artifact and debugger fixture.</li>
+<li>Fake Live client interruption/restart.</li>
+<li>Browser dynamic-playback lifecycle with aligned replay.</li>
+<li>Local fake Telnyx <code>ws_send</code> lifecycle and wire recording.</li>
+<li>Local retained-call rehydration.</li>
+<li>Feature flag on/off byte and pre-existing event comparison.</li>
+<li>One Telnyx OTA call after explicit human <code>GO</code>.</li>
+</ol>
+<h3 id="ota-acceptance">OTA Acceptance</h3>
+<ul>
+<li>Generated consent interruption yields one interrupted and one linked completed
+attempt.</li>
+<li>Repeated prefix finding points to the correct output attempts and named
+playback/carrier interval.</li>
+<li>Model receipt, Telnyx outbound acceptance, and carrier-recorded audio remain
+distinct and agree where all three are available.</li>
+<li>A valid start-claim input does not immediately fall through consent because
+of stale progress context; this caller-behavior fix is a separate Claude
+packet and must have its own tests/FX entry.</li>
+<li><code>explain_moment</code> returns under 4 KB and the UI deep link restores it.</li>
+<li>Full call audio and transcripts remain aligned.</li>
+</ul>
+<h2 id="commit-plan">Commit Plan</h2>
+<p>Use these commit boundaries unless the reconciled mailbox approval changes
+them:</p>
+<pre><code class="language-text">test(debugger): freeze output-attempt schema fixture
+refactor(live): centralize output request and scratch reset boundaries
+feat(live): retain provider output attempts
+feat(browser): retain generated playback acknowledgements
+feat(phone): retain generated outbound playback lifecycle
+feat(fsm): retain behavior-affecting state context
+feat(debugger): normalize output and playback attempts
+feat(debugger): classify output causality
+feat(debugger): add bounded explain-moment projection
+feat(debugger-ui): visualize output attempts and causal chain
+docs(debugger): publish audio-causality operator guide
+</code></pre>
+<p>Every fix commit references its FX entry. Pure design/test fixture commits may
+reference the design document instead.</p>
+<h3 id="packet-result-template">Packet Result Template</h3>
+<p>Every implementation result appended to the mailbox contains:</p>
+<pre><code class="language-text">packet/task_id:
+status: done | blocked | needs-human-go
+commit:
+files changed:
+commands/tests:
+event examples and artifact path:
+flag-off equivalence evidence:
+known unavailable evidence:
+rollback:
+next owner/action:
+</code></pre>
+<h3 id="rollback">Rollback</h3>
+<ul>
+<li><code>RIFF_DEBUG_OUTPUT_ATTEMPTS=0</code> removes new capture/control envelopes and
+preserves the pre-change audio and event path.</li>
+<li>Artifact readers accept missing optional attempt fields and keep legacy
+<code>playback_spans</code>; rollback does not rewrite retained calls.</li>
+<li>Detector/UI rollout remains separately switchable until capture has passed
+deterministic fixture, browser, and fake-phone gates.</li>
+<li>No packet deploys live behavior or performs an OTA call without human <code>GO</code>.</li>
+</ul>
+<h2 id="implementation-stop-conditions">Implementation Stop Conditions</h2>
+<p>Stop and post <code>blocked</code> to the other mailbox when:</p>
+<ul>
+<li>neither provider telemetry nor a typed RIFF response/reset boundary can
+distinguish a restart;</li>
+<li>terminalization would require changing audio queue ordering;</li>
+<li>a stable causal ID cannot survive scratch resets;</li>
+<li>context capture mutates or serializes unbounded history;</li>
+<li>a detector needs an LLM or current mutable flow to decide;</li>
+<li>an API response cannot meet its size cap without dropping required provenance;</li>
+<li>concurrent work touches the same owned file;</li>
+<li>validation requires an OTA call without human GO.</li>
+</ul>
+<h2 id="plan-approval-gate">Plan Approval Gate</h2>
+<p>Implementation begins only after:</p>
+<ol>
+<li>Claude's <code>CL2C-001</code> required changes are incorporated.</li>
+<li>Codex appends <code>C2C-002</code> with a
+resolution table.</li>
+<li>Claude appends <code>CL2C-002</code> approving the reconciled schema and packet ordering
+or identifies one bounded remaining blocker.</li>
+<li>AC-00 schema/fixture is committed before live capture code changes.</li>
+</ol>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#goal">Goal</a></li><li class="toc-h2"><a href="#rules-for-implementation-agents">Rules for Implementation Agents</a></li><li class="toc-h2"><a href="#ownership">Ownership</a></li><li class="toc-h2"><a href="#verified-starting-point">Verified Starting Point</a></li><li class="toc-h2"><a href="#packet-dependency-graph">Packet Dependency Graph</a></li><li class="toc-h2"><a href="#ac-00-freeze-schema-and-synthetic-evidence">AC-00: Freeze Schema and Synthetic Evidence</a></li><li class="toc-h3"><a href="#files">Files</a></li><li class="toc-h3"><a href="#work">Work</a></li><li class="toc-h3"><a href="#tests">Tests</a></li><li class="toc-h3"><a href="#done">Done</a></li><li class="toc-h2"><a href="#ac-01-request-identity-and-structural-gates">AC-01: Request Identity and Structural Gates</a></li><li class="toc-h3"><a href="#files-2">Files</a></li><li class="toc-h3"><a href="#work-2">Work</a></li><li class="toc-h3"><a href="#tests-2">Tests</a></li><li class="toc-h3"><a href="#done-2">Done</a></li><li class="toc-h2"><a href="#ac-02-provider-output-attempt-capture">AC-02: Provider Output-Attempt Capture</a></li><li class="toc-h3"><a href="#files-3">Files</a></li><li class="toc-h3"><a href="#work-3">Work</a></li><li class="toc-h3"><a href="#tests-3">Tests</a></li><li class="toc-h3"><a href="#done-3">Done</a></li><li class="toc-h2"><a href="#ac-03a-browser-playback-truth">AC-03A: Browser Playback Truth</a></li><li class="toc-h3"><a href="#files-4">Files</a></li><li class="toc-h3"><a href="#work-4">Work</a></li><li class="toc-h3"><a href="#tests-4">Tests</a></li><li class="toc-h3"><a href="#done-4">Done</a></li><li class="toc-h2"><a href="#ac-03b-phone-outbound-truth">AC-03B: Phone Outbound Truth</a></li><li class="toc-h3"><a href="#files-5">Files</a></li><li class="toc-h3"><a href="#work-5">Work</a></li><li class="toc-h3"><a href="#tests-5">Tests</a></li><li class="toc-h3"><a href="#done-5">Done</a></li><li class="toc-h2"><a href="#ac-04-capture-behavior-affecting-context">AC-04: Capture Behavior-Affecting Context</a></li><li class="toc-h3"><a href="#files-6">Files</a></li><li class="toc-h3"><a href="#work-6">Work</a></li><li class="toc-h3"><a href="#tests-6">Tests</a></li><li class="toc-h3"><a href="#done-6">Done</a></li><li class="toc-h2"><a href="#ac-05-normalize-output-and-playback-attempts">AC-05: Normalize Output and Playback Attempts</a></li><li class="toc-h3"><a href="#files-7">Files</a></li><li class="toc-h3"><a href="#work-7">Work</a></li><li class="toc-h3"><a href="#tests-7">Tests</a></li><li class="toc-h3"><a href="#done-7">Done</a></li><li class="toc-h2"><a href="#ac-06-mechanism-aware-findings-and-pause-audit">AC-06: Mechanism-Aware Findings and Pause Audit</a></li><li class="toc-h3"><a href="#files-8">Files</a></li><li class="toc-h3"><a href="#work-8">Work</a></li><li class="toc-h3"><a href="#tests-8">Tests</a></li><li class="toc-h3"><a href="#done-8">Done</a></li><li class="toc-h2"><a href="#ac-07-compact-explain-moment-and-ai-cli">AC-07: Compact explain_moment and AI CLI</a></li><li class="toc-h3"><a href="#files-9">Files</a></li><li class="toc-h3"><a href="#work-9">Work</a></li><li class="toc-h3"><a href="#tests-9">Tests</a></li><li class="toc-h3"><a href="#done-9">Done</a></li><li class="toc-h2"><a href="#ac-08-browser-causal-ui">AC-08: Browser Causal UI</a></li><li class="toc-h3"><a href="#files-10">Files</a></li><li class="toc-h3"><a href="#work-10">Work</a></li><li class="toc-h3"><a href="#tests-10">Tests</a></li><li class="toc-h3"><a href="#done-10">Done</a></li><li class="toc-h2"><a href="#ac-09-reproduction-and-regression-promotion-seam">AC-09: Reproduction and Regression Promotion Seam</a></li><li class="toc-h3"><a href="#work-11">Work</a></li><li class="toc-h3"><a href="#done-11">Done</a></li><li class="toc-h2"><a href="#ac-10-validation-and-rollout">AC-10: Validation and Rollout</a></li><li class="toc-h3"><a href="#ladder">Ladder</a></li><li class="toc-h3"><a href="#ota-acceptance">OTA Acceptance</a></li><li class="toc-h2"><a href="#commit-plan">Commit Plan</a></li><li class="toc-h3"><a href="#packet-result-template">Packet Result Template</a></li><li class="toc-h3"><a href="#rollback">Rollback</a></li><li class="toc-h2"><a href="#implementation-stop-conditions">Implementation Stop Conditions</a></li><li class="toc-h2"><a href="#plan-approval-gate">Plan Approval Gate</a></li></ul></aside>
+</div>
+</body>
+</html>

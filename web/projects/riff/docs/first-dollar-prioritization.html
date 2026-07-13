@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RIFF First-Dollar Prioritization · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-11-first-dollar-prioritization.md</span>
+<a class="raw" href="/docs/docs/strategy/2026-07-11-first-dollar-prioritization.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>RIFF First-Dollar Prioritization</h1>
+<p><strong>Date:</strong> 2026-07-11<br />
+<strong>Decision surface:</strong> <code>/riff-priority.html</code><br />
+<strong>Objective:</strong> reach one paid, reliable plumbing appointment-booking pilot while building the system that makes every later flow cheaper and safer to produce.</p>
+<h2 id="executive-decision">Executive Decision</h2>
+<p>RIFF should not operate ten product initiatives in parallel. The immediate offer is:</p>
+<blockquote>
+<p>A plumbing phone line that answers, qualifies the service request, offers real calendar availability, and books the caller's selected appointment.</p>
+</blockquote>
+<p>The compounding platform investment is one measured release loop:</p>
+<pre><code class="language-text">call -&gt; outcome and cost -&gt; synchronized replay -&gt; marked defect
+     -&gt; regression fixture -&gt; M3 candidate proof -&gt; M1 promotion
+</code></pre>
+<p>Everything in the near-term portfolio must either sell that offer or strengthen that loop.</p>
+<h2 id="priority-order">Priority Order</h2>
+<p>The workbench treats prioritization as a fixed 100-point allocation with a
+protected <code>0.1</code>-point floor for every criterion. Increasing one criterion
+proportionally reduces the discretionary points on the other four; decreasing
+it returns those points in the same proportions. With five criteria the
+effective range is <code>0.1</code> to <code>99.6</code>: moving one fully right produces
+<code>[0.1, 99.6, 0.1, 0.1, 0.1]</code>, and reducing it to <code>80</code> produces
+<code>[5, 80, 5, 5, 5]</code>. The floor makes a criterion negligible without creating
+the undefined-ratio behavior of absolute zero.</p>
+<h3 id="editable-principle-prompts">Editable principle prompts</h3>
+<p>Each principle name in <code>/riff-priority.html</code> opens the exact prompt used to
+score the work queue. Saving a changed prompt marks that principle's existing
+scores stale. <strong>Save &amp; re-score queue</strong> sends the edited prompt and all current
+initiative evidence through one bounded structured-output model call; the
+browser replaces that principle's score column only when every initiative ID
+appears exactly once with an integer score from <code>1</code> to <code>5</code>.</p>
+<p>Re-scoring is disabled by default. To enable it on the local RIFF server:</p>
+<pre><code class="language-bash">RIFF_PRIORITY_RESCORE_ENABLED=1 python -m riff.web_server
+</code></pre>
+<p>The default evaluator is <code>gemini-3.1-flash-lite</code>; override it with
+<code>RIFF_PRIORITY_MODEL</code>. Identical prompt-and-queue requests are cached by model.
+The endpoint allows six uncached runs per minute, reserves at most 1,600 output
+tokens per call, and defaults to 24 runs or 100,000 reserved tokens per UTC day.
+Those limits can be lowered with <code>RIFF_PRIORITY_MAX_RUNS_PER_MINUTE</code>,
+<code>RIFF_PRIORITY_MAX_RUNS_PER_DAY</code>, and
+<code>RIFF_PRIORITY_MAX_TOKENS_PER_DAY</code>.</p>
+<p>The row reports the resolved model, token count, and cache status. Dollar cost
+remains <code>unknown</code>, not zero, until RIFF has a current provider-pricing ledger.
+The model supplies candidate scores and reasons; weighted totals, ordering,
+validation, and the decision to act remain deterministic and operator-owned.</p>
+<h3 id="1-cost-ledger-and-unit-economics">1. Cost ledger and unit economics</h3>
+<p>Cost truth is a prerequisite for pricing, margin, model selection, and daily risk control. Persist normalized usage for model input/output, realtime audio, transcription, telephony, storage, and non-call development jobs. A missing price or provider measurement must render as <code>unknown</code>, never <code>$0</code>.</p>
+<p>The first useful surface is small:</p>
+<ul>
+<li>total spend today and this month;</li>
+<li>cost per call and per completed booking;</li>
+<li>cost by provider, flow, model, and account;</li>
+<li>unknown-cost event count;</li>
+<li>daily warning and hard-ceiling policy;</li>
+<li>reconciliation delta against provider billing.</li>
+</ul>
+<p>The current repository has cost estimators and local counters, but they are not yet one authoritative cross-provider ledger. <code>T-M3-COST-WIRING-012</code> in the hardening backlog already identifies this as P0.</p>
+<h3 id="2-replay-to-regression-reliability-loop">2. Replay-to-regression reliability loop</h3>
+<p>The remaining caller-visible flow bugs block charging more directly than missing product breadth. Continue improving capture and the State Program Debugger, but define completion as a closed defect loop rather than a better visualization:</p>
+<ol>
+<li>mark the exact audible problem;</li>
+<li>preserve aligned audio, transcript, state, tool, and variable evidence;</li>
+<li>reproduce it with a deterministic fixture;</li>
+<li>fix the generator or runtime ownership boundary;</li>
+<li>prove the fixture fails before and passes after;</li>
+<li>verify on M3 before promotion.</li>
+</ol>
+<p>This is the highest-leverage AI surface. Codex and Claude can navigate the same artifact, compare repeated visits, generate adversarial pattern families, and propose regression tests without re-reading entire call logs.</p>
+<h3 id="3-calendar-booking-contract">3. Calendar booking contract</h3>
+<p>Booking is the outcome that makes the initial plumbing product valuable. The deterministic contract must own offered slots, selected slot ID, timezone, duration, corrections, provider idempotency, final event ID, and confirmation evidence. AI may interpret a phrase such as &quot;tomorrow afternoon,&quot; but it must not invent availability or own the final calendar write.</p>
+<p>Before a paid pilot, prove:</p>
+<ul>
+<li>the offered slots came from the configured provider;</li>
+<li>the booked event exactly matches the selected slot;</li>
+<li>corrections clear stale selections;</li>
+<li>retries cannot double-book;</li>
+<li>provider timeout produces recovery rather than silence;</li>
+<li>the debugger retains the tool arguments and result.</li>
+</ul>
+<h3 id="4-sellable-plumbing-pilot">4. Sellable plumbing pilot</h3>
+<p>Publish one literal plumbing offer and provision one line. The landing page should show the product, the phone number, the booking outcome, a narrow pilot promise, and one conversion action. It should not advertise a general AI platform or several unfinished verticals.</p>
+<p>Use manual operations deliberately:</p>
+<ul>
+<li>manually approve and provision the first account;</li>
+<li>manually configure hours and service area;</li>
+<li>manually invoice the customer;</li>
+<li>manually review early calls with the debugger.</li>
+</ul>
+<p>Manual billing is enough to collect the first dollar. Automated billing is not a launch prerequisite.</p>
+<h3 id="5-m3-m1-promotion-and-failover">5. M3/M1 promotion and failover</h3>
+<p>M3 is the candidate lane and M1 is the stable lane. Before paid traffic, finish the minimum safe release contract: exact clean SHA, node identity, health, drain state, targetable test call, active-call ownership, promotion evidence, and rollback. Elaborate active-active failover should not displace the plumbing happy path, but a known stable fallback is required once a customer depends on the line.</p>
+<h3 id="6-billing-and-automated-provisioning">6. Billing and automated provisioning</h3>
+<p>After one customer accepts the offer and price, automate the repeated parts: account, plan, line provisioning, entitlement, usage statement, invoice, suspension, and teardown. Money movement and plan enforcement remain deterministic. AI can draft explanations or flag anomalies, but it cannot be the billing ledger.</p>
+<h3 id="7-prerecorded-dtmf-starter-tier">7. Prerecorded DTMF Starter tier</h3>
+<p>This is the strongest adjacent product idea. AI can author and test the menu offline while production uses prerecorded prompts and deterministic keypad routing. That produces low variable cost, a degraded-mode fallback, and an entry plan for customers who do not yet need natural booking.</p>
+<p>It must reuse RIFF's compiler, asset validation, telemetry, and account model. Do not build it as a second platform.</p>
+<h3 id="8-intentional-voice-work-inbox">8. Intentional voice work inbox</h3>
+<p>The internal workflow opportunity is real, but begin with explicit recording sessions rather than ambient forever-recording. Each session should produce retained audio, timestamped transcription, editable decisions, proposed tasks, and links from every summary item back to the exact audio span. Human review occurs before tasks are dispatched.</p>
+<p>This is a leverage experiment, not part of the first paid plumbing offer.</p>
+<h3 id="9-domain-rag">9. Domain RAG</h3>
+<p>RAG begins only when a real customer supplies an owned corpus and repeated questions. The contract requires corpus scope, authorization, freshness, citations, evaluation questions, and a deterministic escape to booking or a person. It must never block the core appointment workflow.</p>
+<h3 id="10-live-bulletization-and-additional-vertical-pages">10. Live bulletization and additional vertical pages</h3>
+<p>Live transcription-to-bullets is a separate product hypothesis with a different user and quality bar. Prototype it from recorded voice-inbox sessions before building realtime infrastructure.</p>
+<p>Electrical and law landing pages are inexpensive to generate but costly in focus. Clone the plumbing acquisition and onboarding pattern only after its conversion path is measured.</p>
+<h2 id="product-ladder">Product Ladder</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Runtime</th>
+<th>Customer outcome</th>
+<th>Timing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Starter</td>
+<td>Prerecorded audio and DTMF</td>
+<td>Route calls and capture a structured message</td>
+<td>After core cost model</td>
+</tr>
+<tr>
+<td>Core</td>
+<td>Natural voice plus deterministic tools</td>
+<td>Qualify and book a plumbing appointment</td>
+<td>First paid pilot</td>
+</tr>
+<tr>
+<td>Knowledge</td>
+<td>Core plus source-backed RAG</td>
+<td>Answer approved domain questions without blocking booking</td>
+<td>After customer corpus exists</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cost-guardrails">Cost Guardrails</h2>
+<p>The interactive workbench contains a planning calculator. Its values are assumptions, not billing truth. The production cost ledger must support:</p>
+<pre><code class="language-text">call_variable_cost = model + realtime_audio + transcription + telephony + storage
+monthly_operating_cost = sum(call_variable_cost) + attributable_fixed_cost
+price_floor_per_account = monthly_operating_cost / accounts / (1 - target_margin)
+</code></pre>
+<p>Daily controls should include a warning threshold, a reviewed hard ceiling, and explicit behavior when the ceiling is reached. A ceiling must not terminate an active emergency call or corrupt an in-progress calendar write.</p>
+<h2 id="ai-allocation">AI Allocation</h2>
+<p>Use lower-cost models for bounded, verifiable expansion:</p>
+<ul>
+<li>scenario and phrase families;</li>
+<li>state titles and summaries;</li>
+<li>documentation and landing-page variants;</li>
+<li>transcript clustering and evidence summaries;</li>
+<li>routine test scaffolding.</li>
+</ul>
+<p>Use stronger models selectively for:</p>
+<ul>
+<li>adversarial architecture review;</li>
+<li>ambiguous cross-layer root-cause analysis;</li>
+<li>safety, authorization, and billing-contract review;</li>
+<li>judging whether a fix addresses the caller-visible defect.</li>
+</ul>
+<p>Keep these deterministic:</p>
+<ul>
+<li>provider usage and dollar aggregation;</li>
+<li>calendar availability and writes;</li>
+<li>DTMF resolution;</li>
+<li>billing records and entitlements;</li>
+<li>deployment health and promotion gates;</li>
+<li>evidence completeness and pass/fail results.</li>
+</ul>
+<h2 id="thirty-day-gates">Thirty-Day Gates</h2>
+<h3 id="gate-1-cost-truth">Gate 1: Cost truth</h3>
+<ul>
+<li>Daily spend page reconciles to recorded usage.</li>
+<li>Every call has cost or an explicit unknown-cost finding.</li>
+<li>Alert threshold and price-floor view exist.</li>
+</ul>
+<h3 id="gate-2-sellable-path">Gate 2: Sellable path</h3>
+<ul>
+<li>Plumbing caller books an intended provider slot.</li>
+<li>The full call is replayable with aligned transcript, state, tools, and audio.</li>
+<li>Known P0 flow defects have regression fixtures.</li>
+</ul>
+<h3 id="gate-3-first-customer">Gate 3: First customer</h3>
+<ul>
+<li>One plumbing page and number are public.</li>
+<li>One qualified pilot conversation occurs.</li>
+<li>Pilot scope, price, and manual invoice are ready.</li>
+</ul>
+<h3 id="gate-4-safe-operation">Gate 4: Safe operation</h3>
+<ul>
+<li>M3 candidate is provable against M1 stable.</li>
+<li>Promotion and rollback name exact SHAs and preserve active-call ownership.</li>
+<li>Per-call cost and booking outcome are visible to the operator.</li>
+</ul>
+<h2 id="stop-rules">Stop Rules</h2>
+<ul>
+<li>Do not build three vertical landing pages before one plumbing page produces a qualified pilot conversation.</li>
+<li>Do not automate billing before a customer agrees to a plan and price.</li>
+<li>Do not add RAG before an owned corpus and evaluation set exist.</li>
+<li>Do not build ambient forever-recording before explicit-session retention and review work.</li>
+<li>Do not call a zero value &quot;free&quot; when provider usage is unavailable.</li>
+<li>Do not promote a flow fix without a failing-before, passing-after regression fixture.</li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#executive-decision">Executive Decision</a></li><li class="toc-h2"><a href="#priority-order">Priority Order</a></li><li class="toc-h3"><a href="#editable-principle-prompts">Editable principle prompts</a></li><li class="toc-h3"><a href="#1-cost-ledger-and-unit-economics">1. Cost ledger and unit economics</a></li><li class="toc-h3"><a href="#2-replay-to-regression-reliability-loop">2. Replay-to-regression reliability loop</a></li><li class="toc-h3"><a href="#3-calendar-booking-contract">3. Calendar booking contract</a></li><li class="toc-h3"><a href="#4-sellable-plumbing-pilot">4. Sellable plumbing pilot</a></li><li class="toc-h3"><a href="#5-m3-m1-promotion-and-failover">5. M3/M1 promotion and failover</a></li><li class="toc-h3"><a href="#6-billing-and-automated-provisioning">6. Billing and automated provisioning</a></li><li class="toc-h3"><a href="#7-prerecorded-dtmf-starter-tier">7. Prerecorded DTMF Starter tier</a></li><li class="toc-h3"><a href="#8-intentional-voice-work-inbox">8. Intentional voice work inbox</a></li><li class="toc-h3"><a href="#9-domain-rag">9. Domain RAG</a></li><li class="toc-h3"><a href="#10-live-bulletization-and-additional-vertical-pages">10. Live bulletization and additional vertical pages</a></li><li class="toc-h2"><a href="#product-ladder">Product Ladder</a></li><li class="toc-h2"><a href="#cost-guardrails">Cost Guardrails</a></li><li class="toc-h2"><a href="#ai-allocation">AI Allocation</a></li><li class="toc-h2"><a href="#thirty-day-gates">Thirty-Day Gates</a></li><li class="toc-h3"><a href="#gate-1-cost-truth">Gate 1: Cost truth</a></li><li class="toc-h3"><a href="#gate-2-sellable-path">Gate 2: Sellable path</a></li><li class="toc-h3"><a href="#gate-3-first-customer">Gate 3: First customer</a></li><li class="toc-h3"><a href="#gate-4-safe-operation">Gate 4: Safe operation</a></li><li class="toc-h2"><a href="#stop-rules">Stop Rules</a></li></ul></aside>
+</div>
+</body>
+</html>

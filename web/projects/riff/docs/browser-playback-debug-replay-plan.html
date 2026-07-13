@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Browser Playback Debug and Replay Plan · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-10-browser-playback-debug-replay-plan.md</span>
+<a class="raw" href="/docs/design/2026-07-10-browser-playback-debug-replay-plan.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Browser Playback Debug and Replay Plan</h1>
+<p><strong>Status:</strong> implementation plan<br />
+<strong>Priority:</strong> debug and replay first; do not change property-management flow behavior until the next call can prove what browser audio played.</p>
+<h2 id="problem">Problem</h2>
+<p>The caller heard the agent audio play and immediately say the same thing again. The browser-session debugger can reconstruct FSM visits, but it cannot prove a browser double-play because the browser path currently retains neither the played agent PCM nor durable playback lifecycle events. A repeated state and a repeated audible prompt are different failures.</p>
+<h2 id="objective">Objective</h2>
+<p>For every browser call, the retained artifact and debugger must answer:</p>
+<ol>
+<li>Which agent audio was requested, generated, started, stopped, and completed?</li>
+<li>Which state visit owned each playback span?</li>
+<li>Was a prompt played twice, and was the duplicate static, model-generated, re-entry, nudge, or client replay?</li>
+<li>At what exact recorded timestamp did the first duplicate begin?</li>
+<li>Can an operator pause, rewind, and fork simulation immediately before that event?</li>
+</ol>
+<h2 id="current-reality">Current Reality</h2>
+<p>The repository does not yet satisfy the full objective:</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Current state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recorded event step/reverse</td>
+<td>implemented in the read-only cursor engine</td>
+</tr>
+<tr>
+<td>State visits and redacted variable boundaries</td>
+<td>implemented, with known fold-mismatch findings on the real call</td>
+</tr>
+<tr>
+<td>Browser playback lifecycle evidence</td>
+<td>implemented for static audio at actual client callbacks; streamed model-audio completion/fingerprint remains</td>
+</tr>
+<tr>
+<td>Agent played-audio recording on browser calls</td>
+<td>unavailable/empty on the reported call</td>
+</tr>
+<tr>
+<td>Millisecond synchronized media replay</td>
+<td>implemented for retained local WAV plus canonical events/transcript; carrier alignment remains</td>
+</tr>
+<tr>
+<td>Duplicate playback detector</td>
+<td>implemented for matching lifecycle fingerprints within the bounded gap</td>
+</tr>
+<tr>
+<td>Shareable issue point</td>
+<td>implemented with session, time, event, confirmation, and deep-link URL</td>
+</tr>
+<tr>
+<td>State capsule export</td>
+<td>specified, not implemented</td>
+</tr>
+<tr>
+<td>Variable/audio/input fork execution</td>
+<td>not implemented; <code>fork</code> is intentionally rejected by the current engine</td>
+</tr>
+</tbody>
+</table>
+<p>Implementation must follow the causal dependency order: capture truthful
+playback evidence, normalize the shared clock, deliver recorded media replay,
+export restorable checkpoints, then enable S1 state simulation. A polished fork
+button before those layers exist would be a mock, not a debugger.</p>
+<h2 id="playback-ledger-contract">Playback Ledger Contract</h2>
+<p>Add canonical durable events, emitted at the browser playback boundary rather than inferred from FSM intent:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Required fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>audio_requested</code></td>
+<td><code>session_id</code>, <code>visit_id</code>, <code>state_id</code>, <code>playback_id</code>, <code>source_kind</code>, <code>content_fingerprint</code>, request epoch</td>
+</tr>
+<tr>
+<td><code>audio_started</code></td>
+<td>all identifiers, actual start epoch, transport/browser playback mechanism</td>
+</tr>
+<tr>
+<td><code>audio_completed</code></td>
+<td>identifiers, end epoch, played duration, completion reason</td>
+</tr>
+<tr>
+<td><code>audio_interrupted</code></td>
+<td>identifiers, epoch, interruption reason, elapsed duration</td>
+</tr>
+<tr>
+<td><code>audio_failed</code></td>
+<td>identifiers, epoch, failure code, safe diagnostic</td>
+</tr>
+</tbody>
+</table>
+<p><code>source_kind</code> is one of <code>static_asset</code>, <code>model_audio</code>, <code>entry_line</code>, <code>nudge</code>, or <code>unknown</code>. <code>content_fingerprint</code> is a session-safe fingerprint of the resolved text/audio asset; it supports duplicate detection without retaining prohibited raw content.</p>
+<p>The browser emits acknowledgement events after it actually starts/stops playback. The server writes the immutable ledger. Client-only console logs are not evidence.</p>
+<h2 id="audio-evidence-contract">Audio Evidence Contract</h2>
+<ol>
+<li>Attempt to capture browser-played agent PCM into <code>audio_agent_played.wav</code> with a declared sample rate and channel map.</li>
+<li>If browser audio cannot be captured, retain the playback spans above and record <code>AGENT_PLAYED_AUDIO_UNAVAILABLE</code> with the technical reason.</li>
+<li>Never create a 44-byte empty WAV and label it recorded. The manifest must say <code>unavailable</code> or <code>empty_capture</code>.</li>
+<li>The finalizer links each playback span to WAV offsets when audio exists.</li>
+</ol>
+<h2 id="double-play-detector">Double-Play Detector</h2>
+<p>The post-call artifact derives <code>DUPLICATE_AGENT_PLAYBACK</code> when two completed or overlapping playback spans have the same content fingerprint and satisfy a bounded gap policy.</p>
+<p>Output fields:</p>
+<pre><code class="language-json">{
+  &quot;code&quot;: &quot;DUPLICATE_AGENT_PLAYBACK&quot;,
+  &quot;first_playback_id&quot;: &quot;...&quot;,
+  &quot;duplicate_playback_id&quot;: &quot;...&quot;,
+  &quot;first_visit_id&quot;: &quot;menu#1&quot;,
+  &quot;duplicate_visit_id&quot;: &quot;menu#1&quot;,
+  &quot;gap_ms&quot;: 82,
+  &quot;source_pair&quot;: [&quot;static_asset&quot;, &quot;model_audio&quot;],
+  &quot;confidence&quot;: &quot;recorded&quot;
+}
+</code></pre>
+<p>Do not label two deliberately different prompts as duplicates solely because they occur in the same state.</p>
+<h2 id="replay-ux">Replay UX</h2>
+<p>The debugger has one shared recorded clock.</p>
+<ul>
+<li><code>Play</code> advances transcript bubbles, playback spans, waveform, slot writes, guard verdicts, and transitions together.</li>
+<li><code>Pause</code> freezes every lane at one timestamp.</li>
+<li>Clicking a playback span seeks to its exact <code>audio_started</code> event.</li>
+<li><code>Step</code> and <code>Reverse</code> move one canonical event, including playback lifecycle events.</li>
+<li><code>Rewind to duplicate</code> seeks to the first <code>audio_requested</code> or <code>audio_started</code> in a duplicate pair and highlights the second span below it.</li>
+<li>The inspector shows current state visit, entry/current/exit slots, audio source, content fingerprint, client acknowledgement, and the event which requested playback.</li>
+<li>Recorded, unavailable, and simulated evidence use distinct labels.</li>
+</ul>
+<h3 id="two-synchronized-cursors">Two synchronized cursors</h3>
+<p>The implementation must not confuse media time with executable state:</p>
+<ul>
+<li>The <strong>media cursor</strong> is a millisecond position on the retained call clock. It
+can seek to any audio sample or transcript segment.</li>
+<li>The <strong>event cursor</strong> is an index in the canonical debugger event stream. It
+advances only across recorded or simulated events.</li>
+</ul>
+<p>Each audio artifact declares <code>call_start_epoch</code>, <code>media_start_offset_ms</code>, sample
+rate, channel map, and duration. Every transcript segment and FSM event carries
+<code>clock_ms</code> on the same call clock. The UI derives the event cursor by binary
+searching the last event whose <code>clock_ms</code> is at or before the media cursor.
+Seeking, pausing, or rewinding therefore moves audio, transcript, state,
+variables, and evidence together without inventing sub-event state.</p>
+<p>The browser uses one playback controller for the retained audio rather than one
+independent player per state. <code>Play</code> advances the media cursor; animation-frame
+updates project the event cursor. <code>Step</code> and <code>Reverse</code> pause playback, select the
+next or previous event, and seek audio to that event's media offset. Audio is
+never synthesized during recorded replay.</p>
+<h2 id="simulation-boundary">Simulation Boundary</h2>
+<p>Playback replay is immutable. The operator may place the visual cursor at any
+timestamp, but deterministic execution can fork only from a restorable
+<strong>causal checkpoint</strong>. Version 1 checkpoints are:</p>
+<ol>
+<li>state-visit entry, before entry actions;</li>
+<li>immediately before a caller-input/DTMF selection;</li>
+<li>immediately before a tool invocation whose result has a fixture;</li>
+<li>immediately before an audio outcome (<code>completed</code>, <code>interrupted</code>, or
+<code>failed</code>) is consumed by the FSM.</li>
+</ol>
+<p>If the operator clicks <code>Fork</code> halfway through audio, the UI preserves that
+timestamp as the issue marker but restores execution from the nearest preceding
+checkpoint. It must display both <code>Issue at 42.180 s</code> and <code>Branch executes from menu#2 entry at 40.933 s</code>. Claiming arbitrary instruction-level restoration
+would require serializing the live model connection, transport buffers, audio
+decoder, pending callbacks, and Python stack, which this design does not do.</p>
+<h3 id="state-test-capsule">State test capsule</h3>
+<p>Every fork exports an immutable <code>riff.state_test_capsule/v1</code> containing:</p>
+<ul>
+<li>recorded session, engine revision, flow revision, state definition, and
+checkpoint identity;</li>
+<li>entry slots plus safe fingerprints, counters, retry state, and prior visit
+path required by guards;</li>
+<li>selected caller-input evidence and alternative Gemini/Whisper/DTMF sources;</li>
+<li>bounded conversation/model context needed by that state;</li>
+<li>recorded tool results converted to read-only fixtures;</li>
+<li>audio policy, prompt/template inputs, voice/TTS configuration, RNG seed, and
+virtual clock;</li>
+<li>recorded expected exit, slot delta, playback requests, and invariant
+findings for comparison.</li>
+</ul>
+<p>The capsule is the program input. The recorded timeline remains the oracle.
+Candidate execution runs in an isolated subprocess with network and
+side-effecting tools disabled.</p>
+<h3 id="supported-mutations">Supported mutations</h3>
+<p>“Change audio” is split into causal operations rather than editing waveform
+pixels and pretending the FSM changed:</p>
+<table>
+<thead>
+<tr>
+<th>Mutation</th>
+<th>Branch behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Slot value</td>
+<td>Apply an overlay at checkpoint entry, then re-run guards/state logic</td>
+</tr>
+<tr>
+<td>Caller answer</td>
+<td>Substitute a transcript fixture at the caller-input checkpoint</td>
+</tr>
+<tr>
+<td>Caller audio</td>
+<td>Attach a PCM fixture, re-run the selected STT engine, then feed its transcript result</td>
+</tr>
+<tr>
+<td>Transcript source</td>
+<td>Select recorded Gemini, Whisper, or DTMF evidence and re-run resolution</td>
+</tr>
+<tr>
+<td>Tool result</td>
+<td>Substitute a schema-valid read-only fixture before the tool-result event</td>
+</tr>
+<tr>
+<td>Playback outcome</td>
+<td>Inject completed, interrupted, failed, duplicated, or delayed lifecycle events</td>
+</tr>
+<tr>
+<td>Agent prompt/text</td>
+<td>Run candidate prompt/template resolution and produce simulated text/audio references</td>
+</tr>
+<tr>
+<td>TTS/voice</td>
+<td>Regenerate simulated agent audio under a pinned candidate voice configuration</td>
+</tr>
+</tbody>
+</table>
+<p>Changing agent output audio does not retroactively change the recorded call.
+It creates a purple simulated playback span. Newly generated audio is labelled
+<code>simulated</code>; it may be auditioned but never used as evidence of what the caller
+heard.</p>
+<h3 id="branch-continuation-levels">Branch continuation levels</h3>
+<ul>
+<li><strong>Level S1 — state outcome:</strong> re-run one state from its checkpoint through
+its exit. This is the first implementation target and is sufficient to test
+alternative caller answers, slot values, guards, and playback outcomes.</li>
+<li><strong>Level S2 — bounded path:</strong> continue across subsequent deterministic states
+using recorded tool fixtures until a side effect, missing fixture, model
+boundary, or explicit stop condition.</li>
+<li><strong>Level S3 — candidate conversation:</strong> run with a pinned model/TTS and virtual
+transport. This is a new simulation, not historical reproduction, and must
+display model, prompt, voice, and runtime revisions.</li>
+</ul>
+<p>Reverse before the fork checkpoint discards the branch and restores the
+byte-identical recorded projection. Editing a branch never changes Entry or
+Recorded Exit columns.</p>
+<h2 id="work-packets">Work Packets</h2>
+<h3 id="pb1-browser-playback-event-capture">PB1 — Browser Playback Event Capture</h3>
+<ul>
+<li>Locate every browser audio start/stop path.</li>
+<li>Assign a playback ID before dispatch and carry state/visit identity through client acknowledgement.</li>
+<li>Persist lifecycle events through the session ledger.</li>
+<li>Test static, model, interrupted, and failed playback.</li>
+</ul>
+<h3 id="pb2-honest-audio-finalization">PB2 — Honest Audio Finalization</h3>
+<ul>
+<li>Repair agent-played WAV capture or mark it unavailable with reason.</li>
+<li>Add manifest availability/channel-map validation.</li>
+<li>Test that an empty WAV cannot be reported as recorded audio.</li>
+</ul>
+<h3 id="pb3-artifact-and-detector">PB3 — Artifact and Detector</h3>
+<ul>
+<li>Hydrate playback events into state visits and the global timeline.</li>
+<li>Derive duplicate playback findings from fingerprints and span timing.</li>
+<li>Test same-visit static-plus-model duplicate, adjacent-visit replay, and non-duplicate distinct prompts.</li>
+</ul>
+<h3 id="pb4-time-travel-debugger-ui">PB4 — Time-Travel Debugger UI</h3>
+<ul>
+<li>Render playback spans and transcript bubbles in the chronological timeline.</li>
+<li>Add play/pause/scrub/step/reverse and rewind-to-duplicate.</li>
+<li>Test that a selected duplicate span maps to its exact state visit and command cursor hash.</li>
+</ul>
+<h3 id="pb4a-shared-clock-and-media-controller">PB4A — Shared Clock and Media Controller</h3>
+<ul>
+<li>Normalize audio, transcript, playback, and FSM timestamps onto <code>clock_ms</code>.</li>
+<li>Add one media controller with deterministic seek-to-event and
+event-from-media binary search.</li>
+<li>Prove play/pause/seek/reverse do not drift across transcript, waveform, and
+state projection.</li>
+</ul>
+<h3 id="pb4b-state-capsule-and-s1-fork">PB4B — State Capsule and S1 Fork</h3>
+<ul>
+<li>Export and validate <code>riff.state_test_capsule/v1</code> at supported checkpoints.</li>
+<li>Implement isolated slot, caller answer/source, tool fixture, and playback
+outcome overlays.</li>
+<li>Re-run one state to exit and compare exit edge, variable delta, playback
+requests, transcript selection, and findings to the recorded visit.</li>
+</ul>
+<h3 id="pb5-property-management-validation">PB5 — Property-Management Validation</h3>
+<ul>
+<li>Reproduce the reported browser symptom with call recording enabled.</li>
+<li>Confirm whether the duplicate is static+model, client replay, re-entry, or another mechanism.</li>
+<li>Only then change the responsible flow/client/runtime behavior and add a regression fixture.</li>
+</ul>
+<h2 id="acceptance-gates">Acceptance Gates</h2>
+<ol>
+<li>Every browser playback attempt has a durable lifecycle result or explicit capture gap.</li>
+<li>Agent WAV availability is truthful; empty headers are never successful recordings.</li>
+<li>A controlled duplicate produces <code>DUPLICATE_AGENT_PLAYBACK</code> with both source refs and visits.</li>
+<li>The replay UI can pause on each duplicate start and reverse to its request event.</li>
+<li>CLI, API, and UI identify the same duplicate pair and determinism hash.</li>
+<li>A property-management rerun either identifies the duplicate mechanism or explicitly states what evidence remains unavailable.</li>
+<li>Seeking any retained audio timestamp projects the same transcript/state
+event after page reload; step-forward then reverse restores the original
+determinism hash and audio position.</li>
+<li>Forking from a mid-audio issue marker visibly restores from the named prior
+checkpoint; it never claims to resume a live Python/model/audio stack.</li>
+<li>An S1 variable or caller-answer mutation can change the simulated exit while
+recorded Entry, Recorded Exit, audio, transcript, and events remain
+byte-identical.</li>
+<li>Simulated agent audio is playable but visually and structurally impossible
+to confuse with recorded caller-heard evidence.</li>
+</ol>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#problem">Problem</a></li><li class="toc-h2"><a href="#objective">Objective</a></li><li class="toc-h2"><a href="#current-reality">Current Reality</a></li><li class="toc-h2"><a href="#playback-ledger-contract">Playback Ledger Contract</a></li><li class="toc-h2"><a href="#audio-evidence-contract">Audio Evidence Contract</a></li><li class="toc-h2"><a href="#double-play-detector">Double-Play Detector</a></li><li class="toc-h2"><a href="#replay-ux">Replay UX</a></li><li class="toc-h3"><a href="#two-synchronized-cursors">Two synchronized cursors</a></li><li class="toc-h2"><a href="#simulation-boundary">Simulation Boundary</a></li><li class="toc-h3"><a href="#state-test-capsule">State test capsule</a></li><li class="toc-h3"><a href="#supported-mutations">Supported mutations</a></li><li class="toc-h3"><a href="#branch-continuation-levels">Branch continuation levels</a></li><li class="toc-h2"><a href="#work-packets">Work Packets</a></li><li class="toc-h3"><a href="#pb1-browser-playback-event-capture">PB1 — Browser Playback Event Capture</a></li><li class="toc-h3"><a href="#pb2-honest-audio-finalization">PB2 — Honest Audio Finalization</a></li><li class="toc-h3"><a href="#pb3-artifact-and-detector">PB3 — Artifact and Detector</a></li><li class="toc-h3"><a href="#pb4-time-travel-debugger-ui">PB4 — Time-Travel Debugger UI</a></li><li class="toc-h3"><a href="#pb4a-shared-clock-and-media-controller">PB4A — Shared Clock and Media Controller</a></li><li class="toc-h3"><a href="#pb4b-state-capsule-and-s1-fork">PB4B — State Capsule and S1 Fork</a></li><li class="toc-h3"><a href="#pb5-property-management-validation">PB5 — Property-Management Validation</a></li><li class="toc-h2"><a href="#acceptance-gates">Acceptance Gates</a></li></ul></aside>
+</div>
+</body>
+</html>

@@ -123,7 +123,7 @@ html { scroll-behavior: smooth; }
 <header class="doc-header">
 <a class="home" href="/choice-health.html">&larr; Choice Health</a>
 <span class="crumb">2026-07-10-state-program-debugger-implementation-plan.md</span>
-<a class="raw" href="/docs/design/2026-07-10-state-program-debugger-implementation-plan.md" title="View raw markdown source">raw .md</a>
+<a class="raw" href="/docs/docs/design/2026-07-10-state-program-debugger-implementation-plan.md" title="View raw markdown source">raw .md</a>
 </header>
 <div class="doc-layout with-toc">
 <main class="doc-container">
@@ -369,12 +369,17 @@ findings. See <code>FX-122</code>. Existing uninstrumented direct slot mutations
 detected by the boundary fingerprint gate rather than silently represented.</li>
 <li>WP4 completed: a pure, read-only cursor engine opens normalized artifacts and
 provides deterministic visit, variable, exit, evidence, audio-reference, and
-forward/reverse navigation projections. It is intentionally not yet wired to
-a CLI, HTTP route, browser, simulation, or audio playback.</li>
-<li>WP5 in progress: <code>scripts/state_program_debugger.py</code> can build a normalized
-artifact from a retained session and issue one JSON cursor command for an AI
-or shell client. The loopback HTTP API and its authorization tests remain
-pending; browser hydration is WP6.</li>
+forward/reverse navigation projections.</li>
+<li>WP5 delivered: <code>scripts/state_program_debugger.py</code> builds and commands
+retained artifacts; <code>/api/debug/state_program</code> exposes the same engine to
+loopback browser clients. Additional remote-token route tests remain
+hardening work, not a Mode 1 blocker.</li>
+<li>WP6 in progress: the hydrated browser renders state visits, transcript/event
+progression, entry/recorded-exit values, grouped findings, retained-WAV
+play/pause/scrub, deterministic event step/reverse, duplicate playback spans,
+and shareable issue markers. Canonical static-playback lifecycle is retained
+for browser and normal Telnyx playback. Streamed model-audio lifecycle,
+carrier recording/alignment, and S1 simulation remain outstanding.</li>
 </ul>
 <h2 id="wp0-redacted-boundary-fixture">WP0 - Redacted Boundary Fixture</h2>
 <p><strong>Goal:</strong> create the smallest durable fixture that reproduces the original
@@ -585,6 +590,14 @@ apparently canonical debugger entries.</p>
 <h2 id="wp7-state-capsule-and-candidate-simulation">WP7 - State Capsule and Candidate Simulation</h2>
 <p><strong>Goal:</strong> support safe counterfactual runs against an explicitly selected
 candidate engine and flow.</p>
+<p><strong>Status (2026-07-11):</strong> the call-time identity/snapshot prerequisite and
+<code>riff.state_test_capsule/v1</code> export are implemented. CLI and session-service/API
+exports are byte-identical for the same cursor, and the browser exposes the same
+export action. Capsules fail closed on mutable-flow provenance, redacted inputs,
+uncorrelated tool previews, unaddressed audio, missing mutable context, and
+unfrozen execution policies. Candidate simulation,
+historical execution, pattern runs, and browser fork controls remain NO-GO until
+the no-network/no-write runner and its security gates land.</p>
 <p><strong>Files:</strong> chosen only after a strong-model design check of WP0-WP6. Extend the
 pure engine rather than adding simulation to HTTP or JavaScript.</p>
 <p><strong>Required behavior:</strong></p>

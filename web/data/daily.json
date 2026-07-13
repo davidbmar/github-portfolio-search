@@ -1,17 +1,136 @@
 {
-  "generated_at": "2026-07-12T09:03:30.170227Z",
-  "count": 163,
+  "generated_at": "2026-07-13T10:24:00.180565Z",
+  "count": 165,
   "days": [
     {
-      "date": "2026-07-11",
-      "headline": "Deterministic Turn Engine with Fallback Routing and Priority Kanban",
-      "summary": "Implemented a deterministic-first turn engine that routes no-match scenarios to static menu retries without live model invocation, alongside a new standalone priority workbench. This architecture ensures predictable conversational flows by treating the live model as a backup tier rather than the primary driver.",
+      "date": "2026-07-13",
+      "headline": "Implementing Reuse-Aware Building with Intent Hooks and MCP Tools",
+      "summary": "The developer integrated a reuse-check system into the portfolio search tool, featuring intent hooks, provenance merging, and MCP exposure to prevent redundant work. Concurrently, minor UI and playback fixes were applied to the Riff project's static audio and channel linking.",
       "takeaways": [
-        "Implement flag-gated deterministic routing in state machines to handle no-match edges via static re-asks, reducing unnecessary LLM costs.",
-        "Adopt a 'deterministic-first' design pattern where live models serve only as a backup tier for ambiguous states, ensuring predictable user experiences.",
-        "Use compiler tags to enforce deterministic turn modes on menu hubs, allowing for declarative control over conversational flow logic."
+        "Implement a 'build-intent' hook that triggers a reuse check against existing assets before starting new development tasks.",
+        "Expose reuse verification logic via Model Context Protocol (MCP) tools to allow AI agents to query asset provenance directly.",
+        "Calibrate vector search minimum scores to match specific store scales (e.g., L2) to improve retrieval accuracy for reusable components."
       ],
-      "total_commits": 8,
+      "total_commits": 18,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 14,
+          "messages": [
+            "Merge branch 'feat/reuse-token-cuts'",
+            "perf(reuse): --tools reuse filter + compact results by default",
+            "Merge branch 'feat/reuse-ask-gate'",
+            "feat(reuse): ask-gate trigger — design doc written -> ask before searching",
+            "Merge branch 'feat/reuse-aware-building'",
+            "fix(reuse): calibrate min_score to the store L2 scale (0.5 -> 0.05)",
+            "docs(backlog): B-022 pre-existing narrate re-render-on-second-run failure",
+            "feat(reuse): surface reuse tools + constellation in llms.txt",
+            "feat(reuse): build-intent hook nudges the reuse check",
+            "feat(reuse): reuse-check skill + CLAUDE.md scan-before-build rule",
+            "feat(mcp): expose portfolio_reuse_check + portfolio_record_reuse",
+            "feat(reuse): reuse_check retrieval + provenance merge",
+            "feat(reuse): reuse ledger writer + building-input resolver",
+            "plan: reuse-aware building — implementation plan (6 tasks, TDD)"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 4,
+          "messages": [
+            "Make Phone L5 honor styled static audio (#21)",
+            "Make Space Channel link-only and seal static playback (#20)",
+            "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
+            "chore: publish Space Channel and debugger artifacts (FX-169)"
+          ]
+        }
+      ],
+      "commit_sig": "28b31cc3bca3c2ca"
+    },
+    {
+      "date": "2026-07-12",
+      "headline": "Reuse Ledgers, 3D Repo Maps, and Deterministic Voice Debugging",
+      "summary": "This update introduces a reuse-aware architecture with MCP integration and a 3D portfolio constellation, alongside major UI refinements for kanban workbenches. It also hardens voice agent reliability through deterministic STT fallbacks, counterfactual debugging simulations, and precise audio causality tracking.",
+      "takeaways": [
+        "Implement a 'reuse ledger' and MCP reuse-check to track component provenance and enforce reuse-aware building practices across repositories.",
+        "Visualize repository similarity graphs as interactive 3D star-maps to help developers navigate and discover related projects within a portfolio.",
+        "Apply deterministic choice-STT patterns using Whisper as primary and Gemini as backstop, with configurable timeouts to prevent silence-trim errors in voice flows.",
+        "Use counterfactual 'what-if' transition simulations and append-only mailbox protocols to debug agent state changes without affecting live production buses."
+      ],
+      "total_commits": 42,
+      "repos": [
+        {
+          "name": "github-portfolio-search",
+          "commits": 5,
+          "messages": [
+            "ADR-0001: reuse-aware building — MCP reuse-check + reuse ledger",
+            "Merge pull request #8 from davidbmar/feat/blog-ratchet-loop",
+            "Merge remote-tracking branch 'origin/main' into feat/blog-ratchet-loop",
+            "Add Portfolio Constellation — 3D star-map of the repo similarity graph",
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "prioity_foregrounds_kanban",
+          "commits": 6,
+          "messages": [
+            "Redesign layout as 3-panel workbench filling the viewport",
+            "Fix cache headers and clean up AI Infrastructure Leverage label remnants",
+            "Reframe AI Infra Leverage as AI Compounding — the autonomy ratchet",
+            "Add score breakdown and security severity badge to initiative detail panel",
+            "Refine security scoring to CRITICAL/HIGH/MEDIUM/LOW framework",
+            "Add 3-theme UI, 6 principles on 0-100 scale, and 24 SRE initiatives"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 31,
+          "messages": [
+            "docs(debugger): hand off reviewed AC-03 capture",
+            "feat(phone): retain Telnyx outbound playback truth (FX-168)",
+            "feat(browser): retain generated playback acknowledgements (FX-167)",
+            "docs(debugger): hand off reviewed AC-02 capture",
+            "fix(debugger): isolate AC-02 tracker failures (FX-166)",
+            "feat(debugger): retain provider output attempts (FX-166)",
+            "docs(debugger): record AC-01 correction review",
+            "fix(debugger): preserve bounded input causality (FX-165)",
+            "feat(debugger): AC-01 flag-gated model-request capture in live session",
+            "docs(agents): ratify append-only mailbox protocol",
+            "docs(debugger): hand AC-01 capture packet to Claude",
+            "feat(debugger): freeze generated audio evidence schema (FX-164)",
+            "docs(debugger): approve audio causality implementation plan",
+            "fix(docs): keep mobile TOC off document content (FX-163)",
+            "fix(FX): menu compiler auto-derives content-word aliases from option labels",
+            "feat(choice-stt): per-flow decision-mode override for independent rollback",
+            "feat(choice-stt): whisper-PRIMARY decision mode (Gemini as backstop)",
+            "feat(choice-stt): configurable Whisper timeout for a larger, more accurate model",
+            "fix(FX): stop the choice-STT silence-trim from collapsing a quiet caller to a sliver",
+            "fix(FX): feed the whisper choice-STT rescue on the PHONE path, not just the browser",
+            "feat(debugger): expose exact exits and slot history (FX-162)",
+            "fix(FX): deterministic confirm on the LIVE path — a plain yes no longer deadlocks a gate",
+            "fix(debugger): isolate what-if guard telemetry from the real bus (Codex review)",
+            "docs(debugger): codex coordination message + improvement backlog",
+            "feat(debugger): what-if transition simulation (counterfactual step)",
+            "feat(debugger): scripts/dbg.py — ergonomic driver + improvement backlog",
+            "fix(FX-161): timeline scored a played goodbye as dead air (audio.wav missed the tail)",
+            "fix(FX-160): state-aware silence — stop flagging the caller's turn as dead air",
+            "fix(FX-158): backfill menu_retry word_timings (companion karaoke)",
+            "fix(FX-159): scope menu_retry to a per-flow opt-in (deterministic_retry)",
+            "fix(FX-158): commit menu_retry prerendered audio + CI gate for static coverage"
+          ]
+        }
+      ],
+      "commit_sig": "37e5adb59b51a44e"
+    },
+    {
+      "date": "2026-07-11",
+      "headline": "Deterministic Turn Engine, Data Service Migration, and Audio Debugger",
+      "summary": "Implemented a deterministic-first turn engine with static fallbacks to eliminate dead air, while executing a multi-step data service migration using the strangler fig pattern. Enhanced developer tooling with a timeline debugger that tags audio silence and exports immutable state capsules for precise replay.",
+      "takeaways": [
+        "Implement a 'deterministic-first' voice flow compiler that routes no-match events to static menu retries instead of live models to prevent latency-induced dead air.",
+        "Execute database migrations using a flag-gated strangler pattern: start with dual-writes, proceed to idempotent backfills, and finish with read cut-overs to ensure zero-downtime consistency.",
+        "Build audio debugging tools that detect true silence and tag it visually in the timeline, allowing developers to export immutable state capsules for exact defect reproduction."
+      ],
+      "total_commits": 83,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -29,34 +148,124 @@
         },
         {
           "name": "riff",
-          "commits": 6,
+          "commits": 81,
           "messages": [
+            "fix(FX-157): shift-left the static-state dead air to policy + a forever-guard",
+            "fix(phone): stall recovery replays the static WAV instead of nudging the model",
+            "feat(debugger): detect true audio silence and tag it RED in the timeline",
             "build(mfclaw): regenerate flow with menu_retry + menu turn_mode=deterministic",
             "test(turn-engine): behavioral proof — no-match routes to menu_retry, no model injection",
             "feat(turn-engine): flag-gated deterministic no-match routes to menu_retry (no live model)",
             "feat(turn-engine): compiler emits menu_retry static re-ask + flag-gated no-match edge",
             "feat(turn-engine): compiler tags menu hubs turn_mode=deterministic (phase 1, declarative)",
-            "design(turn-engine): deterministic-first per-state brain; live model as backup tier"
+            "design(turn-engine): deterministic-first per-state brain; live model as backup tier",
+            "build(mfclaw): regenerate flow with menu_retry + menu turn_mode=deterministic",
+            "test(turn-engine): behavioral proof — no-match routes to menu_retry, no model injection",
+            "feat(turn-engine): flag-gated deterministic no-match routes to menu_retry (no live model)",
+            "feat(turn-engine): compiler emits menu_retry static re-ask + flag-gated no-match edge",
+            "feat(FX-156): export immutable state debugger capsules",
+            "feat(turn-engine): compiler tags menu hubs turn_mode=deterministic (phase 1, declarative)",
+            "design(turn-engine): deterministic-first per-state brain; live model as backup tier",
+            "feat(FX-155): edit and rerun priority principles",
+            "docs(backlog): B-031 — menu no-match re-ask is dead air when the live model stays silent",
+            "fix(FX-154): rank priority principles on release",
+            "docs(FX-149): record physical slider proof",
+            "fix(FX-149): keep priority weights above zero",
+            "docs(FX-148): record linked-slider proof",
+            "feat(FX-148): link priority sliders to 100 points",
+            "docs(backlog): B-030 — caller 'yes' heard before consent prompt finished (mfclaw)",
+            "feat(debugger): tag dead-air pauses red in the timeline",
+            "fix(FX-147): serve priority workbench",
+            "feat(FX-147): add product priority workbench",
+            "feat(debug): post-processor that labels call pauses/delays (red = dead air)",
+            "docs(migration): 4-step data-service runbook + step-4 readiness gate",
+            "fix(data-service): isolate tests to a *_test DB + add step-4 parity gate",
+            "feat(migration): step 3 — flag-gated recognition read cut-over to the consolidated DB",
+            "feat(migration): step 2 — idempotent backfill of profiles + call history into the consolidated DB",
+            "feat(FX-146): preview state overview on hover",
+            "feat(FX-145): prototype human-readable state overviews",
+            "feat(migration): step 1 — flag-gated dual-write of calls to the consolidated DB",
+            "fix(FX-146): log benign companion telemetry at INFO, not WARNING",
+            "test: complete the barge-in fixture — set _static_playback_id (FX-126 added the read)",
+            "test: generalize FX-144's 'never-spoken dynamic inform' gate to all routed flows",
+            "fix(FX-145): surface enforce-mode webhook auth misconfig at boot, not as dead air",
+            "test: complete FX-144 rollout — base-menu loop-back done states advance on response_emitted",
+            "loop(iter 68): fix 3 regressions the concurrent FX-144 (response_emitted) rollout left behind",
+            "feat(data-service): companion links (space-channel 'text link' + SMS verify) (loop iter 10)",
+            "feat(riff): flag-gated data-service seam (loop iter 9, Plan 5b)",
+            "feat(data-service): DataServiceClient — the RIFF-side strangler seam (loop iter 8, Plan 5)",
+            "feat(data-service): space-channel content ingestion (loop iter 7, Plan 4)",
+            "chore(data-service): deployable container — Dockerfile ordering + self-migrate on startup (loop iter 6 deploy)",
+            "feat(data-service): Replicant scheduled pull + on-demand cache-aside (loop iter 6, Plan 3 complete)",
+            "fix(FX-144): wait for ticket status speech",
+            "feat(data-service): service-request submit/list endpoints — Replicant tool facade backing (loop iter 5, Plan 3)",
+            "feat(data-service): Replicant write-through outbox + anti-corruption adapter (loop iter 4, Plan 3 core)",
+            "feat(data-service): calls, recordings & S3 pointers (loop iter 3, Plan 2)",
+            "feat(data-service): DB-backed foundation — schema, auth, account writes, recognize, RLS (loop iter 2)",
+            "fix(FX-143): strengthen playhead state border",
+            "feat(data-service): foundation scaffold + pure recognition/wall (loop iter 1)",
+            "fix(FX-143): emphasize playhead state program",
+            "docs: add RIFF data service foundation plan",
+            "chore(FX-141 FX-142): checkpoint debugger and current workspace",
+            "docs(design): backend spec — space-channel content ingestion from external URLs",
+            "docs(design): backend spec — Replicant partner sync + compatibility facade + advanced entities",
+            "fix(FX-140): reject Whisper speech over silence",
+            "docs(FX-139): record deployed alignment evidence",
+            "docs(design): fold operator decisions into backend data-service spec",
+            "fix(FX-139): align transcript bars to the audio clock",
+            "fix(FX-138): stabilize followed state evidence",
+            "fix(FX-138): organize replay into rolling evidence lanes",
+            "docs(design): RIFF backend data service — schema, two-layer identity, API, S3 pointers",
+            "fix(FX-137): surface replayable pause tuning candidates",
+            "fix(FX-136): compare repeated state visits causally",
+            "fix(FX-135): rev replay debugger asset",
+            "fix(FX-135): center the exact replay event",
+            "fix(FX-135): keep active replay evidence visible",
+            "fix(FX-135): keep replay context visible",
+            "fix(FX-134): remove cleared slots from debugger folds",
+            "docs: reconcile debugger implementation status",
+            "fix(FX-135): persist and replay debugger defect points",
+            "fix(FX-134): retain state boundary variable truth",
+            "fix(FX-133): support replay audio byte ranges",
+            "fix(FX-132): align debugger transcript evidence",
+            "docs: define truth-oriented debugger replay contract",
+            "docs(codex): consolidated state-program-debugger fix plan (audio playback + capture gaps)",
+            "fix(FX-131): block unsafe phone webhook restarts"
           ]
         }
       ],
-      "commit_sig": "54bf13482aa3507c"
+      "commit_sig": "fd6e310d5f95d74e"
     },
     {
       "date": "2026-07-10",
-      "headline": "Ship Recorded State Debugger with Browser, CLI, and Telemetry",
-      "summary": "Implemented a comprehensive state debugging suite featuring a browser UI, JSON CLI, and read-only session service to inspect agent execution history. The system persists telemetry evidence like emit delays and normalizes visit frames, enabling precise post-mortem analysis of complex call flows.",
+      "headline": "Build a State Debugger for AI Voice Agents with Replay and Telemetry",
+      "summary": "This update introduces a comprehensive state debugger featuring browser-based replay, JSON CLI tools, and precise telemetry for diagnosing AI voice agent failures. It resolves critical audio alignment issues and establishes strict documentation standards for dual-sided call evidence to ensure reproducible debugging.",
       "takeaways": [
-        "Build a read-only debugger session service to safely inspect historical agent states without risking side effects or data mutation.",
-        "Persist specific telemetry evidence, such as agent-emit-delay, to correlate performance metrics with state transitions during debugging.",
-        "Normalize visit frames and expose transition metadata to create a consistent data structure for both browser-based and CLI debugging tools."
+        "Implement a read-only state debugger service with a browser surface and JSON CLI to inspect agent transition metadata and visit frames without affecting live production data.",
+        "Align phone replay with the call clock and fail closed on unaligned audio to create deterministic, causal replay forks for accurate post-mortem analysis.",
+        "Persist agent-emit-delay evidence and stamp agent-first-audio at the source to attribute latency metrics correctly and identify performance bottlenecks in real-time turns.",
+        "Enforce dual-sided Telnyx replay evidence requirements in documentation to standardize how call captures are reviewed and shared across engineering teams."
       ],
-      "total_commits": 67,
+      "total_commits": 81,
       "repos": [
         {
           "name": "riff",
-          "commits": 67,
+          "commits": 81,
           "messages": [
+            "fix(FX-130): fail closed on unaligned call audio",
+            "fix(FX-128,FX-129): align phone replay with call clock",
+            "feat(FX-127): add debugger recent-call picker",
+            "feat(FX-126): replay recorded playback evidence",
+            "docs: close replay review requirements",
+            "docs: require dual-sided Telnyx replay evidence",
+            "docs: specify causal audio replay forks",
+            "docs: plan browser playback replay debugging",
+            "docs: plan unified call capture and replay",
+            "docs(codex): add debugger defect 6 — blind to within-state double-asks (agent-prompt events missing)",
+            "fix(telemetry): emit agent-first-audio at the stamp site + epoch-window attribution (FX-125b)",
+            "loop(iter 67): FX-125 — the rename guard banned a word, not a slot",
+            "loop(iter 66): FX-124 — the caller-scoping test was blocked by a deploy gate it predated",
+            "feat: render state debugger evidence frames",
             "docs: note — pushed 75 unpushed commits to main + git add -A footguns (2026-07-10)",
             "feat: serve recorded state debugger API",
             "feat(telemetry): persist agent-emit-delay evidence for the state program debugger (FX-125)",
@@ -127,7 +336,7 @@
           ]
         }
       ],
-      "commit_sig": "8a72293c80be34e9"
+      "commit_sig": "18461af08c024351"
     },
     {
       "date": "2026-07-09",
@@ -426,20 +635,21 @@
     {
       "date": "2026-07-07",
       "headline": "Build Flow Atlas Visualizer and One-Command Business Deployments",
-      "summary": "Developed a static Flow Atlas viewer for debugging complex voice interactions and implemented one-command business deployment with automated SMS deliverability gates. Enhanced session fact registries and compiler fixes to ensure robust state management and first-try green deployments for new verticals.",
+      "summary": "The developer shipped a comprehensive Flow Atlas tool for visualizing call logic trees and implemented a one-command deployment system that successfully launched new verticals. Additional work included hardening SMS deliverability gates, refining session fact registries, and publishing technical articles on ratchet loops.",
       "takeaways": [
-        "Implement a static Flow Atlas using BFS unrolling and hash routing to visualize voice interaction trees, detect unreachable nodes, and debug divergence without live traffic.",
-        "Adopt a one-command deployment pattern that integrates pre-flight SMS deliverability checks and identity gates to prevent broken builds and ensure regulatory compliance.",
-        "Use a declared session-fact registry with trust layers to manage state persistence, ensuring routes survive acknowledgments and consent resolves correctly from user profiles."
+        "Implement a Flow Atlas viewer using BFS unrolling and hash routing to visualize state machines, detect unreachable nodes, and debug transition ambiguities via a static tree interface.",
+        "Adopt a one-command deploy/teardown pattern with pre-flight gates (such as SMS DID verification) to ensure new business verticals launch with first-try green status.",
+        "Use a session-facts module with trust layers and consume-on-fire gates to manage identity eligibility and consent resolution across complex voice interaction flows."
       ],
-      "total_commits": 64,
+      "total_commits": 65,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 3,
+          "commits": 4,
           "messages": [
             "chore: regenerate L0 docs + daily digest [skip ci]",
             "Rename blog article URL: drop parens from filename",
+            "Publish \"Ratchet Loops\" blog article + downloadable skills",
             "Publish \"Ratchet Loops\" blog article + downloadable skills"
           ]
         },
@@ -511,7 +721,7 @@
           ]
         }
       ],
-      "commit_sig": "6bd54ecd021c700e"
+      "commit_sig": "77fff7c066625bb8"
     },
     {
       "date": "2026-07-06",
@@ -1225,22 +1435,22 @@
     },
     {
       "date": "2026-06-30",
-      "headline": "Riff Voice: DTMF Barge-in, Space Channel Menu, and Audio Leak Fixes",
-      "summary": "Implemented interactive voice features including DTMF barge-in and numbered menu routing for the Space Channel, while migrating to prerendered Umbriel British voices. Resolved critical audio slot leaks and established a static-audio cache identity system with comprehensive preflow architecture documentation.",
+      "headline": "Build DTMF Voice Menus with Barge-in and Static Audio Caching",
+      "summary": "Implemented a voice interface featuring numbered DTMF routing, caller barge-in capabilities, and a static audio cache keyed by style. The update also establishes a preflow architecture pattern and resolves dynamic WAV fallback issues to prevent resource leaks.",
       "takeaways": [
-        "Implement DTMF barge-in to allow callers to interrupt prerendered WAVs by speaking, improving interactive voice response latency.",
-        "Use style attributes as part of the static-audio cache identity to ensure consistent voice rendering across flow levels.",
-        "Adopt a fail-closed strategy for reading dynamic content bodies to prevent undeliverable routes in voice menus.",
-        "Reference the new Preflow Pattern architecture docs to structure capability hierarchies and manage live-audio threading."
+        "Implement DTMF barge-in to let users interrupt prerendered WAVs by speaking, improving interactive voice response latency.",
+        "Cache static audio using style identifiers as part of the cache key to optimize retrieval for different voice personas.",
+        "Adopt the Preflow Pattern architecture to manage subflows and pre-rendered content briefings before connecting live calls."
       ],
-      "total_commits": 25,
+      "total_commits": 26,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 3,
+          "commits": 4,
           "messages": [
             "chore: regenerate L0 docs + daily digest [skip ci]",
             "chore: regenerate L0 docs + daily digest [skip ci]",
+            "Deploy davidbmar.com: regenerate portfolio data + publish web/",
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
         },
@@ -1273,18 +1483,18 @@
           ]
         }
       ],
-      "commit_sig": "f71f95314f9a603d"
+      "commit_sig": "0e31a31418bf3496"
     },
     {
       "date": "2026-06-29",
-      "headline": "Stabilizing Riff Phone Timelines and Space Channel Audio Processing",
-      "summary": "This update focuses on stabilizing call timeline synchronization, improving audio pacing for Telnyx integrations, and refining the Space Channel phone processing architecture. It also includes critical fixes for booking title clobbering and CI evaluation reliability.",
+      "headline": "Stabilize Riff Phone Timelines and Fix Calendar Booking Bugs",
+      "summary": "This update stabilizes phone timeline publishing in Riff by aligning clocks, recording media jitter, and condensing signal matrices. It also resolves a calendar provider bug where empty titles incorrectly overwrote existing booking data.",
       "takeaways": [
-        "Implement absolute deadline pacing for VoIP media streams to prevent jitter and ensure synchronized audio playback.",
-        "Use pre-encoded and pre-rendered prompts to reduce latency and improve speech pacing in real-time phone interactions.",
-        "Apply deterministic mocking and waveform energy alignment to stabilize call timeline replay and debugging workflows."
+        "Implement clock alignment and media jitter recording to stabilize real-time audio timeline publishing.",
+        "Condense signal matrices to optimize call timeline data processing and reduce overhead.",
+        "Guard against empty-string inputs in booking systems to prevent accidental data clobbering."
       ],
-      "total_commits": 30,
+      "total_commits": 6,
       "repos": [
         {
           "name": "cal-provider",
@@ -1302,52 +1512,26 @@
         },
         {
           "name": "riff",
-          "commits": 28,
+          "commits": 4,
           "messages": [
             "Document Space Channel subflow architecture",
             "Condense call timeline signal matrix",
             "Align phone timeline clocks and record media jitter",
-            "Stabilize phone timeline publishing",
-            "Add post-call dream loop artifacts",
-            "Short-circuit static phone transitions",
-            "Publish call timeline after Space Channel calls",
-            "Refresh call timeline report",
-            "Show live caller audio level in phone observer",
-            "Improve phone processing tone",
-            "Add call waveform energy alignment",
-            "Improve call timeline replay UI",
-            "Add deterministic call timeline mock",
-            "Add Space Channel phone processing tone",
-            "Improve Space Channel phone speech pacing",
-            "Build Space Channel phone content refresh",
-            "Pre-encode Telnyx media before paced send",
-            "Add phone audio artifact analyzer",
-            "Capture Telnyx played agent audio",
-            "Pace Telnyx audio on absolute deadlines",
-            "Keep diagnostic static chain off Live boot",
-            "Add Space Channel audio path diagnostic",
-            "Suppress Space Channel live prompt audio",
-            "Disable Space Channel processing tone",
-            "Make Space Channel droid voice phone safe",
-            "Pre-render Space Channel phone prompts",
-            "Add Space Channel network ops flow",
-            "fix(austin_plumbing): blocked-days deadlock + make ci_eval gate reliable"
+            "Stabilize phone timeline publishing"
           ]
         }
       ],
-      "commit_sig": "5062a6b32e08e02f"
+      "commit_sig": "8a321542f05191cb"
     },
     {
       "date": "2026-06-28",
-      "headline": "Voice AI: Semantic WER Metrics, Synthetic Caller Harness, and Cal-Provider Fixes",
-      "summary": "This update introduces a semantic Word Error Rate metric to distinguish hallucinations from mishears, alongside a synthetic caller harness for end-to-end audio flow testing. It also resolves critical cal-provider tool scoping leaks and implements verified migration recipes for scheduling flows.",
+      "headline": "Stabilize Booking Titles and Pin Narrative Slugs Across Rebuilds",
+      "summary": "Fixed a state machine bug preventing blank slots from overwriting existing booking titles while enhancing the portfolio search tool to persist narrative slugs during cold rebuilds. These updates ensure data integrity in scheduling and maintain consistent content linking despite voice regeneration.",
       "takeaways": [
-        "Implement semantic WER by splitting errors into mishears, hallucinations, and drops to accurately bound empty-reference scores at 1.0 instead of infinity.",
-        "Reuse the event-driven synthetic caller harness (voice_case.py) to drive any voice flow to terminal state with audio, enabling deterministic confirm-gate simulation across all sessions.",
-        "Apply the verified B-302 migration recipe to swap scheduling flows safely, ensuring input_transcription.finished bits propagate correctly to prevent early-dispatch failures.",
-        "Scope provider tools strictly to declaring flows to prevent leakage (e.g., stopping schedule_event access in unrelated contexts) and verify booking targets by ID during boot checks."
+        "Implement FSM guards that check for existing values before applying blank updates to prevent accidental data loss in booking systems.",
+        "Pin content identifiers (like Learn slugs) during static site regeneration to preserve URL stability and SEO value across full rebuilds."
       ],
-      "total_commits": 78,
+      "total_commits": 4,
       "repos": [
         {
           "name": "cal-provider",
@@ -1364,100 +1548,20 @@
             "Merge pull request #7 from davidbmar/feat/narrate-render-and-link",
             "feat(narrate): pin Learn slugs across cold rebuilds + regen pages in new voice"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 74,
-          "messages": [
-            "feat(scheduling): offer-slot matcher fix + no-answer escape pattern (+ audit)",
-            "Add trades phone-to-web product concepts",
-            "feat(debug): audio↔FSM call review, recording guarantee, booking-flow generator gate",
-            "docs: record caller_truth resolution of the hallucination/Whisper confound in the playbook",
-            "feat(voice): persist caller_truth ground truth - resolves the hallucination/Whisper confound",
-            "feat(voice): mishear_breakdown - split errors into mis-hears/hallucinations/drops (part-3, TDD)",
-            "fix(wer): bound empty-reference WER to 1.0 (hallucination), not inf - keeps aggregates valid",
-            "docs: full-corpus semantic_wer confirmation - 117 sessions, sem~=raw, terse worst (B-321)",
-            "fix(linter): collect-state-no-reprompt false-positive on locked_choice states (shift-left accuracy)",
-            "docs(html): bring the cohesive doc current - measurement layer + B-302 resolution + skyline",
-            "feat(flows): skyline_apartments - EXECUTES the B-302 migration (apartment viewing on book_appointment_v1)",
-            "docs(B-302): VERIFIED migration recipe for path (c) - how to swap scheduling flows to book_appointment_v1",
-            "docs(B-321): word-level characterization - mis-hears are DROPPED words (VAD), not wrong words",
-            "feat(voice)+fix(docs): semantic_wer metric in the DB + CORRECT the 'WER is formatting' claim",
-            "feat(voice): voice_mishears.py - semantic mis-hear analyzer (part-3 word-level, TDD)",
-            "docs(B-302): BLOCKER - Gemini doesn't populate input_transcription.finished; early-dispatch fix blocked",
-            "feat(live): propagate input_transcription.finished bit (B-302 fix prerequisite, TDD)",
-            "docs(B-302): exact fix point - early-dispatch returns False on no_match -> muted turn -> late retry",
-            "docs(B-302): PROVEN mechanism via live capture - first-utterance no_match then retry (~9s)",
-            "feat(hygiene): verify_shipped_fixes.sh - manifest check that fixes are in HEAD, not just the worktree",
-            "fix(verify): restore B-318 fixes lost from HEAD during B-322 file-juggling",
-            "feat(voice): voice_scenarios.py - named scenario registry (part-1 scenarios as DATA)",
-            "docs(B-300): quantify via the barge-in scenario — graded latency cost, not a hard drop",
-            "test+docs(B-302): classification works (guard added); the live delay is dispatch-timing not the classifier",
-            "docs(B-302): deepest root cause — triage choice can't classify 'day AND time' cleanly",
-            "docs(B-302): refine — scheduling locked-choice is SLOW/flaky (~50s), not fully broken",
-            "docs(B-302): corpus quantifies it — top cause of scheduling_v1 flow failures (apartment 0/4)",
-            "docs: serene_mobile_massage live-validated — real cal-provider booking via the audio path",
-            "docs(html): bring voice-quality.html current — cal-provider, full fix ledger, open decisions",
-            "feat(flows): serene_mobile_massage — REAL cal-provider booking (sellable example, fixes fake-booker class)",
-            "docs(B-322): final — gate residual is eval-design (skeptical persona escalates verification flow)",
-            "docs(B-322): RESOLVED — property_trouble_ticket is correct (10.0); the 0.0 was eval infra",
-            "fix(ci_eval): clear telemetry export URLs during the gate eval (B-322 #2)",
-            "fix(eval): mock tutorial_send_verification_text so verify flows clear verification (B-322 #1)",
-            "docs: file B-322 — property_trouble_ticket scores correctness 0.0 in ci_eval (pre-existing)",
-            "fix(verify)+lint: bump property_trouble_ticket to 3 verification attempts + flag max_attempts:1 (B-318 #3)",
-            "fix(verify): reject non-digit 'yes' as a verification code without burning the attempt (B-318)",
-            "test(linter): baseline gate freezes the 3 known fake-bookers; NEW ones fail CI (step 5)",
-            "feat(linter): flag announce-booked-without-booking (shift-left, step 5)",
-            "docs(B-321): post-fix measurement — clarify raised terse 25%->44%; residual is the VAD layer",
-            "fix(voice_dream): backfill clarify_fired at end of run (upsert races turns.jsonl flush)",
-            "feat(voice): capture clarify_fired metric so the B-303/B-321 fix's impact is measurable",
-            "fix(live): clarify re-prompt on an unresolved confirm gate (B-303/B-321) instead of silence",
-            "test+docs(voice): prove confirm-gate logic is correct; root-cause B-303/B-321 to B-313 nudge suppression",
-            "feat(voice): voice_learnings.py (repeatable step-3 report) + file B-321 (terse-caller failure)",
-            "test(cal-provider): clear boot probe's availability call in _boot_adapter",
-            "test(cal-provider): update boot_check tests for the by-ID booking-target probe",
-            "fix(cal-provider): boot_check verifies the BOOKING TARGET by ID, not just list_calendars",
-            "docs(voice): document cal-provider tool-scoping fix + the sweet_things_bakery validation flow",
-            "feat(flows): sweet_things_bakery — new sellable flow validating all 3 session fixes (step 6)",
-            "fix(providers): scope cal-provider tools to flows that declare them (stops the schedule_event leak)",
-            "test(voice): document the provider-tool leak (pizza gets schedule_event) as a guard",
-            "fix(voice_case): converse waits for playback_end before replying (B-303 root cause = B-300)",
-            "docs(voice): document the audio-simulation system + file B-303 (await_confirmation stall)",
-            "fix(voice_case): send static_done so the harness can drive the 28 static-greeting flows",
-            "feat(voice): caller PERSONAS + timing variance + voice_dream.py (randomized fuzzer)",
-            "feat(voice): voice_sim_all.py — run converse sims across ALL flows -> quality.db + coverage",
-            "feat(voice_case): generic LLM-caller 'converse' mode — drives ANY flow to terminal with audio",
-            "fix(voice_case): trailing silence unblocks Tier-2 — real audio runs now complete end-to-end",
-            "test(voice): close the two biggest coverage gaps — direct-confirm pattern + ALL closes",
-            "docs(review): create voice-quality playbook methodology page and update markdown playbook",
-            "feat(flows): after_hours_answering — sellable example + B-319/B-320 regression fixture (part 6)",
-            "fix(live): suppress re-narration when caller speaks after a terminal close (B-320)",
-            "test(voice): guard the greeting-doesn't-auto-advance case (B-051) the B-319 fix preserved",
-            "test(voice): deterministic confirm-gate simulation across ALL flows (Tier 1) + file B-320",
-            "fix(live): advance read_back/confirm states on the agent's own emission (B-319)",
-            "docs: Voice-Quality Playbook — detect -> reproduce -> shift-left -> fix -> document",
-            "feat(test): voice_case.py — event-driven synthetic-caller harness for the live audio path",
-            "docs(backlog): B-319 — live read_back confirmation stall (response_emitted not fired on live turn_complete)",
-            "feat(record): timestamp-preserving audio + roadmap the verification 'yes' bug (B-318)",
-            "feat(review): wire AUDIO review into the nightly cycle (remote M1 Whisper + local fallback)",
-            "docs(review): create call-review methodology page and link from index",
-            "feat(review): schedule the two-layer call-review cycle at 01:30 + fold into quality.db + skill",
-            "fix(live): tune VAD so short answers ('yes') don't get a ~9s pause"
-          ]
         }
       ],
-      "commit_sig": "678a4d65cb02e93f"
+      "commit_sig": "aaf68f890db55ede"
     },
     {
       "date": "2026-06-27",
-      "headline": "Riff Stabilizes Call Recording and Fixes Agent Dispatch Oscillation",
-      "summary": "The Riff project resolved critical bugs in session recording logic and agent dispatch loops while implementing cascading record policies. Concurrently, the portfolio search tool updated its tutorial narrative and aligned Learn pages with a unified design system.",
+      "headline": "Redesign Learn Pages with Punchy Voice and Unified Design System",
+      "summary": "The Learn tutorial experience was overhauled to adopt a punchy, concrete narrative voice and align visually with the davidbmar.com design system. This update merges rendering improvements and documentation regeneration to ensure consistency across the portfolio search platform.",
       "takeaways": [
-        "Implement cascading audio record overrides (overall to state level) using normalized YAML boolean parsing to ensure PII blackout rules execute correctly.",
-        "Prevent agent dispatch oscillation by adding end-to-end reproduction guards and treating rate-limit errors (403/429) as transient failures to trigger failover.",
-        "Key audio recorders by session_id rather than global state to prevent finalized recordings from being clobbered during session resumption."
+        "Adopt a punchy, concrete tone in tutorial copy to improve user engagement and clarity.",
+        "Reuse the davidbmar.com design system components to maintain visual consistency across different application modules.",
+        "Automate documentation regeneration and daily digests via CI skips to keep project docs current without manual overhead."
       ],
-      "total_commits": 27,
+      "total_commits": 4,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1468,49 +1572,20 @@
             "Merge pull request #6 from davidbmar/feat/narrate-render-and-link",
             "feat(narrate): redesign Learn pages to match the davidbmar.com design system"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 23,
-          "messages": [
-            "feat(debug): compare_call_transcription — Whisper (caller truth) vs Gemini, on a timeline",
-            "fix(record): session resumption clobbered the finalized recording — key recorder by session_id",
-            "docs(record): iter2 status — YAML-bool fix + PII blackout shipped; feature built+tested",
-            "fix(record-policy): YAML parses on/off as booleans — normalize so record:off actually blacks out",
-            "feat(record): wire CallSessionRecorder into the live transport (per-state gated)",
-            "feat(record-policy): cascading call-audio record override (overall->flow->group->state)",
-            "chore(deps): bump undici 7.25.0 -> 7.28.0 in flow-editor (fixes 7 Dependabot alerts)",
-            "docs: document scaffold exclusion + require_question runtime recovery",
-            "docs(flow-eval): log the directed reproduce-first session (3 bugs + 1 follow-up)",
-            "fix(turn): suppress the spurious bare reprompt when the turn advanced past collection",
-            "fix(flow-eval): exclude single-turn scaffolds from the headline quality aggregate",
-            "fix(rules,turn): make require_question_unenforced reflect what the caller heard",
-            "test(ceo): end-to-end repro guards the dispatch oscillation fix",
-            "docs(flow-eval): iter10 — robotic-repetition has no clean lever; recommend pausing the loop",
-            "docs(flow-eval): iter9 — pet_store judged fix attempt reverted (regressed) + humanness-fix learnings",
-            "fix(pizza,coffee,coffee_split): accurate pickup/delivery close + held-out deli_counter",
-            "docs(flow-eval): iter7 convergence confirmed; slow loop to hourly",
-            "docs(flow-eval): iter6 inflection — no-judge track converged + API self-throttled",
-            "fix(ceo_command_center): stop dispatch_intent<->dispatch_send oscillation",
-            "docs(flow-eval): iter4 convergence checkpoint + ceo oscillation root cause",
-            "fix(eval): retry rate-limit 403/429 on agent AND persona calls + held-out flow",
-            "fix(apartment_viewing): force tool calls on tool-only steps + linter guard",
-            "fix(eval): treat rate-limit 403/429 as transient so failover engages"
-          ]
         }
       ],
-      "commit_sig": "244f0f49ef0f13c3"
+      "commit_sig": "312c2171e7ea2182"
     },
     {
       "date": "2026-06-26",
-      "headline": "Automated Portfolio Narration Pipeline with LLM Fact Extraction",
-      "summary": "This update introduces an end-to-end pipeline that scans merged GitHub PRs, extracts technical facts using Qwen3.7, and generates structured tutorial content. It features a resilient CLI tool with MiniLM-based theme retrieval, deterministic evidence selection, and automated publishing to a daily digest feed.",
+      "headline": "Build an Automated Portfolio Narrator with LLMs and MiniRM Retrieval",
+      "summary": "This update introduces a CLI tool that scans merged GitHub PRs, extracts technical facts using Qwen3.7, and generates structured learning tutorials. It employs MiniRM cosine retrieval for theme matching and maintains a resilient local state store to ensure deterministic, idempotent content generation.",
       "takeaways": [
-        "Implement a PR-grounded narration pipeline by scanning merged commits, extracting facts via LLM (e.g., Qwen3.7), and validating them into structured PRRecords for automated tutorial generation.",
-        "Use MiniLM cosine similarity to retrieve relevant themes for content classification, ensuring deterministic output through path tiebreakers and immutable slug ledgers.",
-        "Build resilient batch processing with loss-safe cursors, overlap windows for PR scanning, and retry logic to handle API failures during large-scale repository analysis."
+        "Implement a PR scanning pipeline using merged_at cursors and overlap windows to safely fetch files and metadata without duplication.",
+        "Use MiniRM cosine retrieval to map raw code changes to specific thematic categories before triggering LLM-based fact extraction.",
+        "Adopt a repo-local state store with content hashing and membership ledgers to guarantee idempotent tutorial generation and prevent re-processing."
       ],
-      "total_commits": 32,
+      "total_commits": 30,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1547,17 +1622,9 @@
             "docs: add portfolio-narrate implementation plan (13 TDD tasks, v1)",
             "docs: add portfolio-narrate design spec (PR-grounded applied tutorials)"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 2,
-          "messages": [
-            "fix(ci_eval): make the pre-push gate able to evaluate verification + complex flows",
-            "fix(property_trouble_ticket): remove cloned scheduling sub-flow, collapse double-confirm, consolidate to verified phone"
-          ]
         }
       ],
-      "commit_sig": "d5c25395a40da28e"
+      "commit_sig": "ae9ac8e507c66b12"
     },
     {
       "date": "2026-06-25",
@@ -1581,14 +1648,14 @@
     },
     {
       "date": "2026-06-24",
-      "headline": "Optimize CI Docs and Enhance Riff Flow Graph Interactivity",
-      "summary": "Added conditional documentation generation to streamline single-repo publishing workflows. Improved the Riff web interface by advancing flow-graph highlights during click-to-talk interactions and filtering generated artifacts.",
+      "headline": "Enable Single-Repo Documentation Publishing in CI",
+      "summary": "Added an 'only' input to the documentation generation workflow, allowing targeted publishing for individual repositories. This update streamlines the CI process by preventing unnecessary full-portfolio rebuilds during single-repo updates.",
       "takeaways": [
-        "Implement conditional 'only' inputs in CI pipelines to trigger documentation builds for specific repositories, reducing unnecessary compute.",
-        "Enhance voice interaction UIs by programmatically advancing visual flow-graph highlights on user input events for better feedback.",
-        "Configure build tools to ignore generated evaluation artifacts, keeping version control clean and focused on source code."
+        "Add an optional 'only' input parameter to your CI workflow to filter execution scope.",
+        "Use conditional logic in documentation generators to support single-repo publishing modes.",
+        "Reduce CI build times by isolating documentation regeneration to changed repositories."
       ],
-      "total_commits": 4,
+      "total_commits": 3,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1598,16 +1665,9 @@
             "chore: regenerate L0 docs + daily digest [skip ci]",
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 1,
-          "messages": [
-            "fix(web): advance flow-graph highlight on click-to-talk turns + ignore generated eval artifacts"
-          ]
         }
       ],
-      "commit_sig": "5c4196097d843c96"
+      "commit_sig": "12449600200d3cef"
     },
     {
       "date": "2026-06-23",

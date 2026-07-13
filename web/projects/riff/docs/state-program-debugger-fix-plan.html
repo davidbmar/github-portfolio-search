@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>State Program Debugger — consolidated fix plan for Codex · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-10-state-program-debugger-fix-plan.md</span>
+<a class="raw" href="/docs/docs/codex/2026-07-10-state-program-debugger-fix-plan.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>State Program Debugger — consolidated fix plan for Codex</h1>
+<p><strong>Date:</strong> 2026-07-10 · <strong>Author:</strong> Claude (diagnosis) → Codex (implementation)
+<strong>Supersedes/absorbs:</strong> <code>docs/codex/2026-07-10-state-program-debugger-defects.md</code> (defects 1-6).
+<strong>Purpose:</strong> one authoritative, evidence-backed list of everything wrong with the
+State Program Debugger and exactly how to fix it, so a caller/operator can open a
+real call and actually see + explain what happened (including &quot;the audio played,
+then said the same thing again&quot;).</p>
+<blockquote>
+<p><strong>Codex reconciliation after FX-126 through FX-130 and three new calls:</strong> this
+brief remains valuable historical evidence, but its two referenced calls
+predate the current capture path. Do not implement stale conclusions without
+the status table below. The canonical forward plan is
+<code>docs/design/2026-07-10-unified-call-capture-replay-plan.md</code>.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Brief item</th>
+<th>Current status</th>
+<th>Required action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1 raw auto-selection</td>
+<td>Superseded by FX-129/FX-130</td>
+<td>New calls have aligned <code>audio_replay.wav</code>. Legacy unaligned calls intentionally fail closed and require explicit raw audition; do <strong>not</strong> auto-select raw audio as synchronized replay.</td>
+</tr>
+<tr>
+<td>A2 HTTP Range</td>
+<td>Implemented by FX-133</td>
+<td>The page uses the artifact URL directly; <code>206</code>, valid/invalid ranges, and browser seeking are tested. HEAD support remains a general endpoint improvement, not a replay blocker.</td>
+</tr>
+<tr>
+<td>A3 local call-clock mapping</td>
+<td>Implemented for new local captures by FX-129</td>
+<td>Preserve <code>audio_replay.wav</code>; carrier-heard alignment remains separate work.</td>
+</tr>
+<tr>
+<td>B1 playback lifecycle</td>
+<td>Implemented for new browser/phone captures by FX-126/FX-128</td>
+<td>Current calls contain <code>audio_requested/started/completed/interrupted</code>; preserve and extend with outbound frame/clear telemetry rather than reimplementing the old event names.</td>
+</tr>
+<tr>
+<td>B2 Whisper outbound evidence</td>
+<td>Implemented by FX-132</td>
+<td>Aligned replay channels are transcribed independently, manifest-backed, automatically queued, and consumed by every debugger client. Energy-based uncertainty remains.</td>
+</tr>
+<tr>
+<td>C5 variable folds</td>
+<td>Partial by FX-134</td>
+<td>New boundaries carry self-verifying safe rows and name exact differing slots. Direct writer coverage still determines mutation-attribution completeness; old fingerprint-only calls remain incomplete.</td>
+</tr>
+<tr>
+<td>Durable issue markers</td>
+<td>Implemented point-marker slice by FX-135</td>
+<td>Browser/HTTP/CLI append the same versioned marker artifact. UI range selection and note editing remain.</td>
+</tr>
+</tbody>
+</table>
+<p>Fresh property session <code>v3:B-ly...</code> contains eight playback requests, aligned
+replay audio, real repeated outbound prompts, and a
+<code>DUPLICATE_AGENT_PLAYBACK</code> finding. It proves that the current highest-priority
+work is no longer &quot;make any audio play&quot;; it is canonical loading, HTTP Range,
+automatic aligned per-channel transcription, causal joining, and state-boundary
+integrity.</p>
+<p>All findings below were reproduced against live artifacts on 2026-07-10. Commands
+are copy-pasteable. Two real sessions are referenced throughout:</p>
+<ul>
+<li><strong>Phone (v3):</strong> <code>v3:I8q45QS7XuGypjVwlY-y7aVMdWMCawTQrrRXzmIpKQRsLiGbY7k4HA</code> — real
+Telnyx call, 133 s, full audio (<code>audio.wav</code> 11 MB, <code>audio_agent_played.wav</code> 6.1 MB).</li>
+<li><strong>Browser (vc):</strong> <code>vc-property_management-1783714682</code> — converse call, 247 events,
+agent channel empty by construction (browser plays agent audio client-side).</li>
+</ul>
+<hr />
+<h2 id="priority-a-audio-will-not-play-the-reported-blocker">Priority A — Audio will not play (the reported blocker)</h2>
+<h3 id="a1-the-page-refuses-to-auto-load-audio-unless-a-track-is-clock-aligned-none-ever-are">A1. The page refuses to auto-load audio unless a track is clock-<code>aligned</code>; none ever are</h3>
+<p><strong>Symptom:</strong> open <code>/state-program-debugger.html?session_id=&lt;v3…&gt;</code> → Play is disabled,
+&quot;No synchronized replay&quot; — for essentially every call.</p>
+<p><strong>Proven root cause:</strong> <code>state-program-debugger.js::populateAudioTracks</code> picks
+<code>preferred = aligned.find(...) || aligned[0] || null</code>, i.e. it only auto-selects a
+track whose <code>clock.status === &quot;aligned&quot;</code>. The artifact marks <strong>every</strong> track
+<code>&quot;unverified&quot;</code> because the sample-to-call-clock mapping (A3 / CP3A) is not
+implemented. So <code>preferred = null</code>, <code>activeAudioRef = null</code>, the <code>&lt;select&gt;</code> sits on
+the empty placeholder, and <code>loadRecordedAudio(null)</code> returns early with playback
+disabled.</p>
+<p>Reproduction:</p>
+<pre><code class="language-bash">SID='v3:I8q45QS7XuGypjVwlY-y7aVMdWMCawTQrrRXzmIpKQRsLiGbY7k4HA'
+curl -s &quot;http://127.0.0.1:8765/api/debug/state_program&quot; -H 'Content-Type: application/json' \
+  -d &quot;{\&quot;session_id\&quot;:\&quot;$SID\&quot;,\&quot;cursor\&quot;:null,\&quot;command\&quot;:{\&quot;action\&quot;:\&quot;inspect_timeline\&quot;}}&quot; \
+  | python3 -c &quot;import sys,json;[print(r['path'],r['clock']['status']) for r in json.load(sys.stdin)['timeline']['audio_refs']]&quot;
+# -&gt; all four tracks: &quot;unverified&quot;
+</code></pre>
+<p>The audio itself is fine — the raw endpoint serves it:</p>
+<pre><code class="language-bash">curl -s -o /dev/null -w &quot;%{http_code} %{content_type} %{size_download}\n&quot; \
+  &quot;http://127.0.0.1:8765/api/sessions/$(python3 -c 'import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1],safe=&quot;&quot;))' &quot;$SID&quot;)/audio_caller.wav&quot;
+# -&gt; 200 audio/wav 4283852
+</code></pre>
+<p><strong>Fix (minimal, unblocks now):</strong> in <code>populateAudioTracks</code>, fall back to a raw track
+for audition when nothing is aligned, and enable playback whenever any recorded
+track exists:</p>
+<pre><code class="language-js">const preferred = aligned.find(ref=&gt;ref.path===&quot;audio_replay.wav&quot;) || aligned[0]
+  || audioRefs.find(ref=&gt;ref.path===&quot;audio.wav&quot;) || audioRefs[0] || null;
+</code></pre>
+<p>Keep <code>renderTrackStatus()</code>'s honest &quot;Raw audition · Alignment unverified&quot; label — the
+point is playback works while the cursor sync is declared approximate, not that we
+pretend it's aligned.</p>
+<h3 id="a2-the-wav-endpoint-does-not-support-http-range-seeking-scrubbing-is-broken">A2. The WAV endpoint does not support HTTP Range → seeking/scrubbing is broken</h3>
+<p><strong>Proven:</strong> a <code>Range: bytes=0-1023</code> request returns <strong><code>200</code>, not <code>206</code></strong>, no
+<code>Accept-Ranges</code> header, full <code>Content-Length</code>.</p>
+<pre><code class="language-bash">curl -s -o /dev/null -w &quot;%{http_code}\n&quot; -H 'Range: bytes=0-1023' \
+  &quot;http://127.0.0.1:8765/api/sessions/&lt;esc-sid&gt;/audio_caller.wav&quot;   # -&gt; 200 (want 206)
+</code></pre>
+<p>Consequence: <code>&lt;audio&gt;</code> cannot seek without re-downloading the whole file; scrubbing
+the timeline ruler will be janky or non-functional on multi-MB phone WAVs.</p>
+<p><strong>Fix:</strong> add HTTP Range handling to the <code>/api/sessions/&lt;sid&gt;/&lt;file&gt;</code> artifact handler
+(<code>riff/web_server.py</code> ~line 2988): parse <code>Range</code>, return <code>206</code> + <code>Content-Range</code> +
+<code>Accept-Ranges: bytes</code> for the requested byte slice. Standard partial-content serving.</p>
+<h3 id="a3-no-sample-to-call-clock-mapping-the-reason-a1-exists-the-real-end-state">A3. No sample-to-call-clock mapping (the reason A1 exists) — the real end-state</h3>
+<p>Every track is <code>&quot;unverified&quot;</code> because nothing computes each WAV's media-zero offset
+relative to call answer. This is CP3A/C4 in the capture-replay plan. Until it lands,
+A1's raw-audition fallback is the honest interim. When it lands, tracks become
+<code>&quot;aligned&quot;</code> and the audio scrubs in lockstep with states/transcripts/playback spans.</p>
+<hr />
+<h2 id="priority-b-the-debugger-cannot-see-the-actual-bug-quot-played-then-repeated-quot">Priority B — The debugger cannot see the actual bug (&quot;played, then repeated&quot;)</h2>
+<h3 id="b1-no-playback-lifecycle-events-on-either-transport-playback-spans-duplicate-detection-are-dead">B1. No playback-lifecycle events on either transport → playback spans + duplicate detection are dead</h3>
+<p><strong>Proven:</strong> <code>inspect_timeline</code> returns <code>playback_spans: 0</code>. The ledger has
+<strong><code>audio_pushed: 0</code>, <code>audio_done: 0</code></strong> on both the phone call and the browser call.
+The page already has the machinery to render this (<code>playback-span</code>, <code>.duplicate</code>
+styling, <code>DUPLICATE_AGENT_PLAYBACK</code> finding, <code>_DUPLICATE_PLAYBACK_GAP_MS</code> in the
+builder) — but it is fed by events that are never emitted.</p>
+<pre><code class="language-bash">python3 -c &quot;import json,collections;c=collections.Counter(json.loads(l)['type'] for l in open('data/sessions/v3:I8q45QS7XuGypjVwlY-y7aVMdWMCawTQrrRXzmIpKQRsLiGbY7k4HA/bus_events.jsonl') if l.strip());print({k:c[k] for k in ('audio_pushed','audio_done','assistant_first_audio')})&quot;
+# -&gt; {'audio_pushed': 0, 'audio_done': 0, 'assistant_first_audio': 0}
+</code></pre>
+<p><strong>Fix (capture — Claude's lane, same as FX-125):</strong> emit and persist per-prompt
+playback events into <code>bus_events.jsonl</code> for <strong>both</strong> transports:
+<code>audio_requested</code> / <code>audio_started</code> / <code>audio_done</code>, each carrying <code>playback_id</code>,
+resolved prompt text hash, audio asset hash, and <code>visit</code>/<code>state_id</code> + <code>turn_index</code>.
+Then a double-play is literally <strong>two <code>audio_*</code> spans for the same asset, back-to-back,
+in one visit</strong> — and the existing <code>DUPLICATE_AGENT_PLAYBACK</code> finding fires. This is
+the single highest-value capture change; it makes both the double-play and the
+double-ask debuggable.</p>
+<h3 id="b2-interim-acoustic-path-phone-only-no-code-change">B2. Interim acoustic path (phone only, no code change)</h3>
+<p>The phone session already has real agent audio: <code>audio_agent_played.wav</code> (6.1 MB,
+the exact outbound codec PCM) and <code>audio_agent.wav</code> (5.5 MB, pre-codec). A double-play
+is therefore already <strong>acoustically present</strong> on the agent track for phone calls.
+Running Whisper on <code>audio_agent_played.wav</code> would transcribe the prompt twice and
+prove the re-narration today — independent of B1. (Browser calls can't do this: agent
+channel is empty, RMS 0.) Worth wiring as a fallback &quot;Heard/played&quot; evidence source
+for phone until B1 lands.</p>
+<h3 id="b3-scope-note-observability-fix">B3. Scope note — observability ≠ fix</h3>
+<p>B1/B2 make the double-play <strong>visible</strong>. The re-narration itself is a separate
+flow/runtime defect (the B-320 / static-plus-model double-voice / entry-line-replay
+class). Fixing the cause is a follow-up once capture proves which mechanism fires.</p>
+<hr />
+<h2 id="priority-c-earlier-defects-status-update">Priority C — Earlier defects (status update)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Defect</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>assistant_first_audio</code> emitted once per call</td>
+<td><strong>FIXED</strong> FX-125b (<code>63187623</code>) — emit at stamp site, once per turn</td>
+</tr>
+<tr>
+<td>2</td>
+<td>delay stamped with post-transition state → negative/unavailable</td>
+<td><strong>FIXED</strong> FX-125b — builder attributes by <code>[entry_epoch, exit_epoch]</code> window</td>
+</tr>
+<tr>
+<td>3</td>
+<td>command responses omit <code>completeness</code>/<code>findings</code></td>
+<td><strong>Appears addressed</strong> — <code>list_visits</code> now returns them (the page consumes <code>listed.findings</code>/<code>listed.completeness</code>); verify <code>inspect_*</code> too</td>
+</tr>
+<tr>
+<td>4</td>
+<td>hardcoded mockup page, announce-frame leak</td>
+<td><strong>Superseded</strong> by the hydrated <code>/state-program-debugger.html</code>; verify the live builder's correct attribution (caller/resolver → <code>menu</code>, not the announce frame) is preserved in the rendered timeline</td>
+</tr>
+<tr>
+<td>5</td>
+<td>variable-boundary <code>VARIABLE_*_FOLD_MISMATCH</code> on real calls</td>
+<td><strong>PARTIAL FX-134</strong> — new boundary rows preserve actual Entry/Exit values and name missing-ledger slots; remaining direct writers still need instrumentation</td>
+</tr>
+<tr>
+<td>6</td>
+<td>debugger blind to within-state double-asks</td>
+<td>= <strong>B1</strong> above (playback events)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="capture-matrix-what-each-transport-actually-retains-today">Capture matrix — what each transport actually retains today</h2>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Phone (<code>v3:</code> Telnyx)</th>
+<th>Browser (<code>vc-</code>/<code>voice-</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bus_events.jsonl</code> (states/guards/transitions)</td>
+<td>✅ (190 events)</td>
+<td>✅ since FX-125 (247 events); was 0/35 before</td>
+</tr>
+<tr>
+<td>Caller audio</td>
+<td>✅ <code>audio_caller.wav</code> 4.3 MB</td>
+<td>✅ (caller mic)</td>
+</tr>
+<tr>
+<td>Agent audio (pre-codec)</td>
+<td>✅ <code>audio_agent.wav</code> 5.5 MB</td>
+<td>❌ empty 44-byte header</td>
+</tr>
+<tr>
+<td>Agent audio (outbound wire)</td>
+<td>✅ <code>audio_agent_played.wav</code> 6.1 MB</td>
+<td>❌ played client-side, not captured</td>
+</tr>
+<tr>
+<td>Composite <code>audio.wav</code></td>
+<td>✅ 11 MB (caller L / pre-codec agent R)</td>
+<td>✅ but agent channel silent (RMS 0)</td>
+</tr>
+<tr>
+<td><code>audio_pushed</code>/<code>audio_done</code> playback events</td>
+<td>❌ 0</td>
+<td>❌ 0</td>
+</tr>
+<tr>
+<td><code>assistant_first_audio</code> timing</td>
+<td>❌ 0 (call predates FX-125)</td>
+<td>✅ 1 (old) → per-turn after FX-125b restart</td>
+</tr>
+<tr>
+<td><code>state_trace.jsonl</code></td>
+<td>check</td>
+<td>❌ not written for browser</td>
+</tr>
+<tr>
+<td>Clock-aligned tracks</td>
+<td>❌ all <code>unverified</code></td>
+<td>❌ all <code>unverified</code></td>
+</tr>
+</tbody>
+</table>
+<p>Takeaway: <strong>phone</strong> retains rich audio but no playback events; <strong>browser</strong> retains
+neither agent audio nor playback events. B1 (playback events) fixes both for the
+event-based path; A1/A2 fix playback of the audio that already exists.</p>
+<hr />
+<h2 id="recommended-order-for-codex">Recommended order for Codex</h2>
+<ol>
+<li><strong>A1</strong> (raw-audition fallback) + <strong>A2</strong> (Range support) — unblocks playback of the
+audio that already exists, today. Smallest, highest user-visible impact.</li>
+<li><strong>B1</strong> (playback-lifecycle events, both transports) — capture is Claude's lane;
+the render/<code>DUPLICATE_AGENT_PLAYBACK</code> wiring is Codex's. This makes the double-play
+and double-ask actually diagnosable.</li>
+<li><strong>C5</strong> (variable fold mismatch / CP4) and <strong>C3/C4</strong> verification.</li>
+<li><strong>A3</strong> (clock alignment / CP3A) — the real synchronized-replay end-state.</li>
+</ol>
+<h2 id="acceptance-checks-to-add">Acceptance checks to add</h2>
+<ul>
+<li>Opening any finalized call with a recorded track loads that track and enables Play
+(no aligned track required); status still declares alignment unverified.</li>
+<li>The artifact WAV endpoint answers <code>Range</code> with <code>206</code> + <code>Content-Range</code>.</li>
+<li>A call with two back-to-back agent playbacks of one asset yields ≥1 <code>playback_span</code>
+pair and a <code>DUPLICATE_AGENT_PLAYBACK</code> finding attributed to the owning visit.</li>
+<li>Phone <code>audio_agent_played.wav</code> is offered as a selectable, playable track.</li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#priority-a-audio-will-not-play-the-reported-blocker">Priority A — Audio will not play (the reported blocker)</a></li><li class="toc-h3"><a href="#a1-the-page-refuses-to-auto-load-audio-unless-a-track-is-clock-aligned-none-ever-are">A1. The page refuses to auto-load audio unless a track is clock-aligned; none ever are</a></li><li class="toc-h3"><a href="#a2-the-wav-endpoint-does-not-support-http-range-seeking-scrubbing-is-broken">A2. The WAV endpoint does not support HTTP Range → seeking/scrubbing is broken</a></li><li class="toc-h3"><a href="#a3-no-sample-to-call-clock-mapping-the-reason-a1-exists-the-real-end-state">A3. No sample-to-call-clock mapping (the reason A1 exists) — the real end-state</a></li><li class="toc-h2"><a href="#priority-b-the-debugger-cannot-see-the-actual-bug-quot-played-then-repeated-quot">Priority B — The debugger cannot see the actual bug (&amp;quot;played, then repeated&amp;quot;)</a></li><li class="toc-h3"><a href="#b1-no-playback-lifecycle-events-on-either-transport-playback-spans-duplicate-detection-are-dead">B1. No playback-lifecycle events on either transport → playback spans + duplicate detection are dead</a></li><li class="toc-h3"><a href="#b2-interim-acoustic-path-phone-only-no-code-change">B2. Interim acoustic path (phone only, no code change)</a></li><li class="toc-h3"><a href="#b3-scope-note-observability-fix">B3. Scope note — observability ≠ fix</a></li><li class="toc-h2"><a href="#priority-c-earlier-defects-status-update">Priority C — Earlier defects (status update)</a></li><li class="toc-h2"><a href="#capture-matrix-what-each-transport-actually-retains-today">Capture matrix — what each transport actually retains today</a></li><li class="toc-h2"><a href="#recommended-order-for-codex">Recommended order for Codex</a></li><li class="toc-h2"><a href="#acceptance-checks-to-add">Acceptance checks to add</a></li></ul></aside>
+</div>
+</body>
+</html>

@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unified Call Capture and Replay Plan · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-10-unified-call-capture-replay-plan.md</span>
+<a class="raw" href="/docs/docs/design/2026-07-10-unified-call-capture-replay-plan.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Unified Call Capture and Replay Plan</h1>
+<p><strong>Status:</strong> active implementation contract. Recorded navigation, local
+call-clock replay, automatic aligned per-channel transcription, shared HTTP/CLI
+artifact loading, state-boundary snapshots, durable annotations, causal
+late-turn ownership, and repeated-visit comparison are implemented. Full
+transport-neutral finalization, model/tool span joins, carrier recording, flow
+behavior fixes, and isolated branch simulation remain NO-GO.
+<strong>Goal:</strong> every browser and phone call can be replayed end-to-end in the State Program Debugger: what the caller said, what the agent generated and emitted, what audio was recorded, what the FSM decided, and why a state repeated.</p>
+<p><strong>2026-07-10 checkpoint:</strong> FX-126 through FX-130 implement retained playback
+lifecycle hydration, recent-session discovery, selectable raw tracks, an
+explicit call-clock replay track for new local captures, and calibrated
+Play/Step/Reverse browser tests. Legacy tracks without a retained clock mapping
+remain typed <code>unverified</code>. Three fresh phone calls now prove that the raw
+evidence is sufficient to diagnose real repetition, while also proving that the
+the former transcript hydrator and CLI loader could not present that evidence
+on one trustworthy timeline. FX-132 through FX-136 now close those replay-side
+gaps: the canonical loader, aligned role-separated Whisper observations,
+durable problem markers, causal turn ownership, and semantic visit comparison
+all use the same debugger engine. The measurements and revised work packets
+below supersede earlier assumptions about which WAV is canonical.</p>
+<h2 id="implementation-checkpoint">Implementation Checkpoint</h2>
+<table>
+<thead>
+<tr>
+<th>Packet</th>
+<th>Current result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CP0</td>
+<td>Shared manifest-aware loader is used by HTTP and CLI; explicit legacy import exists. Full domain checksums/builder version remain open.</td>
+</tr>
+<tr>
+<td>CP1</td>
+<td>Browser and phone retain the evidence used here, but one idempotent transport-neutral finalizer and outbound frame ledger remain open.</td>
+</tr>
+<tr>
+<td>CP2</td>
+<td>Implemented: <code>audio_replay.wav</code> is split by role, Whisper runs asynchronously, and manifest-backed rows retain source/channel/model/clock provenance.</td>
+</tr>
+<tr>
+<td>CP3</td>
+<td>Bounds and channel separation are implemented; complete disagreement grouping and energy adjudication remain open.</td>
+</tr>
+<tr>
+<td>CP4</td>
+<td>One recorded cursor and strict visit frames are implemented. Late locked-choice, guardrail, transcription, and turn-complete events now retain causal and observed visits. Complete model/tool span links and barge-in decisions remain open.</td>
+</tr>
+<tr>
+<td>CP5</td>
+<td>Recorded Entry/Exit boundary rows self-verify; clears are removed from folds and exact differing slots are named. Unsupported writers remain typed gaps.</td>
+</tr>
+<tr>
+<td>CP6</td>
+<td>Implemented: synchronized browser replay, append-only problem markers, <code>compare_visits</code>, and <code>rewind_to_first_divergence</code> are shared by UI/API/CLI.</td>
+</tr>
+<tr>
+<td>CP7-CP9</td>
+<td>Property/LAW behavior fixes, isolated state capsules, and authorized carrier capture remain open.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="outcome">Outcome</h2>
+<p>A completed call produces one retained session directory and one manifest-backed evidence bundle. The debugger opens the bundle without guessing. It can follow the call downward through distinct state visits, play available recorded audio, compare Gemini and Whisper transcripts, and identify the transition that caused a repeated visit.</p>
+<p>This is a diagnostic contract, not a promise that every channel is always available. Missing evidence must be explicit, typed, and visible.</p>
+<h2 id="empirical-wav-and-transcript-study">Empirical WAV and Transcript Study</h2>
+<h3 id="question-and-method">Question and method</h3>
+<p>The recorder currently retains three legacy agent-bearing perspectives:</p>
+<ol>
+<li><code>audio.wav</code>: legacy stereo composite, caller on the left and generated agent
+audio on the right;</li>
+<li><code>audio_agent.wav</code>: generated/pre-codec agent audio;</li>
+<li><code>audio_agent_played.wav</code>: PCM reconstructed from the outbound Telnyx codec
+payload.</li>
+</ol>
+<p>The study transcribed all three with
+<code>mlx-community/whisper-small.en-mlx</code>. It also transcribed
+<code>audio_caller.wav</code> and <code>audio_replay.wav</code>, then split <code>audio_replay.wav</code> into
+left and right mono channels and transcribed those separately. The replay split
+is required as an alignment control because the replay manifest is the only
+one that declares <code>sample_zero_call_ms: 0</code> on the session call clock.</p>
+<p>The sample comprises three finalized calls from 2026-07-10:</p>
+<table>
+<thead>
+<tr>
+<th>Short ID</th>
+<th>Flow and caller goal</th>
+<th style="text-align:right">Manifest duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v3:W0bj...</code></td>
+<td>LAW, start a new claim</td>
+<td style="text-align:right">119.773 s</td>
+</tr>
+<tr>
+<td><code>v3:SsLr...</code></td>
+<td>LAW, existing case/status</td>
+<td style="text-align:right">61.359 s</td>
+</tr>
+<tr>
+<td><code>v3:B-ly...</code></td>
+<td>Property management, read dishwasher status</td>
+<td style="text-align:right">206.507 s</td>
+</tr>
+</tbody>
+</table>
+<p>Whisper text is an observation, not truth. The comparison therefore used four
+signals: WAV duration, PCM/channel identity, 20 ms speech-energy alignment, and
+normalized phrase/three-word coverage. A phrase is treated as genuinely sent
+only when it appears on the outbound played/replay channel or is supported by a
+playback lifecycle event. Downmixed Whisper output alone cannot prove a repeat.</p>
+<h3 id="duration-and-clock-results">Duration and clock results</h3>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th style="text-align:right"><code>audio_replay.wav</code></th>
+<th style="text-align:right"><code>audio.wav</code> / <code>audio_agent.wav</code></th>
+<th style="text-align:right">Difference from call</th>
+<th style="text-align:right"><code>audio_agent_played.wav</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LAW new claim</td>
+<td style="text-align:right">119.773 s</td>
+<td style="text-align:right">143.338 s</td>
+<td style="text-align:right">+23.565 s</td>
+<td style="text-align:right">118.681 s</td>
+</tr>
+<tr>
+<td>LAW status</td>
+<td style="text-align:right">61.359 s</td>
+<td style="text-align:right">65.629 s</td>
+<td style="text-align:right">+4.270 s</td>
+<td style="text-align:right">61.114 s</td>
+</tr>
+<tr>
+<td>Property status</td>
+<td style="text-align:right">206.507 s</td>
+<td style="text-align:right">255.227 s</td>
+<td style="text-align:right">+48.720 s</td>
+<td style="text-align:right">206.513 s</td>
+</tr>
+</tbody>
+</table>
+<p><code>audio.wav</code> is not independent evidence: its left channel is a byte-exact copy
+of <code>audio_caller.wav</code> and its right channel is a byte-exact copy of
+<code>audio_agent.wav</code>, padded to the longer raw track. It inherits both raw clock
+problems. In the property call it is 23.6% longer than the call, so no event,
+state, or transcript timestamp may be aligned against it.</p>
+<p>By contrast, <code>audio_agent_played.wav</code> and the right channel of
+<code>audio_replay.wav</code> agreed on speech/non-speech activity in 99.7% to 100.0% of
+20 ms windows across the three calls. Sample bytes are not globally identical
+because the raw writer concatenates timestamped chunks while the replay writer
+places them on a fixed buffer with per-chunk rounding and clipping. The activity
+agreement and matching content establish the replay right channel as the
+call-clock view of RIFF's outbound audio.</p>
+<p>The study also exposed missing derivation evidence. After the LAW new-claim
+menu barge-in, the raw played file and replay-right channel retain equivalent
+speech activity but are not sample-identical because queue clear and absolute
+timeline rendering handle overlapping chunks differently. RIFF retains no
+per-frame outbound ledger explaining send/reservation time, playback ID, clear
+generation, collision, overwrite, or clipping. The replay manifest currently
+says only <code>aligned</code>; it does not retain measured drift, collision counts,
+clipped samples, or confidence. Those derivation facts are required before the
+debugger can explain why two locally reconstructed waveforms differ.</p>
+<h3 id="transcript-and-repetition-results">Transcript and repetition results</h3>
+<p><strong>LAW new claim (<code>v3:W0bj...</code>).</strong> <code>audio_agent.wav</code> contains the complete menu,
+including options 3, 4, and leave-a-message. The outbound played track stops
+after option 2 because the caller barged in. The generated track is therefore a
+content superset, but it includes speech the caller was not sent. Its later
+summary begins near raw-media 116.1 s while the played version begins near
+call-clock 90.0 s, a 26.1 s divergence. Whole-mix Whisper reported <code>Goodbye</code>
+twice, while the played mono channel and replay-right mono channel contain it
+once. That is an ASR/mix false duplicate, not an audible repeat.</p>
+<p><strong>LAW existing status (<code>v3:SsLr...</code>).</strong> Generated and played agent transcripts
+had 100% mutual normalized three-word coverage. There was no material
+generated-versus-sent omission in this short call. The aligned replay adds the
+caller's interruptions and makes their overlap with the menu visible. The
+caller said <code>Status</code> around call-clock 30.5 s while the full menu was playing,
+but the ledger contains no <code>audio_interrupted</code> event. The caller repeated the
+choice after the menu and then routed successfully. The evidence needs a
+<code>barge_in_candidate</code> decision lane so a rejected or suppressed interruption is
+as explainable as an accepted one.</p>
+<p><strong>Property status (<code>v3:B-ly...</code>).</strong> The generated clock diverges progressively:
+the first dishwasher action prompt starts at generated-media 88.6 s versus
+played call-clock 72.2 s; a later full menu starts at 202.6 s versus 156.2 s.
+The same repeated phrases occur on generated, played, and replay-right audio:</p>
+<table>
+<thead>
+<tr>
+<th>Repeated outbound phrase/group</th>
+<th style="text-align:right">Count on played/replay evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dishwasher action question</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td>Full property menu, including the initial menu</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td><code>What else can I help with?</code> recovery family</td>
+<td style="text-align:right">4</td>
+</tr>
+</tbody>
+</table>
+<p>The repetition is therefore real outbound behavior, not merely transcript
+duplication. Playback lifecycle evidence independently reports two matching
+static prompts requested 445 ms apart near the end. The caller made roughly six
+status attempts; the durable live transcript recognized only two as <code>status</code>
+and rendered others as unrelated phrases. Recognition failures amplified the
+loop, but they did not create the repeated outbound audio.</p>
+<p>The raw caller Whisper passes also produced long repeated hallucinations such
+as one word repeated over silence, and one segment with an end before its
+start. Phrase blacklists are insufficient. Transcript acceptance must be
+energy-backed, time-bounded, source-labelled, and disagreement-preserving.
+Both LAW manifests also have null <code>flow_git_sha</code> and null model versions, so an
+otherwise complete transcript still cannot reproduce the exact flow/model
+combination that produced it.</p>
+<h3 id="superset-decision">Superset decision</h3>
+<p>There is no single truth-superset WAV:</p>
+<table>
+<thead>
+<tr>
+<th>Debugging question</th>
+<th>Canonical evidence</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What did RIFF generate or intend?</td>
+<td><code>audio_agent.wav</code>, labelled raw/generated and clock-unverified</td>
+<td>Contains generated content, including audio later interrupted or suppressed</td>
+</tr>
+<tr>
+<td>What outbound audio did RIFF submit?</td>
+<td>right channel of aligned <code>audio_replay.wav</code>; raw audit in <code>audio_agent_played.wav</code></td>
+<td>Post-codec content on the session call clock</td>
+</tr>
+<tr>
+<td>What caller audio did RIFF receive?</td>
+<td>left channel of aligned <code>audio_replay.wav</code></td>
+<td>Inbound media placed on the same call clock</td>
+</tr>
+<tr>
+<td>What is the best synchronized local conversation?</td>
+<td><code>audio_replay.wav</code>, transcribed per channel and merged by timestamps</td>
+<td>Only retained local stereo artifact with an explicit sample-to-call mapping</td>
+</tr>
+<tr>
+<td>What did the handset actually play?</td>
+<td>Telnyx dual-channel carrier recording</td>
+<td>Independent carrier evidence; not yet enabled</td>
+</tr>
+</tbody>
+</table>
+<p><code>audio_agent.wav</code> is the generated-content superset. <code>audio_replay.wav</code> is the
+synchronized evidence superset. <code>audio.wav</code> is neither: it packages caller and
+generated content but does so on incompatible raw clocks. The implementation
+must preserve all perspectives, default playback and timed transcription to
+<code>audio_replay.wav</code>, and never transcribe the stereo mix as one speaker stream.</p>
+<h2 id="implementation-status-and-remaining-defects">Implementation Status and Remaining Defects</h2>
+<p>This table is the execution source of truth. Later work packets retain the full
+contract, but agents must not redo completed items or infer that a partial item
+is trustworthy beyond its stated boundary.</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status on 2026-07-10</th>
+<th>Remaining work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Canonical CLI/HTTP loader</td>
+<td><strong>Complete (FX-132)</strong></td>
+<td>Add domain-level checksums and artifact revision; no new client-specific loader.</td>
+</tr>
+<tr>
+<td>Aligned per-channel Whisper</td>
+<td><strong>Complete locally (FX-132)</strong></td>
+<td>Automatic next-call proof is pending; energy coverage and uncertain/rejected rows remain CP3.</td>
+</tr>
+<tr>
+<td>HTTP media seeking</td>
+<td><strong>Complete (FX-133)</strong></td>
+<td>Browser uses the artifact URL directly so native Range requests drive seeking.</td>
+</tr>
+<tr>
+<td>Playback lifecycle and duplicate finding</td>
+<td><strong>Complete for current captures</strong></td>
+<td>Add outbound frame, queue-clear, collision, overwrite, and clip evidence.</td>
+</tr>
+<tr>
+<td>Transcript state ownership</td>
+<td><strong>Partial</strong></td>
+<td>Clock-overlap attribution exists; capture-state/decision-state and selected-input evidence remain.</td>
+</tr>
+<tr>
+<td>State boundary variables</td>
+<td><strong>Partial (FX-134)</strong></td>
+<td>New boundaries retain self-verifying safe rows and name differing unledgered slots. Instrument or centrally observe the remaining direct mutations; old fingerprint-only calls stay incomplete.</td>
+</tr>
+<tr>
+<td>Cursor-following UI</td>
+<td><strong>Partial (FX-135)</strong></td>
+<td>Audio, transcript, state strip, step/reverse, and duplicate replay follow one cursor; model/tool/guard lanes and first-divergence comparison remain.</td>
+</tr>
+<tr>
+<td>Durable problem markers</td>
+<td><strong>Complete point-marker slice (FX-135)</strong></td>
+<td>Browser, HTTP, and CLI share append-only revisions and hashes. Add note/category editing and explicit range selection in the UI.</td>
+</tr>
+<tr>
+<td>Causal LLM/tool timeline</td>
+<td><strong>Open</strong></td>
+<td>Join prompt, generation, suppression, first-token/audio, tools, guards, and transitions.</td>
+</tr>
+<tr>
+<td>Safe branch simulation</td>
+<td><strong>Open</strong></td>
+<td>Implement immutable state capsules, overlays, alternate input/audio, and isolated forward comparison.</td>
+</tr>
+<tr>
+<td>Carrier-heard evidence</td>
+<td><strong>Human GO required</strong></td>
+<td>Local replay proves sent/queued audio only.</td>
+</tr>
+<tr>
+<td>Barge-in decision evidence</td>
+<td><strong>Open</strong></td>
+<td>Capture candidate, threshold, accepted/rejected/suppressed reason, and queue-clear generation.</td>
+</tr>
+<tr>
+<td>Reproducibility revisions</td>
+<td><strong>Open</strong></td>
+<td>Freeze flow, engine, prompt, and model revisions; current study manifests contain nulls.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="required-evidence-contract">Required Evidence Contract</h2>
+<p>Every finalized call, regardless of browser or Telnyx transport, retains:</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Required artifact</th>
+<th>Meaning when unavailable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Call identity</td>
+<td><code>session_manifest.json</code></td>
+<td>call cannot be opened</td>
+</tr>
+<tr>
+<td>FSM ledger</td>
+<td><code>bus_events.jsonl</code></td>
+<td><code>EVENT_LEDGER_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>State trace</td>
+<td><code>state_trace.jsonl</code> or ledger equivalent</td>
+<td><code>STATE_TRACE_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>Caller audio</td>
+<td><code>audio_caller.wav</code>, when transport supplies it</td>
+<td><code>CALLER_AUDIO_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>Agent emitted audio</td>
+<td><code>audio_agent.wav</code> or <code>audio_agent_played.wav</code>, when capture is possible</td>
+<td><code>AGENT_AUDIO_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>Composite recording</td>
+<td><code>audio.wav</code>, with declared channel map</td>
+<td><code>COMPOSITE_AUDIO_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>Call-clock replay</td>
+<td><code>audio_replay.wav</code>, derived without altering raw tracks</td>
+<td><code>ALIGNED_REPLAY_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>Gemini transcript</td>
+<td>durable <code>transcript.jsonl</code> rows</td>
+<td><code>GEMINI_TRANSCRIPT_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>Whisper transcript</td>
+<td>durable <code>whisper_transcript.jsonl</code> rows or queued result</td>
+<td><code>WHISPER_TRANSCRIPT_UNAVAILABLE</code> / <code>WHISPER_PENDING</code></td>
+</tr>
+<tr>
+<td>Timing</td>
+<td>per-turn/state timing events including first agent emit</td>
+<td><code>AGENT_EMIT_DELAY_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>Telnyx carrier recording</td>
+<td>dual-channel WAV, both tracks, from answer</td>
+<td><code>TELNYX_CARRIER_RECORDING_UNAVAILABLE</code></td>
+</tr>
+<tr>
+<td>RIFF phone-wire reconstruction</td>
+<td>inbound caller plus exact outbound codec PCM</td>
+<td><code>RIFF_WIRE_RECORDING_UNAVAILABLE</code></td>
+</tr>
+</tbody>
+</table>
+<p>No raw secret, card, authentication code, or unnecessary caller PII may enter
+text, slot, event, or derived-debug artifacts. Transcript and slot retention use
+the existing redaction policy; safe fingerprints preserve change evidence where
+raw values cannot be retained. Spoken audio is inherently unredactable and is
+governed by the separate Audio Privacy and Retention Contract below.</p>
+<h2 id="cross-transport-playback-lifecycle">Cross-Transport Playback Lifecycle</h2>
+<p>Per-prompt playback evidence is required before the carrier-recording lift. Both
+browser and Telnyx paths emit the same lifecycle schema:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Required identity and evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>audio_requested</code></td>
+<td>session, visit, state, playback ID, source kind, safe content fingerprint, request epoch</td>
+</tr>
+<tr>
+<td><code>audio_started</code></td>
+<td>identifiers, actual start epoch, transport, client/wire acknowledgement source</td>
+</tr>
+<tr>
+<td><code>audio_completed</code></td>
+<td>identifiers, end epoch, played duration, completion reason</td>
+</tr>
+<tr>
+<td><code>audio_interrupted</code></td>
+<td>identifiers, epoch, elapsed duration, interruption reason</td>
+</tr>
+<tr>
+<td><code>audio_failed</code></td>
+<td>identifiers, epoch, typed failure and safe diagnostic</td>
+</tr>
+</tbody>
+</table>
+<p>The browser creates a playback ID before dispatch and posts client-side
+acknowledgements from the actual Web Audio/player start, stop, completion, and
+error boundaries. The server persists them; browser console logs are not
+evidence. Telnyx emits corresponding acknowledgements at outbound codec/send
+boundaries and retains carrier recording lifecycle separately.</p>
+<p>This lifecycle is the required cross-transport signal for detecting a double
+request or replay. Carrier audio is an independent phone-only confirmation that
+the duplicate was audible on the Telnyx call. A plan may pass browser duplicate
+detection without a carrier file, but it may not claim caller-heard phone audio
+without carrier confirmation.</p>
+<h2 id="audio-privacy-and-retention-contract">Audio Privacy and Retention Contract</h2>
+<p>Full caller and agent audio can contain names, addresses, health information,
+authentication codes, and other spoken PII that cannot be redacted reliably.
+Therefore:</p>
+<ul>
+<li>existing <code>record:off</code> policy must cascade to local tracks, browser capture,
+carrier recording, downloads, Whisper jobs, excerpts, and branch fixtures;</li>
+<li>carrier recording is disabled until a human-approved recording/consent policy
+and bounded retention value are configured for the deployment;</li>
+<li>audio and derived transcripts require authenticated, audited access and must
+not be exposed by a broadly accessible debugger route;</li>
+<li>the finalizer records retention class and <code>delete_after_utc</code>; an expiry job
+removes carrier downloads, local WAVs, derived Whisper output, and cached
+excerpts while retaining only policy-approved non-audio metadata;</li>
+<li>capacity monitoring must alert before the configured retention window can
+exhaust disk; indefinite local retention is not permitted;</li>
+<li>export or regression promotion uses the smallest redacted excerpt/fixture
+necessary and never silently copies the whole caller recording.</li>
+</ul>
+<p>The plan defines the engineering controls; enabling recording for real calls is
+a separate human <code>GO</code> and policy decision.</p>
+<p>These controls do not block implementation or testing with synthetic audio,
+redacted fixtures, or explicitly authorized local recordings. Privacy/retention
+hardening is a production enablement gate, not a prerequisite for building the
+playback lifecycle, debugger replay, detector, or simulation engine.</p>
+<h2 id="canonical-session-layout">Canonical Session Layout</h2>
+<pre><code class="language-text">data/sessions/&lt;session-id&gt;/
+  session_manifest.json
+  bus_events.jsonl
+  state_trace.jsonl
+  transcript.jsonl
+  whisper_transcript.jsonl
+  audio.wav
+  audio_replay.wav
+  audio_caller.wav
+  audio_agent.wav
+  audio_agent_played.wav
+  state_program_artifact.json
+  replay_index.json
+</code></pre>
+<p><code>session_manifest.json</code> lists each artifact, checksum, availability, producer, channel map, time base, and unavailability reason. <code>replay_index.json</code> is a convenience index only; the ledger and audio artifacts remain source evidence.</p>
+<h2 id="telnyx-two-sided-recording-contract">Telnyx Two-Sided Recording Contract</h2>
+<p>Phone replay requires two independent capture points:</p>
+<ol>
+<li><strong>Carrier truth:</strong> Telnyx records from answer with track <code>both</code>, channels
+<code>dual</code>, format <code>wav</code>, and no silence trimming. RIFF retains the recording ID,
+call-control/session IDs, start/stop/saved webhook epochs, checksum, channel
+count, sample rate, duration, and retrieval status. The downloaded carrier
+WAV is the default audible phone-call replay because it is independent of
+RIFF's local mixer.</li>
+<li><strong>RIFF wire reconstruction:</strong> RIFF retains inbound media after decoding and
+the exact outbound PCM reconstructed from the codec bytes immediately before
+<code>ws_send</code>. This produces <code>audio_telnyx_wire.wav</code>, with a declared caller and
+agent channel map, plus the two mono source files.</li>
+</ol>
+<p>The current recorder already has relevant inputs: <code>write_caller()</code> receives
+decoded inbound Telnyx audio and <code>write_agent_played()</code> receives PCM rebuilt
+from the exact outbound Telnyx payload. However, the existing composite
+<code>audio.wav</code> combines caller audio with <code>audio_agent.wav</code>, which is the agent
+source before the final phone codec path. Implementation must add the explicit
+wire composite rather than silently treating the existing composite as carrier
+truth.</p>
+<p>The manifest must preserve all three agent perspectives when available:</p>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>Question answered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>audio_agent.wav</code></td>
+<td>What agent/model audio did RIFF produce before the phone codec?</td>
+</tr>
+<tr>
+<td><code>audio_agent_played.wav</code></td>
+<td>What outbound codec PCM did RIFF submit to Telnyx?</td>
+</tr>
+<tr>
+<td>Telnyx dual-channel WAV</td>
+<td>What did the carrier recording contain on the two call legs?</td>
+</tr>
+</tbody>
+</table>
+<p>Telnyx documents dual recording as first leg on channel A and other legs on
+channel B; RIFF must not assume that means caller-left/agent-right. A canary
+fixture with non-overlapping caller and agent tones verifies the channel map,
+and the verified mapping is written into each manifest per direction:
+<code>inbound_channel</code>, <code>outbound_channel</code>, and <code>mapping_method</code>. A channel whose
+direction was not verified is labelled <code>unknown</code>, not guessed.</p>
+<h3 id="recording-lifecycle">Recording lifecycle</h3>
+<ul>
+<li>Start carrier recording as part of answer, not after the greeting begins.</li>
+<li>Use an idempotent command ID and retain every recording lifecycle webhook.</li>
+<li>Do not trim silence; preserving call-zero and gaps is required for alignment.</li>
+<li>Finalization remains <code>pending</code> until the recording-saved webhook and download
+complete, or until a bounded retry policy records a typed unavailable reason.</li>
+<li>Compare carrier duration and per-channel energy with RIFF's local wire tracks.
+Material drift, missing leading audio, empty channels, or duration mismatch
+creates a capture finding and blocks claims about what the caller heard.</li>
+</ul>
+<h3 id="one-replay-clock">One replay clock</h3>
+<p>The carrier WAV, local wire WAV, local replay WAV, transcript segments,
+playback lifecycle, and FSM events are normalized onto one <code>clock_ms</code> axis from
+call answer. Each audio artifact declares its media-zero offset and any measured
+alignment correction. A local <code>audio_replay.wav</code> may use retained caller media
+timestamps plus a serialized outbound-queue estimate, but its manifest must
+label that agent lane as sent/queued evidence rather than carrier-heard truth.
+The UI defaults to the carrier WAV while allowing an operator to switch to
+caller mono, RIFF outbound-wire mono, or pre-codec agent audio without moving
+the cursor. Play, pause, scrub, step, and reverse therefore keep both sides of
+the Telnyx call aligned with state and transcript evidence.</p>
+<p>The named alignment fiducial is the first outbound playback whose exact PCM is
+present in both RIFF's wire track and the carrier outbound channel. RIFF aligns
+those signals by bounded cross-correlation, then validates the inbound direction
+against the first caller-energy segment. If no outbound playback exists, it uses
+the first inbound media segment. The manifest records <code>alignment_method</code>,
+<code>offset_ms</code>, <code>confidence</code>, and measured drift; low-confidence alignment is
+<code>unavailable</code>, not a guessed offset.</p>
+<h2 id="one-finalization-pipeline">One Finalization Pipeline</h2>
+<p>Create a single <code>finalize_call_evidence()</code> contract used by browser and phone transports.</p>
+<ol>
+<li>Freeze the session ID, flow revision, engine revision, start/end epoch, and transport metadata.</li>
+<li>Flush the event bus and state trace for that session into its directory.</li>
+<li>Finalize recorder streams and record channel availability rather than creating misleading empty artifacts.</li>
+<li>For Telnyx calls, wait for and download the dual-channel carrier recording,
+or retain a typed pending/unavailable result after bounded retries.</li>
+<li>Persist Gemini caller and agent transcript events into <code>transcript.jsonl</code> with role, source, turn, state/visit when known, and timing.</li>
+<li>Run or enqueue Whisper for each available permitted audio channel. Store source, model, segments, timestamps, language, and unavailable/pending reason.</li>
+<li>Build <code>state_program_artifact.json</code> from the same frozen ledger.</li>
+<li>Write manifest checksums and a completeness summary.</li>
+<li>Run the capture-completeness gate before declaring finalization successful.</li>
+</ol>
+<p>Browser and Telnyx adapters may differ in what they can capture, but they must invoke this same finalizer and express gaps with the same schema. They must never silently omit a ledger or transcript.</p>
+<h2 id="debugger-replay-model">Debugger Replay Model</h2>
+<p>The State Program Debugger consumes only retained artifacts.</p>
+<ul>
+<li>The left state tree renders every visit, including <code>state#2</code>, with the entry source, exit reason, and repeat marker.</li>
+<li>The center timeline is ordered evidence: agent/caller transcript bubbles, emitted-audio events, slot writes, guard verdicts, and transition commits.</li>
+<li>Transcript is always visible in the timeline. Each bubble names its source
+(<code>Gemini</code>, <code>Whisper</code>, <code>selected</code>, or <code>DTMF</code>), role, turn, state visit, and
+timestamp; disagreements expand inline rather than replacing one source.</li>
+<li>Each selected state has immutable Entry and Exit snapshots, cursor-derived Current values, legal edges, winner/shadowed verdicts, and evidence lanes.</li>
+<li>Audio controls play only artifact-backed spans. They show unavailable or pending rather than synthesizing replacement speech.</li>
+<li>If no audio track has a proven sample-to-call mapping, the debugger selects
+no track and disables Play. An operator may explicitly audition raw tracks,
+but the UI labels their media position nominal and never presents their mix
+as the synchronized conversation.</li>
+<li>Regenerated or re-recorded candidate audio is always a simulated branch
+artifact. It is playable for comparison but can never replace, edit, or be
+presented as carrier/recorded evidence from the original call.</li>
+<li>Replay is a shared time cursor, not a list of unrelated controls: <code>Play</code>
+advances through timestamped transcript, audio, and FSM events; <code>Pause</code>
+freezes every lane; scrubbing seeks every lane together; <code>Step</code> and
+<code>Reverse</code> move one canonical recorded event; and <code>Rewind to divergence</code>
+seeks the earliest transcript/audio/transition mismatch for the selected
+repeated path. The timeline keeps past evidence visible above the cursor and
+future evidence below it, so an operator can stop precisely before or after
+the defect.</li>
+<li>The inspector shows Gemini, Whisper, selected input, and DTMF independently; disagreement is a first-class finding.</li>
+<li><code>agent_emit_delay_ms</code> is labelled server-side emit delay. Recorded agent audio/energy is separate evidence for caller-heard claims.</li>
+</ul>
+<h2 id="repeat-diagnosis">Repeat Diagnosis</h2>
+<p>A repeat is a property of visits, not state IDs. The debugger must show:</p>
+<ol>
+<li><code>menu#1 → cap_leave_message__collect#1 → menu_announce#2 → menu#2</code> as separate frames.</li>
+<li>The transition reason and guard/verdict for each edge.</li>
+<li>Caller/Gemini/Whisper observations before the return edge.</li>
+<li>A repeat summary: first visit, repeated visit, intervening state path, and earliest evidence divergence.</li>
+<li>A typed conclusion only when supported: caller retry, no-match/retry policy, timeout/no-input, tool failure, or <code>REPEAT_CAUSE_UNAVAILABLE</code>.</li>
+</ol>
+<p>The implemented comparison uses semantic projections rather than raw event
+objects. It compares entry context, boundary values, acted-on input,
+source-labelled caller observations, slot writes, playback, and exit decision;
+it ignores volatile visit/event/playback IDs, sequence numbers, and timestamps.
+Entry context remains repeat topology, not a claimed behavioral defect. The
+engine chooses the earliest candidate-side difference by recorded timeline
+position. If an unavailable required lane occurs earlier, it returns an
+<code>earliest_known_divergence</code> but withholds <code>first_divergence</code> and refuses to move
+the synchronized cursor.
+When telemetry for a turn arrives after synchronous transitions have re-entered
+the same state, the event carries both the causal visit and the visit active at
+observation time. Causal ownership wins; otherwise the debugger can fabricate a
+repeat by assigning the earlier input to the later occurrence.</p>
+<h2 id="work-packets">Work Packets</h2>
+<p>These packets are deliberately small enough for lower-capability implementation
+agents. A packet owns its listed files, lands its red test first, and ends with
+one focused commit. Agents must not combine an evidence-contract change with a
+caller-facing flow change. No packet requires a real OTA call unless its gate
+explicitly says <code>HUMAN GO</code>.</p>
+<h3 id="cp0-canonical-manifest-loader-and-cross-client-parity">CP0 — Canonical Manifest Loader and Cross-Client Parity</h3>
+<p><strong>Objective:</strong> browser, CLI, Codex, and Claude build byte-identical artifacts
+from one session bundle.</p>
+<p><strong>Primary files:</strong> new <code>riff/postcall/session_evidence.py</code>,
+<code>riff/state_program_debugger_service.py</code>, <code>scripts/state_program_debugger.py</code>,
+<code>tests/test_state_program_debugger_service.py</code>, and
+<code>tests/test_state_program_debugger_cli.py</code>.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Introduce <code>SessionEvidenceBundle.open(session_dir)</code> as the only canonical,
+manifest-mediated loader. It validates paths, checksums, artifact kinds,
+availability, channel maps, and clock maps.</li>
+<li>Move <code>_audio_refs()</code> into that loader. Stop canonical code from globbing
+WAVs and inventing bare <code>recorded</code> references.</li>
+<li>Make the CLI and HTTP service call the same loader and the same
+<code>build_state_program_artifact()</code> function. Put legacy filename fallback
+behind an explicit <code>import_legacy_session()</code> adapter.</li>
+<li>Add <code>artifact_revision</code>, builder version, and source checksums to the derived
+artifact. Redefine completeness by domains: manifest, ledger, state,
+variables, Gemini transcript, Whisper transcript, playback, audio, and
+clock.</li>
+</ol>
+<p><strong>Gate:</strong> a golden session produces byte-identical JSON, completeness domains,
+audio refs, and determinism hash through CLI, HTTP, and direct Python. The
+current case where CLI says <code>AUDIO_CLOCK_UNAVAILABLE</code> while HTTP says <code>aligned</code>
+must fail the red test and pass after the change.</p>
+<h3 id="cp1-one-transport-neutral-evidence-finalizer">CP1 — One Transport-Neutral Evidence Finalizer</h3>
+<p><strong>Objective:</strong> browser and phone sessions freeze the same complete evidence
+bundle, in the same order, without relying on teardown races.</p>
+<p><strong>Primary files:</strong> new <code>riff/postcall/finalize_call_evidence.py</code>,
+<code>riff/audio/session_recorder.py</code>, <code>riff/live/session.py</code>,
+<code>riff/phone/telnyx_transport.py</code>, and focused browser/phone finalization tests.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Implement idempotent <code>finalize_call_evidence()</code> with one session-scoped bus
+spool. Do not slice a global fixed-size event buffer at teardown.</li>
+<li>Stop and flush audio, freeze the ledger and trace, persist Gemini transcript
+rows, register typed absences, and then write the final manifest atomically.</li>
+<li>Enqueue Whisper after raw evidence is frozen. Record <code>pending</code>, <code>complete</code>,
+<code>failed</code>, or <code>unavailable</code>; a background result updates the manifest through
+an atomic revision and rebuilds the derived artifact.</li>
+<li>Mark empty WAV headers unavailable. Retain manifest <code>finalized: false</code> until
+all synchronous evidence is durable.</li>
+<li>Resolve and freeze flow revision, engine revision, transcript model versions,
+and audio producer versions at call start. A missing revision is a named
+completeness defect, not <code>null</code> with no explanation.</li>
+<li>Retain <code>agent_media_frames.jsonl</code> with playback ID, PCM fingerprint, source
+and reserved call times, actual send time, queue/clear generation, collision
+or overwrite result, and clipped sample count.</li>
+</ol>
+<p><strong>Gate:</strong> browser and phone fixtures produce the same layout and completeness
+schema; double finalization is byte-stable; a crash at each phase leaves a
+recoverable partial manifest rather than a falsely complete call.</p>
+<h3 id="cp2-automatic-aligned-per-channel-transcription">CP2 — Automatic Aligned Per-Channel Transcription</h3>
+<p><strong>Objective:</strong> every permitted finalized call receives a timed transcript on
+the call clock without an operator running a script.</p>
+<p><strong>Primary files:</strong> new <code>riff/postcall/transcript_hydration.py</code>, a thin
+<code>scripts/hydrate_transcript.py</code> wrapper, the finalizer, the manifest schema,
+and <code>tests/test_hydrate_transcript.py</code>.</p>
+<p><strong>Canonical transcript row:</strong> stable ID, role, source
+(<code>gemini</code>, <code>whisper</code>, <code>static_text</code>, <code>dtmf</code>, or <code>selected</code>), text or typed
+redaction, source artifact/channel, model, language, media start/end, call-clock
+start/end, clock status, confidence/no-speech evidence, turn index, state/visit
+attribution, and source references.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>For new local calls, split <code>audio_replay.wav</code> into caller-left and
+outbound-agent-right in process; do not downmix and do not require an
+external <code>ffmpeg</code> binary.</li>
+<li>Transcribe the channels independently, apply the retained clock map, and
+merge only after both roles have timestamps.</li>
+<li>Keep <code>audio_agent.wav</code> as a separate generated/intended observation. Its
+transcript may be useful for suppression comparison, but stays untimed when
+its clock is unverified.</li>
+<li>Persist <code>whisper_transcript.jsonl</code>, list it in the manifest with its model
+and source checksum, and make the artifact loader consume it.</li>
+<li>Preserve Gemini and Whisper rows side by side. Never overwrite one with the
+other and never treat Whisper as the selected FSM input unless the recorded
+resolver actually selected it.</li>
+</ol>
+<p><strong>Gate:</strong> a synthetic stereo fixture with non-overlapping phrases at known
+offsets yields correct roles and call times within 100 ms. A barge-in fixture
+proves generated menu options can exist without appearing on the played lane.
+No accepted transcript segment may extend beyond its source duration.</p>
+<h3 id="cp3-transcript-validation-and-disagreement-adjudication">CP3 — Transcript Validation and Disagreement Adjudication</h3>
+<p><strong>Objective:</strong> silence hallucinations and downmix artifacts are visible as
+rejected hypotheses, not promoted as spoken words or duplicate defects.</p>
+<p><strong>Primary files:</strong> <code>riff/postcall/transcript_hydration.py</code>,
+<code>riff/postcall/state_program_artifact.py</code>, and focused validation fixtures.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Reject invalid bounds (<code>start &lt; 0</code>, <code>end &lt;= start</code>, or beyond duration plus
+tolerance) and non-finite values.</li>
+<li>Require overlapping channel energy for accepted speech, retain
+<code>no_speech_prob</code> and model confidence, and classify low-evidence rows as
+<code>rejected_silence</code> or <code>uncertain</code> rather than deleting them silently.</li>
+<li>Group Gemini, Whisper, static text, DTMF, and selected-input observations by
+overlap. Emit word diff, source confidence, agreement status, and the source
+the FSM acted on.</li>
+<li>Detect repeated audio from playback IDs, content fingerprints, and outbound
+channel spans. Text-only repetition is corroboration, never sufficient
+proof.</li>
+</ol>
+<p><strong>Gate:</strong> the LAW whole-mix false <code>Goodbye. Goodbye.</code> does not create a repeat
+finding because the outbound mono/lifecycle contains one occurrence. The
+property action/menu repeats remain findings because they exist on
+played/replay evidence. Silence fixtures containing repeated hallucinated words
+do not enter the selected conversation.</p>
+<h3 id="cp4-one-causal-timeline-and-explicit-state-ownership">CP4 — One Causal Timeline and Explicit State Ownership</h3>
+<p><strong>Objective:</strong> audio, transcript, LLM, FSM, variables, and tools become one
+step-able event stream.</p>
+<p><strong>Primary files:</strong> <code>riff/postcall/state_program_artifact.py</code>, live-session
+telemetry emitters, <code>riff/state_program_debugger.py</code>, and artifact/engine tests.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Produce one <code>timeline_events</code> array ordered by
+<code>(clock_ms, causal_suborder, stable_event_id)</code>. Untimed evidence goes in an
+explicit untimed lane and never defaults to call zero.</li>
+<li>Persist capture-state ID, decision-state ID, turn, and visit when speech is
+received. Deterministic hydration may fill a missing visit by interval, but
+must retain that the attribution was derived.</li>
+<li>Join static playback fingerprints to immutable resolved text. Retain model
+request/instruction hash, output transcript, first token, first audio,
+suppression reason, playback lifecycle, tool start/result, guard verdict,
+slot writes, and transition commit as linked spans.</li>
+<li>Make conversation observations cursor events rather than a side list.</li>
+<li>Use recorded state entry/exit clocks for visit bands. Display visit ordinal
+(<code>menu#1</code>, <code>menu#2</code>) separately from total occurrence count.</li>
+<li>Add <code>barge_in_candidate</code>, <code>barge_in_accepted</code>, <code>barge_in_rejected</code>, and
+<code>barge_in_suppressed</code> events with energy, threshold, active playback ID,
+state/visit, decision reason, and queue-clear generation. Render outbound
+frame overwrite/clipping evidence on the same span.</li>
+</ol>
+<p><strong>Gate:</strong> stepping and reversing across a caller utterance selects the same
+audio sample, transcript group, owning visit, resolver verdict, slot write, and
+transition in browser, CLI, and direct API. A post-transition transcription
+cannot leak into the prior announce frame.</p>
+<h3 id="cp5-state-boundary-variable-integrity">CP5 — State Boundary Variable Integrity</h3>
+<p><strong>Objective:</strong> Entry, Current, and Exit variables are trustworthy enough to
+support mutation and regression promotion.</p>
+<p><strong>Primary files:</strong> slot/boundary emitters, <code>state_program_artifact.py</code>, and
+state-program artifact tests.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Reproduce each <code>VARIABLE_ENTRY_FOLD_MISMATCH</code> and
+<code>VARIABLE_EXIT_FOLD_MISMATCH</code> from the three study calls with a minimal
+fixture.</li>
+<li>Align snapshot and fold fingerprint schemes; capture every supported writer,
+including seeding, nested/dict mutation, tool writes, sets, and clears.</li>
+<li>If a mutation cannot be instrumented, emit a typed gap naming the writer and
+affected variables. Never label an unobserved variable <code>unchanged</code> or
+<code>ignored</code>.</li>
+</ol>
+<p><strong>Gate:</strong> fixtures and one browser/phone integration call have zero unexplained
+fold mismatches. Overlay editing changes only simulated Current/Exit values and
+never recorded Entry/Exit evidence.</p>
+<h3 id="cp6-synchronized-ui-and-durable-problem-markers">CP6 — Synchronized UI and Durable Problem Markers</h3>
+<p><strong>Objective:</strong> a human and an AI can open the same point, hear it, and inspect
+the same causal evidence without raw-log work.</p>
+<p><strong>Primary files:</strong> <code>web/state-program-debugger.html</code>,
+<code>web/state-program-debugger.js</code>, debugger HTTP routes, and Playwright tests.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Render fixed lanes for state visits, caller Gemini/Whisper observations,
+selected input/DTMF, agent resolved text, generated audio, played audio,
+model spans, tools, slots, guards, and transitions.</li>
+<li>Make Play/Pause/Scrub/Step/Reverse drive one cursor and auto-focus the active
+row. Raw audition remains visibly separate and cannot move an aligned cursor
+as if it were calibrated.</li>
+<li>Add append-only durable annotations with point/range, session and artifact
+revision, event/visit refs, category, note, author, status, timestamps, and
+evidence window. The share URL carries annotation ID.</li>
+<li>Add <code>rewind_to_first_divergence</code> and <code>compare_visits</code>; highlight the return
+edge and first changed input/variable/playback rather than merely coloring
+every repeated state.</li>
+</ol>
+<p><strong>Implemented checkpoint:</strong> the visit rail exposes ordinals and the immediately
+previous same-state occurrence. Selecting a repeat renders one compact
+comparison band, and the jump command moves the canonical cursor to the
+candidate-side event. Equal or unavailable evidence fails closed with typed
+errors and no cursor motion. <code>inspect_pause_gaps</code> is a deterministic companion
+projection that classifies caller wait, agent response delay, and back-to-back
+output with zero model calls; per-call model-token usage remains a typed capture
+gap until the live transport persists it.</p>
+<p><strong>Gate:</strong> an operator marks the property status defect, opens the marker through
+CLI/API, replays a bounded audio range, and sees the same state and evidence
+hash. Desktop and mobile Playwright screenshots show no overlap or clipped
+labels.</p>
+<h3 id="cp7a-first-behavior-regression-property-status-loop">CP7A — First Behavior Regression: Property Status Loop</h3>
+<p><strong>Objective:</strong> use the completed debugger to fix the observed call, then promote
+the evidence into a cold-rebuild regression.</p>
+<p><strong>Primary files:</strong> <code>riff/business_pack/compile.py</code>, locked-choice retry ownership
+in the FSM engine, <code>tests/business_pack/test_replicant_compile.py</code>, and a
+recorded/synthetic replay fixture. Do not hand-edit generated
+<code>flows/property_management.yaml</code> as the source fix.</p>
+<p><strong>Required defects to prove independently:</strong></p>
+<ol>
+<li><code>cap_existing_request__status</code> entered and exited in roughly 4 ms on
+<code>when: always</code>, with no playback lifecycle between them, so the status
+summary was skipped.</li>
+<li><code>__locked_choice_retry_cap_existing_request__choose_action</code> survived return
+to the capability and immediately satisfied <code>choice_retry_exhausted</code>.</li>
+<li><code>_replicant_selected_ticket_id</code> survived menu return, so later
+<code>select_ticket</code> visits auto-advanced without a new selection.</li>
+</ol>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Add a compiler/runtime gate: a caller-facing state with resolved speech may
+not take an immediate edge until an observable speech-completion boundary.
+For dynamic status text, generate an announce boundary whose success/failure
+edges both preserve explicit playback evidence.</li>
+<li>Make locked-choice retry counters state-visit scoped or clear them on every
+matched/exhausted exit.</li>
+<li>Clear selected-ticket ID/title/status and capability-local choice/action
+state when returning to the main menu.</li>
+<li>Recompile the property flow from the pack and run the cold-rebuild test.</li>
+</ol>
+<p><strong>Gate:</strong> one status request speaks the recorded status once, then offers the
+next operation once. Re-entering existing requests waits for a fresh ticket
+choice and a fresh action. The debugger reports no immediate retry-exhausted
+loop and no unexplained duplicate playback.</p>
+<h3 id="cp7b-second-behavior-regression-law-barge-in-and-case-status">CP7B — Second Behavior Regression: LAW Barge-In and Case Status</h3>
+<p><strong>Objective:</strong> prove why an early <code>Status</code> was ignored and prevent a capability
+question from being mistaken for a completed case-status message.</p>
+<p><strong>Evidence from <code>v3:SsLr...</code>:</strong> the caller says <code>Status</code> during the full menu,
+but no accepted interruption event exists; the repeated post-menu choice routes.
+After the caller asks whether cases can be listed, the agent states its
+limitation, repeats the office-message question, and immediately returns to the
+main menu.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Use CP4 barge-in decision telemetry to distinguish insufficient energy,
+disabled barge-in, echo rejection, and accepted interruption. Do not infer a
+reason from the absence of <code>audio_interrupted</code>.</li>
+<li>Separate case identifier, caller message/status question, and capability
+question in the LAW capability schema. A question such as <code>can you list them?</code> must not satisfy the message-complete guard by itself.</li>
+<li>After a limitation response, offer a concrete recovery (<code>tell me the case name/number</code>, <code>leave a message</code>, or <code>return to menu</code>) and wait for a new
+caller decision.</li>
+<li>Fix the source generator/compiler and run a cold rebuild; do not patch only
+the generated LAW YAML.</li>
+</ol>
+<p><strong>Gate:</strong> the first menu-time <code>Status</code> either interrupts and routes or appears
+as a rejected candidate with the exact reason. A case-list capability question
+does not auto-complete the collection or return to the menu without a caller
+choice.</p>
+<h3 id="cp8-immutable-state-capsule-and-branch-simulation">CP8 — Immutable State Capsule and Branch Simulation</h3>
+<p><strong>Objective:</strong> let Codex, Claude, and the UI change an input, variable, tool
+fixture, or candidate audio and replay forward without altering recorded truth.</p>
+<p><strong>Primary files:</strong> new capsule schema/runner, debugger engine/API, CLI, UI, and
+simulation tests. Existing <code>scripts/replay_branch.py</code> remains explicitly legacy
+until replaced.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Export <code>riff.state_test_capsule/v1</code>: exact state definition and legal edges,
+recorded engine/flow revisions, Entry snapshot, selected and alternate
+transcript observations, DTMF/control input, deterministic tool fixtures,
+audio outcome, and evidence refs.</li>
+<li>Run the capsule in a bounded subprocess with network disabled,
+side-effecting tools rejected, fixture-only reads, and explicit event/time
+budgets. Missing recorded code must fail; never fall back silently to HEAD.</li>
+<li>Implement <code>fork</code>, <code>set_overlay</code>, <code>set_input</code>, <code>set_audio_fixture</code>, <code>run</code>,
+<code>compare_branches</code>, and <code>promote_regression</code> over the same structured API
+used by browser and AI clients.</li>
+<li>Store simulated output separately with purple provenance, fork root,
+overlays, candidate revision, exit/variable/audio deltas, and invariant
+results. Recorded artifacts remain immutable.</li>
+</ol>
+<p><strong>Gate:</strong> mutate the property status state from the misheard input to <code>status</code>,
+run forward with a fixture ticket, hear candidate audio, compare recorded and
+candidate exits/variables, reverse to the fork, and export a deterministic test.
+UI, CLI, Codex, and Claude return the same branch hash.</p>
+<h3 id="cp9-carrier-heard-confirmation-human-go">CP9 — Carrier-Heard Confirmation (<code>HUMAN GO</code>)</h3>
+<p><strong>Objective:</strong> distinguish RIFF sent/queued evidence from what the phone carrier
+recorded on both legs.</p>
+<p><strong>Primary files:</strong> Telnyx recording lifecycle, finalizer/download worker,
+manifest channel/alignment schema, and synthetic/canary tests.</p>
+<p><strong>Steps:</strong> start dual-channel recording from answer, retain recording webhooks,
+download without silence trimming, verify direction with non-overlapping tones,
+align to the outbound PCM fiducial, and record offset, drift, confidence, and
+channel map. Low-confidence alignment remains unavailable.</p>
+<p><strong>Gate:</strong> caller-only, agent-only, overlap, barge-in, interrupted playback, and
+early hangup are audible on the expected carrier channels. Enabling this on a
+real line still requires explicit human authorization; all prior packets run on
+local or synthetic evidence.</p>
+<h3 id="handoff-contract-for-implementation-agents">Handoff Contract for Implementation Agents</h3>
+<p>Every assigned packet must include:</p>
+<ul>
+<li>the single packet ID and objective;</li>
+<li>exact allowed files and explicit files that are out of scope;</li>
+<li>the failing test to add first;</li>
+<li>fixture/session IDs and expected evidence codes;</li>
+<li>commands to run and the required pass criteria;</li>
+<li>whether a service restart, browser cache bust, or human GO is required;</li>
+<li>resulting commit, changed files, evidence artifact, and next dependency.</li>
+</ul>
+<p>Lower-cost models are appropriate for CP0 loader consolidation, schema fixtures,
+HTML rendering, and narrow UI/test packets. Use stronger models for CP1 teardown
+concurrency, CP3 transcript adjudication, CP7 FSM ownership, and CP8 sandboxed
+simulation. Parallel agents must use isolated worktrees and must not edit the
+same schema or generated flow concurrently.</p>
+<h2 id="acceptance-gates">Acceptance Gates</h2>
+<ol>
+<li>A finalized call cannot have audio without explicit ledger, transcript, and
+clock availability results.</li>
+<li>CLI, HTTP, browser, Codex, and Claude consume the same manifest-backed bundle
+and return the same artifact bytes and determinism hash.</li>
+<li><code>audio_replay.wav</code> duration equals manifest call duration within 20 ms; its
+channel map and clock provenance are retained. Raw tracks remain unverified
+unless separately calibrated.</li>
+<li>Automatic Whisper transcribes replay channels independently. No accepted row
+has invalid bounds, exceeds source duration, or lacks role, source, model,
+clock status, and evidence reference.</li>
+<li>Every speech-energy span longer than one second is covered by an accepted or
+uncertain transcript row, or by a typed reason. Silence hallucinations do not
+become selected conversation.</li>
+<li>Gemini, Whisper, static text, DTMF, and selected input remain distinct.
+Disagreement shows what the FSM actually used.</li>
+<li>Play, pause, seek, step, and reverse keep audio, transcript, state visit,
+variable projection, playback, model/tool span, guard, and transition on the
+same call-time cursor.</li>
+<li>Every state repeat renders as a distinct visit ordinal with the return edge,
+total occurrence count, and earliest causal divergence shown separately.</li>
+<li>Entry and Exit folds match recorded boundary snapshots, or name the exact
+uninstrumented writer and affected variables.</li>
+<li>Barge-in candidates record accepted/rejected/suppressed outcomes and queue
+clear generation. Replay derivation records collisions, overwrites, clips,
+drift, and confidence.</li>
+<li>A durable issue marker opened by browser, CLI, or AI resolves to the same
+bounded audio range, event/visit references, and artifact revision.</li>
+<li>A controlled double-play produces two matching lifecycle/audio spans with
+owning visits; a downmix-only duplicate transcript produces no false defect.</li>
+<li>The property status regression speaks status once, resets retry/selection
+state, and does not enter an immediate menu loop.</li>
+<li>The LAW status regression explains the early barge-in decision and does not
+auto-complete a capability question as an office message.</li>
+<li>A simulated branch is immutable, network-isolated, separately labelled,
+reproducible by hash, and cannot overwrite or masquerade as recorded audio
+or events.</li>
+<li>Every call freezes flow and model revisions or reports a typed reproducibility
+gap.</li>
+<li>Carrier-heard claims require the separately authorized Telnyx dual-channel
+artifact; local replay remains labelled sent/queued evidence.</li>
+</ol>
+<h2 id="rollout">Rollout</h2>
+<ol>
+<li>Land CP0 first. No additional UI or AI client may introduce another session
+loader while artifact parity is unresolved.</li>
+<li>Land CP1 and CP2 behind the retained-call feature flag. Run browser and phone
+fixtures; keep asynchronous Whisper failures typed and non-fatal.</li>
+<li>Land CP3 through CP5 and make domain completeness visible. Keep the gate
+warning-only for one release while collecting real gap counts.</li>
+<li>Land CP6, including durable markers, after the canonical timeline is stable.
+A human must replay the property repeat without consulting raw logs.</li>
+<li>Use that marker to implement CP7A and CP7B, cold-rebuild both generated
+flows, and promote the two calls into regression fixtures.</li>
+<li>Land CP8 only after recorded evidence gates pass. The Fork button remains
+disabled until capsule validation and isolation tests are green.</li>
+<li>Implement CP9 with synthetic/canary evidence, but do not enable real carrier
+recording without explicit <code>HUMAN GO</code>.</li>
+</ol>
+<p>This sequence makes the reported double-play observable and attributable. It
+does not itself fix the duplicate; behavior changes follow only after replay
+evidence identifies the responsible request, client playback, state transition,
+or model narration.</p>
+<h2 id="operator-validation">Operator Validation</h2>
+<p>After CP0, run one browser simulator call and one phone-path fixture. For each:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py build data/sessions/&lt;session-id&gt; --out /tmp/&lt;session-id&gt;.json
+.venv/bin/python scripts/state_program_debugger.py command /tmp/&lt;session-id&gt;.json --json '{&quot;action&quot;:&quot;list_visits&quot;}'
+</code></pre>
+<p>Open <code>/state-program-debugger.html</code>, enter the session ID, and verify the same visit list, completeness status, and repeat markers. A call without required evidence is a capture failure to fix before using it to judge flow behavior.</p>
+<p>To persist the exact defect point for browser, Codex, and Claude:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py session-command \
+  data/sessions/&lt;session-id&gt; \
+  --json '{&quot;action&quot;:&quot;record_issue&quot;,&quot;issue&quot;:{&quot;issue_id&quot;:&quot;issue:repeat-1&quot;,&quot;status&quot;:&quot;confirmed&quot;,&quot;time_ms&quot;:123400,&quot;event_id&quot;:&quot;bus:42&quot;,&quot;visit_id&quot;:&quot;menu#3&quot;,&quot;reporter&quot;:&quot;codex&quot;,&quot;category&quot;:&quot;duplicate_agent_playback&quot;,&quot;note&quot;:&quot;Same outbound prompt twice.&quot;}}'
+</code></pre>
+<p>This appends an annotation; it never rewrites recorded audio, events, or state.</p>
+<p>Then run automatic transcript hydration and verify that the browser timeline,
+<code>inspect_timeline</code>, and the CLI expose identical caller/agent transcript groups,
+audio refs, visit ownership, and artifact hash. The study session
+<code>v3:B-ly...</code> is the required negative/positive control: its real outbound
+repeats must remain visible, while raw-track timestamps past 206.507 s and
+downmix-only duplicate words must not enter the synchronized lane.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#implementation-checkpoint">Implementation Checkpoint</a></li><li class="toc-h2"><a href="#outcome">Outcome</a></li><li class="toc-h2"><a href="#empirical-wav-and-transcript-study">Empirical WAV and Transcript Study</a></li><li class="toc-h3"><a href="#question-and-method">Question and method</a></li><li class="toc-h3"><a href="#duration-and-clock-results">Duration and clock results</a></li><li class="toc-h3"><a href="#transcript-and-repetition-results">Transcript and repetition results</a></li><li class="toc-h3"><a href="#superset-decision">Superset decision</a></li><li class="toc-h2"><a href="#implementation-status-and-remaining-defects">Implementation Status and Remaining Defects</a></li><li class="toc-h2"><a href="#required-evidence-contract">Required Evidence Contract</a></li><li class="toc-h2"><a href="#cross-transport-playback-lifecycle">Cross-Transport Playback Lifecycle</a></li><li class="toc-h2"><a href="#audio-privacy-and-retention-contract">Audio Privacy and Retention Contract</a></li><li class="toc-h2"><a href="#canonical-session-layout">Canonical Session Layout</a></li><li class="toc-h2"><a href="#telnyx-two-sided-recording-contract">Telnyx Two-Sided Recording Contract</a></li><li class="toc-h3"><a href="#recording-lifecycle">Recording lifecycle</a></li><li class="toc-h3"><a href="#one-replay-clock">One replay clock</a></li><li class="toc-h2"><a href="#one-finalization-pipeline">One Finalization Pipeline</a></li><li class="toc-h2"><a href="#debugger-replay-model">Debugger Replay Model</a></li><li class="toc-h2"><a href="#repeat-diagnosis">Repeat Diagnosis</a></li><li class="toc-h2"><a href="#work-packets">Work Packets</a></li><li class="toc-h3"><a href="#cp0-canonical-manifest-loader-and-cross-client-parity">CP0 — Canonical Manifest Loader and Cross-Client Parity</a></li><li class="toc-h3"><a href="#cp1-one-transport-neutral-evidence-finalizer">CP1 — One Transport-Neutral Evidence Finalizer</a></li><li class="toc-h3"><a href="#cp2-automatic-aligned-per-channel-transcription">CP2 — Automatic Aligned Per-Channel Transcription</a></li><li class="toc-h3"><a href="#cp3-transcript-validation-and-disagreement-adjudication">CP3 — Transcript Validation and Disagreement Adjudication</a></li><li class="toc-h3"><a href="#cp4-one-causal-timeline-and-explicit-state-ownership">CP4 — One Causal Timeline and Explicit State Ownership</a></li><li class="toc-h3"><a href="#cp5-state-boundary-variable-integrity">CP5 — State Boundary Variable Integrity</a></li><li class="toc-h3"><a href="#cp6-synchronized-ui-and-durable-problem-markers">CP6 — Synchronized UI and Durable Problem Markers</a></li><li class="toc-h3"><a href="#cp7a-first-behavior-regression-property-status-loop">CP7A — First Behavior Regression: Property Status Loop</a></li><li class="toc-h3"><a href="#cp7b-second-behavior-regression-law-barge-in-and-case-status">CP7B — Second Behavior Regression: LAW Barge-In and Case Status</a></li><li class="toc-h3"><a href="#cp8-immutable-state-capsule-and-branch-simulation">CP8 — Immutable State Capsule and Branch Simulation</a></li><li class="toc-h3"><a href="#cp9-carrier-heard-confirmation-human-go">CP9 — Carrier-Heard Confirmation (HUMAN GO)</a></li><li class="toc-h3"><a href="#handoff-contract-for-implementation-agents">Handoff Contract for Implementation Agents</a></li><li class="toc-h2"><a href="#acceptance-gates">Acceptance Gates</a></li><li class="toc-h2"><a href="#rollout">Rollout</a></li><li class="toc-h2"><a href="#operator-validation">Operator Validation</a></li></ul></aside>
+</div>
+</body>
+</html>

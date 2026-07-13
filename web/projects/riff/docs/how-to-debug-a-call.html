@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How to debug a RIFF phone call (the full-everything trace) · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">how-to-debug-a-call.md</span>
+<a class="raw" href="/docs/docs/how-to-debug-a-call.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>How to debug a RIFF phone call (the full-everything trace)</h1>
+<p>Every newly recorded call leaves a <strong>unified trace</strong>: aligned caller and outbound
+audio, source-labeled transcripts, FSM state visits, slot writes, tool calls, and
+guard verdicts. The aligned artifacts share the session call clock. Raw audit
+tracks remain available but are explicitly not synchronized.</p>
+<p>Open <code>http://127.0.0.1:8765/state-program-debugger.html</code>, choose a recent call,
+and use Play, Pause, Step, or the scrubber. The cursor is shared by audio,
+conversation evidence, and state inspection. The same normalized artifact is
+available to Codex and Claude through <code>scripts/state_program_debugger.py</code>.</p>
+<blockquote>
+<p>Operator ruling: <strong>&quot;the transcription and audio are the source of truth.&quot;</strong> The
+FSM tells you what the machine did; the audio/transcript tell you what actually
+happened to the caller. Debug from both.</p>
+</blockquote>
+<h2 id="1-where-a-call-lives">1. Where a call lives</h2>
+<p>Each call is a directory under <code>data/sessions/&lt;session_id&gt;/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session_manifest.json</code></td>
+<td>start/end time, <code>duration_sec</code>, artifact list</td>
+</tr>
+<tr>
+<td><code>audio_replay.wav</code></td>
+<td>aligned replay: caller left, outbound queued/sent audio right</td>
+</tr>
+<tr>
+<td><code>audio.wav</code></td>
+<td>raw audit composite; its channels are not synchronized</td>
+</tr>
+<tr>
+<td><code>audio_caller.wav</code> / <code>audio_agent.wav</code></td>
+<td>raw per-channel evidence; not a shared clock</td>
+</tr>
+<tr>
+<td><code>audio_agent_played.wav</code></td>
+<td>outbound post-codec audit track; not a shared clock</td>
+</tr>
+<tr>
+<td><code>bus_events.jsonl</code></td>
+<td>the FSM trace — one JSON event per line, each with <code>ts</code> + <code>turn_index</code></td>
+</tr>
+<tr>
+<td><code>caller_media_frames.jsonl</code></td>
+<td>raw inbound RTP frame telemetry (timestamps, RMS)</td>
+</tr>
+<tr>
+<td><code>whisper_transcript.jsonl</code></td>
+<td>role-separated Whisper observations on the replay clock</td>
+</tr>
+<tr>
+<td><code>debug_issues.jsonl</code></td>
+<td>append-only candidate/confirmed issue points shared by browser and AI clients</td>
+</tr>
+</tbody>
+</table>
+<p>The manifest's <code>extras.audio_timeline.tracks</code> is the clock authority. A track is
+step-synchronized only when its status is <code>aligned</code>; <code>unverified</code> never means
+aligned. The outbound replay channel proves what RIFF queued or sent, not what the
+carrier or caller ultimately heard.</p>
+<p>Find the call you want:</p>
+<pre><code class="language-bash"># most recent sessions with a trace, newest last
+find data/sessions -maxdepth 2 -name bus_events.jsonl -mmin -120 -print | while read f; do
+  d=$(dirname &quot;$f&quot;); echo &quot;$(stat -f '%Sm' -t '%H:%M' &quot;$f&quot;)  $d&quot;; done | sort
+</code></pre>
+<h2 id="2-the-six-lanes-bus-events-jsonl">2. The six lanes (<code>bus_events.jsonl</code>)</h2>
+<p>Everything you need is in <code>bus_events.jsonl</code>, grouped by event <code>type</code>:</p>
+<ul>
+<li><strong>PATH</strong> — <code>transition_committed</code> (<code>from_state -&gt; to_state</code>, <code>reason</code>, <code>turn_index</code>)</li>
+<li><strong>HEAR</strong> — <code>transcription</code> (live Gemini text; often empty, see §4) or the hydrated backup</li>
+<li><strong>SLOTS</strong> — <code>slot_write</code> (<code>slot</code>, <code>old -&gt; new</code>, <code>writer</code>) — the ground truth of what was captured</li>
+<li><strong>TOOLS</strong> — <code>tool_called</code> (<code>tool_name</code>, <code>args</code>, <code>result_preview</code>) — often carries the <em>actual values</em></li>
+<li><strong>VERDICTS</strong> — <code>transition_verdict</code> (<code>winner</code> + each candidate edge's <code>result</code>) — <strong>which edge fired and why</strong></li>
+<li><strong>GUARDS</strong> — <code>guard_evaluated</code> (<code>guard_name</code> -&gt; <code>result</code>, <code>slots_read</code>) — why an edge did/didn't fire</li>
+</ul>
+<p><code>transition_verdict</code> is the single most useful lane: it names the winning edge. That
+is how the 32-minute intake loop (FX-033) was pinned — the verdict said
+<code>must_include_slot_changed</code> matched, and <code>tool_called</code> seq 122 vs 362 showed the model
+re-transcribed the name (<code>&quot;David Marr&quot;</code> -&gt; <code>&quot;David Mar&quot;</code>).</p>
+<p>Quick reconstruction:</p>
+<pre><code class="language-bash">python - &quot;$D/bus_events.jsonl&quot; &lt;&lt;'PY'
+import json,sys,collections
+rows=[json.loads(l) for l in open(sys.argv[1]) if l.strip()]
+print(dict(collections.Counter(r.get(&quot;type&quot;) for r in rows)))
+for r in rows:
+    if r.get(&quot;type&quot;)==&quot;transition_committed&quot;:
+        print(f&quot;t{r.get('turn_index','?'):&gt;2} {r['from_state']} -&gt; {r['to_state']}  [{r.get('reason')}]&quot;)
+PY
+</code></pre>
+<h2 id="3-state-program-debugger-the-primary-view">3. State Program Debugger — the primary view</h2>
+<p>The browser debugger is the primary human view. It combines:</p>
+<ul>
+<li>synchronized audio and transcript spans;</li>
+<li>the current state visit and its legal exits;</li>
+<li>entry, current, and recorded-exit values;</li>
+<li>tool, LLM, guard, and transition evidence;</li>
+<li>recorded versus derived versus unavailable provenance.</li>
+</ul>
+<p>For an AI or terminal client, build the same artifact and issue deterministic
+commands instead of reading screenshots:</p>
+<pre><code class="language-bash">python scripts/state_program_debugger.py build data/sessions/&lt;session_id&gt; \
+  --out /tmp/state-program-debugger.json
+python scripts/state_program_debugger.py command /tmp/state-program-debugger.json \
+  --json '{&quot;action&quot;:&quot;list_visits&quot;}'
+</code></pre>
+<p>When a state repeats, compare its two visits semantically and then move the
+shared cursor to the first supported difference:</p>
+<pre><code class="language-bash">python scripts/state_program_debugger.py command /tmp/state-program-debugger.json \
+  --json '{&quot;action&quot;:&quot;compare_visits&quot;,&quot;baseline_visit_id&quot;:&quot;menu#1&quot;,&quot;candidate_visit_id&quot;:&quot;menu#2&quot;}'
+python scripts/state_program_debugger.py command /tmp/state-program-debugger.json \
+  --json '{&quot;action&quot;:&quot;rewind_to_first_divergence&quot;,&quot;baseline_visit_id&quot;:&quot;menu#1&quot;,&quot;candidate_visit_id&quot;:&quot;menu#2&quot;}'
+</code></pre>
+<p>The comparison ignores volatile IDs and timestamps, but preserves Entry/Exit
+variable differences, acted-on input, transcript source, slot writes, playback,
+and winning edge. A late event carries both <code>causal_visit_id</code> and
+<code>observed_visit_id</code>; use the causal visit when explaining which state handled
+the caller's input.</p>
+<p>For a deterministic pause audit, run:</p>
+<pre><code class="language-bash">python scripts/state_program_debugger.py command /tmp/state-program-debugger.json \
+  --json '{&quot;action&quot;:&quot;inspect_pause_gaps&quot;}'
+</code></pre>
+<p>It distinguishes caller wait from agent response delay and duplicate/back-to-back
+output. This debugger projection makes zero model calls and consumes zero model
+tokens; live-call model token usage remains unavailable unless retained with the
+session artifacts.</p>
+<p>To mark a point durably, use the retained-session command. The response returns
+the new determinism hash and latest marker revision:</p>
+<pre><code class="language-bash">python scripts/state_program_debugger.py session-command data/sessions/&lt;session_id&gt; \
+  --json '{&quot;action&quot;:&quot;record_issue&quot;,&quot;issue&quot;:{&quot;issue_id&quot;:&quot;issue:repeat-1&quot;,&quot;status&quot;:&quot;confirmed&quot;,&quot;time_ms&quot;:123400,&quot;event_id&quot;:&quot;bus:42&quot;,&quot;visit_id&quot;:&quot;menu#3&quot;,&quot;reporter&quot;:&quot;claude&quot;,&quot;category&quot;:&quot;duplicate_agent_playback&quot;,&quot;note&quot;:&quot;Same outbound prompt played twice.&quot;}}'
+</code></pre>
+<p>The marker is an annotation with explicit provenance. It does not alter or
+masquerade as recorded call evidence.</p>
+<p><code>call_replay.py</code> remains a compact legacy lane report:</p>
+<pre><code class="language-bash">python scripts/call_replay.py data/sessions/&lt;session_id&gt;   # writes replay.html
+</code></pre>
+<p>Renders HEAR / PATH / SLOTS / VERDICTS lanes on one timeline. The HEAR lane reads
+live <code>transcription</code> events if present, else the Whisper-hydrated backup (§4).</p>
+<h2 id="4-transcript-gemini-primary-whisper-backup">4. Transcript: Gemini (primary) + Whisper (backup)</h2>
+<p>The transcript comes from <strong>Gemini's live audio transcription</strong> (primary). It can be
+missing — Gemini delivers transcriptions asynchronously and the per-turn buffer is
+sometimes empty at emit (a known gap). So there is a <strong>post-call Whisper backup</strong>:</p>
+<pre><code class="language-bash">python scripts/hydrate_transcript.py data/sessions/&lt;session_id&gt;
+</code></pre>
+<p>It splits <code>audio_replay.wav</code> before transcription, transcribes caller-left and
+agent-right separately, and writes manifest-backed <code>whisper_transcript.jsonl</code> rows.
+Each row retains its role, source channel, model, start/end span, clock status, and
+source artifact. The debugger presents Whisper and live-model transcription as
+separate observations; disagreement is evidence, not something to overwrite.</p>
+<p>If no aligned replay exists, the hydrator can use raw per-role tracks, but those
+rows are marked <code>unverified</code> and are not placed on the step clock.</p>
+<p><strong>Debugging a &quot;hang&quot; with no live transcript:</strong> hydrate the aligned replay first.
+For an older call without replay alignment, Whisper the outbound played track as
+content-only evidence and do not compare its timestamps to FSM timestamps:</p>
+<pre><code class="language-bash">python - &quot;$D/audio_agent_played.wav&quot; &lt;&lt;'PY'
+import sys,mlx_whisper
+for s in mlx_whisper.transcribe(sys.argv[1], path_or_hf_repo=&quot;mlx-community/whisper-small.en-mlx&quot;)[&quot;segments&quot;]:
+    print(f&quot;[{s['start']:6.1f}s] {s['text'].strip()}&quot;)
+PY
+</code></pre>
+<p><strong>Sanity-check the audio first.</strong> <code>audio_replay.wav</code> should match manifest
+<code>duration_sec</code>. Raw tracks can be longer because they preserve generation and
+transport evidence without a shared sample clock; that is why the debugger must
+not auto-select them for synchronized stepping.</p>
+<h2 id="5-the-debugging-loop-what-actually-works">5. The debugging loop (what actually works)</h2>
+<ol>
+<li><strong>Reproduce from the trace, not memory.</strong> Read <code>transition_verdict</code> for the state
+in question — it names the edge. Read <code>tool_called</code> args for the real values
+(they're often unredacted locally). Read <code>slot_write</code> for what got captured.</li>
+<li><strong>Line the transcript up.</strong> If the debugger has no Whisper spans, hydrate (§4),
+reload the call, and confirm each row says <code>clock_status: aligned</code> before using
+its timestamp to blame a state.</li>
+<li><strong>Separate &quot;my processing dropped it&quot; from &quot;the source has nothing&quot;</strong> — re-run the
+raw source (e.g. whisper with the filter off). B-409 was pinned this way: the raw
+caller channel was all silence-hallucination, so the <em>audio</em> was wrong, not the filter.</li>
+<li><strong>Check the artifact's own duration vs the manifest</strong> before blaming downstream.</li>
+<li><strong>Write it down.</strong> Every real fix gets a <code>docs/fixlog/FX-NNN-*.md</code> (Symptom / Root
+cause / Fix / Why / Shift-left gate / Test / Success / Evidence), searchable via
+<code>scripts/fixlog.py</code>. Narrate the iteration in <code>docs/fixlog/LOOP-LOG.md</code>. That is how
+the next AI recollects this call.</li>
+</ol>
+<h2 id="6-recording-invariants-so-the-trace-is-always-there">6. Recording invariants (so the trace is always there)</h2>
+<ul>
+<li>Audio recording is a checked deploy property: <code>deploy_business.py</code> prints
+<code>✅ call recording ON</code> (FX-032). It is gated by <code>RIFF_RECORD_CALLS</code>.</li>
+<li>Post-call Whisper is enabled with <code>RIFF_POSTCALL_WHISPER_ENABLED=1</code>. The finalizer
+records <code>pending</code>, <code>complete</code>, or <code>failed</code> in the manifest; a missing transcript
+is therefore distinguishable from silence.</li>
+<li>Both need the phone node running the current code — Python changes (session/recorder/
+transport) require a <strong>node restart</strong>, not just a flow reload.</li>
+</ul>
+<h2 id="worked-example-the-verify-code-quot-hang-quot-fx-041">Worked example — the verify-code &quot;hang&quot; (FX-041)</h2>
+<p>Operator: &quot;the verify code section seems to be hanging.&quot;</p>
+<ol>
+<li><code>bus_events</code> TOOLS lane: <code>intake_send_verification_link</code> fired <strong>twice</strong> (+0.0s and
++2.5s) — two codes sent.</li>
+<li>Agent whisper (§4): &quot;…say the four digit code&quot; voiced twice (~52s, ~62s).</li>
+<li>Root cause: the model re-called the send tool before the caller could ask; the tool
+had no in-flight dedup. Removing it from the state's allowlist would not help —
+B-271's reachable-target look-ahead re-admits it via the retry state.</li>
+<li>Fix: tool-level idempotency window; regression tests; <code>FX-041</code> journal.</li>
+</ol>
+<p>One call, fully explained — audio + transcript + states + tools on one clock.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-where-a-call-lives">1. Where a call lives</a></li><li class="toc-h2"><a href="#2-the-six-lanes-bus-events-jsonl">2. The six lanes (bus_events.jsonl)</a></li><li class="toc-h2"><a href="#3-state-program-debugger-the-primary-view">3. State Program Debugger — the primary view</a></li><li class="toc-h2"><a href="#4-transcript-gemini-primary-whisper-backup">4. Transcript: Gemini (primary) + Whisper (backup)</a></li><li class="toc-h2"><a href="#5-the-debugging-loop-what-actually-works">5. The debugging loop (what actually works)</a></li><li class="toc-h2"><a href="#6-recording-invariants-so-the-trace-is-always-there">6. Recording invariants (so the trace is always there)</a></li><li class="toc-h2"><a href="#worked-example-the-verify-code-quot-hang-quot-fx-041">Worked example — the verify-code &amp;quot;hang&amp;quot; (FX-041)</a></li></ul></aside>
+</div>
+</body>
+</html>

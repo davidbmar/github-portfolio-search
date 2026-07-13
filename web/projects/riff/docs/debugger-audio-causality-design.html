@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugger Audio Causality and Explain-Moment Design · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  width: 100%; max-width: 820px; margin: 0 auto;
+  padding: 2.4rem 1.4rem 4rem; box-sizing: border-box;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  display: block; max-width: 100%; overflow-x: auto;
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+.doc-container { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .doc-layout.with-toc {
+    max-width: 820px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .doc-toc { display: none; }
+  header.doc-header .crumb {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .doc-container { padding-top: 1.4rem; }
+}
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">2026-07-12-debugger-audio-causality-design.md</span>
+<a class="raw" href="/docs/docs/design/2026-07-12-debugger-audio-causality-design.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Debugger Audio Causality and Explain-Moment Design</h1>
+<p><strong>Date:</strong> 2026-07-12<br />
+<strong>Status:</strong> Approved for implementation by Claude <code>CL2C-002</code><br />
+<strong>Build status:</strong> Not implemented<br />
+<strong>Extends:</strong> <code>docs/design/2026-07-10-state-program-debugger-evidence-design.md</code><br />
+<strong>Audio truth contract:</strong> <code>docs/design/2026-07-10-unified-call-capture-replay-plan.md</code><br />
+<strong>Motivating call:</strong> <code>v3:FXI4R9RYo0Y18AZQHu4uMjHGgcuiQRzHoPLHWGvx4Il0sp1cUa4iTg</code></p>
+<h2 id="decision">Decision</h2>
+<p>Add a transport-neutral <strong>output-attempt ledger</strong>, join it to the existing
+cross-transport <strong>playback lifecycle</strong>, and add a bounded,
+deterministic <strong><code>explain_moment</code> projection</strong> to the existing State Program
+Debugger. Do not create a second timeline. Static playback, generated Gemini
+audio, entry lines, nudges, and restart attempts all normalize into one
+caller-facing output-attempt model and remain joined to the existing canonical
+event cursor.</p>
+<p>The design has three required properties:</p>
+<ol>
+<li>It distinguishes an FSM requesting the same content twice from a transport
+replaying one attempt twice and from a model restarting after interruption.</li>
+<li>It records enough non-slot state context to explain guards such as <code>stalled</code>
+without guessing internal counters.</li>
+<li>It lets a human, Codex, or Claude request a compact causal explanation of one
+moment without loading a 100,000-token timeline.</li>
+</ol>
+<p>Mutation remains disabled. The isolated capsule-backed simulation runner is a
+later packet and consumes this evidence; it is not part of this capture change.</p>
+<h3 id="effectiveness-target">Effectiveness Target</h3>
+<p>“200% better” means a threefold improvement against the current retained-call
+workflow, measured rather than inferred:</p>
+<ul>
+<li>one audible defect is localized with <code>latest</code> plus <code>explain_moment</code> in at
+most two debugger commands;</li>
+<li>the default evidence returned to an AI is at most 10 KB total, versus the
+roughly 148,000-token unfiltered timeline for the motivating call;</li>
+<li>a human can open a durable issue marker and reach the first causal divergence
+in at most three interactions without reading raw JSON;</li>
+<li>the compact explanation and full artifact name the same state, input,
+decision, and output-attempt IDs in deterministic tests.</li>
+</ul>
+<p>These are product acceptance measures, not a claim that instrumentation alone
+fixes the caller-facing behavior.</p>
+<h2 id="evidence-from-the-last-call">Evidence From the Last Call</h2>
+<p>The retained call has an aligned replay WAV, caller and outbound-agent channels,
+47 timed Whisper rows, 526 bus events, and static playback lifecycle evidence.
+That was enough to prove three distinct failure classes.</p>
+<table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Recorded fact</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>36.700s</code></td>
+<td><code>menu_retry#1</code> starts a static asset after Gemini selected “Ah! Start a new queue.” as a no-match</td>
+<td>FSM-requested retry caused by STT/resolver input</td>
+</tr>
+<tr>
+<td><code>39.930s</code></td>
+<td><code>menu_retry#2</code> starts the same asset after the selected input is only “start”</td>
+<td>A second FSM request, not one transport attempt replayed</td>
+</tr>
+<tr>
+<td><code>42.190s</code></td>
+<td><code>cap_start_claim__consent#1</code> enters and <code>stalled</code> matches in the same millisecond</td>
+<td>Target state inherited behavior-affecting progress context</td>
+</tr>
+<tr>
+<td><code>42.201s</code></td>
+<td><code>menu_reentry_prompt#1</code> starts “Say repeat…”</td>
+<td>Wrong caller-facing output caused by the immediate state churn</td>
+</tr>
+<tr>
+<td><code>52.864s</code></td>
+<td>first generated-audio burst begins in <code>cap_start_claim__consent#2</code></td>
+<td>Model says “Before we start:”</td>
+</tr>
+<tr>
+<td><code>55.429s</code></td>
+<td>a second <code>assistant_first_audio</code> event appears for the same state and recorded turn index</td>
+<td>Generated response restarted after caller interruption</td>
+</tr>
+</tbody>
+</table>
+<p>The live log confirms the second generated response again begins “Before we
+start:” and then continues the full disclaimer. The existing
+<code>DUPLICATE_AGENT_PLAYBACK</code> detector finds the two static retry visits but misses
+the generated restart. The existing pause audit also reasons primarily from
+static playback spans and misses dynamic prompt boundaries.</p>
+<p>This proves the current evidence is useful but not yet self-explanatory.</p>
+<h2 id="terminology">Terminology</h2>
+<ul>
+<li><strong>Logical output:</strong> the caller-facing utterance RIFF intends to deliver, such
+as the consent disclaimer. One logical output can have multiple attempts.</li>
+<li><strong>Model request:</strong> one <code>send_client_content</code> injection with a typed purpose and
+output expectation. Policy/context requests may forbid caller-facing output;
+a model response to one is observable but not retroactively “intended.”</li>
+<li><strong>Output attempt:</strong> one contiguous provider generation effort for that
+logical output. An interruption followed by a provider restart creates a new
+output attempt.</li>
+<li><strong>Playback attempt:</strong> one transport delivery effort, identified by the
+existing <code>playback_id</code>, for static audio or a generated output attempt. One
+output attempt may have more than one playback attempt only when an explicit
+retry, resume, or duplicate is recorded.</li>
+<li><strong>Generated receipt:</strong> PCM/text received from the model before a transport
+accepts it. This is not sent or played evidence.</li>
+<li><strong>Transport playback:</strong> static or generated audio acknowledged at the named
+browser-player or outbound phone boundary. It is sent/played evidence at that
+boundary, not carrier confirmation.</li>
+<li><strong>Carrier recording:</strong> the retained call recording perspective. It is the
+strongest available evidence of what traversed the call, but it is still
+labelled separately from a handset-side acknowledgement.</li>
+<li><strong>Causal parent:</strong> the event or request that caused a later event. Timestamp
+proximity alone is not causality.</li>
+<li><strong>Observed visit:</strong> the visit active when telemetry was emitted.</li>
+<li><strong>Causal visit:</strong> the visit whose input, decision, or output produced it.</li>
+</ul>
+<h2 id="one-canonical-output-attempt-model">One Canonical Output-Attempt Model</h2>
+<p>The normalized artifact adds <code>output_attempts</code>. Existing <code>playback_spans</code>
+remains a compatibility projection until clients migrate; it must be derived
+from <code>output_attempts</code>, never maintained independently.</p>
+<pre><code class="language-json">{
+  &quot;schema&quot;: &quot;riff.output_attempt/v1&quot;,
+  &quot;model_request_id&quot;: &quot;req:v3-example:19&quot;,
+  &quot;request_kind&quot;: &quot;locked_choice_prompt&quot;,
+  &quot;output_expectation&quot;: &quot;required&quot;,
+  &quot;logical_output_id&quot;: &quot;out:v3-example:14&quot;,
+  &quot;output_attempt_id&quot;: &quot;attempt:v3-example:14:2&quot;,
+  &quot;playback_ids&quot;: [&quot;play:v3-example:14:2:1&quot;],
+  &quot;parent_attempt_id&quot;: &quot;attempt:v3-example:14:1&quot;,
+  &quot;restart_reason&quot;: &quot;caller_barge_in&quot;,
+  &quot;source_kind&quot;: &quot;model_audio&quot;,
+  &quot;transport&quot;: &quot;telnyx_outbound&quot;,
+  &quot;causal_visit_id&quot;: &quot;cap_start_claim__consent#2&quot;,
+  &quot;observed_visit_id&quot;: &quot;cap_start_claim__consent#2&quot;,
+  &quot;state_id&quot;: &quot;cap_start_claim__consent&quot;,
+  &quot;decision_epoch&quot;: 14,
+  &quot;input_id&quot;: &quot;input:v3-example:4&quot;,
+  &quot;selected_source&quot;: &quot;whisper&quot;,
+  &quot;decision_reason&quot;: &quot;whisper_primary&quot;,
+  &quot;model_response_id&quot;: &quot;gemini-response:7&quot;,
+  &quot;requested_event_id&quot;: &quot;bus:389&quot;,
+  &quot;started_event_id&quot;: &quot;bus:395&quot;,
+  &quot;terminal_event_id&quot;: &quot;bus:402&quot;,
+  &quot;requested_ms&quot;: 51527,
+  &quot;first_text_ms&quot;: 55420,
+  &quot;first_audio_ms&quot;: 55429,
+  &quot;last_audio_ms&quot;: 62920,
+  &quot;terminal_ms&quot;: 62925,
+  &quot;outcome&quot;: &quot;completed&quot;,
+  &quot;content_fingerprint&quot;: &quot;hmac-sha256:...&quot;,
+  &quot;normalized_prefix_fingerprint&quot;: &quot;hmac-sha256:...&quot;,
+  &quot;audio_bytes&quot;: 401280,
+  &quot;audio_duration_ms&quot;: 8360,
+  &quot;attempt_confidence&quot;: &quot;provider_signalled&quot;,
+  &quot;provenance&quot;: &quot;recorded&quot;,
+  &quot;source_refs&quot;: [&quot;bus:395&quot;, &quot;bus:402&quot;]
+}
+</code></pre>
+<h3 id="identity-rules">Identity Rules</h3>
+<ol>
+<li><code>logical_output_id</code> identifies one intended caller-facing message across
+interruption, retry, resume, or regeneration.</li>
+<li><code>output_attempt_id</code> identifies one contiguous generation/playback effort.</li>
+<li><code>parent_attempt_id</code> is present only when a recorded restart, resume, or
+replacement relationship exists.</li>
+<li><code>model_request_id</code> identifies every session-side model injection and records
+<code>request_kind</code> plus <code>output_expectation=required|allowed|forbidden|unknown</code>.</li>
+<li><code>model_response_id</code> comes from the provider when available. Otherwise RIFF
+allocates a connection-local monotonic response ordinal and labels it
+<code>derived_local</code>.</li>
+<li><code>decision_epoch</code> is the epoch active when the logical output was requested.</li>
+<li><code>input_id</code> joins the selected caller input to its resolver, transition, and
+resulting output. It is absent for unsolicited greetings and timer actions.</li>
+<li><code>causal_visit_id</code> never changes because telemetry arrived late.</li>
+<li>IDs are session-scoped, bounded, and contain no raw caller text.</li>
+<li><code>playback_id</code> identifies one transport delivery attempt and always names its
+<code>output_attempt_id</code>; static sources allocate a synthetic output attempt so
+the artifact shape remains uniform.</li>
+</ol>
+<p>Using only <code>turn_index</code> is prohibited. The motivating call recorded two genuine
+audio starts with the same <code>turn_index=4</code> because the per-turn scratch buffer
+reset while <code>SessionContext.turn_count</code> did not advance.</p>
+<p>Identity allocation is evidence-driven:</p>
+<p>Every session-side send first allocates a bounded <code>model_request_id</code>. The
+semantic identity key is <code>(session_id, causal_visit_id, request_ordinal)</code>; its
+encoded ID may use stable ordinals/tokens so it always satisfies the existing
+160-character safe-ID limit.</p>
+<table>
+<thead>
+<tr>
+<th>Recorded condition</th>
+<th>Logical output</th>
+<th>Output attempt</th>
+<th>Playback attempt</th>
+<th>Parent link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model request with `output_expectation=required</td>
+<td>allowed`</td>
+<td>allocate from causal visit plus request ordinal</td>
+<td>allocate when the provider first emits text or PCM</td>
+<td>allocate at transport dispatch</td>
+</tr>
+<tr>
+<td>Model request with <code>output_expectation=forbidden</code> and no response</td>
+<td>none</td>
+<td>none</td>
+<td>none</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Model emits output for a forbidden request</td>
+<td>allocate observed-unexpected logical output linked to request</td>
+<td>allocate</td>
+<td>allocate if dispatched</td>
+<td>none; finding records mismatch</td>
+</tr>
+<tr>
+<td>Provider restarts after an explicit interruption without a new logical request</td>
+<td>reuse</td>
+<td>allocate new</td>
+<td>allocate new</td>
+<td>prior output attempt</td>
+</tr>
+<tr>
+<td>RIFF explicitly retries or resumes an existing request and records that relationship</td>
+<td>reuse</td>
+<td>allocate new</td>
+<td>allocate new</td>
+<td>prior output attempt</td>
+</tr>
+<tr>
+<td>FSM visit requests equivalent words again</td>
+<td>allocate new</td>
+<td>allocate new</td>
+<td>allocate new</td>
+<td>none</td>
+</tr>
+<tr>
+<td>One generated attempt is submitted again by a transport</td>
+<td>reuse</td>
+<td>reuse</td>
+<td>allocate new</td>
+<td>prior playback attempt</td>
+</tr>
+<tr>
+<td>Relationship is ambiguous in a legacy call</td>
+<td>do not merge</td>
+<td>keep observed attempts separate</td>
+<td>keep observed playback separate</td>
+<td>unavailable</td>
+</tr>
+</tbody>
+</table>
+<p>Content equality or timestamp proximity never causes two attempts to share a
+logical output. A provider ID is supporting identity evidence, not a substitute
+for the RIFF logical-request ID.</p>
+<h3 id="raw-durable-event-family">Raw Durable Event Family</h3>
+<p>AC-00 freezes these additive events; implementation agents must not choose a
+different vocabulary:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Emission boundary</th>
+<th>Required core fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model_request_recorded</code></td>
+<td>immediately after the provider accepts a session-side request, or in the preserved exception path</td>
+<td><code>model_request_id</code>, request kind, output expectation, dispatch outcome, causal visit, input/decision IDs, safe content fingerprint</td>
+</tr>
+<tr>
+<td><code>model_output_attempt_started</code></td>
+<td>first provider output text or PCM for the attempt</td>
+<td>model request, logical output, output attempt, provider/local response identity, first content kind, confidence</td>
+</tr>
+<tr>
+<td><code>model_output_attempt_terminal</code></td>
+<td>explicit/derived interruption, turn complete, provider failure, teardown, or typed unavailable boundary</td>
+<td>output attempt, `outcome=completed</td>
+</tr>
+</tbody>
+</table>
+<p><code>model_request_recorded.dispatch_outcome</code> is <code>accepted</code> or <code>failed</code>. The wrapper
+allocates identity before the call, records <code>accepted</code> only after the awaited
+provider call returns, and records <code>failed</code> best-effort before re-raising the
+same exception. It does not swallow, translate, retry, or reorder the call.</p>
+<p>The existing <code>assistant_first_audio</code> event remains a compatibility/timing row
+and gains causal IDs. It is not an attempt lifecycle. The existing
+<code>audio_requested/started/completed/interrupted/failed</code> family remains the only
+playback lifecycle.</p>
+<h2 id="capture-contract">Capture Contract</h2>
+<p>Use the existing canonical lifecycle names from <code>riff/playback_evidence.py</code> for
+every <strong>playback attempt</strong>:</p>
+<pre><code class="language-text">audio_requested
+  -&gt; audio_started
+  -&gt; audio_completed | audio_interrupted | audio_failed
+</code></pre>
+<p>Generated audio extends these events with <code>source_kind=model_audio</code>; it does not
+invent a second playback vocabulary. Provider response boundaries remain
+provider evidence and are normalized into <code>output_attempts</code>. They must not be
+relabeled as playback evidence.</p>
+<h3 id="evidence-stages">Evidence Stages</h3>
+<p>The same audio has different truth at different capture points. Every row names
+its stage; the UI and detectors may not collapse them:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Evidence</th>
+<th>Maximum allowed claim</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model_received</code></td>
+<td>output text or PCM accepted from Gemini</td>
+<td>RIFF received generated content</td>
+</tr>
+<tr>
+<td><code>outbound_accepted</code></td>
+<td>successful browser WebSocket or Telnyx <code>ws_send</code> boundary</td>
+<td>RIFF submitted bytes to its outbound transport</td>
+</tr>
+<tr>
+<td><code>client_playback</code></td>
+<td>browser Web Audio start/stop/completion acknowledgement</td>
+<td>the browser player started or ended the attempt</td>
+</tr>
+<tr>
+<td><code>carrier_recorded</code></td>
+<td>aligned Telnyx dual-channel recording</td>
+<td>the carrier recording contains the audio</td>
+</tr>
+</tbody>
+</table>
+<p><code>LiveSession.record_audio_out</code> currently runs <strong>before</strong> browser <code>await ws.send(payload)</code> and before Telnyx <code>_emit_pcm24_bytes</code>; therefore it proves
+<code>model_received</code>, not <code>outbound_accepted</code>, <code>client_playback</code>, or
+<code>carrier_recorded</code>. Instrumentation must preserve that distinction.</p>
+<h3 id="required-payload">Required Payload</h3>
+<p>Every playback lifecycle event carries:</p>
+<ul>
+<li><code>logical_output_id</code>, <code>output_attempt_id</code>, and <code>playback_id</code>;</li>
+<li><code>model_request_id</code>, <code>request_kind</code>, and <code>output_expectation</code> when model-backed;</li>
+<li>playback parent/retry identity when applicable;</li>
+<li><code>source_kind</code> and <code>transport</code>;</li>
+<li><code>evidence_stage</code> and an acknowledgement source;</li>
+<li><code>state_id</code>, <code>causal_visit_id</code>, and <code>decision_epoch</code>;</li>
+<li><code>input_id</code> and <code>model_response_id</code> when applicable;</li>
+<li>session-scoped content and normalized-prefix fingerprints;</li>
+<li>an exact event timestamp and source provenance.</li>
+</ul>
+<p>Terminal events also carry submitted or played bytes, sample rate, channel
+count, derived audio duration, text fingerprint, and a bounded reason. Exact
+output transcript continues to live in the transcript evidence lane; lifecycle
+rows do not copy a second full transcript.</p>
+<h3 id="generated-audio-capture-points">Generated-Audio Capture Points</h3>
+<p>The implementation must use these choke points rather than scattered log
+parsing:</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Current location</th>
+<th>Required change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model request / logical request</td>
+<td>all 10 <code>LiveSession</code> <code>send_client_content</code> callers</td>
+<td>route through one helper that always allocates a model request and allocates a logical output only according to the typed output expectation</td>
+</tr>
+<tr>
+<td>Provider interruption</td>
+<td><code>riff/live/live_client.py::_translate_server_message</code></td>
+<td>propagate <code>server_content.interrupted</code> before <code>turn_complete</code>, plus provider response identity when exposed</td>
+</tr>
+<tr>
+<td>First output text</td>
+<td><code>LiveSession.handle_event(output_transcription)</code></td>
+<td>open or join the output attempt and stamp first text</td>
+</tr>
+<tr>
+<td>Generated PCM received</td>
+<td><code>LiveSession.record_audio_out</code></td>
+<td>open/join the output attempt, accumulate generated bytes, and extend <code>assistant_first_audio</code> with IDs; do <strong>not</strong> emit sent/played truth here</td>
+</tr>
+<tr>
+<td>Browser outbound</td>
+<td><code>riff/live/transport.py::_session_to_browser</code></td>
+<td>bind binary frames to <code>playback_id</code>; record server acceptance only after successful <code>await ws.send</code></td>
+</tr>
+<tr>
+<td>Browser playback</td>
+<td>browser audio player/worklet lifecycle</td>
+<td>persist client start, completion, interruption, and failure acknowledgements using the same <code>playback_id</code></td>
+</tr>
+<tr>
+<td>Phone outbound</td>
+<td><code>riff/phone/telnyx_transport.py::_emit_pcm24_bytes_locked</code></td>
+<td>request before dispatch, start after first successful <code>ws_send</code>, terminalize after the final submitted chunk or a typed failure/interruption</td>
+</tr>
+<tr>
+<td>Carrier confirmation</td>
+<td>unified capture/replay finalizer</td>
+<td>join the independently authorized aligned carrier interval; never synthesize it from local sends</td>
+</tr>
+<tr>
+<td>Scratch reset</td>
+<td>all 11 current <code>self.turn.reset()</code> callers</td>
+<td>route through <code>_reset_turn_scratch(reason)</code>, which terminalizes or records typed terminal-unavailable evidence before clearing scratch fields</td>
+</tr>
+</tbody>
+</table>
+<p>An AST/source gate must reject new direct <code>send_client_content</code> calls in
+<code>riff/live/session.py</code> outside the wrapper. This follows the existing rule that
+hand-copied live paths drift.</p>
+<p>An independent AST/source gate must reject raw <code>self.turn.reset()</code> outside
+<code>_reset_turn_scratch</code>. The output-attempt tracker is owned by <code>LiveSession</code>, not
+<code>TurnAccumulator</code>, so a scratch reset cannot erase causal identity.</p>
+<h3 id="attempt-boundary-rule">Attempt-Boundary Rule</h3>
+<p>For a logical output with an existing started output attempt, a new attempt may
+open only after one of these recorded boundaries:</p>
+<ol>
+<li>an explicit provider interruption;</li>
+<li>a changed provider response ID;</li>
+<li>a typed RIFF retry/resume action; or</li>
+<li>a <code>_reset_turn_scratch(reason)</code> boundary followed by fresh first text/PCM.</li>
+</ol>
+<p>If the prior attempt lacks a provider terminal at boundary 2 or 4, record a
+derived interruption with <code>attempt_confidence=derived</code> and a typed reason such
+as <code>derived_response_restart</code> or <code>derived_scratch_reset</code>. Provider-signalled
+interruption uses <code>attempt_confidence=provider_signalled</code>. A time gap or matching
+text alone is never a response boundary. If no boundary can be established,
+keep the attempts separate and expose <code>OUTPUT_ATTEMPT_LINK_UNAVAILABLE</code> rather
+than inventing a parent link.</p>
+<h3 id="lifecycle-invariants">Lifecycle Invariants</h3>
+<ol>
+<li>One <code>playback_id</code> has at most one <code>audio_started</code> per evidence stage.</li>
+<li>One started playback attempt has exactly one terminal event in a finalized
+call, or a typed <code>PLAYBACK_TERMINAL_UNAVAILABLE</code> finding.</li>
+<li>One started output attempt has one provider terminal or typed
+<code>OUTPUT_ATTEMPT_TERMINAL_UNAVAILABLE</code> evidence before scratch identity is
+discarded.</li>
+<li>Completion after interruption is invalid for the same stage and attempt.</li>
+<li>A model restart uses a new output-attempt ID; a transport retry uses a new
+<code>playback_id</code>. Each links only to the matching parent kind.</li>
+<li>State transition never silently reassigns an attempt's causal visit.</li>
+<li>Static audio behavior and bytes remain unchanged by instrumentation.</li>
+<li>Event emission failure never blocks caller audio, but it produces a capture
+completeness finding.</li>
+</ol>
+<h2 id="state-context-evidence">State-Context Evidence</h2>
+<p>Slots are not the entire FSM context. The debugger adds a recorded
+<code>state_context_snapshot</code> at state entry and exit with behavior-affecting fields:</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;state_context_snapshot&quot;,
+  &quot;phase&quot;: &quot;entry&quot;,
+  &quot;visit_id&quot;: &quot;cap_start_claim__consent#1&quot;,
+  &quot;state_id&quot;: &quot;cap_start_claim__consent&quot;,
+  &quot;turn_count&quot;: 3,
+  &quot;no_progress_streak&quot;: 2,
+  &quot;max_no_progress_loops&quot;: 2,
+  &quot;decision_epoch&quot;: 11,
+  &quot;recent_states&quot;: [&quot;menu_retry&quot;, &quot;menu&quot;],
+  &quot;pending_transition&quot;: null,
+  &quot;active_logical_output_id&quot;: null,
+  &quot;active_output_attempt_id&quot;: null,
+  &quot;context_fingerprint&quot;: &quot;sha256:...&quot;
+}
+</code></pre>
+<p>The snapshot also inventories unavailable fields. It is separate from
+<code>state_slot_snapshot</code> because Python attributes and slots have different read
+and write semantics.</p>
+<p><code>guard_evaluated</code> gains <code>context_reads</code> for non-slot values read by the guard.
+For <code>stalled</code>, that evidence must include <code>no_progress_streak</code> and
+<code>max_no_progress_loops</code>. <code>slots_read=[]</code> must no longer imply that the guard
+read no behavior-affecting data.</p>
+<h2 id="causal-link-contract">Causal-Link Contract</h2>
+<p>New calls carry explicit links:</p>
+<pre><code class="language-text">input_id
+  -&gt; transcription observations
+  -&gt; selected observation + selected_source + decision_reason
+  -&gt; locked_choice_evaluated/tool decision
+  -&gt; slot writes
+  -&gt; transition_verdict/transition_committed
+  -&gt; model_request_id + request_kind + output_expectation
+  -&gt; logical_output_id
+  -&gt; output_attempt_id(s)
+  -&gt; playback_id(s) at named evidence stages
+  -&gt; carrier-recorded transcript/audio interval
+</code></pre>
+<p>Each link cites source events. A legacy artifact may derive a link only when the
+join is unique and non-conflicting. Derived links state the rule. Ambiguous
+links remain unavailable.</p>
+<p>The compact <code>input_id</code> record contains <code>selected_source</code> and <code>decision_reason</code>
+because those scalars determine which observation acted on the FSM. It cites,
+rather than duplicates, the complete Gemini/Whisper <code>transcript_sources</code> block.
+This preserves the current <code>whisper_primary</code> and <code>gemini_backup</code> decisions.</p>
+<p>Artifact normalization is a pure function of recorded events ordered by
+<code>(seq, source_suborder)</code>. Builders may not depend on current YAML, wall clocks,
+random values, process hash order, or Python set iteration. All indexes used by
+<code>explain_moment</code> are deterministic artifact projections.</p>
+<h2 id="explain-moment-command"><code>explain_moment</code> Command</h2>
+<p><code>explain_moment</code> is a read-only deterministic projection over the canonical
+artifact. It executes no flow logic and calls no model.</p>
+<h3 id="request">Request</h3>
+<pre><code class="language-json">{
+  &quot;action&quot;: &quot;explain_moment&quot;,
+  &quot;anchor&quot;: {&quot;event_id&quot;: &quot;bus:395&quot;},
+  &quot;window_before_ms&quot;: 4000,
+  &quot;window_after_ms&quot;: 10000,
+  &quot;detail&quot;: &quot;summary&quot;,
+  &quot;expected_hash&quot;: &quot;sha256:...&quot;
+}
+</code></pre>
+<p>Exactly one of <code>event_id</code> or <code>time_ms</code> is required. <code>detail</code> is <code>summary</code>,
+<code>evidence</code>, or <code>raw_refs</code>. The default response is capped at 4 KB canonical
+JSON; evidence detail is capped at 32 KB and paginated. Raw events are returned
+only by reference or an explicit filtered request.</p>
+<h3 id="response">Response</h3>
+<pre><code class="language-json">{
+  &quot;schema&quot;: &quot;riff.explain_moment/v1&quot;,
+  &quot;mode&quot;: &quot;recorded&quot;,
+  &quot;anchor&quot;: {&quot;event_id&quot;: &quot;bus:395&quot;, &quot;clock_ms&quot;: 55429},
+  &quot;state&quot;: {
+    &quot;visit_id&quot;: &quot;cap_start_claim__consent#2&quot;,
+    &quot;entry_ms&quot;: 51526,
+    &quot;exit_ms&quot;: 68275
+  },
+  &quot;caller_input&quot;: {
+    &quot;input_id&quot;: &quot;input:4&quot;,
+    &quot;selected_text&quot;: &quot;&lt;recorded transcript reference&gt;&quot;,
+    &quot;selected_source&quot;: &quot;whisper&quot;,
+    &quot;decision_reason&quot;: &quot;whisper_primary&quot;,
+    &quot;source_refs&quot;: [&quot;bus:400&quot;]
+  },
+  &quot;decision&quot;: {
+    &quot;winning_edge_id&quot;: null,
+    &quot;context_reads&quot;: []
+  },
+  &quot;output&quot;: {
+    &quot;logical_output_id&quot;: &quot;out:14&quot;,
+    &quot;attempts&quot;: [&quot;attempt:14:1&quot;, &quot;attempt:14:2&quot;]
+  },
+  &quot;first_divergence&quot;: {
+    &quot;code&quot;: &quot;MODEL_OUTPUT_RESTART_REPEATED_PREFIX&quot;,
+    &quot;event_id&quot;: &quot;bus:395&quot;,
+    &quot;confidence&quot;: &quot;recorded_lifecycle_plus_text&quot;
+  },
+  &quot;evidence_gaps&quot;: [],
+  &quot;next_commands&quot;: [
+    {&quot;action&quot;: &quot;inspect_output_attempt&quot;, &quot;output_attempt_id&quot;: &quot;attempt:14:2&quot;}
+  ],
+  &quot;analysis_execution&quot;: {&quot;model_calls&quot;: 0, &quot;input_tokens&quot;: 0, &quot;output_tokens&quot;: 0}
+}
+</code></pre>
+<p>The response reports facts and deterministic findings. It does not claim an
+LLM, network, or transport root cause when the required stage telemetry is
+missing.</p>
+<h2 id="deterministic-findings">Deterministic Findings</h2>
+<p>The debugger replaces the overly broad duplicate label with mechanism-aware
+findings.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Required evidence</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MODEL_OUTPUT_RESTART_REPEATED_PREFIX</code></td>
+<td>provider-signalled or derived-interrupted output attempt, linked restart, matching normalized prefix</td>
+<td>model output restarted caller-facing content</td>
+</tr>
+<tr>
+<td><code>FSM_REPEATED_OUTPUT_REQUEST</code></td>
+<td>different causal visits or logical outputs, same content fingerprint</td>
+<td>FSM requested equivalent content again</td>
+</tr>
+<tr>
+<td><code>TRANSPORT_DUPLICATE_ATTEMPT</code></td>
+<td>one <code>playback_id</code> has duplicate starts or recorded delivery copies at the same evidence stage</td>
+<td>transport/player duplicated one delivery attempt</td>
+</tr>
+<tr>
+<td><code>MULTIPLE_PLAYBACK_ATTEMPTS_UNEXPLAINED</code></td>
+<td>one output attempt has multiple playback IDs on one transport without a recorded retry/resume/parent relationship</td>
+<td>more than one delivery was attempted, but the mechanism is not proven</td>
+</tr>
+<tr>
+<td><code>UNEXPECTED_OUTPUT_FROM_NON_SPEAKING_REQUEST</code></td>
+<td>model output linked to a request recorded with <code>output_expectation=forbidden</code></td>
+<td>a context/directive injection produced caller-facing output it was not permitted to produce</td>
+</tr>
+<tr>
+<td><code>STATE_EXITED_BEFORE_FIRST_OUTPUT</code></td>
+<td>state entered/exited with a declared prompt but no owned output start</td>
+<td>state churn bypassed its caller prompt</td>
+</tr>
+<tr>
+<td><code>MATCHED_INPUT_FOLLOWED_BY_UNRELATED_OUTPUT</code></td>
+<td>matched input and committed target followed by caller-facing output causally owned by another route</td>
+<td>emitted output is inconsistent with the accepted route; audibility depends on the named stage</td>
+</tr>
+<tr>
+<td><code>STALE_PROGRESS_GUARD_ON_ENTRY</code></td>
+<td><code>stalled</code> matches before any input owned by the visit and context threshold is recorded</td>
+<td>recovery state inherited a saturated progress counter</td>
+</tr>
+<tr>
+<td><code>DYNAMIC_POST_PROMPT_SILENCE</code></td>
+<td>playback terminal at a named delivery stage plus next caller/output event</td>
+<td>long silence after submitted or played generated speech at that stage</td>
+</tr>
+<tr>
+<td><code>OUTPUT_AFTER_STATE_EXIT</code></td>
+<td>generated receipt or playback bytes after owning visit exit without declared carryover</td>
+<td>audio escaped its state boundary at the named stage</td>
+</tr>
+</tbody>
+</table>
+<p>For legacy calls, <code>DUPLICATE_AGENT_PLAYBACK</code> remains available with its older,
+weaker meaning. New calls use the mechanism-aware codes.</p>
+<h2 id="ui-contract">UI Contract</h2>
+<p>The existing synchronized timeline remains the overview. The Agent lane renders
+one band per playback attempt, grouped by logical output and output attempt. A
+thin labelled receipt tick may precede it when model receipt and transport
+acceptance differ materially:</p>
+<ul>
+<li>green: completed;</li>
+<li>amber: interrupted;</li>
+<li>red: failed or invalid lifecycle;</li>
+<li>purple: simulated, only after the isolated runner exists.</li>
+</ul>
+<p>Linked output restarts share a small connector and logical-output label.
+Transport retries show distinct <code>playback_id</code> labels inside the same output
+attempt group. Color is redundant; every band includes status text, evidence
+stage, and an accessible title.</p>
+<p>At the playhead, the right inspector shows one downward causal story:</p>
+<pre><code class="language-text">Caller spoke
+Selected STT source
+Resolver matched
+State/guard decision
+Model request intent and output expectation
+Output attempt 1 started
+Caller interrupted
+Output attempt 2 restarted
+Playback submitted to transport
+Browser playback or carrier evidence: available/unavailable
+Repeated prefix detected
+</code></pre>
+<p>The selected state breadcrumb, Entry/Exit variables, and context values remain
+visible. The UI does not create cards inside cards and does not add a second
+independent cursor.</p>
+<p>Selecting <strong>Explain this moment</strong> calls the shared command. Selecting <strong>Mark
+problem</strong> stores the anchor plus finding code and output-attempt IDs in the
+existing durable issue marker. An AI-created marker starts as <code>proposed</code>; the
+operator can replay its bounded interval and select <strong>Confirm this point</strong>.
+Confirmation changes marker status, not recorded evidence. The resulting URL
+restores the same cursor, interval, and explanation.</p>
+<h2 id="ai-contract">AI Contract</h2>
+<p>Codex and Claude use the same API as the browser. The minimum high-level command
+set is:</p>
+<pre><code class="language-text">latest_call(flow_id)
+explain_moment(event_id | time_ms)
+trace_cause(event_id)
+list_output_attempts(visit_id | time_range)
+inspect_output_attempt(output_attempt_id)
+inspect_context_history(field)
+compare_visits(baseline_visit_id, candidate_visit_id)
+mark_defect(anchor, finding_code)
+export_capsule(visit_id)
+</code></pre>
+<p>Every list command is bounded and paginated. Responses default to compact
+summaries with source references. An AI should never need to load the entire
+timeline to answer where one audible failure began.</p>
+<p><code>mark_defect</code> created by an AI records <code>status=proposed</code>, the anchor, bounded
+replay interval, finding code, rationale, and source references. Only an
+explicit operator action may change it to <code>confirmed</code>; neither status changes
+the underlying artifact.</p>
+<p><code>explain_moment</code> resolves through prebuilt indexes keyed by event, visit,
+<code>input_id</code>, logical output, output attempt, and playback ID. The causal join is
+bounded by the requested clock window and referenced IDs; it must not scan or
+serialize the full timeline on each request.</p>
+<h2 id="simulation-boundary">Simulation Boundary</h2>
+<p>This design does not enable browser mutation. A future simulation may change a
+typed Entry value, caller input fixture, or output fixture only after exporting
+an immutable capsule and selecting exact engine/flow revisions. Simulated audio
+attempts use a separate namespace and purple presentation. They never append to
+the recorded ledger or call external tools.</p>
+<h2 id="acceptance-gates">Acceptance Gates</h2>
+<ol>
+<li>A generated response that is interrupted and restarted produces two attempt
+IDs, one parent link, and one terminal event per attempt.</li>
+<li>Rehydrating the same ledger produces byte-identical <code>output_attempts</code> and
+determinism hash.</li>
+<li>The static playback fixtures remain behaviorally and byte-for-byte unchanged.</li>
+<li>The motivating consent sequence yields
+<code>MODEL_OUTPUT_RESTART_REPEATED_PREFIX</code>, not <code>TRANSPORT_DUPLICATE_ATTEMPT</code>.</li>
+<li>The two menu retries yield <code>FSM_REPEATED_OUTPUT_REQUEST</code> and preserve both
+causal visits.</li>
+<li>A consent state entered with <code>no_progress_streak=2</code> records that value and
+reports <code>STALE_PROGRESS_GUARD_ON_ENTRY</code> when <code>stalled</code> fires before owned
+caller input.</li>
+<li>A dynamic prompt followed by 60 seconds of silence appears in the pause
+audit.</li>
+<li><code>explain_moment(detail=summary)</code> is at most 4 KB and uses zero model calls.</li>
+<li>Browser, CLI, and HTTP responses are byte-identical after canonical JSON
+encoding.</li>
+<li>A stale expected hash, unknown event, ambiguous legacy link, or incomplete
+lifecycle fails closed with a typed error.</li>
+<li>UI Play, Pause, Step, Reverse, transcript, state, and attempt selection use
+the one shared call clock.</li>
+<li>A Playwright test proves an operator can jump from a repeated-prefix finding
+to the first attempt, play through the restart, and inspect its causal chain.</li>
+<li>With <code>RIFF_DEBUG_OUTPUT_ATTEMPTS=0</code>, fake-client and retained-browser
+comparisons produce byte-identical audio and pre-existing bus event streams.</li>
+<li>Source gates fail when a direct <code>send_client_content</code> or raw
+<code>self.turn.reset()</code> is introduced outside its approved wrapper.</li>
+<li>Every scratch-reset path terminalizes the active attempt or records typed
+terminal-unavailable evidence before fields are cleared.</li>
+<li>When the provider interruption bit is absent, a recorded response/reset
+boundary produces a derived restart with lower confidence; a time gap alone
+does not.</li>
+<li>Whisper-primary and Gemini-backup fixtures retain the acted-on source and
+decision reason through <code>input_id</code> into <code>explain_moment</code>.</li>
+<li>A model-received PCM event before a failed browser/Telnyx send never appears
+as outbound-accepted, client-played, or carrier-recorded evidence.</li>
+<li>The normal path records logical output -&gt; output attempt -&gt; playback ID at
+its exact truth stage; no detector treats stage multiplicity as duplication.</li>
+<li>A model response to <code>output_expectation=forbidden</code> remains linked to its
+request and produces <code>UNEXPECTED_OUTPUT_FROM_NON_SPEAKING_REQUEST</code>; it is
+not rewritten as an intended FSM prompt.</li>
+</ol>
+<h2 id="rollout">Rollout</h2>
+<ol>
+<li>Land schema and pure normalization tests.</li>
+<li>Add request identity plus provider-attempt capture behind
+<code>RIFF_DEBUG_OUTPUT_ATTEMPTS=1</code>.</li>
+<li>Add browser and phone playback-stage capture without changing audio bytes or
+send ordering.</li>
+<li>Record local fake-client and browser calls; compare emitted audio bytes and
+pre-existing events with the flag off/on.</li>
+<li>Make capture default after lifecycle invariants pass.</li>
+<li>Add debugger projections and UI.</li>
+<li>Run one Telnyx OTA validation only after explicit human <code>GO</code>.</li>
+<li>Keep legacy projections until retained pre-schema calls age out.</li>
+</ol>
+<h2 id="non-goals">Non-Goals</h2>
+<ul>
+<li>Proving that a handset speaker rendered a packet without carrier/handset
+acknowledgement.</li>
+<li>Changing Gemini prompting, FSM transitions, retry policy, or barge-in behavior
+in the instrumentation packets.</li>
+<li>Calling an LLM inside <code>explain_moment</code>.</li>
+<li>Enabling external tool writes or production calls from a debugger fork.</li>
+<li>Treating generated audio as static playback or inferring content from duration.</li>
+</ul>
+<h2 id="cl2c-001-resolutions"><code>CL2C-001</code> Resolutions</h2>
+<table>
+<thead>
+<tr>
+<th>Claude question or blocker</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logical output keyed by FSM request, not epoch</td>
+<td>Confirmed: causal visit plus request ordinal; content equality never merges requests</td>
+</tr>
+<tr>
+<td>Selected transcript evidence</td>
+<td>Store <code>selected_source</code> and <code>decision_reason</code> on the compact input link; reference the full transcript-source observations</td>
+</tr>
+<tr>
+<td>Reset terminalization</td>
+<td>Claude owns <code>_reset_turn_scratch(reason)</code> plus a source gate; the output tracker is not stored in <code>TurnAccumulator</code></td>
+</tr>
+<tr>
+<td>First capture packet</td>
+<td>Request-identity wrapper and gates land before provider attempt capture</td>
+</tr>
+<tr>
+<td>Provider interruption may be absent</td>
+<td>Use only recorded response/reset boundaries for a lower-confidence derived restart; never a time gap alone</td>
+</tr>
+<tr>
+<td>Deterministic hydration</td>
+<td>Pure <code>(seq, source_suborder)</code> fold with no mutable flow, clocks, randomness, or unordered sets</td>
+</tr>
+<tr>
+<td>Generated PCM truth</td>
+<td>Corrected beyond the review: <code>record_audio_out</code> is model-received evidence because both transports call it before their send boundary</td>
+</tr>
+<tr>
+<td>Playback detector key</td>
+<td><code>TRANSPORT_DUPLICATE_ATTEMPT</code> requires duplicate evidence for the same <code>playback_id</code>; distinct unexplained playback IDs use a weaker separate finding</td>
+</tr>
+<tr>
+<td>Golden evidence</td>
+<td>AC-00 uses two PII-free synthetic fixtures derived from the FXI4R9 restart and J4SWUbfq Whisper-primary patterns; retained calls remain cited evidence, not copied fixture truth</td>
+</tr>
+</tbody>
+</table>
+<h2 id="open-review-questions">Open Review Questions</h2>
+<ol>
+<li>Does the Gemini SDK expose a stable response ID and explicit interrupted bit
+in every supported model/version, or must RIFF allocate the local response
+ordinal for some paths?</li>
+<li>What is the smallest flag-protected browser control message that binds
+binary PCM frames to a <code>playback_id</code> without changing audio frame bytes or
+ordering?</li>
+<li>Can the Telnyx send helper report first-success/final-success/failure without
+changing its existing exception behavior, or must telemetry wrap <code>ws_send</code>
+inside <code>_emit_pcm24_bytes_locked</code>?</li>
+<li>Which non-slot <code>SessionContext</code> fields can current guards read beyond the
+initial required inventory?</li>
+<li>Should <code>STALE_PROGRESS_GUARD_ON_ENTRY</code> remain debugger-only initially, then
+become a flow/compiler lint in a separately reviewed packet?</li>
+</ol>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#decision">Decision</a></li><li class="toc-h3"><a href="#effectiveness-target">Effectiveness Target</a></li><li class="toc-h2"><a href="#evidence-from-the-last-call">Evidence From the Last Call</a></li><li class="toc-h2"><a href="#terminology">Terminology</a></li><li class="toc-h2"><a href="#one-canonical-output-attempt-model">One Canonical Output-Attempt Model</a></li><li class="toc-h3"><a href="#identity-rules">Identity Rules</a></li><li class="toc-h3"><a href="#raw-durable-event-family">Raw Durable Event Family</a></li><li class="toc-h2"><a href="#capture-contract">Capture Contract</a></li><li class="toc-h3"><a href="#evidence-stages">Evidence Stages</a></li><li class="toc-h3"><a href="#required-payload">Required Payload</a></li><li class="toc-h3"><a href="#generated-audio-capture-points">Generated-Audio Capture Points</a></li><li class="toc-h3"><a href="#attempt-boundary-rule">Attempt-Boundary Rule</a></li><li class="toc-h3"><a href="#lifecycle-invariants">Lifecycle Invariants</a></li><li class="toc-h2"><a href="#state-context-evidence">State-Context Evidence</a></li><li class="toc-h2"><a href="#causal-link-contract">Causal-Link Contract</a></li><li class="toc-h2"><a href="#explain-moment-command">explain_moment Command</a></li><li class="toc-h3"><a href="#request">Request</a></li><li class="toc-h3"><a href="#response">Response</a></li><li class="toc-h2"><a href="#deterministic-findings">Deterministic Findings</a></li><li class="toc-h2"><a href="#ui-contract">UI Contract</a></li><li class="toc-h2"><a href="#ai-contract">AI Contract</a></li><li class="toc-h2"><a href="#simulation-boundary">Simulation Boundary</a></li><li class="toc-h2"><a href="#acceptance-gates">Acceptance Gates</a></li><li class="toc-h2"><a href="#rollout">Rollout</a></li><li class="toc-h2"><a href="#non-goals">Non-Goals</a></li><li class="toc-h2"><a href="#cl2c-001-resolutions">CL2C-001 Resolutions</a></li><li class="toc-h2"><a href="#open-review-questions">Open Review Questions</a></li></ul></aside>
+</div>
+</body>
+</html>

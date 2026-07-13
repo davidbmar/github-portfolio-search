@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Mailbox Protocol · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  width: 100%; max-width: 820px; margin: 0 auto;
+  padding: 2.4rem 1.4rem 4rem; box-sizing: border-box;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  display: block; max-width: 100%; overflow-x: auto;
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+.doc-container { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .doc-layout.with-toc {
+    max-width: 820px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .doc-toc { display: none; }
+  header.doc-header .crumb {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .doc-container { padding-top: 1.4rem; }
+}
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">mailbox-protocol.md</span>
+<a class="raw" href="/docs/docs/design/mailbox-protocol.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Agent Mailbox Protocol</h1>
+<p><strong>Status:</strong> v1.0 APPROVED — proposed by Claude (<code>CL2C-005</code>), hardened and
+ratified by Codex after AC-00.
+<strong>Origin:</strong> distilled from the live Claude↔Codex negotiation in
+<code>docs/toclaude/2025.07.12</code> / <code>docs/tocodex/2025.07.12</code> (the debugger-audio-causality GO).</p>
+<hr />
+<h2 id="1-what-this-is-and-when-to-use-it">1. What this is (and when to use it)</h2>
+<p>A file-based, append-only channel for two (or more) autonomous agents to run a <strong>durable,
+auditable design negotiation</strong> — reviews, reconciliations, GO/NO-GO decisions, ownership splits —
+without a live chat and without either side clobbering the other. It is deliberately slower and
+more deliberate than chat: every claim is written down, verified, and reply-chained, and the whole
+exchange lands in git as a permanent record (an ADR-grade conversation).</p>
+<p>Use it when: the work spans hours or sessions, decisions are load-bearing, and you want the
+reasoning preserved. Do <strong>not</strong> use it for high-frequency chatter — see §7.</p>
+<p>This protocol is a durable <strong>decision and evidence channel</strong>, not a process
+scheduler. In RIFF, Switchboard remains the source of truth for task assignment,
+lease, heartbeat, <code>done</code>, and <code>blocked</code> state. A mailbox message may negotiate a
+packet, but implementation starts only after the worker owns the corresponding
+Switchboard <code>task_id</code> or the human explicitly assigns the bounded task in the
+active session.</p>
+<h2 id="2-the-mailbox-model">2. The mailbox model</h2>
+<ul>
+<li><strong>One mailbox per reader; the sender is the sole writer.</strong> A file named <code>docs/to&lt;READER&gt;/&lt;date&gt;</code>
+holds messages <em>for</em> READER — and only READER's peer writes to it. READER only reads. With two
+agents this gives each side exactly one file it writes and one it reads:
+<ul>
+<li><code>docs/toclaude/&lt;date&gt;</code> — Codex writes, Claude reads.</li>
+<li><code>docs/tocodex/&lt;date&gt;</code> — Claude writes, Codex reads.</li>
+</ul>
+</li>
+<li><strong>Append-only.</strong> New messages are appended to the end. Earlier bytes are never rewritten.</li>
+<li><strong>Ownership is structural, not advisory.</strong> &quot;Never edit the peer's mailbox&quot; is the one rule that
+makes concurrent writing safe. Verified in the live run: one side made ~6 appends while the
+other's file stayed byte-identical.</li>
+</ul>
+<h2 id="3-message-format">3. Message format</h2>
+<p>Each message is a Markdown section:</p>
+<pre><code>## [&lt;SENDER&gt;, &lt;HH:MM TZ&gt;] &lt;ID&gt;: &lt;one-line subject&gt;
+
+**in-reply-to:** &lt;ID(s) this answers, or &quot;—&quot;&gt;
+**acks:** [&lt;IDs whose receipt this confirms&gt;]
+**task_id:** &lt;Switchboard task ID, local packet ID, or &quot;design-only&quot;&gt;
+**status:** &lt;one line: e.g. &quot;GO&quot;, &quot;blocked on X&quot;, &quot;working AC-00 ETA ~30m&quot;&gt;
+
+&lt;body — use the sections in §3.1 as they apply&gt;
+
+**NEXT:** &lt;who acts next&gt; — &lt;exactly what they do next&gt;
+</code></pre>
+<h3 id="3-1-body-sections-include-those-that-apply">3.1 Body sections (include those that apply)</h3>
+<ul>
+<li><strong>Verdict / decision</strong> — GO / GO-WITH-CHANGES / NO-GO / ACK.</li>
+<li><strong>Verified facts</strong> — load-bearing claims <em>checked against source</em>, with <code>file:line</code>. (§5)</li>
+<li><strong>Blocking items</strong> — numbered, each with the exact change required to clear it.</li>
+<li><strong>Evidence</strong> — commit hashes, test results, <code>file:line</code>, run IDs. Claims without evidence are
+hypotheses and must be labelled as such.</li>
+<li><strong>Rollback</strong> — feature flag, revert boundary, or why the packet is documentation-only.</li>
+<li><strong>Questions</strong> — only those that <em>materially block</em> the plan, numbered for reply.</li>
+</ul>
+<h2 id="4-ids-and-reply-chaining">4. IDs and reply-chaining</h2>
+<ul>
+<li><strong>Stable, monotonic, directional IDs:</strong> <code>&lt;SRC&gt;2&lt;DST&gt;-&lt;NNN&gt;</code> — e.g. <code>C2C-003</code> (Codex→Claude #3),
+<code>CL2C-004</code> (Claude→Codex #4). Never reuse or renumber.</li>
+<li>Every message names what it answers (<code>in-reply-to</code>) and what it confirms receipt of (<code>acks</code>).
+Citation <strong>is</strong> the read-receipt — you know the peer read <code>CL2C-002</code> when a message replies to it.</li>
+</ul>
+<h2 id="5-verify-before-you-accept">5. Verify before you accept</h2>
+<p>Load-bearing claims are <strong>checked against the primary source before acceptance</strong>, not taken on the
+peer's word. In the live run this caught real errors on both sides: a &quot;12 send sites&quot; count that was
+actually 10 (+1 inbound to exclude), and a <code>record_audio_out</code>-proves-playback assumption that was
+false (it fires <em>before</em> <code>ws.send</code>). Cite <code>file:line</code>. When source contradicts a summary, trust the
+source and say so.</p>
+<h2 id="6-liveness-silence-must-never-be-ambiguous">6. Liveness — silence must never be ambiguous</h2>
+<p>The single biggest gap in an unadorned mailbox: a quiet peer is indistinguishable from a dead one.
+Three conventions fix it:</p>
+<ul>
+<li><strong><code>NEXT:</code> closing line on every message</strong> — names who acts next and on what. Removes whose-turn
+ambiguity.</li>
+<li><strong><code>STATUS:</code> heartbeat when heads-down.</strong> If a side will be working silently for more than ~20 min,
+it appends a normal, uniquely identified message (<code>status: authoring AC-00, ETA ~30m</code>) so
+silence ≠ stall. Status messages obey the same append-only and reply-chain rules.</li>
+<li><strong>~20-minute poll or milestone cadence</strong>, and <strong>no empty heartbeat chatter</strong> — a poll that finds
+nothing new produces <em>no</em> message; only real progress or a status/ETA gets written.</li>
+</ul>
+<p>Out-of-band notification (a human relay, or a file-watch on mtime) is expected to sit <em>on top of</em>
+the poll — the protocol assumes the reader is pinged, but degrades gracefully to polling.</p>
+<p>An interactive model cannot promise unattended continuity after its process or
+session stops. “Poll every 20 minutes” applies only while the worker is active;
+all-night continuity requires an external supervisor that restarts the worker,
+injects the newest unacknowledged message, and verifies that the worker actually
+executes it. A file watcher or heartbeat alone is not proof of work.</p>
+<blockquote>
+<p>Live lesson: one side went silent ~1.5 h mid-negotiation. With no <code>NEXT:</code>/<code>STATUS:</code> convention the
+peer could only poll blindly and eventually escalate to the human. A single <code>STATUS: … ETA</code> line
+would have removed the ambiguity entirely.</p>
+</blockquote>
+<h2 id="7-immutability-and-corrections">7. Immutability and corrections</h2>
+<ul>
+<li><strong>A delivered message is immutable.</strong> Do not edit a message after appending it.</li>
+<li><strong>Correct by superseding:</strong> append a <em>new</em> message with <code>**supersedes:** &lt;ID&gt;</code>. The record then
+shows both the original and the correction — history is never rewritten under the reader.</li>
+<li><strong>Detect drift by message count, not file length.</strong> In the live run a peer made an in-place tweak
+that changed byte count but not line count; a reader caching &quot;same line count = unchanged&quot; would
+have missed it. Track the last-seen message ID; compare mtime <strong>and</strong> size, never lines alone.</li>
+</ul>
+<h2 id="8-the-index-file-fast-resume-rollover">8. The index file (fast resume + rollover)</h2>
+<p>Optionally generate a short <code>docs/MAILBOX.md</code> (or leading INDEX block) from the
+two mailbox tails:</p>
+<pre><code>last-message: CL2C-004
+turn: Codex (owes AC-00 commit + fixture/schema evidence)
+active-files: docs/toclaude/2025.07.12, docs/tocodex/2025.07.12
+</code></pre>
+<p>A resuming agent (or a monitor) reads one line instead of tailing a 350-line
+file. The index is a cache, never the ownership or approval source of truth. It
+has one named generator/coordinator; peers do not concurrently hand-edit a
+shared status file. If stale or missing, read the two owned mailboxes directly.</p>
+<h2 id="9-file-naming-and-rollover">9. File naming and rollover</h2>
+<ul>
+<li>Name mailbox files by <strong>real ISO date</strong> (<code>YYYY-MM-DD</code>). <em>Known debt:</em> the live files are named
+<code>2025.07.12</code> while the actual date is 2026-07-12 — a latent bug. <strong>Do not rename active files
+mid-negotiation</strong> (both agents are pointed at them); fix at the next day/file boundary.</li>
+<li>On rollover, the last message in the old file carries a <strong><code>continued-in: &lt;new-file&gt;</code></strong> line and
+the new file opens with <strong><code>continues: &lt;old-file&gt;</code></strong> so a multi-day thread never silently fragments.</li>
+</ul>
+<h2 id="10-authority-boundary-who-may-approve-what">10. Authority boundary (who may approve what)</h2>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Approver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local docs, local tests, fixtures, replay / dry-run, design + schema decisions, ownership splits</td>
+<td><strong>Peer agent</strong> (via this channel)</td>
+</tr>
+<tr>
+<td>Narrow implementation packets with commit + test evidence</td>
+<td><strong>Peer agent</strong>, after the reconciled plan is agreed</td>
+</tr>
+<tr>
+<td>OTA / live-call deployment, caller-facing changes</td>
+<td><strong>Human only</strong> — explicit GO</td>
+</tr>
+<tr>
+<td>Secrets handling, destructive git (force-push, history rewrite, hard reset)</td>
+<td><strong>Human only</strong></td>
+</tr>
+</tbody>
+</table>
+<p>This standing contract rides in every message (&quot;no implementation until reconciled; no OTA without
+human GO&quot;) and is the reason a multi-hour autonomous exchange never touched production.</p>
+<p>Peer approval does not override repository ownership boundaries, required fix
+journal entries, focused tests, or the Switchboard lifecycle. A <code>GO</code> approves
+the described packet, not unrelated files or a broader deployment.</p>
+<h2 id="11-sensitive-data-boundary">11. Sensitive-data boundary</h2>
+<ul>
+<li>Never place secrets, raw credentials, authentication codes, or <code>.env</code> values
+in either mailbox.</li>
+<li>Use synthetic/redacted evidence for caller text, slots, audio excerpts, and
+fixtures unless the repository's authorized evidence policy explicitly
+permits the retained artifact.</li>
+<li>Reference retained call IDs and artifact paths; do not copy full transcripts
+or audio into the negotiation merely for convenience.</li>
+<li>A mailbox being committed to a private repository is not a substitute for
+the repository's data-retention and access policy.</li>
+</ul>
+<h2 id="12-anti-patterns">12. Anti-patterns</h2>
+<ul>
+<li>❌ Editing the peer's mailbox (breaks the one structural guarantee).</li>
+<li>❌ Editing a delivered message in place (use <code>supersedes:</code>).</li>
+<li>❌ Empty heartbeat messages (&quot;still polling, nothing new&quot;).</li>
+<li>❌ Accepting a load-bearing claim without checking source.</li>
+<li>❌ Any human-gated side effect (§10) without an explicit human GO.</li>
+<li>❌ Caching &quot;no change&quot; on line count alone.</li>
+<li>❌ Treating a watcher, heartbeat, or mailbox append as proof that an AI read
+the task or executed work.</li>
+<li>❌ Using peer <code>GO</code> to bypass Switchboard ownership or a human-only gate.</li>
+<li>❌ Letting two agents stage or commit the same mailbox file.</li>
+</ul>
+<h2 id="13-worked-example-abbreviated-from-the-live-run">13. Worked example (abbreviated, from the live run)</h2>
+<pre><code>C2C-001  Codex → Claude   review request (design as contract)      NEXT: Claude — review
+CL2C-001 Claude → Codex   GO WITH REQUIRED CHANGES + 5 blockers     NEXT: Codex — reconcile
+C2C-002  Codex → Claude   reconciled graph + 2 amendments; asks 5   NEXT: Claude — close schema
+CL2C-002 Claude → Codex   GO; 5 answers verified vs source          NEXT: Codex — AC-00
+CL2C-003 Claude → Codex   readiness nudge (peer silent ~1h)         NEXT: Codex — status/ETA
+C2C-003  Codex → Claude   accepts GO; 2 clarifications; hold AC-01  NEXT: Claude — ack, hold
+CL2C-004 Claude → Codex   ack; holding AC-01                        NEXT: Codex — AC-00 commit
+</code></pre>
+<p>Outcome: Claude found blockers → Codex reconciled → Claude issued GO → both sides agree exactly who
+starts AC-00 and AC-01, with no production side effects and a full audit trail in git.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#1-what-this-is-and-when-to-use-it">1. What this is (and when to use it)</a></li><li class="toc-h2"><a href="#2-the-mailbox-model">2. The mailbox model</a></li><li class="toc-h2"><a href="#3-message-format">3. Message format</a></li><li class="toc-h3"><a href="#3-1-body-sections-include-those-that-apply">3.1 Body sections (include those that apply)</a></li><li class="toc-h2"><a href="#4-ids-and-reply-chaining">4. IDs and reply-chaining</a></li><li class="toc-h2"><a href="#5-verify-before-you-accept">5. Verify before you accept</a></li><li class="toc-h2"><a href="#6-liveness-silence-must-never-be-ambiguous">6. Liveness — silence must never be ambiguous</a></li><li class="toc-h2"><a href="#7-immutability-and-corrections">7. Immutability and corrections</a></li><li class="toc-h2"><a href="#8-the-index-file-fast-resume-rollover">8. The index file (fast resume + rollover)</a></li><li class="toc-h2"><a href="#9-file-naming-and-rollover">9. File naming and rollover</a></li><li class="toc-h2"><a href="#10-authority-boundary-who-may-approve-what">10. Authority boundary (who may approve what)</a></li><li class="toc-h2"><a href="#11-sensitive-data-boundary">11. Sensitive-data boundary</a></li><li class="toc-h2"><a href="#12-anti-patterns">12. Anti-patterns</a></li><li class="toc-h2"><a href="#13-worked-example-abbreviated-from-the-live-run">13. Worked example (abbreviated, from the live run)</a></li></ul></aside>
+</div>
+</body>
+</html>

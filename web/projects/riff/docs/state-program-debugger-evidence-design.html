@@ -123,7 +123,7 @@ html { scroll-behavior: smooth; }
 <header class="doc-header">
 <a class="home" href="/choice-health.html">&larr; Choice Health</a>
 <span class="crumb">2026-07-10-state-program-debugger-evidence-design.md</span>
-<a class="raw" href="/docs/design/2026-07-10-state-program-debugger-evidence-design.md" title="View raw markdown source">raw .md</a>
+<a class="raw" href="/docs/docs/design/2026-07-10-state-program-debugger-evidence-design.md" title="View raw markdown source">raw .md</a>
 </header>
 <div class="doc-layout with-toc">
 <main class="doc-container">
@@ -597,6 +597,14 @@ state visit, then compare exits, variable deltas, audio output, and findings.</l
 runs answer &quot;what would happen if this input or value changed.&quot; The result must
 always identify its mode.</p>
 <h3 id="state-under-test-capsule">State-Under-Test Capsule</h3>
+<p><strong>Implementation status (2026-07-11):</strong> immutable call-time flow/runtime/call
+identity capture and <code>export_capsule</code> are implemented through the shared
+browser/API/CLI engine. Recorded navigation now includes authoritative
+<code>winning_edge_id</code>/exit-reason summaries and provenance-preserving
+<code>inspect_slot_history</code>; the browser and compact AI CLI consume those same
+commands. Candidate execution and historical reproduction remain disabled
+pending the isolated runner and safety gates; capsule availability is not an
+execution claim.</p>
 <p>Any visit can be exported as a self-contained state-under-test capsule:</p>
 <pre><code class="language-json">{
   &quot;schema&quot;: &quot;riff.state_test_capsule/v1&quot;,
@@ -604,10 +612,13 @@ always identify its mode.</p>
   &quot;recorded_engine_revision&quot;: &quot;git:0123456789abcdef&quot;,
   &quot;recorded_build_id&quot;: &quot;riff-m3-20260710.4&quot;,
   &quot;flow_version&quot;: &quot;sha256:...&quot;,
+  &quot;flow_definition&quot;: {},
   &quot;visit_id&quot;: &quot;menu#1&quot;,
   &quot;state_definition&quot;: {},
   &quot;entry_snapshot&quot;: {},
+  &quot;session_context&quot;: {},
   &quot;recorded_events&quot;: [],
+  &quot;recorded_input_fixtures&quot;: {},
   &quot;legal_exits&quot;: [],
   &quot;tool_fixtures&quot;: [],
   &quot;audio_refs&quot;: [],
@@ -645,8 +656,8 @@ identity, fixture hash, compatibility/migration notes, and a determinism hash.</
 and an authenticated local API. The browser is built on that interface.</p>
 <p>Required actions are:</p>
 <ul>
-<li><code>list_visits</code>, <code>inspect_state</code>, <code>seek</code>, <code>step</code>, <code>reverse</code>, and
-<code>continue_until</code></li>
+<li><code>list_visits</code>, <code>inspect_state</code>, <code>inspect_slot_history</code>, <code>seek</code>, <code>step</code>,
+<code>reverse</code>, and <code>continue_until</code></li>
 <li><code>inspect_variables</code>, <code>inspect_exits</code>, <code>inspect_evidence</code>, and
 <code>fetch_audio_range</code></li>
 <li><code>fork</code>, <code>set_overlay</code>, <code>set_input_fixture</code>, <code>run_to_exit</code>, and

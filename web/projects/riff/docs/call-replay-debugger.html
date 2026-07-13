@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Call Replay Debugger · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  max-width: 820px; margin: 0 auto; padding: 2.4rem 1.4rem 4rem;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">34-call-replay-debugger.md</span>
+<a class="raw" href="/docs/docs/guide/34-call-replay-debugger.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Call Replay Debugger</h1>
+<p>Use the State Program Debugger to replay a retained call on one clock, confirm
+the exact defect point, and inspect the state evidence around it.</p>
+<h2 id="open-a-call">Open a Call</h2>
+<p>Start the RIFF web server and open:</p>
+<pre><code class="language-text">http://127.0.0.1:8765/state-program-debugger.html
+</code></pre>
+<p>Choose a call from <strong>Recent recorded calls</strong>. Each option shows its flow, local
+start time, duration, and exact session ID; newest calls appear first. Selecting
+an option copies its ID into the adjacent field and opens it immediately. You
+can still paste a known ID into <strong>Or paste a session ID</strong> and select <strong>Open</strong>.
+The list refreshes every ten seconds while the tab is visible; use the refresh
+icon to check immediately after a call ends.</p>
+<p>The dropdown lists only retained calls with a <code>session_manifest.json</code>, so every
+listed item can be opened by the debugger. The page loads the normalized
+artifact through the same read-only engine used by the CLI and API. If you need
+to identify the current call for an AI or command-line invocation, read the ID
+from the text field or the page heading after the call opens.</p>
+<h2 id="what-moves-together">What Moves Together</h2>
+<p>The replay cursor synchronizes:</p>
+<ul>
+<li>retained call audio, when available;</li>
+<li>caller and agent transcript bubbles;</li>
+<li>state visits, including repeated visits such as <code>menu#2</code>;</li>
+<li>playback request/start/completion/interruption/failure events;</li>
+<li>slot writes, transition commits, and evidence findings.</li>
+</ul>
+<p><code>Play</code> follows the selected audio track on the call clock. <code>Pause</code> freezes all
+lanes. The scrubber seeks audio and projects the last recorded event at that
+time. <code>Step</code> and <code>Reverse</code> pause playback, move one canonical event, and seek the
+selected track to that event's mapped sample.</p>
+<p>The cursor inspector prints both values:</p>
+<pre><code class="language-text">event 41 · state_entered · call 00:37.420 · sample 00:37.420
+</code></pre>
+<p>That equality is a claim only when the track badge is green. On an unverified
+legacy track, the inspector says <code>nominal media</code> instead of <code>sample</code>.</p>
+<h2 id="audio-tracks">Audio Tracks</h2>
+<p>Use the audio-track selector to separate capture perspectives:</p>
+<table>
+<thead>
+<tr>
+<th>Track</th>
+<th>Meaning</th>
+<th>Alignment claim</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Aligned replay mix</strong></td>
+<td>Caller on left, sent agent audio on right, placed on the retained session clock</td>
+<td>Green: Step and Reverse map to a recorded/derived sample offset</td>
+</tr>
+<tr>
+<td><strong>Caller only</strong></td>
+<td>Raw inbound caller media</td>
+<td>Amber on legacy calls unless its clock mapping was retained</td>
+</tr>
+<tr>
+<td><strong>Agent generated</strong></td>
+<td>Raw model PCM before the phone codec</td>
+<td>Diagnostic only; it may include audio generated faster than real time</td>
+</tr>
+<tr>
+<td><strong>Agent sent · post-codec</strong></td>
+<td>Audio accepted by the outbound transport after codec conversion</td>
+<td>Sent/queued evidence, not proof the handset played it</td>
+</tr>
+<tr>
+<td><strong>Composite · caller L / agent R</strong></td>
+<td>Historical evidence-preserving concatenation</td>
+<td>Amber unless its manifest explicitly supplies a mapping</td>
+</tr>
+</tbody>
+</table>
+<p>Do not infer conversational timing by comparing raw-track durations. Preserve
+those tracks so generation, codec, queueing, and capture defects can be heard in
+isolation. Use <strong>Aligned replay mix</strong> for synchronized playback. Older calls
+without clock metadata remain amber because their alignment cannot be recovered
+honestly after the fact. When every retained track is unverified, the debugger
+selects no audio and disables Play. Choose a <code>Raw</code> track explicitly to audition
+one capture perspective; it is not a synchronized conversation and Step/Reverse
+show <code>nominal media</code> rather than a proven sample position.</p>
+<h2 id="confirm-a-defect">Confirm a Defect</h2>
+<ol>
+<li>Play or scrub until the audible problem begins.</li>
+<li>Select <strong>Mark issue</strong>.</li>
+<li>Use <strong>Earlier</strong> or <strong>Later</strong> to adjust the candidate point by one second.</li>
+<li>Replay the window and answer <strong>Yes</strong> when it is the defect.</li>
+</ol>
+<p>The server appends a revisioned marker containing session ID, call time, event
+ID, state visit, reporter, status, and determinism hash to
+<code>debug_issues.jsonl</code>. The browser keeps only a local display cache. That gives
+a human or AI one durable point to inspect instead of a prose description such
+as &quot;somewhere near the second menu.&quot;</p>
+<p>The marker is also encoded into the page URL as <code>session_id</code>, <code>time_ms</code>, and
+<code>event_id</code>. An AI can return that URL; opening it loads the call and seeks to the
+same evidence point. Confirmed markers add <code>confirmed=1</code>.</p>
+<h2 id="find-repeated-audio">Find Repeated Audio</h2>
+<p>Browser and Telnyx playback paths use the same lifecycle vocabulary:</p>
+<pre><code class="language-text">audio_requested → audio_started → audio_completed
+                                 ↘ audio_interrupted / audio_failed
+</code></pre>
+<p>For browser static audio, acknowledgements originate at the actual client
+player callbacks and are persisted by the server. For Telnyx static audio, they
+originate at the outbound codec/send boundary. Matching content fingerprints
+within the bounded duplicate window produce <code>DUPLICATE_AGENT_PLAYBACK</code>.</p>
+<p>Select <strong>Replay duplicate</strong> in the transport or <strong>Replay audio</strong> in the finding
+to audition a bounded window containing both starts. <strong>Show evidence</strong> seeks to
+the first playback event. The red playback spans show the first and duplicate
+requests on the same state/audio timeline.</p>
+<h2 id="compare-repeated-state-visits">Compare Repeated State Visits</h2>
+<p>Select a repeated visit such as <code>menu#2</code> or
+<code>cap_existing_request__choose_action#2</code>. The comparison band appears directly
+below the current state and compares it with the immediately previous visit to
+the same state. It reports these semantic dimensions separately:</p>
+<ul>
+<li>entry path and Entry variable changes;</li>
+<li>the caller input the resolver acted on;</li>
+<li>source-labelled caller transcript observations;</li>
+<li>slot writes and agent playback spans;</li>
+<li>recorded Exit variables and winning edge.</li>
+</ul>
+<p>The comparison ignores event IDs, sequence numbers, playback IDs, and clock
+values when deciding semantic equality. Those fields naturally differ on every
+visit and would create a false divergence. Entry path is shown as repeat
+topology, not automatically treated as a defect. The returned first difference
+is the earliest <em>provable</em> changed variable, input, playback, or exit in call
+time. If an earlier required evidence lane is unavailable, the debugger reports
+only an <strong>earliest known</strong> difference and does not enable a synchronized jump.
+Select <strong>Jump to first difference</strong> to move the one shared replay cursor, audio
+position, transcript highlight, and state inspector to that recorded point.</p>
+<p>Late turn telemetry keeps two locations when synchronous transitions outrun
+event emission: <code>causal_visit_id</code> names the state visit that handled the input,
+while <code>observed_visit_id</code> names the visit active when the event was finally
+recorded. The debugger must compare by causal ownership. In the retained
+property-management call, “Status, please” was observed during
+<code>choose_action#2</code> but causally belongs to <code>choose_action#1</code>; the second visit's
+first new input is the later no-match utterance.</p>
+<h2 id="read-the-state-path">Read the State Path</h2>
+<p>Each item under <strong>State visits</strong> shows the human-readable state title, visit
+ordinal, exact fired guard, exit target, and recorded exit reason. The fired
+guard is never guessed from the target or reason: the debugger joins the
+<code>transition_verdict.winning_edge_id</code> to the retained legal-exit table. If that
+identifier or table is missing, the page says <strong>Winning guard unavailable</strong>.</p>
+<p>The selected state's <strong>Exit decision</strong> table lists every legal edge and marks
+only that authoritative edge as <strong>Fired</strong>. This matters when two guards share a
+target, such as <code>denied</code> and <code>stalled</code> both routing to leave-message. The raw
+recorded verdict remains available below the table.</p>
+<p>Use <strong>Slot history</strong> in the right inspector to trace a variable across every
+state visit. Each row keeps the typed Entry and Exit value, boundary writer,
+whether the value changed, and the count of retained <code>slot_write</code> events. An
+absent variable, a redacted value, and an unavailable capture are distinct;
+the UI never renders any of them as <code>null</code>.</p>
+<h2 id="ai-use">AI Use</h2>
+<p>Codex and Claude use the structured engine rather than reading screenshots:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py build \
+  data/sessions/&lt;session-id&gt; --out /tmp/call.json
+
+.venv/bin/python scripts/state_program_debugger.py command /tmp/call.json \
+  --json '{&quot;action&quot;:&quot;inspect_timeline&quot;}'
+</code></pre>
+<p>Available recorded operations include visit listing, state/variable/exit
+inspection, timeline/playback inspection, seek, step, reverse, and
+continue-until. Each response carries the cursor and determinism hash.</p>
+<p>For a compact, human-readable view of a retained session directory, both AIs
+can use the wrapper around those same commands:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/dbg.py data/sessions/&lt;session-id&gt; visits
+.venv/bin/python scripts/dbg.py data/sessions/&lt;session-id&gt; explain 8
+.venv/bin/python scripts/dbg.py data/sessions/&lt;session-id&gt; slot _route
+</code></pre>
+<p><code>visits</code> prints the path with exact edge IDs and exit reasons. <code>explain</code> lists
+all legal exits and marks only the edge named by <code>winning_edge_id</code>. <code>slot</code>
+calls <code>inspect_slot_history</code>; it preserves absent, redacted, and unavailable
+cells rather than treating public placeholders as executable values.</p>
+<p>The wrapper's <code>what-if</code> command is currently an explicitly labelled
+candidate-current-flow edge probe. It is not historical replay and is not
+connected to the browser. Do not use it as evidence of what a recorded call
+did. Browser mutation remains disabled until the capsule-backed subprocess
+runner can pin an engine revision, a flow revision, typed fixtures, and a
+simulation-only result namespace.</p>
+<p>To export one visit for Codex, Claude, or a future isolated runner:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py command /tmp/call.json \
+  --json '{&quot;action&quot;:&quot;export_capsule&quot;,&quot;visit_id&quot;:&quot;menu#1&quot;}'
+</code></pre>
+<p>The browser exposes the identical action as <strong>Capsule</strong> after a state visit is
+selected. Browser, CLI, and session API exports carry the same capsule and
+cursor hashes.</p>
+<p>The returned <code>riff.state_test_capsule/v1</code> contains the exact normalized flow and
+selected state definition, Entry boundary, a typed inventory of every mutable
+<code>SessionContext</code> field, state-owned events, structured caller/resolver/control/
+audio/model fixtures, caller/agent transcript rows, playback spans, legal exits,
+recorded outcome, tool-result fixtures, audio and source references, and
+immutable flow/engine/build/runtime identities. The capsule and its complete
+execution-fixture set have separate SHA-256 hashes. Export reads only the
+recorded <code>flow_snapshot.json</code>; an older or tampered call fails with
+<code>FLOW_SNAPSHOT_UNAVAILABLE</code> instead of reading today's YAML.</p>
+<p>Audio references carry the manifest and observed content hashes. Missing,
+changed, or stray unmanifested WAV files are unavailable rather than recorded.
+Tool results are executable fixtures only when a stable call ID and tool name
+join a complete result plus result schema; previews remain diagnostic evidence.
+The capsule also identifies the debugger projector revision that created it. A
+visit is limited to 2,000 events and a capsule to 4 MB.</p>
+<p><code>recorded_reproduction.availability</code> is independent of capsule export. Public
+slot placeholders are not executable values. Missing or redacted Entry slots,
+session history, turn/progress counters, recent/visited-state context, engine
+SHA, dependency lock, tool results, or caller-specific prompt overlays appear
+as typed gaps. The capsule remains useful for inspection, but no client may call
+such a run an exact historical reproduction.</p>
+<p>Behavior-affecting feature flags are recorded separately from the Python and
+package lock. Live wall clock and randomness are currently unavailable execution
+inputs, so they remain blockers until an isolated runner supplies frozen
+fixtures.</p>
+<p>To compare two visits without moving the cursor:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py command /tmp/call.json \
+  --json '{&quot;action&quot;:&quot;compare_visits&quot;,&quot;baseline_visit_id&quot;:&quot;menu#1&quot;,&quot;candidate_visit_id&quot;:&quot;menu#2&quot;}'
+</code></pre>
+<p>To deterministically move to the candidate-side event returned as the first
+semantic difference:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py command /tmp/call.json \
+  --json '{&quot;action&quot;:&quot;rewind_to_first_divergence&quot;,&quot;baseline_visit_id&quot;:&quot;menu#1&quot;,&quot;candidate_visit_id&quot;:&quot;menu#2&quot;}'
+</code></pre>
+<p>Both commands use the same engine as the browser and HTTP API. Equal evidence
+returns <code>NO_RECORDED_DIVERGENCE</code>; missing required evidence returns
+<code>DIVERGENCE_UNAVAILABLE</code>. Neither condition guesses or moves the cursor.</p>
+<p>To review pauses without asking a model to interpret the call:</p>
+<pre><code class="language-bash">.venv/bin/python scripts/state_program_debugger.py command /tmp/call.json \
+  --json '{&quot;action&quot;:&quot;inspect_pause_gaps&quot;}'
+</code></pre>
+<p>The report separates caller-response wait, back-to-back agent output, and
+caller-input-to-agent-output delay. It prefers the recorded resolver input over
+nearby Whisper duplicates and marks superseded inputs rather than charging a
+later response to the wrong turn. The report's own <code>analysis_execution</code> is
+always zero model calls and zero tokens. Per-call model-token usage is marked
+unavailable until the live transport persists it in the session bundle.</p>
+<p>Delays of two seconds or more from a resolved caller input to first agent output
+are returned as <code>tuning_candidates</code>. They are replayable in the browser's
+<strong>Analyze pauses</strong> panel and can jump the shared audio, transcript, state, and
+event cursor to the caller input. A candidate proves the interval, not its
+cause: model-generation, synthesis, and transport-enqueue spans remain typed
+unavailable until retained by the live session.</p>
+<h2 id="visual-reading-order">Visual Reading Order</h2>
+<p>The debugger uses an overview-plus-detail layout. The full-call scrubber is the
+overview. Below it, a 30-second rolling window keeps the playhead stable while
+four explicitly labelled lanes move through call time:</p>
+<ol>
+<li><strong>Caller</strong>: recorded caller transcript intervals.</li>
+<li><strong>Agent</strong>: audio-derived agent transcript and retained playback intervals.</li>
+<li><strong>State</strong>: FSM visit ownership on the same clock.</li>
+<li><strong>Finding</strong>: marked defects and deterministic pause-audit intervals.</li>
+</ol>
+<p>Lane labels carry the meaning; color is redundant emphasis rather than the only
+key. Cyan means caller speech, green means confirmed agent audio evidence, blue
+means FSM state, and amber means a diagnostic interval. A legend remains visible
+above the lanes.</p>
+<p>All lane spans and the amber playhead use the lane track's exact pixel bounds;
+the visible tick labels are generated from that same 30-second call-time scale.
+A transcript line is highlighted only while the cursor is inside its recorded
+start/end interval. During silence, no earlier line is presented as current.
+Clicking a transcript bubble seeks the synchronized call cursor to its start.</p>
+<p>Aligned Whisper rows are also checked against their source-channel PCM before
+they become timeline bars. The hydrator measures 20 ms RMS frames, rejects a
+row with no supported speech frames, and trims silence-spanning Whisper bounds
+to the strongest contiguous speech region. Each retained row carries an
+<code>acoustic_support</code> record with its threshold, active-frame count, and original
+Whisper bounds. <code>clock_status: aligned</code> alone is not sufficient evidence that a
+word was spoken at that time.</p>
+<p>Only a track whose manifest clock is <code>aligned</code> may move the call cursor. A raw
+or <code>unverified</code> WAV remains available for audition, but its sample time does not
+move transcript, state, findings, or events and the UI explicitly reports
+<code>raw track unaligned</code>.</p>
+<p>The palette is semantic across both views: caller evidence is cyan, agent
+speech/audio is green, FSM state and state-owned events are blue, and the active
+cursor or diagnostic evidence is amber. Current highlighting adds an amber
+outline without replacing the underlying caller/agent/state color.</p>
+<p>The state intersecting the gold playhead is deliberately more prominent than
+the surrounding evidence. Both <strong>Current State Program</strong> and the right-side
+state inspector use a four-pixel gold frame and clear gold halo while their
+interior remains state blue. The <code>PLAYHEAD STATE</code> edge label makes the
+relationship explicit without relying on color alone.</p>
+<p>Only observations with an audio-derived start, end, and source channel become
+Caller or Agent lane duration bars. Gemini resolver observations remain visible
+in the conversation as point-in-time observations but are not drawn as if their
+event-emission timestamp were the caller's speech time. If the full-channel
+Whisper pass leaves an acoustically active caller region uncovered, the
+hydrator retranscribes that bounded region and validates the recovered segment
+against the source PCM before adding it.</p>
+<p>The right panel shows the selected state as a small program: predecessor,
+successor, Entry variables, and values changed before Exit. <strong>Follow state</strong> is
+enabled during normal replay. Selecting a state visit disables it and pins the
+state and variables while audio can be inspected; enabling it again catches the
+panel up to the playhead. Detailed Entry/Exit tables remain below the transcript
+for inspection on demand. On a new state, its name changes immediately from the
+local recorded timeline while boundary variables load. Completed immutable state
+snapshots are cached in the browser, so revisiting a state does not rebuild and
+visually replace the panel again.</p>
+<h2 id="recorded-versus-simulated">Recorded Versus Simulated</h2>
+<p>Recorded replay and state-capsule export are implemented and immutable. The
+purple <strong>Fork here</strong> control remains disabled until the isolated state runner is
+implemented and passes its no-network/no-write gates. A future fork will restore
+from the capsule's Entry boundary, apply one slot/input/tool/audio overlay, run
+one state to its exit, and compare the candidate with the recorded visit. It
+will not edit the historical audio or claim regenerated audio was heard by the
+caller.</p>
+<p>Capture now distinguishes six identities that must never be collapsed:</p>
+<ol>
+<li>normalized flow-content revision;</li>
+<li>exact clean engine Git revision;</li>
+<li>deployment build ID;</li>
+<li>Python/dependency runtime lock;</li>
+<li>behavior flags plus clock/randomness execution policy;</li>
+<li>resolved call configuration such as transport, model, voice, STT, and codec.</li>
+</ol>
+<p>A dirty runtime records the engine revision as unavailable. A phone call whose
+system prompt included caller-specific prior-call context freezes the authored
+flow first and records the dynamic overlay as redacted; exact LLM prompt replay
+is therefore unavailable even though deterministic FSM evidence remains useful.</p>
+<p>The local debugger API validates loopback peer, Host, and browser Origin to
+prevent DNS-rebinding access to retained evidence. Non-loopback clients require
+<code>RIFF_DEBUG_API_TOKEN</code>; request bodies are capped at 256 KiB.</p>
+<h2 id="evidence-gaps">Evidence Gaps</h2>
+<p>The debugger reports unavailable evidence rather than filling it in. Older
+browser calls may have no event ledger or agent audio. New playback lifecycle
+capture applies only to calls recorded after deployment and server restart.
+<code>AUDIO_CLOCK_UNAVAILABLE</code> means WAVs exist but none can be placed on the event
+clock; the debugger must not auto-play their composite.
+Carrier-side Telnyx recording remains a separately authorized implementation
+packet; local lifecycle and wire evidence do not by themselves prove what the
+carrier delivered to the handset.</p>
+<h2 id="debug-the-debugger">Debug the Debugger</h2>
+<p>The replay clock has three named coordinates:</p>
+<ol>
+<li><strong>Call time</strong>: milliseconds since the retained session start.</li>
+<li><strong>Event time</strong>: the canonical FSM/LLM/tool event's position on that call clock.</li>
+<li><strong>Media time</strong>: the selected WAV sample offset, mapped by
+<code>sample_zero_call_ms</code> in <code>riff.audio_timeline/v1</code> metadata.</li>
+</ol>
+<p>An aligned track must satisfy <code>media_ms = call_ms - sample_zero_call_ms</code>. The UI
+shows the mapping at the cursor and refuses the green aligned label when the
+manifest does not retain it.</p>
+<p>The shift-left calibration test synthesizes a caller tone at 100 ms and an agent
+tone at 500 ms. It steps to the first event, steps forward to the second, then
+reverses. Each cursor position must land on the expected channel sample. This
+detects swapped channels, sign errors, hidden offsets, and forward/reverse drift
+without relying on a human listening judgment.</p>
+<p>For a real-call validation, use this sequence:</p>
+<ol>
+<li>Open the newest call and select <strong>Aligned replay mix</strong>.</li>
+<li>Confirm the badge is green and the replay duration matches the call duration.</li>
+<li>Play through one caller/agent exchange while watching transcript and state.</li>
+<li>Pause on a known word, Step once, then Reverse once.</li>
+<li>Confirm the call time, sample time, event, transcript, and audible window all
+return to the same evidence point.</li>
+<li>Mark and share any mismatch as a debugger defect; do not diagnose the voice
+flow from a replay whose clock is amber.</li>
+</ol>
+<h2 id="supporting-design">Supporting Design</h2>
+<ul>
+<li><a href="../design/2026-07-10-state-program-debugger-evidence-design.md?format=html">State Program Debugger evidence contract</a></li>
+<li><a href="../design/2026-07-10-unified-call-capture-replay-plan.md?format=html">Unified call capture and replay plan</a></li>
+<li><a href="../design/2026-07-10-browser-playback-debug-replay-plan.md?format=html">Browser playback debug and replay plan</a></li>
+<li><a href="../design/2026-07-10-state-program-debugger-implementation-plan.md?format=html">Implementation work packets</a></li>
+</ul>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#open-a-call">Open a Call</a></li><li class="toc-h2"><a href="#what-moves-together">What Moves Together</a></li><li class="toc-h2"><a href="#audio-tracks">Audio Tracks</a></li><li class="toc-h2"><a href="#confirm-a-defect">Confirm a Defect</a></li><li class="toc-h2"><a href="#find-repeated-audio">Find Repeated Audio</a></li><li class="toc-h2"><a href="#compare-repeated-state-visits">Compare Repeated State Visits</a></li><li class="toc-h2"><a href="#read-the-state-path">Read the State Path</a></li><li class="toc-h2"><a href="#ai-use">AI Use</a></li><li class="toc-h2"><a href="#visual-reading-order">Visual Reading Order</a></li><li class="toc-h2"><a href="#recorded-versus-simulated">Recorded Versus Simulated</a></li><li class="toc-h2"><a href="#evidence-gaps">Evidence Gaps</a></li><li class="toc-h2"><a href="#debug-the-debugger">Debug the Debugger</a></li><li class="toc-h2"><a href="#supporting-design">Supporting Design</a></li></ul></aside>
+</div>
+</body>
+</html>

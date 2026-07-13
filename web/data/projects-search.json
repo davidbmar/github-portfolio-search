@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T09:02:27.806292Z",
+  "generated_at": "2026-07-13T10:22:21.817091Z",
   "count": 140,
   "entries": [
     {
@@ -2412,23 +2412,18 @@
     {
       "repo": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
+      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration",
       "keywords": [
         "python",
         "html",
         "javascript",
+        "sqlite",
         "fastapi",
-        "sqlite-vec",
-        "sentence-transformers",
         "aws lambda",
-        "s3",
-        "cloudfront",
         "semantic-search",
-        "github-indexer",
-        "portfolio-tool",
-        "mcp-server",
-        "vector-database",
-        "static-site-generator"
+        "github-tools",
+        "ai-agents",
+        "portfolio-management"
       ],
       "chunks": [
         {
@@ -2437,23 +2432,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF."
+          "text": "Semantic search engine for personal GitHub repositories with AI agent integration"
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio."
+          "text": "A tool that indexes GitHub repositories using embeddings and TF-IDF to enable semantic search, faceted filtering, and capability clustering. It exposes data via a static web UI, a REST API, and an MCP server for AI agents."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON exports. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing."
+          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. The indexing pipeline fetches repo metadata and READMEs from the GitHub API. The web frontend is a static HTML/JS application served from S3/CloudFront. AI agent access is provided via a Model Context Protocol (MCP) server."
         },
         {
           "source": "how_to_apply",
-          "text": "Install locally to index your own repos, deploy to S3/CloudFront for a public portfolio site, or connect via MCP to allow AI agents to search your codebase contextually."
+          "text": "Use the CLI to index your own GitHub account, then serve the web UI locally or deploy to AWS. Integrate with AI coding assistants like Claude Code via the MCP server to allow them to search your codebase contextually."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF weighting Auto-clustering of repos into capability categories MCP server integration for AI agent access Static web UI with faceted filtering and autocomplete Automated weekly reindexing via GitHub Actions Exportable data formats for LLM discovery"
+          "text": "Semantic search using embeddings and TF-IDF across repository READMEs Automatic clustering of repositories into capability categories MCP server for AI agents to search and retrieve repo details Faceted filtering by language, tech stack, and star count Static web UI with autocomplete and shareable search URLs Automated weekly reindexing via GitHub Actions"
         }
       ]
     },
@@ -3885,18 +3880,18 @@
     {
       "repo": "prioity_foregrounds_kanban",
       "title": "Priority Foregrounds Kanban",
-      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles.",
+      "one_liner": "A standalone workbench for allocating a fixed 100-point budget across decision principles to deterministically rank product initiatives.",
       "keywords": [
         "python 3.11+",
-        "standard library http.server",
-        "vanilla javascript",
-        "google gemini api",
-        "html5/css3",
+        "javascript",
+        "html5",
+        "css3",
+        "gemini api",
         "product-management",
         "prioritization",
-        "kanban",
-        "decision-science",
-        "local-tool"
+        "decision-support",
+        "local-first",
+        "ai-evaluation"
       ],
       "chunks": [
         {
@@ -3905,23 +3900,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles."
+          "text": "A standalone workbench for allocating a fixed 100-point budget across decision principles to deterministically rank product initiatives."
         },
         {
           "source": "what_it_is",
-          "text": "A standalone Python web application that helps product teams make tradeoffs explicit by allocating a strict 100-point budget across five customizable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores with strict validation to prevent malformed or partial outputs from affecting the board."
+          "text": "A local-first web application that helps product teams make tradeoffs explicit by distributing a strict 100-point budget across five editable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores based on structured prompts while enforcing strict validation contracts to prevent malformed data injection."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python 3.11+ using only the standard library for the core server (http.server) and logic. The frontend is vanilla JavaScript, HTML, and CSS. Optional AI integration uses the Google Gemini API via an extra dependency group, with strict in-memory caching, rate limiting, and token budgeting implemented in pure Python."
+          "text": "The backend is a Python standard library HTTP server serving static assets and handling AI rescoring via the Gemini API. The frontend is a vanilla JavaScript single-page application managing state in browser local storage. Communication occurs via JSON APIs with strict schema validation, hash-based provenance tracking, and in-memory rate limiting."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this tool during product strategy sessions to force explicit weighting of decision criteria (e.g., Customer Value vs. Risk). Edit the seed data in web/app.js to reflect your current initiative queue, then use the slider interface to adjust principle weights and observe immediate rank changes. Enable AI rescoring to get structured, evidence-based scoring proposals for specific principles."
+          "text": "Use this tool during product strategy sessions to force explicit prioritization. Define five key principles (e.g., Customer Value, Risk, Leverage), allocate points to reflect current strategic weight, and input your initiative queue. Use the AI rescoring feature to generate evidence-based justifications for each principle, then manually review and accept or reject the proposed scores to maintain human-in-the-loop control."
         },
         {
           "source": "features",
-          "text": "Enforces an exact 100-point budget across five editable decision principles with a 0.1 floor Deterministic queue ranking that updates instantly as principle weights change Optional AI evaluator that proposes complete score columns with strict validation and rejection of partial outputs Local storage persistence for scores, reasons, prompt state, and budget provenance Responsive UI with unit-economics calculator and queue comparison view Fail-closed security model with same-origin checks and no HTML injection in model reasons"
+          "text": "Enforces an exact 100-point budget across five principles with a 0.1 floor Deterministic queue ranking based on weighted principle scores Optional AI evaluator proposes complete score columns with concise reasons Strict validation rejects partial, duplicate, or out-of-range AI outputs Retains score history, prompt state, and model provenance in local storage Includes responsive queue comparison view and unit-economics calculator"
         }
       ]
     },
@@ -4134,20 +4129,19 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
         "mermaid",
-        "jsonl",
         "sqlite",
         "websockets",
-        "pytest",
+        "jsonl",
         "voice-agent",
-        "fsm",
-        "llm-orchestration",
-        "deterministic-ai",
-        "python-framework"
+        "fsm-orchestration",
+        "llm-guardrails",
+        "yaml-config",
+        "python-backend"
       ],
       "chunks": [
         {
@@ -4156,23 +4150,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "riff is a Python-based voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows users to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, and intake. The system ensures reliability by using the LLM only for 'riffing' (language generation) while a deterministic FSM 'keeps the beat' (validating slots, enforcing transitions, and preventing hallucinations)."
+          "text": "A Python-based platform for building voice agents where an LLM handles natural language generation while a declared YAML state graph enforces business logic, slot validation, and transition guards. It separates the 'riff' (LLM creativity) from the 'beat' (deterministic state management) to prevent hallucinations in phone conversations."
         },
         {
           "source": "how_its_built",
-          "text": "The core architecture separates concerns into deterministic pure functions and non-deterministic LLM calls. A web server exposes APIs for flow generation and conversation. When a call comes in, Speech-to-Text converts audio to text, which is passed to `run_turn()`. This function orchestrates guardrails, an LLM adapter (supporting Gemini, Gemma, Claude), and a `state_manager` that validates inputs against a YAML-defined state graph. Deterministic slot extraction and validation occur outside the LLM. The result is converted back to speech via Text-to-Speech. The system includes a session store, event bus, and observability tools for tracking silent failures and performance metrics."
+          "text": "Built with Python using a modular architecture. Core components include a YAML flow loader, a pure-function state manager, guardrails, and adapters for STT/TTS/LLM providers (Gemini, Gemma, Claude). The web server exposes APIs for flow generation and real-time conversation inspection via a browser UI."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to build robust customer service voice agents for specific verticals like plumbing, dental clinics, or retail. It is ideal for scenarios requiring strict data collection (slots) and workflow adherence, such as appointment scheduling or order taking, where pure LLM agents might hallucinate or drift. Developers can define new flows via YAML or generate them via API, integrate with existing telephony systems via the web server, and extend functionality through custom tools and guards."
+          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, salons, tutoring) or retail (coffee, pizza). Describe the business logic in plain English to auto-generate a flow, or manually edit the YAML state graph for precise control. Integrate with existing telephony or use the built-in web interface for testing."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic workflows using YAML-defined Finite State Machines Prevents LLM hallucination via pure-function guardrails and slot validation Supports multiple LLM providers including Gemini, Gemma, and Claude Includes built-in flows for common services like plumbing, salons, and retail Provides real-time web UI for monitoring active conversations and FSM states"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions via YAML-defined FSMs Prevents LLM hallucinations with pure-function guardrails and slot validators Real-time web UI for inspecting live conversations and FSM states Supports multiple LLM providers including Gemini, Gemma, and Claude Includes 11 pre-built flows for common service and retail scenarios"
         }
       ]
     },

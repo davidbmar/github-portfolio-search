@@ -1,92 +1,76 @@
 {
   "title": "GitHub Portfolio Search",
-  "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
-  "what_it_is": "A tool that indexes GitHub repositories, extracts README content, generates embeddings, and provides a searchable interface via CLI, Web UI, and MCP server. It allows developers to find reusable code patterns and architectures across their own portfolio.",
-  "how_its_built": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. FastAPI serves the REST API. The web frontend is static HTML/JS consuming JSON exports. AWS Lambda handles OAuth and logging. GitHub Actions automate weekly reindexing.",
-  "how_to_apply": "Install locally to index your own repos, deploy to S3/CloudFront for a public portfolio site, or connect via MCP to allow AI agents to search your codebase contextually.",
+  "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration",
+  "what_it_is": "A tool that indexes GitHub repositories using embeddings and TF-IDF to enable semantic search, faceted filtering, and capability clustering. It exposes data via a static web UI, a REST API, and an MCP server for AI agents.",
+  "how_its_built": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. The indexing pipeline fetches repo metadata and READMEs from the GitHub API. The web frontend is a static HTML/JS application served from S3/CloudFront. AI agent access is provided via a Model Context Protocol (MCP) server.",
+  "how_to_apply": "Use the CLI to index your own GitHub account, then serve the web UI locally or deploy to AWS. Integrate with AI coding assistants like Claude Code via the MCP server to allow them to search your codebase contextually.",
   "quickstart": "git clone https://github.com/davidbmar/github-portfolio-search.git\ncd github-portfolio-search\npython3 -m venv .venv\nsource .venv/bin/activate\npip install -e \".[dev]\"\ncp .env.example .env\nghps index <your_github_username>\nghps export\ncd web && python3 -m http.server 8000",
   "features": [
-    "Semantic search using embeddings and TF-IDF weighting",
-    "Auto-clustering of repos into capability categories",
-    "MCP server integration for AI agent access",
-    "Static web UI with faceted filtering and autocomplete",
-    "Automated weekly reindexing via GitHub Actions",
-    "Exportable data formats for LLM discovery"
+    "Semantic search using embeddings and TF-IDF across repository READMEs",
+    "Automatic clustering of repositories into capability categories",
+    "MCP server for AI agents to search and retrieve repo details",
+    "Faceted filtering by language, tech stack, and star count",
+    "Static web UI with autocomplete and shareable search URLs",
+    "Automated weekly reindexing via GitHub Actions"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User or AI Agent]\n    WebUI[Web UI Static Files]\n    CLICLI[CLI Tool ghps]\n    MCPServer[MCP Server]\n    API[FastAPI REST API]\n    Indexer[Indexing Pipeline]\n    GitHubAPI[GitHub API]\n    VectorDB[SQLite vec Database]\n    S3[S3 Bucket]\n    CloudFront[CloudFront CDN]\n    LambdaOAuth[Lambda OAuth Handler]\n    \n    User --> WebUI\n    User --> CLI\n    User --> MCPServer\n    \n    WebUI --> API\n    CLI --> Indexer\n    CLI --> API\n    MCPServer --> API\n    \n    Indexer --> GitHubAPI\n    Indexer --> VectorDB\n    \n    API --> VectorDB\n    \n    Indexer --> S3\n    S3 --> CloudFront\n    CloudFront --> WebUI\n    \n    WebUI --> LambdaOAuth\n    LambdaOAuth --> GitHubAPI",
-  "diagram_sequence": "sequenceDiagram\n    participant Client as Web Browser or CLI\n    participant API as FastAPI Server\n    participant DB as SQLite vec DB\n    participant GH as GitHub API\n    \n    Client->>API: GET /search?q=voice+processing\n    API->>DB: Query embeddings and TF-IDF\n    DB-->>API: Return ranked repo IDs\n    API->>DB: Fetch repo metadata for IDs\n    DB-->>API: Return repo details\n    API-->>Client: Return JSON results with snippets\n    \n    Note over Client,GH: Optional OAuth Flow\n    Client->>API: Request OAuth URL\n    API-->>Client: Return GitHub OAuth URL\n    Client->>GH: Authorize App\n    GH-->>Client: Redirect with Code\n    Client->>API: POST /oauth/callback with Code\n    API->>GH: Exchange Code for Token\n    GH-->>API: Return Access Token\n    API-->>Client: Return Session Token",
+  "diagram_architecture": "flowchart TD\n    User[User Browser]\n    AIAgent[AI Agent]\n    WebUI[Static Web UI]\n    MCPServer[MCP Server]\n    IndexingPipeline[Indexing Pipeline]\n    GitHubAPI[GitHub API]\n    VectorDB[SQLite vec DB]\n    StaticAssets[S3 CloudFront]\n    \n    User --> WebUI\n    AIAgent --> MCPServer\n    WebUI --> StaticAssets\n    MCPServer --> VectorDB\n    IndexingPipeline --> GitHubAPI\n    IndexingPipeline --> VectorDB\n    IndexingPipeline --> StaticAssets",
+  "diagram_sequence": "sequenceDiagram\n    participant User\n    participant WebUI\n    participant MCPServer\n    participant VectorDB\n    participant GitHubAPI\n    \n    User->>WebUI: Enter search query\n    WebUI->>VectorDB: Query embeddings\n    VectorDB-->>WebUI: Return matching repos\n    WebUI-->>User: Display results\n    \n    AIAgent->>MCPServer: portfolio_search query\n    MCPServer->>VectorDB: Semantic search\n    VectorDB-->>MCPServer: Repo records\n    MCPServer-->>AIAgent: Formatted response",
   "capabilities": [
-    "Semantic Code Search",
+    "Semantic Search",
     "Repository Indexing",
-    "Vector Similarity Matching",
-    "Static Site Generation",
-    "MCP Tool Exposure",
-    "Automated Data Refresh"
+    "AI Agent Integration",
+    "Data Export",
+    "Access Control"
   ],
   "components": [
-    "ghps CLI",
-    "FastAPI Backend",
-    "SQLite-vec Storage",
-    "Static Web Frontend",
-    "MCP Server Module",
     "Indexing Pipeline",
-    "AWS Lambda Functions"
+    "MCP Server",
+    "REST API",
+    "Static Web UI",
+    "Lambda Functions"
   ],
   "tech": [
     "Python",
     "HTML",
     "JavaScript",
+    "SQLite",
     "FastAPI",
-    "SQLite-vec",
-    "sentence-transformers",
-    "AWS Lambda",
-    "S3",
-    "CloudFront"
+    "AWS Lambda"
   ],
   "depends_on": [
-    "GitHub Personal Access Token",
-    "Python 3.9+",
-    "AWS CLI",
-    "sentence-transformers library",
-    "sqlite-vec extension"
+    "sentence-transformers",
+    "sqlite-vec",
+    "GitHub API",
+    "AWS CLI"
   ],
   "integrates_with": [
-    "GitHub API",
     "Claude Code",
-    "AI Agents via MCP",
     "Google OAuth",
-    "Telegram Bot API"
+    "Telegram",
+    "CloudFront"
   ],
   "patterns": [
     "Progressive Disclosure",
-    "Static Site Export",
+    "Static Site Generation",
     "Vector Search",
-    "Serverless Functions",
-    "CI/CD Automation"
+    "Serverless Functions"
   ],
   "reuse_tags": [
     "semantic-search",
-    "github-indexer",
-    "portfolio-tool",
-    "mcp-server",
-    "vector-database",
-    "static-site-generator"
+    "github-tools",
+    "ai-agents",
+    "portfolio-management"
   ],
   "slug": "github-portfolio-search",
   "repo_url": "https://github.com/davidbmar/github-portfolio-search",
   "visibility": "public",
   "status": "shipped",
   "thin": false,
-  "todos": [
-    {
-      "kind": "unmerged_branch",
-      "detail": "feat/narrate-render-and-link is 1 commit ahead of the default branch"
-    }
-  ],
+  "todos": [],
   "screenshot_url": "",
-  "generated_at": "2026-07-12T09:01:24.277479Z",
-  "source_commit": "f7c9f21",
+  "generated_at": "2026-07-13T10:21:14.304213Z",
+  "source_commit": "27c6276",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-07-11T08:48:08Z",
+  "pushed_at": "2026-07-13T04:22:38Z",
   "docs": []
 }

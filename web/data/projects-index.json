@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T09:02:27.802864Z",
+  "generated_at": "2026-07-13T10:22:21.813590Z",
   "count": 140,
   "projects": [
     {
@@ -1290,29 +1290,24 @@
     {
       "slug": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub repositories using embeddings and TF-IDF.",
+      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration",
       "tech": [
         "Python",
         "HTML",
         "JavaScript",
+        "SQLite",
         "FastAPI",
-        "SQLite-vec",
-        "sentence-transformers",
-        "AWS Lambda",
-        "S3",
-        "CloudFront"
+        "AWS Lambda"
       ],
       "reuse_tags": [
         "semantic-search",
-        "github-indexer",
-        "portfolio-tool",
-        "mcp-server",
-        "vector-database",
-        "static-site-generator"
+        "github-tools",
+        "ai-agents",
+        "portfolio-management"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-11T08:48:08Z"
+      "pushed_at": "2026-07-13T04:22:38Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2056,24 +2051,24 @@
     {
       "slug": "prioity_foregrounds_kanban",
       "title": "Priority Foregrounds Kanban",
-      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget across editable decision principles.",
+      "one_liner": "A standalone workbench for allocating a fixed 100-point budget across decision principles to deterministically rank product initiatives.",
       "tech": [
         "Python 3.11+",
-        "Standard Library http.server",
-        "Vanilla JavaScript",
-        "Google Gemini API",
-        "HTML5/CSS3"
+        "JavaScript",
+        "HTML5",
+        "CSS3",
+        "Gemini API"
       ],
       "reuse_tags": [
         "product-management",
         "prioritization",
-        "kanban",
-        "decision-science",
-        "local-tool"
+        "decision-support",
+        "local-first",
+        "ai-evaluation"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/prioity_foregrounds_kanban",
-      "pushed_at": "2026-07-11T21:09:56Z"
+      "pushed_at": "2026-07-12T19:34:28Z"
     },
     {
       "slug": "pythonArrays",
@@ -2185,26 +2180,25 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "JSONL",
         "SQLite",
         "WebSockets",
-        "Pytest"
+        "JSONL"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm",
-        "llm-orchestration",
-        "deterministic-ai",
-        "python-framework"
+        "fsm-orchestration",
+        "llm-guardrails",
+        "yaml-config",
+        "python-backend"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-12T03:55:48Z"
+      "pushed_at": "2026-07-13T07:34:01Z"
     },
     {
       "slug": "riot",
