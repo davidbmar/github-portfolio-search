@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-13T10:22:21.813590Z",
+  "generated_at": "2026-07-14T09:04:49.551508Z",
   "count": 140,
   "projects": [
     {
@@ -1290,24 +1290,26 @@
     {
       "slug": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration",
+      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration.",
       "tech": [
         "Python",
         "HTML",
         "JavaScript",
         "SQLite",
         "FastAPI",
+        "sentence-transformers",
+        "AWS S3",
         "AWS Lambda"
       ],
       "reuse_tags": [
-        "semantic-search",
-        "github-tools",
-        "ai-agents",
-        "portfolio-management"
+        "Portfolio Tool",
+        "Search Engine",
+        "AI Assistant",
+        "Developer Tool"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-13T04:22:38Z"
+      "pushed_at": "2026-07-13T10:24:02Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2051,24 +2053,24 @@
     {
       "slug": "prioity_foregrounds_kanban",
       "title": "Priority Foregrounds Kanban",
-      "one_liner": "A standalone workbench for allocating a fixed 100-point budget across decision principles to deterministically rank product initiatives.",
+      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget and optional AI-assisted scoring.",
       "tech": [
         "Python 3.11+",
         "JavaScript",
         "HTML5",
         "CSS3",
-        "Gemini API"
+        "Google Gemini API"
       ],
       "reuse_tags": [
         "product-management",
         "prioritization",
-        "decision-support",
-        "local-first",
-        "ai-evaluation"
+        "kanban",
+        "ai-evaluation",
+        "local-server"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/prioity_foregrounds_kanban",
-      "pushed_at": "2026-07-12T19:34:28Z"
+      "pushed_at": "2026-07-13T19:33:20Z"
     },
     {
       "slug": "pythonArrays",
@@ -2180,25 +2182,26 @@
     {
       "slug": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "tech": [
         "Python",
         "YAML",
         "Mermaid",
-        "SQLite",
+        "JSONL",
         "WebSockets",
-        "JSONL"
+        "SQLite"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
+        "fsm",
+        "llm-orchestration",
+        "python",
         "yaml-config",
-        "python-backend"
+        "deterministic-validation"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-13T07:34:01Z"
+      "pushed_at": "2026-07-14T06:42:14Z"
     },
     {
       "slug": "riot",
@@ -2746,26 +2749,26 @@
     {
       "slug": "training",
       "title": "Phone Agent Training Pipeline",
-      "one_liner": "A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists.",
+      "one_liner": "Generate synthetic phone conversations and fine-tune local LLMs via LoRA on Apple Silicon to create low-cost, high-quality plumbing receptionist agents.",
       "tech": [
         "Python",
         "MLX",
         "LoRA",
         "JSONL",
         "Apple Silicon",
-        "Phi-4-mini"
+        "Phi-4 Mini"
       ],
       "reuse_tags": [
-        "llm-training",
         "voice-agent",
+        "local-llm",
+        "fine-tuning",
+        "data-pipeline",
         "apple-silicon",
-        "mlx",
-        "lora",
-        "synthetic-data"
+        "customer-service"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/training",
-      "pushed_at": null
+      "pushed_at": "2026-07-13T20:44:22Z"
     },
     {
       "slug": "transcriber-2-pass-riva-conformer-cf-s3-lambda-cognito-adapter-2025-10-14",

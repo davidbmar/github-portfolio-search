@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-13T10:22:21.817091Z",
+  "generated_at": "2026-07-14T09:04:49.554812Z",
   "count": 140,
   "entries": [
     {
@@ -2412,18 +2412,20 @@
     {
       "repo": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration",
+      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration.",
       "keywords": [
         "python",
         "html",
         "javascript",
         "sqlite",
         "fastapi",
+        "sentence-transformers",
+        "aws s3",
         "aws lambda",
-        "semantic-search",
-        "github-tools",
-        "ai-agents",
-        "portfolio-management"
+        "portfolio tool",
+        "search engine",
+        "ai assistant",
+        "developer tool"
       ],
       "chunks": [
         {
@@ -2432,7 +2434,7 @@
         },
         {
           "source": "one_liner",
-          "text": "Semantic search engine for personal GitHub repositories with AI agent integration"
+          "text": "Semantic search engine for personal GitHub repositories with AI agent integration."
         },
         {
           "source": "what_it_is",
@@ -2440,15 +2442,15 @@
         },
         {
           "source": "how_its_built",
-          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. The indexing pipeline fetches repo metadata and READMEs from the GitHub API. The web frontend is a static HTML/JS application served from S3/CloudFront. AI agent access is provided via a Model Context Protocol (MCP) server."
+          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. The indexing pipeline fetches repo metadata and READMEs from the GitHub API. The web UI is a static HTML/JS application consuming JSON exports. Deployment uses AWS S3, CloudFront, and Lambda functions for OAuth and logging."
         },
         {
           "source": "how_to_apply",
-          "text": "Use the CLI to index your own GitHub account, then serve the web UI locally or deploy to AWS. Integrate with AI coding assistants like Claude Code via the MCP server to allow them to search your codebase contextually."
+          "text": "Use the CLI to index your own GitHub account, then serve the web UI locally or deploy to AWS. Integrate the MCP server into AI coding assistants like Claude Code to allow them to search your codebase contextually without loading all files into memory."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF across repository READMEs Automatic clustering of repositories into capability categories MCP server for AI agents to search and retrieve repo details Faceted filtering by language, tech stack, and star count Static web UI with autocomplete and shareable search URLs Automated weekly reindexing via GitHub Actions"
+          "text": "Semantic search across repositories using embeddings and TF-IDF Auto-clustering of repos into capability categories like Voice or AI MCP server for AI agents to search portfolio programmatically Faceted filtering by language, tech stack, and star count Static web UI with shareable URLs and localStorage collections Automated weekly reindexing via GitHub Actions"
         }
       ]
     },
@@ -3880,18 +3882,18 @@
     {
       "repo": "prioity_foregrounds_kanban",
       "title": "Priority Foregrounds Kanban",
-      "one_liner": "A standalone workbench for allocating a fixed 100-point budget across decision principles to deterministically rank product initiatives.",
+      "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget and optional AI-assisted scoring.",
       "keywords": [
         "python 3.11+",
         "javascript",
         "html5",
         "css3",
-        "gemini api",
+        "google gemini api",
         "product-management",
         "prioritization",
-        "decision-support",
-        "local-first",
-        "ai-evaluation"
+        "kanban",
+        "ai-evaluation",
+        "local-server"
       ],
       "chunks": [
         {
@@ -3900,23 +3902,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A standalone workbench for allocating a fixed 100-point budget across decision principles to deterministically rank product initiatives."
+          "text": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget and optional AI-assisted scoring."
         },
         {
           "source": "what_it_is",
-          "text": "A local-first web application that helps product teams make tradeoffs explicit by distributing a strict 100-point budget across five editable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores based on structured prompts while enforcing strict validation contracts to prevent malformed data injection."
+          "text": "A standalone web application that helps product operators make explicit tradeoffs by allocating a strict 100-point budget across five decision principles. It features a deterministic queue ranking system, responsive UI for editing principles, and an optional AI evaluator that proposes scores based on structured prompts while enforcing strict validation contracts to prevent malformed data injection."
         },
         {
           "source": "how_its_built",
-          "text": "The backend is a Python standard library HTTP server serving static assets and handling AI rescoring via the Gemini API. The frontend is a vanilla JavaScript single-page application managing state in browser local storage. Communication occurs via JSON APIs with strict schema validation, hash-based provenance tracking, and in-memory rate limiting."
+          "text": "The backend is a lightweight Python HTTP server using the standard library (http.server) to serve static assets and handle API requests. The frontend is a vanilla JavaScript single-page application managing state in browser local storage. AI integration uses the Google Gemini API via a bounded rescore module that enforces rate limits, token budgets, and strict schema validation before accepting any proposed scores."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this tool during product strategy sessions to force explicit prioritization. Define five key principles (e.g., Customer Value, Risk, Leverage), allocate points to reflect current strategic weight, and input your initiative queue. Use the AI rescoring feature to generate evidence-based justifications for each principle, then manually review and accept or reject the proposed scores to maintain human-in-the-loop control."
+          "text": "Use this tool to replace subjective gut-feel prioritization with a transparent, auditable process. Define your five key decision principles (e.g., Customer Value, Risk, Leverage), assign them weights summing to 100, and input your initiative queue. Use the AI rescoring feature to get consistent, evidence-based scoring suggestions for each principle, then manually review and accept changes to maintain human-in-the-loop control."
         },
         {
           "source": "features",
-          "text": "Enforces an exact 100-point budget across five principles with a 0.1 floor Deterministic queue ranking based on weighted principle scores Optional AI evaluator proposes complete score columns with concise reasons Strict validation rejects partial, duplicate, or out-of-range AI outputs Retains score history, prompt state, and model provenance in local storage Includes responsive queue comparison view and unit-economics calculator"
+          "text": "Enforces an exact 100-point budget across five editable decision principles with proportional redistribution. Deterministic queue ranking that reorders initiatives only after user interaction completes. Optional AI evaluator that proposes complete score columns with concise reasons, rejecting partial or malformed output. Strict validation contract ensuring every initiative ID is scored exactly once with integer values between 1 and 5. Local storage persistence for scores, reasons, prompt state, and model provenance without external databases. Built-in spend controls including per-minute and per-day rate limits and token budgets for AI calls."
         }
       ]
     },
@@ -4129,19 +4131,19 @@
     {
       "repo": "riff",
       "title": "Riff",
-      "one_liner": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions.",
+      "one_liner": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions.",
       "keywords": [
         "python",
         "yaml",
         "mermaid",
-        "sqlite",
-        "websockets",
         "jsonl",
+        "websockets",
+        "sqlite",
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
+        "fsm",
+        "llm-orchestration",
         "yaml-config",
-        "python-backend"
+        "deterministic-validation"
       ],
       "chunks": [
         {
@@ -4150,23 +4152,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Voice agent platform that generates deterministic FSM-based voice agents from plain English business descriptions."
+          "text": "Voice agent platform that generates deterministic state-machine-driven agents from plain English business descriptions."
         },
         {
           "source": "what_it_is",
-          "text": "A Python-based platform for building voice agents where an LLM handles natural language generation while a declared YAML state graph enforces business logic, slot validation, and transition guards. It separates the 'riff' (LLM creativity) from the 'beat' (deterministic state management) to prevent hallucinations in phone conversations."
+          "text": "riff is a voice agent framework that combines Large Language Models for natural language understanding with declared Finite State Machines (YAML) for strict workflow enforcement. It allows developers to describe a business process in plain text, automatically generating a voice agent that handles phone conversations for tasks like scheduling, ordering, or intake. The system ensures reliability by using the FSM to validate slots and enforce transitions, preventing LLM hallucinations while maintaining natural conversation flow."
         },
         {
           "source": "how_its_built",
-          "text": "Built with Python using a modular architecture. Core components include a YAML flow loader, a pure-function state manager, guardrails, and adapters for STT/TTS/LLM providers (Gemini, Gemma, Claude). The web server exposes APIs for flow generation and real-time conversation inspection via a browser UI."
+          "text": "The core engine is built in Python, utilizing a hybrid architecture where an LLM (Gemini, Gemma, or Claude) drives the conversational 'riff' while a deterministic state manager keeps the 'beat'. Key components include pure-function guardrails, a YAML-based flow loader, a session store for context management, and adapters for Speech-to-Text and Text-to-Speech. The system exposes a web server for real-time interaction and an API for flow generation, with all non-LLM logic designed as deterministic pure functions to ensure reproducibility and ease of testing."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, salons, tutoring) or retail (coffee, pizza). Describe the business logic in plain English to auto-generate a flow, or manually edit the YAML state graph for precise control. Integrate with existing telephony or use the built-in web interface for testing."
+          "text": "Use riff to rapidly prototype and deploy voice agents for service businesses (plumbing, dental, salons) or retail scenarios (coffee, pizza). It is ideal for applications requiring strict data collection (slots) within a flexible conversational interface. Developers can extend it by defining new YAML flows, integrating custom tools via the MCP server, or connecting specific STT/TTS providers through the adapter interface."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions via YAML-defined FSMs Prevents LLM hallucinations with pure-function guardrails and slot validators Real-time web UI for inspecting live conversations and FSM states Supports multiple LLM providers including Gemini, Gemma, and Claude Includes 11 pre-built flows for common service and retail scenarios"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces strict state transitions and slot validation via YAML-defined FSMs Supports multiple LLM backends including Gemini, Gemma, and Claude Provides a real-time web UI for monitoring and interacting with active sessions Includes deterministic guardrails and pure-function validators to prevent hallucinations Exposes reusable RIFF blocks to MCP clients for extended integration"
         }
       ]
     },
@@ -5211,18 +5213,20 @@
     {
       "repo": "training",
       "title": "Phone Agent Training Pipeline",
-      "one_liner": "A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists.",
+      "one_liner": "Generate synthetic phone conversations and fine-tune local LLMs via LoRA on Apple Silicon to create low-cost, high-quality plumbing receptionist agents.",
       "keywords": [
         "python",
         "mlx",
         "lora",
         "jsonl",
         "apple silicon",
-        "phi-4-mini",
-        "llm-training",
+        "phi-4 mini",
         "voice-agent",
+        "local-llm",
+        "fine-tuning",
+        "data-pipeline",
         "apple-silicon",
-        "synthetic-data"
+        "customer-service"
       ],
       "chunks": [
         {
@@ -5231,23 +5235,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A pipeline for generating synthetic phone conversation data and fine-tuning local LLMs (via LoRA on Apple Silicon) to act as automated plumbing receptionists."
+          "text": "Generate synthetic phone conversations and fine-tune local LLMs via LoRA on Apple Silicon to create low-cost, high-quality plumbing receptionist agents."
         },
         {
           "source": "what_it_is",
-          "text": "This project provides a complete workflow to train small, efficient language models (3.8B-7B parameters) to handle inbound phone calls for a plumbing business. It uses knowledge distillation where a large teacher model generates realistic conversations, which are then processed into structured training data with slot injection (context, state, tasks). The resulting models are fine-tuned using MLX LoRA adapters to run locally on Mac hardware, offering low-latency, zero-cost inference while maintaining high-quality receptionist behavior across 11 conversation phases."
+          "text": "A data generation and fine-tuning pipeline that uses knowledge distillation to teach small language models (3.8B-7B parameters) how to handle inbound phone calls for a plumbing business. It converts raw conversational data into structured training examples with slot injection, normalizes conversation phases, and produces MLX-compatible datasets for efficient local training on Mac hardware."
         },
         {
           "source": "how_its_built",
-          "text": "The pipeline is built in Python, leveraging the `mlx-lm` library for efficient fine-tuning on Apple Silicon. It processes raw JSON conversation logs through normalization scripts that map diverse user inputs to standardized FSM states. Data is enriched with structured context blocks ([CONTEXT], [SLOTS], [STATE], [TASK]) to teach the model slot-filling and workflow adherence. The final training data is converted into chat templates compatible with MLX, and LoRA adapters are trained against base models like Phi-4-mini-instruct."
+          "text": "The pipeline starts with raw conversation data which is normalized and split using Python scripts. It injects structured context including current time, available slots, caller mood, and FSM state into every training example. Scripts convert these examples into turn-level prompt/completion pairs compatible with MLX, Phi-4, Mistral, or Gemma templates. Finally, the model is fine-tuned using mlx-lm with LoRA adapters to learn specific receptionist behaviors like slot filling and phase transitions."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this pipeline when you need a specialized, domain-specific voice agent that runs entirely on-device without API costs. It is ideal for businesses requiring consistent handling of scheduling, triage, and customer service queries where data privacy and low latency are critical. The modular script structure allows adaptation to other service industries by updating the scenario matrix and slot definitions."
+          "text": "Use this pipeline when you need to customize a small language model for a specific voice agent workflow without relying on expensive cloud APIs. It is ideal for developers with Apple Silicon hardware who want to iterate quickly on domain-specific dialogue policies, such as scheduling logic or empathy handling, by generating synthetic data that mirrors production FSM states."
         },
         {
           "source": "features",
-          "text": "Generates synthetic training data using knowledge distillation from large teacher models Implements slot injection training with structured context, state, and task prompts Fine-tunes local LLMs using LoRA on Apple Silicon via MLX for efficient inference Normalizes conversation phases into 11 standardized FSM states for consistent behavior Includes stratified splitting and edge-case oversampling for robust model performance Provides interactive HTML documentation and data explorers for pipeline transparency"
+          "text": "Generates structured training data with slot injection for context-aware responses Normalizes conversation phases to align with finite state machine workflows Converts data into multiple chat template formats including MLX and Phi-4 Fine-tunes local models on Apple Silicon using LoRA for efficient adaptation Includes edge case handling for after-hours calls and emergency scenarios Produces stratified train/val/test splits to ensure balanced phase coverage"
         }
       ]
     },

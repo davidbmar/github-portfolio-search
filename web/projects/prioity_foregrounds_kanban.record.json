@@ -1,27 +1,26 @@
 {
   "title": "Priority Foregrounds Kanban",
-  "one_liner": "A standalone workbench for allocating a fixed 100-point budget across decision principles to deterministically rank product initiatives.",
-  "what_it_is": "A local-first web application that helps product teams make tradeoffs explicit by distributing a strict 100-point budget across five editable decision principles. It features a deterministic queue ranking system, proportional point redistribution, and an optional AI evaluator that proposes scores based on structured prompts while enforcing strict validation contracts to prevent malformed data injection.",
-  "how_its_built": "The backend is a Python standard library HTTP server serving static assets and handling AI rescoring via the Gemini API. The frontend is a vanilla JavaScript single-page application managing state in browser local storage. Communication occurs via JSON APIs with strict schema validation, hash-based provenance tracking, and in-memory rate limiting.",
-  "how_to_apply": "Use this tool during product strategy sessions to force explicit prioritization. Define five key principles (e.g., Customer Value, Risk, Leverage), allocate points to reflect current strategic weight, and input your initiative queue. Use the AI rescoring feature to generate evidence-based justifications for each principle, then manually review and accept or reject the proposed scores to maintain human-in-the-loop control.",
-  "quickstart": "python3 -m venv .venv\n. .venv/bin/activate\npython -m pip install -e '.[ai]'\ncp .env.example .env\n# Edit .env to add GEMINI_API_KEY and set PRIORITY_RESCORE_ENABLED=1\nset -a\n. ./.env\nset +a\npython3 -m priority_foregrounds.server",
+  "one_liner": "A local-first workbench for deterministic product prioritization using a fixed 100-point budget and optional AI-assisted scoring.",
+  "what_it_is": "A standalone web application that helps product operators make explicit tradeoffs by allocating a strict 100-point budget across five decision principles. It features a deterministic queue ranking system, responsive UI for editing principles, and an optional AI evaluator that proposes scores based on structured prompts while enforcing strict validation contracts to prevent malformed data injection.",
+  "how_its_built": "The backend is a lightweight Python HTTP server using the standard library (http.server) to serve static assets and handle API requests. The frontend is a vanilla JavaScript single-page application managing state in browser local storage. AI integration uses the Google Gemini API via a bounded rescore module that enforces rate limits, token budgets, and strict schema validation before accepting any proposed scores.",
+  "how_to_apply": "Use this tool to replace subjective gut-feel prioritization with a transparent, auditable process. Define your five key decision principles (e.g., Customer Value, Risk, Leverage), assign them weights summing to 100, and input your initiative queue. Use the AI rescoring feature to get consistent, evidence-based scoring suggestions for each principle, then manually review and accept changes to maintain human-in-the-loop control.",
+  "quickstart": "python3 -m priority_foregrounds.server",
   "features": [
-    "Enforces an exact 100-point budget across five principles with a 0.1 floor",
-    "Deterministic queue ranking based on weighted principle scores",
-    "Optional AI evaluator proposes complete score columns with concise reasons",
-    "Strict validation rejects partial, duplicate, or out-of-range AI outputs",
-    "Retains score history, prompt state, and model provenance in local storage",
-    "Includes responsive queue comparison view and unit-economics calculator"
+    "Enforces an exact 100-point budget across five editable decision principles with proportional redistribution.",
+    "Deterministic queue ranking that reorders initiatives only after user interaction completes.",
+    "Optional AI evaluator that proposes complete score columns with concise reasons, rejecting partial or malformed output.",
+    "Strict validation contract ensuring every initiative ID is scored exactly once with integer values between 1 and 5.",
+    "Local storage persistence for scores, reasons, prompt state, and model provenance without external databases.",
+    "Built-in spend controls including per-minute and per-day rate limits and token budgets for AI calls."
   ],
-  "diagram_architecture": "flowchart TD\n    User[Operator Browser]\n    Server[Python HTTP Server]\n    Rescore[Rescore Module]\n    Cache[In-Memory Cache]\n    Limits[Rate Limiters]\n    Gemini[Gemini API]\n    Storage[Browser Local Storage]\n    User -->|HTTP Requests| Server\n    Server -->|Static Assets| User\n    Server -->|POST /api/rescore| Rescore\n    Rescore -->|Check Limits| Limits\n    Rescore -->|Check Cache| Cache\n    Cache -->|Hit| Rescore\n    Cache -->|Miss| Rescore\n    Rescore -->|API Call| Gemini\n    Gemini -->|Response| Rescore\n    Rescore -->|Validated Result| Server\n    Server -->|JSON Response| User\n    User -->|Save State| Storage",
-  "diagram_sequence": "sequenceDiagram\n    participant Browser as Operator Browser\n    participant Server as Python HTTP Server\n    participant Rescore as Rescore Module\n    participant Gemini as Gemini API\n    Browser->>Server: POST /api/rescore with queue and principle\n    Server->>Rescore: Validate request schema and bounds\n    Rescore->>Rescore: Check rate limits and daily budgets\n    Rescore->>Rescore: Check in-memory cache for identical request\n    alt Cache Miss\n        Rescore->>Gemini: Send structured prompt with initiative data\n        Gemini-->>Rescore: Return raw model output\n        Rescore->>Rescore: Parse and validate scores against contract\n        Rescore->>Rescore: Update cache and daily counters\n    else Cache Hit\n        Rescore-->>Rescore: Retrieve cached result\n    end\n    Rescore-->>Server: Return validated rescore_result/v1\n    Server-->>Browser: JSON response with scores and provenance\n    Browser->>Browser: Validate contract client-side\n    Browser->>Browser: Update UI and save to local storage",
+  "diagram_architecture": "flowchart TD\n    User[Browser User]\n    UI[Web Interface app.js]\n    Server[Python HTTP Server]\n    Rescore[Rescore Module]\n    Cache[In-Memory Cache]\n    Gemini[Gemini API]\n    Storage[Browser Local Storage]\n    User --> UI\n    UI --> Server\n    Server --> Rescore\n    Rescore --> Cache\n    Rescore --> Gemini\n    UI --> Storage",
+  "diagram_sequence": "sequenceDiagram\n    participant Browser\n    participant Server\n    participant RescoreModule\n    participant GeminiAPI\n    Browser->>Server: POST /api/rescore\n    Server->>RescoreModule: Validate request schema\n    RescoreModule->>RescoreModule: Check rate limits and budgets\n    RescoreModule->>GeminiAPI: Send structured prompt\n    GeminiAPI-->>RescoreModule: Return JSON scores\n    RescoreModule->>RescoreModule: Validate complete set contract\n    RescoreModule-->>Server: Return validated result\n    Server-->>Browser: 200 OK with scores",
   "capabilities": [
     "Deterministic prioritization",
     "AI-assisted scoring",
-    "Strict data validation",
-    "Local-first storage",
-    "Rate limiting",
-    "Provenance tracking"
+    "Budget enforcement",
+    "Local data persistence",
+    "Strict input validation"
   ],
   "components": [
     "priority_foregrounds/server.py",
@@ -35,7 +34,7 @@
     "JavaScript",
     "HTML5",
     "CSS3",
-    "Gemini API"
+    "Google Gemini API"
   ],
   "depends_on": [
     "google-generativeai",
@@ -48,16 +47,16 @@
   "patterns": [
     "Human-in-the-loop",
     "Fail-closed validation",
-    "In-memory caching",
-    "Token bucket rate limiting",
-    "Single-responsibility server"
+    "Local-first architecture",
+    "Rate limiting",
+    "Request coalescing"
   ],
   "reuse_tags": [
     "product-management",
     "prioritization",
-    "decision-support",
-    "local-first",
-    "ai-evaluation"
+    "kanban",
+    "ai-evaluation",
+    "local-server"
   ],
   "slug": "prioity_foregrounds_kanban",
   "repo_url": "https://github.com/davidbmar/prioity_foregrounds_kanban",
@@ -66,9 +65,9 @@
   "thin": false,
   "todos": [],
   "screenshot_url": "",
-  "generated_at": "2026-07-13T10:21:39.154358Z",
-  "source_commit": "5f732d9",
+  "generated_at": "2026-07-14T09:03:34.575721Z",
+  "source_commit": "e3ae8b0",
   "model": "qwen3.7-plus",
-  "pushed_at": "2026-07-12T19:34:28Z",
+  "pushed_at": "2026-07-13T19:33:20Z",
   "docs": []
 }

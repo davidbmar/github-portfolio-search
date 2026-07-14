@@ -1,22 +1,23 @@
 {
-  "generated_at": "2026-07-13T10:24:00.180565Z",
+  "generated_at": "2026-07-14T09:05:54.474254Z",
   "count": 165,
   "days": [
     {
       "date": "2026-07-13",
-      "headline": "Implementing Reuse-Aware Building with Intent Hooks and MCP Tools",
-      "summary": "The developer integrated a reuse-check system into the portfolio search tool, featuring intent hooks, provenance merging, and MCP exposure to prevent redundant work. Concurrently, minor UI and playback fixes were applied to the Riff project's static audio and channel linking.",
+      "headline": "Implementing Reuse-Aware Building with Ask-Gate and MCP Tools",
+      "summary": "The developer integrated a reuse-check workflow into the portfolio search tool, featuring an ask-gate trigger, calibrated scoring, and exposed MCP endpoints for provenance tracking. Parallel updates refined the Kanban board with effort overrides and 3D visualization, while Riff adjusted audio playback constraints.",
       "takeaways": [
-        "Implement a 'build-intent' hook that triggers a reuse check against existing assets before starting new development tasks.",
-        "Expose reuse verification logic via Model Context Protocol (MCP) tools to allow AI agents to query asset provenance directly.",
-        "Calibrate vector search minimum scores to match specific store scales (e.g., L2) to improve retrieval accuracy for reusable components."
+        "Implement an 'ask-gate' pattern that pauses execution to prompt users for existing solutions before starting new builds, reducing redundant work.",
+        "Expose reuse checks and ledger writing via Model Context Protocol (MCP) tools to enable external agents to query and record component provenance.",
+        "Calibrate semantic search thresholds (e.g., min_score) to match specific vector store scales to improve retrieval accuracy for reusable assets."
       ],
-      "total_commits": 18,
+      "total_commits": 21,
       "repos": [
         {
           "name": "github-portfolio-search",
-          "commits": 14,
+          "commits": 15,
           "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]",
             "Merge branch 'feat/reuse-token-cuts'",
             "perf(reuse): --tools reuse filter + compact results by default",
             "Merge branch 'feat/reuse-ask-gate'",
@@ -34,6 +35,14 @@
           ]
         },
         {
+          "name": "prioity_foregrounds_kanban",
+          "commits": 2,
+          "messages": [
+            "Add editable effort, color-coded overrides, user presets, and UI refinements",
+            "Add meeting-mode features, 3D constellation, and Compound return principle"
+          ]
+        },
+        {
           "name": "riff",
           "commits": 4,
           "messages": [
@@ -44,7 +53,7 @@
           ]
         }
       ],
-      "commit_sig": "28b31cc3bca3c2ca"
+      "commit_sig": "588dd3c3258df79f"
     },
     {
       "date": "2026-07-12",
