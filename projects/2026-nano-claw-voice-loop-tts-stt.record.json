@@ -1,32 +1,33 @@
 {
   "title": "nano-claw voice loop",
-  "one_liner": "A local, voice-powered AI agent that runs in your browser with Metal-accelerated speech recognition and tool execution.",
-  "what_it_is": "nano-claw is a personal AI assistant designed for local execution. It creates a continuous voice loop where users speak to their browser, audio is transcribed via Whisper (running natively on Mac for GPU speed), processed by Claude (via API), and spoken back using Kokoro TTS. It supports interactive tool approval, allowing the AI to request permission before executing shell commands or file operations on the host machine.",
-  "how_its_built": "The system uses a hybrid architecture to bypass Docker GPU limitations on macOS. A native Python service runs `faster-whisper` on port 8200 using Apple Metal acceleration. The core logic, including the TypeScript API server and Python-based Voice Server (handling WebRTC and Kokoro TTS), runs inside a Docker container. The browser client communicates via WebSockets for real-time audio streaming and UI updates.",
-  "how_to_apply": "Use this project as a foundation for building private, voice-first AI agents that require low-latency speech-to-text on Apple Silicon. It demonstrates how to bridge native high-performance ML services with containerized application logic and secure tool execution patterns.",
+  "one_liner": "A local, voice-powered AI assistant that runs in your browser with Metal-accelerated speech-to-text and tool execution capabilities.",
+  "what_it_is": "nano-claw is a personal AI agent designed for voice interaction. It combines a TypeScript-based agent core with a Python voice server to create a full-duplex voice loop. The system uses Whisper for speech-to-text (STT) running natively on macOS for GPU acceleration, Claude for reasoning, and Piper for text-to-speech (TTS). It supports tool use (shell, file operations) with explicit user approval via the browser interface.",
+  "how_its_built": "The architecture splits responsibilities between a native macOS process and a Docker container. The STT service runs natively to access Apple's Metal GPU, exposing an HTTP API on port 8200. The main application runs in Docker, containing a TypeScript API server (port 3001) for agent logic and a Python Voice Server (port 8080/9090) handling WebRTC audio streaming and Piper TTS. The browser client connects via WebSocket to the Voice Server, which orchestrates the flow: receiving audio, calling the native STT service, sending text to the TypeScript agent, and streaming back synthesized speech.",
+  "how_to_apply": "Use this project as a template for building local-first voice agents. It demonstrates how to bypass Docker GPU limitations on macOS by sidecar-ing native services. The modular agent loop in TypeScript allows for easy extension of tools and skills, while the Python voice server provides a robust WebRTC bridge for real-time audio processing.",
   "quickstart": "git clone https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt.git\ncd 2026-nano-claw-voice-loop-tts-stt\nexport ANTHROPIC_API_KEY=sk-ant-...\n./run.sh",
   "features": [
-    "Real-time voice interaction via WebRTC in the browser",
-    "Metal-accelerated Whisper STT running natively on macOS",
-    "Kokoro TTS for natural-sounding voice responses",
-    "Interactive tool approval for shell and file operations",
-    "Persistent conversation memory stored in JSON files",
-    "Modular skill system loaded from Markdown definitions"
+    "Full-duplex voice conversation via WebRTC in the browser",
+    "Metal-accelerated Whisper STT running natively on macOS for low latency",
+    "Claude-powered agent loop with persistent memory and skill loading",
+    "Secure tool execution (shell, file read/write) with browser-based approval cards",
+    "Local Piper TTS for private, offline-capable speech synthesis",
+    "Hands-free phone mode with automatic voice activity detection"
   ],
-  "diagram_architecture": "flowchart TD\n    User[User Browser] <-->|WebRTC Audio / WebSocket| VS[Voice Server: Python/Docker]\n    VS <-->|HTTP POST /transcribe| STT[STT Service: faster-whisper/Native Mac]\n    VS <-->|HTTP API| API[nano-claw API: TypeScript/Docker]\n    API <-->|LLM Request| Claude[Anthropic Claude API]\n    API -->|Execute| Tools[Local Tools: Shell/File]\n    subgraph Docker Container\n        VS\n        API\n    end\n    subgraph Host Mac\n        STT\n        Tools\n    end",
-  "diagram_sequence": "sequenceDiagram\n    participant U as User\n    participant B as Browser Client\n    participant V as Voice Server (Docker)\n    participant S as STT Service (Native)\n    participant A as Agent API (Docker)\n    participant L as Claude API\n    \n    U->>B: Hold button & Speak\n    B->>V: Stream Audio (WebRTC)\n    U->>B: Release button\n    V->>S: POST audio bytes\n    S-->>V: Transcribed Text\n    V->>A: POST text message\n    A->>L: Send prompt + context\n    L-->>A: Response + Tool Calls?\n    alt Tool Call Required\n        A-->>V: Pending tool request\n        V-->>B: Show approval card\n        B->>U: Display approval\n        U->>B: Approve/Reject\n        B->>V: Send decision\n        V->>A: Confirm execution\n        A->>A: Execute Tool\n        A->>L: Send tool result\n        L-->>A: Final response\n    end\n    A-->>V: Final text response\n    V->>V: Generate Speech (Kokoro TTS)\n    V->>B: Stream Audio Response\n    B->>U: Play audio",
+  "diagram_architecture": "flowchart TD\n    Browser[Browser Client] -->|WebRTC Audio| VoiceServer[Voice Server Python]\n    VoiceServer -->|HTTP POST Audio Bytes| STTService[STT Service Native Mac]\n    STTService -->|JSON Text| VoiceServer\n    VoiceServer -->|HTTP POST Text| AgentAPI[nano claw API TypeScript]\n    AgentAPI -->|API Call| Claude[Claude LLM]\n    AgentAPI -->|Execute| Tools[Tool Registry]\n    Tools -->|File System| LocalDisk[Local Disk]\n    AgentAPI -->|Text Response| VoiceServer\n    VoiceServer -->|Piper TTS Audio| Browser",
+  "diagram_sequence": "sequenceDiagram\n    participant User as User\n    participant Browser as Browser Client\n    participant VoiceServer as Voice Server\n    participant STT as STT Service\n    participant Agent as Agent API\n    participant LLM as Claude LLM\n    participant Tools as Tool Registry\n    \n    User->>Browser: Speak into microphone\n    Browser->>VoiceServer: Stream audio chunks via WebRTC\n    VoiceServer->>VoiceServer: Detect silence end of turn\n    VoiceServer->>STT: POST audio bytes\n    STT->>VoiceServer: Return transcribed text\n    VoiceServer->>Agent: POST transcribed text\n    Agent->>LLM: Send prompt with context\n    LLM->>Agent: Return response or tool call\n    alt Tool Call Required\n        Agent->>Browser: Send approval request via WebSocket\n        Browser->>User: Display approval card\n        User->>Browser: Approve or Reject\n        Browser->>Agent: Send decision\n        alt Approved\n            Agent->>Tools: Execute tool\n            Tools->>Agent: Return result\n            Agent->>LLM: Send tool result\n            LLM->>Agent: Return final text response\n        end\n    else Direct Response\n        Agent->>VoiceServer: Return text response\n    end\n    VoiceServer->>VoiceServer: Generate speech via Piper TTS\n    VoiceServer->>Browser: Stream audio via WebRTC\n    Browser->>User: Play audio response",
   "capabilities": [
-    "Voice-to-Voice Interaction",
-    "Local Tool Execution",
-    "Contextual Memory",
-    "Skill Extension",
-    "Real-time Transcription"
+    "Speech-to-Text",
+    "Text-to-Speech",
+    "LLM Integration",
+    "Tool Execution",
+    "Voice Activity Detection",
+    "Persistent Memory"
   ],
   "components": [
-    "Browser Client",
+    "STT Service",
     "Voice Server",
     "Agent API",
-    "STT Service",
+    "Browser Client",
     "Tool Registry",
     "Memory Store"
   ],
@@ -36,36 +37,32 @@
     "Docker",
     "WebRTC",
     "Whisper",
-    "Kokoro TTS",
+    "Piper TTS",
     "Claude API"
   ],
   "depends_on": [
     "Docker Desktop",
     "Python 3.10+",
     "Anthropic API Key",
-    "macOS (for Metal STT)"
+    "macOS Metal GPU"
   ],
   "integrates_with": [
-    "Anthropic Claude",
     "Local File System",
-    "Shell Environment"
+    "Shell Commands",
+    "Web Browser Microphone"
   ],
   "patterns": [
-    "Voice Loop",
+    "Sidecar Pattern",
+    "Agent Loop",
     "Human-in-the-Loop Approval",
-    "Hybrid Native/Container Architecture",
-    "Skill-based Prompting"
+    "Event-Driven Audio Processing"
   ],
   "reuse_tags": [
-    "ai-agent",
-    "voice-interface",
+    "voice-agent",
     "local-llm",
-    "typescript",
-    "python",
-    "docker",
-    "webrtc",
-    "whisper",
-    "tool-use"
+    "webrtc-audio",
+    "typescript-python-hybrid",
+    "docker-macos-gpu"
   ],
   "slug": "2026-nano-claw-voice-loop-tts-stt",
   "repo_url": "https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt",
@@ -87,7 +84,9 @@
     }
   ],
   "screenshot_url": "https://raw.githubusercontent.com/davidbmar/2026-nano-claw-voice-loop-tts-stt/main/docs/voice-full-flow.png",
-  "generated_at": "2026-06-14T01:50:35.509108Z",
-  "source_commit": "6e302a0",
-  "model": "qwen3.7-plus"
+  "generated_at": "2026-07-15T09:08:03.731354Z",
+  "source_commit": "d3769d0",
+  "model": "qwen3.7-plus",
+  "pushed_at": "2026-07-14T23:44:50Z",
+  "docs": []
 }

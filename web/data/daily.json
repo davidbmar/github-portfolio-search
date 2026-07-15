@@ -1,17 +1,70 @@
 {
-  "generated_at": "2026-07-14T09:05:54.474254Z",
-  "count": 165,
+  "generated_at": "2026-07-15T09:11:11.518662Z",
+  "count": 167,
   "days": [
     {
-      "date": "2026-07-13",
-      "headline": "Implementing Reuse-Aware Building with Ask-Gate and MCP Tools",
-      "summary": "The developer integrated a reuse-check workflow into the portfolio search tool, featuring an ask-gate trigger, calibrated scoring, and exposed MCP endpoints for provenance tracking. Parallel updates refined the Kanban board with effort overrides and 3D visualization, while Riff adjusted audio playback constraints.",
+      "date": "2026-07-15",
+      "headline": "Hardening Phone Nodes with Hermetic Tests and Durable State",
+      "summary": "This update finalizes Phase 0 phone node hardening by implementing role-aware supervision, fail-closed admission gates, and hermetic testing. It also establishes durable state migration orders and deduplication logic to ensure system reliability during live receptionist operations.",
       "takeaways": [
-        "Implement an 'ask-gate' pattern that pauses execution to prompt users for existing solutions before starting new builds, reducing redundant work.",
-        "Expose reuse checks and ledger writing via Model Context Protocol (MCP) tools to enable external agents to query and record component provenance.",
-        "Calibrate semantic search thresholds (e.g., min_score) to match specific vector store scales to improve retrieval accuracy for reusable assets."
+        "Implement hermetic node-serving tests to isolate dependencies and prevent environment-specific failures in distributed systems.",
+        "Apply fail-closed admission gates and answer idempotency checks to protect phone nodes from invalid states or duplicate events.",
+        "Use role-aware supervision patterns (e.g., M1->customer-bot) to manage complex service interactions and ensure correct routing logic."
       ],
-      "total_commits": 21,
+      "total_commits": 6,
+      "repos": [
+        {
+          "name": "riff",
+          "commits": 6,
+          "messages": [
+            "Merge pull request #22 from davidbmar/live-receptionist-console",
+            "test(phone): make node-serving tests hermetic (Phase 0 fail-closed follow-up)",
+            "feat(phone): Phase 0 close-out — durable-state migration-order + answered-event dedup",
+            "feat(phone): Phase 0 — role-aware supervision (M1->customer-bot, M3->riff-phone)",
+            "feat(phone): Phase 0 node hardening — role/mode fail-closed, admission gate, answer idempotency",
+            "docs(routing): dev/prod node-environment design + phone-line registry"
+          ]
+        }
+      ],
+      "commit_sig": "5097d9c130c96318"
+    },
+    {
+      "date": "2026-07-14",
+      "headline": "Hands-Free Voice Loop Enables Natural Phone Conversations",
+      "summary": "A new hands-free phone conversation mode was added to the nano-claw project, integrating text-to-speech and speech-to-text in a continuous loop. Routine documentation updates were also performed for the portfolio search tool.",
+      "takeaways": [
+        "Implement a voice interaction loop by chaining STT input directly into TTS output for seamless hands-free phone calls.",
+        "Automate daily documentation regeneration and digest creation using CI-skipped chore commits to keep project docs current without triggering builds."
+      ],
+      "total_commits": 2,
+      "repos": [
+        {
+          "name": "2026-nano-claw-voice-loop-tts-stt",
+          "commits": 1,
+          "messages": [
+            "Add hands-free phone conversation mode"
+          ]
+        },
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        }
+      ],
+      "commit_sig": "cc90a80691bcb7cb"
+    },
+    {
+      "date": "2026-07-13",
+      "headline": "Reuse-Aware Search Gates and Test-First Live Receptionist Console",
+      "summary": "Implemented a reuse-check workflow that intercepts build intent to surface existing tools, alongside a robust live receptionist console featuring hot-lead scoring and atomic state management. The system enforces quality through test-first development for authentication, call routing, and UI event handling.",
+      "takeaways": [
+        "Implement an 'ask-gate' hook that scans documentation (CLAUDE.md) before building to prevent redundant work and surface reusable components via LLMs.txt.",
+        "Use a BoundedFanout pattern with atomic register-and-snapshot handshakes to manage non-blocking console events and maintain consistent call state across adapters.",
+        "Apply test-first specs for critical infrastructure like operator auth sessions and caller-canary routing to ensure fail-closed security and reliable multi-call isolation."
+      ],
+      "total_commits": 60,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -44,8 +97,47 @@
         },
         {
           "name": "riff",
-          "commits": 4,
+          "commits": 43,
           "messages": [
+            "feat(console): compare streaming Whisper and Gemini (FX-179)",
+            "feat(auth): operator login endpoint + additive session auth (B-3)",
+            "test(auth): operator login endpoint + additive session auth (B-3, test-first)",
+            "feat(auth): OperatorAuth — per-operator tokens + sessions, hashed at rest (B-3 core)",
+            "test(auth): operator token + session store (B-3, test-first)",
+            "fix(console): stamp conv_id on transcript/playback/barge frames (B-1 multi-call)",
+            "test(console): multi-call transcript isolation (B-1, test-first)",
+            "test(console): simulated-call acceptance harness (hot-lead, existing, menu barge-in, reconnect)",
+            "feat(ops): console-deploy.sh — M1/M3 deployment menu + canary routing config",
+            "feat(routing): flag-gated caller-canary node acceptance (my-number->M3)",
+            "test(routing): caller-canary node acceptance gate (test-first)",
+            "feat(console): WS reconnect + visible stale state (review B-2)",
+            "docs(console): hot-lead banner + clean-UI evidence screenshots",
+            "feat(console): hot-lead banner — surface the 'act now' signal in the UI (J-3)",
+            "feat(console): compute hot-lead signal on each state, carry it in the frame (J-3)",
+            "test(console): lead signal rides the state frame (J-3 wiring, test-first)",
+            "fix(console): secure live receptionist UI (FX-177)",
+            "feat(console): hot-lead scorer — new+injured+unrepresented signal (J-3)",
+            "test(console): hot-lead scorer spec (review J-3, test-first)",
+            "Merge remote-tracking branch 'origin/main' into live-receptionist-console",
+            "feat(console): call-back API + button — server-resolved phone, fail-closed",
+            "test(console): callback endpoint spec — server-resolved phone, fail-closed (test-first)",
+            "docs(console): MVP review (Bezos + Jobs) + working-console evidence",
+            "fix(console): serve /receptionist.js + allow-list console web files",
+            "feat(console): wire live receptionist UI (FX-175)",
+            "test(console): server endpoints spec — fail-closed auth + active-call list (test-first)",
+            "feat(console): observer console-sink hook — feed live events into ConsoleHub",
+            "test(console): observer console-sink hook spec (additive, test-first)",
+            "feat(console): ConsoleHub — per-call adapter registry + active-call list",
+            "test(console): ConsoleHub spec — per-call adapter registry + active-call list (test-first)",
+            "feat(console): ConsolePhoneAdapter — phone broadcast events -> console turns",
+            "test(console): ConsolePhoneAdapter spec — phone events -> console turns (test-first)",
+            "feat(console): ConsoleSession — atomic register+snapshot handshake (§2.2)",
+            "test(console): ConsoleSession spec — atomic register+snapshot handshake (§2.2, test-first)",
+            "feat(console): P3 CallbackStore — SQLite queue w/ ownership, audit, TTL",
+            "test(console): CallbackStore spec — ownership/audit/TTL/allowlist (P3, test-first)",
+            "feat(console): P0 ConsoleCallState — frame identity, turn aggregation, snapshot",
+            "test(console): ConsoleCallState spec — seq/turn-aggregation/snapshot (P0, test-first)",
+            "feat(console): P0 BoundedFanout — non-blocking console fan-out (N-4)",
             "Make Phone L5 honor styled static audio (#21)",
             "Make Space Channel link-only and seal static playback (#20)",
             "Merge remote-tracking branch 'origin/main' into tree-intake-ingestion",
@@ -53,7 +145,7 @@
           ]
         }
       ],
-      "commit_sig": "588dd3c3258df79f"
+      "commit_sig": "638fbce3318fda2d"
     },
     {
       "date": "2026-07-12",
@@ -1342,14 +1434,15 @@
     },
     {
       "date": "2026-07-01",
-      "headline": "Deterministic Voice Hub: Zero-Latency Routing and Offline Flow Simulation",
-      "summary": "Replaced LLM-dependent routing with a deterministic state machine to eliminate post-utterance delays and prevent session crashes. Introduced an offline IVR Flow Studio for visualizing, testing, and validating all 32 call permutations without live telephony infrastructure.",
+      "headline": "Deterministic Voice Hub: Zero-Latency Routing and Flow Visualization",
+      "summary": "Replaced LLM-based routing with a deterministic state machine to eliminate post-utterance delays and implemented a visual flow map for IVR simulation. The update introduces barge-in capabilities, static audio prefetching for instant playback, and a comprehensive console for tracing call permutations.",
       "takeaways": [
-        "Implement deterministic voice routing by locking choices to specific states and triggering routes on user transcription alone, removing the need for turn completion waits.",
-        "Pre-render static audio assets (like goodbyes) and use latest-WAV fallbacks to eliminate call-time synthesis latency and prevent silence during dynamic state transitions.",
-        "Build an offline flow simulator that renders YAML state diagrams into interactive trees, allowing developers to validate reachability and audio paths via automated permutation tests."
+        "Implement deterministic routing hubs using locked choices instead of LLMs to eliminate latency and ensure predictable state transitions.",
+        "Prefetch and cache static audio assets (like goodbyes) by state to enable instant playback and remove call-time synthesis delays.",
+        "Build visual flow maps that render directly from YAML state diagrams to validate reachability and simulate user paths offline.",
+        "Enable 'barge-in' functionality by allowing user transcription to interrupt ongoing audio streams without waiting for turn completion."
       ],
-      "total_commits": 76,
+      "total_commits": 57,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1360,7 +1453,7 @@
         },
         {
           "name": "riff",
-          "commits": 75,
+          "commits": 56,
           "messages": [
             "feat(web): barge-in — speak over the menu/briefing to interrupt it",
             "fix(web): loop-back stalled at the re-announced menu — browser blocked the replay",
@@ -1417,41 +1510,22 @@
             "call map: scope Play audio to this flow (fix welcome 'modular sandbox' WAV)",
             "call map: bigger panel + independent Tree/Text zoom",
             "flow: briefings loop back to the locked-choice hub instead of hanging up",
-            "call map: horizontal/vertical switcher, fit+zoom, per-state audio playback",
-            "call map: welcome is the hub — direct-dial options, menu is optional help",
-            "ui: Space Channel call map — LL-NN logical tree + text-it-plays pane",
-            "call-tree: show 8 menu options as branch nodes with expected text",
-            "security(call-tree): drop admin token from URLs + kill innerHTML XSS sinks",
-            "debug: live call-tree page — gold-lit current state + 'WAV never played' flag",
-            "fix(phone): menu path stranded caller on fetch_space_content -> Gemini improvised",
-            "dashboard: offline Space Channel flow viewer — tree + every path + briefing text, no call needed",
-            "test: PHONE-PATH harness — drives the real transport audio decision + Whispers the actual PCM",
-            "fix: re-enable menu-path briefing fetch, NON-BLOCKING (freshness-guarded, content-only)",
-            "revert: ensure-fetch ran a blocking (network) fetch on the async loop -> Gemini session cancel/reconnect LOOP",
-            "quality: shorten the menu 42->26 words (~19s -> ~11s) + align tests to reframed DSN/radio text",
-            "quality: reframe deflecting Mission-ops + Radio briefings (LLM-judged 3->9, 4->9)",
-            "fix: menu/DTMF path skipped the briefing fetch -> empty slot -> wrong/leaked audio",
-            "harness+fix: Whisper-audio quality harness (grades what the caller HEARS) + reframe deflecting DSN briefing",
-            "fix: THE space-content-summary leak — a poisoned WAV of the unresolved template",
-            "test: Space Channel route matrix — 32 (option x input-method) permutations -> quality.db + coverage report",
-            "audit: drive the real menu-press path (press 1-8) instead of routing from triage",
-            "fix: DTMF transition to a static state now plays audio immediately (kills the ~15s pause + terminal leak)",
-            "fix: numbered menu auto-routed to content on stale route (press 1 landed on content, not launches)"
+            "call map: horizontal/vertical switcher, fit+zoom, per-state audio playback"
           ]
         }
       ],
-      "commit_sig": "cef6311d48ecf6f3"
+      "commit_sig": "7c3f5427b4c5a420"
     },
     {
       "date": "2026-06-30",
-      "headline": "Build DTMF Voice Menus with Barge-in and Static Audio Caching",
-      "summary": "Implemented a voice interface featuring numbered DTMF routing, caller barge-in capabilities, and a static audio cache keyed by style. The update also establishes a preflow architecture pattern and resolves dynamic WAV fallback issues to prevent resource leaks.",
+      "headline": "Automated Portfolio Data Regeneration and Site Deployment",
+      "summary": "The developer executed automated workflows to regenerate portfolio data, update L0 documentation, and publish the updated site to davidbmar.com. These routine maintenance tasks ensure the public-facing portfolio remains synchronized with the latest underlying data and documentation.",
       "takeaways": [
-        "Implement DTMF barge-in to let users interrupt prerendered WAVs by speaking, improving interactive voice response latency.",
-        "Cache static audio using style identifiers as part of the cache key to optimize retrieval for different voice personas.",
-        "Adopt the Preflow Pattern architecture to manage subflows and pre-rendered content briefings before connecting live calls."
+        "Implement a 'regenerate and publish' script to automate static site updates from dynamic data sources.",
+        "Use CI/CD pipelines with [skip ci] flags for non-code changes like documentation regeneration to avoid build loops.",
+        "Separate daily digest generation from core deployment logic to maintain clean commit history and efficient builds."
       ],
-      "total_commits": 26,
+      "total_commits": 4,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1462,48 +1536,19 @@
             "Deploy davidbmar.com: regenerate portfolio data + publish web/",
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 22,
-          "messages": [
-            "voice: numbered Space Channel menu — press or say 1-8 to route (locked_choice + DTMF barge-in)",
-            "voice: call-time Umbriel fallback on stale/missing dynamic WAV (fixes the slot leak)",
-            "voice: Space Channel route audit — enumerate every menu option, catch undeliverable routes",
-            "voice: barge-in — let the caller interrupt a prerendered WAV by speaking over it",
-            "voice P1: wire the call-level live voice to the flow voice (Umbriel + British)",
-            "voice P0.3: document the sim-proven terminal live-audio leak (Phase 2 needed)",
-            "voice P0.3: Space Channel migrated droid -> prerendered Umbriel British",
-            "voice P0.2: flow-level voice+style config, resolved + threaded to phone",
-            "voice: add resume guide to the capability-hierarchy doc",
-            "voice docs: render capability-hierarchy design to docs/html",
-            "voice P0.1: style is part of the static-audio cache identity",
-            "docs: add Preflow Pattern architecture doc (md + html)",
-            "Space Channel: fail-closed reads body, not a label fragment",
-            "Space Channel: caller-friendly launch read (Central time, clean names)",
-            "Space Channel: 12-hour briefed-refresh cron + 14h TTL",
-            "Space Channel: richer, differentiated mission-ops and DSN briefs",
-            "Space Channel: anchor-style 3-headline briefs per subflow",
-            "Tighten Space Channel news briefing",
-            "Export static phone audio transcripts",
-            "Test Space Channel preflight subflows",
-            "Connect Space Channel content briefings",
-            "Add Space Channel subflows and preflow cache"
-          ]
         }
       ],
-      "commit_sig": "0e31a31418bf3496"
+      "commit_sig": "633f824da8fd22fd"
     },
     {
       "date": "2026-06-29",
-      "headline": "Stabilize Riff Phone Timelines and Fix Calendar Booking Bugs",
-      "summary": "This update stabilizes phone timeline publishing in Riff by aligning clocks, recording media jitter, and condensing signal matrices. It also resolves a calendar provider bug where empty titles incorrectly overwrote existing booking data.",
+      "headline": "Fix Calendar Booking Title Bug and Regenerate Portfolio Docs",
+      "summary": "Resolved a critical issue where blank calendar slots overwrote booking titles in the provider service. Concurrently, automated documentation regeneration and daily digest updates were executed for the GitHub portfolio search tool.",
       "takeaways": [
-        "Implement clock alignment and media jitter recording to stabilize real-time audio timeline publishing.",
-        "Condense signal matrices to optimize call timeline data processing and reduce overhead.",
-        "Guard against empty-string inputs in booking systems to prevent accidental data clobbering."
+        "Implement validation logic to prevent empty strings from overwriting existing metadata fields during booking operations.",
+        "Automate documentation builds and status digests using CI skip flags to maintain project visibility without triggering full pipelines."
       ],
-      "total_commits": 6,
+      "total_commits": 2,
       "repos": [
         {
           "name": "cal-provider",
@@ -1518,19 +1563,9 @@
           "messages": [
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
-        },
-        {
-          "name": "riff",
-          "commits": 4,
-          "messages": [
-            "Document Space Channel subflow architecture",
-            "Condense call timeline signal matrix",
-            "Align phone timeline clocks and record media jitter",
-            "Stabilize phone timeline publishing"
-          ]
         }
       ],
-      "commit_sig": "8a321542f05191cb"
+      "commit_sig": "f045ff9b1b9caddc"
     },
     {
       "date": "2026-06-28",
