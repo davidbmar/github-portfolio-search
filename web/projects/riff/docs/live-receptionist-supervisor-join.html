@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Receptionist Supervisor Join — Detailed Design · riff docs</title>
+<style>
+:root {
+  --bg: #14121a; --panel: #1a1825; --border: #2a2830;
+  --text: #d6d6dc; --muted: #8a93a6;
+  --accent: #d4a054; --code-bg: rgba(0,0,0,0.32);
+}
+body {
+  margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  font-size: 15px;
+}
+.doc-container {
+  width: 100%; max-width: 820px; margin: 0 auto;
+  padding: 2.4rem 1.4rem 4rem; box-sizing: border-box;
+}
+h1, h2, h3, h4 {
+  color: #f0f0f5; margin-top: 1.8rem; margin-bottom: 0.6rem;
+  line-height: 1.25;
+}
+h1 { font-size: 1.7rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; color: var(--accent); }
+h3 { font-size: 1.05rem; }
+p { margin: 0.7rem 0; }
+a { color: var(--accent); text-decoration: none;
+    border-bottom: 1px dotted rgba(212,160,84,0.5); }
+a:hover { border-bottom-color: var(--accent); }
+code {
+  background: var(--code-bg); color: #f0f0f5;
+  padding: 0.08rem 0.35rem; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+}
+pre {
+  background: var(--code-bg); padding: 0.85rem 1rem;
+  border-radius: 6px; overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code {
+  background: transparent; padding: 0;
+  font-size: 0.86rem; line-height: 1.45;
+}
+blockquote {
+  margin: 1rem 0; padding: 0.4rem 1rem;
+  border-left: 3px solid var(--muted); color: var(--muted);
+  background: rgba(255,255,255,0.02);
+}
+table {
+  display: block; max-width: 100%; overflow-x: auto;
+  border-collapse: collapse; margin: 1rem 0;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+th, td {
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted); font-weight: 600; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.2);
+}
+tr:last-child td { border-bottom: none; }
+ul, ol { margin: 0.6rem 0; padding-left: 1.6rem; }
+li { margin: 0.2rem 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+header.doc-header {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 1.4rem; position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: baseline; gap: 0.8rem;
+  font-size: 0.78rem;
+}
+header.doc-header .home {
+  color: var(--accent); text-decoration: none;
+  border: none;
+}
+header.doc-header .crumb { color: var(--muted); }
+header.doc-header .raw {
+  margin-left: auto; color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.doc-layout.with-toc {
+  max-width: 1120px;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2.4rem;
+}
+.doc-toc {
+  position: sticky; top: 4rem; align-self: start;
+  margin-top: 2.4rem;
+  padding: 0.8rem 1rem;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+.doc-toc-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted);
+  margin-bottom: 0.4rem; font-weight: 600;
+}
+.doc-toc ul { list-style: none; padding: 0; margin: 0; }
+.doc-toc li { margin: 0.25rem 0; line-height: 1.35; }
+.doc-toc li.toc-h3 { margin-left: 0.9rem; font-size: 0.78rem; }
+.doc-toc a {
+  color: var(--text); border: none;
+  font-size: 0.82rem;
+}
+.doc-toc a:hover { color: var(--accent); }
+.doc-container { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .doc-layout.with-toc {
+    max-width: 820px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .doc-toc { display: none; }
+  header.doc-header .crumb {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .doc-container { padding-top: 1.4rem; }
+}
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<header class="doc-header">
+<a class="home" href="/choice-health.html">&larr; Choice Health</a>
+<span class="crumb">live-receptionist-supervisor-join.md</span>
+<a class="raw" href="/docs/docs/design/live-receptionist-supervisor-join.md" title="View raw markdown source">raw .md</a>
+</header>
+<div class="doc-layout with-toc">
+<main class="doc-container">
+<h1>Live Receptionist Supervisor Join — Detailed Design</h1>
+<p>Status: BUILDING v1 — P0/P1, idle-only PTT, and Telnyx queue-boundary evidence implemented locally; L2/L3/OTA pending</p>
+<p>Owner: RIFF phone service / M3 lane</p>
+<p>Date: 2026-07-14
+Parent: <a href="../design/live-receptionist-console.md?format=html">Live Receptionist Console MVP</a></p>
+<h2 id="0-decision">0. Decision</h2>
+<p>An authenticated operator can open the live receptionist console on a computer, listen to one
+active phone call, activate a talk control to speak to the caller, optionally take over the call,
+and explicitly give control back to the AI.</p>
+<p>The first production implementation uses RIFF's existing bidirectional Telnyx media stream as the
+browser audio bridge:</p>
+<pre><code class="language-text">                                                listen: caller + agent PCM
+Browser microphone ◀──▶ /ws/supervisor ◀──▶ per-call SupervisorMediaHub
+                                                    │
+                                                    ▼
+Caller ◀──▶ Telnyx ◀──▶ /ws/media ◀──▶ TelnyxTransport ◀──▶ Gemini Live
+                                      human PCM ────▶│
+                                      AI input/output gates
+</code></pre>
+<p>This is a real computer join, but the browser is not initially a separate carrier participant.
+RIFF relays audio through the phone call's existing stream. That choice preserves the current call
+topology and avoids assuming that a second Telnyx WebRTC/conference leg is compatible with a call
+already using bidirectional media streaming. Native Telnyx supervision remains a provider option
+after the carrier spike in §15 proves it.</p>
+<p>The existing companion-control tap ladder is not the audio-control protocol. It supplies useful
+precedents—per-call routing, one deterministic owner, dedupe, and capability checks—but audio needs
+an exclusive expiring lease, media epochs, backpressure, and explicit AI/FSM quiescence.</p>
+<h2 id="1-product-behavior">1. Product behavior</h2>
+<p>The console exposes four progressively more powerful modes:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What the operator can do</th>
+<th>Call owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Observe</td>
+<td>Read the live transcript and call state</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>Listen</td>
+<td>Hear caller and AI audio in the browser</td>
+<td>AI</td>
+</tr>
+<tr>
+<td>Push to talk</td>
+<td>Click once to activate a short talk lease and click again to stop</td>
+<td>Human while active</td>
+</tr>
+<tr>
+<td>Take over</td>
+<td>Latch human control until explicit handback</td>
+<td>Human</td>
+</tr>
+</tbody>
+</table>
+<p>The product language must be literal:</p>
+<ul>
+<li><code>Listen</code> never activates the microphone.</li>
+<li><code>Start talking</code> is a click toggle backed by an expiring server lease; it never depends on a
+pointer remaining held.</li>
+<li>The UI distinguishes microphone capture, local WebSocket-send acceptance, Telnyx queue-boundary
+acknowledgement, and handset audibility. It never claims “caller can hear you” without
+independent caller-side evidence.</li>
+<li><code>Take over</code> requires a confirmation and stays visibly latched.</li>
+<li><code>Give back to AI</code> is an explicit, acknowledged transition, not a cosmetic button state.</li>
+<li><code>End call</code> remains separate and requires its own confirmation.</li>
+</ul>
+<p>Multiple authorized operators may listen. Exactly one operator may own the talk/takeover lease for
+a call. A second operator sees who owns it and cannot race the first operator.</p>
+<p>Private whispering to another human agent is not in v1: the active call has one caller, one AI, and
+at most one speaking browser operator.</p>
+<h2 id="2-scope-and-explicit-cuts">2. Scope and explicit cuts</h2>
+<h3 id="in-scope">In scope</h3>
+<ul>
+<li>Same-origin browser audio on the designated phone node.</li>
+<li>Per-operator listen/talk/takeover capabilities.</li>
+<li>Multiple listen-only sessions and one exclusive speaker lease.</li>
+<li>Caller and delivered-agent audio mirrored to the browser without blocking the call path.</li>
+<li>Browser microphone audio injected into the existing Telnyx media stream.</li>
+<li>Deterministic AI input, AI output, tool, and static-playback gates while a human owns speech.</li>
+<li>Auditable state changes and a separate operator recording track.</li>
+<li>Safe disconnect behavior, explicit handback, and local/stub/replay test coverage.</li>
+<li>A media-provider interface for a later native Telnyx WebRTC participant.</li>
+</ul>
+<h3 id="not-in-the-first-implementation-slice">Not in the first implementation slice</h3>
+<ul>
+<li>Multi-node active-call discovery or cross-node media proxying.</li>
+<li>More than one speaking operator.</li>
+<li>Warm transfer to an arbitrary external telephone number.</li>
+<li>Browser screen sharing, video, or team chat.</li>
+<li>A guarantee that a carrier-level conference command works beside the existing media stream.</li>
+<li>Automatic language-model summaries as the authority for handback.</li>
+<li>Real external OTA validation without the human's literal <code>GO</code>.</li>
+</ul>
+<h2 id="3-grounded-constraints">3. Grounded constraints</h2>
+<p>The implementation must preserve these current facts:</p>
+<ol>
+<li><code>riff/phone/server.py</code> owns <code>/ws/media</code> and keeps active transports in-process. Console state is
+process-local, so the browser and call must reach the same designated node.</li>
+<li><code>riff/phone/telnyx_transport.py::handle_media_sync</code> decodes caller audio to mono PCM16 at 16 kHz,
+then may gate it during prerecorded playback before forwarding it to Gemini.</li>
+<li>All AI, static, droid, and fallback speech converges at the Telnyx outbound send boundary, but
+static playback threads can independently advance the FSM when playback completes.</li>
+<li><code>ws_clear</code> requests removal of queued Telnyx output. A correlated Telnyx <code>mark</code> returned after
+the clear provides a queue boundary; neither local send return nor a returned mark proves that a
+handset or human heard audio. The Gemini wrapper exposes audio/text send and close, but no
+dependable mid-turn cancel acknowledgement.</li>
+<li><code>riff/console_fanout.py</code> already proves the nonblocking bounded-fanout pattern for JSON. Audio
+needs a separate high-rate queue, never the transcript queue.</li>
+<li><code>web/live/audio-recorder.js</code> already captures mono PCM16 at 16 kHz in 20 ms frames with echo
+cancellation, noise suppression, and automatic gain control. <code>audio-player.js</code> can be reused
+after its sample rate is made configurable.</li>
+<li><code>riff/operator_auth.py</code> currently identifies an operator but has no capabilities. The shared
+administrator URL token is not sufficient authority to put a voice onto a live call.</li>
+<li>The law DID is not guaranteed to route to the same flow on M1 and M3. Single-node pinning is a
+correctness requirement, not merely a deployment preference.</li>
+</ol>
+<h2 id="4-options-considered">4. Options considered</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Advantages</th>
+<th>Blocking concern</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RIFF same-origin media bridge</td>
+<td>Reuses the active bidirectional stream; no extra carrier leg; full deterministic gating</td>
+<td>RIFF owns jitter, mixing, and failback</td>
+<td><strong>Build first</strong></td>
+</tr>
+<tr>
+<td>Telnyx supervised WebRTC leg</td>
+<td>Carrier-native monitor/barge roles; browser is a true telephony participant</td>
+<td>Current AI leg already media-streams; Telnyx documents commands that can fail while media streaming is active</td>
+<td>Provider spike, then optional swap</td>
+</tr>
+<tr>
+<td>Convert the call to a Telnyx conference</td>
+<td>Familiar conference semantics</td>
+<td>Larger live-call topology migration, new webhook correlation, and greater failure surface</td>
+<td>Do not use for v1</td>
+</tr>
+<tr>
+<td>Browser sends audio through Gemini</td>
+<td>Minimal new outbound seam</td>
+<td>The model is not a deterministic media relay and may transform, delay, or answer</td>
+<td>Rejected</td>
+</tr>
+</tbody>
+</table>
+<p>The chosen bridge is deliberately behind <code>SupervisorMediaProvider</code>. Product state, auth, leases,
+recording, UI, and audit must not depend on whether media is RIFF-relayed or carrier-native.</p>
+<h2 id="5-component-architecture">5. Component architecture</h2>
+<pre><code class="language-text">receptionist.html / receptionist.js
+  ├─ existing /ws/console                 transcript + state
+  ├─ POST /api/console/calls/:id/supervisor-sessions
+  └─ /ws/supervisor                       control JSON + binary PCM
+             │
+             ▼
+SupervisorSessionRegistry
+  ├─ authenticates session/operator/capabilities/origin
+  ├─ binds conv_id and owning node
+  ├─ owns listen sessions
+  └─ delegates call control to SupervisorController
+             │
+             ├─ SupervisorMediaHub         bounded listener fanout
+             ├─ SpeakerLease               one owner, generation, TTL
+             └─ SupervisorMediaProvider
+                    ├─ RiffMediaBridge      v1
+                    └─ TelnyxSupervisor     later, after §15 spike
+                                      │
+                                      ▼
+TelnyxTransport
+  ├─ caller mirror tap                    before AI playback gate
+  ├─ agent send-boundary mirror tap       after local WebSocket acceptance
+  ├─ operator injection queue             bounded + epoch checked
+  ├─ ModelControlGate                     input/output/event quarantine
+  └─ static playback freeze/resume         no hidden FSM advance
+</code></pre>
+<p>The media hub and controller are per <code>conv_id</code>. The global registry only locates them and must not
+hold a global lock while encoding, sending, waiting, or touching the model.</p>
+<p>The provider contract is intentionally small:</p>
+<pre><code class="language-text">capabilities() -&gt; listen / inject / native_role_switch
+open_session(call_binding, operator_binding) -&gt; media_connection_plan
+enter_human_control(control_revision, media_generation)
+send_operator_frame(validated_frame)
+leave_human_control(control_revision, handback_context)
+close_session(reason)
+</code></pre>
+<p><code>media_connection_plan</code> tells the browser whether audio uses RIFF's supervisor WebSocket or a
+short-lived carrier WebRTC token. It never changes the product-level control state machine.</p>
+<h2 id="6-hard-invariants">6. Hard invariants</h2>
+<p>These are ship gates, not implementation suggestions:</p>
+<ol>
+<li>A slow, disconnected, or malicious browser cannot delay caller audio, AI audio, FSM work, or a
+Telnyx send.</li>
+<li>Audio and control frames are bound to exactly one <code>conv_id</code>; no global “current call” exists.</li>
+<li>Many listeners are allowed; only one live speaker lease is allowed.</li>
+<li>The server admits no microphone frame until it has acknowledged the matching control revision,
+media generation, and human-owned state.</li>
+<li>AI audio, AI tool calls, and autonomous FSM transitions cannot reach the call while a human owns
+speech.</li>
+<li>A static/droid playback thread cannot advance the FSM after human control has interrupted it.</li>
+<li>Stale audio is never played. Releasing/revoking a lease increments the generation and flushes
+every older injection frame.</li>
+<li>Named operator auth is required for listen/talk. The shared admin token remains read-only.</li>
+<li>Call end, operator revocation, or session expiry closes media and invalidates every lease.</li>
+<li>The operator track and every ownership transition are replayable and auditable.</li>
+<li>A node mismatch is an explicit error. The system never presents a remote call as locally
+controllable.</li>
+<li>Monitoring/talk features stay disabled until the business has configured the required caller
+notice/consent policy for its jurisdictions.</li>
+</ol>
+<h2 id="7-control-state-machine">7. Control state machine</h2>
+<p>The call has one authoritative supervisor-control record:</p>
+<pre><code class="language-text">AI_ACTIVE
+   │ request push-to-talk
+   ▼
+PTT_ARMING ── gate/clear/mark/quiesce failed ──▶ AI_ACTIVE (error)
+   │ ready_ack
+   ▼
+HUMAN_PTT ── release/disconnect ──▶ HANDING_BACK ── context accepted ──▶ AI_ACTIVE
+   │ latch takeover
+   ▼
+HUMAN_TAKEOVER ── give back ─────▶ HANDING_BACK
+   │ owner disconnect
+   ▼
+RECOVERING ── reconnect ─────────▶ HUMAN_TAKEOVER
+   └─ grace expires ─────────────▶ HANDING_BACK
+
+Any state ── call ended ─────────▶ ENDED
+</code></pre>
+<p>Each record contains:</p>
+<pre><code class="language-text">conv_id
+state
+revision                    monotonically increasing control CAS
+media_generation            increments on every ownership boundary
+lease_id?                   opaque, never accepted across generations
+lease_owner_operator_id?
+lease_expires_at?
+entered_at
+reason
+model_turn_status           idle | active | quarantining | reconnecting
+parked_static_playback?     state/playback identity, never just a boolean
+</code></pre>
+<p>Every mutating request supplies <code>expected_revision</code>. A mismatch returns the current snapshot and
+does nothing. This prevents double clicks, reconnect replays, and two tabs from issuing conflicting
+commands.</p>
+<h3 id="session-state">Session state</h3>
+<p>Each browser session independently moves through:</p>
+<pre><code class="language-text">CONNECTING → LISTENING → LEASED → TALKING → LISTENING → CLOSED
+</code></pre>
+<p><code>LEASED</code> means the server has admitted the operator as speaker; <code>TALKING</code> means the push-to-talk
+control is down and current-generation mic frames are accepted. Browser UI state is derived from
+server acknowledgements, never optimistic button state.</p>
+<h2 id="8-entering-human-control">8. Entering human control</h2>
+<p>Push-to-talk/takeover admission is a server transaction:</p>
+<ol>
+<li>Authenticate the named operator, capability, call/node binding, and expected revision.</li>
+<li>Acquire the exclusive speaker lease and increment <code>media_generation</code>.</li>
+<li>Move to <code>PTT_ARMING</code>; immediately close the caller-to-Gemini input gate.</li>
+<li>Close the AI-to-carrier output gate at the common outbound choke point.</li>
+<li>Quarantine current Gemini model events: output, tool calls, and turn completion may update
+provider bookkeeping, but cannot mutate the FSM or emit caller-facing audio.</li>
+<li>Interrupt and freeze any RIFF-owned static/droid playback. Record it as interrupted and prevent
+its thread's <code>finally</code> block from advancing the state.</li>
+<li>Flush old operator frames, call <code>ws_clear</code>, and reset the outbound playback cursor.</li>
+<li>Send a unique <code>supervisor_clear_barrier</code> mark and wait on the supervisor-control thread for its
+correlated return. The <code>/ws/media</code> receive loop performs only correlation and <code>Event.set()</code>;
+the waiting control thread publishes barrier evidence before <code>ready_ptt</code>. Caller media continues
+flowing while the control thread waits.</li>
+<li>If the mark is absent, rejected, or late, time out and return to <code>AI_ACTIVE</code> without admitting
+microphone audio. The initial timeout is configurable with
+<code>RIFF_SUPERVISOR_CARRIER_MARK_TIMEOUT_MS</code> and defaults to 1000 ms.</li>
+<li>Only after the barrier returns, move to <code>HUMAN_PTT</code> or <code>HUMAN_TAKEOVER</code>, send <code>ready_ack</code> with
+the new revision/generation/lease, and accept current-generation mic frames through the
+bounded operator-injection queue.</li>
+</ol>
+<p>The first push-to-talk slice is enabled only when <code>model_turn_status=idle</code> and no RIFF-owned static
+audio is active. The later “Interrupt and talk” slice enables steps 5–7 against an active turn after
+the quarantine/reset tests pass. This is a staged rollout, not two competing designs.</p>
+<h2 id="9-human-media-interval-and-handback">9. Human media interval and handback</h2>
+<p>While a human owns speech:</p>
+<ul>
+<li>Caller PCM continues to the recorder, Whisper tap, level meter, and authorized browser listeners.</li>
+<li>Caller PCM does not enter Gemini or deterministic choice dispatch.</li>
+<li>Operator PCM goes only to the Telnyx outbound path, operator recorder track, and other authorized
+listeners. It never goes through Gemini.</li>
+<li>The first successfully submitted operator frame is followed by a nonblocking diagnostic mark.
+Its return means the preceding Telnyx queue boundary completed; it is not proof of handset
+rendering, human audibility, or speech recognition.</li>
+<li>Gemini output and tool calls remain quarantined.</li>
+<li>The FSM state/slots remain authoritative and frozen except for call-end/transport-failure facts.</li>
+<li>Caller and operator transcript segments are captured as evidence, but transcript guesses cannot
+directly mutate slots.</li>
+</ul>
+<p>Handback is also an acknowledged transaction:</p>
+<ol>
+<li>Stop accepting mic audio and increment <code>media_generation</code>.</li>
+<li>Flush operator injection and send a nonblocking <code>operator_burst_complete</code> mark after the final
+locally submitted operator frame. Do not delay AI restoration on this diagnostic mark.</li>
+<li>Finalize the human-interval caller/operator transcript and build a structured context envelope:
+authoritative FSM state and slots, human interval boundaries, and transcript clearly marked as
+observations—not committed facts.</li>
+<li>Quiesce the old model turn. If it does not reach a safe boundary within the configured timeout,
+close and recreate the Gemini Live connection rather than allowing an old response to leak.</li>
+<li>Inject the handback envelope through the model-control adapter.</li>
+<li>Reopen model event processing, then model input, then model output in that order.</li>
+<li>Emit one <code>handback_complete</code> acknowledgement and move to <code>AI_ACTIVE</code>.</li>
+</ol>
+<p>No browser timer may reopen the AI gates. The server alone decides that handback is complete.</p>
+<p>ASR finalization gets a bounded 1.5-second drain at handback. If either human-interval track has no
+usable final transcript, the envelope marks that segment <code>unavailable</code>; it does not invent text,
+block indefinitely, or commit guessed slots. Authoritative FSM state still permits a clean neutral
+resume such as asking the caller what they would like to do next.</p>
+<p>For PTT owner disconnect, operator injection stops immediately and handback begins. For latched
+takeover, the server allows a three-second reconnect grace in <code>RECOVERING</code>; after that it performs
+the same failback transaction. The latched takeover button remains feature-flagged off until this
+automatic recovery passes L2 and L3 fault tests.</p>
+<h2 id="10-audio-taps-format-and-backpressure">10. Audio taps, format, and backpressure</h2>
+<h3 id="caller-mirror">Caller mirror</h3>
+<p>Mirror normalized PCM16/16 kHz immediately after Telnyx decode and recorder timestamping, before
+the normal playback/barge-in gate. The operator must still hear the caller while the AI is speaking
+or while RIFF is intentionally suppressing caller input to Gemini.</p>
+<h3 id="agent-mirror">Agent mirror</h3>
+<p>Mirror the carrier-normalized played PCM only after <code>ws_send</code> returns successfully. Do not mirror
+raw Gemini output: generated audio is not proof of what crossed the phone send boundary. Include the
+estimated carrier-play timestamp already tracked by the outbound playback cursor.</p>
+<h3 id="operator-injection">Operator injection</h3>
+<p>Browser mic frames are mono signed PCM16 little-endian, 16 kHz, exactly 20 ms (320 samples / 640
+bytes). The server converts directly from 16 kHz to the negotiated Telnyx codec/rate under the same
+outbound audio lock used by AI/static audio. It records a separate operator track after validation
+and records the carrier-normalized form after local <code>ws_send</code> acceptance. That artifact proves the
+RIFF send boundary, not Telnyx queue completion or handset playback; correlated mark events provide
+the separate Telnyx queue-boundary fact.</p>
+<h3 id="queue-limits">Queue limits</h3>
+<ul>
+<li>Listener queue: 50 frames per track (one second), drop oldest, publish a gap counter.</li>
+<li>Operator injection queue: 10 frames (200 ms), reject newest on full and surface congestion.</li>
+<li>Frame rate limit: 60 mic frames/second with a short burst allowance.</li>
+<li>Speaker heartbeat: every two seconds; lease TTL six seconds.</li>
+<li>One-time join secret TTL: 60 seconds.</li>
+<li>A frame more than 250 ms behind the server's current receive window is stale and rejected.</li>
+</ul>
+<p>Media publishing is <code>put_nowait</code> only. Encoding and WebSocket writes happen in isolated sender
+workers. Audio never shares the console JSON fanout queue, so a transcript snapshot cannot create
+an audio latency spike.</p>
+<h3 id="binary-frame-v1">Binary frame v1</h3>
+<p>All integers use network byte order. The 22-byte header is:</p>
+<pre><code class="language-text">magic[4] = &quot;RSM1&quot;
+kind u8                    1 caller, 2 agent send-boundary, 3 operator send-boundary, 16 mic
+flags u8                   bit 0 discontinuity, bit 1 end-of-segment
+media_generation u32
+sequence u32
+timestamp_ms u64           monotonic offset from call start
+payload                    PCM16-LE, mono, 16 kHz; 640 bytes in v1
+</code></pre>
+<p>The server ignores unknown kinds and rejects malformed lengths before allocating/copying a payload.</p>
+<h2 id="11-web-api-contract">11. Web/API contract</h2>
+<h3 id="create-a-supervisor-session">Create a supervisor session</h3>
+<pre><code class="language-http">POST /api/console/calls/{conv_id}/supervisor-sessions
+Content-Type: application/json
+
+{&quot;requested_mode&quot;:&quot;listen&quot;}
+</code></pre>
+<p>Response:</p>
+<pre><code class="language-json">{
+  &quot;supervisor_session_id&quot;: &quot;opaque&quot;,
+  &quot;join_secret&quot;: &quot;one-time opaque secret&quot;,
+  &quot;join_secret_expires_at&quot;: 0,
+  &quot;ws_path&quot;: &quot;/ws/supervisor&quot;,
+  &quot;operator_id&quot;: &quot;named operator&quot;,
+  &quot;allowed_modes&quot;: [&quot;listen&quot;, &quot;ptt&quot;],
+  &quot;call_revision&quot;: 7,
+  &quot;media_generation&quot;: 2,
+  &quot;node_id&quot;: &quot;designated-node&quot;
+}
+</code></pre>
+<p>The join secret is returned in the HTTPS body, never a URL/query string, and never logged. The
+browser opens <code>/ws/supervisor</code> with its normal secure operator cookie and sends a first JSON frame:</p>
+<pre><code class="language-json">{&quot;type&quot;:&quot;join&quot;,&quot;session_id&quot;:&quot;opaque&quot;,&quot;join_secret&quot;:&quot;opaque&quot;}
+</code></pre>
+<p>The secret is consumed once. The socket is rejected unless the secure operator session, operator
+identity, session row, exact configured Origin, <code>conv_id</code>, and node all match.</p>
+<h3 id="control-frames">Control frames</h3>
+<p>Client frames:</p>
+<pre><code class="language-text">claim_ptt(expected_revision)
+ptt_start(expected_revision, lease_id, media_generation)
+ptt_stop(expected_revision, lease_id, media_generation)
+latch_takeover(expected_revision, lease_id, media_generation)
+give_back(expected_revision, lease_id, media_generation)
+heartbeat(lease_id, media_generation)
+leave
+</code></pre>
+<p>Server frames:</p>
+<pre><code class="language-text">snapshot
+ready_ack
+state_changed
+lease_denied
+audio_gap
+congestion
+carrier_media_status
+carrier_media_error
+handback_complete
+error
+call_ended
+</code></pre>
+<p>Every server control frame carries <code>conv_id</code>, <code>revision</code>, <code>media_generation</code>, and <code>ts</code>. Error frames
+use stable machine codes such as <code>WRONG_NODE</code>, <code>CALL_ENDED</code>, <code>CAPABILITY_DENIED</code>, <code>LEASE_HELD</code>,
+<code>STALE_REVISION</code>, <code>STALE_GENERATION</code>, <code>MODEL_NOT_QUIESCENT</code>, and <code>ORIGIN_DENIED</code>.
+Carrier admission adds <code>CARRIER_CLEAR_FAILED</code> and <code>CARRIER_BARRIER_FAILED</code>. A
+<code>carrier_media_status</code> frame carries <code>evidence_stage=telnyx_queue</code> and
+<code>handset_verified=false</code>; it must not be rendered as proof that the caller heard speech.</p>
+<p><code>DELETE /api/console/supervisor-sessions/{session_id}</code> closes a listen session. It does not silently
+release a takeover; speaker disconnect follows the recovery state machine.</p>
+<h2 id="12-authentication-authorization-and-audit">12. Authentication, authorization, and audit</h2>
+<p>Extend operators with independent default-deny capabilities:</p>
+<pre><code class="language-text">can_observe
+can_listen
+can_talk
+can_takeover
+can_end_call
+</code></pre>
+<p>Database migration preserves current operators as observe-only unless explicitly upgraded. The
+shared <code>admin_token</code> URL remains unable to listen or speak. A named operator session, exact trusted
+Origin, CSRF protection on POST/DELETE, secure cookie, live revocation, and periodic revalidation are
+required.</p>
+<p>Provision or rotate a local operator token out of band; the command prints the raw token once and
+stores only its hash:</p>
+<pre><code class="language-bash">scripts/console-operator.py provision &lt;operator-id&gt; --listen --talk
+</code></pre>
+<p>Use <code>grant</code>, <code>show</code>, or <code>revoke</code> subcommands for later capability/session administration. Talk
+implies listen; neither command changes the default-off service feature flags.</p>
+<p>Audit each attempted and completed mutation with:</p>
+<pre><code class="language-text">event_id, conv_id, operator_id, supervisor_session_id,
+from_state, to_state, expected_revision, committed_revision,
+media_generation, result, reason_code, server_ts, node_id
+</code></pre>
+<p>Do not put transcript text, raw audio, caller phone, join secrets, session cookies, or lease secrets
+in the audit row. Audio/transcript evidence follows the call artifact access and retention policy.</p>
+<p>The operator UI always shows microphone permission/state, speaker lease owner, recording status,
+node, call identity, and whether caller-notice policy has enabled the feature.</p>
+<h2 id="13-recording-and-replay">13. Recording and replay</h2>
+<p>Add <code>audio_operator.wav</code> alongside caller, generated-agent, and played-agent evidence. Preserve:</p>
+<ul>
+<li>Raw validated operator PCM at 16 kHz.</li>
+<li>Carrier-normalized operator PCM after local WebSocket-send acceptance.</li>
+<li>Supervisor state/lease transitions as timed events.</li>
+<li>Sanitized Telnyx stream errors and correlated mark send/acknowledgement/timeout events, each with
+an explicit evidence stage.</li>
+<li>Per-talk browser-offer, injection-queue, local-send, byte, timing, post-codec RMS/peak, and
+diagnostic-mark counters.</li>
+<li>Human interval transcript with <code>role=operator|caller</code>, confidence, engine, and finality.</li>
+<li>AI output/tool events that were quarantined, labelled <code>not_delivered</code> / <code>not_applied</code>.</li>
+<li>Static playback interruption and whether it was parked, replayed, or superseded at handback.</li>
+</ul>
+<p>The normal stereo replay may mix locally submitted agent and operator audio on the right channel
+for human listening, but the separate operator track remains canonical for diagnosis.</p>
+<p>Phone teardown writes a bounded, session-scoped <code>bus_events.jsonl</code> beside the canonical audio and
+manifest. Supervisor transitions and carrier-media events always include <code>session_id</code>; secrets,
+raw phone numbers, transcript text, and complete carrier control identifiers are excluded from
+these new event types.</p>
+<p>The diagnostic active-frame level uses a fixed <code>-45 dBFS</code> post-codec frame threshold and reports
+both all-frame and active-frame RMS/peak. It is not a speech recognizer and does not alter, normalize,
+or gate operator audio.</p>
+<p>Required metrics, partitioned by <code>node_id</code> and provider but not by caller PII:</p>
+<pre><code class="language-text">supervisor_sessions{mode}
+supervisor_claim_latency_ms
+supervisor_listener_queue_depth / listener_frames_dropped_total
+supervisor_mic_frames_accepted_total / rejected_total{reason}
+supervisor_injection_queue_depth
+supervisor_carrier_mark_latency_ms{purpose}
+supervisor_carrier_mark_timeout_total{purpose,admission_required}
+supervisor_carrier_stream_error_total{code}
+supervisor_human_interval_seconds{mode}
+supervisor_handback_latency_ms{result}
+supervisor_quarantined_model_events_total{kind}
+supervisor_control_leak_total{kind=audio|tool|fsm|static_advance}
+supervisor_lease_expiry_total / recovery_total{result}
+</code></pre>
+<p><code>supervisor_control_leak_total</code> must remain exactly zero. Initial L3 quality targets are less than
+350 ms p95 from accepted browser mic frame to carrier-send return, less than 500 ms p95 listen
+delay, and less than 1% listener-frame loss on a healthy connection. The first measured candidate
+run may tighten these thresholds; it may not silently relax the zero-leak invariant.</p>
+<h2 id="14-node-affinity-and-deployment">14. Node affinity and deployment</h2>
+<p>Phase 2 inherits the console's single-node decision:</p>
+<ul>
+<li>The law DID is pinned to one accepting node before supervisor controls are enabled.</li>
+<li>The console page, control API, supervisor WebSocket, and <code>/ws/media</code> run same-origin on that node.</li>
+<li><code>GET /api/console/active</code> includes <code>node_id</code> and a local control capability flag.</li>
+<li>A request for a nonlocal <code>conv_id</code> returns <code>409 WRONG_NODE</code>; it never creates a detached session.</li>
+<li><code>/healthz</code> reports the supervisor feature flags/provider and whether the node accepts live calls.</li>
+<li>Candidate deployment must prove SHA, clean/dirty state, configured route, and feature flags before
+the first call.</li>
+</ul>
+<p>A future broker may proxy control/media to the owning node using an active-call directory with
+leases. That is a separate design; v1 does not fake active-active behavior.</p>
+<p>Feature flags are independently default-off:</p>
+<pre><code class="language-text">RIFF_SUPERVISOR_LISTEN_ENABLED
+RIFF_SUPERVISOR_PTT_ENABLED
+RIFF_SUPERVISOR_INTERRUPT_ENABLED
+RIFF_SUPERVISOR_TAKEOVER_ENABLED
+RIFF_SUPERVISOR_PROVIDER=riff_bridge|telnyx_supervisor
+RIFF_SUPERVISOR_CARRIER_MARK_TIMEOUT_MS=1000
+</code></pre>
+<h2 id="15-native-telnyx-provider-spike">15. Native Telnyx provider spike</h2>
+<p>Telnyx documents browser JWT login, call-control dialing, conference join, and supervisor roles
+<code>monitor</code>, <code>whisper</code>, and <code>barge</code>. It also documents error <code>90045</code>, where some commands cannot be
+issued while media streaming is used. The current RIFF AI call already uses bidirectional media
+streaming, so native supervision is a hypothesis until tested on a disposable route.</p>
+<p>The spike must:</p>
+<ol>
+<li>Mint a short-lived WebRTC JWT on the backend, with one telephony credential per operator.</li>
+<li>Keep credentials and API keys out of browser storage and URLs.</li>
+<li>Establish the current AI streaming call on a test DID.</li>
+<li>Dial or join the browser leg using <code>supervise_call_control_id</code>/conference supervisor role.</li>
+<li>Correlate the supervisor leg before the general incoming-call webhook path so it can never be
+mistaken for a new caller and answered by a second RIFF agent.</li>
+<li>Prove monitor audio, switch to barge, speak both directions, switch back, detach, and preserve the
+original AI leg.</li>
+<li>Capture call-control webhooks, command IDs, errors, PCAP/browser stats where allowed, and aligned
+caller/operator recordings.</li>
+<li>Repeat while the AI bidirectional stream is active, not on an easier non-streaming surrogate.</li>
+</ol>
+<p>Adopt <code>TelnyxSupervisorProvider</code> only if the spike passes without disrupting AI media, node
+ownership, recording, or handback. Otherwise retain <code>RiffMediaBridge</code>; product behavior does not
+change.</p>
+<p>Relevant official documentation:</p>
+<ul>
+<li><a href="https://developers.telnyx.com/development/webrtc/js-sdk/tutorials/make-your-first-call">Telnyx WebRTC JavaScript quickstart</a></li>
+<li><a href="https://developers.telnyx.com/development/webrtc/js-sdk/how-to/production-best-practices/index">Telnyx WebRTC production practices</a></li>
+<li><a href="https://developers.telnyx.com/api-reference/call-commands/dial">Dial a call / supervised role fields</a></li>
+<li><a href="https://developers.telnyx.com/api-reference/call-commands/switch-supervisor-role">Switch supervisor role</a></li>
+<li><a href="https://developers.telnyx.com/api-reference/conference-commands/create-conference">Create a conference</a></li>
+<li><a href="https://developers.telnyx.com/api-reference/conference-commands/join-a-conference">Join a conference</a></li>
+<li><a href="https://developers.telnyx.com/api-reference/conference-commands/update-conference-participant">Update a conference participant</a></li>
+<li><a href="https://developers.telnyx.com/docs/voice/programmable-voice/media-streaming">Programmable Voice media streaming — clear, mark, and error frames</a></li>
+<li><a href="https://developers.telnyx.com/development/api-fundamentals/api-errors">Telnyx API errors</a></li>
+</ul>
+<p>Any external carrier spike is OTA work and requires the human's literal <code>GO</code>.</p>
+<h2 id="16-ui-states">16. UI states</h2>
+<p>The live-call header adds one compact control group:</p>
+<pre><code class="language-text">[ Listen ]  [ Start talking ]  [ Take over ]
+Audio: connected · Mic: muted · AI: active · Owner: none
+</code></pre>
+<p>Behavior:</p>
+<ul>
+<li><code>Listen</code> asks for audio playback permission only and starts muted until a user gesture.</li>
+<li><code>Start talking</code> asks for microphone permission. One click requests the lease; the next click ends
+it. The control remains disabled until the clear-barrier mark returns and <code>ready_ack</code> arrives.</li>
+<li>While active: high-contrast <code>LIVE — click to stop</code>, call owner <code>You</code>, and AI <code>Paused</code>.</li>
+<li>Status progresses through literal evidence: <code>Mic live</code>, <code>Telnyx queue ready</code>, <code>first talk frame crossed Telnyx queue</code>, and <code>handset unverified</code>. The console never converts queue acknowledgement
+into “caller heard.”</li>
+<li>If another operator owns the lease: disabled control plus <code>Alex is speaking</code>.</li>
+<li><code>Take over</code> opens a confirmation explaining disconnect recovery and explicit handback.</li>
+<li>During <code>HANDING_BACK</code>: all talk controls disabled and <code>Restoring AI context…</code> shown.</li>
+<li>A revision/generation mismatch forces a fresh snapshot before controls re-enable.</li>
+<li>Headphone guidance appears before first mic activation to reduce echo.</li>
+<li>Browser background/suspend is treated as loss of heartbeat, never as continued ownership.</li>
+</ul>
+<p>Keyboard behavior and accessible names must make push-to-talk usable without a pointer. Key-up,
+window blur, visibility loss, and socket close all issue/trigger stop semantics; the server lease is
+still the final safety boundary.</p>
+<h2 id="17-failure-matrix">17. Failure matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Required behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Slow listener</td>
+<td>Drop oldest listener audio; call path and other listeners continue</td>
+</tr>
+<tr>
+<td>Malformed/rate-abusive mic</td>
+<td>Reject frame, count violation, close repeat offender; never allocate unbounded memory</td>
+</tr>
+<tr>
+<td>Speaker WS drops during PTT</td>
+<td>Stop/flush mic immediately; enter handback</td>
+</tr>
+<tr>
+<td>Speaker WS drops during takeover</td>
+<td>Three-second recovery grace, then deterministic handback</td>
+</tr>
+<tr>
+<td>Browser reconnects with stale generation</td>
+<td>Listen snapshot only; stale mic rejected</td>
+</tr>
+<tr>
+<td>AI emits old audio/tool after claim</td>
+<td>Evidence records it as quarantined; no send, tool, or FSM mutation</td>
+</tr>
+<tr>
+<td>Static playback thread finishes after claim</td>
+<td>No state advance; parked/interrupted evidence retained</td>
+</tr>
+<tr>
+<td><code>ws_clear</code> fails</td>
+<td>Claim fails closed; no mic admitted</td>
+</tr>
+<tr>
+<td>Clear-barrier mark missing, rejected, or late</td>
+<td>Claim returns <code>CARRIER_BARRIER_FAILED</code>, restores AI gates, and admits no mic</td>
+</tr>
+<tr>
+<td>Telnyx media error while arming</td>
+<td>Wake the barrier immediately, fail closed, retain sanitized code/title</td>
+</tr>
+<tr>
+<td>Telnyx media error while talking</td>
+<td>Surface the error, stop talk/hand back outside the media receive loop, retain evidence</td>
+</tr>
+<tr>
+<td>Model will not quiesce</td>
+<td>Recreate model session or stay human-owned; never reopen gates optimistically</td>
+</tr>
+<tr>
+<td>Handback context injection fails</td>
+<td>Remain in recovery, show error; no mixed AI/human ownership</td>
+</tr>
+<tr>
+<td>Operator session revoked</td>
+<td>Disconnect immediately; revoke lease and recover</td>
+</tr>
+<tr>
+<td>Call ends</td>
+<td>Revoke all sessions/leases, flush queues, emit <code>call_ended</code></td>
+</tr>
+<tr>
+<td>Wrong node</td>
+<td>Explicit <code>409 WRONG_NODE</code> with no media session</td>
+</tr>
+<tr>
+<td>Server process restarts</td>
+<td>Existing call follows current phone-service failure policy; browser cannot claim recovery succeeded</td>
+</tr>
+</tbody>
+</table>
+<h2 id="18-test-and-evidence-ladder">18. Test and evidence ladder</h2>
+<h3 id="l0-pure-deterministic-tests">L0 — pure deterministic tests</h3>
+<ul>
+<li>Every legal and illegal control-state transition.</li>
+<li>CAS revision races and single lease under concurrent claims.</li>
+<li>Lease expiry/generation rejection and one-time join-secret consumption.</li>
+<li>Binary packet parser, length/rate/timestamp limits, and fuzz corpus.</li>
+<li>Capability matrix and observe-only migration.</li>
+<li>Static playback freeze token prevents late completion advance.</li>
+<li>Handback envelope contains authoritative slots and labels ASR as observation.</li>
+<li>Telnyx mark correlation, unknown/late marks, timeout replacement, and stream-error fanout.</li>
+</ul>
+<h3 id="l1-in-process-fake-media-model-carrier">L1 — in-process fake media/model/carrier</h3>
+<ul>
+<li>Caller mirror occurs before playback gate.</li>
+<li>Agent/operator mirror occurs only after local WebSocket-send acceptance.</li>
+<li>Stalled listeners and full queues cannot increase media-loop latency.</li>
+<li>AI audio, tools, and FSM transitions are quarantined for the whole human interval.</li>
+<li>PTT idle entry, release, disconnect, and stale-frame cases.</li>
+<li>Failed <code>ws_clear</code> never produces <code>ready_ack</code>.</li>
+<li><code>clear → barrier mark returned → ready_ack → operator media → first/final marks</code> preserves order;
+missing marks and Telnyx error frames restore AI without admitting mic audio.</li>
+<li>Caller media mirroring remains live while the supervisor-control thread waits for the barrier.</li>
+<li>Carrier event fields are sanitized and session-scoped; phone teardown writes them with supervisor
+transitions to <code>bus_events.jsonl</code>.</li>
+<li>Two calls and two operators prove cross-call isolation.</li>
+<li>Recording contains aligned caller/agent/operator tracks and control events.</li>
+</ul>
+<h3 id="l2-local-browser-phone-simulator">L2 — local browser + phone simulator</h3>
+<ul>
+<li>Real microphone permission, 20 ms worklet frames, two-track playback, headphones.</li>
+<li>Hold/release, key-up, blur, tab suspension, refresh, network loss, and reconnect.</li>
+<li>One slow listener and one active speaker under synthetic packet loss/jitter.</li>
+<li>Transcript continues while AI input is gated and labels operator speech correctly.</li>
+<li>Browser automation asserts controls reflect server ACKs, never optimistic state.</li>
+<li>Browser automation asserts queue acknowledgement is labelled <code>handset unverified</code> and a
+mid-talk carrier error requests handback.</li>
+</ul>
+<h3 id="l3-candidate-node-synthetic-stub-carrier-where-possible">L3 — candidate node, synthetic/stub carrier where possible</h3>
+<ul>
+<li>Pinned route/node/SHA/feature-flag preflight.</li>
+<li>Long call, operator churn, auth expiry/revocation, provider reconnect, service deploy guard.</li>
+<li>No call-path latency regression with listen fanout enabled but no listeners.</li>
+<li>Rollback by disabling each feature flag independently.</li>
+</ul>
+<h3 id="ota-explicit-human-go-only">OTA — explicit human GO only</h3>
+<ul>
+<li>One controlled law-line call: listen only.</li>
+<li>One controlled PTT call with AI idle.</li>
+<li>One interrupt-and-talk call after PTT evidence is clean.</li>
+<li>One takeover/disconnect/handback call after recovery evidence is clean.</li>
+<li>Native Telnyx provider spike is a separate GO.</li>
+</ul>
+<p>Each run retains health snapshot, node/SHA, feature flags, console control trace, aligned WAV tracks,
+transcript engines, playback lifecycle, queue/gap counters, and the flow-evaluator report.</p>
+<h2 id="19-implementation-sequence">19. Implementation sequence</h2>
+<p>Implementation checkpoint (2026-07-14): the default-off control core, listen bridge, click-toggle
+browser UI, idle-only PTT path, Telnyx mark/error dispatch, fail-closed clear barrier, operator-send
+counters, and session event ledger are implemented with focused L0/L1 coverage. Interrupting active
+AI/static audio, gain changes, latched takeover, the native carrier experiment, L2/L3, and OTA proof
+remain gated.</p>
+<h3 id="p0-contracts-and-default-off-control-core">P0 — contracts and default-off control core</h3>
+<ul>
+<li>Add <code>riff/supervisor_control.py</code>: pure state machine, revisions, leases, generations.</li>
+<li>Add operator capabilities and migration with current users observe-only.</li>
+<li>Add API/session rows, one-time join secrets, audit events, exact-origin checks.</li>
+<li>Define <code>SupervisorMediaProvider</code> and a fake provider.</li>
+<li>Unit/concurrency/security tests. No audio path changes and all feature flags off.</li>
+</ul>
+<h3 id="p1-listen-only-bridge">P1 — listen-only bridge</h3>
+<ul>
+<li>Add <code>riff/supervisor_media.py</code>: packet codec, per-call bounded hub, listener lifecycle.</li>
+<li>Tap caller PCM before the AI playback gate.</li>
+<li>Tap agent PCM after local WebSocket-send acceptance.</li>
+<li>Parameterize/reuse browser PCM player; add console <code>Listen</code> state.</li>
+<li>Prove nonblocking behavior and call isolation. Enable only listen in local/L2.</li>
+</ul>
+<h3 id="p2-safe-ptt-while-ai-is-idle">P2 — safe PTT while AI is idle</h3>
+<ul>
+<li>Add bounded operator injection and separate recorder track.</li>
+<li>Add common AI input/output gates and provider event quarantine.</li>
+<li>Admit PTT only at model/static idle; implement release and disconnect handback.</li>
+<li>Require a correlated Telnyx mark after <code>ws_clear</code>, retain first/final diagnostic marks and stream
+errors, and keep all UI evidence labels below handset-audibility claims.</li>
+<li>Ship behind <code>RIFF_SUPERVISOR_PTT_ENABLED=0</code> until L0–L3 pass.</li>
+</ul>
+<h3 id="p3-interrupt-and-talk">P3 — interrupt and talk</h3>
+<ul>
+<li>Integrate carrier clear, generated-audio interruption evidence, static freeze, model-turn quiescence,
+and context handback.</li>
+<li>Prove no old audio, tool, or transition leaks after claim.</li>
+</ul>
+<h3 id="p4-latched-takeover-and-recovery">P4 — latched takeover and recovery</h3>
+<ul>
+<li>Add confirmation, reconnect grace, automatic failback, explicit give-back, and terminal call-end
+handling.</li>
+<li>Enable only after disconnect/recovery tests pass.</li>
+</ul>
+<h3 id="p5-carrier-provider-experiment">P5 — carrier provider experiment</h3>
+<ul>
+<li>Run §15 under a separate human GO and implement <code>TelnyxSupervisorProvider</code> only if proven.</li>
+</ul>
+<h3 id="p6-multi-node-ownership">P6 — multi-node ownership</h3>
+<ul>
+<li>Design and build an authenticated broker/active-call directory. This is not a prerequisite for a
+pinned single-node pilot.</li>
+</ul>
+<p>Expected code ownership:</p>
+<table>
+<thead>
+<tr>
+<th>File/area</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>riff/supervisor_control.py</code></td>
+<td>New pure control FSM and lease core</td>
+</tr>
+<tr>
+<td><code>riff/supervisor_media.py</code></td>
+<td>New media packets, hub, provider contract</td>
+</tr>
+<tr>
+<td><code>riff/operator_auth.py</code></td>
+<td>Default-deny capabilities and migration</td>
+</tr>
+<tr>
+<td><code>riff/phone/server.py</code></td>
+<td>API/WS/session binding and active transport lookup</td>
+</tr>
+<tr>
+<td><code>riff/phone/telnyx_transport.py</code></td>
+<td>Mirror taps, gates, quarantine, injection, static freeze</td>
+</tr>
+<tr>
+<td><code>riff/audio/session_recorder.py</code></td>
+<td>Separate operator track/evidence</td>
+</tr>
+<tr>
+<td><code>web/receptionist.html</code>, <code>.js</code></td>
+<td>Listen/PTT/takeover controls and ACK-driven UI</td>
+</tr>
+<tr>
+<td><code>web/live/audio-player.js</code></td>
+<td>Configurable input rate / independent track players</td>
+</tr>
+<tr>
+<td><code>web/live/audio-recorder.js</code></td>
+<td>Reuse existing 16 kHz/20 ms mic frames</td>
+</tr>
+</tbody>
+</table>
+<h2 id="20-definition-of-done">20. Definition of done</h2>
+<p>Listen-only is done when an authorized computer hears the caller and the audio actually sent to the
+caller, while a blocked browser has no measurable effect on the phone path.</p>
+<p>Push-to-talk is done when one authorized operator can acquire a lease after a correlated Telnyx
+clear-barrier acknowledgement, submit speech, release/disconnect, and return control exactly
+once—with zero AI audio, tool, or FSM leakage during the human interval. Local completion still
+does not establish caller audibility; that requires the separately authorized OTA evidence below.</p>
+<p>Takeover/handback is done when latched human ownership survives a short reconnect, fails back safely
+after grace expiry, restores model context from authoritative call state plus labelled observations,
+and produces complete replay evidence.</p>
+<p>No mode is production-done until:</p>
+<ul>
+<li>named capability auth and exact-origin tests pass;</li>
+<li>same-call and cross-call concurrency tests pass;</li>
+<li>aligned operator/caller/agent artifacts prove what was sent;</li>
+<li>node/SHA/feature flags are visible and rollback is tested;</li>
+<li>the applicable L0–L3 ladder is green;</li>
+<li>caller-notice policy is configured;</li>
+<li>the next external call has a literal human <code>GO</code>.</li>
+</ul>
+<h2 id="21-design-iteration-record">21. Design iteration record</h2>
+<p>This design was stress-tested in six passes:</p>
+<ol>
+<li><strong>Topology:</strong> rejected the original assumption that Telnyx conference/WebRTC could be added
+directly to the already-streaming AI leg; selected a provider boundary and RIFF bridge first.</li>
+<li><strong>Audio truth:</strong> moved caller mirroring before the playback gate and agent mirroring after local
+WebSocket-send acceptance so “listen” reflects RIFF's last proven outbound boundary, not raw
+provider intent or unproven handset rendering.</li>
+<li><strong>Split brain:</strong> separated many listeners from one expiring speaker lease and added revision/CAS
+plus media generations.</li>
+<li><strong>AI leakage:</strong> expanded “pause the model” into four deterministic gates: caller input, outbound
+audio, provider event/tool quarantine, and static-playback freeze.</li>
+<li><strong>Recovery:</strong> made handback a server transaction with a quiescence/recreate path; added explicit
+PTT and takeover disconnect behavior.</li>
+<li><strong>Operations/security:</strong> retained single-node pinning, named capabilities, exact Origin, separate
+operator evidence, default-off flags, staged L0–OTA gates, and literal-GO protection.</li>
+<li><strong>Carrier truth:</strong> reconstructed the 2026-07-14 failed drop-in, separated browser capture, local
+WebSocket send, Telnyx queue completion, and handset audibility, then added mark/error evidence
+and a fail-closed admission barrier without changing gain, codec, framing, or call topology.</li>
+</ol>
+<p>The result is implementation-ready for P0, P1, and instrumented idle-only PTT. Interrupt, gain,
+takeover, native Telnyx supervision, and any handset-audibility claim are intentionally gated by the
+evidence named above rather than implied by a button.</p>
+
+</main>
+<aside class="doc-toc"><div class="doc-toc-label">on this page</div><ul><li class="toc-h2"><a href="#0-decision">0. Decision</a></li><li class="toc-h2"><a href="#1-product-behavior">1. Product behavior</a></li><li class="toc-h2"><a href="#2-scope-and-explicit-cuts">2. Scope and explicit cuts</a></li><li class="toc-h3"><a href="#in-scope">In scope</a></li><li class="toc-h3"><a href="#not-in-the-first-implementation-slice">Not in the first implementation slice</a></li><li class="toc-h2"><a href="#3-grounded-constraints">3. Grounded constraints</a></li><li class="toc-h2"><a href="#4-options-considered">4. Options considered</a></li><li class="toc-h2"><a href="#5-component-architecture">5. Component architecture</a></li><li class="toc-h2"><a href="#6-hard-invariants">6. Hard invariants</a></li><li class="toc-h2"><a href="#7-control-state-machine">7. Control state machine</a></li><li class="toc-h3"><a href="#session-state">Session state</a></li><li class="toc-h2"><a href="#8-entering-human-control">8. Entering human control</a></li><li class="toc-h2"><a href="#9-human-media-interval-and-handback">9. Human media interval and handback</a></li><li class="toc-h2"><a href="#10-audio-taps-format-and-backpressure">10. Audio taps, format, and backpressure</a></li><li class="toc-h3"><a href="#caller-mirror">Caller mirror</a></li><li class="toc-h3"><a href="#agent-mirror">Agent mirror</a></li><li class="toc-h3"><a href="#operator-injection">Operator injection</a></li><li class="toc-h3"><a href="#queue-limits">Queue limits</a></li><li class="toc-h3"><a href="#binary-frame-v1">Binary frame v1</a></li><li class="toc-h2"><a href="#11-web-api-contract">11. Web/API contract</a></li><li class="toc-h3"><a href="#create-a-supervisor-session">Create a supervisor session</a></li><li class="toc-h3"><a href="#control-frames">Control frames</a></li><li class="toc-h2"><a href="#12-authentication-authorization-and-audit">12. Authentication, authorization, and audit</a></li><li class="toc-h2"><a href="#13-recording-and-replay">13. Recording and replay</a></li><li class="toc-h2"><a href="#14-node-affinity-and-deployment">14. Node affinity and deployment</a></li><li class="toc-h2"><a href="#15-native-telnyx-provider-spike">15. Native Telnyx provider spike</a></li><li class="toc-h2"><a href="#16-ui-states">16. UI states</a></li><li class="toc-h2"><a href="#17-failure-matrix">17. Failure matrix</a></li><li class="toc-h2"><a href="#18-test-and-evidence-ladder">18. Test and evidence ladder</a></li><li class="toc-h3"><a href="#l0-pure-deterministic-tests">L0 — pure deterministic tests</a></li><li class="toc-h3"><a href="#l1-in-process-fake-media-model-carrier">L1 — in-process fake media/model/carrier</a></li><li class="toc-h3"><a href="#l2-local-browser-phone-simulator">L2 — local browser + phone simulator</a></li><li class="toc-h3"><a href="#l3-candidate-node-synthetic-stub-carrier-where-possible">L3 — candidate node, synthetic/stub carrier where possible</a></li><li class="toc-h3"><a href="#ota-explicit-human-go-only">OTA — explicit human GO only</a></li><li class="toc-h2"><a href="#19-implementation-sequence">19. Implementation sequence</a></li><li class="toc-h3"><a href="#p0-contracts-and-default-off-control-core">P0 — contracts and default-off control core</a></li><li class="toc-h3"><a href="#p1-listen-only-bridge">P1 — listen-only bridge</a></li><li class="toc-h3"><a href="#p2-safe-ptt-while-ai-is-idle">P2 — safe PTT while AI is idle</a></li><li class="toc-h3"><a href="#p3-interrupt-and-talk">P3 — interrupt and talk</a></li><li class="toc-h3"><a href="#p4-latched-takeover-and-recovery">P4 — latched takeover and recovery</a></li><li class="toc-h3"><a href="#p5-carrier-provider-experiment">P5 — carrier provider experiment</a></li><li class="toc-h3"><a href="#p6-multi-node-ownership">P6 — multi-node ownership</a></li><li class="toc-h2"><a href="#20-definition-of-done">20. Definition of done</a></li><li class="toc-h2"><a href="#21-design-iteration-record">21. Design iteration record</a></li></ul></aside>
+</div>
+</body>
+</html>

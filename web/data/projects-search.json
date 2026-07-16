@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15T09:09:34.521462Z",
+  "generated_at": "2026-07-16T09:13:07.390598Z",
   "count": 140,
   "entries": [
     {
@@ -186,20 +186,20 @@
     {
       "repo": "2026-nano-claw-voice-loop-tts-stt",
       "title": "nano-claw voice loop",
-      "one_liner": "A local, voice-powered AI assistant that runs in your browser with Metal-accelerated speech-to-text and tool execution capabilities.",
+      "one_liner": "A local, voice-powered AI assistant running in your browser with native GPU-accelerated speech processing.",
       "keywords": [
         "typescript",
         "python",
         "docker",
         "webrtc",
+        "websockets",
         "whisper",
-        "piper tts",
-        "claude api",
-        "voice-agent",
+        "kokoro",
+        "piper",
+        "ai-agent",
+        "voice-interface",
         "local-llm",
-        "webrtc-audio",
-        "typescript-python-hybrid",
-        "docker-macos-gpu"
+        "macos"
       ],
       "chunks": [
         {
@@ -208,23 +208,23 @@
         },
         {
           "source": "one_liner",
-          "text": "A local, voice-powered AI assistant that runs in your browser with Metal-accelerated speech-to-text and tool execution capabilities."
+          "text": "A local, voice-powered AI assistant running in your browser with native GPU-accelerated speech processing."
         },
         {
           "source": "what_it_is",
-          "text": "nano-claw is a personal AI agent designed for voice interaction. It combines a TypeScript-based agent core with a Python voice server to create a full-duplex voice loop. The system uses Whisper for speech-to-text (STT) running natively on macOS for GPU acceleration, Claude for reasoning, and Piper for text-to-speech (TTS). It supports tool use (shell, file operations) with explicit user approval via the browser interface."
+          "text": "nano-claw is a personal AI agent that operates entirely through voice in the browser. It combines a TypeScript-based agent core with native macOS services for Speech-to-Text (Whisper) and Text-to-Speech (Kokoro/Piper), leveraging Metal acceleration to bypass Docker's GPU limitations on Apple Silicon."
         },
         {
           "source": "how_its_built",
-          "text": "The architecture splits responsibilities between a native macOS process and a Docker container. The STT service runs natively to access Apple's Metal GPU, exposing an HTTP API on port 8200. The main application runs in Docker, containing a TypeScript API server (port 3001) for agent logic and a Python Voice Server (port 8080/9090) handling WebRTC audio streaming and Piper TTS. The browser client connects via WebSocket to the Voice Server, which orchestrates the flow: receiving audio, calling the native STT service, sending text to the TypeScript agent, and streaming back synthesized speech."
+          "text": "The system uses a hybrid architecture: a Docker container hosts the TypeScript API, agent loop, and WebSocket voice server, while two standalone Python HTTP services run natively on the host Mac to handle Whisper STT and Kokoro TTS via Metal. The browser communicates via WebRTC for audio and WebSockets for control, while the agent interacts with LLMs (Claude/Gemini) and local tools."
         },
         {
           "source": "how_to_apply",
-          "text": "Use this project as a template for building local-first voice agents. It demonstrates how to bypass Docker GPU limitations on macOS by sidecar-ing native services. The modular agent loop in TypeScript allows for easy extension of tools and skills, while the Python voice server provides a robust WebRTC bridge for real-time audio processing."
+          "text": "Use nano-claw as a hands-free coding companion or desktop assistant. It can execute shell commands, read/write files, and manage tasks based on voice instructions, requiring explicit user approval for any tool execution to ensure safety."
         },
         {
           "source": "features",
-          "text": "Full-duplex voice conversation via WebRTC in the browser Metal-accelerated Whisper STT running natively on macOS for low latency Claude-powered agent loop with persistent memory and skill loading Secure tool execution (shell, file read/write) with browser-based approval cards Local Piper TTS for private, offline-capable speech synthesis Hands-free phone mode with automatic voice activity detection"
+          "text": "Real-time voice interaction via WebRTC and WebSockets in the browser Native Metal-accelerated Whisper STT and Kokoro TTS for low latency Secure tool execution with manual user approval for shell and file operations Streaming LLM responses with sentence-level audio synthesis Support for multiple LLM providers including Anthropic, Google, and OpenAI Live pipeline configuration for switching models and voices without restart"
         }
       ]
     },
@@ -2413,22 +2413,23 @@
     {
       "repo": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub portfolios with AI agent integration",
+      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration.",
       "keywords": [
         "python",
         "html",
         "javascript",
-        "sqlite",
-        "sentence-transformers",
         "fastapi",
-        "aws lambda",
-        "s3",
+        "sqlite-vec",
+        "sentence-transformers",
+        "aws s3",
         "cloudfront",
-        "semantic-search",
-        "github-tools",
-        "ai-agents",
+        "lambda",
         "portfolio",
-        "indexing"
+        "search",
+        "embeddings",
+        "mcp",
+        "static-site",
+        "aws"
       ],
       "chunks": [
         {
@@ -2437,23 +2438,23 @@
         },
         {
           "source": "one_liner",
-          "text": "Semantic search engine for personal GitHub portfolios with AI agent integration"
+          "text": "Semantic search engine for personal GitHub repositories with AI agent integration."
         },
         {
           "source": "what_it_is",
-          "text": "A tool that indexes GitHub repositories using embeddings and TF-IDF to enable semantic search, faceted filtering, and capability clustering. It exposes data via a static web UI, a REST API, and an MCP server for AI agents."
+          "text": "A tool that indexes GitHub repositories using embeddings and TF-IDF to enable semantic search, faceted filtering, and capability clustering. It exposes data via a static web UI, a REST API, and an MCP server for AI agents, allowing developers to find reusable code patterns across their portfolio without loading entire codebases into context."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend using sentence-transformers for embeddings and SQLite-vec for vector storage. The indexing pipeline fetches repo metadata and READMEs via GitHub API. The web UI is a static HTML/JS application consuming JSON exports. Deployment uses AWS S3, CloudFront, and Lambda for OAuth."
+          "text": "Built with Python for the indexing pipeline (using sentence-transformers and SQLite-vec) and FastAPI for the backend. The frontend is a static HTML/JS application served from S3/CloudFront. AWS Lambda functions handle OAuth and logging. GitHub Actions automate weekly reindexing and deployment."
         },
         {
           "source": "how_to_apply",
-          "text": "Use it to quickly find reusable code patterns across your own projects. Integrate the MCP server into AI coding assistants like Claude Code to let them discover relevant context from your portfolio without loading all code into context. Embed the widget on personal sites."
+          "text": "Use it to build a searchable knowledge base of your own code. Integrate the MCP server into AI coding assistants like Claude Code to allow them to query your past solutions. Deploy the static site to showcase your portfolio with advanced filtering and semantic relatedness features."
         },
         {
           "source": "features",
-          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-clustering of repos into capability categories like Voice or AI MCP server for AI agents to search portfolio programmatically Faceted filtering by language, tech stack, and star count Static web UI with shareable URLs and localStorage collections Automated weekly reindexing via GitHub Actions"
+          "text": "Semantic search using embeddings and TF-IDF across READMEs and code Auto-clustering of repositories into capability categories MCP server integration for AI agents to query portfolio data Faceted filtering by language, tech stack, and star count Static web UI with shareable URLs and localStorage collections Automated weekly reindexing via GitHub Actions"
         }
       ]
     },
@@ -4138,16 +4139,16 @@
       "keywords": [
         "python",
         "yaml",
-        "websockets",
-        "sqlite",
         "mermaid",
-        "pytest",
+        "jsonl",
+        "sqlite",
+        "websockets",
+        "http api",
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "python-backend",
-        "yaml-configuration",
-        "deterministic-pipeline"
+        "fsm",
+        "llm-orchestration",
+        "yaml-config",
+        "deterministic-ai"
       ],
       "chunks": [
         {
@@ -4160,19 +4161,19 @@
         },
         {
           "source": "what_it_is",
-          "text": "A Python-based platform for building voice agents where an LLM handles natural language generation while a declared YAML state graph enforces business logic, slot validation, and transition guards to prevent hallucinations."
+          "text": "riff is a Python-based platform for building voice agents that combine Large Language Models (LLMs) for natural language understanding with Finite State Machines (FSMs) for strict workflow enforcement. Users describe a business process in plain text, and riff generates a YAML-defined state graph. During calls, the LLM handles conversation nuances while the FSM validates slots, enforces transitions, and prevents hallucinations, ensuring reliable execution of tasks like scheduling, ordering, or intake."
         },
         {
           "source": "how_its_built",
-          "text": "Python backend using a hybrid architecture: deterministic pure functions for guardrails, state management, and slot extraction; LLM adapters (Gemini/Gemma/Claude) for conversational flexibility; and a WebSocket-enabled web server for real-time interaction and visualization."
+          "text": "The core engine uses a `run_turn` pipeline where speech-to-text input passes through deterministic guardrails, an LLM adapter (Gemini/Gemma/Claude), and a state manager. The state manager uses pure functions to validate transitions against a declared YAML graph. Slot extraction uses deterministic fallbacks. The system is designed with strict separation between non-deterministic LLM calls and deterministic logic (guardrails, validators, state transitions). It includes a web server for UI interaction, an MCP server for tool integration, and a self-improvement loop for metric tracking."
         },
         {
           "source": "how_to_apply",
-          "text": "Use riff to rapidly prototype customer service voice agents for scheduling, intake, or ordering by describing the business workflow in plain text, then refining the generated YAML flow or integrating it via API into existing telephony systems."
+          "text": "Use riff to rapidly prototype and deploy voice agents for specific business verticals (e.g., plumbing, dental clinics, retail). Define the business logic via natural language description to auto-generate the flow, or manually edit the YAML state graph for complex requirements. Integrate into existing telephony systems via the provided API endpoints or use the built-in web interface for testing and demonstration. Extend capabilities by registering custom tools and guards in Python modules that auto-load with the package."
         },
         {
           "source": "features",
-          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions via YAML-defined FSMs Prevents LLM hallucinations with pure-function guardrails and validators Real-time web UI for monitoring active conversations and FSM states Supports multiple LLM backends including local Gemma and cloud Gemini Includes 11 pre-built flows for retail and service industries"
+          "text": "Generates voice agent flows from plain English business descriptions Enforces deterministic state transitions using YAML-defined FSMs Prevents LLM hallucinations via slot validation and guardrails Supports multiple LLM backends including Gemini, Gemma, and Claude Includes built-in web UI for real-time conversation monitoring Provides MCP server integration for reusable agent blocks"
         }
       ]
     },

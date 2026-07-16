@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15T09:09:34.518160Z",
+  "generated_at": "2026-07-16T09:13:07.386839Z",
   "count": 140,
   "projects": [
     {
@@ -104,26 +104,28 @@
     {
       "slug": "2026-nano-claw-voice-loop-tts-stt",
       "title": "nano-claw voice loop",
-      "one_liner": "A local, voice-powered AI assistant that runs in your browser with Metal-accelerated speech-to-text and tool execution capabilities.",
+      "one_liner": "A local, voice-powered AI assistant running in your browser with native GPU-accelerated speech processing.",
       "tech": [
         "TypeScript",
         "Python",
         "Docker",
         "WebRTC",
+        "WebSockets",
         "Whisper",
-        "Piper TTS",
-        "Claude API"
+        "Kokoro",
+        "Piper"
       ],
       "reuse_tags": [
-        "voice-agent",
+        "ai-agent",
+        "voice-interface",
         "local-llm",
-        "webrtc-audio",
-        "typescript-python-hybrid",
-        "docker-macos-gpu"
+        "typescript",
+        "docker",
+        "macos"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/2026-nano-claw-voice-loop-tts-stt",
-      "pushed_at": "2026-07-14T23:44:50Z"
+      "pushed_at": "2026-07-16T07:35:30Z"
     },
     {
       "slug": "4kUpScalerWorker",
@@ -1286,28 +1288,29 @@
     {
       "slug": "github-portfolio-search",
       "title": "GitHub Portfolio Search",
-      "one_liner": "Semantic search engine for personal GitHub portfolios with AI agent integration",
+      "one_liner": "Semantic search engine for personal GitHub repositories with AI agent integration.",
       "tech": [
         "Python",
         "HTML",
         "JavaScript",
-        "SQLite",
-        "sentence-transformers",
         "FastAPI",
-        "AWS Lambda",
-        "S3",
-        "CloudFront"
+        "SQLite-vec",
+        "Sentence-Transformers",
+        "AWS S3",
+        "CloudFront",
+        "Lambda"
       ],
       "reuse_tags": [
-        "semantic-search",
-        "github-tools",
-        "ai-agents",
         "portfolio",
-        "indexing"
+        "search",
+        "embeddings",
+        "mcp",
+        "static-site",
+        "aws"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/github-portfolio-search",
-      "pushed_at": "2026-07-14T09:05:57Z"
+      "pushed_at": "2026-07-15T09:11:14Z"
     },
     {
       "slug": "gpt4-pdf-chatbot-langchain",
@@ -2184,22 +2187,23 @@
       "tech": [
         "Python",
         "YAML",
-        "WebSockets",
-        "SQLite",
         "Mermaid",
-        "Pytest"
+        "JSONL",
+        "SQLite",
+        "WebSockets",
+        "HTTP API"
       ],
       "reuse_tags": [
         "voice-agent",
-        "fsm-orchestration",
-        "llm-guardrails",
-        "python-backend",
-        "yaml-configuration",
-        "deterministic-pipeline"
+        "fsm",
+        "llm-orchestration",
+        "python",
+        "yaml-config",
+        "deterministic-ai"
       ],
       "thin": false,
       "repo_url": "https://github.com/davidbmar/riff",
-      "pushed_at": "2026-07-15T06:44:05Z"
+      "pushed_at": "2026-07-16T01:31:58Z"
     },
     {
       "slug": "riot",

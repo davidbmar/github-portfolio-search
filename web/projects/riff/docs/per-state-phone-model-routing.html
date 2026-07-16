@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RIFF · Per-state phone model routing</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0b1020; --card:#151c31; --ink:#eef3ff; --muted:#aeb9d3; --line:#34405f; --accent:#79d9c5; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui,-apple-system,sans-serif; }
+    main { width:min(980px,calc(100% - 32px)); margin:40px auto 72px; }
+    h1,h2 { line-height:1.18; } h1 { font-size:clamp(2rem,5vw,3.4rem); margin-bottom:.35rem; }
+    h2 { margin-top:2.2rem; color:var(--accent); }
+    p,li { max-width:78ch; } .lede { color:var(--muted); font-size:1.1rem; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:18px 0; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; } th,td { border:1px solid var(--line); padding:10px; text-align:left; vertical-align:top; } th { background:#1d2742; }
+    code,pre { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; } code { color:#b7f4e8; }
+    pre { overflow:auto; padding:16px; background:#080c17; border:1px solid var(--line); border-radius:10px; color:#dce7ff; }
+    .warning { border-left:4px solid #f2bd68; } .ok { border-left:4px solid var(--accent); }
+    a { color:#9bdcf7; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Per-state phone model routing</h1>
+  <p class="lede">Safe hybrid enabled for the generated <code>mfclaw</code> law flow.</p>
+
+  <div class="card ok">
+    <strong>Configured path:</strong> caller PCM → Whisper Medium → RIFF FSM + Qwen3.5-Flash → Kokoro Bella. Gemini Live remains connected as the immediate backup.
+  </div>
+
+  <h2>Modes</h2>
+  <table><thead><tr><th>turn_mode</th><th>Owner</th><th>Use</th></tr></thead><tbody>
+    <tr><td><code>live</code></td><td>Gemini Live</td><td>Consent and confirmation gates.</td></tr>
+    <tr><td><code>llm</code></td><td>Whisper → RIFF/Qwen → Kokoro</td><td>Freeform intake and message collection.</td></tr>
+    <tr><td><code>deterministic</code></td><td>RIFF resolver</td><td>Menus and locked choices.</td></tr>
+  </tbody></table>
+
+  <div class="card warning"><strong>Cost boundary:</strong> Whisper, Qwen, and Kokoro are cheaper in isolation, but this comparison mode may cost about the same as Gemini-only or slightly more because Gemini still receives audio and can generate the queued backup. Real savings require local endpointing and lazy Gemini invocation only after primary failure.</div>
+
+  <h2>FSM configuration</h2>
+  <pre><code>defaults:
+  llm:
+    classes:
+      gemini_fast: gemini-2.5-flash
+      qwen_fast: qwen3.5-flash
+  turn_routing:
+    enabled: true
+    states:
+      cap_start_claim__stage_identity:
+        turn_mode: llm
+        llm: qwen_fast
+        stt_model: mlx-community/whisper-medium.en-mlx
+        tts_voice: kokoro:af_bella
+        backup: live
+        backup_model: inherit
+      cap_start_claim__confirm:
+        turn_mode: live</code></pre>
+
+  <p>Edit <code>data/site_ingest/mfclaw/overlay.yaml</code>, then regenerate the pack and flow:</p>
+  <pre><code>.venv/bin/python -m riff.business_pack.importers.website data/site_ingest/mfclaw --out packs/generated
+.venv/bin/python -m riff.business_pack compile packs/generated/mfclaw.pack.yaml --out-dir flows</code></pre>
+
+  <h2>Law states on Qwen</h2>
+  <ul>
+    <li><code>cap_start_claim__stage_identity</code></li>
+    <li><code>cap_start_claim__stage_matter</code></li>
+    <li><code>cap_case_status__collect</code></li>
+    <li><code>cap_leave_message__collect</code></li>
+  </ul>
+
+  <h2>Operation</h2>
+  <p>Boot warms MLX Whisper, Kokoro Bella, and the rolling faster-whisper comparison model in the phone process. Inspect readiness:</p>
+  <pre><code>curl -s http://127.0.0.1:8767/healthz | jq .text_turn_warmup</code></pre>
+  <p>The authenticated <code>/receptionist.html</code> console shows Gemini and rolling Whisper caller rows and labels Qwen agent output.</p>
+
+  <table><thead><tr><th>Control</th><th>Default</th></tr></thead><tbody>
+    <tr><td><code>RIFF_TEXT_LLM_STT_TIMEOUT_S</code></td><td>2.0 seconds</td></tr>
+    <tr><td><code>RIFF_TEXT_LLM_TIMEOUT_S</code></td><td>4.0 seconds</td></tr>
+    <tr><td><code>RIFF_TEXT_LLM_MAX_AUDIO_S</code></td><td>12.0 seconds</td></tr>
+    <tr><td><code>RIFF_TURN_MODE_ROUTING=0</code></td><td>Emergency rollback to Gemini</td></tr>
+  </tbody></table>
+
+  <h2>Evidence</h2>
+  <p>A local synthetic law identity turn captured name and callback number, advanced to matter collection, and produced local speech. One Apple Silicon run measured 484 ms Whisper, 1,326 ms Qwen/RIFF, and 2,002 ms total after endpoint including TTS. This is a readiness check, not an SLA.</p>
+  <p>No external phone call is run automatically. OTA validation requires explicit human <strong>GO</strong>.</p>
+
+  <p><a href="../guide/32-per-state-phone-model-routing.md">Markdown source and full failure semantics</a></p>
+</main>
+</body>
+</html>

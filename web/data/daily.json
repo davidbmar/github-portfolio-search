@@ -1,42 +1,171 @@
 {
-  "generated_at": "2026-07-15T09:11:11.518662Z",
-  "count": 167,
+  "generated_at": "2026-07-16T09:14:35.093033Z",
+  "count": 168,
   "days": [
     {
-      "date": "2026-07-15",
-      "headline": "Hardening Phone Nodes with Hermetic Tests and Durable State",
-      "summary": "This update finalizes Phase 0 phone node hardening by implementing role-aware supervision, fail-closed admission gates, and hermetic testing. It also establishes durable state migration orders and deduplication logic to ensure system reliability during live receptionist operations.",
+      "date": "2026-07-16",
+      "headline": "Riff Hardens Codex Supervisor Join and Fixes Multi-DID Routing",
+      "summary": "This update merges the Codex supervisor join logic and splits node environments for better isolation. It also resolves critical post-rollout defects, fixes multi-DID routing via the line registry, and regenerates stale audio clips.",
       "takeaways": [
-        "Implement hermetic node-serving tests to isolate dependencies and prevent environment-specific failures in distributed systems.",
-        "Apply fail-closed admission gates and answer idempotency checks to protect phone nodes from invalid states or duplicate events.",
-        "Use role-aware supervision patterns (e.g., M1->customer-bot) to manage complex service interactions and ensure correct routing logic."
+        "Implement environment splitting for node services to isolate configurations and improve deployment safety.",
+        "Use a central line registry to resolve multi-DID routes, ensuring consistent production entry point mapping.",
+        "Automate regeneration of dependent assets, such as audio clips, when upstream content definitions are refreshed."
       ],
-      "total_commits": 6,
+      "total_commits": 5,
       "repos": [
         {
           "name": "riff",
-          "commits": 6,
+          "commits": 5,
           "messages": [
+            "Merge pull request #26 from davidbmar/phase1-node-env-split",
+            "fix(audio): regenerate stale space_channel_widgets clips after PR #25 content refresh",
+            "fix(ops): close codex verification defects #1-#4 (post-rollout hardening)",
+            "Merge pull request #25 from davidbmar/codex/supervisor-join-p0-p2",
+            "fix(importer): resolve multi-DID routes via the line registry's prod entry"
+          ]
+        }
+      ],
+      "commit_sig": "2d406084cc5789cc"
+    },
+    {
+      "date": "2026-07-15",
+      "headline": "Real-Time Voice Agent: Barge-In, Streaming TTS, and Telemetry",
+      "summary": "Implemented a low-latency voice loop featuring Kokoro TTS with barge-in interruption, SSE streaming, and per-turn telemetry. Added dynamic pipeline configuration to switch STT, LLM, and TTS providers live while tracking cost and latency metrics.",
+      "takeaways": [
+        "Implement barge-in by detecting speech onset during playback, pausing the audio queue, and using exponential backoff to resume listening only after confirming user intent.",
+        "Stream TTS output by chunking text at sentence boundaries and consuming Server-Sent Events (SSE) to speak audio fragments immediately as they arrive from the LLM.",
+        "Track voice agent performance by recording time-to-first-token and processing milliseconds per turn into a local SQLite database for accurate latency and cost analysis.",
+        "Enable live pipeline switching by exposing an API that validates model availability and injects provider-specific keys, allowing dynamic selection of STT, LLM, and TTS engines without restarts."
+      ],
+      "total_commits": 96,
+      "repos": [
+        {
+          "name": "2026-nano-claw-voice-loop-tts-stt",
+          "commits": 65,
+          "messages": [
+            "fix(voice): apply saved voice/model/STT settings that arrive before the session",
+            "fix(run): forward optional provider keys + feature flags into the container",
+            "Merge: telemetry metrics DB (per-turn latency + cost)",
+            "fix(metrics): accurate TTFT/TTS/e2e timing, dedup transcript, cover non-stream + tool turns",
+            "chore: persist metrics.db volume; document telemetry",
+            "feat(metrics): GET /api/metrics aggregates + live TTFT in the Debug panel",
+            "feat(voice): time each stage and write one telemetry row per turn",
+            "feat(stt): return processing_ms in the transcribe response",
+            "feat(api): report LLM time-to-first-token (firstTokenMs) in debug",
+            "feat(metrics): SQLite telemetry module (turns + prices, best-effort)",
+            "Add plan: telemetry metrics DB",
+            "Add design doc: telemetry metrics DB",
+            "fix(models): use stable Gemini -latest aliases (flash-lite + flash)",
+            "Merge: pipeline settings — switch STT / LLM / TTS live",
+            "fix(api): strip only known provider prefixes; reject unavailable model override; guard stt test",
+            "docs: pipeline settings (switch STT/LLM/TTS) + multi-provider streaming",
+            "feat(web): ⚙ Pipeline panel — switch STT size, LLM model, and TTS voice",
+            "feat(voice): /api/models proxy; set_model/set_stt; thread model + Whisper size",
+            "feat(stt): per-size Whisper model cache selected by X-Model-Size header",
+            "feat(config): inject dashscope/moonshot/zhipu/minimax keys; fix Gemini OpenAI base URL",
+            "feat(api): per-request model override on /api/chat (validated against catalog)",
+            "feat(api): model catalog + GET /api/models with per-provider availability",
+            "feat(api): OpenAI-compatible streaming + strip provider/ model prefix",
+            "Add plan: pipeline settings (switch STT / LLM / TTS)",
+            "Add design doc: pipeline settings (switch STT / LLM / TTS)",
+            "chore(deps): bump vitest to ^3.2.6 to fix critical Dependabot alert",
+            "feat(voice): voice-assistant system prompt (Whisper input, spoken output)",
+            "Merge: Kokoro TTS voice selection + streaming replies + barge-in",
+            "fix(voice): clear queue on new reply; reset paused on stop; cap backoff growth",
+            "docs: barge-in (NANO_CLAW_BARGE_IN) usage + changelog",
+            "feat(web): wire barge-in — detect during playback, commit captures the turn",
+            "feat(web): BargeInDetector — pause on onset, confirm speech vs false alarm",
+            "fix(voice): one active agent task at a time; cancel in-flight task on disconnect",
+            "fix(voice): run agent handler as spawned task so barge-in can interrupt live playback",
+            "feat(voice): barge-in server — flag, hello_ack, pause/commit/resume+backoff",
+            "feat(voice): session pause/resume/cancel + pause-aware drain for barge-in",
+            "feat(voice): Backoff — full-jitter exponential backoff for barge-in resume",
+            "Add Phase 2 plan: barge-in (feature-flagged)",
+            "Add NANO_CLAW_BARGE_IN feature flag to barge-in design",
+            "fix(voice): stream tool-continuation replies; flush chunker on tool interrupt; strip list numbers",
+            "fix(web): reset streaming bubble on turn end so replies don't leak across turns",
+            "feat(web): stream reply text into the chat log; docs for streaming",
+            "fix(voice): clean up audio state on mid-stream SSE error; use ws.closed guard",
+            "feat(voice): consume SSE from nano-claw, speak chunks as they stream",
+            "fix(voice): require whitespace after sentence punctuation so streamed decimals aren't split",
+            "feat(voice): TextChunker — eager first chunk, sentence chunks after",
+            "fix(api): fail loud on corrupt config; idempotent lazy init; no CLI-wide init leak",
+            "feat(api): stepLoopStream + SSE on /api/chat when Accept: text/event-stream",
+            "fix(api): UTF-8-safe SSE decoding, ProviderError parity, multi-chunk test",
+            "feat(api): Anthropic native streaming (parseAnthropicEvents + completeStream)",
+            "fix(api): completeStream routes identically to complete() (gateway/fallback parity)",
+            "feat(api): StreamEvent + completeStream fallback and routing",
+            "Add Phase 1 plan: streaming voice replies",
+            "Add design doc: streaming voice replies + barge-in",
+            "feat: auto-start Kokoro TTS service in run.sh; document voices",
+            "feat(web): voice picker with grades, preview, and speed slider",
+            "feat(voice): /api/voices, /api/preview, set_voice WS wiring",
+            "fix(tts): fall back to Piper on malformed Kokoro response; add router coverage",
+            "feat(tts): engine router — Kokoro dispatch with Piper fallback",
+            "feat(tts): combined voice catalog + Kokoro HTTP client (Docker side)",
+            "fix(tts): offload Kokoro synthesis to threadpool so /health stays responsive",
+            "feat(tts): native Kokoro-82M service (EN+ES) on port 8300",
+            "Pre-flight plan fixes: JS test runner + gitignore .venv-test",
+            "Add implementation plan: Kokoro TTS with voice selection",
+            "Add design doc: Kokoro-82M TTS with voice selection"
+          ]
+        },
+        {
+          "name": "github-portfolio-search",
+          "commits": 1,
+          "messages": [
+            "chore: regenerate L0 docs + daily digest [skip ci]"
+          ]
+        },
+        {
+          "name": "riff",
+          "commits": 30,
+          "messages": [
+            "Merge remote-tracking branch 'origin/main' into codex/supervisor-join-p0-p2",
+            "Merge remote-tracking branch 'origin/main' into codex/supervisor-join-p0-p2",
+            "Merge pull request #24 from davidbmar/phase1-node-env-split",
+            "config(routing): _routing.yaml FLOW-101 -> space_channel_widgets (dev twin, full parity restored)",
+            "config(registry): FLOW-101 is now the Space Channel dev twin (LIVE 2026-07-15)",
+            "Merge pull request #23 from davidbmar/phase1-node-env-split",
+            "feat(audio): space_channel_widgets joins the release-blocking coverage gate (C2C-010 #1)",
+            "feat(phone): per-environment parity projections (FLOW-101 §5.8, C2C-010 #3)",
+            "feat(phone): dev/prod data-isolation seams + prod-sentinel test (FLOW-101 §5.5, C2C-011 Q1)",
+            "feat(phone): (connection_id, DID) pair admission gate (FLOW-101 §5.6, C2C-011 Q2)",
+            "fix(ops): one shared fail-closed node-mode parser — supervisor split-brain (C2C-010 #4b)",
+            "docs(mailbox): add FLOW-101 delta review",
+            "docs(design): FLOW-101 dev twin v3 — fold in C2C-011 binding criteria",
+            "feat(skills): codex-mailbox — Claude↔Codex mailbox + CLI collaboration recipe",
+            "docs(design): FLOW-101 dev twin v2 — fold in Codex C2C-010 blockers 1-5",
+            "docs(mailbox): FX-190 verification reply + FLOW-101 dev-twin review exchange (CL2C-010/C2C-010)",
+            "docs(design): Space Channel dev twin on FLOW-101 (parallel dev, prod untouched)",
+            "fix(phone-node): let .env override RIFF_WEB_HOST for the web server",
+            "fix(space): importer carries the no-code-gate ruling + content refresh (FX-192 follow-up)",
+            "fix(tts): honor RIFF_PIPER_PYTHON in tts_server worker spawn",
+            "fix(intake): remove space-channel code gate + stamp locked-choice decisions (FX-191, FX-192)",
+            "chore(space): joke-of-the-day copy swap — regenerated WAVs + word timings",
+            "feat(phone): Phase 1 registry loader + parity-check gate (inert, pre-cutover)",
             "Merge pull request #22 from davidbmar/live-receptionist-console",
             "test(phone): make node-serving tests hermetic (Phase 0 fail-closed follow-up)",
             "feat(phone): Phase 0 close-out — durable-state migration-order + answered-event dedup",
             "feat(phone): Phase 0 — role-aware supervision (M1->customer-bot, M3->riff-phone)",
             "feat(phone): Phase 0 node hardening — role/mode fail-closed, admission gate, answer idempotency",
-            "docs(routing): dev/prod node-environment design + phone-line registry"
+            "docs(routing): dev/prod node-environment design + phone-line registry",
+            "fix(phone): gate supervisor talk on Telnyx marks (FX-190)"
           ]
         }
       ],
-      "commit_sig": "5097d9c130c96318"
+      "commit_sig": "03226a193e768b90"
     },
     {
       "date": "2026-07-14",
-      "headline": "Hands-Free Voice Loop Enables Natural Phone Conversations",
-      "summary": "A new hands-free phone conversation mode was added to the nano-claw project, integrating text-to-speech and speech-to-text in a continuous loop. Routine documentation updates were also performed for the portfolio search tool.",
+      "headline": "Hands-Free Phone Mode with AI Supervisor and PTT Controls",
+      "summary": "Implemented a hands-free phone conversation mode featuring browser-based supervisor listening and Push-to-Talk gestures. The update integrates Kokoro Bella for voice turns, routes logic through Whisper and Qwen, and stabilizes operator login and webhook readiness.",
       "takeaways": [
-        "Implement a voice interaction loop by chaining STT input directly into TTS output for seamless hands-free phone calls.",
-        "Automate daily documentation regeneration and digest creation using CI-skipped chore commits to keep project docs current without triggering builds."
+        "Implement hands-free voice loops by chaining STT (Whisper) and TTS (Kokoro Bella) with an LLM (Qwen) for real-time conversational routing.",
+        "Add browser-based Push-to-Talk (PTT) and supervisor listen modes to enable human-in-the-loop monitoring and gesture-controlled interaction.",
+        "Enforce webhook preflight checks and state restoration logic to prevent stalls during operator toggles and ensure reliable outbound probes."
       ],
-      "total_commits": 2,
+      "total_commits": 14,
       "repos": [
         {
           "name": "2026-nano-claw-voice-loop-tts-stt",
@@ -51,20 +180,38 @@
           "messages": [
             "chore: regenerate L0 docs + daily digest [skip ci]"
           ]
+        },
+        {
+          "name": "riff",
+          "commits": 12,
+          "messages": [
+            "docs(fixlog): record FX-189 live proof",
+            "fix(console): add operator login bootstrap (FX-189)",
+            "fix(console): restore AI after toggled operator talk (FX-188)",
+            "fix(console): protect Chrome PTT hold gesture (FX-187)",
+            "feat(phone): add browser supervisor listen and PTT (FX-186)",
+            "docs(fixlog): record FX-185 candidate readiness",
+            "fix(phone): commit LAW Qwen facts before stall (FX-185)",
+            "docs(fixlog): record Bella candidate warmup (FX-184)",
+            "feat(phone): use Kokoro Bella for LAW turns (FX-184)",
+            "fix(phone): repair LAW L5 routing and outbound probe (FX-182, FX-183)",
+            "feat(phone): route law turns through Whisper and Qwen (FX-181)",
+            "fix(phone): enforce webhook preflight and readiness (FX-180)"
+          ]
         }
       ],
-      "commit_sig": "cc90a80691bcb7cb"
+      "commit_sig": "db572909206e1bed"
     },
     {
       "date": "2026-07-13",
-      "headline": "Reuse-Aware Search Gates and Test-First Live Receptionist Console",
-      "summary": "Implemented a reuse-check workflow that intercepts build intent to surface existing tools, alongside a robust live receptionist console featuring hot-lead scoring and atomic state management. The system enforces quality through test-first development for authentication, call routing, and UI event handling.",
+      "headline": "Build Reuse Gates and Live Receptionist Console with Test-First Auth",
+      "summary": "Implemented a reuse-aware building system that intercepts development intent to check existing assets before coding, alongside a live receptionist console featuring real-time lead scoring and robust operator authentication. The work emphasizes test-first development for critical paths like session management, call state aggregation, and canary routing.",
       "takeaways": [
-        "Implement an 'ask-gate' hook that scans documentation (CLAUDE.md) before building to prevent redundant work and surface reusable components via LLMs.txt.",
-        "Use a BoundedFanout pattern with atomic register-and-snapshot handshakes to manage non-blocking console events and maintain consistent call state across adapters.",
-        "Apply test-first specs for critical infrastructure like operator auth sessions and caller-canary routing to ensure fail-closed security and reliable multi-call isolation."
+        "Implement a 'build-intent' hook that triggers a reuse check against a ledger of existing components, preventing redundant work by surfacing provenance before coding begins.",
+        "Use an atomic register-and-snapshot handshake pattern for managing live console sessions, ensuring consistent state across WebSocket reconnections and multi-call scenarios.",
+        "Apply test-first development to authentication flows by defining operator token specs and session stores before implementation, ensuring hashed-at-rest security and additive session logic."
       ],
-      "total_commits": 60,
+      "total_commits": 65,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -97,9 +244,11 @@
         },
         {
           "name": "riff",
-          "commits": 43,
+          "commits": 48,
           "messages": [
             "feat(console): compare streaming Whisper and Gemini (FX-179)",
+            "feat(console): compare streaming Whisper and Gemini (FX-179)",
+            "Merge remote-tracking branch 'origin/live-receptionist-console'",
             "feat(auth): operator login endpoint + additive session auth (B-3)",
             "test(auth): operator login endpoint + additive session auth (B-3, test-first)",
             "feat(auth): OperatorAuth — per-operator tokens + sessions, hashed at rest (B-3 core)",
@@ -110,7 +259,9 @@
             "feat(ops): console-deploy.sh — M1/M3 deployment menu + canary routing config",
             "feat(routing): flag-gated caller-canary node acceptance (my-number->M3)",
             "test(routing): caller-canary node acceptance gate (test-first)",
+            "Merge branch 'live-receptionist-console'",
             "feat(console): WS reconnect + visible stale state (review B-2)",
+            "Merge branch 'live-receptionist-console'",
             "docs(console): hot-lead banner + clean-UI evidence screenshots",
             "feat(console): hot-lead banner — surface the 'act now' signal in the UI (J-3)",
             "feat(console): compute hot-lead signal on each state, carry it in the frame (J-3)",
@@ -118,6 +269,7 @@
             "fix(console): secure live receptionist UI (FX-177)",
             "feat(console): hot-lead scorer — new+injured+unrepresented signal (J-3)",
             "test(console): hot-lead scorer spec (review J-3, test-first)",
+            "Merge branch 'live-receptionist-console'",
             "Merge remote-tracking branch 'origin/main' into live-receptionist-console",
             "feat(console): call-back API + button — server-resolved phone, fail-closed",
             "test(console): callback endpoint spec — server-resolved phone, fail-closed (test-first)",
@@ -145,7 +297,7 @@
           ]
         }
       ],
-      "commit_sig": "638fbce3318fda2d"
+      "commit_sig": "bf465121d710afac"
     },
     {
       "date": "2026-07-12",
@@ -1434,15 +1586,15 @@
     },
     {
       "date": "2026-07-01",
-      "headline": "Deterministic Voice Hub: Zero-Latency Routing and Flow Visualization",
-      "summary": "Replaced LLM-based routing with a deterministic state machine to eliminate post-utterance delays and implemented a visual flow map for IVR simulation. The update introduces barge-in capabilities, static audio prefetching for instant playback, and a comprehensive console for tracing call permutations.",
+      "headline": "Riff Adds Voice Barge-In, Corridor Simulation Traces, and Console Mockups",
+      "summary": "The Riff project introduces voice barge-in capabilities for interrupting menus and enhances simulation tooling with data-driven trace emitters. It also stabilizes the audio pump with critical fixes and adds a console corridor mockup for temporal projections.",
       "takeaways": [
-        "Implement deterministic routing hubs using locked choices instead of LLMs to eliminate latency and ensure predictable state transitions.",
-        "Prefetch and cache static audio assets (like goodbyes) by state to enable instant playback and remove call-time synthesis delays.",
-        "Build visual flow maps that render directly from YAML state diagrams to validate reachability and simulate user paths offline.",
-        "Enable 'barge-in' functionality by allowing user transcription to interrupt ongoing audio streams without waiting for turn completion."
+        "Implement voice barge-in by allowing users to speak over active menu briefings to trigger immediate interruptions.",
+        "Reuse the extracted _maybe_push_static_audio helper and regression tests to stabilize audio pumping logic in speech-to-bot systems.",
+        "Build data-driven simulations by emitting per-permutation traces (like Space Channel OD-M5) to validate complex state transitions.",
+        "Design console interfaces using a 'corridor' layout that projects past, present, and future states around a central cursor."
       ],
-      "total_commits": 57,
+      "total_commits": 11,
       "repos": [
         {
           "name": "github-portfolio-search",
@@ -1453,7 +1605,7 @@
         },
         {
           "name": "riff",
-          "commits": 56,
+          "commits": 10,
           "messages": [
             "feat(web): barge-in — speak over the menu/briefing to interrupt it",
             "fix(web): loop-back stalled at the re-announced menu — browser blocked the replay",
@@ -1464,57 +1616,11 @@
             "codex cleanup: fix trace null-token, sim collect-skip + audio source, DTMF check",
             "corridor: data-driven — replays real per-permutation §6 sim traces",
             "sim: §6 trace emitter per Space Channel permutation (OD-M5) + tests",
-            "console: L1 corridor mockup — past|now|next projection around a cursor (build step 2)",
-            "riffc: classify every speech_act — rigorous sweep found greet/act/inform/repair gaps",
-            "docs: companion-channel design v0 + render all 5 Console/Artifact docs to docs/html",
-            "riffc: emit {shape, edges, order} for the corridor layout + §6 trace fixture",
-            "docs: save Fable 5 corridor flow-map design v0 + Claude build plan",
-            "trace: the §6 event emitter — the universal call record (schema §9 step 1, part 1)",
-            "console: 'Walk the flow' — level-by-level drill-down tree explorer",
-            "console: operator console mockup — route-table + keypad + shared trace panel",
-            "riffc v0: pre-flow compiler, validation-only (schema §9 step 2)",
-            "docs: save Call-Plan Artifact & Trace Schema v0 (Fable 5 design) as design of record",
-            "docs: ground-truth flow fact sheet for the v0 artifact schema",
-            "docs: architecture questions for Fable 5 — deterministic flows, FSM UI, pre/flow/post",
-            "web: fix subflow loop-back stall — push static audio on arrival, dedupe by asset",
-            "flow map: ▶▶ Run all determinism view + hand-pan on the map",
-            "space channel: loop every subflow back to the MAIN MENU (re-announced)",
-            "voice: make the routing hub fully deterministic — locked_choice 1-8, no LLM",
-            "test: prove early voice route fires on user_transcription alone (no turn_complete)",
-            "voice: restore prior slot values (not blind-delete) on the required-tool peek revert",
-            "voice: eliminate the post-utterance delay — route deterministically at the hub",
-            "fix: latest-WAV fallback for ANY dynamic state (fixes launches silence) + all-options sim",
-            "fix(web voice): resolve flow voice+style (Umbriel), not default Achernar",
-            "fix(web voice): content briefing plays latest topic WAV (mirror phone fix)",
-            "fix(phone): the REAL live bug — trigger playback on voice transitions + play latest topic WAV",
-            "prerender the goodbye (sign_off) WAV — plays instantly, no call-time synth",
-            "plan model: goodbye is real now (sign_off), not 'planned'",
-            "goodbye: wire space_route_goodbye into triage (fix codex no-op finding)",
-            "feat(flow): goodbye exit — say 'goodbye'/'bye' or press 9 to sign off",
-            "direct-dial: defer required-tool routes to the menu (fix codex dead-air finding)",
-            "direct-dial: restrict router detection to dialogue states (no act/static/terminal)",
-            "feat(phone): welcome direct-dial — keypad digit at the routing hub jumps to the option",
-            "fix audio_harness content resolution (stale-helper, direct routing)",
-            "fix offline generators broken by direct routing (codex stale-helpers finding)",
-            "phone: graceful content-unavailable fallback (closes the console_not_ready regression)",
-            "plan model: drop the phantom fetch_space_content hop (codex finding)",
-            "fix(flow): route content picks DIRECTLY to the briefing — kill the Gemini improvise hop",
-            "map: offline click-through simulation (IVR Flow Studio sim mode)",
-            "refactor slice: per-route guards (Track A) + generalize map flow_id (Track B)",
-            "static_audio: add lookup_latest_by_state (prefetch design primitive)",
-            "plan: lock in prefetch/Design-1 — eliminate call-time fetch states",
-            "map: collapsible elements + descriptive state panel",
-            "map+test: reachability validation in the page + two-path acceptance test",
-            "add plan view alongside the YAML map view",
-            "map: render the real YAML state diagram (not a hand-built model)",
-            "call map: scope Play audio to this flow (fix welcome 'modular sandbox' WAV)",
-            "call map: bigger panel + independent Tree/Text zoom",
-            "flow: briefings loop back to the locked-choice hub instead of hanging up",
-            "call map: horizontal/vertical switcher, fit+zoom, per-state audio playback"
+            "console: L1 corridor mockup — past|now|next projection around a cursor (build step 2)"
           ]
         }
       ],
-      "commit_sig": "7c3f5427b4c5a420"
+      "commit_sig": "016c173e4672430c"
     },
     {
       "date": "2026-06-30",
