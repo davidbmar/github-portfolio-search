@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voxels.local/voice-director.schema.json",
+  "title": "Voxels Voice Director Command",
+  "description": "A tool-friendly command envelope for controlling conversational visual expression.",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "look",
+        "motion",
+        "light",
+        "expression",
+        "emotion",
+        "presence",
+        "cue",
+        "segment.start",
+        "segment.progress",
+        "segment.end",
+        "timeline.play",
+        "timeline.pause",
+        "timeline.resume",
+        "timeline.seek",
+        "timeline.stop",
+        "stream.open",
+        "stream.text",
+        "stream.audio",
+        "stream.close",
+        "state",
+        "capabilities"
+      ]
+    },
+    "id": { "type": "string" },
+    "emotion": {
+      "type": "string",
+      "enum": ["neutral", "calm", "curious", "confused", "warm", "joyful", "confident", "tense", "somber", "awe", "urgent"]
+    },
+    "presence": {
+      "type": "string",
+      "enum": ["idle", "listening", "silent", "thinking", "confused", "speaking", "paused"]
+    },
+    "intensity": { "type": "number", "minimum": 0, "maximum": 1 },
+    "durationMs": { "type": "number", "minimum": 0 },
+    "transitionMs": { "type": "number", "minimum": 0, "maximum": 30000 },
+    "progress": { "type": "number", "minimum": 0, "maximum": 1 },
+    "elapsedMs": { "type": "number", "minimum": 0 },
+    "text": { "type": "string" },
+    "emphasis": {
+      "type": "string",
+      "enum": ["subtle", "strong", "turn", "hush", "brighten", "flash", "strobe"]
+    },
+    "cue": {
+      "type": "string",
+      "enum": ["impact", "turn", "sweep", "flash", "strobe", "brighten", "hush"]
+    },
+    "cues": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/cue" }
+    },
+    "look": { "$ref": "#/$defs/look" },
+    "settings": { "$ref": "#/$defs/look" },
+    "axis": { "type": "string", "enum": ["x", "y", "z", "voice"] },
+    "speed": { "type": "number", "minimum": 0, "maximum": 1.2 },
+    "level": { "type": "number", "minimum": 0, "maximum": 1 },
+    "bands": {
+      "type": "array",
+      "items": { "type": "number", "minimum": 0, "maximum": 1 },
+      "minItems": 1
+    },
+    "segments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/segment" },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "look": {
+      "type": "object",
+      "properties": {
+        "pattern": { "type": "string", "enum": ["focus", "wave", "spectrum", "helix", "scan", "nebula"] },
+        "formation": { "type": "string", "enum": ["focus", "polygon", "octahedron", "cube"] },
+        "polygonSides": { "type": "integer", "enum": [3, 5, 8] },
+        "elementShape": { "type": "string", "enum": ["orb", "octagon", "diamond", "voxel"] },
+        "primary": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "secondary": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "energy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "response": { "type": "number", "minimum": 0, "maximum": 1 },
+        "speed": { "type": "number", "minimum": 0.08, "maximum": 1.4 },
+        "bloom": { "type": "number", "minimum": 0, "maximum": 1 },
+        "opacity": { "type": "number", "minimum": 0.08, "maximum": 1 },
+        "density": { "type": "number", "minimum": 0.2, "maximum": 1 },
+        "spread": { "type": "number", "minimum": 0.68, "maximum": 1.35 },
+        "rotationSpeed": { "type": "number", "minimum": 0, "maximum": 1.2 },
+        "rotationAxis": { "type": "string", "enum": ["x", "y", "z", "voice"] },
+        "autoRotate": { "type": "boolean" },
+        "showLinks": { "type": "boolean" },
+        "showFrame": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "cue": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["impact", "turn", "sweep", "flash", "strobe", "brighten", "hush"] },
+        "at": {
+          "oneOf": [
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "string", "enum": ["start", "early", "middle", "late", "end"] }
+          ]
+        },
+        "atMs": { "type": "number", "minimum": 0 },
+        "intensity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "durationMs": { "type": "number", "minimum": 0 },
+        "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "axis": { "type": "string", "enum": ["x", "y", "z", "voice"] },
+        "frequencyHz": { "type": "number", "minimum": 0.5, "maximum": 2.5 },
+        "pulses": { "type": "integer", "minimum": 1, "maximum": 6 }
+      },
+      "additionalProperties": true
+    },
+    "segment": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "startMs": { "type": "number", "minimum": 0 },
+        "durationMs": { "type": "number", "minimum": 250 },
+        "text": { "type": "string" },
+        "emotion": { "$ref": "#/properties/emotion" },
+        "presence": { "$ref": "#/properties/presence" },
+        "intensity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "transitionMs": { "type": "number", "minimum": 0 },
+        "look": { "$ref": "#/$defs/look" },
+        "cues": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/cue" }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
