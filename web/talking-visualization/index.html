@@ -9,8 +9,8 @@
       content="A voice-reactive 3D light constellation for expressive AI interfaces."
     />
     <title>Voxels — Spatial Voice</title>
-    <script type="module" crossorigin src="/talking-visualization/assets/index-BUV5ma1x.js"></script>
-    <link rel="stylesheet" crossorigin href="/talking-visualization/assets/index-CKhRYdHt.css">
+    <script type="module" crossorigin src="/talking-visualization/assets/index-BxPnR-by.js"></script>
+    <link rel="stylesheet" crossorigin href="/talking-visualization/assets/index-DrL3tTbw.css">
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -43,7 +43,7 @@
       <canvas id="voice-cube" aria-label="Interactive voice-reactive three-dimensional light formation"></canvas>
 
       <section class="stage-copy" aria-label="Visualization status">
-        <p class="eyebrow">VOICE FIELD <span>·</span> LENS MATRIX</p>
+        <p class="eyebrow">VOICE FIELD <span>·</span> OCTAHEDRON</p>
         <h1>See the shape<br />of a voice.</h1>
         <p class="stage-description">
           A spatial signal that thinks in color,<br />motion, and light.
@@ -96,10 +96,10 @@
         <section class="control-section">
           <div class="section-label">
             <span>Pattern</span>
-            <output id="pattern-output">Lens drift</output>
+            <output id="pattern-output">Voice wave</output>
           </div>
           <div class="pattern-grid" id="pattern-grid">
-            <button class="pattern" type="button" data-pattern="wave" aria-pressed="false">
+            <button class="pattern active" type="button" data-pattern="wave" aria-pressed="true">
               <svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12c5 0 5-8 10-8s5 16 10 16 5-16 10-16 5 8 14 8" /></svg>
               <span>Wave</span>
             </button>
@@ -107,7 +107,7 @@
               <svg viewBox="0 0 48 24" aria-hidden="true"><path d="M4 17v-5M10 20V6M16 16V9M22 21V3M28 17V7M34 20V11M40 16V5M46 18v-8" /></svg>
               <span>Spectrum</span>
             </button>
-            <button class="pattern active" type="button" data-pattern="focus" aria-pressed="true">
+            <button class="pattern" type="button" data-pattern="focus" aria-pressed="false">
               <svg viewBox="0 0 48 24" aria-hidden="true"><circle cx="8" cy="7" r="1" /><circle cx="16" cy="7" r="1.7" /><circle cx="24" cy="7" r="2.5" /><circle cx="32" cy="7" r="1.7" /><circle cx="40" cy="7" r="1" /><circle cx="8" cy="17" r="1" /><circle cx="16" cy="17" r="1.7" /><circle cx="24" cy="17" r="2.5" /><circle cx="32" cy="17" r="1.7" /><circle cx="40" cy="17" r="1" /></svg>
               <span>Lens</span>
             </button>
@@ -129,16 +129,16 @@
         <section class="control-section color-section">
           <div class="section-label">
             <span>Color field</span>
-            <output id="color-output">Electric blue</output>
+            <output id="color-output">Solar flare</output>
           </div>
           <div class="palette-row" id="palette-row">
-            <button class="palette active" type="button" data-palette="electric" data-primary="#43e7ff" data-secondary="#169fdf" aria-label="Electric blue" aria-pressed="true"><i></i></button>
+            <button class="palette" type="button" data-palette="electric" data-primary="#43e7ff" data-secondary="#169fdf" aria-label="Electric blue" aria-pressed="false"><i></i></button>
             <button class="palette" type="button" data-palette="aurora" data-primary="#52f5a8" data-secondary="#31d7ff" aria-label="Aurora" aria-pressed="false"><i></i></button>
             <button class="palette" type="button" data-palette="violet" data-primary="#d86cff" data-secondary="#715cff" aria-label="Ultraviolet" aria-pressed="false"><i></i></button>
-            <button class="palette" type="button" data-palette="sunset" data-primary="#ff775f" data-secondary="#ffca5c" aria-label="Solar flare" aria-pressed="false"><i></i></button>
+            <button class="palette active" type="button" data-palette="sunset" data-primary="#ff775f" data-secondary="#ffca5c" aria-label="Solar flare" aria-pressed="true"><i></i></button>
             <button class="palette" type="button" data-palette="mono" data-primary="#f4f7f8" data-secondary="#8da2ad" aria-label="Moonlight" aria-pressed="false"><i></i></button>
             <label class="custom-color" aria-label="Choose a custom primary color">
-              <input id="custom-color" type="color" value="#43e7ff" />
+              <input id="custom-color" type="color" value="#ff775f" />
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             </label>
           </div>
@@ -154,28 +154,28 @@
             <input id="response" data-setting="response" type="range" min="0" max="1" value="0.78" step="0.01" />
           </label>
           <label class="range-control">
-            <span>Motion speed <output for="speed">21%</output></span>
-            <input id="speed" data-setting="speed" type="range" min="0.08" max="1.4" value="0.36" step="0.01" />
+            <span>Motion speed <output for="speed">32%</output></span>
+            <input id="speed" data-setting="speed" type="range" min="0.08" max="1.4" value="0.5" step="0.01" />
           </label>
           <label class="range-control">
-            <span>Opacity <output for="opacity">68%</output></span>
-            <input id="opacity" data-setting="opacity" type="range" min="0.08" max="1" value="0.68" step="0.01" />
+            <span>Opacity <output for="opacity">70%</output></span>
+            <input id="opacity" data-setting="opacity" type="range" min="0.08" max="1" value="0.7" step="0.01" />
           </label>
           <label class="range-control">
-            <span>Visual density <output for="density">100%</output></span>
-            <input id="density" data-setting="density" type="range" min="0.2" max="1" value="1" step="0.01" />
+            <span>Visual density <output for="density">90%</output></span>
+            <input id="density" data-setting="density" type="range" min="0.2" max="1" value="0.9" step="0.01" />
           </label>
           <label class="range-control">
-            <span>Glow <output for="bloom">50%</output></span>
-            <input id="bloom" data-setting="bloom" type="range" min="0" max="1" value="0.5" step="0.01" />
+            <span>Glow <output for="bloom">48%</output></span>
+            <input id="bloom" data-setting="bloom" type="range" min="0" max="1" value="0.48" step="0.01" />
           </label>
           <label class="range-control">
-            <span>Element spacing <output for="spread">102%</output></span>
-            <input id="spread" data-setting="spread" type="range" min="0.68" max="1.35" value="1.02" step="0.01" />
+            <span>Element spacing <output for="spread">104%</output></span>
+            <input id="spread" data-setting="spread" type="range" min="0.68" max="1.35" value="1.04" step="0.01" />
           </label>
           <label class="range-control">
-            <span>Idle rotation <output for="rotationSpeed">13%</output></span>
-            <input id="rotation-speed" data-setting="rotationSpeed" type="range" min="0" max="1.2" value="0.16" step="0.01" />
+            <span>Idle rotation <output for="rotationSpeed">18%</output></span>
+            <input id="rotation-speed" data-setting="rotationSpeed" type="range" min="0" max="1.2" value="0.22" step="0.01" />
           </label>
         </section>
 
@@ -183,10 +183,10 @@
           <label class="select-control">
             <span>Scene</span>
             <select id="scene-preset" aria-label="Scene preset">
-              <option value="focus" selected>Lens field</option>
+              <option value="focus">Lens field</option>
               <option value="matrix">Halftone matrix</option>
               <option value="polygon">Polygon axes</option>
-              <option value="octahedron">Octahedron</option>
+              <option value="octahedron" selected>Octahedron</option>
               <option value="classic">Classic cube</option>
               <option value="custom">Custom</option>
             </select>
@@ -194,9 +194,9 @@
           <label class="select-control">
             <span>Formation</span>
             <select id="formation" aria-label="Overall formation">
-              <option value="focus" selected>Lens field</option>
+              <option value="focus">Lens field</option>
               <option value="polygon">Polygon axes</option>
-              <option value="octahedron">Octahedron</option>
+              <option value="octahedron" selected>Octahedron</option>
               <option value="cube">Cube</option>
             </select>
           </label>
@@ -212,16 +212,16 @@
             <span>Rotation axis</span>
             <select id="rotation-axis" aria-label="Automatic rotation axis">
               <option value="x">X · Tumble</option>
-              <option value="y" selected>Y · Orbit</option>
+              <option value="y">Y · Orbit</option>
               <option value="z">Z · Roll</option>
-              <option value="voice">Voice shift</option>
+              <option value="voice" selected>Voice shift</option>
             </select>
           </label>
           <label class="select-control">
             <span>Light shape</span>
             <select id="element-shape" aria-label="Individual light shape">
-              <option value="orb" selected>Soft orb</option>
-              <option value="octagon">Octagon</option>
+              <option value="orb">Soft orb</option>
+              <option value="octagon" selected>Octagon</option>
               <option value="diamond">Diamond</option>
               <option value="voxel">3D voxel</option>
             </select>
